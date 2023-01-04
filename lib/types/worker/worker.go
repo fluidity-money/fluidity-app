@@ -178,6 +178,7 @@ type (
 		Curve            float64 `json:"curve"`
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
+		Apeswap          float64 `json:"apeswap"`
 	}
 )
 

@@ -100,6 +100,9 @@ func init() {
 
 	sushiswapTests := unmarshalJsonTestOrFatal(integrationTestSushiswap)
 	tests = append(tests, sushiswapTests...)
+
+	apeswapTests := unmarshalJsonTestOrFatal(integrationTestApeSwap)
+	tests = append(tests, apeswapTests...)
 }
 
 func TestIntegrations(t *testing.T) {

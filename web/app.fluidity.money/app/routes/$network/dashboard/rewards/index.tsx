@@ -14,7 +14,6 @@ import {
 } from "~/util";
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
-import useViewport from "~/hooks/useViewport";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -26,7 +25,7 @@ import {
   ManualCarousel,
   trimAddress,
   LinkButton,
-  LoadingDots,
+  useViewport,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
@@ -105,6 +104,7 @@ const SAFE_DEFAULT: CacheData = {
   transactions: [],
   totalPrizePool: 0,
   page: 0,
+  loaded: false,
   fluidPairs: 0,
   networkFee: 0,
   gasFee: 0,
@@ -587,29 +587,20 @@ export default function Rewards() {
       </section>
 
       <section id="table">
-        {transactions.length === 0 ? (
-          <>
-            Fetching table data...
-            <div className="center-table-loading-anim loader-dots">
-              <LoadingDots />
-            </div>
-          </>
-        ) : (
-          <Table
-            itemName="rewards"
-            headings={txTableColumns}
-            pagination={{
-              page,
-              rowsPerPage: 12,
-            }}
-            count={count}
-            data={transactions}
-            renderRow={TransactionRow(network)}
-            filters={txTableFilters}
-            onFilter={setActiveTableFilterIndex}
-            activeFilterIndex={activeTableFilterIndex}
-          />
-        )}
+        <Table
+          itemName="rewards"
+          headings={txTableColumns}
+          pagination={{
+            page,
+            rowsPerPage: 12,
+          }}
+          count={count}
+          data={transactions}
+          renderRow={TransactionRow(network)}
+          filters={txTableFilters}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
+        />
       </section>
 
       {/* Highest Rewarders */}

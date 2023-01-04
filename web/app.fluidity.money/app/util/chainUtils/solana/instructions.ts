@@ -9,7 +9,7 @@ import {
 import { getATAAddressSync } from "@saberhq/token-utils";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { jsonPost } from "~/util";
-import { BN } from "bn.js";
+import BN from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
 import { TransactionResponse } from "../instructions";
@@ -35,7 +35,7 @@ export const getCheckedSolContext = () => {
   };
 };
 
-const getBalance = async (token: Token): Promise<number> => {
+const getBalance = async (token: Token): Promise<BN> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -51,7 +51,7 @@ const getBalance = async (token: Token): Promise<number> => {
     //balance of SOL represented as a TokenAmount
     if (token.name === "Solana") {
       const value = await connection.getBalance(publicKey);
-      return value;
+      return new BN(value);
 
       //otherwise balance of an SPL token
     } else {
@@ -60,7 +60,7 @@ const getBalance = async (token: Token): Promise<number> => {
         owner: publicKey,
       });
       const { value } = await connection.getTokenAccountBalance(ata);
-      return parseInt(value.toString());
+      return new BN(value.toString());
     }
   } catch (e) {
     throw new Error(
@@ -77,7 +77,7 @@ type UserMintLimitRes = {
   mint_limit: number;
 };
 
-const limit = async (tokenName: string): Promise<number> => {
+const limit = async (tokenName: string): Promise<BN> => {
   const url = "https://api.solana.fluidity.money/user-mint-limit";
   const body = {
     token_short_name: tokenName,
@@ -88,7 +88,7 @@ const limit = async (tokenName: string): Promise<number> => {
     body
   );
 
-  return response.mint_limit;
+  return new BN(response.mint_limit);
 };
 
 type UserAmountMintedReq = {
@@ -100,7 +100,7 @@ export type UserAmountMintedRes = {
   amount_minted: number;
 };
 
-const amountMinted = async (tokenName: string): Promise<number> => {
+const amountMinted = async (tokenName: string): Promise<BN> => {
   const solContext = getCheckedSolContext();
 
   if (solContext instanceof Error) {
@@ -120,7 +120,7 @@ const amountMinted = async (tokenName: string): Promise<number> => {
     body
   );
 
-  return response.amount_minted;
+  return new BN(response.amount_minted);
 };
 
 const internalSwap = async (

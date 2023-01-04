@@ -179,7 +179,6 @@ main > footer > section {
 
 .rainbow {
   position: relative;
-  z-index: 1;
   overflow: hidden;
   font-size: 15px;
   box-shadow: 0 0 8px 2px #f3b8d8;
@@ -272,6 +271,10 @@ main > footer > section > a {
   gap: 1em;
   width: fit-content;
   min-width: 340px;
+}
+
+.overlay > div:nth-child(3) {
+  justify-content: flex-end;
 }
 
 .transaction-filters {
@@ -568,6 +571,15 @@ main > footer > section > a {
   flex-direction: column;
 }
 
+.dropdown-options > ul {
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-options > ul > li {
+  list-style: none;
+}
+
 .token-option {
   display: flex;
   justify-content: space-between;
@@ -595,7 +607,7 @@ main > footer > section > a {
 .connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background-color: transparent;
   position: absolute;
   top: 0;
   left: 0;

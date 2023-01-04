@@ -2,6 +2,5 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import TabButton from "./TabButton";
-
-export default TabButton;
+import AttentionButton from "./AttentionButton";
+export default AttentionButton;

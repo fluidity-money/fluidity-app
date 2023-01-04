@@ -2,7 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import Script from "next/script";
 import { useEffect, useRef } from "react";
 import { isFirefox } from "react-device-detect";
 import styles from "./Video.module.scss";
@@ -13,7 +12,7 @@ interface IPropsVideo {
   loop: boolean;
   preload?: "none" | "metadata" | "auto";
   display?: "none" | "inline";
-  key?: string;
+  videoKey?: string;
   scale?: number;
   opacity?: number;
   margin? : string;
@@ -35,7 +34,7 @@ interface IPropsVideo {
 }
 
 export const Video = ({
-  key,
+  videoKey,
   src,
   type,
   mimeType = "video/mp4",
@@ -80,7 +79,7 @@ export const Video = ({
     <>
       <video
         ref={vidRef}
-        key={key}
+        key={videoKey}
         loop={loop}
         preload={preload}
         muted
