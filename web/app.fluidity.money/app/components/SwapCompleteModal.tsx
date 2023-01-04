@@ -1,6 +1,7 @@
 import type { Chain } from "~/util/chainUtils/chains";
 
 import Modal from "./Modal";
+import BN from "bn.js";
 import { ColorMap } from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,9 +15,14 @@ import {
   Heading,
   Text,
   numberToMonetaryString,
+  stringifiedNumberToMonetaryString,
 } from "@fluidity-money/surfing";
 import BloomEffect from "~/components/BloomEffect";
 import Video from "~/components/Video";
+import {
+  addDecimalToBn,
+  getUsdFromTokenAmount,
+} from "~/util/chainUtils/tokens";
 
 interface ISwapCompleteModalProps {
   visible: boolean;
@@ -25,7 +31,7 @@ interface ISwapCompleteModalProps {
   colorMap: ColorMap[string];
   assetToken: AugmentedToken;
   tokenPair: AugmentedToken;
-  amount: number;
+  amount: string;
   network: string;
   txHash: string;
   error: boolean;
@@ -45,7 +51,7 @@ const SwapCompleteModal = ({
 }: ISwapCompleteModalProps) => {
   const { balance, addToken } = useContext(FluidityFacadeContext);
 
-  const [walletBalance, setWalletBalance] = useState<number | undefined>();
+  const [walletBalance, setWalletBalance] = useState<BN | undefined>();
 
   const [playVideo, setPlayVideo] = useState(true);
 
@@ -142,13 +148,23 @@ const SwapCompleteModal = ({
             {confirmed && !error && (
               <>
                 <Heading as="h5">
-                  {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
-                  created and added to your wallet.
+                  {amount} {tokenPair.symbol} (
+                  {stringifiedNumberToMonetaryString(amount, 2)}) created and
+                  added to your wallet.
                 </Heading>
                 <Text>
-                  {walletBalance} {assetToken.symbol} (
-                  {numberToMonetaryString(walletBalance || 0)}) remaining in
-                  wallet..
+                  {addDecimalToBn(
+                    walletBalance || new BN(0),
+                    assetToken.decimals
+                  )}{" "}
+                  {assetToken.symbol} (
+                  {numberToMonetaryString(
+                    getUsdFromTokenAmount(
+                      walletBalance || new BN(0),
+                      assetToken
+                    )
+                  )}
+                  ) remaining in wallet..
                 </Text>
               </>
             )}
@@ -162,8 +178,9 @@ const SwapCompleteModal = ({
             {!confirmed && (
               <>
                 <Heading as="h5">
-                  {amount} {tokenPair.symbol} ({numberToMonetaryString(amount)})
-                  swapping and awaiting confirmation...
+                  {amount} {tokenPair.symbol} ($
+                  {stringifiedNumberToMonetaryString(amount, 2)}) swapping and
+                  awaiting confirmation...
                 </Heading>
                 <Text>We&apos;ll notify you when it&apos;s done!</Text>
               </>

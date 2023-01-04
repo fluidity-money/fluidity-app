@@ -3,15 +3,12 @@
 // LICENSE.md file.
 
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import { ReusableGrid } from "@fluidity-money/surfing";
+import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
-import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 
 const Use = () => {
   // to set order correct when in column layout
-  const { width } = useViewport();
-  const breakpoint = 860;
 
   const right =
   <HowItWorksTemplate header={header} info={info}>

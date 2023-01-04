@@ -5,7 +5,7 @@
 import { AppProps } from 'next/app';
 
 import { ApolloProvider } from "@apollo/client";
-import useViewport from "hooks/useViewport";
+import {useViewport} from '@fluidity-money/surfing';
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
 import { useEffect } from "react";
@@ -70,7 +70,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <ApolloProvider client={client}>
         <ChainContextProvider>
             <div className="App">
-              {width < breakpoint ? (<MobileNavBar />) : (<NavBar />)}
+              {width < breakpoint && width > 0 ? (<MobileNavBar />) : (<NavBar />)}
               <Component {...pageProps} />
             </div>
         </ChainContextProvider>
