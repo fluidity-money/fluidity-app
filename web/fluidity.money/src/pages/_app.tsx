@@ -4,9 +4,6 @@
 
 import { AppProps } from 'next/app';
 
-import Script from 'next/script';
-
-import { useEffect } from 'react';
 import { ApolloProvider } from "@apollo/client";
 import useViewport from "hooks/useViewport";
 import { ChainContextProvider } from "hooks/ChainContext";
@@ -51,6 +48,20 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.events])
 
+  useEffect(() => {
+    const script = document.createElement('script');
+    if (width >= breakpoint) {
+      script.src = "assets/gfx/renderer.js";
+      document.body.appendChild(script);
+    }
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    }
+  }, [width, breakpoint])
+
   return <>
     <div id={"fluid"} />
     <div id="shade" />
@@ -65,6 +76,5 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </ApolloProvider>
       <CookieConsent />
     </div>
-    <Script src='assets/gfx/renderer.js' strategy='lazyOnload' />
   </>
 }
