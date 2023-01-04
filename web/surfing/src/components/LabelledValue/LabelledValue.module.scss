@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  
+  > .value {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    > img, svg {
+      height: 1.2em;
+    }
+  }
+
+}
+
+.noPadding {
+  padding: 0;
+  margin: 0;
+}
+
