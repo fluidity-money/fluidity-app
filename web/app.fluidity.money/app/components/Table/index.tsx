@@ -43,6 +43,8 @@ type ITable<T> = {
   activeFilterIndex?: number;
 
   loaded?: boolean | undefined;
+
+  showLoadingAnimation?: boolean;
 };
 
 const Table = <T,>(props: ITable<T>) => {
@@ -57,6 +59,7 @@ const Table = <T,>(props: ITable<T>) => {
     onFilter,
     activeFilterIndex,
     loaded,
+    showLoadingAnimation = false,
   } = props;
 
   const { rowsPerPage, page } = pagination;
@@ -108,7 +111,7 @@ const Table = <T,>(props: ITable<T>) => {
           <>
             Fetching table data...
             <div className="center-table-loading-anim loader-dots">
-              {itemName === "rewards" && <LoadingDots />}
+              {showLoadingAnimation && <LoadingDots />}
             </div>
           </>
         ) : (

@@ -605,6 +605,7 @@ export default function Rewards() {
               ? userTransactionsData.data?.loaded
               : globalTransactionsData?.loaded
           }
+          showLoadingAnimation={true}
         />
       </section>
 
