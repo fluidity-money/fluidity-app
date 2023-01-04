@@ -80,6 +80,7 @@ const addDecimalToBn = (amount: BN, decimals: number) => {
   const dec = amount
     .toString()
     .slice(0 - decimals)
+    .padStart(decimals, "0")
     .replace(/0+$/, "");
 
   return !dec ? whole : `${whole}.${dec}`;
