@@ -2,7 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import Script from "next/script";
 import { useEffect, useRef } from "react";
 import { isFirefox } from "react-device-detect";
 import styles from "./Video.module.scss";

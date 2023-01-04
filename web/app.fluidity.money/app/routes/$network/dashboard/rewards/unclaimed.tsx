@@ -21,8 +21,8 @@ import {
   numberToMonetaryString,
   Text,
   trimAddress,
+  useViewport,
 } from "@fluidity-money/surfing";
-import useViewport from "~/hooks/useViewport";
 import { getBlockExplorerLink } from "~/util/chainUtils/links";
 
 export const unstable_shouldReload = () => false;
