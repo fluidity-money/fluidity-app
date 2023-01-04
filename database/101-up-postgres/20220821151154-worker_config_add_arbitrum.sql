@@ -6,7 +6,9 @@ INSERT INTO worker_config_ethereum (
 	default_seconds_since_last_block,
 	current_atx_transaction_margin,
 	default_transfers_in_block,
-	atx_buffer_size
+	atx_buffer_size,
+	spooler_instant_reward_threshold,
+	spooler_batched_reward_threshold
 )
 
 VALUES (
@@ -15,7 +17,9 @@ VALUES (
 	1,
 	0,
 	0,
-	30
+	30,
+	1,
+	1
 );
 
 -- migrate:down
