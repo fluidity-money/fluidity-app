@@ -19,6 +19,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const balancerSwapLogTopic = "0x2170c741c41531aec20e7c107c24eecfdd15e69c9bb0a8dd37b1840b9e0b207b"
+
 const balancerV2VaultAbiString = `[
 	 {
 	   "inputs": [
@@ -112,6 +114,15 @@ var balancerV2PoolAbi ethAbi.ABI
 // output token is the fluid token. This method generalises for Balancer's different pools
 // (stable, weighted, etc.)
 func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed")
+	}
+
+	topic := transfer.Log.Topics[0]
+
+	if topic.String() != balancerSwapLogTopic {
+		return nil, nil
+	}
 
 	if len(transfer.Log.Topics) != 4 {
 		return nil, fmt.Errorf(

@@ -1,5 +1,10 @@
 import type Transaction from "~/types/Transaction";
-import type { Winner } from "~/queries/useUserRewards";
+import {
+  PendingWinner,
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
+  Winner,
+} from "~/queries/useUserRewards";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
@@ -11,6 +16,7 @@ import {
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
+import { getTokenForNetwork } from "~/util";
 
 type UserTransaction = {
   sender: string;
@@ -25,6 +31,7 @@ export type TransactionsLoaderData = {
   transactions: Transaction[];
   page: number;
   count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -45,7 +52,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ? await useUserRewardsByAddress(network ?? "", address)
       : await useUserRewardsAll(network ?? "");
 
-    if (winnersErr || !winnersData) {
+    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
+      ? await useUserPendingRewardsByAddress(network ?? "", address)
+      : await useUserPendingRewardsAll(network ?? "");
+
+    if (
+      winnersErr ||
+      !winnersData ||
+      !pendingWinnersData ||
+      pendingWinnersErr
+    ) {
       throw winnersErr;
     }
 
@@ -55,47 +71,103 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         ...map,
         [winner.send_transaction_hash]: {
           ...winner,
-          winning_amount:
+          win_amount:
             winner.winning_amount +
-            (map[winner.send_transaction_hash]?.winning_amount || 0),
+            (map[winner.transaction_hash]?.winning_amount || 0),
         },
       }),
       {} as { [key: string]: Winner }
     );
 
+    // winnersMap looks up if a transaction was the send that caused a win
+    const pendingWinnersMap =
+      pendingWinnersData.ethereum_pending_winners.reduce(
+        (map, winner) => ({
+          ...map,
+          [winner.transaction_hash]: {
+            ...winner,
+            win_amount:
+              winner.win_amount +
+              (map[winner.transaction_hash]?.win_amount || 0),
+          },
+        }),
+        {} as { [key: string]: PendingWinner }
+      );
+
+    const jointWinnersMap = {
+      ...pendingWinnersMap,
+      ...winnersMap,
+    };
+
     // payoutsMap looks up if a transaction was a payout transaction
-    const payoutAddrs = winnersData.winners.map(
+    const winnersPayoutAddrs = winnersData.winners.map(
       ({ transaction_hash }) => transaction_hash
     );
 
-    const { data: userTransactionsData, errors: userTransactionsErr } =
-      await (async () => {
-        switch (true) {
-          case !!address:
-            return useUserTransactionsByAddress(
-              network,
-              page,
-              address as string,
-              payoutAddrs
-            );
-          default:
-            return useUserTransactionsAll(network, page, payoutAddrs);
-        }
-      })();
+    const pendingWinnersPayoutAddrs = winnersData.winners.map(
+      ({ transaction_hash }) => transaction_hash
+    );
 
-    if (!userTransactionsData || userTransactionsErr) {
-      captureException(
-        new Error(
-          `Could not fetch User Transactions for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
-        }
+    // Because every ethereum_pending_winners is present in winner
+    // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
+    const JointPayoutAddrs = [
+      ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
+    ];
+
+    const userTransactionsData = {
+      [network as string]: {
+        transfers: [],
+      },
+    };
+
+    // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
+    // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
+    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+      const { data: transactionsData, errors: transactionsErr } =
+        await (async () => {
+          switch (true) {
+            case !!address: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+              return useUserTransactionsByAddress(
+                network,
+                getTokenForNetwork(network),
+                page,
+                address as string,
+                JointPayoutAddrs.slice(i, i + 99),
+                limit === Infinity ? 12 : limit
+              );
+            }
+            default: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+              return useUserTransactionsAll(
+                network,
+                getTokenForNetwork(network),
+                page,
+                JointPayoutAddrs.slice(i, i + 99),
+                limit === Infinity ? 12 : limit
+              );
+            }
+          }
+        })();
+
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
       );
-
-      return new Error("Server could not fulfill request");
     }
 
     const {
@@ -156,25 +228,33 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           ? "out"
           : undefined;
 
-      const winner = winnersMap[tx.hash];
+      const winner = jointWinnersMap[tx.hash];
+      const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
 
       return {
         sender: tx.sender,
         receiver: tx.receiver,
-        winner: winner?.winning_address ?? "",
+        winner: isFromPendingWin
+          ? ((winner as PendingWinner)?.address as unknown as string)
+          : ((winner as Winner)?.winning_address as unknown as string) ?? "",
         reward: winner
-          ? winner.winning_amount / 10 ** winner.token_decimals
+          ? (isFromPendingWin
+              ? (winner as PendingWinner).win_amount
+              : (winner as Winner).winning_amount) /
+            10 ** winner.token_decimals
           : 0,
         hash: tx.hash,
-        rewardHash: winner?.transaction_hash ?? "",
+        rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
         currency: tx.currency,
         value: tx.value,
         timestamp: tx.timestamp,
         logo: tokenLogoMap[tx.currency] || defaultLogo,
         provider:
           (network === "ethereum"
-            ? winner?.ethereum_application
-            : winner?.solana_application) ?? "Fluidity",
+            ? !isFromPendingWin
+              ? (winner as Winner)?.ethereum_application
+              : (winner as Winner)?.solana_application
+            : "Fluidity") ?? "Fluidity",
         swapType,
       };
     });

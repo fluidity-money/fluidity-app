@@ -17,6 +17,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const curveTokenExchangeLogTopic = "0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140"
+
 const curveAbiString = `[
 {
 	"name": "TokenExchange",
@@ -89,6 +91,16 @@ var curveAbi ethAbi.ABI
 // GetCurveSwapFees calculates fees from Swapping TokenA and TokenB performed by a pool's exchange()
 // All tokens in a pool are stable relative to each other, so slippage and token exchange rates are negligible
 func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("Not enough log topics passed!")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != curveTokenExchangeLogTopic {
+		return nil, nil
+	}
+
 	unpacked, err := curveAbi.Unpack("TokenExchange", transfer.Log.Data)
 
 	if err != nil {

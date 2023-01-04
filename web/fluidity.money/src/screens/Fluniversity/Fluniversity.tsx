@@ -8,9 +8,9 @@ import {
   LinkButton,
   ManualCarousel,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./Fluniversity.module.scss";
-import useViewport from "hooks/useViewport";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 

@@ -89,13 +89,14 @@ func TestGetBalancerFees(t *testing.T) {
 		ethTypes.HashFromString(""),
 	}
 
-	// nil data fails
+	// nil data fails with no error (topics don't match)
 	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
-	assert.Error(t, err)
+	assert.Nil(t, err)
 	assert.Nil(t, fees)
 
 	// fluid -> other successful
 	transfer.Log.Data = *dataBlob
+	transfer.Log.Topics[0] = ethTypes.HashFromString(balancerSwapLogTopic)
 	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
 	assert.Equal(t, big.NewRat(25, 1), fees)

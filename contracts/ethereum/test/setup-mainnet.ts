@@ -56,6 +56,8 @@ before(async function () {
     toDeploy,
   );
 
+  console.log("signer" + tokenOperatorSigner)
+  console.log("addr" + await tokenOperatorSigner.getAddress())
   const { tokens } = await deployTokens(
     hre,
     toDeploy,

@@ -182,20 +182,20 @@ main {
 
 /* Track */
 .fluidify-tokens::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #888;
   border-radius: 6px;
 }
 
 /* Handle */
 .fluidify-tokens::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #555;
   border-radius: 6px;
   cursor: pointer;
 }
 
 /* Handle on hover */
 .fluidify-tokens::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #f1f1f1;
   cursor: pointer;
 }
 
@@ -402,7 +402,7 @@ main {
 .connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background-color: transparent;
   position: absolute;
   top: 0;
   left: 0;
@@ -1042,10 +1042,6 @@ main {
   .highest-rewarders {
     font-size: 2em;
   }
-
-  .provide-liquidity-left > div > h2 {
-    font-size: 2em;
-  }
 }
 
 @media (max-width: 900px) {
@@ -1064,12 +1060,6 @@ main {
 
   #provide-liquidity {
     padding-top: 0;
-  }
-
-  .provide-liquidity-left {
-    order: 1;
-    align-items: center;
-    text-align: center;
   }
 }
 

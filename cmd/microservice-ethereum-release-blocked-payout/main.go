@@ -17,78 +17,80 @@ import (
 )
 
 const (
-    // EnvBlockedPayoutPayload to read the payload sent in discord from
-    EnvBlockedPayoutPayload = `FLU_ETHEREUM_BLOCKED_PAYOUT_PAYLOAD`
+	// EnvBlockedPayoutPayload to read the payload sent in discord from
+	EnvBlockedPayoutPayload = `FLU_ETHEREUM_BLOCKED_PAYOUT_PAYLOAD`
 
-    // EnvShouldPayout to be set to `true` to release the payout,
-    // `false` to just acknowledge it
-    EnvShouldPayout = `FLU_ETHEREUM_PAYOUT`
+	// EnvShouldPayout to be set to `true` to release the payout,
+	// `false` to just acknowledge it
+	EnvShouldPayout = `FLU_ETHEREUM_PAYOUT`
 )
 
 func main() {
-    var (
-        payload    = util.GetEnvOrFatal(EnvBlockedPayoutPayload)
-        payout_    = util.GetEnvOrFatal(EnvShouldPayout)
+	var (
+		payload = util.GetEnvOrFatal(EnvBlockedPayoutPayload)
+		payout_ = util.GetEnvOrFatal(EnvShouldPayout)
 
-        payout     bool
-    )
+		payout bool
+	)
 
-    switch payout_ {
-        case "true":
-            payout = true
-        case "false":
-            payout = false
-        default:
-            log.Fatal(func (k *log.Log) {
-                k.Format(
-                    "Invalid value for %s %s - expected true or false!",
-                    EnvBlockedPayoutPayload,
-                    payout_,
-                )
-            })
-    }
+	switch payout_ {
+	case "true":
+		payout = true
+	case "false":
+		payout = false
+	default:
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Invalid value for %s %s - expected true or false!",
+				EnvBlockedPayoutPayload,
+				payout_,
+			)
+		})
+	}
 
-    var blockedReward winners.BlockedWinner
+	var blockedReward winners.BlockedWinner
 
-    err := json.Unmarshal([]byte(payload), &blockedReward)
+	err := json.Unmarshal([]byte(payload), &blockedReward)
 
-    if err != nil {
-        log.Fatal(func (k *log.Log) {
-            k.Message = "Failed to read a blocked reward payload from env!"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to read a blocked reward payload from env!"
+			k.Payload = err
+		})
+	}
 
-    var (
-        rewardHash_  = blockedReward.RewardTransactionHash
-        user_       = blockedReward.WinnerAddress
-        amount_     = blockedReward.WinningAmount
-        firstBlock_ = blockedReward.BatchFirstBlock
-        lastBlock_  = blockedReward.BatchLastBlock
+	var (
+		rewardHash_ = blockedReward.RewardTransactionHash
+		user_       = blockedReward.WinnerAddress
+		amount_     = blockedReward.WinningAmount
+		firstBlock_ = blockedReward.BatchFirstBlock
+		lastBlock_  = blockedReward.BatchLastBlock
 
-        amount     = &amount_.Int
-        firstBlock = &firstBlock_.Int
-        lastBlock  = &lastBlock_.Int
-    )
-    rewardHash := common.HexToHash(rewardHash_)
-    user := common.HexToAddress(user_)
+		amount     = &amount_.Int
+		firstBlock = &firstBlock_.Int
+		lastBlock  = &lastBlock_.Int
+	)
 
-    unblockCall, err := fluidity.FluidityContractAbi.Pack(
-        "unblockReward",
-        rewardHash,
-        user,
-        amount,
-        payout,
-        firstBlock,
-        lastBlock,
-    )
+	rewardHash := common.HexToHash(rewardHash_)
 
-    if err != nil {
-        log.Fatal(func (k *log.Log) {
-            k.Message = "Failed to encode an unblockReward call!"
-            k.Payload = err
-        })
-    }
+	user := common.HexToAddress(user_)
+
+	unblockCall, err := fluidity.FluidityContractAbi.Pack(
+		"unblockReward",
+		rewardHash,
+		user,
+		amount,
+		payout,
+		firstBlock,
+		lastBlock,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to encode an unblockReward call!"
+			k.Payload = err
+		})
+	}
 
 	fmt.Println(hexutil.Encode(unblockCall))
 }

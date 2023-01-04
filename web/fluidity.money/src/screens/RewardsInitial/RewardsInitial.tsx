@@ -8,11 +8,12 @@ import styles from "./RewardsInitial.module.scss";
 
 interface IProps {
   changeScreen: () => void;
+  carouselInfo: React.ReactNode[]
 }
 
-const RewardsInitial = ({ changeScreen }: IProps) => {
+const RewardsInitial = ({ changeScreen, carouselInfo }: IProps) => {
   const { apiState, chain } = useChainContext();
-	const { onChainData } = apiState;
+  const { onChainData } = apiState;
 
   const [prizePool, setPrizePool] = useState<number>(onChainData.data?.ethPool || 0);
 
@@ -42,7 +43,7 @@ const RewardsInitial = ({ changeScreen }: IProps) => {
           key={`${apiState.onChainData.loading}-${prizePool}`}
         />
         <div className={styles.rewardsBackground}>
-          <RewardsBackground />
+          <RewardsBackground carouselInfo={carouselInfo}/>
         </div>
       </motion.div>
     </AnimatePresence>

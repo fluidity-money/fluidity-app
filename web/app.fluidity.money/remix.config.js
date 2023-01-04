@@ -7,4 +7,5 @@ module.exports = {
     /^react-dnd-touch-backend.*/,
     "dnd-core",
   ],
+  ignoredRouteFiles: ["**/__tests__/**"],
 };

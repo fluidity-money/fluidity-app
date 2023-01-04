@@ -19,7 +19,6 @@ import {
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
-import useViewport from "~/hooks/useViewport";
 import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
 import {
@@ -31,6 +30,7 @@ import {
   ChainSelectorButton,
   BlockchainModal,
   numberToMonetaryString,
+  useViewport,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -512,13 +512,30 @@ export default function Dashboard() {
               <Text>Fluidity Money</Text>
             </a>
             {/* Terms */}
-            <a href={"/"}>
+            <a
+              href={
+                "https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+              }
+            >
               <Text>Terms</Text>
             </a>
 
             {/* Privacy Policy */}
-            <a href={"/"}>
+            <a
+              href={
+                "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+              }
+            >
               <Text>Privacy policy</Text>
+            </a>
+
+            {/* Audits Completed */}
+            <a
+              href={
+                "https://docs.fluidity.money/docs/security/audits-completed"
+              }
+            >
+              <Text>Audits Completed</Text>
             </a>
 
             {/* Roadmap */}

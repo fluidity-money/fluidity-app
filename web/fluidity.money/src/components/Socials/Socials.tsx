@@ -78,6 +78,8 @@ const Socials = () => {
           {repeatingSocials}
           {repeatingSocials}
           {repeatingSocials}
+          {repeatingSocials}
+          {repeatingSocials}
         </div>
       </ContinuousCarousel>
     </div>

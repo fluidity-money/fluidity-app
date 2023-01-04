@@ -141,6 +141,7 @@ export const deployTokens = async (
 
     await deployedToken.deployed();
 
+    console.log(`init ${operatorAddress}`)
     await deployedToken.functions.init(
       deployedPool.address,
       token.decimals,

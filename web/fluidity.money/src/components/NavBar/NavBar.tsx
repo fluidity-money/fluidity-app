@@ -4,9 +4,8 @@
 
 import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
-import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
+import { NavBarModal, Text, TriangleDown, useViewport } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 import { LaunchButton } from "components/Button";
 import Link from "next/link";
@@ -26,6 +25,7 @@ const NavBar = () => {
     appear: { y: 0 },
     disappear: { y: -100 },
   };
+  const windowObjDefined = typeof window !== 'undefined'
 
   return (
     <div className={styles.outerContainer}>
@@ -67,7 +67,7 @@ const NavBar = () => {
             <LaunchButton
               version={"secondary"}
               type={"text"}
-              size={width < breakpoint ? "small" : "medium"}
+              size={width < breakpoint && width > 0 ? "small" : "medium"}
             >
               LAUNCH FLUIDITY
             </LaunchButton>
@@ -89,7 +89,7 @@ const NavBar = () => {
                   >
                     <a
                       className={
-                        window.location.pathname.toString() === "/howitworks"
+                        (windowObjDefined && window.location.pathname.toString() === "/howitworks")
                           ? styles.active
                           : ""
                       }
@@ -103,7 +103,7 @@ const NavBar = () => {
                   <a
                     href={"/ecosystem"}
                     className={
-                      window.location.pathname.toString() === "/ecosystem"
+                      windowObjDefined && window.location.pathname.toString() === "/ecosystem"
                         ? styles.active
                         : ""
                     }
@@ -115,7 +115,7 @@ const NavBar = () => {
                   <a
                     href={"/fluidstats"}
                     className={
-                      window.location.pathname.toString() === "/fluidstats"
+                      windowObjDefined && window.location.pathname.toString() === "/fluidstats"
                         ? styles.active
                         : ""
                     }
@@ -131,7 +131,7 @@ const NavBar = () => {
                     <a
                       href={"/resources"}
                       className={
-                        window.location.pathname.toString() === "/resources"
+                       (windowObjDefined && window.location.pathname.toString() === "/resources")
                           ? styles.active
                           : ""
                       }
