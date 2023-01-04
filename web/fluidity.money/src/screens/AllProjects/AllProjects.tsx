@@ -3,7 +3,6 @@
 // LICENSE.md file.
 
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { FilterCriteria } from "@fluidity-money/surfing";
 import FluidProject from "../../components/FluidProject";
 import styles from "./AllProjects.module.scss";

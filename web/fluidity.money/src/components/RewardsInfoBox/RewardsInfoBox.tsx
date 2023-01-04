@@ -3,12 +3,12 @@
 // LICENSE.md file.
 import { Suspense, useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
   SupportedChains,
   Heading,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
@@ -92,6 +92,7 @@ const RewardsInfoBox = ({
                     height="70"
                     width="70"
                     src="assets/images/LoopAnim.webp"
+                    alt='loading'
                   />
                 )}
               </Suspense>
@@ -123,7 +124,7 @@ const RewardsInfoBox = ({
             className={styles.overlap}
             options={options}
             setOption={setChain}
-            mobile={width <= mobileBreakpoint}
+            mobile={width <= mobileBreakpoint && width > 0}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

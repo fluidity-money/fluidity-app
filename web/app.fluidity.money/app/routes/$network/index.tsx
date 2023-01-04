@@ -5,7 +5,6 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
-import useViewport from "~/hooks/useViewport";
 import { networkMapper } from "~/util";
 import { generateTweet } from "~/util/tweeter";
 import {
@@ -18,6 +17,7 @@ import {
   Twitter,
   numberToMonetaryString,
   LoadingDots,
+  useViewport,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import Video from "~/components/Video";
