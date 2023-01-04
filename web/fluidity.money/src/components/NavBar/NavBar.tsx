@@ -4,9 +4,8 @@
 
 import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
-import useViewport from "hooks/useViewport";
 import { useState } from "react";
-import { NavBarModal, Text, TriangleDown } from "@fluidity-money/surfing";
+import { NavBarModal, Text, TriangleDown, useViewport } from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 import { LaunchButton } from "components/Button";
 import Link from "next/link";

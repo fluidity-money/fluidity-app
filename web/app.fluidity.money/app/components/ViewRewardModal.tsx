@@ -7,9 +7,9 @@ import {
   Heading,
   LinkButton,
   Twitter,
+  useViewport,
 } from "@fluidity-money/surfing";
 import BloomEffect from "./BloomEffect";
-import useViewport from "~/hooks/useViewport";
 import { generateTweet } from "~/util/tweeter";
 
 interface IPropsConnectedWalletModal {

@@ -2,7 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import useViewport from "hooks/useViewport";
 import Socials from "../../components/Socials";
 import {
   ContinuousCarousel,
@@ -11,6 +10,7 @@ import {
   Text,
   Heading,
   LinkButton,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
 import { LaunchButton } from "components/Button";

@@ -2,9 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-
-import { LinkButton } from "@fluidity-money/surfing";
-import useViewport from "hooks/useViewport";
+import { LinkButton, useViewport } from "@fluidity-money/surfing";
 import Link from "next/link";
 import React from "react";
 import styles from "./FooterItem.module.scss";

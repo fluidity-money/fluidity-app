@@ -3,12 +3,12 @@
 // LICENSE.md file.
 import { Suspense, useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
   SupportedChains,
   Heading,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";

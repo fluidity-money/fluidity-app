@@ -2,8 +2,8 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Heading, Text } from "@fluidity-money/surfing";
-import useViewport from "hooks/useViewport";
+import { Heading, Text, useViewport } from "@fluidity-money/surfing";
+import React from "react";
 import styles from "./UseCase.module.scss";
 
 interface UseCaseProps {

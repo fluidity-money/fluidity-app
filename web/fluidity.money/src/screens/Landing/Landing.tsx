@@ -3,10 +3,9 @@
 // LICENSE.md file.
 
 import { useState } from "react";
-import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
+import { ContinuousCarousel, Heading, useViewport } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
-import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
 import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";

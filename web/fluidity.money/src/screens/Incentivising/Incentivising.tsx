@@ -2,9 +2,8 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Display, Heading } from "@fluidity-money/surfing";
+import { Display, Heading, useViewport } from "@fluidity-money/surfing";
 import Video from "components/Video";
-import useViewport from "hooks/useViewport";
 import { isFirefox } from "react-device-detect";
 import styles from "./Incentivising.module.scss";
 
