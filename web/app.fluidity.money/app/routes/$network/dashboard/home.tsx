@@ -207,6 +207,7 @@ const SAFE_DEFAULT: CacheData = {
   count: 0,
   network: "ethereum",
   transactions: [],
+  loaded: false,
   rewards: {
     day: [],
     week: [],
@@ -579,7 +580,7 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
@@ -626,13 +627,13 @@ export default function Home() {
               <div className="statistics-set">
                 <Text>Prize Pool</Text>
                 <Display
-                  size={width < 500 && width > 0 ? "xxs" : "xs"}
+                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(totalPrizePool)}
                 </Display>
               </div>
-              {activeTableFilterIndex === 0 && (
+              {activeTableFilterIndex === 0 ? (
                 <div className="statistics-set">
                   <Text>Total volume</Text>
                   <Display
@@ -642,32 +643,55 @@ export default function Home() {
                     {numberToMonetaryString(volume)}
                   </Display>
                 </div>
+              ) : (
+                <div className="statistics-set">
+                  <Text>Fluid assets</Text>
+                  <Display
+                    size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                    style={{ margin: 0 }}
+                  >
+                    {fluidPairs}
+                  </Display>
+                  <Link to={`/${network}/fluidify`}>
+                    <LinkButton
+                      size="medium"
+                      type="internal"
+                      handleClick={() => {
+                        return;
+                      }}
+                    >
+                      Create Assets
+                    </LinkButton>
+                  </Link>
+                </div>
               )}
             </div>
 
             {/* Column 3 */}
-            <div className="totals-column">
-              <div className="statistics-set">
-                <Text>Fluid assets</Text>
-                <Display
-                  size={width < 500 && width > 0 ? "xxxs" : "xxs"}
-                  style={{ margin: 0 }}
-                >
-                  {fluidPairs}
-                </Display>
-                <Link to={`/${network}/fluidify`}>
-                  <LinkButton
-                    size="medium"
-                    type="internal"
-                    handleClick={() => {
-                      return;
-                    }}
+            {activeTableFilterIndex === 0 && (
+              <div className="totals-column">
+                <div className="statistics-set">
+                  <Text>Fluid assets</Text>
+                  <Display
+                    size={width < 500 && width > 0 ? "xxxs" : "xxs"}
+                    style={{ margin: 0 }}
                   >
-                    Create Assets
-                  </LinkButton>
-                </Link>
+                    {fluidPairs}
+                  </Display>
+                  <Link to={`/${network}/fluidify`}>
+                    <LinkButton
+                      size="medium"
+                      type="internal"
+                      handleClick={() => {
+                        return;
+                      }}
+                    >
+                      Create Assets
+                    </LinkButton>
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
             {/* Fluid Pairs */}
           </div>
 

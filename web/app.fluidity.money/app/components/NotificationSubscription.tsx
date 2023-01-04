@@ -4,10 +4,11 @@ import { useNavigate } from "@remix-run/react";
 import { NotificationType, PipedTransaction } from "drivers/types";
 import { MintAddress } from "~/types/MintAddress";
 
-import { Token } from "~/util/chainUtils/tokens.js";
+import { addDecimalToBn, Token } from "~/util/chainUtils/tokens";
 import { ColorMap } from "~/webapp.config.server";
 import { getTxExplorerLink, trimAddress } from "~/util";
 import DSSocketManager from "~/util/client-connections";
+import BN from "bn.js";
 
 import { ToolTipContent, useToolTip } from "./ToolTip";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -91,7 +92,7 @@ export const NotificationSubscription = ({
       case NotificationType.ONCHAIN:
       default:
         if (sourceParseTrimAddress === mintLabel) {
-          return "successfully f͟l͟u͟i͟d͟i͟f͟i͟e͟d";
+          return "successfully m͟i͟n͟t͟e͟d";
         }
         if (destinationParseTrimAddress === mintLabel) {
           return "successfully r͟e͟v͟e͟r͟t͟e͟d";
@@ -105,6 +106,9 @@ export const NotificationSubscription = ({
 
   const handleClientListener = (payload: PipedTransaction) => {
     const _token = tokens.find((token) => token.symbol === payload.token);
+
+    // No matching token found
+    if (!_token) return payload;
 
     const imgUrl = _token?.logo;
     const tokenColour = colorMap[payload.token as unknown as string];
@@ -130,8 +134,10 @@ export const NotificationSubscription = ({
                 colour: tokenColour as unknown as string,
                 winAmount: payload.amount,
                 explorerUri: transactionUrl,
-                balance: String(
-                  await balance?.(_token?.address as unknown as string)
+                balance: addDecimalToBn(
+                  (await balance?.(_token?.address as unknown as string)) ||
+                    new BN(0),
+                  _token.decimals
                 ),
                 forSending: payload.rewardType === `send` ? true : false,
               })
@@ -158,7 +164,7 @@ export const NotificationSubscription = ({
           : undefined
       );
 
-      emitEvent(network, rawAddress as unknown as string);
+      emitEvent(network, rawAddress.toLowerCase() as unknown as string);
     }
   }, [rawAddress]);
 

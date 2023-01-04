@@ -31,6 +31,7 @@ export type TransactionsLoaderData = {
   transactions: Transaction[];
   page: number;
   count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -94,8 +95,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       );
 
     const jointWinnersMap = {
-      ...winnersMap,
       ...pendingWinnersMap,
+      ...winnersMap,
     };
 
     // payoutsMap looks up if a transaction was a payout transaction
@@ -107,9 +108,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ({ transaction_hash }) => transaction_hash
     );
 
-    const JointPayoutAddrs = winnersPayoutAddrs.concat(
-      pendingWinnersPayoutAddrs
-    );
+    // Because every ethereum_pending_winners is present in winner
+    // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
+    const JointPayoutAddrs = [
+      ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
+    ];
 
     const userTransactionsData = {
       [network as string]: {
@@ -124,23 +127,26 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         await (async () => {
           switch (true) {
             case !!address: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsByAddress(
                 network,
                 getTokenForNetwork(network),
                 page,
                 address as string,
                 JointPayoutAddrs.slice(i, i + 99),
-                12 / Math.ceil(JointPayoutAddrs.length / 100)
+                limit === Infinity ? 12 : limit
               );
             }
-            default:
+            default: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsAll(
                 network,
                 getTokenForNetwork(network),
                 page,
                 JointPayoutAddrs.slice(i, i + 99),
-                12 / Math.ceil(JointPayoutAddrs.length / 100)
+                limit === Infinity ? 12 : limit
               );
+            }
           }
         })();
 
@@ -181,6 +187,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         transactionsData[network as string].transfers
       );
     }
+
     const {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
@@ -270,14 +277,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       };
     });
 
-    const splitMergedTransactions = mergedTransactions.slice(
-      (page - 1) * 12,
-      page * 12
-    );
-
     return json({
       page,
-      transactions: splitMergedTransactions,
+      transactions: mergedTransactions,
       count: Object.keys(winnersMap).length,
     } as TransactionsLoaderData);
   } catch (err) {

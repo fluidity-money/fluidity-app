@@ -19,11 +19,13 @@ export const getBalanceOfERC20 = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-) => {
+): Promise<BN> => {
   const contract = getContract(ABI, contractAddress, signer);
-  if (!contract) return "0";
+  if (!contract) return new BN(0);
+
   const userAddress = await signer.getAddress();
-  return (await contract.balanceOf(userAddress)).toString();
+
+  return new BN((await contract.balanceOf(userAddress)).toString());
 };
 
 // get ERC20 balance for the given token, divided by its decimals
@@ -64,10 +66,10 @@ export const getUserMintLimit = async (
   provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
-): Promise<string> => {
+): Promise<BN> => {
   const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return "0";
-  return (await contract.userMintLimit()).toString();
+  if (!contract) return new BN(0);
+  return new BN((await contract.userMintLimit()).toString());
 };
 
 // the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
@@ -91,10 +93,11 @@ export const getAmountMinted = async (
   contractAddress: string,
   ABI: ContractInterface,
   userAddress: string
-): Promise<string> => {
+): Promise<BN> => {
   const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return "0";
-  return (await contract.userAmountMinted(userAddress)).toString();
+  if (!contract) return new BN(0);
+
+  return new BN((await contract.userAmountMinted(userAddress)).toString());
 };
 
 // the amount towards the mint limit the given user has currently minted scaled by decimals
