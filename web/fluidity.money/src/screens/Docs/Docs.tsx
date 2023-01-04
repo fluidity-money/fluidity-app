@@ -2,13 +2,10 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import {
   ContinuousCarousel,
   ManualCarousel,
   Heading,
-  Text,
   LinkButton,
   useViewport,
 } from "@fluidity-money/surfing";
@@ -52,7 +49,6 @@ const Docs = () => {
             <a href={item.link} rel="noopener noreferrer" target="_blank">
               <div key={index} className={styles.docsCard}>
                 <div className={styles.imgContainer}>
-                  {/* <img src={item.img} alt="carousel-object" /> */}
                   <span
                     role="img"
                     title="crystal ball"

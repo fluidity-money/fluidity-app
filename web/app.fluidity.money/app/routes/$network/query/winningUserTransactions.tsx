@@ -3,12 +3,15 @@ import type Transaction from "~/types/Transaction";
 import { LoaderFunction, json } from "@remix-run/node";
 import config from "~/webapp.config.server";
 import {
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
   useUserRewardsAll,
   useUserRewardsByAddress,
   useUserTransactionsByTxHash,
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
+import { Winner } from "~/queries/useUserRewards";
 
 type UserTransaction = {
   sender: string;
@@ -43,9 +46,43 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ? await useUserRewardsByAddress(network ?? "", address)
       : await useUserRewardsAll(network ?? "");
 
-    if (winnersErr || !winnersData) {
+    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
+      ? await useUserPendingRewardsByAddress(network ?? "", address)
+      : await useUserPendingRewardsAll(network ?? "");
+
+    if (
+      winnersErr ||
+      !winnersData ||
+      !pendingWinnersData ||
+      pendingWinnersErr
+    ) {
       throw winnersErr;
     }
+
+    const castPending: Winner[] =
+      pendingWinnersData.ethereum_pending_winners.map((pending_winner) => {
+        return {
+          network: pending_winner.network,
+          solana_winning_owner_address: null,
+          winning_address: pending_winner.address,
+          created: "",
+          transaction_hash: "",
+          send_transaction_hash: pending_winner.transaction_hash,
+          winning_amount: pending_winner.win_amount,
+          token_decimals: pending_winner.token_decimals,
+          ethereum_application: undefined,
+          solana_application: undefined,
+          reward_type: pending_winner.reward_type,
+          awarded_time: pending_winner.inserted_date,
+        };
+      });
+
+    winnersData.winners = castPending
+      .concat(winnersData.winners)
+      .sort(
+        (first, second) =>
+          Date.parse(second.awarded_time) - Date.parse(first.awarded_time)
+      );
 
     // winnersMap looks up if a transaction was the send that caused a win
     const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
@@ -54,13 +91,17 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ({ send_transaction_hash }) => send_transaction_hash
     );
 
-    // payoutsMap looks up if a transaction was a payout transaction
-    const payoutAddrs = winnersData.winners.map(
-      ({ transaction_hash }) => transaction_hash
-    );
+    const ethereumTokens = config.config["ethereum"].tokens
+      .filter((entry) => entry.isFluidOf !== undefined)
+      .map((entry) => entry.symbol);
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
-      await useUserTransactionsByTxHash(network, winnerAddrs, payoutAddrs);
+      await useUserTransactionsByTxHash(
+        network,
+        winnerAddrs,
+        [],
+        ethereumTokens
+      );
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -153,10 +194,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           winner: winner.winning_address ?? "",
           reward: winner.winning_amount / 10 ** winner.token_decimals,
           hash: tx.hash,
-          rewardHash: winner?.transaction_hash ?? "",
+          rewardHash:
+            winner.ethereum_application === undefined
+              ? ""
+              : winner?.transaction_hash ?? "",
           currency: tx.currency,
           value: tx.value,
-          timestamp: new Date(winner.created).getTime(),
+          timestamp: new Date(winner.awarded_time).getTime(),
           logo: tokenLogoMap[tx.currency] || defaultLogo,
           provider:
             (network === "ethereum"
@@ -170,6 +214,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       page,
       transactions: mergedTransactions,
       count: winnersData.winners.length,
+      loaded: true,
     } as TransactionsLoaderData);
   } catch (err) {
     captureException(

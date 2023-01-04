@@ -106,10 +106,6 @@ main > footer > section {
   opacity: 0.8;
 }
 
-/* .navbar-v2 {
-  
-} */
-
 .navbar-v2 li {
   display: flex;
   flex-direction: column;
@@ -183,7 +179,6 @@ main > footer > section {
 
 .rainbow {
   position: relative;
-  z-index: 0;
   overflow: hidden;
   font-size: 15px;
   box-shadow: 0 0 8px 2px #f3b8d8;
@@ -259,11 +254,27 @@ main > footer > section > a {
   text-underline-offset: 0.12em;
 }
 
-.totals-row {
+.totals-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.totals-column > div {
+  height: 82px;
+}
+
+.overlay {
   display: flex;
   flex-wrap: wrap;
-  gap: 2em;
-  margin-bottom: 1em;
+  flex-shrink: 1;
+  gap: 1em;
+  width: fit-content;
+  min-width: 340px;
+}
+
+.overlay > div:nth-child(3) {
+  justify-content: flex-end;
 }
 
 .transaction-filters {
@@ -560,6 +571,15 @@ main > footer > section > a {
   flex-direction: column;
 }
 
+.dropdown-options > ul {
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-options > ul > li {
+  list-style: none;
+}
+
 .token-option {
   display: flex;
   justify-content: space-between;
@@ -587,7 +607,7 @@ main > footer > section > a {
 .connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background-color: transparent;
   position: absolute;
   top: 0;
   left: 0;
@@ -1205,6 +1225,10 @@ main > footer > section > a {
 
   .transaction-filters {
     margin-bottom: 1em;
+  }
+
+  .totals-column > div {
+    height: 67.6px;
   }
 }
 

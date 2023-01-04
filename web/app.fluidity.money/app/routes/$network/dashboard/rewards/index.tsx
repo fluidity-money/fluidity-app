@@ -28,11 +28,17 @@ import {
   useViewport,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
-import { LabelledValue, ProviderCard, ProviderIcon } from "~/components";
+import {
+  LabelledValue,
+  ProviderCard,
+  ProviderIcon,
+  ToolTipContent,
+  useToolTip,
+} from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
-import config from "~/webapp.config.server";
+import config, { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
 
 export const links: LinksFunction = () => {
@@ -53,6 +59,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     network,
     icons,
     page: txTablePage,
+    colors: (await colors)[network as string],
   });
 };
 
@@ -60,6 +67,9 @@ type LoaderData = {
   network: Chain;
   icons: { [provider: string]: string };
   page: number;
+  colors: {
+    [symbol: string]: string;
+  };
 };
 
 function ErrorBoundary() {
@@ -94,6 +104,7 @@ const SAFE_DEFAULT: CacheData = {
   transactions: [],
   totalPrizePool: 0,
   page: 0,
+  loaded: false,
   fluidPairs: 0,
   networkFee: 0,
   gasFee: 0,
@@ -114,7 +125,7 @@ const SAFE_DEFAULT: CacheData = {
 };
 
 export default function Rewards() {
-  const { network, page } = useLoaderData<LoaderData>();
+  const { network, page, colors } = useLoaderData<LoaderData>();
 
   const { data: rewardsData } = useCache<RewardsLoaderData>(
     `/${network}/query/dashboard/rewards`
@@ -341,7 +352,37 @@ export default function Rewards() {
 
   const TransactionRow = (chain: Chain): IRow<Transaction> =>
     function Row({ data, index }: { data: Transaction; index: number }) {
-      const { winner, timestamp, value, reward, hash, rewardHash, logo } = data;
+      const {
+        winner,
+        timestamp,
+        value,
+        reward,
+        hash,
+        rewardHash,
+        logo,
+        currency,
+      } = data;
+
+      const toolTip = useToolTip();
+
+      const handleRewardTransactionClick = (
+        network: Chain,
+        currency: string,
+        logo: string,
+        hash: string
+      ) => {
+        hash && window.open(getTxExplorerLink(network, hash), "_blank");
+
+        !hash &&
+          toolTip.open(
+            colors[currency as unknown as string],
+            <ToolTipContent
+              tokenLogoSrc={logo}
+              boldTitle={``}
+              details={"⏳ This reward claim is still pending! ⏳"}
+            />
+          );
+      };
 
       return (
         <motion.tr
@@ -384,7 +425,14 @@ export default function Rewards() {
             {reward ? (
               <a
                 className="table-address"
-                href={getTxExplorerLink(network, rewardHash)}
+                onClick={() =>
+                  handleRewardTransactionClick(
+                    network,
+                    currency,
+                    logo,
+                    rewardHash
+                  )
+                }
               >
                 <Text prominent={true}>
                   {reward ? numberToMonetaryString(reward) : "-"}

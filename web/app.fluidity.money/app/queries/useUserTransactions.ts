@@ -92,12 +92,14 @@ const queryByTxHash: Queryable = {
     query getTransactionsByTxHash(
       $transactions: [String!]
       $filterHashes: [String!] = []
+      $tokens: [String!] = []
       $limit: Int = 12
     ) {
       ethereum {
         transfers(
           options: { desc: "block.timestamp.unixtime", limit: $limit }
           txHash: { in: $transactions }
+          currency: { in: $tokens }
         ) {
           sender {
             address
@@ -318,11 +320,13 @@ const useUserTransactionsByTxHash = async (
   network: string,
   transactions: string[],
   filterHashes: string[],
+  tokens: string[],
   limit = 12
 ) => {
   const variables = {
     transactions,
     filterHashes,
+    tokens,
     limit,
   };
 

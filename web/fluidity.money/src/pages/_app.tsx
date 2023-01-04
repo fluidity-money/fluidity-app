@@ -58,7 +58,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <ApolloProvider client={client}>
         <ChainContextProvider>
             <div className="App">
-              {width < breakpoint ? (<MobileNavBar />) : (<NavBar />)}
+              {width < breakpoint && width > 0 ? (<MobileNavBar />) : (<NavBar />)}
               <Component {...pageProps} />
             </div>
         </ChainContextProvider>

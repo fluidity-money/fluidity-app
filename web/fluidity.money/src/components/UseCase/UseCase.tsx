@@ -3,7 +3,6 @@
 // LICENSE.md file.
 
 import { Heading, Text, useViewport } from "@fluidity-money/surfing";
-import { motion } from "framer-motion";
 import React from "react";
 import styles from "./UseCase.module.scss";
 
@@ -22,7 +21,7 @@ const UseCase = ({ useCase }: UseCaseProps) => {
         <img src={useCase.img} alt="text representation" />
         <div className={styles.text}>
           <Heading as="h3">{useCase.title}</Heading>
-          <Text as="p" size={width < 500 ? "sm" : "lg"}>
+          <Text as="p" size={width < 500 && width > 0 ? "sm" : "lg"}>
             {useCase.info}
           </Text>
         </div>

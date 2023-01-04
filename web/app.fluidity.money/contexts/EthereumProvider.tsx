@@ -4,6 +4,7 @@ import type { Connector } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
+import BN from "bn.js";
 import { useMemo, useEffect } from "react";
 import {
   useWeb3React,
@@ -17,14 +18,14 @@ import FluidityFacadeContext from "./FluidityFacade";
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import {
   getTotalPrizePool,
-  getUsdUserMintLimit,
+  getUserMintLimit,
   userMintLimitEnabled,
   manualRewardToken,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
-  getUsdAmountMinted,
-  usdBalanceOfERC20,
+  getAmountMinted,
+  getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
@@ -52,13 +53,15 @@ const EthereumFacade = ({
     });
   }, []);
 
-  const getBalance = async (contractAddress: string): Promise<number> => {
+  const getBalance = async (
+    contractAddress: string
+  ): Promise<BN | undefined> => {
     const signer = provider?.getSigner();
     if (!signer) {
-      return 0;
+      return;
     }
 
-    return await usdBalanceOfERC20(signer, contractAddress, tokenAbi);
+    return await getBalanceOfERC20(signer, contractAddress, tokenAbi);
   };
 
   // find and activate corresponding connector
@@ -97,7 +100,7 @@ const EthereumFacade = ({
   };
 
   // the per-user mint limit for the contract
-  const limit = async (contractAddress: string): Promise<number | undefined> => {
+  const limit = async (contractAddress: string): Promise<BN | undefined> => {
     const signer = provider?.getSigner();
     if (!signer) {
       return;
@@ -106,28 +109,23 @@ const EthereumFacade = ({
     const isEnabled = await userMintLimitEnabled(
       signer.provider,
       contractAddress,
-      tokenAbi,
+      tokenAbi
     );
 
-    if (!isEnabled)
-      return;
+    if (!isEnabled) return;
 
-    return await getUsdUserMintLimit(
-      signer.provider,
-      contractAddress,
-      tokenAbi,
-    );
+    return await getUserMintLimit(signer.provider, contractAddress, tokenAbi);
   };
 
   // the user's minted amount towards the per-user total
   // call with a fluid token
-  const amountMinted = async (contractAddress: string): Promise<number> => {
+  const amountMinted = async (contractAddress: string): Promise<BN> => {
     const signer = provider?.getSigner();
     if (!signer) {
-      return 0;
+      return new BN(0);
     }
 
-    return await getUsdAmountMinted(
+    return await getAmountMinted(
       signer.provider,
       contractAddress,
       tokenAbi,
@@ -262,11 +260,15 @@ const EthereumFacade = ({
       .filter((t) => !!t.isFluidOf)
       .map((t) => t.address);
 
-    const fluidTokenBalances: [string, number][] = await Promise.all(
+    const fluidTokenBalances: [string, BN | undefined][] = await Promise.all(
       fluidTokenAddrs.map(async (addr) => [addr, await getBalance(addr)])
     );
 
-    return fluidTokenBalances.filter((token) => token[1]).map(([addr]) => addr);
+    const ZERO = new BN(0);
+
+    return fluidTokenBalances
+      .filter((token) => token[1]?.gt(ZERO))
+      .map(([addr]) => addr);
   };
 
   return (

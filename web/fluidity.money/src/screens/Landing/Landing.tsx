@@ -22,7 +22,7 @@ const Landing = () => {
   const [state, setState] = useState({
     src: vidSources[0],
     mimeType: type,
-    key: "0",
+    key: "video-0",
     loop: true,
     scale: isFirefox ? 1 : 0.5,
   });
@@ -55,7 +55,7 @@ const Landing = () => {
               type={"reduce"}
               mimeType={state.mimeType}
               loop={state.loop}
-              key={state.key}
+              videoKey={state.key}
               scale={state.scale}
               margin={"-60px 0 0 0"}
               width={'65%'}
@@ -66,7 +66,7 @@ const Landing = () => {
               type={"reduce"}
               mimeType={state.mimeType}
               loop={state.loop}
-              key={state.key}
+              videoKey={state.key}
               scale={state.scale * 2}
               margin={"-400px 0 0 0"}
             />
@@ -77,7 +77,7 @@ const Landing = () => {
       </motion.div>
       {/* Hero animation */}
       <motion.div className={styles.content}>
-        {width < breakpoint ? (
+        {width < breakpoint && width > 0 ? (
           <motion.div
             initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -101,7 +101,7 @@ const Landing = () => {
           </motion.div>
         )}
         <div className={styles.tiles}>
-          {width < breakpoint && (
+          {width < breakpoint && width > 0 && (
             <motion.div
               className={styles.video}
               initial={{ y: -150, scale: 1 }}
@@ -147,25 +147,25 @@ const Landing = () => {
             initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 1, type: "tween" }}
-            className={width < breakpoint ? styles.left : styles.right}
+            className={width < breakpoint && width > 0 ? styles.left : styles.right}
           >
             <IntroTile
               img={"/assets/images/landingIcons/expectedOutcome.png"}
-              side={width < breakpoint ? "left" : "right"}
+              side={width < breakpoint && width > 0 ? "left" : "right"}
             >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/forReceivers.png"}
-              side={width < breakpoint ? "left" : "right"}
+              side={width < breakpoint && width > 0 ? "left" : "right"}
             >
               Rewards can range from cents
               <br /> to millions
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/scalingEcosystem.png"}
-              side={width < breakpoint ? "left" : "right"}
+              side={width < breakpoint && width > 0 ? "left" : "right"}
             >
               Scaling ecosystem
             </IntroTile>

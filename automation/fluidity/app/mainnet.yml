@@ -6,7 +6,7 @@ SERVICES:
       CPU_LIMIT: 512
       MEM_LIMIT: 1024
       DEPLOYMENT_TYPE: CODEDEPLOY
-      CODEDEPLOY_WAIT_TIME: 30 #minutes
+      CODEDEPLOY_WAIT_TIME: 60 #minutes
       LOAD_BALANCER: flu-mainnet-app-fluidity-alb
       TARGET_GROUP_01: flu-mainnet-app-fluidity-fe-tg 
       TARGET_GROUP_02: flu-mainnet-app-fluidity-fe-tg-1

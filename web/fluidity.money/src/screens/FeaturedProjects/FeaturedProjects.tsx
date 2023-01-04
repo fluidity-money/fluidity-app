@@ -2,8 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import styles from "./FeaturedProjects.module.scss";
 
 const FeaturedProjects = () => {

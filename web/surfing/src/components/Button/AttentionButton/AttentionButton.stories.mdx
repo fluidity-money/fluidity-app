@@ -1,0 +1,57 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import AttentionButton from "./AttentionButton";
+
+<Meta 
+    title="Button/Attention Button"
+    component={AttentionButton}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+        }
+    }}
+/>
+
+export const Template = ({children, ...props}) => <AttentionButton {...props}>
+    {children}
+</AttentionButton>;
+
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Attention Button</Title>
+    <Subtitle>Button to grab users attention</Subtitle>
+    
+    <h2>Default</h2>
+    <Story
+        name="Attention Button Default"
+        args={{
+            children: "FLUIDIFY MONEY",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Hover</h2>
+    <Story
+        name="Attention Button Hover"
+        args={{
+            className: "hover",
+            children: "FLUIDIFY MONEY",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+    <h2>Button Focus</h2>
+    <Story
+        name="Attention Button Focus"
+        args={{
+            className: "focus",
+            children: "FLUIDIFY MONEY",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+</Canvas>

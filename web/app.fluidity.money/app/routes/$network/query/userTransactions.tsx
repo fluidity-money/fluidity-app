@@ -31,6 +31,7 @@ export type TransactionsLoaderData = {
   transactions: Transaction[];
   page: number;
   count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -94,8 +95,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       );
 
     const jointWinnersMap = {
-      ...winnersMap,
       ...pendingWinnersMap,
+      ...winnersMap,
     };
 
     // payoutsMap looks up if a transaction was a payout transaction
@@ -107,44 +108,84 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ({ transaction_hash }) => transaction_hash
     );
 
-    const JointPayoutAddrs = winnersPayoutAddrs.concat(
-      pendingWinnersPayoutAddrs
-    );
+    // Because every ethereum_pending_winners is present in winner
+    // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
+    const JointPayoutAddrs = [
+      ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
+    ];
 
-    const { data: userTransactionsData, errors: userTransactionsErr } =
-      await (async () => {
-        switch (true) {
-          case !!address:
-            return useUserTransactionsByAddress(
-              network,
-              getTokenForNetwork(network),
-              page,
-              address as string,
-              JointPayoutAddrs
-            );
-          default:
-            return useUserTransactionsAll(
-              network,
-              getTokenForNetwork(network),
-              page,
-              JointPayoutAddrs
-            );
-        }
-      })();
+    const userTransactionsData = {
+      [network as string]: {
+        transfers: [],
+      },
+    };
 
-    if (!userTransactionsData || userTransactionsErr) {
-      captureException(
-        new Error(
-          `Could not fetch User Transactions for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
-        }
+    // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
+    // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
+    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+      const { data: transactionsData, errors: transactionsErr } =
+        await (async () => {
+          switch (true) {
+            case !!address: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+              return useUserTransactionsByAddress(
+                network,
+                getTokenForNetwork(network),
+                page,
+                address as string,
+                JointPayoutAddrs.slice(i, i + 99),
+                limit === Infinity ? 12 : limit
+              );
+            }
+            default: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+              return useUserTransactionsAll(
+                network,
+                getTokenForNetwork(network),
+                page,
+                JointPayoutAddrs.slice(i, i + 99),
+                limit === Infinity ? 12 : limit
+              );
+            }
+          }
+        })();
+
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
       );
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
 
-      return new Error("Server could not fulfill request");
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
+      );
     }
 
     const {

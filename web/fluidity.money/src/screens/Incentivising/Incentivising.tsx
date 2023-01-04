@@ -13,7 +13,7 @@ const Incentivising = () => {
 
   return (
     <div className={styles.container}>
-      {width <= breakpoint ? (
+      {width <= breakpoint && width > 0 ? (
       <Video
         src={"/assets/videos/FluidityHowItWorks.mp4"}
         type={"reduce"}
@@ -35,13 +35,13 @@ const Incentivising = () => {
         <br />
         <Display
           className={styles.backgroundText}
-          size={width > breakpoint ? "lg" : "sm"}
+          size={width < breakpoint && width > 0 ? "sm" : "lg"}
         >
           Incentivising
         </Display>
         <Display
           className={styles.backgroundText}
-          size={width > breakpoint ? "lg" : "sm"}
+          size={width < breakpoint && width > 0 ? "sm" : "lg"}
         >
           blockchain utility
         </Display>
