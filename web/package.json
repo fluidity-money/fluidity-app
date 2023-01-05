@@ -1,20 +1,28 @@
 {
-    "name": "@fluidity-money/fluidity-monorepo",
-    "version": "1.0.0",
-    "workspaces": [
-        "app.fluidity.money",
-        "fluidity.money",
-        "surfing"
-    ],
-    "dependencies": {
-        "turbo": "^1.6.3"
-    },
-    "scripts": {
-        "build": "turbo build",
-        "dev": "turbo dev",
-        "start": "turbo start",
-        "lint": "turbo lint",
-        "format": "turbo format",
-        "test": "turbo test"
-    }
+  "name": "@fluidity-money/fluidity-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "app.fluidity.money",
+    "fluidity.money",
+    "surfing"
+  ],
+  "dependencies": {
+    "prettier": "^2.8.1",
+    "turbo": "^1.6.3"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "start": "turbo start",
+    "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
+    "test": "turbo test",
+    "storybook": "turbo storybook"
+  },
+  "packageManager": "npm@9.2.0",
+  "devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "webpack": "^5.75.0"
+  }
 }

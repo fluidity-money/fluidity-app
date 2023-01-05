@@ -14,7 +14,7 @@ import { Integrations } from "@sentry/tracing";
 import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
-import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
+// import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import cookieConsentUrl from "./components/CookieConsent/CookieConsent.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
@@ -93,7 +93,7 @@ export const links = () => {
     { rel: "theme-color", content: "#000000" },
 
     { rel: "stylesheet", href: globalStylesheetUrl },
-    { rel: "stylesheet", href: surfingStylesheetUrl },
+    //    { rel: "stylesheet", href: surfingStylesheetUrl },
     { rel: "stylesheet", href: cookieConsentUrl },
   ];
 };

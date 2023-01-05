@@ -13,7 +13,7 @@ const httpLink = new HttpLink({
 
 const wsLink = new GraphQLWsLink(createClient({
     url: 'wss://fluidity.hasura.app/v1/graphql',
-    webSocketImpl: typeof window !== "undefined" ? WebSocket : ws,
+    webSocketImpl: typeof window !== "undefined" ? WebSocket : (await (import("ws"))).default,
 }))
 
 const splitLink = split(

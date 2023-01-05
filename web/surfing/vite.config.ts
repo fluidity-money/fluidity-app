@@ -32,7 +32,7 @@ export default defineConfig({
       name: "Surfing",
       // the proper extensions will be added
       fileName: "surfing",
-      formats: ["es"], // UMD/CJS isn't the way forward, so no we support only ES modules.
+      formats: ["es", "cjs"],
     },
     emptyOutDir: false,
     rollupOptions: {

@@ -1,4 +1,4 @@
-const { create } = require('@storybook/theming');
+import { create } from '@storybook/theming/create';
 
 export default create({
   base: 'dark',
@@ -6,4 +6,5 @@ export default create({
   brandUrl: 'https://fluidity.money',
   brandImage: '/logo.svg',
   brandTarget: '_self',
+  colorPrimary: 'hotpink',
 });

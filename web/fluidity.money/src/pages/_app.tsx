@@ -14,7 +14,6 @@ import { client } from "data/apolloClient";
 
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
-import "@fluidity-money/surfing/dist/style.css";
 import "styles/app.global.scss"
 import CookieConsent from 'components/CookieConsent/CookieConsent';
 import { useRouter } from 'next/router';

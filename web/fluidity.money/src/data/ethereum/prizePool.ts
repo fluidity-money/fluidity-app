@@ -81,7 +81,7 @@ export const getEthTotalPrizePool = async (): Promise<number> => {
       return sum.add(amountDiv);
     }, new BN(0));
 
-    return totalPrizePool;
+    return totalPrizePool.toNumber();
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return 0;
