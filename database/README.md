@@ -6,25 +6,17 @@ REQUIRES DBmate for migrations / initialization
 
 ## Guidelines to follow
 
-- All files/folders start with an ID xxx-[Name]. IDs should ONLY consist of numbers!
+- All folders start with an ID xxx-[Name]. IDs should ONLY consist of numbers!
 
-- Folder names should start with 1xx
-
-- File names should start with 0xx
-
-- Order DOES matter. Please don't go and mess with the order of the existing SQL files (Unless you know what you're doing!)
-
-- All names should have a unique xxx identifier. DBmate will not run/find files with duplicate identifiers
+- Migrations should follow the format of (year . month . date . hour . minute . seconds) . - category . _ . name . .sql
 
 ## Creating new Migrations
 
-1. Find/Create your SQL directory.
+1. Run the script `create-migration.sh` to create a new migration
 
-2. Create a new SQL file. This should begin with the next available xxx identifier in the directory
+2. At the top of the SQL file, write `-- migrate:up`. All subsequent SQL will be performed in 'Up' migrations.
 
-3. At the top of the SQL file, write `-- migrate:up`. All subsequent SQL will be performed in 'Up' migrations.
-
-4. At the bottom of the SQL file, write `-- migrate:down`. All subsequent SQL will be performed in 'Down' migrations.
+3. At the bottom of the SQL file, write `-- migrate:down`. All subsequent SQL will be performed in 'Down' migrations.
 
 ## Creating a new DB
 
@@ -47,4 +39,3 @@ REQUIRES DBmate for migrations / initialization
 3. Run up-migrate: `dbmate -u [PG_URL] -d build/[timescale/postgres] up`
 
 4. Connect to PG and test
-
