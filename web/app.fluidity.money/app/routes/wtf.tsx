@@ -8,7 +8,6 @@ import {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import useViewport from "~/hooks/useViewport";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
 import { format, parseISO } from "date-fns";
 import { getAddressExplorerLink, networkMapper } from "~/util";
@@ -24,6 +23,7 @@ import {
   trimAddressShort,
   numberToMonetaryString,
   appendLeading0x,
+  useViewport,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import Video from "~/components/Video";

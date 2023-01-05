@@ -2,9 +2,8 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { ManualCarousel } from "@fluidity-money/surfing";
+import { ManualCarousel, useViewport } from "@fluidity-money/surfing";
 import UseCase from "components/UseCase";
-import useViewport from "hooks/useViewport";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {

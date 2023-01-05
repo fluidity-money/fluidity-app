@@ -2,8 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { ReusableGrid } from "@fluidity-money/surfing";
-import useViewport from "hooks/useViewport";
+import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Yield.module.scss";
 import Video from "components/Video";

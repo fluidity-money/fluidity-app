@@ -2,8 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import useViewport from "hooks/useViewport";
-import { ArrowTopRight, ReusableGrid, GeneralButton } from "@fluidity-money/surfing";
+import { ArrowTopRight, ReusableGrid, GeneralButton, useViewport } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
 import styles from "./Roadmap.module.scss";

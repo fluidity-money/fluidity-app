@@ -4,11 +4,12 @@
 
 import {
   ContinuousCarousel,
-} from "@fluidity-money/surfing";
+  useViewport,
+} 
+from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import useViewport from "hooks/useViewport";
 
 interface IProps {
   carouselInfo: React.ReactNode[]

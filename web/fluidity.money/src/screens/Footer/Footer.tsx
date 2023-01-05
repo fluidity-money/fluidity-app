@@ -2,7 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import useViewport from "hooks/useViewport";
 import Socials from "../../components/Socials";
 import {
   ContinuousCarousel,
@@ -11,6 +10,7 @@ import {
   Text,
   Heading,
   LinkButton,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
 import { LaunchButton } from "components/Button";
@@ -133,18 +133,18 @@ export default Footer;
 
 const howItWorks: IItem[] = [{ title: "Roadmap", src: "https://docs.fluidity.money/docs/fundamentals/roadmap", type: "external" }];
 
-const ecosystem: IItem[] = [
-  { title: "DeFi", src: "", type: "internal" },
-  { title: "DEX", src: "", type: "internal" },
-  { title: "Transactions", src: "", type: "internal" },
-  { title: "NFTs", src: "", type: "external" },
-];
+// const ecosystem: IItem[] = [
+//   { title: "DeFi", src: "", type: "internal" },
+//   { title: "DEX", src: "", type: "internal" },
+//   { title: "Transactions", src: "", type: "internal" },
+//   { title: "NFTs", src: "", type: "external" },
+// ];
 
-const fluidStats: IItem[] = [
-  { title: "Overview", src: "", type: "internal" },
-  { title: "Rewards", src: "", type: "internal" },
-  { title: "Transactions", src: "", type: "internal" },
-];
+// const fluidStats: IItem[] = [
+//   { title: "Overview", src: "", type: "internal" },
+//   { title: "Rewards", src: "", type: "internal" },
+//   { title: "Transactions", src: "", type: "internal" },
+// ];
 
 const resources: IItem[] = [
   { title: "Articles", src: "", type: "internal" },

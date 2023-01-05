@@ -5,13 +5,13 @@ import {
   LineChart,
   numberToMonetaryString,
   trimAddress,
+  useViewport
 } from "@fluidity-money/surfing";
 
 import type { LargestDailyWinner } from "data/monthlyLargestWinners";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
 
 import styles from "./RewardsStats.module.scss";
 
