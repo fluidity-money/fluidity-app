@@ -28,7 +28,7 @@ const Footer = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading  as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         USE YIELD WIN
       </Heading>
       <Heading as="h4" className={styles.text}>
@@ -68,7 +68,9 @@ const Footer = () => {
               LAUNCH FLUIDITY
             </LaunchButton>
             <GeneralButton
-              handleClick={() => {window.location.href = "mailto:contact@fluidity.money"}}
+              handleClick={() => {
+                window.location.href = "mailto:contact@fluidity.money";
+              }}
               version={"secondary"}
               buttontype={"text"}
               size={
@@ -83,22 +85,34 @@ const Footer = () => {
             </GeneralButton>
           </div>
           <div className={styles.legal}>
-            <LinkButton 
+            <LinkButton
               size="small"
               type="external"
-              handleClick={() => {window.location.href = "https://static.fluidity.money/assets/fluidity-website-tc.pdf"}} >
+              handleClick={() => {
+                window.location.href =
+                  "https://static.fluidity.money/assets/fluidity-website-tc.pdf";
+              }}
+            >
               Terms of Service
             </LinkButton>
-            <LinkButton 
+            <LinkButton
               size="small"
               type="external"
-              handleClick={() => {window.location.href = "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"}} >
+              handleClick={() => {
+                window.location.href =
+                  "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf";
+              }}
+            >
               Privacy Policy
             </LinkButton>
-            <LinkButton 
+            <LinkButton
               size="small"
               type="external"
-              handleClick={() => {window.location.href = "https://docs.fluidity.money/docs/security/audits-completed"}} >
+              handleClick={() => {
+                window.location.href =
+                  "https://docs.fluidity.money/docs/security/audits-completed";
+              }}
+            >
               AUDITS COMPLETED
             </LinkButton>
             <Text as="p" size="xs">
@@ -131,7 +145,13 @@ const Footer = () => {
 
 export default Footer;
 
-const howItWorks: IItem[] = [{ title: "Roadmap", src: "https://docs.fluidity.money/docs/fundamentals/roadmap", type: "external" }];
+const howItWorks: IItem[] = [
+  {
+    title: "Roadmap",
+    src: "https://docs.fluidity.money/docs/fundamentals/roadmap",
+    type: "external",
+  },
+];
 
 // const ecosystem: IItem[] = [
 //   { title: "DeFi", src: "", type: "internal" },
@@ -150,5 +170,9 @@ const resources: IItem[] = [
   { title: "Articles", src: "", type: "internal" },
   { title: "Fluniversity", src: "", type: "internal" },
   { title: "Whitepapers", src: "", type: "internal" },
-  { title: "Documentation", src: "https://docs.fluidity.money/", type: "external" },
+  {
+    title: "Documentation",
+    src: "https://docs.fluidity.money/",
+    type: "external",
+  },
 ];

@@ -5,7 +5,12 @@
 import { motion } from "framer-motion";
 import useScrollDirection from "hooks/useScrollDirection";
 import { useState } from "react";
-import { NavBarModal, Text, TriangleDown, useViewport } from "@fluidity-money/surfing";
+import {
+  NavBarModal,
+  Text,
+  TriangleDown,
+  useViewport,
+} from "@fluidity-money/surfing";
 import styles from "./NavBar.module.scss";
 import { LaunchButton } from "components/Button";
 import Link from "next/link";
@@ -25,7 +30,7 @@ const NavBar = () => {
     appear: { y: 0 },
     disappear: { y: -100 },
   };
-  const windowObjDefined = typeof window !== 'undefined'
+  const windowObjDefined = typeof window !== "undefined";
 
   return (
     <div className={styles.outerContainer}>
@@ -36,10 +41,7 @@ const NavBar = () => {
           animate={scrollDir === "up" ? "appear" : "disappear"}
           transition={{ type: "tween" }}
         >
-          <Link 
-            href={"/"}
-            passHref
-          >
+          <Link href={"/"} passHref>
             <a href={"/"}>
               <img src="/assets/images/textLogo.svg" alt="home page" />
             </a>
@@ -53,10 +55,7 @@ const NavBar = () => {
               animate={scrollDir === "up" ? "disappear" : "appear"}
               transition={{ type: "tween" }}
             >
-              <Link
-                href={"/"}
-                passHref
-              >
+              <Link href={"/"} passHref>
                 <a href={"/"}>
                   <div className={styles.imgContainer}>
                     <img src="/assets/images/logoOutline.png" alt="home page" />
@@ -83,19 +82,19 @@ const NavBar = () => {
             <nav>
               <ul>
                 <li>
-                  <Link
-                    href={"/howitworks"}
-                    passHref
-                  >
+                  <Link href={"/howitworks"} passHref>
                     <a
                       className={
-                        (windowObjDefined && window.location.pathname.toString() === "/howitworks")
+                        windowObjDefined &&
+                        window.location.pathname.toString() === "/howitworks"
                           ? styles.active
                           : ""
                       }
                       href={"/howitworks"}
                     >
-                      <Text size="md" className={styles.transparent}>HOW IT WORKS</Text>
+                      <Text size="md" className={styles.transparent}>
+                        HOW IT WORKS
+                      </Text>
                     </a>
                   </Link>
                 </li>
@@ -124,30 +123,36 @@ const NavBar = () => {
                   </a>
                 </li> */}
                 <li>
-                  <Link
-                    href={"/resources"}
-                    passHref
-                  >
+                  <Link href={"/resources"} passHref>
                     <a
                       href={"/resources"}
                       className={
-                       (windowObjDefined && window.location.pathname.toString() === "/resources")
+                        windowObjDefined &&
+                        window.location.pathname.toString() === "/resources"
                           ? styles.active
                           : ""
                       }
                     >
-                      <Text size="md" className={styles.transparent}>RESOURCES</Text>
+                      <Text size="md" className={styles.transparent}>
+                        RESOURCES
+                      </Text>
                     </a>
                   </Link>
 
-                  <button className={`${styles.modalButton} ${styles.transparent}`} onClick={() => handleModal(!modal)}>
+                  <button
+                    className={`${styles.modalButton} ${styles.transparent}`}
+                    onClick={() => handleModal(!modal)}
+                  >
                     <TriangleDown />
                   </button>
                 </li>
               </ul>
             </nav>
             {modal && (
-              <NavBarModal handleModal={() => handleModal(false)} navLinks={links} />
+              <NavBarModal
+                handleModal={() => handleModal(false)}
+                navLinks={links}
+              />
             )}
           </div>
         </motion.div>

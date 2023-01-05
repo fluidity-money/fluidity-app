@@ -8,23 +8,22 @@ import styles from "./RewardsInitial.module.scss";
 
 interface IProps {
   changeScreen: () => void;
-  carouselInfo: React.ReactNode[]
+  carouselInfo: React.ReactNode[];
 }
 
 const RewardsInitial = ({ changeScreen, carouselInfo }: IProps) => {
   const { apiState, chain } = useChainContext();
   const { onChainData } = apiState;
 
-  const [prizePool, setPrizePool] = useState<number>(onChainData.data?.ethPool || 0);
+  const [prizePool, setPrizePool] = useState<number>(
+    onChainData.data?.ethPool || 0
+  );
 
   useEffect(() => {
-    chain === `ETH` && 
-    setPrizePool(onChainData.data?.ethPool || 0);
+    chain === `ETH` && setPrizePool(onChainData.data?.ethPool || 0);
 
-    chain === `SOL` && 
-    setPrizePool(onChainData.data?.solPool || 0);
-
-  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
+    chain === `SOL` && setPrizePool(onChainData.data?.solPool || 0);
+  }, [onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
 
   return (
     <AnimatePresence>
@@ -43,7 +42,7 @@ const RewardsInitial = ({ changeScreen, carouselInfo }: IProps) => {
           key={`${apiState.onChainData.loading}-${prizePool}`}
         />
         <div className={styles.rewardsBackground}>
-          <RewardsBackground carouselInfo={carouselInfo}/>
+          <RewardsBackground carouselInfo={carouselInfo} />
         </div>
       </motion.div>
     </AnimatePresence>

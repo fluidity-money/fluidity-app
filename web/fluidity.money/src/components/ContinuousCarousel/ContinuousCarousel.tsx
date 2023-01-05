@@ -47,4 +47,3 @@ const ContinuousCarousel = ({ direction, children }: IContinuousCarousel) => {
 };
 
 export default ContinuousCarousel;
-

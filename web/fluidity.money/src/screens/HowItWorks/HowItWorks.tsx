@@ -102,10 +102,7 @@ const HowItWorks = () => {
           <Text as={"p"} prominent={currentImageIndex === 2}>
             The user is incentivised through governance.
           </Text>
-          <Link
-            href="/howitworks"
-            passHref
-          >
+          <Link href="/howitworks" passHref>
             <a href="/howitworks">
               <LinkButton
                 type={"internal"}

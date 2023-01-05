@@ -29,7 +29,7 @@ export {
   GeneralButton,
   LinkButton,
   TabButton,
-  AttentionButton
+  AttentionButton,
 } from "./Button";
 export { BlockchainModal } from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";

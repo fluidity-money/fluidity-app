@@ -19,7 +19,7 @@ type Props<Datum extends object> = {
     xAccessor: (d: Datum) => number | Date;
     yAccessor: (d: Datum) => number;
   };
-  renderTooltip: ({datum}: {datum: Datum} & Element) => React.ReactNode
+  renderTooltip: ({ datum }: { datum: Datum } & Element) => React.ReactNode;
 } & any;
 
 //
@@ -27,9 +27,7 @@ const ChartTooltip = ({ datum }: { datum: any }) => {
   return (
     <span>
       {datum.y}{" "}
-      <span style={{ color: "rgba(255,255,255, 50%)" }}>
-        {datum.key}
-      </span>
+      <span style={{ color: "rgba(255,255,255, 50%)" }}>{datum.key}</span>
     </span>
   );
 };
@@ -72,7 +70,7 @@ const { baseColor, generatedGradient, gradientIds } = {
   baseColor: "transparent",
 };
 
-const _LineChart = <Datum extends object,>({
+const _LineChart = <Datum extends object>({
   accessors,
   data,
   lineLabel,
@@ -91,9 +89,16 @@ const _LineChart = <Datum extends object,>({
         ],
         zero: false,
       }}
-      yScale={{ type: "linear", zero: false, domain: [Math.min(...data.map(accessors.yAccessor)) - 0.1, Math.max(...data.map(accessors.yAccessor)) + 0.1] }}
+      yScale={{
+        type: "linear",
+        zero: false,
+        domain: [
+          Math.min(...data.map(accessors.yAccessor)) - 0.1,
+          Math.max(...data.map(accessors.yAccessor)) + 0.1,
+        ],
+      }}
       margin={{ top: 10, right: 0, bottom: 0, left: 0 }}
-      height={props.parentHeight * 9 / 10}
+      height={(props.parentHeight * 9) / 10}
       {...props}
     >
       <defs>{generatedGradient}</defs>
@@ -118,25 +123,30 @@ const _LineChart = <Datum extends object,>({
         />
       ))}
 
-      <rect x="0" y="0" width="100%" height={`${props.parentHeight}`} fill="url(#dim)" />
+      <rect
+        x="0"
+        y="0"
+        width="100%"
+        height={`${props.parentHeight}`}
+        fill="url(#dim)"
+      />
 
       <Tooltip
         showVerticalCrosshair
         style={{
           position: "absolute",
         }}
-        renderTooltip={({ tooltipData }: RenderTooltipParams<Datum>) => (
-          tooltipData?.nearestDatum &&
-            <>
-              {renderTooltip({datum: tooltipData.nearestDatum.datum})}
-            </>
-        )}
+        renderTooltip={({ tooltipData }: RenderTooltipParams<Datum>) =>
+          tooltipData?.nearestDatum && (
+            <>{renderTooltip({ datum: tooltipData.nearestDatum.datum })}</>
+          )
+        }
       />
     </XYChart>
   );
 };
 
-const LineChart = <Data extends object,>(props: Props<Data>) => {
+const LineChart = <Data extends object>(props: Props<Data>) => {
   const defaultAccessors = {
     xAccessor: (d: any) => d.x,
     yAccessor: (d: any) => d.y,

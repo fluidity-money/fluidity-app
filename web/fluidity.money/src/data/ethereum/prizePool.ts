@@ -61,11 +61,7 @@ export const getEthTotalPrizePool = async (): Promise<number> => {
   const poolABI: ContractInterface = PrizePoolABI;
 
   try {
-    const rewardPoolContract = new Contract(
-      poolAddress,
-      poolABI,
-      provider
-    );
+    const rewardPoolContract = new Contract(poolAddress, poolABI, provider);
 
     if (!rewardPoolContract)
       throw new Error(`Could not instantiate Reward Pool at ${poolAddress}`);

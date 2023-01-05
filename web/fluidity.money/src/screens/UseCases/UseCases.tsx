@@ -38,10 +38,7 @@ const UseCases = () => {
         />
       )}
 
-      <ManualCarousel
-        className={styles.map}
-        scrollBar={true}
-      >
+      <ManualCarousel className={styles.map} scrollBar={true}>
         {items.map((item, i) => (
           <UseCase key={`usecase-${i}`} useCase={item} />
         ))}

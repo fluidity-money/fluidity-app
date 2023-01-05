@@ -2,8 +2,13 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import {formatTo12HrDate, numberToMonetaryString, Text, trimAddressShort} from "@fluidity-money/surfing";
-import {useChainContext} from "hooks/ChainContext";
+import {
+  formatTo12HrDate,
+  numberToMonetaryString,
+  Text,
+  trimAddressShort,
+} from "@fluidity-money/surfing";
+import { useChainContext } from "hooks/ChainContext";
 import { useMemo, useState } from "react";
 import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
@@ -32,13 +37,17 @@ const Reward = () => {
 
   // memoise rewards to be shown in rewards background
   // to avoid reloading every time the background is toggled
-  const rewards: IReward[] = useMemo(() => weekWinnings.map((winning) => ({
-    token: winning.token_short_name,
-    amount: winning.winning_amount / 10 ** winning.token_decimals,
-    address: winning.winning_address,
-    date: new Date(winning.awarded_time),
-    transaction: winning.transaction_hash,
-  })), [weekWinnings]);
+  const rewards: IReward[] = useMemo(
+    () =>
+      weekWinnings.map((winning) => ({
+        token: winning.token_short_name,
+        amount: winning.winning_amount / 10 ** winning.token_decimals,
+        address: winning.winning_address,
+        date: new Date(winning.awarded_time),
+        transaction: winning.transaction_hash,
+      })),
+    [weekWinnings]
+  );
 
   const txExplorerUrl = (txHash: string) => {
     switch (true) {
@@ -54,44 +63,49 @@ const Reward = () => {
   };
 
   // memoise carousel entries generated from rewards
-  const CarouselInfo = useMemo(() => (
-    rewards.map(({token, amount, address, date, transaction}, i) => (
-      <div key={`winner-${i}`} className={styles.winner}>
-        <a
-          href={txExplorerUrl(transaction)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src={"/assets/images/tokenIcons/f" + token + ".png"}
-            alt="tokenIcon"
-          />
+  const CarouselInfo = useMemo(
+    () =>
+      rewards.map(({ token, amount, address, date, transaction }, i) => (
+        <div key={`winner-${i}`} className={styles.winner}>
+          <a
+            href={txExplorerUrl(transaction)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={"/assets/images/tokenIcons/f" + token + ".png"}
+              alt="tokenIcon"
+            />
 
-          <Text as="p" prominent={true} className={styles.hover}>
-            {numberToMonetaryString(amount)}{" "}
-          </Text>
+            <Text as="p" prominent={true} className={styles.hover}>
+              {numberToMonetaryString(amount)}{" "}
+            </Text>
 
-          <Text as="p" className={styles.hover}>
-            {`sent to`}{" "}
-          </Text>
+            <Text as="p" className={styles.hover}>
+              {`sent to`}{" "}
+            </Text>
 
-          <Text as="p" className={styles.hoverUnderline}>
-            {`${trimAddressShort(address)}`}{" "}
-          </Text>
+            <Text as="p" className={styles.hoverUnderline}>
+              {`${trimAddressShort(address)}`}{" "}
+            </Text>
 
-          <Text as="p" className={styles.hover}>
-            {formatTo12HrDate(date)}
-          </Text>
-        </a>
-      </div>
-    ))
-  ), [rewards]);
+            <Text as="p" className={styles.hover}>
+              {formatTo12HrDate(date)}
+            </Text>
+          </a>
+        </div>
+      )),
+    [rewards]
+  );
 
   return (
     <>
       <div className={styles.container}>
         {present ? (
-          <RewardsInitial carouselInfo={CarouselInfo} changeScreen={() => setPresent(!present)} />
+          <RewardsInitial
+            carouselInfo={CarouselInfo}
+            changeScreen={() => setPresent(!present)}
+          />
         ) : (
           <RewardStats changeScreen={() => setPresent(!present)} />
         )}

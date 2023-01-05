@@ -8,8 +8,10 @@ I'll give you the tour.
 - Project app.fluidity.money is our system's main point of access.
 
 We're using turborepo here so just use:
+
 ```bash
 npm install
 npm run dev
 ```
+
 in _this_ folder and it should all be live.

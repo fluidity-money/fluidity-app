@@ -10,7 +10,7 @@ import styles from "./Ecosystem.module.scss";
 const Ecosystem = () => {
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({ container: scrollRef });
-  
+
   return (
     <div className={styles.container}>
       <div className={styles.textBehind}>

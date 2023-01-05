@@ -2,22 +2,22 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { AppProps } from 'next/app';
+import { AppProps } from "next/app";
 
-import Script from 'next/script';
+import Script from "next/script";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import { ApolloProvider } from "@apollo/client";
-import {useViewport} from '@fluidity-money/surfing';
+import { useViewport } from "@fluidity-money/surfing";
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
 
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
-import "styles/app.global.scss"
-import CookieConsent from 'components/CookieConsent/CookieConsent';
-import { useRouter } from 'next/router';
-import * as gtag from 'utils/gtag'
+import "styles/app.global.scss";
+import CookieConsent from "components/CookieConsent/CookieConsent";
+import { useRouter } from "next/router";
+import * as gtag from "utils/gtag";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -40,30 +40,32 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const handleRouteChange = (url: URL) => {
-      gtag.pageview(url)
-    }
+      gtag.pageview(url);
+    };
 
-    router.events.on("routeChangeComplete", handleRouteChange)
+    router.events.on("routeChangeComplete", handleRouteChange);
 
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange)
-    }
-  }, [router.events])
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router.events]);
 
-  return <>
-    <div id={"fluid"} />
-    <div id="shade" />
-    <div id="root">
-      <ApolloProvider client={client}>
-        <ChainContextProvider>
+  return (
+    <>
+      <div id={"fluid"} />
+      <div id="shade" />
+      <div id="root">
+        <ApolloProvider client={client}>
+          <ChainContextProvider>
             <div className="App">
-              {width < breakpoint && width > 0 ? (<MobileNavBar />) : (<NavBar />)}
+              {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
               <Component {...pageProps} />
             </div>
-        </ChainContextProvider>
-      </ApolloProvider>
-      <CookieConsent />
-    </div>
-    <Script src='assets/gfx/renderer.js' strategy='lazyOnload' />
-  </>
+          </ChainContextProvider>
+        </ApolloProvider>
+        <CookieConsent />
+      </div>
+      <Script src="assets/gfx/renderer.js" strategy="lazyOnload" />
+    </>
+  );
 }

@@ -1,5 +1,3 @@
-import MailingList from './MailingList';
+import MailingList from "./MailingList";
 
 export default MailingList;
-
-
