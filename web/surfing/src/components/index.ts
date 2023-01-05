@@ -29,25 +29,13 @@ export {
   GeneralButton,
   LinkButton,
   TabButton,
-  AttentionButton
+  AttentionButton,
 } from "./Button";
 export { BlockchainModal } from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
 export { LabelledValue } from "./LabelledValue";
-export {
-  ArrowRight,
-  ArrowLeft,
-  ArrowDown,
-  ArrowUp,
-  ArrowTopRight,
-  TriangleDown,
-  Trophy,
-  Twitter,
-  DashboardIcon,
-  AssetsIcon,
-  DaoIcon,
-} from "./Images";
+export * from "./Images";
 export { default as Spinner } from "./Spinner";
 export { default as LoadingDots } from "./LoadingDots";
 export { default as TransparentVideo } from "./TransparentVideo";
