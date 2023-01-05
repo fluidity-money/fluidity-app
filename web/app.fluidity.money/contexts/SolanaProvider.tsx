@@ -1,3 +1,5 @@
+import type BN from "bn.js";
+
 import { useMemo } from "react";
 import {
   ConnectionProvider,
@@ -54,7 +56,7 @@ const SolanaFacade = ({
     return internalSwap(amount, fromToken, toToken);
   };
 
-  const balance = async (tokenAddr: string): Promise<number> => {
+  const balance = async (tokenAddr: string): Promise<BN> => {
     const token = tokens.find((t) => t.address === tokenAddr);
 
     if (!token)

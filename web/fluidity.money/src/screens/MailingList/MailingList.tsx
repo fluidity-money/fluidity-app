@@ -2,9 +2,8 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { GeneralButton, Heading, Text } from '@fluidity-money/surfing';
+import { GeneralButton, Heading, Text, useViewport } from '@fluidity-money/surfing';
 import { motion, useAnimation } from 'framer-motion';
-import useViewport from 'hooks/useViewport';
 import { useState } from 'react';
 import styles from './MailingList.module.scss';
 

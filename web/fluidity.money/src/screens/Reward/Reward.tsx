@@ -9,7 +9,7 @@ import RewardsInitial from "screens/RewardsInitial";
 import RewardStats from "screens/RewardsStats";
 import styles from "./Reward.module.scss";
 
-interface Reward {
+interface IReward {
   token: string;
   amount: number;
   address: string;
@@ -32,7 +32,7 @@ const Reward = () => {
 
   // memoise rewards to be shown in rewards background
   // to avoid reloading every time the background is toggled
-  const rewards: Reward[] = useMemo(() => weekWinnings.map((winning) => ({
+  const rewards: IReward[] = useMemo(() => weekWinnings.map((winning) => ({
     token: winning.token_short_name,
     amount: winning.winning_amount / 10 ** winning.token_decimals,
     address: winning.winning_address,

@@ -3,12 +3,12 @@
 // LICENSE.md file.
 
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
 import {
   Display,
   Text,
   numberToMonetaryString,
   GeneralButton,
+  useViewport,
 } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./Demo.module.scss";

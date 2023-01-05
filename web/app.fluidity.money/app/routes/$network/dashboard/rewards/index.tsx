@@ -14,7 +14,6 @@ import {
 } from "~/util";
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
-import useViewport from "~/hooks/useViewport";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -26,6 +25,7 @@ import {
   ManualCarousel,
   trimAddress,
   LinkButton,
+  useViewport,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
@@ -600,6 +600,12 @@ export default function Rewards() {
           filters={txTableFilters}
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
+          loaded={
+            activeTableFilterIndex
+              ? userTransactionsData.data?.loaded
+              : globalTransactionsData?.loaded
+          }
+          showLoadingAnimation={true}
         />
       </section>
 

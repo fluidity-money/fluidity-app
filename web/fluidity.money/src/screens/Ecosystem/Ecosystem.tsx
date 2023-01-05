@@ -10,8 +10,7 @@ import styles from "./Ecosystem.module.scss";
 const Ecosystem = () => {
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({ container: scrollRef });
-
-  // console.log(scrollYProgress);
+  
   return (
     <div className={styles.container}>
       <div className={styles.textBehind}>
@@ -74,87 +73,87 @@ const items = [
   { item: "🦍" },
 ];
 
-const projects = [
-  {
-    title: "🦍",
-    categories: [
-      "anyCat",
-      "defi",
-      "dex",
-      "nft",
-      "gaming",
-      "payments",
-      "metaverse",
-      "dao",
-    ],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 20000,
-  },
-  {
-    title: "🦍",
-    categories: [
-      "anyCat",
-      "defi",
-      "dex",
-      "nft",
-      "gaming",
-      "payments",
-      "metaverse",
-      "dao",
-    ],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 10000,
-  },
-  {
-    title: "🦍",
-    categories: ["anyCat", "defi", "dex", "payments", "metaverse", "dao"],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 5000,
-  },
-  {
-    title: "🦍",
-    categories: ["anyCat", "gaming", "payments", "metaverse", "dao"],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 2000,
-  },
-  {
-    title: "🦍",
-    categories: ["anyCat", "defi", "dex", "nft", "gaming", "dao"],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 14000,
-  },
-  {
-    title: "🦍",
-    categories: [
-      "anyCat",
-      "defi",
-      "dex",
-      "nft",
-      "payments",
-      "metaverse",
-      "dao",
-    ],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 12000,
-  },
-  {
-    title: "🦍",
-    categories: ["anyCat", "defi", "dex", "nft", "gaming", "payments"],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 18000,
-  },
-  {
-    title: "🦍",
-    categories: ["anyCat", "dex", "nft", "payments", "dao"],
-    chains: ["anyChain", "ethereum"],
-    years: ["anyYear", "2022"],
-    topPrize: 800,
-  },
-];
+// const projects = [
+//   {
+//     title: "🦍",
+//     categories: [
+//       "anyCat",
+//       "defi",
+//       "dex",
+//       "nft",
+//       "gaming",
+//       "payments",
+//       "metaverse",
+//       "dao",
+//     ],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 20000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: [
+//       "anyCat",
+//       "defi",
+//       "dex",
+//       "nft",
+//       "gaming",
+//       "payments",
+//       "metaverse",
+//       "dao",
+//     ],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 10000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: ["anyCat", "defi", "dex", "payments", "metaverse", "dao"],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 5000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: ["anyCat", "gaming", "payments", "metaverse", "dao"],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 2000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: ["anyCat", "defi", "dex", "nft", "gaming", "dao"],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 14000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: [
+//       "anyCat",
+//       "defi",
+//       "dex",
+//       "nft",
+//       "payments",
+//       "metaverse",
+//       "dao",
+//     ],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 12000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: ["anyCat", "defi", "dex", "nft", "gaming", "payments"],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 18000,
+//   },
+//   {
+//     title: "🦍",
+//     categories: ["anyCat", "dex", "nft", "payments", "dao"],
+//     chains: ["anyChain", "ethereum"],
+//     years: ["anyYear", "2022"],
+//     topPrize: 800,
+//   },
+// ];

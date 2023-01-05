@@ -1,9 +1,6 @@
 .container {
   display: grid;
   grid-template-columns: 1fr;
-  // flex-direction: column;
-  // justify-content: center;
-  // align-items: center;
   min-height: 850px;
   width: 100%;
   border: solid 2px red;
@@ -54,11 +51,6 @@
     border-radius: 2rem;
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
-    // box-shadow:  inset 0 0 0 200px rgba(255, 255, 255, 0.09);
-
-    // border-top: 0.5px solid rgba(225, 225, 225, 0.3);
-    // border-left: 0.5px solid rgba(225, 225, 225, 0.1);
-    // border-right: 0.5px solid rgba(225, 225, 225, 0.2);
   }
 }
 

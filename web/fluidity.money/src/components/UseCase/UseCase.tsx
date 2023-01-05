@@ -2,9 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Heading, Text } from "@fluidity-money/surfing";
-import { motion } from "framer-motion";
-import useViewport from "hooks/useViewport";
+import { Heading, Text, useViewport } from "@fluidity-money/surfing";
 import React from "react";
 import styles from "./UseCase.module.scss";
 
@@ -23,7 +21,7 @@ const UseCase = ({ useCase }: UseCaseProps) => {
         <img src={useCase.img} alt="text representation" />
         <div className={styles.text}>
           <Heading as="h3">{useCase.title}</Heading>
-          <Text as="p" size={width < 500 ? "sm" : "lg"}>
+          <Text as="p" size={width < 500 && width > 0 ? "sm" : "lg"}>
             {useCase.info}
           </Text>
         </div>
