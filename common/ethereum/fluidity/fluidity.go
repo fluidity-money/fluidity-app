@@ -296,9 +296,9 @@ const workerConfigAbiString = `[
 ]`
 
 var (
-	fluidityContractAbi ethAbi.ABI
-	workerConfigAbi     ethAbi.ABI
-	rewardPoolAbi        ethAbi.ABI
+	FluidityContractAbi ethAbi.ABI
+	WorkerConfigAbi     ethAbi.ABI
+	RewardPoolAbi       ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles
