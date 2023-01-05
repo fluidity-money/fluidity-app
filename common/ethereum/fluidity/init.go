@@ -42,7 +42,7 @@ func init() {
 
 	reader = strings.NewReader(rewardPoolAbiString)
 
-	if rewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
+	if RewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }
