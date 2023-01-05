@@ -182,7 +182,6 @@ main > footer > section {
   overflow: hidden;
   font-size: 15px;
   box-shadow: 0 0 8px 2px #f3b8d8;
-  z-index: 1;
 }
 
 .rainbow::before {
@@ -244,6 +243,10 @@ main > footer > section {
 
 .z-0 {
   z-index: 0;
+}
+
+.z-1 {
+  z-index: 1;
 }
 
 .selector-button {

@@ -42,6 +42,7 @@ import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
+import { createPortal } from "react-dom";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -253,6 +254,14 @@ export default function Dashboard() {
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  const OtherModalOpen =
+    openMobModal ||
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
+      ? true
+      : false;
+
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
@@ -285,6 +294,23 @@ export default function Dashboard() {
             mobile={isMobile}
           />
         </div>
+      </Modal>
+
+      {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
+      <Modal visible={!OtherModalOpen}>
+        <GeneralButton
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            OtherModalOpen ? "z-0" : "z-1"
+          }`}
+          version={"primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() => navigate("../fluidify")}
+        >
+          <Heading as="h5">
+            <b>Fluidify Money</b>
+          </Heading>
+        </GeneralButton>
       </Modal>
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
@@ -458,12 +484,9 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
         <Outlet />
-
         {/* Provide Luquidity*/}
         {!openMobModal && <ProvideLiquidity />}
-
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&
@@ -473,26 +496,20 @@ export default function Dashboard() {
               setShowModal={setShowModal}
             />
           )}
-
-        {/* Fluidify button */}
-        <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            // moves Fluidify button behind modal when a modal is opened
-            (openMobModal ||
-              walletModalVisibility ||
-              connectedWalletModalVisibility ||
-              chainModalVisibility) &&
-            "z-0"
-          }`}
-          version={"primary"}
-          buttontype="text"
-          size={"medium"}
-          handleClick={() => navigate("../fluidify")}
-        >
-          <Heading as="h5">
-            <b>Fluidify Money</b>
-          </Heading>
-        </GeneralButton>
+        {/* Fluidify button to be displayed behind translucent modals */}
+        {OtherModalOpen && (
+          <GeneralButton
+            className={`fluidify-button-dashboard-mobile rainbow`}
+            version={"primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() => navigate("../fluidify")}
+          >
+            <Heading as="h5">
+              <b>Fluidify Money</b>
+            </Heading>
+          </GeneralButton>
+        )}
 
         {/* Mobile Menu Modal */}
         {openMobModal && (
@@ -510,7 +527,6 @@ export default function Dashboard() {
             unclaimedRewards={unclaimedRewards}
           />
         )}
-
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
