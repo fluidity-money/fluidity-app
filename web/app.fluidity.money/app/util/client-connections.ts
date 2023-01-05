@@ -19,7 +19,7 @@ const DSSocketManager = (
     socket.on("Transactions", (payload: PipedTransaction) => {
       onCallback(payload);
     });
-  }, 8000);
+  }, 10000);
 
   return {
     emitEvent,

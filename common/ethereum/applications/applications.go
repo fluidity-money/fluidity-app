@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/apeswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
@@ -38,6 +39,7 @@ const (
 	ApplicationCurve
 	ApplicationMultichain
 	ApplicationXyFinance
+	ApplicationApeswap
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -144,6 +146,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.XyFinance += util.MaybeRatToFloat(fee)
+	case ApplicationApeswap:
+		fee, err = apeswap.GetApeswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Apeswap += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -194,6 +205,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		return transaction.From, logAddress, nil
 	case ApplicationXyFinance:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationApeswap:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 

@@ -1,9 +1,18 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, forknetTakeFunds } from "../script-utils";
+import { deployTokens, deployRewardPools, forknetTakeFunds } from "../script-utils";
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
-import { configAddr, tokenOracleSigner, tokenOperatorSigner, tokenCouncilSigner, configOperatorSigner, configCouncilSigner, accountSigner, account2Signer } from './setup-common';
+import {
+  configAddr,
+  tokenOracleSigner,
+  tokenOperatorSigner,
+  tokenCouncilSigner,
+  configOperatorSigner,
+  configCouncilSigner,
+  rewardPoolsOperatorSigner,
+  accountSigner,
+  account2Signer } from './setup-common';
 
 export let usdtAddr: string;
 export let fUsdtAddr: string;
@@ -30,6 +39,8 @@ export let fUsdtCouncil: ethers.Contract;
 
 export let configOperator: ethers.Contract;
 export let configCouncil: ethers.Contract;
+
+export let rewardPoolsOperator: ethers.Contract;
 
 before(async function () {
   if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
@@ -62,6 +73,7 @@ before(async function () {
     configAddr,
     configOperatorSigner,
   );
+
   configCouncil = await hre.ethers.getContractAt(
     "WorkerConfig",
     configAddr,
@@ -97,4 +109,14 @@ before(async function () {
   fUsdtOracle = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOracleSigner);
   fUsdtOperator = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOperatorSigner);
   fUsdtCouncil = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenCouncilSigner);
+
+  rewardPoolsOperator = await deployRewardPools(
+    hre,
+    await rewardPoolsOperatorSigner.getAddress(),
+    [
+      fUsdtAddr,
+      fFeiAddr,
+      fDaiAddr
+    ]
+  );
 });

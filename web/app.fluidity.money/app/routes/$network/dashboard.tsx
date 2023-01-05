@@ -19,7 +19,6 @@ import {
 import { useState, useEffect, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
-import useViewport from "~/hooks/useViewport";
 import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
 import {
@@ -31,6 +30,7 @@ import {
   ChainSelectorButton,
   BlockchainModal,
   numberToMonetaryString,
+  useViewport,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";

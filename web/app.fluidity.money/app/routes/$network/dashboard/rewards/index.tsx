@@ -14,7 +14,6 @@ import {
 } from "~/util";
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
-import useViewport from "~/hooks/useViewport";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -26,7 +25,7 @@ import {
   ManualCarousel,
   trimAddress,
   LinkButton,
-  LoadingDots,
+  useViewport,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
@@ -588,37 +587,26 @@ export default function Rewards() {
       </section>
 
       <section id="table">
-        {transactions.length === 0 ? (
-          globalTransactionsData?.loaded !== true ? (
-            <>
-              Fetching table data...
-              <div className="center-table-loading-anim loader-dots">
-                <LoadingDots />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="center-table-loading-anim loader-dots">
-                <Text size="lg">No reward record found!</Text>
-              </div>
-            </>
-          )
-        ) : (
-          <Table
-            itemName="rewards"
-            headings={txTableColumns}
-            pagination={{
-              page,
-              rowsPerPage: 12,
-            }}
-            count={count}
-            data={transactions}
-            renderRow={TransactionRow(network)}
-            filters={txTableFilters}
-            onFilter={setActiveTableFilterIndex}
-            activeFilterIndex={activeTableFilterIndex}
-          />
-        )}
+        <Table
+          itemName="rewards"
+          headings={txTableColumns}
+          pagination={{
+            page,
+            rowsPerPage: 12,
+          }}
+          count={count}
+          data={transactions}
+          renderRow={TransactionRow(network)}
+          filters={txTableFilters}
+          onFilter={setActiveTableFilterIndex}
+          activeFilterIndex={activeTableFilterIndex}
+          loaded={
+            activeTableFilterIndex
+              ? userTransactionsData.data?.loaded
+              : globalTransactionsData?.loaded
+          }
+          showLoadingAnimation={true}
+        />
       </section>
 
       {/* Highest Rewarders */}

@@ -3,10 +3,9 @@
 // LICENSE.md file.
 
 import { useState } from "react";
-import { ContinuousCarousel, Heading } from "@fluidity-money/surfing";
+import { ContinuousCarousel, Heading, useViewport } from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
-import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import styles from "./Landing.module.scss";
 import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
@@ -78,7 +77,7 @@ const Landing = () => {
       </motion.div>
       {/* Hero animation */}
       <motion.div className={styles.content}>
-        {width < breakpoint ? (
+        {width < breakpoint && width > 0 ? (
           <motion.div
             initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
@@ -102,7 +101,7 @@ const Landing = () => {
           </motion.div>
         )}
         <div className={styles.tiles}>
-          {width < breakpoint && (
+          {width < breakpoint && width > 0 && (
             <motion.div
               className={styles.video}
               initial={{ y: -150, scale: 1 }}
@@ -148,25 +147,25 @@ const Landing = () => {
             initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 1, type: "tween" }}
-            className={width < breakpoint ? styles.left : styles.right}
+            className={width < breakpoint && width > 0 ? styles.left : styles.right}
           >
             <IntroTile
               img={"/assets/images/landingIcons/expectedOutcome.png"}
-              side={width < breakpoint ? "left" : "right"}
+              side={width < breakpoint && width > 0 ? "left" : "right"}
             >
               Fluidity improves your expected <br />
               outcome over time
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/forReceivers.png"}
-              side={width < breakpoint ? "left" : "right"}
+              side={width < breakpoint && width > 0 ? "left" : "right"}
             >
               Rewards can range from cents
               <br /> to millions
             </IntroTile>
             <IntroTile
               img={"/assets/images/landingIcons/scalingEcosystem.png"}
-              side={width < breakpoint ? "left" : "right"}
+              side={width < breakpoint && width > 0 ? "left" : "right"}
             >
               Scaling ecosystem
             </IntroTile>

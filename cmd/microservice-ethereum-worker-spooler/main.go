@@ -71,6 +71,7 @@ func main() {
 				transactionHash  = announcement.TransactionHash
 				senderAddress    = announcement.FromAddress
 				recipientAddress = announcement.ToAddress
+				toWinAmount      = announcement.ToWinAmount
 				application      = announcement.Application
 
 				tokenDecimals  = tokenDetails.TokenDecimals
@@ -84,7 +85,9 @@ func main() {
 				blockNumber,
 				transactionHash,
 				senderAddress,
+				*fromWinAmount,
 				recipientAddress,
+				*toWinAmount,
 				application,
 			)
 

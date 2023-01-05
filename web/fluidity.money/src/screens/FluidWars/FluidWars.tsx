@@ -3,10 +3,9 @@
 // LICENSE.md file.
 
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import { ReusableGrid } from "@fluidity-money/surfing";
+import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
 import Video from "components/Video";
 import styles from "./FluidWars.module.scss";
-import useViewport from "hooks/useViewport";
 
 const FluidWars = () => {
   const { width } = useViewport();

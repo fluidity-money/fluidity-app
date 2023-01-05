@@ -29,10 +29,12 @@ export {
   GeneralButton,
   LinkButton,
   TabButton,
+  AttentionButton
 } from "./Button";
 export { BlockchainModal } from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
+export { LabelledValue } from "./LabelledValue";
 export {
   ArrowRight,
   ArrowLeft,
