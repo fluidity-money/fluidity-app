@@ -35,7 +35,7 @@ ALTER TABLE winners
 
 ALTER TABLE winners
 	DROP COLUMN ethereum_application,
-	DROP COLUMN solana_application;	
+	DROP COLUMN solana_application;
 
 DROP TYPE ethereum_application;
 DROP TYPE solana_application;

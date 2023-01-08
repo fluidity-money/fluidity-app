@@ -5,7 +5,8 @@
 import {
   ContinuousCarousel,
   useViewport,
-} from "@fluidity-money/surfing";
+} 
+from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
