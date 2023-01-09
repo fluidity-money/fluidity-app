@@ -234,7 +234,7 @@ fUSDT = "https://www.orca.so/"
 
 [[liquidity_providers.solana.providers]]
 name= "saber"
-img= "/images/providers/saber.svg"
+img= "/images/providers/Saber.svg"
 
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.saber.so/"
@@ -261,7 +261,7 @@ Maker= "/images/providers/maker-mkr-logo.png"
 Multicoin= "/images/providers/Multicoin.png"
 Orca= "/images/providers/Orca.svg"
 Polygon= "/images/providers/Polygon.svg"
-Saber= "/images/providers/saber.svg"
+Saber= "/images/providers/Saber.svg"
 Solana= "/images/providers/Solana.svg"
 Solend= "/images/providers/solend.png"
 Uniswap= "/images/providers/Uniswap.svg"
