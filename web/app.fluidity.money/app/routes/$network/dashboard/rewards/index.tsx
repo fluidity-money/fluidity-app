@@ -600,6 +600,12 @@ export default function Rewards() {
           filters={txTableFilters}
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
+          loaded={
+            activeTableFilterIndex
+              ? userTransactionsData.data?.loaded
+              : globalTransactionsData?.loaded
+          }
+          showLoadingAnimation={true}
         />
       </section>
 

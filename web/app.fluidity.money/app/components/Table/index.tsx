@@ -1,6 +1,6 @@
 import { Link, useTransition } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { GeneralButton, Text } from "@fluidity-money/surfing";
+import { GeneralButton, LoadingDots, Text } from "@fluidity-money/surfing";
 
 type Filter<T> = {
   filter: (item: T) => boolean; // eslint-disable-line no-unused-vars
@@ -41,6 +41,10 @@ type ITable<T> = {
   onFilter?: React.Dispatch<React.SetStateAction<number>>;
 
   activeFilterIndex?: number;
+
+  loaded?: boolean | undefined;
+
+  showLoadingAnimation?: boolean;
 };
 
 const Table = <T,>(props: ITable<T>) => {
@@ -54,6 +58,8 @@ const Table = <T,>(props: ITable<T>) => {
     filters,
     onFilter,
     activeFilterIndex,
+    loaded,
+    showLoadingAnimation = false,
   } = props;
 
   const { rowsPerPage, page } = pagination;
@@ -100,55 +106,73 @@ const Table = <T,>(props: ITable<T>) => {
       </div>
 
       {/* Table */}
-      <table className="transaction-table">
-        {/* Table Headings */}
-        <thead>
-          <tr>
-            {headings.map((heading) => {
-              const alignProps = heading.alignRight
-                ? "alignRight"
-                : "alignLeft";
-              const classProps = `heading ${alignProps}`;
+      {data.length === 0 ? (
+        loaded !== true ? (
+          <>
+            Fetching table data...
+            <div className="center-table-loading-anim loader-dots">
+              {showLoadingAnimation && <LoadingDots />}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="center-table-loading-anim loader-dots">
+              <Text size="lg">No reward record found!</Text>
+            </div>
+          </>
+        )
+      ) : (
+        <table className="transaction-table">
+          {/* Table Headings */}
+          <thead>
+            <tr>
+              {headings.map((heading) => {
+                const alignProps = heading.alignRight
+                  ? "alignRight"
+                  : "alignLeft";
+                const classProps = `heading ${alignProps}`;
 
-              return (
-                <th className={classProps} key={heading.name}>
-                  <Text>{heading.name}</Text>
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
+                return (
+                  <th className={classProps} key={heading.name}>
+                    <Text>{heading.name}</Text>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
 
-        {/* Table Body */}
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.tbody
-            key={`page-${page}`}
-            initial="enter"
-            animate={isTransition.state === "idle" ? "enter" : "transitioning"}
-            exit="exit"
-            variants={{
-              enter: {
-                opacity: 1,
-                transition: {
-                  when: "beforeChildren",
-                  staggerChildren: 0.05,
+          {/* Table Body */}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.tbody
+              key={`page-${page}`}
+              initial="enter"
+              animate={
+                isTransition.state === "idle" ? "enter" : "transitioning"
+              }
+              exit="exit"
+              variants={{
+                enter: {
+                  opacity: 1,
+                  transition: {
+                    when: "beforeChildren",
+                    staggerChildren: 0.05,
+                  },
                 },
-              },
-              exit: {
-                opacity: 0,
-                transition: {
-                  when: "afterChildren",
-                  staggerChildren: 0.05,
+                exit: {
+                  opacity: 0,
+                  transition: {
+                    when: "afterChildren",
+                    staggerChildren: 0.05,
+                  },
                 },
-              },
-              transitioning: {},
-            }}
-          >
-            {data.map((row, i) => renderRow({ data: row, index: i }))}
-          </motion.tbody>
-        </AnimatePresence>
-      </table>
-
+                transitioning: {},
+              }}
+            >
+              {data.map((row, i) => renderRow({ data: row, index: i }))}
+            </motion.tbody>
+          </AnimatePresence>
+        </table>
+      )}
       {/* Pagination */}
       {pageCount > 0 && (
         <motion.div className="pagination" layout="position">

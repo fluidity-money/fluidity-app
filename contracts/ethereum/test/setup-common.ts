@@ -14,6 +14,7 @@ export let tokenOperatorSigner: ethers.Signer;
 export let tokenCouncilSigner: ethers.Signer;
 export let configOperatorSigner: ethers.Signer;
 export let configCouncilSigner: ethers.Signer;
+export let rewardPoolsOperatorSigner: ethers.Signer;
 
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
@@ -30,6 +31,7 @@ before(async function () {
     tokenCouncilSigner,
     configOperatorSigner,
     configCouncilSigner,
+    rewardPoolsOperatorSigner
   ] = await hre.ethers.getSigners();
 
   accountAddr = await accountSigner.getAddress();
