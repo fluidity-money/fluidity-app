@@ -4,7 +4,7 @@
 
 export { default as LineChart } from "./LineChart";
 export { default as DataTable } from "./Table";
-export { default as Socias } from "./Socials";
+export { default as Socials } from "./Socials";
 export { Display } from "./Display";
 export { Heading } from "./Heading";
 export { default as Text } from "./Text";
