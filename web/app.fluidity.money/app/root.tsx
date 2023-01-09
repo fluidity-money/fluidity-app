@@ -1,5 +1,4 @@
 import type { MetaFunction, LoaderFunction } from "@remix-run/node";
-import { SplitFactory } from "@splitsoftware/splitio"; }
 import {
   useLoaderData,
   Links,
@@ -216,30 +215,6 @@ function App() {
       });
     }
   }, [location, gaToken]);
-
-  useEffect(() => {
-    const { userKey, splitName } = this.props.pageProps;
-
-    // Init Split on client-side
-    (function () {
-      window["split"] = window["split"] ||
-        SplitFactory({
-          core: {
-            authorizationKey: 'BROWSER API KEY',
-            key: userKey,
-          },
-          debug: true,
-        });
-    })();
-
-  // This branch runs only on the client-side
-    const splitClient = window["split"].client()
-    await splitClient.ready()
-    const ctreatment  = splitClient.getTreatment(clientFEATURE);
-    this.setState({          
-        ctreatment: this.props.ctreatment
-    });
-  }, []);
 
   return (
     <html lang="en">
