@@ -22,13 +22,14 @@ nextjs:
 ${FRONTEND_BUILD}: nextjs
 	@touch ${FRONTEND_BUILD}
 
+# No the double dot is not a typo. Turbo builds are from the monorepo root.
 docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/${REPO}-frontend" \
 		-f Dockerfile.frontend \
-		.
+		..
 
 	@touch docker-frontend
 

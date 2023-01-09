@@ -21,37 +21,40 @@ export const Template = ({ children, ...props }) => (
   <Title>Anchor Button</Title>
   <Subtitle>Button to visit Anchor points</Subtitle>
 
-  <h2>Default</h2>
-  <Story
-    name="Anchor Button Default"
-    args={{
-      children: "Distributions",
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Default</h2>
+<Story
+  name="Anchor Button Default"
+  args={{
+    children: "Distributions",
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>Button Hover</h2>
-  <Story
-    name="Anchor Button Hover"
-    args={{
-      className: "hover",
-      children: "Distributions",
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Button Hover</h2>
+<Story
+  name="Anchor Button Hover"
+  args={{
+    className: "hover",
+    children: "Distributions",
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>Button Focus</h2>
-  <Story
-    name="Anchor Button Focus"
-    args={{
-      className: "focus",
-      children: "Distributions",
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Button Focus</h2>
+<Story
+  name="Anchor Button Focus"
+  args={{
+    className: "focus",
+    children: "Distributions",
+  }}
+>
+  {Template.bind({})}
+</Story>
 
   <h2>Button Disabled</h2>
   <Story

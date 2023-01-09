@@ -21,26 +21,28 @@ export const Template = ({ children, ...props }) => (
   <Title>Attention Button</Title>
   <Subtitle>Button to grab users attention</Subtitle>
 
-  <h2>Default</h2>
-  <Story
-    name="Attention Button Default"
-    args={{
-      children: "FLUIDIFY MONEY",
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Default</h2>
+<Story
+  name="Attention Button Default"
+  args={{
+    children: "FLUIDIFY MONEY",
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>Button Hover</h2>
-  <Story
-    name="Attention Button Hover"
-    args={{
-      className: "hover",
-      children: "FLUIDIFY MONEY",
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Button Hover</h2>
+<Story
+  name="Attention Button Hover"
+  args={{
+    className: "hover",
+    children: "FLUIDIFY MONEY",
+  }}
+>
+  {Template.bind({})}
+</Story>
 
   <h2>Button Focus</h2>
   <Story

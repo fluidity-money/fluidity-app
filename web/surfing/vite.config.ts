@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import { resolve } from "path";
-import { defineConfig } from "vite";
+import { defineConfig, PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -12,7 +12,14 @@ import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [svgr(), dts(), react(), tsconfigPaths(), injectCSS()],
+  // I trust the authors of these plugins are compliant with vite's plugin API
+  plugins: [
+    svgr(),
+    dts(),
+    react(),
+    tsconfigPaths(),
+    injectCSS(),
+  ] as PluginOption[],
   css: {
     preprocessorOptions: {
       scss: {

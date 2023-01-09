@@ -21,119 +21,122 @@ export const Template = ({ children, ...props }) => (
   <Title>Filter Button</Title>
   <Subtitle>Button to toggle filters</Subtitle>
 
-  <h2>Filter Button</h2>
-  <Story
-    name="Filter Button Text"
-    args={{
-      option: {
-        name: "opt1",
+{" "}
+<h2>Filter Button</h2>
+<Story
+  name="Filter Button Text"
+  args={{
+    option: {
+      name: "opt1",
+      selected: false,
+    },
+    options: [
+      {
+        name: "opt2",
+        selected: true,
+      },
+      {
+        name: "opt3",
         selected: false,
       },
-      options: [
-        {
-          name: "opt2",
-          selected: true,
-        },
-        {
-          name: "opt3",
-          selected: false,
-        },
-      ],
-    }}
-  >
-    {Template.bind({})}
-  </Story>
-  <Story
-    name="Filter Button Icon Before"
-    args={{
-      option: {
-        name: "opt1",
+    ],
+  }}
+>
+  {Template.bind({})}
+</Story>
+<Story
+  name="Filter Button Icon Before"
+  args={{
+    option: {
+      name: "opt1",
+      selected: false,
+    },
+    options: [
+      {
+        name: "opt2",
         selected: false,
       },
-      options: [
-        {
-          name: "opt2",
-          selected: false,
-        },
-        {
-          name: "opt3",
-          selected: false,
-        },
-      ],
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+      {
+        name: "opt3",
+        selected: false,
+      },
+    ],
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>FilterButton States</h2>
-  <Story
-    name="Filter Button Hover"
-    args={{
-      className: "hover",
-      option: {
-        name: "opt1",
+{" "}
+<h2>FilterButton States</h2>
+<Story
+  name="Filter Button Hover"
+  args={{
+    className: "hover",
+    option: {
+      name: "opt1",
+      selected: false,
+    },
+    options: [
+      {
+        name: "opt2",
         selected: false,
       },
-      options: [
-        {
-          name: "opt2",
-          selected: false,
-        },
-        {
-          name: "opt3",
-          selected: false,
-        },
-      ],
-    }}
-  >
-    {Template.bind({})}
-  </Story>
-  <Story
-    name="Filter Button Focus"
-    args={{
-      className: "focus",
-      option: {
-        name: "opt1",
+      {
+        name: "opt3",
         selected: false,
       },
-      options: [
-        {
-          name: "opt2",
-          selected: false,
-        },
-        {
-          name: "opt3",
-          selected: false,
-        },
-      ],
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+    ],
+  }}
+>
+  {Template.bind({})}
+</Story>
+<Story
+  name="Filter Button Focus"
+  args={{
+    className: "focus",
+    option: {
+      name: "opt1",
+      selected: false,
+    },
+    options: [
+      {
+        name: "opt2",
+        selected: false,
+      },
+      {
+        name: "opt3",
+        selected: false,
+      },
+    ],
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>Disabled</h2>
-  <Story
-    name="Filter Button Disabled"
-    args={{
-      option: {
-        name: "opt1",
+{" "}
+<h2>Disabled</h2>
+<Story
+  name="Filter Button Disabled"
+  args={{
+    option: {
+      name: "opt1",
+      selected: false,
+    },
+    options: [
+      {
+        name: "opt2",
         selected: false,
       },
-      options: [
-        {
-          name: "opt2",
-          selected: false,
-        },
-        {
-          name: "opt3",
-          selected: false,
-        },
-      ],
-      disabled: true,
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+      {
+        name: "opt3",
+        selected: false,
+      },
+    ],
+    disabled: true,
+  }}
+>
+  {Template.bind({})}
+</Story>
 
   <h2>Selected</h2>
   <Story

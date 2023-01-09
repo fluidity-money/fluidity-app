@@ -20,49 +20,52 @@ export const Template = (props) => <ChainSelectorButton {...props} />;
   <Title>ChainSelector Button</Title>
   <Subtitle>Button to switch Chains</Subtitle>
 
-  <h2>Default</h2>
-  <Story
-    name="ChainSelector Button Default"
-    args={{
-      chain: {
-        name: "OPT",
-        icon: <ReactSvg />,
-      },
-      onClick: () => {},
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Default</h2>
+<Story
+  name="ChainSelector Button Default"
+  args={{
+    chain: {
+      name: "OPT",
+      icon: <ReactSvg />,
+    },
+    onClick: () => {},
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>Button Hover</h2>
-  <Story
-    name="ChainSelector Button Hover"
-    args={{
-      className: "hover",
-      chain: {
-        name: "OPT",
-        icon: <ReactSvg />,
-      },
-      onClick: () => {},
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Button Hover</h2>
+<Story
+  name="ChainSelector Button Hover"
+  args={{
+    className: "hover",
+    chain: {
+      name: "OPT",
+      icon: <ReactSvg />,
+    },
+    onClick: () => {},
+  }}
+>
+  {Template.bind({})}
+</Story>
 
-  <h2>Button Focus</h2>
-  <Story
-    name="ChainSelector Button Focus"
-    args={{
-      className: "focus",
-      chain: {
-        name: "OPT",
-        icon: <ReactSvg />,
-      },
-      onClick: () => {},
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+{" "}
+<h2>Button Focus</h2>
+<Story
+  name="ChainSelector Button Focus"
+  args={{
+    className: "focus",
+    chain: {
+      name: "OPT",
+      icon: <ReactSvg />,
+    },
+    onClick: () => {},
+  }}
+>
+  {Template.bind({})}
+</Story>
 
   <h2>Button Disabled</h2>
   <Story
