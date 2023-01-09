@@ -1,23 +1,19 @@
-import {
-  Meta,
-  Title,
-  Subtitle,
-  Story,
-  Canvas,
-  ArgsTable,
-} from "@storybook/addon-docs";
+import { Meta, Title, Subtitle, Story, Canvas, ArgsTable } from "@storybook/addon-docs";
 import Spinner from "./Spinner";
 
 <Meta title={"Loading/Spinner"} component={Spinner} />
 
+
 <Title>Spinner</Title>
 
-<Subtitle>Loading spinner</Subtitle>
+<Subtitle>
+  Loading spinner
+</Subtitle>
 
 export const Template = (args) => <Spinner />;
 
 <Canvas>
-  <Story name="Spinner" args={{}}>
+<Story name="Spinner" args={{}}>
     {Template.bind({})}
-  </Story>
+</Story>
 </Canvas>

@@ -16,7 +16,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "start": "turbo start",
-    "format": "prettier --write \"**/*.{js,ts,tsx,md,mdx}\"",
+    "format": "prettier --write \"**/*.{js,ts,tsx}\"",
     "test": "turbo test",
     "storybook": "turbo storybook"
   },
