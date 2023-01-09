@@ -26,12 +26,15 @@ const LabelledValue = ({
     <div className={classProps}>
       <Text size={mobileView ? "sm" : "md"}>{label}</Text>
       <div className={styles.value}>
-        {icon && 
-          typeof icon === "string"
-            ? <img className={styles.icon} src={icon} />
-            : icon
-        }
-        <Display className={styles.noPadding} size={mobileView ? "xxxs" : "xxs"}>
+        {icon && typeof icon === "string" ? (
+          <img className={styles.icon} src={icon} />
+        ) : (
+          icon
+        )}
+        <Display
+          className={styles.noPadding}
+          size={mobileView ? "xxxs" : "xxs"}
+        >
           {children}
         </Display>
       </div>

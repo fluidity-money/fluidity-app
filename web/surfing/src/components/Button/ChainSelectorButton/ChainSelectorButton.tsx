@@ -5,7 +5,7 @@
 import type { ButtonHTMLAttributes, ReactComponentElement } from "react";
 
 import { Text } from "~/components";
-import { ReactComponent as ArrowDiag } from '~/assets/images/buttonIcons/arrowDiagWhite.svg';
+import { ReactComponent as ArrowDiag } from "~/assets/images/buttonIcons/arrowDiagWhite.svg";
 import styles from "./ChainSelectorButton.module.scss";
 
 interface ChainOption {
@@ -25,14 +25,15 @@ const ChainSelectorButton = ({
   ...props
 }: IChainSelectorButton) => {
   const classProps = className || "";
-  
+
   return (
-    <button onClick={onClick} className={`${styles.dropdown} ${classProps}`} {...props}>
+    <button
+      onClick={onClick}
+      className={`${styles.dropdown} ${classProps}`}
+      {...props}
+    >
       {chain.icon}
-      <Text
-        size={"lg"}
-        prominent={true}
-      >
+      <Text size={"lg"} prominent={true}>
         {chain.name}
       </Text>
       <ArrowDiag />

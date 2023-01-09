@@ -1,4 +1,11 @@
-import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
+import {
+  Meta,
+  Canvas,
+  Story,
+  Title,
+  Subtitle,
+  ArgsTable,
+} from "@storybook/addon-docs";
 
 import LabelledValue from "./LabelledValue";
 import { ReactComponent as ReactSvg } from "/src/assets/react.svg";
@@ -11,24 +18,24 @@ export const Template = (args) => <LabelledValue {...args} />;
 <Subtitle>Heading and Value pair</Subtitle>
 
 <Canvas withToolbar>
-    <Story
-        name="Labelled Value"
-        args={{
-            children: "Test",
-            label: "Title",
-            icon: <ReactSvg />,
-        }}
-    >
-        {Template.bind({})}
-    </Story>
-    <Story
-        name="Labelled Value - Static img"
-        args={{
-            children: "Test",
-            label: "Title",
-            icon: "https://app.fluidity.money/images/logoMetallic.png",
-        }}
-    >
-        {Template.bind({})}
-    </Story>
+  <Story
+    name="Labelled Value"
+    args={{
+      children: "Test",
+      label: "Title",
+      icon: <ReactSvg />,
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+  <Story
+    name="Labelled Value - Static img"
+    args={{
+      children: "Test",
+      label: "Title",
+      icon: "https://app.fluidity.money/images/logoMetallic.png",
+    }}
+  >
+    {Template.bind({})}
+  </Story>
 </Canvas>

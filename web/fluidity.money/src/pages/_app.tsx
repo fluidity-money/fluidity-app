@@ -51,7 +51,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }, [router.events]);
 
   useEffect(() => {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     if (width >= breakpoint) {
       script.src = "assets/gfx/renderer.js";
       document.body.appendChild(script);
@@ -61,22 +61,24 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       if (document.body.contains(script)) {
         document.body.removeChild(script);
       }
-    }
-  }, [width, breakpoint])
+    };
+  }, [width, breakpoint]);
 
-  return <>
-    <div id={"fluid"} />
-    <div id="shade" />
-    <div id="root">
-      <ApolloProvider client={client}>
-        <ChainContextProvider>
+  return (
+    <>
+      <div id={"fluid"} />
+      <div id="shade" />
+      <div id="root">
+        <ApolloProvider client={client}>
+          <ChainContextProvider>
             <div className="App">
               {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
               <Component {...pageProps} />
             </div>
-        </ChainContextProvider>
-      </ApolloProvider>
-      <CookieConsent />
-    </div>
-  </>
+          </ChainContextProvider>
+        </ApolloProvider>
+        <CookieConsent />
+      </div>
+    </>
+  );
 }
