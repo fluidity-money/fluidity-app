@@ -7,7 +7,7 @@ export {
   numberToCommaSeparated,
   stringifiedNumberToMonetaryString,
   toSignificantDecimals,
-  decimalTrim, 
+  decimalTrim,
   shorthandAmountFormatter,
 } from "./numberConverters";
 export {
