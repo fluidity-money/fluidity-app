@@ -3,29 +3,20 @@
 // LICENSE.md file.
 
 import { resolve } from "path";
-import { defineConfig, PluginOption } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import tsconfigPaths from "vite-tsconfig-paths";
-import injectCSS from "vite-plugin-css-injected-by-js";
-import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // I trust the authors of these plugins are compliant with vite's plugin API
-  plugins: [
-    svgr(),
-    dts(),
-    react(),
-    tsconfigPaths(),
-    injectCSS(),
-  ] as PluginOption[],
+  plugins: [svgr(), react(), tsconfigPaths()],
   css: {
     preprocessorOptions: {
       scss: {
-        includePaths: [resolve(__dirname, "./src")],
-      },
-    },
+        includePaths: [resolve(__dirname, './src')],
+      }
+    }
   },
   build: {
     lib: {
@@ -33,7 +24,6 @@ export default defineConfig({
       name: "Surfing",
       // the proper extensions will be added
       fileName: "surfing",
-      formats: ["es", "cjs"],
     },
     emptyOutDir: false,
     rollupOptions: {

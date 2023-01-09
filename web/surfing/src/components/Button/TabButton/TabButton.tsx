@@ -11,16 +11,11 @@ interface ITabButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: string;
 }
 
-const TabButton = ({
-  children,
-  size,
-  className,
-  ...props
-}: ITabButtonProps) => {
+const TabButton = ({ children, size, className, ...props }: ITabButtonProps) => {
   const classProps = className || "";
 
   return (
-    <button
+    <button 
       className={`${styles.button} ${styles[size]} ${classProps}`}
       {...props}
     >

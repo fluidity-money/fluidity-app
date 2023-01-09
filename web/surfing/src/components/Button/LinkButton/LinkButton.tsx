@@ -30,9 +30,7 @@ const LinkButton = ({
   const classProps = className || "";
 
   const buttonColorProps = styles[color];
-  const buttonClassProps = `${
-    styles.button
-  } ${buttonColorProps} ${classProps} ${left && styles.iconLeft}`;
+  const buttonClassProps = `${styles.button} ${buttonColorProps} ${classProps} ${left && styles.iconLeft}`;
 
   const textSizeProps = styles[size];
   const textClassProps = `${styles.text} ${textSizeProps}`;

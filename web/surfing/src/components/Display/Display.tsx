@@ -5,32 +5,25 @@
 import styles from "./Display.module.scss";
 
 type DisplayProps = {
-  children: React.ReactNode;
-  size?: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg";
-  color?: "white" | "gray";
+    children: React.ReactNode
+    size?: "xxxs" | "xxs" | "xs" | "sm" | "md" | "lg"
+    color?: "white" | "gray";
 
-  [key: string]: any;
+    [key: string]: any
 };
 
-const Display = ({
-  children,
-  size = "lg",
-  color = "white",
-  ...props
-}: DisplayProps) => {
-  const propClasses = props.className || "";
+const Display = ({ children, size="lg", color="white", ...props }: DisplayProps ) => {
+    const propClasses = props.className || "";
 
-  const { extraSmall, small, medium, large: _, ...rest } = props;
+    const { extraSmall, small, medium, large: _, ...rest } = props;
+    
+    const sizeProps = styles[size];
+    const colorProps = styles[color];
+    const className = ` ${styles.display} ${sizeProps} ${colorProps} ${propClasses}`;
 
-  const sizeProps = styles[size];
-  const colorProps = styles[color];
-  const className = ` ${styles.display} ${sizeProps} ${colorProps} ${propClasses}`;
-
-  return (
-    <h1 {...rest} className={className}>
-      {children}
+    return <h1 {...rest } className={className}>
+        {children}
     </h1>
-  );
 };
 
 export default Display;

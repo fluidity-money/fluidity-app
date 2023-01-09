@@ -32,9 +32,11 @@ const FilterButton = ({
   ...props
 }: IFilterButtonProps) => {
   const classProps = className || "";
-
-  const optionName = option.name.includes("any") ? "ANY" : option.name;
-
+  
+  const optionName = option.name.includes("any") 
+    ? "ANY"
+    : option.name;
+  
   return (
     <>
       {option.selected ? (
@@ -48,9 +50,7 @@ const FilterButton = ({
       ) : (
         <button
           className={`${styles.option} ${classProps}`}
-          onClick={() =>
-            disabled !== true && handleFilter(option, setOptions, options)
-          }
+          onClick={() => disabled !== true && handleFilter(option, setOptions, options)}
           disabled={disabled}
           {...props}
         >

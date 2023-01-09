@@ -2,31 +2,34 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { motion } from "framer-motion";
-import { ReactSVGElement } from "react";
+import { motion } from 'framer-motion'
+import { ReactSVGElement } from 'react'
 
 type Props = {
-  icon: ReactSVGElement;
-};
+    icon: ReactSVGElement
+}
 
-const Tab = ({ leading, children, active }: any) => {
-  return (
-    <>
-      <ul>
-        <li></li>
-      </ul>
+const Tab = ({
+    leading,
+    children,
+    active,
+}: any) => {
+    return <>
+        <ul>
+            <li>
+                
+            </li>
+        </ul>
     </>
-  );
-};
+}
 
 const TabBar = () => {
-  return (
-    <>
-      <ul>
-        <li></li>
-      </ul>
+    return <>
+        <ul>
+            <li>
+            </li>
+        </ul>
     </>
-  );
-};
+}
 
-export { Tab, TabBar };
+export { Tab, TabBar }

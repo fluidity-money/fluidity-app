@@ -8,7 +8,7 @@ interface ISupportedChains {
   SOL: Chain;
 }
 
-export type SupportedChainsList = keyof ISupportedChains;
+export type SupportedChainsList = keyof ISupportedChains
 
 export const SupportedChains: ISupportedChains = {
   ETH: {
@@ -28,4 +28,5 @@ export const SupportedChains: ISupportedChains = {
   //   name: "polygon",
   //   short: "POL"
   // },
-};
+}
+

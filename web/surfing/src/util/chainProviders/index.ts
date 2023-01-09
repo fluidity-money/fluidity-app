@@ -1,3 +1,3 @@
-export type { SupportedChainsList } from "./chains";
+export type { SupportedChainsList } from './chains';
 
-export { SupportedChains } from "./chains";
+export { SupportedChains } from './chains';

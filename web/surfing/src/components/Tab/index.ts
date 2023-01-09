@@ -2,4 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-export { Tab, TabBar } from "./Tab";
+export {
+    Tab,
+    TabBar
+} from './Tab';

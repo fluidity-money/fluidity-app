@@ -1,20 +1,13 @@
-import {
-  Meta,
-  Canvas,
-  Story,
-  Title,
-  Subtitle,
-  ArgsTable,
-} from "@storybook/addon-docs";
+import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
 
 import Display from "./Display";
 
 <Meta title="Typography/Display" component={Display} />
 
 export const Template = (args) => (
-  <Display {...args}>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-  </Display>
+    <Display {...args}>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    </Display>
 );
 
 <Title>Display</Title>
@@ -25,65 +18,61 @@ export const Template = (args) => (
 ## Variants
 
 ### Large
-
 <Canvas>
-  <Story
-    name="Display Large"
-    args={{
-      extraSmall: false,
-      small: false,
-      medium: false,
-      large: true,
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+    <Story
+        name="Display Large"
+        args={{
+            extraSmall: false,
+            small: false,
+            medium: false,
+            large: true
+        }}
+    >
+        {Template.bind({})}
+    </Story>
 </Canvas>
 
 ### Medium
-
 <Canvas>
-  <Story
-    name="Display Medium"
-    args={{
-      extraSmall: false,
-      small: false,
-      medium: true,
-      large: false,
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+    <Story
+        name="Display Medium"
+        args={{
+            extraSmall: false,
+            small: false,
+            medium: true,
+            large: false
+        }}
+    >
+        {Template.bind({})}
+    </Story>
 </Canvas>
 
 ### Small
-
 <Canvas>
-  <Story
-    name="Display Small"
-    args={{
-      extraSmall: false,
-      small: true,
-      medium: false,
-      large: false,
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+    <Story
+        name="Display Small"
+        args={{
+            extraSmall: false,
+            small: true,
+            medium: false,
+            large: false
+        }}
+    >
+        {Template.bind({})}
+    </Story>
 </Canvas>
 
 ### Extra Small
-
 <Canvas>
-  <Story
-    name="Display Extra Small"
-    args={{
-      extraSmall: true,
-      small: false,
-      medium: false,
-      large: false,
-    }}
-  >
-    {Template.bind({})}
-  </Story>
+    <Story
+        name="Display Extra Small"
+        args={{
+            extraSmall: true,
+            small: false,
+            medium: false,
+            large: false
+        }}
+    >
+        {Template.bind({})}
+    </Story>
 </Canvas>

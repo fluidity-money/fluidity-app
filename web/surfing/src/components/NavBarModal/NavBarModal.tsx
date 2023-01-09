@@ -18,17 +18,14 @@ interface ILinkButton {
 const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   const navBarModal = useRef(null);
-
+  
   useClickOutside(navBarModal, () => handleModal(false));
 
   return (
     <div ref={navBarModal} className={styles.container}>
       {navLinks.map((link) => (
         <h4>
-          <a
-            onClick={() => handleModal(false)}
-            href={`/resources#${link.children}`}
-          >
+          <a onClick={() => handleModal(false)} href={`/resources#${link.children}`}>
             <LinkButton
               size={link.size}
               type={link.type}

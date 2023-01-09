@@ -1,9 +1,31 @@
-import { Meta, Canvas } from "@storybook/blocks";
-
-import { Display } from "./lib";
+import { Meta, Subtitle, Title } from '@storybook/addon-docs';
 
 <Meta title="Introduction" />
 
-# Surfing
+<Title>Surfing</Title>
 
-Surfing is Fluidity's beautiful new design language.
+<Subtitle>
+    Surfing is Fluidity's beautiful new design language. <br />
+    Designed to flow.
+</Subtitle>
+
+## Start Surfing
+
+Getting started is easy.
+
+If you're developing for Fluidity, simply install the package and start using it.
+
+```bash
+npm install --save ../surfing
+```
+
+This assumes that you're using the mono-repo setup.
+Otherwise, you'll need to install the package separately.
+
+Post launch, you should simply be able to use `@fluidity/surfing` in your project. Pending approval of course!
+
+## Development setup
+
+You're already here! We use Storybook to develop our components.
+
+Vite should just build the components for you.

@@ -2,4 +2,4 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-export { default as ManualCarousel } from "./ManualCarousel";
+export { default as ManualCarousel } from './ManualCarousel';

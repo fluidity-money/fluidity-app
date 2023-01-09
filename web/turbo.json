@@ -26,7 +26,8 @@
         ]
       },
       "dev": {
-          "cache": false
+        "dependsOn": ["^build"],
+        "cache": false
       },
       "storybook": {
         "cache": false

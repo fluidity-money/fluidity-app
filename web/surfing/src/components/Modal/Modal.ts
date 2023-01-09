@@ -2,10 +2,7 @@ import type { MutableRefObject } from "react";
 
 import { useEffect } from "react";
 
-const useClickOutside = (
-  ref: MutableRefObject<any>,
-  handleClick: VoidFunction
-) => {
+const useClickOutside = (ref: MutableRefObject<any>, handleClick: VoidFunction) => {
   useEffect(() => {
     /**
      * Run callback if clicked on outside of element
@@ -14,7 +11,7 @@ const useClickOutside = (
       if (ref.current && !ref.current.contains(event.target)) {
         handleClick();
       }
-    };
+    }
 
     // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);

@@ -4,4 +4,4 @@
 
 import ContinuousCarousel from "./ContinuousCarousel";
 
-export { ContinuousCarousel };
+export { ContinuousCarousel} ;

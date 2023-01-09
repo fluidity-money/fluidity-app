@@ -1,3 +1,3 @@
-import TransparentVideo from "./TransparentVideo";
+import TransparentVideo from './TransparentVideo';
 
 export default TransparentVideo;

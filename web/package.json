@@ -5,7 +5,8 @@
   "workspaces": [
     "app.fluidity.money",
     "fluidity.money",
-    "surfing"
+    "surfing",
+    "surfing-sb"
   ],
   "dependencies": {
     "prettier": "^2.8.1",
@@ -22,7 +23,6 @@
   "packageManager": "npm@9.2.0",
   "devDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "webpack": "^5.75.0"
+    "react-dom": "^18.2.0"
   }
 }

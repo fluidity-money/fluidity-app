@@ -9,20 +9,11 @@ import styles from "./AnchorButton.module.scss";
 
 interface IAnchorButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 
-const AnchorButton = ({
-  children,
-  disabled,
-  className,
-  ...props
-}: IAnchorButtonProps) => {
+const AnchorButton = ({ children, disabled, className, ...props }: IAnchorButtonProps) => {
   const classProp = className || "";
 
   return (
-    <button
-      className={`${styles.button} ${classProp}`}
-      disabled={disabled}
-      {...props}
-    >
+    <button className={`${styles.button} ${classProp}`} disabled={disabled} {...props} >
       <ArrowDown className={styles.icon} />{" "}
       <div className={styles.text}>{children}</div>
     </button>

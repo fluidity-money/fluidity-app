@@ -10,7 +10,7 @@ interface INavigation {
 
 const Navigation = ({ pageLocations, page, background }: INavigation) => {
   /* scrolls to location on pageload if it contains same ID or scrolls to the top */
-  const backgroundProp = `${background === "black" ? styles.black : ""}`;
+  const backgroundProp = `${background === "black" ? styles.black : ""}`
 
   return (
     <div className={`${styles.container} ${backgroundProp}`}>
