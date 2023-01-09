@@ -2,4 +2,4 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-export { default as CookieConsent } from "./CookieConsent";
+export { default as CookieConsent } from './CookieConsent';
