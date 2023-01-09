@@ -23,6 +23,7 @@ jobs:
         with:
           lfs: true
       - name: Install dependencies
+        working-directory: web
         run: npm install --include dev
         # 👇 Adds Chromatic as a step in the workflow
       - name: Publish to Chromatic
