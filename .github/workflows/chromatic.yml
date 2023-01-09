@@ -6,7 +6,7 @@ name: 'Chromatic'
 # Event for the workflow
 on: 
   push:
-    paths: "web"
+    paths: "web/**"
 
 # List of jobs
 jobs:
