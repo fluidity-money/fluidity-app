@@ -20,4 +20,6 @@ export {
   trimAddressShort,
   appendLeading0x,
   trimLeading0x,
+  decimalTrim, 
+  shorthandAmountFormatter
 } from "./formatters";

@@ -67,4 +67,42 @@ const toSignificantDecimals = (num: number, decimals_?: number): string => {
   return `${numberToCommaSeparated(wholeValue)}.${`${wholeDecimalValue}`.padStart(decimalsToFirstSig, "0")}`
 }
 
-export { numberToCommaSeparated, numberToMonetaryString, stringifiedNumberToMonetaryString, toSignificantDecimals };
+//trim a string to <limit> decimal places
+const decimalTrim = (amount: string, limit: number) => {
+  if (limit <= 0) {
+    return amount;
+  }
+
+  const trimIndex = amount.indexOf(".");
+  const trim = trimIndex > -1 ? amount.slice(0, trimIndex + limit + 1) : amount;
+  return trim;
+};
+
+const shorthandAmountFormatter = (
+  uiAmount: string,
+  decimalPlaces: number
+): string => {
+  const num: number = parseFloat(uiAmount);
+  if (num < 1) {
+    return decimalTrim(uiAmount, decimalPlaces);
+  }
+  const lookup = [
+    { value: 1, symbol: "" },
+    { value: 1e3, symbol: "K" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e9, symbol: "B" },
+    { value: 1e12, symbol: "T" },
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  const item = lookup
+    .slice()
+    .reverse()
+    .find(function (item) {
+      return num >= item.value;
+    });
+  return item
+    ? (num / item.value).toFixed(decimalPlaces).replace(rx, "$1") + item.symbol
+    : "0";
+};
+
+export { numberToCommaSeparated, numberToMonetaryString, stringifiedNumberToMonetaryString, toSignificantDecimals, decimalTrim, shorthandAmountFormatter};

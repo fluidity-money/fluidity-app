@@ -7,6 +7,8 @@ export {
   numberToCommaSeparated,
   stringifiedNumberToMonetaryString,
   toSignificantDecimals,
+  decimalTrim, 
+  shorthandAmountFormatter,
 } from "./numberConverters";
 export {
   normaliseAddress,

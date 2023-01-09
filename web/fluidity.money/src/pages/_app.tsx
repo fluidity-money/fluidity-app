@@ -8,13 +8,13 @@ import { ApolloProvider } from "@apollo/client";
 import {useViewport} from '@fluidity-money/surfing';
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
 import "@fluidity-money/surfing/dist/style.css";
 import "styles/app.global.scss"
-import CookieConsent from 'components/CookieConsent/CookieConsent';
+import { CookieConsent } from "@fluidity-money/surfing";
 import { useRouter } from 'next/router';
 import * as gtag from 'utils/gtag'
 
@@ -49,6 +49,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.events])
 
+  const [cookieConsent, setCookieConsent] = useState(true);
+  useEffect(() => {
+    const _cookieConsent = localStorage.getItem("cookieConsent");
+    if (!_cookieConsent) {
+      setCookieConsent(false);
+    }
+  }, []);
+  
   useEffect(() => {
     const script = document.createElement('script');
     if (width >= breakpoint) {
@@ -75,7 +83,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </div>
         </ChainContextProvider>
       </ApolloProvider>
-      <CookieConsent />
+      <CookieConsent  activated={cookieConsent} url= {'https://static.fluidity.money/assets/fluidity-privacy-policy.pdf'} callBack={()=>{setCookieConsent(true)}}/>
     </div>
   </>
 }

@@ -10,6 +10,7 @@ export { Heading } from "./Heading";
 export { default as Text } from "./Text";
 export { NavBar } from "./NavBar";
 export { NavBarModal } from "./NavBarModal";
+export { CookieConsent } from "./CookieConsent"
 export { Navigation } from "./Navigation";
 export { ReusableGrid } from "./ReusableGrid";
 export { FilterCriteria } from "./Filter";
