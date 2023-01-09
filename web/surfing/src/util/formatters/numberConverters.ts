@@ -72,6 +72,7 @@ const toSignificantDecimals = (num: number, decimals_?: number): string => {
       : 0;
 
   const totalSigDecimals = decimalsToFirstSig + decimals - 1;
+};
 
 //trim a string to <limit> decimal places
 const decimalTrim = (amount: string, limit: number) => {
@@ -111,4 +112,11 @@ const shorthandAmountFormatter = (
     : "0";
 };
 
-export { numberToCommaSeparated, numberToMonetaryString, stringifiedNumberToMonetaryString, toSignificantDecimals, decimalTrim, shorthandAmountFormatter};
+export {
+  numberToCommaSeparated,
+  numberToMonetaryString,
+  stringifiedNumberToMonetaryString,
+  toSignificantDecimals,
+  decimalTrim,
+  shorthandAmountFormatter,
+};
