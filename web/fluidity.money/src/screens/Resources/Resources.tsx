@@ -2,8 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { LinkButton } from "@fluidity-money/surfing";
-import Socials from "../../components/Socials";
+import { LinkButton, Socials } from "@fluidity-money/surfing";
 import styles from "./Resources.module.scss";
 
 const Resources = () => {
