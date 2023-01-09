@@ -2,6 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import FilterCriteria from "./FIlterCriteria"
+import Socials from "./Socials";
 
-export default FilterCriteria;
+export default Socials;
