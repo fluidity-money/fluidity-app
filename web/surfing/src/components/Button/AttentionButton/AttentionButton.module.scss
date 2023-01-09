@@ -1,0 +1,90 @@
+@use 'common' as *;
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.attention {
+  position: relative;
+  overflow: hidden;
+  font-size: 15px;
+  box-shadow: 0 0 8px 2px #f3b8d8;
+  border-radius:50px;
+
+  &::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  left: -20%;
+  top: -150%;
+  width: 400px;
+  height: 400px;
+  border-radius:inherit;
+  background-color: #f3b8d8;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  background-image: linear-gradient(
+    45deg,
+    #f3b8d8,
+    #b793e9,
+    #9fd4f3,
+    #ffd2c4,
+    #fbf3f3,
+    #d9abdf,
+    #af9ce3,
+    #aae4e1,
+    #c6ead0,
+    #ffffff,
+    #fdb5e4
+  );
+  animation: rotate 4s linear infinite;
+}
+
+&::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 3px;
+  top: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: black;
+  border-radius: inherit;
+}
+
+&:hover:enabled {
+  border: 0.5px solid map-get($border, "prominent");
+}
+
+&:hover:enabled > h5 {
+  color: black;
+}
+
+&:hover:focus:enabled > h5 {
+  color: white;
+}
+
+&:hover:focus::after {
+  background: black;
+}
+
+&:hover::after {
+  background: transparent;
+}
+
+ &:focus:enabled {
+    box-shadow: 0px 0px 0px 2px map-get($border, "focus");
+  }
+
+}
+
+h5 {
+  margin:1em;
+}
+
+
+
+

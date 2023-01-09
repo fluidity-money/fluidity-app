@@ -1,0 +1,19 @@
+import { Canvas, Meta, Story } from "@storybook/addon-docs";
+
+import ReusableGrid from "./ReusableGrid";
+
+<Meta title="ReusableGrid/ReusableGrid" component={ReusableGrid} />
+
+export const Template = (args) => <ReusableGrid {...args} />;
+
+<Canvas>
+  <Story
+    name="ReusableGrid"
+    args={{
+      left: <div style={{"color": "white"}}>LEFT</div>,
+      right: <div style={{"color": "white"}}>RIGHT</div>,
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

@@ -215,6 +215,9 @@ contract Token is IERC20, ITransferWithBeneficiary {
         userMintResetBlock_ = block.number;
     }
 
+    function op() public view returns (address) {
+        return operator_;
+    }
     /*
      * @param _maxUncheckedReward that can be paid out before a quarantine happens
      * @param _mintLimitsEnabled to prevent users from minting a large amount
@@ -623,9 +626,21 @@ contract Token is IERC20, ITransferWithBeneficiary {
     function userMintLimit() public view returns (uint) { return userMintLimit_; }
 
     /*
+     * @notice returns the remaining global mint limit
+     */
+    function remainingGlobalMintLimit() public view returns (uint) {
+        return remainingGlobalMint_;
+    }
+
+    /**
      * @notice return the max unchecked reward that's currently set
      */
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
+
+    /*
+     * @notice return the current operator
+     */
+    function operator() public view returns (address) { return operator_; }
 
     /*
      * @notice returns how much `account` has minted
@@ -700,6 +715,26 @@ contract Token is IERC20, ITransferWithBeneficiary {
         rc = Token(token).transfer(beneficiary, amount);
 
         return rc;
+    }
+
+    /// @notice upgrade the underlying LiquidityProvider to a new source
+    function upgradeLiquidityProvider(LiquidityProvider newPool) public {
+      require(noEmergencyMode(), "emergency mode");
+      require(msg.sender == operator_, "only operator can use this function");
+
+      uint oldPoolAmount = pool_.totalPoolAmount();
+
+      pool_.takeFromPool(oldPoolAmount);
+
+      pool_ = newPool;
+
+      pool_.underlying_().safeTransfer(address(pool_), oldPoolAmount);
+
+      pool_.addToPool(oldPoolAmount);
+
+      uint newPoolAmount = pool_.totalPoolAmount();
+
+      require(newPoolAmount == oldPoolAmount, "total pool amount not equal to new amount!");
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {

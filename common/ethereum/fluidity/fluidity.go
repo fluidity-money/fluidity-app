@@ -18,7 +18,7 @@ import (
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const fluidityContractAbiString = `[
+const tokenContractAbiString = `[
   {
     "inputs": [],
     "name": "rewardPoolAmount",
@@ -298,6 +298,7 @@ const workerConfigAbiString = `[
 var (
 	FluidityContractAbi ethAbi.ABI
 	WorkerConfigAbi     ethAbi.ABI
+	RewardPoolAbi       ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles

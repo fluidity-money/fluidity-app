@@ -1,12 +1,5 @@
 import webapp from "~/webapp.config.server";
-
-const getTokenForNetwork = (network: string) => {
-  const { config, drivers } = webapp;
-  if (Object.keys(drivers).includes(network)) {
-    return config[network]?.fluidAssets;
-  }
-  return [];
-};
+import BN from "bn.js";
 
 export type Token = {
   symbol: string;
@@ -17,6 +10,15 @@ export type Token = {
   obligationAccount?: string;
   dataAccount?: string;
   decimals: number;
+  colour: string;
+};
+
+const getTokenForNetwork = (network: string) => {
+  const { config, drivers } = webapp;
+  if (Object.keys(drivers).includes(network)) {
+    return config[network]?.fluidAssets;
+  }
+  return [];
 };
 
 const getTokenFromAddress = (
@@ -64,9 +66,32 @@ const fluidAssetOf = (tokens: Token[], assetToken: Token): Token | undefined =>
     ? assetToken
     : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address);
 
+const getUsdFromTokenAmount = (amount: BN, { decimals }: Token) => {
+  return amount.div(new BN(10).pow(new BN(decimals - 2))).toNumber() / 100;
+};
+
+const getTokenAmountFromUsd = (usd: BN, { decimals }: Token) =>
+  usd.mul(new BN(10).pow(new BN(decimals)));
+
+// Format BN with decimals
+const addDecimalToBn = (amount: BN, decimals: number) => {
+  const whole = amount.toString().slice(0, -decimals) || "0";
+
+  const dec = amount
+    .toString()
+    .slice(0 - decimals)
+    .padStart(decimals, "0")
+    .replace(/0+$/, "");
+
+  return !dec ? whole : `${whole}.${dec}`;
+};
+
 export {
   getTokenForNetwork,
   getTokenFromAddress,
   getTokenFromSymbol,
+  getUsdFromTokenAmount,
+  getTokenAmountFromUsd,
+  addDecimalToBn,
   fluidAssetOf,
 };

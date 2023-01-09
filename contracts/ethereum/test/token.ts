@@ -14,6 +14,7 @@ describe("Token", async function () {
         if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
             return this.skip();
         }
+        await console.log("FUSDST OPERATOR ADDR: " + await fUsdtOperator.op())
     });
 
     it("supports disabling wraps and rewards with emergency mode", async function () {

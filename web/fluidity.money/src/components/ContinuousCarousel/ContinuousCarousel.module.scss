@@ -6,7 +6,6 @@
   width: 100%;
   height: 24px;
   font-size: 16px;
-  // margin: auto;
   background-color: transparent;
   overflow: hidden;
   z-index: 1;
@@ -109,7 +108,6 @@
   width: 100%;
   height: 100%;
   min-height: 850px;
-  // margin: auto;
   background-color: transparent;
   overflow-y: auto;
   overflow-x: hidden;
@@ -117,33 +115,17 @@
   padding-top: 15px;
   padding-bottom: 15px;
   justify-content: center;
+
   &Line {
-    // display: flex;
     position: absolute;
     top: 0;
     left: 0;
-    // align-items: center;
-    // justify-content: space-evenly;
     width: 100%;
     height: 100%;
-    // white-space: nowrap;
-    // transform: scale(2);
-    // transition: all 1s ease;
+    
     & > div {
-      // display: flex;
-      // flex-direction: column;
       height: fit-content;
       animation: scrollUp 50s infinite linear;
-      // display: grid;
-      // width: fit-content;
-      // grid-template-columns: 1fr 1fr;
-      // animation: scrollUp 50s infinite linear;
-      // // grid-template-columns: repeat(2, 500px);
-      // column-gap: 100px;
-      // div:nth-of-type(even) {
-      //   grid-column: 2;
-      //   margin-top: 100px;
-      // }
 
       &:hover {
         // animation-play-state: paused;

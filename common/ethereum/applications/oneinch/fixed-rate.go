@@ -51,8 +51,8 @@ var fixedRateSwapAbi ethAbi.ABI
 // Because TokenA and TokenB are required to have the same decimals, the fee is the value that
 // balances x TokenA + y TokenB + fee = const
 func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
-	if len(transfer.Log.Topics) < 2 {
-		return nil, fmt.Errorf("Not enough log topics passed!")
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()

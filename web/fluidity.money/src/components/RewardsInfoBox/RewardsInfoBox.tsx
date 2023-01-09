@@ -3,12 +3,12 @@
 // LICENSE.md file.
 import { Suspense, useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
   SupportedChains,
   Heading,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
@@ -52,24 +52,10 @@ const RewardsInfoBox = ({
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
 
-  const [prizePool, setPrizePool] = useState<number>(
-    Number(rewardPool.toFixed(3))
-  );
-  const lookupTableValue = [134290.503, 403681.583, 930205.987];
-  let Count = 0;
+  const [prizePool, setPrizePool] = useState<number>(0);
 
   useEffect(() => {
-    if (!loading) return;
-
-    const interval = setInterval(() => {
-      setPrizePool((prizePool) => {
-        Count++;
-        if (Count > 2) Count = 0;
-        return Number(lookupTableValue[Count]);
-      });
-    }, 400);
-
-    return () => clearInterval(interval);
+    setPrizePool(rewardPool);
   }, [loading]);
 
   return (
@@ -96,9 +82,19 @@ const RewardsInfoBox = ({
           <Heading as="h1">
             {showRewardPool ? (
               <Suspense>
-                <>
-                  $<AnimatedNumbers animateToNumber={prizePool} includeComma />
-                </>
+                {!loading ? (
+                  <>
+                    $
+                    <AnimatedNumbers animateToNumber={prizePool} includeComma />
+                  </>
+                ) : (
+                  <img
+                    height="70"
+                    width="70"
+                    src="assets/images/LoopAnim.webp"
+                    alt='loading'
+                  />
+                )}
               </Suspense>
             ) : (
               totalTransactions
@@ -128,7 +124,7 @@ const RewardsInfoBox = ({
             className={styles.overlap}
             options={options}
             setOption={setChain}
-            mobile={width <= mobileBreakpoint}
+            mobile={width <= mobileBreakpoint && width > 0}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

@@ -1,18 +1,18 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigation } from "@fluidity-money/surfing";
 import ResourcesPageTitle from "screens/ResourcesPageTitle";
 import Articles from "screens/Articles";
-import Contact from "screens/Contact";
+// import Contact from "screens/Contact";
 import Demo from "screens/Demo";
 import Docs from "screens/Docs";
 import Fluniversity from "screens/Fluniversity";
 import Footer from "screens/Footer";
-import Hero from "screens/Hero";
-import Introducing from "screens/Introducing";
-import Tweets from "screens/Tweets";
+// import Hero from "screens/Hero";
+// import Introducing from "screens/Introducing";
+// import Tweets from "screens/Tweets";
 import MailingList from "screens/MailingList";
 import Whitepapers from "screens/Whitepapers";
 import { AnimatePresence } from "framer-motion";

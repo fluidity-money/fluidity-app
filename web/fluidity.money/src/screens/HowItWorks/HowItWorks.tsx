@@ -3,13 +3,13 @@
 // LICENSE.md file.
 
 import { useEffect, useState } from "react";
-import useViewport from "hooks/useViewport";
 import Video from "components/Video";
 import {
   ContinuousCarousel,
   Heading,
   LinkButton,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
 import Link from "next/link";
@@ -144,7 +144,7 @@ const HowItWorks = () => {
                 src={"/assets/videos/FluidityWrap.mp4"}
                 type={"fit"}
                 loop={true}
-                key={"abc"}
+                videoKey={"abc"}
                 scale={0.6}
               />
             ) : currentImageIndex === 1 ? (
@@ -153,7 +153,7 @@ const HowItWorks = () => {
                 src={"/assets/videos/FluidityYield.mp4"}
                 type={"fit"}
                 loop={true}
-                key={"xyz"}
+                videoKey={"xyz"}
                 scale={0.7}
               />
             ) : (
@@ -162,7 +162,7 @@ const HowItWorks = () => {
                 src={"/assets/videos/FluidityHowItWorks.mp4"}
                 type={"fit"}
                 loop={true}
-                key={"jfk"}
+                videoKey={"jfk"}
                 scale={0.7}
               />
             )}

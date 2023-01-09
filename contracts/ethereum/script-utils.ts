@@ -141,6 +141,7 @@ export const deployTokens = async (
 
     await deployedToken.deployed();
 
+    console.log(`init ${operatorAddress}`)
     await deployedToken.functions.init(
       deployedPool.address,
       token.decimals,
@@ -162,6 +163,18 @@ export const deployTokens = async (
     compoundBeacon,
     tokens: tokenAddresses,
   };
+};
+
+export const deployRewardPools = async (
+  hre: HardhatRuntimeEnvironment,
+  operatorAddress: string,
+  tokens: Token[]
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("RewardPools");
+  const beacon = await hre.upgrades.deployProxy(factory);
+  await beacon.deployed();
+  await beacon.init(operatorAddress, tokens);
+  return beacon;
 };
 
 export const forknetTakeFunds = async (

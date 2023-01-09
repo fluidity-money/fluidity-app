@@ -87,6 +87,16 @@ var mooniswapPoolV1Abi ethAbi.ABI
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
 func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != mooniswapSwapLogTopic {
+		return nil, nil
+	}
+
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if topics := len(transfer.Log.Topics); topics != 4 {
@@ -94,12 +104,6 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 			"unexpected mooniswap swap log topic length! Expected 4, got %v",
 			topics,
 		)
-	}
-
-	logTopic := transfer.Log.Topics[0].String()
-
-	if logTopic != mooniswapSwapLogTopic {
-		return nil, nil
 	}
 
 	unpacked, err := mooniswapPoolV1Abi.Unpack("Swapped", transfer.Log.Data)

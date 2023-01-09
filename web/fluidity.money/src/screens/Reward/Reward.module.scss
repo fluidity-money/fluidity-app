@@ -40,7 +40,6 @@
   align-items: center;
   justify-content: center;
   margin: 20px;
-  // width: 160px;
 }
 
 .fadeIn {
@@ -51,4 +50,42 @@
   opacity: 0;
   transition: opacity 1s ease;
   z-index: 0;
+}
+
+.winner {
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  font-size: 16px;
+  color: $textGrey;
+  position: relative;
+  min-width: fit-content;
+  padding: 0 10px 0 10px;
+  gap: 5px;
+  align-items: center;
+
+  a {
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+    align-items: center;
+    gap: 5px;
+    &:hover {
+      color: $fluidWhite;
+      opacity: 0.8;
+    }
+  }
+
+  img {
+    width: 18px;
+  }
+  &:hover {
+    color: $fluidWhite;
+  }
+}
+
+.hover {
+  &Underline {
+    text-decoration: underline;
+  }
 }

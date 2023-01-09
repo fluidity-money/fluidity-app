@@ -3,8 +3,7 @@
 // LICENSE.md file.
 
 import HowItWorksTemplate from "components/HowItWorksTemplate";
-import { ReusableGrid } from "@fluidity-money/surfing";
-import useViewport from "hooks/useViewport";
+import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
 import styles from "./Wrap.module.scss";
 import Video from "components/Video";
 

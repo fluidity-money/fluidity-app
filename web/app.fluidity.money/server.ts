@@ -19,6 +19,8 @@ import {
   pendingWinnersTransactionObservables,
 } from "./drivers";
 
+const MODE = process.env.NODE_ENV;
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
@@ -49,7 +51,7 @@ app.use(
 // more aggressive with this caching.
 app.use(express.static("public", { maxAge: "1h" }));
 app.use(morgan("tiny"));
-const MODE = process.env.NODE_ENV;
+
 const BUILD_DIR = path.join(process.cwd(), "build");
 
 const ethereumTokens = config.config["ethereum"].tokens

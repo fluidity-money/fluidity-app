@@ -7,8 +7,8 @@ type IToolTipContentProps = {
   tokenLogoSrc?: string;
   boldTitle: string;
   details: string;
-  linkLabel: `ASSETS` | `DETAILS`;
-  linkLabelOnClickCallback: () => void;
+  linkLabel?: `ASSETS` | `DETAILS`;
+  linkLabelOnClickCallback?: () => void;
 };
 
 export const ToolTipContent = ({

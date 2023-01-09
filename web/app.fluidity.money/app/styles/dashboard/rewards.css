@@ -317,3 +317,9 @@
   flex-wrap: wrap;
   gap: 2em;
 }
+
+.center-table-loading-anim {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

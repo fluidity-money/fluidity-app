@@ -1,5 +1,0 @@
-
-INSERT INTO prize_pool VALUES (
-	10000,
-	CURRENT_TIMESTAMP
-);

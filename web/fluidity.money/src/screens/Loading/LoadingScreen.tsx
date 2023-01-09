@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import useViewport from 'hooks/useViewport';
+import {useViewport} from '@fluidity-money/surfing';
 import styles from './LoadingScreen.module.scss';
 
 const LoadingScreen = () => {
@@ -16,9 +16,9 @@ const LoadingScreen = () => {
             position: "fixed",
             top: '50%',
             left: '50%',
-            width: `${width > breakPoint ? "30%" : "60%"}`,
-            marginTop: `${width > breakPoint ? "-15%" : "-30%"}`,
-            marginLeft: `${width > breakPoint ? "-15%" : "-30%"}`
+            width: `${width < breakPoint&& width > 0? "60%" : "30%"}`,
+            marginTop: `${width < breakPoint && width > 0? "-30%" : "-15%"}`,
+            marginLeft: `${width < breakPoint && width > 0? "-30%" : "-15%"}`
           }}
           alt="circle loop animation"
           />
@@ -28,9 +28,9 @@ const LoadingScreen = () => {
             top: '50%',
             left: '50%',
             position: "fixed",
-            width: `${width > breakPoint ? "15%" : "30%"}`,
-            marginTop: `${width > breakPoint ? "-5%" : "-10%"}`,
-            marginLeft: `${width > breakPoint ? "-7.5%" : "-15%"}`
+            width: `${width < breakPoint && width > 0 ? "30%" : "15%"}`,
+            marginTop: `${width < breakPoint && width > 0? "-10%" : "-5%"}`,
+            marginLeft: `${width < breakPoint && width > 0? "-15%" : "-7.5%"}`
           }}
           alt="text bounce animation"
           />
