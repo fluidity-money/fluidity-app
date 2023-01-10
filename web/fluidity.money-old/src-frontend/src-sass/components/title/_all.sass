@@ -1,0 +1,52 @@
+
+@use "../../global-variables"
+
+$title-font-family: global-variables.$manrope
+$title-font-size: 70px
+$title-margin-bottom: 37px
+$title-font-weight: 500
+
+$title-small-font: global-variables.$manrope
+$title-small-weight: 800
+$title-small-size: 40px
+
+$title-footer-size: 12px
+$title-footer-font: global-variables.$poppins
+$title-footer-weight: 300
+
+$subtitle-font-family: global-variables.$poppins
+$subtitle-font-size: 14px
+$subtitle-font-weight: 400
+$subtitle-colour: #BAC8E9
+
+.title-main,
+.title-small
+  margin-top: 0
+
+.title-main
+  font-family: $title-font-family
+  font-size: $title-font-size
+  margin-bottom: $title-margin-bottom
+  animation: fade-up 1.25s
+  font-weight: $title-font-weight
+
+.title-small
+  font-family: $title-small-font
+  font-weight: $title-small-weight
+  font-size: $title-small-size
+
+.title-footer
+  font-size: $title-footer-size
+  font-family: $title-footer-font
+  font-weight: $title-footer-weight
+
+.title-center
+  text-align: center
+
+.subtitle
+  font-family: $subtitle-font-family
+  font-size: $subtitle-font-size
+  font-weight: $subtitle-font-weight
+  color: $subtitle-colour
+  margin-top: 0
+  margin-bottom: 0

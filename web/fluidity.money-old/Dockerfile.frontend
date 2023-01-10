@@ -1,0 +1,29 @@
+
+FROM node:16 as build
+
+RUN npm install -g sass
+
+RUN apt-get update && \
+	apt-get install -y racket make
+
+ENV REPO fluidity.money
+
+ENV WORKDIR /usr/src/${REPO}
+
+WORKDIR $WORKDIR
+
+COPY . ./
+
+ARG FLU_LANDING_API_URL ${FLU_LANDING_API_URL}
+
+RUN make frontend
+
+FROM nginx:stable-alpine
+
+COPY --from=build \
+	/usr/src/fluidity.money/publish \
+	/usr/share/nginx/html
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]

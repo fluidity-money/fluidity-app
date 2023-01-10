@@ -1,0 +1,74 @@
+
+@use "../../global-variables"
+
+$left-padding: global-variables.$horizontal-padding
+$right-padding: global-variables.$horizontal-padding
+
+$footer-padding-top: 20px
+$footer-padding-bottom: 20px
+
+$small-image-width: 140px
+$small-image-height: 47.5px
+
+$large-image-width: 600px
+
+$social-button-width: 75px
+
+.container
+  max-width: global-variables.$page-max-width
+  margin-left: auto
+  margin-right: auto
+
+.container-hidden-on-large
+  display: none
+
+.container-left
+  padding-left: $left-padding
+
+.container-right
+  padding-right: $right-padding
+
+.container-row,
+.container-row-on-desktop,
+.container-column,
+.container-column-on-desktop
+  display: flex
+  justify-content: space-between
+
+.container-center
+  justify-content: center
+
+.container-justify-left
+  justify-content: left
+
+.container-space-evenly
+  justify-content: space-evenly
+
+.container-row,
+.container-row-on-desktop,
+.container-row-reverse-on-mobile
+  flex-direction: row
+
+.container-column,
+.container-column-on-desktop,
+.container-column-reverse-on-mobile
+  flex-direction: column
+
+.container-small-logo
+  width: $small-image-width
+  height: $small-image-height
+  > img
+    width: $small-image-width
+    height: $small-image-height
+
+.container-big-image
+  > img
+    width: $large-image-width
+
+.container-footer
+  padding-top: $footer-padding-top
+  padding-bottom: $footer-padding-bottom
+  background: rgba(29, 29, 29, 0.7)
+
+.container-social
+  width: $social-button-width
