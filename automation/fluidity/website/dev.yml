@@ -14,7 +14,7 @@ SERVICES:
       MEM_LIMIT: 1024
 
       DOCKER_ARGS:
-        SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
+        SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
 
 
