@@ -9,6 +9,15 @@ pragma abicoder v2;
 
 import "./openzeppelin/Address.sol";
 
+struct TrfVariables {
+    uint8 compoundBlocksPerDay;
+    uint8 defaultSecondsSinceLastBlock;
+    uint8 atxBufferSize;
+
+    uint256 spoolerInstantRewardThreshold;
+    uint256 spoolerBatchedRewardThreshold;
+}
+
 contract WorkerConfig {
     using Address for address;
 
@@ -38,6 +47,10 @@ contract WorkerConfig {
     /// @dev token => oracle
     mapping(address => address) private oracles_;
 
+    /// @notice token configuration for the worker per token supported
+    /// @notice used by the worker for it's configuration
+    mapping (address => TrfVariables) tokenWorkerConfigurations_;
+
     /**
      * @notice intialise the worker config for each of the tokens in the map
      *
@@ -62,11 +75,18 @@ contract WorkerConfig {
         return noGlobalEmergency_;
     }
 
-    /// @notice updates the trusted oracle to a new address
-    function updateOracles(OracleUpdate[] memory newOracles) public {
-        require(noGlobalEmergency(), "emergency mode!");
-        require(msg.sender == operator_, "only operator account can use this");
+    modifier requireNoGlobalEmergency() {
+        require(noGlobalEmergency(), "emergency mode");
+        _;
+    }
 
+    modifier requireOperator() {
+        require(msg.sender == operator_, "only operator account can use this");
+        _;
+    }
+
+    /// @notice updates the trusted oracle to a new address
+    function updateOracles(OracleUpdate[] memory newOracles) public requireNoGlobalEmergency requireOperator {
         for (uint i = 0; i < newOracles.length; i++) {
             OracleUpdate memory oracle = newOracles[i];
 
@@ -76,16 +96,16 @@ contract WorkerConfig {
         }
     }
 
-    function getWorkerAddress(address contractAddr) public view returns (address) {
-        require(noGlobalEmergency(), "emergency mode!");
-
+    function getWorkerAddress(address contractAddr) public requireNoGlobalEmergency view returns (address) {
         return oracles_[contractAddr];
     }
 
-    function getWorkerAddress() public view returns (address) {
-        require(noGlobalEmergency(), "emergency mode!");
-
+    function getWorkerAddress() public requireNoGlobalEmergency view returns (address) {
         return oracles_[msg.sender];
+    }
+
+    function tokenConfiguration(address contractAddr_) public requireNoGlobalEmergency view returns (TrfVariables memory tokenConfig) {
+    	return tokenWorkerConfigurations_[contractAddr_];
     }
 
     function enableEmergencyMode() public {
@@ -100,9 +120,7 @@ contract WorkerConfig {
      * @notice disables emergency mode, following presumably a contract upgrade
      * @notice (operator only)
      */
-    function disableEmergencyMode() public {
-        require(msg.sender == operator_, "only the operator account can use this");
-
+    function disableEmergencyMode() public requireOperator {
         noGlobalEmergency_ = true;
 
         emit Emergency(false);
