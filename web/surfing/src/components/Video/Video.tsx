@@ -81,7 +81,7 @@ export const Video = ({
     if (vidRef.current) {
       vidRef.current.playbackRate = playbackRate;
     }
-  }, [playbackRate, vidRef.current]);
+  }, [playbackRate]);
   
   return (
     <>
