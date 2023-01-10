@@ -42,6 +42,7 @@ import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
+import { SplitContext } from "~/util/split";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -122,6 +123,8 @@ export default function Dashboard() {
   const { connected, address, rawAddress, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
+
+  const { features, client } = useContext(SplitContext);
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -417,6 +420,23 @@ export default function Dashboard() {
             </GeneralButton>
             */}
 
+            {/* Fluidify button */}
+            {features["fluidify"] === "on" && (
+              <GeneralButton
+                className="fluidify-button-dashboard "
+                version={"primary"}
+                buttontype="text"
+                size={"small"}
+                handleClick={() => {
+                  client?.track('user', 'click_fluidify', );
+                  navigate("../fluidify")
+                }}
+              >
+                <b>Fluidify{isMobile ? "" : " Money"}</b>
+              </GeneralButton>
+            )}
+
+
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
@@ -474,18 +494,23 @@ export default function Dashboard() {
             />
           )}
 
-        {/* Fluidify button */}
-        <GeneralButton
-          className="fluidify-button-dashboard-mobile rainbow "
-          version={"primary"}
-          buttontype="text"
-          size={"medium"}
-          handleClick={() => navigate("../fluidify")}
-        >
-          <Heading as="h5">
-            <b>Fluidify Money</b>
-          </Heading>
-        </GeneralButton>
+        {/* Default Fluidify button */}
+        {features["fluidify"] !== "on" && (
+          <GeneralButton
+            className="fluidify-button-dashboard-mobile rainbow "
+            version={"primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() => {
+              client?.track('user', 'click_fluidify', );
+              navigate("../fluidify")
+            }}
+          >
+            <Heading as="h5">
+              <b>Fluidify Money</b>
+            </Heading>
+          </GeneralButton>
+        )}
 
         {/* Mobile Menu Modal */}
         {openMobModal && (

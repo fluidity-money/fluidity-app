@@ -21,6 +21,7 @@ import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect } from "react";
 import CookieConsent from "./components/CookieConsent/CookieConsent";
+import { SplitContextProvider } from "./util/split";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -135,6 +136,10 @@ export const loader: LoaderFunction = async ({
 
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
+  const splitBrowserKey = process.env?.SPLIT_BROWSER_KEY ?? "";
+  const splitClientFeatures = ["fluidify"];
+  const splitUserKey = "user";
+
   return {
     nodeEnv,
     sentryDsn,
@@ -143,6 +148,9 @@ export const loader: LoaderFunction = async ({
     isStaging,
     host,
     gitSha,
+    splitBrowserKey,
+    splitClientFeatures,
+    splitUserKey,
   };
 };
 
@@ -180,6 +188,9 @@ type LoaderData = {
   isStaging: boolean;
   gitSha?: string;
   host?: string;
+  splitBrowserKey: string;
+  splitClientFeatures: string[];
+  splitUserKey: string;
 };
 
 function App() {
@@ -189,6 +200,9 @@ function App() {
     gaToken,
     isProduction,
     gitSha = "unknown",
+    splitBrowserKey,
+    splitUserKey,
+    splitClientFeatures,
   } = useLoaderData<LoaderData>();
 
   switch (true) {
@@ -226,7 +240,9 @@ function App() {
         <CookieConsent />
         <CacheProvider sha={gitSha}>
           <ToolProvider>
-            <Outlet />
+            <SplitContextProvider splitBrowserKey={splitBrowserKey} splitUser={splitUserKey} splitClientFeatures={splitClientFeatures}>
+              <Outlet context={"blah"}/>
+            </SplitContextProvider>
             <ScrollRestoration />
             <Scripts />
             {gaToken && isProduction && (
