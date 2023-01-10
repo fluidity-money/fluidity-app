@@ -3,8 +3,7 @@
 // LICENSE.md file.
 
 import TextButton from "./TextButton/TextButton";
-import AnchorButton from "./AnchorButton";
 import GeneralButton from "./GeneralButton/";
 import LaunchButton from "./GeneralButton/LaunchButton";
 
-export { TextButton, AnchorButton, GeneralButton, LaunchButton };
+export { TextButton, GeneralButton, LaunchButton };
