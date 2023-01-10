@@ -428,14 +428,13 @@ export default function Dashboard() {
                 buttontype="text"
                 size={"small"}
                 handleClick={() => {
-                  client?.track('user', 'click_fluidify', );
-                  navigate("../fluidify")
+                  client?.track("user", "click_fluidify");
+                  navigate("../fluidify");
                 }}
               >
                 <b>Fluidify{isMobile ? "" : " Money"}</b>
               </GeneralButton>
             )}
-
 
             {/* Prize Money */}
             <GeneralButton
@@ -502,8 +501,8 @@ export default function Dashboard() {
             buttontype="text"
             size={"medium"}
             handleClick={() => {
-              client?.track('user', 'click_fluidify', );
-              navigate("../fluidify")
+              client?.track("user", "click_fluidify");
+              navigate("../fluidify");
             }}
           >
             <Heading as="h5">

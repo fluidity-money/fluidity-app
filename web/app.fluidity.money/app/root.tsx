@@ -240,8 +240,12 @@ function App() {
         <CookieConsent />
         <CacheProvider sha={gitSha}>
           <ToolProvider>
-            <SplitContextProvider splitBrowserKey={splitBrowserKey} splitUser={splitUserKey} splitClientFeatures={splitClientFeatures}>
-              <Outlet context={"blah"}/>
+            <SplitContextProvider
+              splitBrowserKey={splitBrowserKey}
+              splitUser={splitUserKey}
+              splitClientFeatures={splitClientFeatures}
+            >
+              <Outlet context={"blah"} />
             </SplitContextProvider>
             <ScrollRestoration />
             <Scripts />
