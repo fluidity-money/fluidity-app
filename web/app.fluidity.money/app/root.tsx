@@ -121,8 +121,7 @@ export const loader: LoaderFunction = async ({
   request,
 }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
-  const sentryDsn =
-    "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+  const sentryDsn = process.env?.FLU_SENTRY_DSN ?? "";
   const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
   const host = request.headers.get("Host") ?? "unknown-host";
@@ -134,7 +133,7 @@ export const loader: LoaderFunction = async ({
 
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
-  const splitBrowserKey = process.env?.SPLIT_BROWSER_KEY ?? "";
+  const splitBrowserKey = process.env?.FLU_SPLIT_BROWSER_KEY ?? "";
   const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
 
