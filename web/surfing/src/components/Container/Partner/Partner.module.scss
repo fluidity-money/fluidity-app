@@ -8,6 +8,19 @@
   flex-direction: column;
   align-items: center;
 
+  div {
+    display: flex;
+    h2 {
+      margin-bottom: 10px;
+    }
+    svg {
+      margin-top: 10px;
+      margin-left: 10px;
+      width: 13px;
+      height:13px;
+    }
+  }
+
   p {
     max-height: 130px;
     padding: 0;
@@ -21,6 +34,11 @@
     color: $black;
     p {
       color: $black;
+    }
+    div {
+      svg {
+        filter: invert(100%);
+      }
     }
   }
 }

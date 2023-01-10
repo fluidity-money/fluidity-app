@@ -3,6 +3,7 @@
 // LICENSE.md file.
 
 import styles from "./Partner.module.scss";
+import { ReactComponent as ExternalLinkIcon } from '~/assets/images/Group.svg';
 
 interface IPropsPartner {
   img: string;
@@ -12,11 +13,16 @@ interface IPropsPartner {
 
 const Partner = ({ img, title, info }: IPropsPartner) => {
   return (
-    <div className={styles.container}>
-      <div>{img}</div>
-      <h3>{title}</h3>
-      <p>{info}</p>
-    </div>
+    <a href={url} rel="noopener noreferrer" target="_blank">
+      <div className={styles.container}>
+        <img src={img} alt={title} />
+        <div>
+          <h2>{title}</h2>
+          <ExternalLinkIcon />
+        </div>
+        <p>{info}</p>
+      </div>
+    </a>
   );
 };
 
