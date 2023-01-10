@@ -11,3 +11,5 @@ RUN apk add --no-cache \
 
 # Libc6-compat is needed for Turbo to work
 # Python/Build-base to remain platform agnostic (node-gyp pre-requisite)
+
+RUN npm install -g turbo
