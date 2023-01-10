@@ -13,14 +13,9 @@ ARG NEXT_PUBLIC_FLU_ETH_RPC_HTTP
 
 ENV CI $CI
 
-ENV PATH /app/node_modules.bin:$PATH
-
 COPY . ./
 
-RUN ls
-
 RUN npm i
-
 
 ARG REACT_APP_SENTRY_DSN
 
