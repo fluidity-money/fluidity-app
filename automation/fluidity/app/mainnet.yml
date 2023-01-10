@@ -12,7 +12,7 @@ SERVICES:
       TARGET_GROUP_02: flu-mainnet-app-fluidity-fe-tg-1
       
       ENV_GA_WEBAPP_ANALYTICS_ID: G-MNXGX2P9KJ
-      SECRET_BITQUERY_TOKEN: /fluidity/bitquery_token
+      SECRET_FLU_BITQUERY_TOKEN: /fluidity/bitquery_token
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
       SECRET_FLU_ETH_RPC_WS: /fluidity/ethereum/websocket_url
       SECRET_FLU_SOL_RPC_HTTP: /fluidity/solana/http_url
@@ -20,8 +20,9 @@ SERVICES:
       SECRET_FLU_HASURA_HTTP: /fluidity/hasura/rpc_http
       SECRET_FLU_HASURA_WS: /fluidity/hasura/rpc_ws
       SECRET_FLU_HASURA_SECRET: /fluidity/hasura/key
+      SECRET_FLU_SPLIT_BROWSER_KEY: /flu/split/key
 
       DOCKER_ARGS:
-        SECRET_REACT_APP_SENTRY_DSN: /fluidity/frontend/sentryURL
+        SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
 

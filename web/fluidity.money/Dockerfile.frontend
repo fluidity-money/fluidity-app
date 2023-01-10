@@ -19,7 +19,7 @@ COPY . ./
 
 RUN npm i
 
-ARG REACT_APP_SENTRY_DSN
+ARG FLU_SENTRY_DSN
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 

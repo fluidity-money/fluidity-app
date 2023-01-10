@@ -17,6 +17,7 @@ import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
+import { SplitContextProvider } from "./util/split";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
@@ -120,8 +121,7 @@ export const loader: LoaderFunction = async ({
   request,
 }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
-  const sentryDsn =
-    "https://6e55f2609b29473599d99a87221c60dc@o1103433.ingest.sentry.io/6745508";
+  const sentryDsn = process.env?.FLU_SENTRY_DSN ?? "";
   const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
   const host = request.headers.get("Host") ?? "unknown-host";
@@ -133,6 +133,10 @@ export const loader: LoaderFunction = async ({
 
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
+  const splitBrowserKey = process.env?.FLU_SPLIT_BROWSER_KEY ?? "";
+  const splitClientFeatures = ["Fluidify-Button-Placement"];
+  const splitUserKey = "user";
+
   return {
     nodeEnv,
     sentryDsn,
@@ -141,6 +145,9 @@ export const loader: LoaderFunction = async ({
     isStaging,
     host,
     gitSha,
+    splitBrowserKey,
+    splitClientFeatures,
+    splitUserKey,
   };
 };
 
@@ -178,6 +185,9 @@ type LoaderData = {
   isStaging: boolean;
   gitSha?: string;
   host?: string;
+  splitBrowserKey: string;
+  splitClientFeatures: string[];
+  splitUserKey: string;
 };
 
 function App() {
@@ -187,6 +197,9 @@ function App() {
     gaToken,
     isProduction,
     gitSha = "unknown",
+    splitBrowserKey,
+    splitUserKey,
+    splitClientFeatures,
   } = useLoaderData<LoaderData>();
 
   switch (true) {
@@ -240,7 +253,13 @@ function App() {
         />
         <CacheProvider sha={gitSha}>
           <ToolProvider>
-            <Outlet />
+            <SplitContextProvider
+              splitBrowserKey={splitBrowserKey}
+              splitUser={splitUserKey}
+              splitClientFeatures={splitClientFeatures}
+            >
+              <Outlet />
+            </SplitContextProvider>
             <ScrollRestoration />
             <Scripts />
             {gaToken && isProduction && (
