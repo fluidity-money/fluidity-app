@@ -15,12 +15,11 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import cookieConsentUrl from "./components/CookieConsent/CookieConsent.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
-import { useEffect } from "react";
-import CookieConsent from "./components/CookieConsent/CookieConsent";
+import { useEffect, useState } from "react";
+import { CookieConsent } from "@fluidity-money/surfing";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -94,7 +93,6 @@ export const links = () => {
 
     { rel: "stylesheet", href: globalStylesheetUrl },
     { rel: "stylesheet", href: surfingStylesheetUrl },
-    { rel: "stylesheet", href: cookieConsentUrl },
   ];
 };
 
@@ -216,6 +214,14 @@ function App() {
     }
   }, [location, gaToken]);
 
+  const [cookieConsent, setCookieConsent] = useState(true);
+  useEffect(() => {
+    const _cookieConsent = localStorage.getItem("cookieConsent");
+    if (!_cookieConsent) {
+      setCookieConsent(false);
+    }
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -223,7 +229,15 @@ function App() {
         <Links />
       </head>
       <body>
-        <CookieConsent />
+        <CookieConsent
+          activated={cookieConsent}
+          url={
+            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+          }
+          callBack={() => {
+            setCookieConsent(true);
+          }}
+        />
         <CacheProvider sha={gitSha}>
           <ToolProvider>
             <Outlet />

@@ -15,15 +15,24 @@ const TextButton = ({ children, colour, onClick }: ITextButtonProps) => {
   return (
     <>
       {colour === "white" ? (
-        <button onClick={onClick} className={`${styles.TextButton} ${styles.white}`}>
+        <button
+          onClick={onClick}
+          className={`${styles.TextButton} ${styles.white}`}
+        >
           {children}
         </button>
       ) : colour === "black" ? (
-        <button onClick={onClick} className={`${styles.TextButton} ${styles.black}`}>
+        <button
+          onClick={onClick}
+          className={`${styles.TextButton} ${styles.black}`}
+        >
           {children}
         </button>
       ) : (
-        <button onClick={onClick} className={`${styles.TextButton} ${styles.coloured}`}>
+        <button
+          onClick={onClick}
+          className={`${styles.TextButton} ${styles.coloured}`}
+        >
           <span className={styles.inner}>{children}</span>
         </button>
       )}

@@ -42,7 +42,6 @@ docker-root: go.sum go.mod Dockerfile.build-root
 docker-root-web: go.sum go.mod Dockerfile.build-root
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
-		--platform linux/amd64 \
 		-t ${ORG_ROOT}/build-container-root-web \
 		-f Dockerfile.build-root-web \
 		.
@@ -70,7 +69,6 @@ docker-runtime: docker-build
 docker-runtime-web:
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
-		--platform linux/amd64 \
 		-t ${ORG_ROOT}/runtime-web-container \
 		-f Dockerfile.runtime-web \
 		.
@@ -80,7 +78,6 @@ docker-runtime-web:
 docker-build-web: docker-root-web
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
-		--platform linux/amd64 \
 		-t ${ORG_ROOT}/build-web-container \
 		-f Dockerfile.build-web \
 		.
@@ -101,6 +98,7 @@ docker: \
 	docker-root-web \
 	docker-build \
 	docker-runtime \
+	docker-runtime-web \
 	docker-build-web \
 	docker-node
 

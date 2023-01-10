@@ -17,5 +17,5 @@ export {
   GeneralButton,
   LinkButton,
   TabButton,
-  AttentionButton
+  AttentionButton,
 };

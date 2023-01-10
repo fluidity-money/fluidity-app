@@ -1,7 +1,7 @@
 
 FROM fluidity/build-web-container:latest AS build
 
-WORKDIR /usr/local/src/fluidity/web/fluidity.money
+WORKDIR /usr/local/src/fluidity/web
 
 ENV PRODUCTION ${PRODUCTION}
 
@@ -15,15 +15,16 @@ ENV CI $CI
 
 ENV PATH /app/node_modules.bin:$PATH
 
-COPY .npmrc package.json package-lock.json ./
+COPY . ./
 
-RUN npm set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN
+RUN ls
 
 RUN npm i
 
-COPY . ./
 
 ARG REACT_APP_SENTRY_DSN
+
+WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
 RUN make frontend
 

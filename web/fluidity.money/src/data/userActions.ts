@@ -2,40 +2,46 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import { gql, useSubscription } from "@apollo/client";
 import { onData } from "./apolloClient";
 
 export interface TransactionCount {
   user_actions_aggregate: {
     aggregate: {
-      count: number,
-    }
-  }
+      count: number;
+    };
+  };
 }
-
 
 const countTransactionsByNetworkSubscription = gql`
-subscription userActionsGetCountTransactionsByNetworkSubscription($network: network_blockchain!) {
-  user_actions_aggregate(where: {network: {_eq: $network}}) {
-    aggregate {
-      count
+  subscription userActionsGetCountTransactionsByNetworkSubscription(
+    $network: network_blockchain!
+  ) {
+    user_actions_aggregate(where: { network: { _eq: $network } }) {
+      aggregate {
+        count
+      }
     }
   }
-}
 `;
 
-export const useCountTransactions = (onNext: (txCount: TransactionCount) => void, network: string) => {
-  const { subscription, options } = useMemo(() => ({
-    subscription: countTransactionsByNetworkSubscription,
-    options: {
-      variables: {
-        network,
+export const useCountTransactions = (
+  onNext: (txCount: TransactionCount) => void,
+  network: string
+) => {
+  const { subscription, options } = useMemo(
+    () => ({
+      subscription: countTransactionsByNetworkSubscription,
+      options: {
+        variables: {
+          network,
+        },
+        onData: onData(onNext),
       },
-      onData: onData(onNext),
-    }
-  }), [network]);
-  
-  return useSubscription(subscription, options);
-}
+    }),
+    [network]
+  );
 
+  return useSubscription(subscription, options);
+};
