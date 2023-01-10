@@ -25,11 +25,11 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
 
   const baseUrl = children.replace(/\s+/g, "").toLowerCase();
 
-  const linkUrls = items.map(item =>
+  const linkUrls = items.map((item) =>
     item.type === "internal"
       ? `/${baseUrl}#${item.title.toLowerCase()}`
       : item.src
-  )
+  );
 
   //  h1 {
   //   font-size: 36px;
@@ -42,9 +42,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
     <ul>
       {items.map((item, i) => (
         <li key={item.title}>
-          <a
-            href={linkUrls[i]}
-          >
+          <a href={linkUrls[i]}>
             <LinkButton
               handleClick={() => {}}
               size={

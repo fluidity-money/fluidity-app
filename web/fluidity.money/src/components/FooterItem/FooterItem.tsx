@@ -23,7 +23,7 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
   const firstBreakpoint = 620;
   const secondBreakpoint = 560;
 
-  const baseUrl = `/${children.replace(/\s+/g, "").toLowerCase()}`
+  const baseUrl = `/${children.replace(/\s+/g, "").toLowerCase()}`;
 
   const itemList = (
     <ul>
@@ -60,14 +60,9 @@ const FooterItem = ({ children, items }: IFooterItemProps) => {
     </ul>
   );
 
-  
-
   return (
     <div className={styles.container}>
-      <Link 
-        href={baseUrl} 
-        passHref
-      >
+      <Link href={baseUrl} passHref>
         <a href={baseUrl}>
           <h1>{children}</h1>
         </a>

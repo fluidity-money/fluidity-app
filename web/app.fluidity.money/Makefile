@@ -23,7 +23,7 @@ docker-frontend:
 		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/app.${REPO}-frontend" \
 		-f Dockerfile.frontend \
-		.
+		..
 
 	@touch docker-frontend
 

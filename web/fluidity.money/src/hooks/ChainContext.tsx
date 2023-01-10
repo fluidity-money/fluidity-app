@@ -4,37 +4,46 @@
 
 import { Dispatch, SetStateAction, useEffect } from "react";
 import type { Winner, WinnersRes } from "data/winners";
-import type { LargestDailyWinner, LargestMonthlyWinnersRes } from "data/monthlyLargestWinners";
+import type {
+  LargestDailyWinner,
+  LargestMonthlyWinnersRes,
+} from "data/monthlyLargestWinners";
 import type { Tvl, TvlRes } from "data/tvl";
 import type { TransactionCount } from "data/userActions";
 
 import { createContext, useContext, useState } from "react";
-import { SupportedChains, SupportedChainsList, formatToGraphQLDate } from "@fluidity-money/surfing";
+import {
+  SupportedChains,
+  SupportedChainsList,
+  formatToGraphQLDate,
+} from "@fluidity-money/surfing";
 import { useWinningTransactions } from "data/winners";
 import { useLiveTvl } from "data/tvl";
 import { useCountTransactions } from "data/userActions";
 import { useHighestRewardStatistics } from "data/monthlyLargestWinners";
 
 interface ChainState {
-  chain: SupportedChainsList,
-  network: Network,
-  setChain: Dispatch<SetStateAction<SupportedChainsList>>,
-  apiState: ApiState,
+  chain: SupportedChainsList;
+  network: Network;
+  setChain: Dispatch<SetStateAction<SupportedChainsList>>;
+  apiState: ApiState;
 }
 
 type onChainData = {
-  data: {
-    ethPool: number
-    solPool: number
-		totalTransactions: number
-  } | undefined
-  loading: boolean
-}
+  data:
+    | {
+        ethPool: number;
+        solPool: number;
+        totalTransactions: number;
+      }
+    | undefined;
+  loading: boolean;
+};
 
 interface ApiState {
-  weekWinnings: Winner[],
-  largestDailyWinnings: LargestDailyWinner[],
-  onChainData: onChainData,
+  weekWinnings: Winner[];
+  largestDailyWinnings: LargestDailyWinner[];
+  onChainData: onChainData;
 }
 
 export type Network = "STAGING" | "MAINNET";
@@ -48,20 +57,29 @@ const initChainState = (): ChainState => {
       weekWinnings: [],
       largestDailyWinnings: [],
       onChainData: { data: undefined, loading: false },
-    }
-  }
-}
+    },
+  };
+};
 
 const ChainContext = createContext<ChainState>(initChainState());
 
-const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]}) => {
+const ChainContextProvider = ({
+  children,
+}: {
+  children: JSX.Element | JSX.Element[];
+}) => {
   const [chain, setChain] = useState<SupportedChainsList>("ETH");
-  
+
   const network: Network = "MAINNET";
 
   const [weekWinnings, setWeekWinnings] = useState<Winner[]>([]);
-  const [largestDailyWinnings, setLargestDailyWinnings] = useState<LargestDailyWinner[]>([]);
-  const [onChainData, setOnChainData] = useState<onChainData>({data: undefined, loading: false});
+  const [largestDailyWinnings, setLargestDailyWinnings] = useState<
+    LargestDailyWinner[]
+  >([]);
+  const [onChainData, setOnChainData] = useState<onChainData>({
+    data: undefined,
+    loading: false,
+  });
   const [txCount, setTxCount] = useState(0);
 
   const apiState = {
@@ -69,63 +87,61 @@ const ChainContextProvider = ({children}: {children: JSX.Element | JSX.Element[]
     largestDailyWinnings,
     onChainData,
     txCount,
-  }
+  };
 
   const prevWeekDate = new Date();
   prevWeekDate.setDate(prevWeekDate.getDate() - 7);
-  
+
   useHighestRewardStatistics(
-    ({highest_rewards_monthly}: LargestMonthlyWinnersRes) => setLargestDailyWinnings(
-      highest_rewards_monthly
-    ),
-    SupportedChains[chain].name,
-  )
+    ({ highest_rewards_monthly }: LargestMonthlyWinnersRes) =>
+      setLargestDailyWinnings(highest_rewards_monthly),
+    SupportedChains[chain].name
+  );
 
   useWinningTransactions(
-    ({winners}: WinnersRes) => setWeekWinnings(
-      winners
-    ),
-    SupportedChains[chain].name,
+    ({ winners }: WinnersRes) => setWeekWinnings(winners),
+    SupportedChains[chain].name
     // formatToGraphQLDate(prevWeekDate),
-  )
+  );
 
   useCountTransactions(
-    (txCount: TransactionCount) => setTxCount(
-      txCount
-        .user_actions_aggregate
-        .aggregate
-        .count
-    ),
-    SupportedChains[chain].name,
+    (txCount: TransactionCount) =>
+      setTxCount(txCount.user_actions_aggregate.aggregate.count),
+    SupportedChains[chain].name
   );
 
   useEffect(() => {
-    setOnChainData({data: undefined, loading: true})
+    setOnChainData({ data: undefined, loading: true });
 
-    fetch('/api/reward_pool')
-    .then((res) => res.json())
-    .then((data: {ethPool: number, solPool: number, totalTransactions: number}) => {
-      setOnChainData({
-        data: {
-          ethPool: Number(data.ethPool),
-          solPool: Number(data.solPool),
-					totalTransactions: Number(data.totalTransactions),
-        },
-        loading: false
-      })
-    })
-  }, [])
-  
+    fetch("/api/reward_pool")
+      .then((res) => res.json())
+      .then(
+        (data: {
+          ethPool: number;
+          solPool: number;
+          totalTransactions: number;
+        }) => {
+          setOnChainData({
+            data: {
+              ethPool: Number(data.ethPool),
+              solPool: Number(data.solPool),
+              totalTransactions: Number(data.totalTransactions),
+            },
+            loading: false,
+          });
+        }
+      );
+  }, []);
+
   return (
-    <ChainContext.Provider value={{chain, network, setChain, apiState}}>
+    <ChainContext.Provider value={{ chain, network, setChain, apiState }}>
       {children}
     </ChainContext.Provider>
   );
 };
 
 const useChainContext = () => {
-  return useContext(ChainContext)
+  return useContext(ChainContext);
 };
 
 export { ChainContextProvider, useChainContext };
-

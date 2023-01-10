@@ -1,3 +1,3 @@
 import ProviderIcon from "./ProviderIcon";
 
-export { ProviderIcon }
+export { ProviderIcon };

@@ -6,7 +6,6 @@ import { ContinuousCarousel, Heading, Text } from "@fluidity-money/surfing";
 import styles from "./Whitepapers.module.scss";
 
 const Whitepapers = () => {
-
   const callout = (
     <div className={styles.callout}>
       <Heading as="h4" className={styles.text}>

@@ -3,7 +3,11 @@
 // LICENSE.md file.
 
 import { useState } from "react";
-import { ContinuousCarousel, Heading, useViewport } from "@fluidity-money/surfing";
+import {
+  ContinuousCarousel,
+  Heading,
+  useViewport,
+} from "@fluidity-money/surfing";
 import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
 import Video from "components/Video";
@@ -11,13 +15,12 @@ import styles from "./Landing.module.scss";
 import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
 
 const Landing = () => {
-
   let type = isSafari || isIOS ? "video/quicktime" : "video/webm";
-  let vidSources = (isSafari || isIOS ? [
-    "/assets/videos/FluidityHomeloop.mov",
-  ] : [
-    "/assets/videos/FluidityHomeloop.webm",
-  ]).map((link) => link);
+  let vidSources = (
+    isSafari || isIOS
+      ? ["/assets/videos/FluidityHomeloop.mov"]
+      : ["/assets/videos/FluidityHomeloop.webm"]
+  ).map((link) => link);
 
   const [state, setState] = useState({
     src: vidSources[0],
@@ -58,7 +61,7 @@ const Landing = () => {
               videoKey={state.key}
               scale={state.scale}
               margin={"-60px 0 0 0"}
-              width={'65%'}
+              width={"65%"}
             />
           ) : isMobile ? (
             <Video
@@ -147,7 +150,9 @@ const Landing = () => {
             initial={{ opacity: 0, y: "-20vh" }}
             animate={{ opacity: [0, 0, 0, 1], y: 0 }}
             transition={{ duration: 1, type: "tween" }}
-            className={width < breakpoint && width > 0 ? styles.left : styles.right}
+            className={
+              width < breakpoint && width > 0 ? styles.left : styles.right
+            }
           >
             <IntroTile
               img={"/assets/images/landingIcons/expectedOutcome.png"}
