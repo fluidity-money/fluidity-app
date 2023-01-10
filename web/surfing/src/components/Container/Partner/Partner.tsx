@@ -9,9 +9,10 @@ interface IPropsPartner {
   img: string;
   title: string;
   info: string;
+  url: string;
 }
 
-const Partner = ({ img, title, info }: IPropsPartner) => {
+const Partner = ({ img, title, info, url }: IPropsPartner) => {
   return (
     <a href={url} rel="noopener noreferrer" target="_blank">
       <div className={styles.container}>
