@@ -89,4 +89,4 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <CookieConsent  activated={cookieConsent} url= {'https://static.fluidity.money/assets/fluidity-privacy-policy.pdf'} callBack={()=>{setCookieConsent(true)}}/>
     </div>
   </>
-}
+)}
