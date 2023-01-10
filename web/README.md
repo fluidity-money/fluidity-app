@@ -57,3 +57,5 @@ Run an `npm install` and it should be good to go!
 
 Before you go, chuck a brief description of your app in this file. 
 It really helps people get their bearings around the code here.
+
+Have fun!
