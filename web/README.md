@@ -17,8 +17,6 @@ npm run dev
 ```
 
 in _this_ folder and it should all be live.
-Things aren't working? Run `npm ci` from the root and it should pull all
-the stuff you need from the lockfile.
 
 ## Package management
 Is it a shared package such as React? An npm install in the root should do.
