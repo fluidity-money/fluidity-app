@@ -13,37 +13,36 @@ const Wrap = () => {
   const breakpoint = 860;
 
   const left =
-  width <= breakpoint ? (
-    <>
-      <Video
-        src={"/assets/videos/FluidityWrap.mp4"}
-        type={"fit"}
-        loop={true}
-        scale={0.7}
-      />
-    </>
+    width <= breakpoint ? (
+      <>
+        <Video
+          src={"/assets/videos/FluidityWrap.mp4"}
+          type={"fit"}
+          loop={true}
+          scale={0.7}
+        />
+      </>
     ) : (
-
       <HowItWorksTemplate header={header} info={info}>
         Wrapped tokens
       </HowItWorksTemplate>
     );
 
   const right =
-  width > breakpoint ? (
-    <>
-      <Video
-        src={"/assets/videos/FluidityWrap.mp4"}
-        type={"fit"}
-        loop={true}
-        scale={0.7}
-      />
-    </>
-  ) : (
-    <HowItWorksTemplate header={header} info={info}>
-      Wrapped tokens
-    </HowItWorksTemplate>
-  );
+    width > breakpoint ? (
+      <>
+        <Video
+          src={"/assets/videos/FluidityWrap.mp4"}
+          type={"fit"}
+          loop={true}
+          scale={0.7}
+        />
+      </>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        Wrapped tokens
+      </HowItWorksTemplate>
+    );
 
   return (
     <div className={styles.container} id="wraptokens">

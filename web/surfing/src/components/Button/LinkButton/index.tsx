@@ -3,4 +3,3 @@
 // LICENSE.md file.
 
 export { default } from "./LinkButton";
-

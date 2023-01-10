@@ -1,1 +1,1 @@
-export { LoadFirst, Prioritize } from './LoadFirst';
+export { LoadFirst, Prioritize } from "./LoadFirst";

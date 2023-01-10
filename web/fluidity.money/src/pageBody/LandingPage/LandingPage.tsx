@@ -13,23 +13,27 @@ import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
 import styles from "./LandingPage.module.scss";
 
-export type onChainData = {
-  ethPool: number,
-  solPool: number,
-	totalTransactions: number
-} | undefined
+export type onChainData =
+  | {
+      ethPool: number;
+      solPool: number;
+      totalTransactions: number;
+    }
+  | undefined;
 
 const LandingPage = () => {
-
   return (
     <div className={styles.pageContainer}>
       <Head>
         <title>Fluidity - Supercharge your Crypto</title>
-        <meta name="description" content="Fluidity lets you earn while spending your crypto. Get more out your crypto - Fluidify your money." />
+        <meta
+          name="description"
+          content="Fluidity lets you earn while spending your crypto. Get more out your crypto - Fluidify your money."
+        />
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />
-        <Reward/>
+        <Reward />
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />

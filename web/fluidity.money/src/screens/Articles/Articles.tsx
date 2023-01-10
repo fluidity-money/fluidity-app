@@ -32,9 +32,8 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
   return (
     <div className={styles.outerContainer}>
       <div className={styles.carousel}>
-        {
-          !(isResourcesPage) ? (
-            <ContinuousCarousel direction={"right"}>
+        {!isResourcesPage ? (
+          <ContinuousCarousel direction={"right"}>
             <div>
               {callout}
               {callout}
@@ -48,8 +47,10 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
               {callout}
               {callout}
             </div>
-          </ContinuousCarousel>): ''
-        }
+          </ContinuousCarousel>
+        ) : (
+          ""
+        )}
       </div>
       <div className={styles.container} id="articles">
         <ArticleCard
@@ -73,7 +74,8 @@ const arr: ArticleListProps = {
   articles: [
     {
       id: 0,
-      title: "Payments, Metaverse, P2E games and DeFi derivatives: A deep dive into Fluidity’s use cases",
+      title:
+        "Payments, Metaverse, P2E games and DeFi derivatives: A deep dive into Fluidity’s use cases",
       desc: `Imagine a protocol — an avant-garde DeFi yield primitive that turns all previous dogma related to earning yields on its head; instead of lockin...`,
       info: "19 min read DEFI",
       link: "https://blog.fluidity.money/payments-metaverse-p2e-games-and-defi-derivatives-a-deep-dive-into-fluiditys-use-cases-767910d6a39c",
@@ -81,7 +83,8 @@ const arr: ArticleListProps = {
     },
     {
       id: 1,
-      title: "Fluidity announces $1.3 Million Seed Round led by Multicoin Capital",
+      title:
+        "Fluidity announces $1.3 Million Seed Round led by Multicoin Capital",
       desc: `Fluidity is excited to announce that we have raised $1.3 million in a seed round led by Multicoin Capital, with participation from Circle Ventures...`,
       info: "3 min read CRYPTOCURRENCY",
       link: "https://blog.fluidity.money/fluidity-announces-1-3-million-seed-round-led-by-multicoin-capital-943ee3fbe0e6",
@@ -113,7 +116,8 @@ const arr: ArticleListProps = {
     },
     {
       id: 5,
-      title: "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
+      title:
+        "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
       desc: `The year 2020 marked the explosion of DeFi protocols in public imagination, driven largely by the rise of liquidity mining — Compound...`,
       info: "5 min  read ARBITRUM",
       link: "https://blog.fluidity.money/tiki-talk-minutes-fluidity-x-dopex-x-arbitrum-and-the-evolving-boundaries-of-defi-ea7f1110f741",
@@ -129,7 +133,7 @@ const arr: ArticleListProps = {
     },
     {
       id: 7,
-      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money", 
+      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money",
       desc: `Providing Users With a Secure Source of Verifiable Randomness Fluidity — Next-Generation Assets If your money’s on the move, exposure to DeFi can...`,
       info: "4 min read FLUIDITY",
       link: "https://blog.fluidity.money/fluidity-using-chainlink-vrf-to-power-the-future-of-money-11882c51ae89",

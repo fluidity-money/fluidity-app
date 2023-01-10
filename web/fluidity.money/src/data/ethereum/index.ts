@@ -1,2 +1,2 @@
 export { getEthTotalPrizePool } from "./prizePool";
-export { getTotalTransactions } from "./onChainUtil"; 
+export { getTotalTransactions } from "./onChainUtil";

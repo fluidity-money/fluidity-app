@@ -7,22 +7,20 @@ import type { ButtonHTMLAttributes } from "react";
 import styles from "./GeneralButton.module.scss";
 
 type GeneralButtonText = {
-  buttontype: "text",
-}
+  buttontype: "text";
+};
 
 type GeneralButtonLogo = {
-  icon: React.ReactNode,
-  buttontype: "icon before" | "icon after" | "icon only",
-}
+  icon: React.ReactNode;
+  buttontype: "icon before" | "icon after" | "icon only";
+};
 
-export type IGeneralButtonProps = 
-ButtonHTMLAttributes<HTMLButtonElement> &
-(GeneralButtonText | GeneralButtonLogo) & 
-{
-  version: "primary" | "secondary" | "transparent";
-  size: "small" | "medium" | "large";
-  handleClick: () => void;
-}
+export type IGeneralButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  (GeneralButtonText | GeneralButtonLogo) & {
+    version: "primary" | "secondary" | "transparent";
+    size: "small" | "medium" | "large";
+    handleClick: () => void;
+  };
 
 const GeneralButton = ({
   children,
@@ -34,9 +32,9 @@ const GeneralButton = ({
   ...props
 }: IGeneralButtonProps) => {
   const classProps = className || "";
-  
-  const { buttontype } = props as GeneralButtonText | GeneralButtonLogo
-  
+
+  const { buttontype } = props as GeneralButtonText | GeneralButtonLogo;
+
   if (buttontype == "text") {
     return (
       <button
@@ -48,7 +46,7 @@ const GeneralButton = ({
         {children}
       </button>
     );
-  };
+  }
 
   return (
     <>
@@ -59,10 +57,8 @@ const GeneralButton = ({
           disabled={disabled}
           {...props}
         >
-          <div className={styles.icon}>
-            {(props as GeneralButtonLogo).icon}
-          </div>
-          {" "}{children}
+          <div className={styles.icon}>{(props as GeneralButtonLogo).icon}</div>{" "}
+          {children}
         </button>
       ) : buttontype === "icon after" ? (
         <button
@@ -72,9 +68,7 @@ const GeneralButton = ({
           {...props}
         >
           {children}{" "}
-          <div className={styles.icon}>
-            {(props as GeneralButtonLogo).icon}
-          </div>
+          <div className={styles.icon}>{(props as GeneralButtonLogo).icon}</div>
         </button>
       ) : (
         <button
@@ -82,9 +76,7 @@ const GeneralButton = ({
           className={`${styles[version]} ${styles[size]} ${styles.iconOnly} ${classProps}`}
           {...props}
         >
-          <div className={styles.icon}>
-            {(props as GeneralButtonLogo).icon}
-          </div>
+          <div className={styles.icon}>{(props as GeneralButtonLogo).icon}</div>
         </button>
       )}
     </>

@@ -18,7 +18,7 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
     y: {
       duration: Math.floor(Math.random() * (21 - 1) + 1) >= 10 ? 2 : 1.5,
       yoyo: Infinity,
-      ease: "easeOut"
+      ease: "easeOut",
     },
   };
   return (
@@ -28,7 +28,7 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
           <motion.div
             transition={bounceTransition}
             animate={{
-              y: ["0px", "13px"]
+              y: ["0px", "13px"],
             }}
           >
             <img src={img} alt="Intro-Title-Left" />
@@ -46,7 +46,7 @@ const IntroTile = ({ img, side, children }: IIntroTileProps) => {
           <motion.div
             transition={bounceTransition}
             animate={{
-              y: ["0px", "13px"]
+              y: ["0px", "13px"],
             }}
           >
             <img src={img} alt="Intro-Title-Right" />

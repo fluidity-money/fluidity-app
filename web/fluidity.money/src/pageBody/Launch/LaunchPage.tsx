@@ -15,7 +15,6 @@ import UseCases from "../../screens/UseCases";
 import styles from "./LaunchPage.module.scss";
 
 const LaunchPage = (props) => {
-
   useEffect(() => {
     window.location.hash = "demo";
   });
@@ -24,7 +23,10 @@ const LaunchPage = (props) => {
     <div className={styles.pageContainer}>
       <Head>
         <title>Fluidity - Supercharge your Crypto</title>
-        <meta name="description" content="Fluidity lets you earn while spending your crypto. Get more out your crypto - Fluidify your money." />
+        <meta
+          name="description"
+          content="Fluidity lets you earn while spending your crypto. Get more out your crypto - Fluidify your money."
+        />
       </Head>
       <div id={"modal"} className={styles.screensContainer}>
         <Landing />

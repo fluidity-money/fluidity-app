@@ -14,10 +14,7 @@ interface IMobileNavModalProps {
 
 const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
-    <Link
-      href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
-      passHref
-    >
+    <Link href={`/${link.replace(/\s+/g, "").toLowerCase()}`} passHref>
       <a
         className={styles.button}
         href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
@@ -30,10 +27,7 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
 
   return (
     <div className={styles.container}>
-      <Link
-        href={"/"}
-        passHref
-      >
+      <Link href={"/"} passHref>
         <a href={"/"} className={styles.logo} onClick={() => setIsOpen(false)}>
           <Image
             src="/assets/images/logoMetallic.png"

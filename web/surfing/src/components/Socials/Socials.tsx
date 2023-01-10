@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import {ContinuousCarousel} from "../Container";
+import { ContinuousCarousel } from "../Container";
 import Text from "../Text";
 import styles from "./Socials.module.scss";
 

@@ -5,7 +5,7 @@ import {
   LineChart,
   numberToMonetaryString,
   trimAddress,
-  useViewport
+  useViewport,
 } from "@fluidity-money/surfing";
 
 import type { LargestDailyWinner } from "data/monthlyLargestWinners";
@@ -20,8 +20,8 @@ interface IProps {
 }
 
 type DailyWinner = LargestDailyWinner & {
-  awarded_day: Date,
-}
+  awarded_day: Date;
+};
 
 const RewardsStats = ({ changeScreen }: IProps) => {
   const { apiState, chain } = useChainContext();
@@ -30,24 +30,22 @@ const RewardsStats = ({ changeScreen }: IProps) => {
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [prizePool, setPrizePool] = useState<number>(onChainData.data?.ethPool || 0);
+  const [prizePool, setPrizePool] = useState<number>(
+    onChainData.data?.ethPool || 0
+  );
 
   useEffect(() => {
-    chain === `ETH` && 
-    setPrizePool(onChainData.data?.ethPool || 0);
+    chain === `ETH` && setPrizePool(onChainData.data?.ethPool || 0);
 
-    chain === `SOL` && 
-    setPrizePool(onChainData.data?.solPool || 0);
+    chain === `SOL` && setPrizePool(onChainData.data?.solPool || 0);
+  }, [onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
 
-  },[onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
-
-  const parsedDailyWinnings = largestDailyWinnings
-    .map(({awarded_day, ...reward}) => (
-      {
-        ...reward,
-        awarded_day: new Date(awarded_day),
-      }
-    ))
+  const parsedDailyWinnings = largestDailyWinnings.map(
+    ({ awarded_day, ...reward }) => ({
+      ...reward,
+      awarded_day: new Date(awarded_day),
+    })
+  );
 
   // information on top of second screen
   const InfoStats = () => (
@@ -101,36 +99,42 @@ const RewardsStats = ({ changeScreen }: IProps) => {
         />
         {!!parsedDailyWinnings.length && (
           <div className={styles.rewardsChart}>
-            <LineChart 
-              data= {parsedDailyWinnings}
-              lineLabel='dailyWinnings'
+            <LineChart
+              data={parsedDailyWinnings}
+              lineLabel="dailyWinnings"
               accessors={{
                 xAccessor: (w: LargestDailyWinner) => w.awarded_day,
-                yAccessor: (w: LargestDailyWinner) => w.winning_amount_scaled * 1000000 + 1,
+                yAccessor: (w: LargestDailyWinner) =>
+                  w.winning_amount_scaled * 1000000 + 1,
               }}
-              renderTooltip={({datum}: {datum: DailyWinner}) => {
+              renderTooltip={({ datum }: { datum: DailyWinner }) => {
                 return (
                   <div className={styles.tooltip}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {`${datum.awarded_day.getDate()}`.padStart(2,'0')}/
-                      {`${datum.awarded_day.getMonth() + 1}`.padStart(2,'0')}/
-                      {`${datum.awarded_day.getUTCFullYear() % 100}`.padStart(2,'0')}
+                      {`${datum.awarded_day.getDate()}`.padStart(2, "0")}/
+                      {`${datum.awarded_day.getMonth() + 1}`.padStart(2, "0")}/
+                      {`${datum.awarded_day.getUTCFullYear() % 100}`.padStart(
+                        2,
+                        "0"
+                      )}
                     </span>
-                    <br/>
+                    <br />
                     <br />
                     <span>
                       <span>{trimAddress(datum.winning_address)}</span>
                     </span>
-                    <br/>
-                    <br/>
+                    <br />
+                    <br />
                     <span>
-                      <span>{numberToMonetaryString(datum.winning_amount_scaled)}{" "}</span>
+                      <span>
+                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      </span>
                       <span style={{ color: "rgba(2555,255,255, 50%)" }}>
                         prize awarded
                       </span>
                     </span>
                   </div>
-                )
+                );
               }}
             />
           </div>

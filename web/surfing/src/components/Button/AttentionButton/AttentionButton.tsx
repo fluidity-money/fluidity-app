@@ -8,16 +8,28 @@ import { ReactComponent as ArrowDown } from "~/assets/images/buttonIcons/arrowDo
 import { Heading } from "~/components/Heading";
 import styles from "./AttentionButton.module.scss";
 
-interface IAttentionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {handleClick: () => void}
+interface IAttentionButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  handleClick: () => void;
+}
 
-const AttentionButton = ({ children, handleClick, className, ...props }: IAttentionButtonProps) => {
+const AttentionButton = ({
+  children,
+  handleClick,
+  className,
+  ...props
+}: IAttentionButtonProps) => {
   const classProp = className || "";
 
   return (
-    <button className={`${styles.attention} ${classProp}`} onClick={handleClick} {...props} >
+    <button
+      className={`${styles.attention} ${classProp}`}
+      onClick={handleClick}
+      {...props}
+    >
       <Heading as="h5">
-            <b>{children}</b>
-          </Heading>
+        <b>{children}</b>
+      </Heading>
     </button>
   );
 };
