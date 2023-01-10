@@ -14,7 +14,7 @@ FRONTEND_SRC := ${FRONTEND_SRC_TS} ${FRONTEND_SRC_SASS}
 
 include ../../web.mk
 
-NEXTJS_BUILD := cd ..  && npm run build -- --filter website
+NEXTJS_BUILD := cd ..  && turbo build --filter website
 
 nextjs:
 	${NEXTJS_BUILD}
