@@ -2,7 +2,7 @@ REPO := fluidity.money
 
 include ../../web.mk
 
-REMIX_BUILD := cd ..  && npm run build -- --filter webapp
+REMIX_BUILD := cd ..  && turbo build --filter webapp
 
 .PHONY: remix
 
