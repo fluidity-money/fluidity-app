@@ -2,8 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import useViewport from "hooks/useViewport";
-import { ContinuousCarousel, Card, Heading, ManualCarousel, Partner } from "@fluidity-money/surfing";
+import { ContinuousCarousel, Card, Heading, ManualCarousel, Partner, useViewport } from "@fluidity-money/surfing";
 import styles from "./SponsorsPartners.module.scss";
 
 const SponsorsPartners = () => {

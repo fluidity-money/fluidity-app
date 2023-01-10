@@ -3,8 +3,6 @@
 // LICENSE.md file.
 
 import { useEffect, useState } from "react";
-import useViewport from "hooks/useViewport";
-import Video from "components/Video";
 import {
   ContinuousCarousel,
   Heading,
