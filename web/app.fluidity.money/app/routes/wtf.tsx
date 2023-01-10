@@ -23,10 +23,10 @@ import {
   trimAddressShort,
   numberToMonetaryString,
   appendLeading0x,
+  Video
   useViewport,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
-import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
