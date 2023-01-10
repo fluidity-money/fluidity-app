@@ -124,7 +124,7 @@ export default function Dashboard() {
     FluidityFacadeContext
   );
 
-  const { features, client } = useContext(SplitContext);
+  const { showExperiment, client } = useContext(SplitContext);
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -421,7 +421,7 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify button */}
-            {features["Fluidify-Button-Placement"] === "on" && (
+            {showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
                 className="fluidify-button-dashboard "
                 version={"primary"}
@@ -494,7 +494,7 @@ export default function Dashboard() {
           )}
 
         {/* Default Fluidify button */}
-        {features["Fluidify-Button-Placement"] !== "on" && (
+        {!showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
             version={"primary"}

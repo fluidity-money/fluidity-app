@@ -259,7 +259,7 @@ function App() {
               splitUser={splitUserKey}
               splitClientFeatures={splitClientFeatures}
             >
-              <Outlet context={"blah"} />
+              <Outlet />
             </SplitContextProvider>
             <ScrollRestoration />
             <Scripts />

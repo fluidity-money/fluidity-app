@@ -13,11 +13,11 @@ type SplitWindow = Window & {
 declare let window: SplitWindow;
 
 type SplitContextType = {
-  features: { [featName: string]: string };
+  showExperiment: (featName: string) => boolean;
   client: SplitClient | null;
 };
 
-const initContext = () => ({ features: {}, client: null });
+const initContext = () => ({ showExperiment: () => false, client: null });
 
 const SplitContext = createContext<SplitContextType>(initContext());
 
@@ -61,10 +61,13 @@ const SplitContextProvider = ({
           ...flags,
           [featName]: splitClient.getTreatment(featName),
         }),
-        {}
+        {} as { [featName: string]: string }
       );
 
-      setSplitTreatment({ features: featureFlags, client: splitClient });
+      setSplitTreatment({
+        showExperiment: (featName: string) => featureFlags[featName] === "on",
+        client: splitClient,
+      });
     })();
   }, []);
 
