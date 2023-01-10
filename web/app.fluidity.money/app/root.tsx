@@ -135,7 +135,7 @@ export const loader: LoaderFunction = async ({
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
   const splitBrowserKey = process.env?.SPLIT_BROWSER_KEY ?? "";
-  const splitClientFeatures = ["fluidify"];
+  const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
 
   return {

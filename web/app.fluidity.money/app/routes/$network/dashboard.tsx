@@ -421,7 +421,7 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify button */}
-            {features["fluidify"] === "on" && (
+            {features["Fluidify-Button-Placement"] === "on" && (
               <GeneralButton
                 className="fluidify-button-dashboard "
                 version={"primary"}
@@ -494,7 +494,7 @@ export default function Dashboard() {
           )}
 
         {/* Default Fluidify button */}
-        {features["fluidify"] !== "on" && (
+        {features["Fluidify-Button-Placement"] !== "on" && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
             version={"primary"}
