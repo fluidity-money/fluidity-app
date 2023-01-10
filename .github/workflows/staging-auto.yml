@@ -34,12 +34,16 @@ jobs:
         id: lib_diff
         with:
           PATTERNS: "web/surfing/**/*"
-      - name: Build & Bump Surfing
+      - name: Pull dependencies and build
+        if: steps.lib_diff.outputs.diff
+        working-directory: web
+        run: |
+          npm install
+          npm run build -- --filter=surfing
+      - name: Bump Surfing
         if: steps.lib_diff.outputs.diff
         working-directory: web/surfing
         run: |
-          npm install
-          npm run build
           npm version patch
       - uses: actions/setup-node@v3
         if: steps.lib_diff.outputs.diff
@@ -49,13 +53,6 @@ jobs:
         run: |
           npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
           npm publish
-      - name: Update version (Fluidity Landing)
-        if: steps.lib_diff.outputs.diff
-        working-directory: web/fluidity.money
-        run: |
-          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GITHUB_TOKEN }}
-          npm install
-          npm update surfing
       - name: Commit changed
         if: steps.lib_diff.outputs.diff
         run: |
