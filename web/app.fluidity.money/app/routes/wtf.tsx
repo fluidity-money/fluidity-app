@@ -23,8 +23,8 @@ import {
   trimAddressShort,
   numberToMonetaryString,
   appendLeading0x,
-  Video
-  useViewport,
+  Video,
+  useViewport
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import Modal from "~/components/Modal";
