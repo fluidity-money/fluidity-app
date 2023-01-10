@@ -1,0 +1,17 @@
+
+@use "../global-variables"
+
+$background-wavey: url("/img/waves.svg")
+$background-wavey-2: url("/img/waves.svg")
+
+.background-wavey
+  background: $background-wavey no-repeat center center
+  background-color: global-variables.$background
+
+.background-wavey-2
+  background: $background-wavey-2 no-repeat center center
+  background-color: global-variables.$background
+
+.background-wavey,
+.background-wavey-2
+  background-size: cover
