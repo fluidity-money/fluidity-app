@@ -2,8 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import TextButton from "./TextButton/TextButton";
 import GeneralButton from "./GeneralButton/";
 import LaunchButton from "./GeneralButton/LaunchButton";
 
-export { TextButton, GeneralButton, LaunchButton };
+export { GeneralButton, LaunchButton };
