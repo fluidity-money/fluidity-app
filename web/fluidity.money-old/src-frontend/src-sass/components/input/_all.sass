@@ -1,0 +1,68 @@
+
+@use "../../global-variables"
+
+$font: global-variables.$poppins
+$font-size: 17px
+$colour: #666666
+
+$background: #333333
+$border: 1px solid #333333
+$border-radius: 40px
+
+$padding-vertical: 16px
+$padding-left: 40px
+
+$formatted-color: #5BFEF3
+$formatted-border-radius: 20px
+$formatted-padding: 8px 20px
+$formatted-text-colour: white
+$formatted-font-size: 17px
+$formatted-font-family: global-variables.$raleway
+$formatted-padding: 8px 20px
+
+.input
+  font-family: $font
+  font-size: $font-size
+  background-color: $background
+  border: $border
+  color: $colour
+  border-color: $background
+  border-radius: $border-radius
+  padding-top: $padding-vertical
+  padding-bottom: $padding-vertical
+  padding-left: $padding-left
+  box-sizing: border-box
+
+.input:valid
+  background-color: white
+
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active
+  webkit-box-shadow: 0 0 0 30px white inset !important
+
+.input-greedy
+  flex-grow: 2
+
+.input-seperator
+  width: 10px
+
+.input-formatted
+  border-color: $formatted-color
+  border-radius: $formatted-border-radius
+  background-color: transparent
+  font-size: $formatted-font-size
+  font-family: $formatted-font-family
+  color: $formatted-text-colour
+  border-style: solid
+  text-decoration: none
+  padding: $formatted-padding
+
+.input-formatted:hover
+  cursor: pointer
+
+select
+  -webkit-appearance: none
+  -moz-appearance: none
+  appearance: none

@@ -17,10 +17,7 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY . ./
 
-RUN ls
-
 RUN npm i
-
 
 ARG FLU_SENTRY_DSN
 
@@ -30,9 +27,11 @@ RUN make frontend
 
 FROM fluidity/runtime-web-container:latest
 
-WORKDIR /usr/local/src/fluidity/web/fluidity.money
+WORKDIR /usr/local/src/fluidity/web
 
-COPY --from=build /usr/local/src/fluidity/web/fluidity.money .
+COPY --from=build /usr/local/src/fluidity/web .
+
+WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
 EXPOSE 3000
 

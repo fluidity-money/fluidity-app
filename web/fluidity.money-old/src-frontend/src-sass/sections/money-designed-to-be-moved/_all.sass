@@ -1,0 +1,62 @@
+
+@use "../../global-variables"
+
+$right-padding: 30px
+$top-padding: 50px
+
+$bold-color: #10D7F5
+$bold-weight: 700
+
+$image-width: 600px
+
+$subscribe-input-padding-top: 20px
+
+$thanks-padding: 10px
+
+$input-container-padding-left: 30px
+
+.money-designed-to-be-moved-title
+  margin-bottom: 0
+
+#money-designed-to-be-moved
+  padding-right: $right-padding
+
+.money-designed-to-be-moved-container
+  padding-top: $top-padding
+
+.money-designed-to-be-moved-pic-container > img
+  max-width: $image-width
+
+.money-designed-to-be-moved-description
+  max-height: 400px
+  max-width: 574px
+  animation: global-variables.$fade-in-animation
+
+.money-designed-to-be-moved-dot
+  animation: money-designed-to-be-moved-dot 1.75s steps(1)
+
+.money-designed-to-be-moved-bold
+  color: $bold-color
+  font-weight: $bold-weight
+
+.money-designed-to-be-moved-subscribe-input
+  padding-top: $subscribe-input-padding-top
+
+.money-designed-to-be-moved-input
+  flex-grow: 1
+  background: #333333
+  border-radius: 20px
+  padding: 8px 20px
+  font-size: 15px
+  border-style: none
+  font-family: "Raleway", "sans-serif"
+  color: #666666
+
+.money-designed-to-be-moved-thanks
+  padding: $thanks-padding
+
+#success:not(:target)
+  display: none
+
+.money-designed-to-be-moved-input-container
+  padding-left: $input-container-padding-left

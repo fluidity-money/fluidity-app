@@ -1,0 +1,43 @@
+
+$container-background: rgba(12, 30, 52, 1)
+
+$subscribe-padding-vertical: 104px
+
+$subscribe-container-text-padding-bottom: 40px
+
+$subscribe-email-background: #00142A
+
+$subscribe-button-size: 60px
+
+$subscribe-container-inputs-separator: 20px
+
+.subscribe-container
+  background-color: $container-background
+  padding-top: $subscribe-padding-vertical
+  padding-bottom: $subscribe-padding-vertical
+
+.subscribe-container-inputs
+  > *:nth-child(1)
+    margin-right: $subscribe-container-inputs-separator
+
+.subscribe-container-text
+  padding-bottom: $subscribe-container-text-padding-bottom
+
+.subscribe-email
+  background-color: $subscribe-email-background
+
+.subscribe-button-container
+  background-color: transparent
+  border: none
+  padding: 0 0
+
+.subscribe-button
+  > img
+    width: $subscribe-button-size
+
+.subscribe-button:hover:not(:disabled)
+  filter: brightness(1.1)
+  cursor: pointer
+
+.subscribe-inputs-container
+  display: flex
