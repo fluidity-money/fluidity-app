@@ -1,5 +1,5 @@
 {
-  "name": "fluidity.money",
+  "name": "@fluidity-money/website",
   "version": "0.1.1",
   "private": true,
   "dependencies": {
