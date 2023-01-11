@@ -7,6 +7,7 @@ package main
 import (
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
@@ -16,7 +17,6 @@ import (
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -49,7 +49,7 @@ func main() {
 		rewardsQueue        = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		batchedRewardsQueue = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		network_            = util.GetEnvOrFatal(EnvNetwork)
-		tokensList_          = util.GetEnvOrFatal(EnvTokensList)
+		tokensList_         = util.GetEnvOrFatal(EnvTokensList)
 
 		workerConfigAddress_ = util.GetEnvOrFatal(EnvWorkerConfigAddress)
 	)
