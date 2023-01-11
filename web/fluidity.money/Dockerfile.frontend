@@ -35,4 +35,4 @@ WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]
