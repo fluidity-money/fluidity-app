@@ -12,16 +12,16 @@ I'll give you the tour.
 We're using turborepo here so just use:
 
 ```bash
-npm install
-npm run dev
+yarn
+yarn dev
 ```
 
 in _this_ folder and it should all be live.
 
 ## Package management
-Is it a shared package such as React? An npm install in the root should do.
+Is it a shared package such as React? An `yarn add` in the root should do.
 If your package manager is new enough to be workspace aware, (we'd hope so in this case) 
-npm install in the directory of the application. 
+`yarn add` in the directory of the application. 
 
 Alternatively you can use the more powerful `--workspace` flag.
 
@@ -30,19 +30,19 @@ Alternatively you can use the more powerful `--workspace` flag.
 Current commands: 
 
 **Turborepo**
-- npm run build
-- npm run test
-- npm run dev
-- npm run storybook
+- yarn build
+- yarn test
+- yarn dev
+- yarn storybook
 
 To use turborepo options behind these, e.g filter use the following syntax.
 
 ```sh
-npm run build -- --filter=surfing
+yarn build --filter=surfing
 ```
 
 **Prettier**
-- npm run format
+- yarn format
 
 ## Creating a new package
 **Great!** This monorepo tech exists to make package creation and code sharing painless.
@@ -51,7 +51,7 @@ Currently we _aren't_ following the best practice for directory structure as a l
 
 Simply use your scaffolder, I like create-vite. Then add your project to the `web` folder's `package.json` as a workspace.
 
-Run an `npm install` and it should be good to go!
+Run a `yarn` and it should be good to go!
 
 Before you go, chuck a brief description of your app in this file. 
 It really helps people get their bearings around the code here.
