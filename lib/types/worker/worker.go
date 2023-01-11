@@ -6,6 +6,7 @@ package worker
 
 import (
 	"encoding/json"
+	"math/big"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -14,17 +15,17 @@ import (
 )
 
 type (
-	// WorkerConfigEthereum to be used with any EVM chains to store config
-	// that was previously hardcoded
+	// WorkerConfigEthereum to be used with any EVM chains with an
+	// on-chain smart contract to get information for the contract
 	WorkerConfigEthereum struct {
 		Network                       network.BlockchainNetwork `json:"network"`
-		CompoundBlocksPerDay          int                       `json:"compound_blocks_per_day"`
-		DefaultSecondsSinceLastBlock  uint64                    `json:"default_seconds_since_last_block"`
-		CurrentAtxTransactionMargin   int64                     `json:"current_atx_transaction_margin"`
-		DefaultTransfersInBlock       int                       `json:"default_transfers_in_block"`
-		AtxBufferSize                 int                       `json:"atx_buffer_size"`
-		SpoolerInstantRewardThreshold float64                   `json:"spooler_instant_reward_threshold"`
-		SpoolerBatchedRewardThreshold float64                   `json:"spooler_batched_reward_threshold"`
+		CompoundBlocksPerDay          uint8                     `json:"compound_blocks_per_day"`
+		DefaultSecondsSinceLastBlock  uint8                     `json:"default_seconds_since_last_block"`
+		CurrentAtxTransactionMargin   uint8                     `json:"current_atx_transaction_margin"`
+		DefaultTransfersInBlock       uint8                     `json:"default_transfers_in_block"`
+		AtxBufferSize                 uint8                     `json:"atx_buffer_size"`
+		SpoolerInstantRewardThreshold *big.Int                  `json:"spooler_instant_reward_threshold"`
+		SpoolerBatchedRewardThreshold *big.Int                  `json:"spooler_batched_reward_threshold"`
 	}
 
 	// WorkerConfigSolana that was previously hardcoded for Solana only
@@ -73,8 +74,8 @@ type (
 		MaxPriorityFeePerGas       misc.BigInt `json:"max_priority_fee_per_gas"`
 		MaxPriorityFeePerGasNormal float64     `json:"max_priority_fee_per_gas_normal"`
 
-		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
-		MaxFeePerGasNormal float64 `json:"max_fee_per_gas_normal"`
+		MaxFeePerGas       misc.BigInt `json:"max_fee_per_gas"`
+		MaxFeePerGasNormal float64     `json:"max_fee_per_gas_normal"`
 
 		EffectiveGasPriceNormal float64 `json:"effective_gas_price_normal"`
 

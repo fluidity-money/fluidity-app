@@ -6,12 +6,14 @@ of unpaid rewards is high enough.
 
 ## Environment variables
 
-|                       Name                       |                           Description
-|--------------------------------------------------|------------------------------------------------------------|
-| `FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME`           | AMQP topic to receive winner announcements from.           |
-| `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`   | AMQP topic to send batched winner announcements down.      |
-| `FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD` | Amount a reward can be before being sent instantly.        |
-| `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD`   | Amount of total unpaid rewards that can accumulate.        |
+|                      Name                       |                          Description
+|-------------------------------------------------|-------------------------------------------------------------|
+| `FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME`          | AMQP topic to receive winner announcements from.            |
+| `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`  | AMQP topic to send batched winner announcements down.       |
+| `FLU_ETHEREUM_SPOOLER_INSTANT_REWARD_THRESHOLD` | Amount a reward can be before being sent instantly.         |
+| `FLU_ETHEREUM_SPOOLER_TOTAL_REWARD_THRESHOLD`   | Amount of total unpaid rewards that can accumulate.         |
+| `FLU_ETHEREUM_NETWORK`                          | Network to use to identify the database (arbitrum/ethereum) |
+| `FLU_ETHEREUM_TOKENS_LIST`                      | Tokens to support, ie (addr:token:decimals, ...)            |
 
 ## Building
 

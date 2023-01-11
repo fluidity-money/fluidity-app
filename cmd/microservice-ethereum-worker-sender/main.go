@@ -48,7 +48,7 @@ const (
 )
 
 // details needed to update the reward type database
-type win = struct{
+type win struct {
 	rewardTransactionHash typesEth.Hash
 	sendTransactionHash   typesEth.Hash
 	winnerAddress         typesEth.Address
@@ -62,7 +62,7 @@ func main() {
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
 		useHardhatFix     bool
-		useLegacyContract = os.Getenv(EnvUseLegacyContract) == "true"
+		useLegacyContract        = os.Getenv(EnvUseLegacyContract) == "true"
 		gasLimit          uint64 = 0
 	)
 
@@ -140,7 +140,7 @@ func main() {
 
 		for i, reward := range announcement {
 			var (
-				winnerAddress 		= reward.Winner
+				winnerAddress       = reward.Winner
 				sendTransactionHash = reward.TransactionHash
 			)
 			wins[i] = win{winnerAddress: winnerAddress, sendTransactionHash: sendTransactionHash}
@@ -159,12 +159,12 @@ func main() {
 			transactions, err := callLegacyRewardFunction(rewardTransactionArguments)
 
 			if err != nil {
-			    log.Fatal(func(k *log.Log) {
-			        k.Format(
+				log.Fatal(func(k *log.Log) {
+					k.Format(
 						"Failed to call the legacy reward function! %v!",
 						err,
 					)
-			    })
+				})
 			}
 
 			hashes := make([]string, len(transactions))
@@ -212,7 +212,7 @@ func main() {
 		receipt, err := bind.WaitMined(context.Background(), ethClient, transactionHash)
 
 		if err != nil {
-			log.Fatal(func (k *log.Log) {
+			log.Fatal(func(k *log.Log) {
 				k.Message = "Error waiting for reward transaction to be mined!"
 				k.Payload = err
 			})

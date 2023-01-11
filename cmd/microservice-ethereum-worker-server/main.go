@@ -16,7 +16,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
-	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
@@ -36,6 +35,9 @@ const (
 const (
 	// EnvContractAddress to use to find the Fluid contract to identify transfers
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
+
+	// EnvWorkerConfigAddress to use as the WorkerConfig contract for various lookups
+	EnvWorkerConfigAddress = `FLU_ETHEREUM_WORKER_CONFIG_ADDR`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
@@ -64,22 +66,23 @@ const (
 func main() {
 	var (
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
-		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		networkId                = util.GetEnvOrFatal(EnvNetwork)
 
+		contractAddress       = mustEthereumAddressFromEnv(EnvContractAddress)
+		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
+		workerConfigAddress   = mustEthereumAddressFromEnv(EnvWorkerConfigAddress)
+
 		dbNetwork network.BlockchainNetwork
 	)
-
 
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
-    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
 			k.Payload = err
 		})
@@ -117,23 +120,41 @@ func main() {
 
 		message.Decode(&hintedBlock)
 
-		// set the configuration using what's in the database for the block
-		log.Debug(func (k *log.Log) {
-			k.Message = "About to fetch worker config from postgres!"
-		})
-		var (
-			workerConfig = worker_config.GetWorkerConfigEthereum(
-				dbNetwork,
+		log.Debug(func(k *log.Log) {
+			k.Format(
+				"About to fetch worker config from %#v for %#v!",
+				workerConfigAddress,
+				contractAddress,
 			)
+		})
 
-			defaultSecondsSinceLastBlock = workerConfig.DefaultSecondsSinceLastBlock
-			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
-			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
-			atxBufferSize                = workerConfig.AtxBufferSize
+		workerConfig, err := fluidity.GetTokenWorkerConfig(
+			gethClient,
+			workerConfigAddress,
+			contractAddress,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to get the worker config from %#v for %#v!",
+					workerConfigAddress,
+					contractAddress,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		var (
+			defaultSecondsSinceLastBlock = uint64(workerConfig.DefaultSecondsSinceLastBlock)
+			currentAtxTransactionMargin  = uint64(workerConfig.CurrentAtxTransactionMargin)
+			defaultTransfersInBlock      = int(workerConfig.DefaultTransfersInBlock)
+			atxBufferSize                = int(workerConfig.AtxBufferSize)
 		)
 
 		var (
-			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
+			currentAtxTransactionMarginRat = new(big.Rat).SetUint64(currentAtxTransactionMargin)
 			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
 			secondsSinceLastBlock          = defaultSecondsSinceLastBlock
 		)
@@ -150,7 +171,7 @@ func main() {
 			transfersInBlock += len(transfers.Transfers)
 		}
 
-		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
+		secondsSinceLastBlockRat := new(big.Rat).SetUint64(uint64(secondsSinceLastBlock))
 
 		emission := worker.NewEthereumEmission()
 
@@ -160,7 +181,7 @@ func main() {
 
 		emission.EthereumBlockNumber = blockNumber
 
-		emission.SecondsSinceLastBlock = secondsSinceLastBlock
+		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
 		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
 			dbNetwork,
@@ -279,7 +300,7 @@ func main() {
 		for _, transaction := range fluidTransactions {
 
 			var (
-				receipt     = transaction.Receipt
+				receipt = transaction.Receipt
 
 				transactionHash      = transaction.Transaction.Hash
 				transferType         = transaction.Transaction.Type
@@ -377,7 +398,7 @@ func main() {
 					appEmission      = transfer.AppEmissions
 				)
 
-				application := applications.ApplicationNone 
+				application := applications.ApplicationNone
 
 				if transfer.Decorator != nil {
 					applicationFeeUsd := transfer.Decorator.ApplicationFee

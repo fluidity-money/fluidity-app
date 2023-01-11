@@ -276,24 +276,91 @@ const tokenContractAbiString = `[
 `
 
 const workerConfigAbiString = `[
-  {
+    {
+      "inputs": [],
+      "name": "getWorkerAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
-        "components": [
-           { "internalType": "address", "name": "contractAddr", "type": "address" },
-           { "internalType": "address", "name": "newOracle", "type": "address" }
-         ],
-         "internalType": "struct OracleUpdate[]",
-         "name": "newOracles",
-         "type": "tuple[]"
+          "internalType": "address",
+          "name": "contractAddr_",
+          "type": "address"
         }
-	    ],
-    "name": "updateOracles",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-]`
+      ],
+      "name": "getTrfConfiguration",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "compoundBlocksPerDay",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint8",
+              "name": "defaultSecondsSinceLastBlock",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint8",
+              "name": "atxBufferSize",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "spoolerInstantRewardThreshold",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "spoolerBatchedRewardThreshold",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct TrfVariables",
+          "name": "tokenConfig",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "contractAddr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "newOracle",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct WorkerConfig.OracleUpdate[]",
+          "name": "newOracles",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "updateOracles",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]`
 
 var (
 	FluidityContractAbi ethAbi.ABI

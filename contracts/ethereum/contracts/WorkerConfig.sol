@@ -13,6 +13,8 @@ struct TrfVariables {
     uint8 compoundBlocksPerDay;
     uint8 defaultSecondsSinceLastBlock;
     uint8 atxBufferSize;
+    uint8 currentAtxTransactionMargin;
+    uint8 defaultTransfersInBlock;
 
     uint256 spoolerInstantRewardThreshold;
     uint256 spoolerBatchedRewardThreshold;
@@ -49,7 +51,7 @@ contract WorkerConfig {
 
     /// @notice token configuration for the worker per token supported
     /// @notice used by the worker for it's configuration
-    mapping (address => TrfVariables) tokenWorkerConfigurations_;
+    mapping (address => TrfVariables) trfConfigurations_;
 
     /**
      * @notice intialise the worker config for each of the tokens in the map
@@ -104,8 +106,8 @@ contract WorkerConfig {
         return oracles_[msg.sender];
     }
 
-    function tokenConfiguration(address contractAddr_) public requireNoGlobalEmergency view returns (TrfVariables memory tokenConfig) {
-    	return tokenWorkerConfigurations_[contractAddr_];
+    function getTrfConfiguration(address contractAddr_) public requireNoGlobalEmergency view returns (TrfVariables memory tokenConfig) {
+    	return trfConfigurations_[contractAddr_];
     }
 
     function enableEmergencyMode() public {
