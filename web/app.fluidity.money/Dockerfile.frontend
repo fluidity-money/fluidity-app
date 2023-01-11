@@ -8,7 +8,7 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY . ./
 
-RUN npm i
+RUN yarn
 
 ARG FLU_SENTRY_DSN
 
@@ -29,4 +29,4 @@ WORKDIR /usr/local/src/fluidity/web/app.fluidity.money
 ARG GIT_SHA=unsetver
 ENV GIT_SHA=$GIT_SHA
 
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]
