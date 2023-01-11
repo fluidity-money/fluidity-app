@@ -3,13 +3,13 @@ import { wrap } from '@motionone/utils';
 import { ReactNode } from 'react';
 import styles from "./MotionContinuousCarousel.module.scss";
 
-interface ParallaxProps {
+interface IMCC {
   children: ReactNode;
   baseVelocity?: number;
   
 }
 
- export const MotionContinuousCarousel = ({ children, baseVelocity = 1 }: ParallaxProps) => {
+ export const MotionContinuousCarousel = ({ children, baseVelocity = 1 }: IMCC) => {
   /**
    * Will create a continuous carousel in 1 of 2 directions based on children
    * This is a wrapping for the length of the text
