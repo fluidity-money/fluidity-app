@@ -8,7 +8,7 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY . ./
 
-RUN npm i
+RUN yarn
 
 ARG FLU_SENTRY_DSN
 
