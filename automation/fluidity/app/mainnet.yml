@@ -21,7 +21,8 @@ SERVICES:
       SECRET_FLU_HASURA_WS: /fluidity/hasura/rpc_ws
       SECRET_FLU_HASURA_SECRET: /fluidity/hasura/key
       SECRET_FLU_SPLIT_BROWSER_KEY: /fluidity/split/key
-
+      SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
+      
       DOCKER_ARGS:
         SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
