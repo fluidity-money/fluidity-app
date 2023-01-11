@@ -9,6 +9,8 @@ pragma abicoder v2;
 
 import "./openzeppelin/Address.sol";
 
+/// @notice trf variables associated with each token, used to configure
+///         the off-chain worker
 struct TrfVariables {
     uint8 compoundBlocksPerDay;
     uint8 defaultSecondsSinceLastBlock;
@@ -98,16 +100,24 @@ contract WorkerConfig {
         }
     }
 
+    /// @notice get the worker address with the contract address given
     function getWorkerAddress(address contractAddr) public requireNoGlobalEmergency view returns (address) {
         return oracles_[contractAddr];
     }
 
+    /// @notice get the worker worker associated with the sender
     function getWorkerAddress() public requireNoGlobalEmergency view returns (address) {
         return oracles_[msg.sender];
     }
 
-    function getTrfConfiguration(address contractAddr_) public requireNoGlobalEmergency view returns (TrfVariables memory tokenConfig) {
-    	return trfConfigurations_[contractAddr_];
+    /// @notice get the trf configuration with the contract address
+    function getTrfConfiguration(address contractAddr) public requireNoGlobalEmergency view returns (TrfVariables memory tokenConfig) {
+        return trfConfigurations_[contractAddr];
+    }
+
+    /// @notice set the trf configuration for a specific contract given
+    function setTrfConfiguration(address contractAddr, TrfVariables memory trfVariables) public requireNoGlobalEmergency requireOperator {
+        trfConfigurations_[contractAddr] = trfVariables;
     }
 
     function enableEmergencyMode() public {
