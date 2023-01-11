@@ -9,6 +9,7 @@ import { ManualCarousel } from "./ManualCarousel";
 import { ContinuousCarousel } from "./ContinuousCarousel";
 import { FooterItem } from "./FooterItem";
 import { Partner } from "./Partner";
+import { MotionContinuousCarousel } from "./MotionContinuousCarousel";
 
 export {
   Row,
@@ -18,4 +19,5 @@ export {
   ContinuousCarousel,
   FooterItem,
   Partner,
+  MotionContinuousCarousel,
 };

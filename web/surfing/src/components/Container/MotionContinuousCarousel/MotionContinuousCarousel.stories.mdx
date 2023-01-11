@@ -1,0 +1,98 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import MotionContinuousCarousel from "./MotionContinuousCarousel";
+
+<Meta
+    title="Container/MotionContinuousCarousel"
+    component={MotionContinuousCarousel}
+/>
+
+export const Template = ({children, ...props}) => <MotionContinuousCarousel {...props}>
+    {children}
+</MotionContinuousCarousel>;
+
+<Canvas>
+    <Title>MotionContinuousCarousel</Title>
+    <Subtitle>MotionContinuousCarousel Component</Subtitle>
+    
+    <h2>MotionContinuousCarousel Component</h2>
+    <Story
+        name="MotionContinuousCarousel"
+        args={{
+            children: list,
+            baseVelocity: 1
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    
+</Canvas>
+
+export const data = [
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+  {
+    blockchain: '🦍',
+    amount: '1.01',
+    id: '9ozY5b..saDwFf',
+    date: '21.06.22 11:54am',
+  },
+];
+
+export const list = <div style={{ display: 'flex', gap: 10, marginTop: 5, marginBottom: 5, color:'white' }}>
+      {data.map((item) => (
+        <div key={`${item.amount} ${item.id}`}>{`${item.blockchain} ${item.amount} to ${item.id} ${item.date}`}</div>
+      ))}
+    </div>
