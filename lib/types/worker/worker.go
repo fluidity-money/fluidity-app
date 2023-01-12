@@ -210,6 +210,7 @@ type (
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
+		Saddle           float64 `json:"saddle"`
 	}
 )
 
