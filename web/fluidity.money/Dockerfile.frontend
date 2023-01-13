@@ -17,9 +17,9 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY . ./
 
-RUN npm i
+RUN yarn
 
-ARG REACT_APP_SENTRY_DSN
+ARG FLU_SENTRY_DSN
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
@@ -35,4 +35,4 @@ WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]

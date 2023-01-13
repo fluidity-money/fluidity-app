@@ -119,7 +119,7 @@ const useVolumeTxByAddressTimestamp = async (
     url,
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
@@ -136,7 +136,7 @@ const useVolumeTxByTimestamp = async (
   };
 
   return jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(url, body, {
-    "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+    "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
   });
 };
 
