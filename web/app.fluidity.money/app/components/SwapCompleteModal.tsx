@@ -16,9 +16,9 @@ import {
   Text,
   numberToMonetaryString,
   stringifiedNumberToMonetaryString,
+  Video
 } from "@fluidity-money/surfing";
 import BloomEffect from "~/components/BloomEffect";
-import Video from "~/components/Video";
 import {
   addDecimalToBn,
   getUsdFromTokenAmount,
