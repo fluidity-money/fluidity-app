@@ -18,9 +18,9 @@ import {
   numberToMonetaryString,
   LoadingDots,
   useViewport,
+  Video
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import ConnectedWallet from "~/components/ConnectedWallet";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
