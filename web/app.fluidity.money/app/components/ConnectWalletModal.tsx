@@ -103,7 +103,9 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
 
   const closeWithEsc = useCallback(
     (event: { key: string }) => {
-      event.key === "Escape" && visible === true && close();
+      if (visible && event.key === "Escape") {
+        close();
+      }
     },
     [visible]
   );

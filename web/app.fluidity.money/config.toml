@@ -289,6 +289,12 @@ id = "walletconnect"
 description = "WalletConnect allows you to connect your wallet to any dApp using a QR code."
 logo = "/assets/wallets/walletconnect.svg"
 
+[[config.ethereum.wallets]]
+name = "Particle"
+id = "particle"
+description = "The most secure Self-custodial wallet with no private key vulnerability."
+logo = "/assets/wallets/eth_browser.svg"
+
 [[contract.solana]]
 name = "Mainnet"
 address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
