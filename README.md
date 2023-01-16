@@ -51,6 +51,8 @@ _---_
 
 _The future of finance excites us. In the world of tomorrow, the way we think about money will be drastically different. The majority of our purchases will be done with digital currencies, and with the utilization of Smart Contracts we can expect a major shift in our economical model._
 
+Fluidity Money is licensed mostly as GPL ([https://github.com/fluidity-money/fluidity-app/blob/develop/LICENSE.md](https://github.com/fluidity-money/fluidity-app/blob/develop/LICENSE.md)), with a dependency on Solmate ERC20 for the governance token (licensed as aGPL) [https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol](https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol) . The TRF is licensed with creative commons (license found here) [https://github.com/fluidity-money/fluidity-app/blob/develop/LICENSE\_TRF.md](https://github.com/fluidity-money/fluidity-app/blob/develop/LICENSE\_TRF.md))
+
 ## Useful links
 
 Website and whitepapers: [https://www.fluidity.money/](https://www.fluidity.money/)
