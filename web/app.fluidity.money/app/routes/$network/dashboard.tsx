@@ -582,6 +582,12 @@ export default function Dashboard() {
             <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
             </a>
+
+            {/* Source code */}
+            { showExperiment("enable-source-code") &&
+                <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                  <Text>Source code</Text>
+                </a> }
           </section>
 
           {/* Socials */}
