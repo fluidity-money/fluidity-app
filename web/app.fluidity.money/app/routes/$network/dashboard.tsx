@@ -169,7 +169,20 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
-  const chainNameMap = {
+  const chainNameMap = showExperiment("enable-arbitrum") ? {
+    ethereum: {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    arbitrum: {
+      name: "ARB",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    solana: {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  } :  {
     ethereum: {
       name: "ETH",
       icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -178,7 +191,7 @@ export default function Dashboard() {
       name: "SOL",
       icon: <img src="/assets/chains/solanaIcon.svg" />,
     },
-  };
+  }
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
