@@ -24,7 +24,7 @@ import {
   numberToMonetaryString,
   appendLeading0x,
   Video,
-  useViewport
+  useViewport,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import Modal from "~/components/Modal";
