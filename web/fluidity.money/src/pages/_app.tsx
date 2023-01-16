@@ -10,7 +10,7 @@ import { ApolloProvider } from "@apollo/client";
 import { useViewport } from "@fluidity-money/surfing";
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
@@ -19,12 +19,15 @@ import "styles/app.global.scss"
 import { CookieConsent } from "@fluidity-money/surfing";
 import { useRouter } from 'next/router';
 import * as gtag from 'utils/gtag'
+import { showExperiment, SplitContext } from "../../utils/split";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
   const breakpoint = 620;
 
   const location = typeof window !== "undefined" ? window.location : null;
+
+  const { showExperiment } = useContext(SplitContext);
 
   useEffect(() => {
     if (location.hash) {
@@ -60,6 +63,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }, []);
   
   useEffect(() => {
+    if (!showExperiment("enable-fluid-animation-background")) return;
+
     const script = document.createElement("script");
     if (width >= breakpoint) {
       script.src = "assets/gfx/renderer.js";
