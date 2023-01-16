@@ -4,6 +4,12 @@ import { fUsdtOperator, fDaiAccount, fFeiAccount, rewardPoolsOperator } from './
 import { assert } from 'chai';
 
 describe("reward pools", async function () {
+  before(async function () {
+    if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
+      return this.skip();
+    }
+  });
+
   it("consistent reward pools", async function () {
     const manualAmount_ =
       [ fUsdtOperator, fDaiAccount, fFeiAccount ]
