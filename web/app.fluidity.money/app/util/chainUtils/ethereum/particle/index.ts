@@ -15,7 +15,7 @@ type ParticleProvider = Provider
 
 export class NoParticleError extends Error {
   public constructor() {
-    super('MetaMask not installed')
+    super('Particle not installed')
     this.name = NoParticleError.name
     Object.setPrototypeOf(this, NoParticleError.prototype)
   }
@@ -59,13 +59,11 @@ export class Particle extends Connector {
   private async isomorphicInitialize(): Promise<void> {
     if (this.eagerConnection) return;
 
-    this.eagerConnection = Promise.resolve((async () => {
-      
+    return (this.eagerConnection = Promise.resolve((async () => {
       const provider = await this.connectKit.connect();
 
       if (provider) {
         this.provider = provider as ParticleProvider
-
         this.provider?.on('connect', (): void => {
           this.actions.update({ chainId: 1 });
         })
@@ -88,9 +86,7 @@ export class Particle extends Connector {
           }
         })
       }
-    })())
-
-    return;
+    })()));
   }
 
   /** {@inheritdoc Connector.connectEagerly} */
@@ -106,8 +102,6 @@ export class Particle extends Connector {
     ])
       .then(([chainId, accounts]) => {
 
-        console.log("chainId", chainId);
-        
         if (accounts.length) {
           this.actions.update({ chainId: parseChainId(chainId), accounts })
         } else {
@@ -144,8 +138,6 @@ export class Particle extends Connector {
           this.provider.request({ method: 'eth_chainId' }) as Promise<string>,
           this.provider.request({ method: 'eth_requestAccounts' }) as Promise<string[]>,
         ]).then(([chainId, accounts]) => {
-          console.log("chain", chainId)
-
           const receivedChainId = parseChainId(chainId)
           const desiredChainId =
             typeof desiredChainIdOrChainParameters === 'number'

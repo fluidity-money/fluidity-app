@@ -75,7 +75,6 @@ const EthereumFacade = ({
         connector = connectors.find(
           (connector) => connector[0] instanceof MetaMask
         )?.[0];
-        return connector?.activate();
       case "walletconnect":
         connector = connectors.find(
           (connector) => connector[0] instanceof WalletConnect
@@ -84,18 +83,17 @@ const EthereumFacade = ({
         // We manually re-add Node.Buffer to client
         // https://github.com/WalletConnect/web3modal/issues/455
         window.Buffer = Buffer;
-        return connector?.activate();
       case "particle":
         connector = connectors.find(
           (connector) => connector[0] instanceof Particle
         )?.[0];
         window.Buffer = Buffer;
-        console.log("connector", connector)
-        return connector?.connect();
       default:
         console.warn("Unsupported connector", type);
         break;
     }
+
+    return connector?.activate();
   };
 
   const deactivate = async (): Promise<void> => {
