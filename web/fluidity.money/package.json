@@ -8,6 +8,7 @@
     "@fluidity-money/surfing": "*",
     "@openzeppelin/contracts": "^4.8.0",
     "@reduxjs/toolkit": "^1.8.3",
+    "@splitsoftware/splitio": "^10.22.3",
     "@types/gtag.js": "^0.0.12",
     "@visx/visx": "^2.16.0",
     "big.js": "^6.2.1",

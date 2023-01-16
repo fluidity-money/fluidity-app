@@ -2,6 +2,8 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { useContext } from "react";
+
 import Head from "next/head";
 import Articles from "screens/Articles";
 import Demo from "../../screens/Demo";
@@ -11,7 +13,10 @@ import Landing from "../../screens/Landing";
 import Reward from "../../screens/Reward";
 import SponsorsPartners from "../../screens/SponsorsPartners";
 import UseCases from "../../screens/UseCases";
+import Ecosystem from "../../screens/Ecosystem";
 import styles from "./LandingPage.module.scss";
+
+import { SplitContext } from "../../utils/split";
 
 export type onChainData =
   | {
@@ -22,6 +27,8 @@ export type onChainData =
   | undefined;
 
 const LandingPage = () => {
+  const { showExperiment, client } = useContext(SplitContext);
+
   return (
     <div className={styles.pageContainer}>
       <Head>
@@ -37,8 +44,7 @@ const LandingPage = () => {
         <HowItWorks />
         <UseCases />
         <SponsorsPartners />
-        {/* Ecosystem which scrolls to projects as a component, not ready for production yet */}
-        {/* <Ecosystem /> */}
+        { showExperiment("enable-ecosystem-page") && <Ecosystem /> }
         <Articles isResourcesPage={false} />
         <Demo />
         <Footer />
