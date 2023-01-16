@@ -19,7 +19,14 @@ type SplitContextType = {
   setSplitUser: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const initContext = () => ({ showExperiment: () => false, client: null, splitUser: "",  setSplitUser: () => {return} });
+const initContext = () => ({
+  showExperiment: () => false,
+  client: null,
+  splitUser: "",
+  setSplitUser: () => {
+    return;
+  },
+});
 
 const SplitContext = createContext<SplitContextType>(initContext());
 
@@ -37,20 +44,23 @@ const SplitContextProvider = ({
   setSplitUser,
   splitClientFeatures = [],
 }: ISplitContextProvider) => {
-  const [splitTreatment, setSplitTreatment] = useState<SplitContextType>(
-    { showExperiment: () => false, client: null, splitUser,  setSplitUser }
-  );
+  const [splitTreatment, setSplitTreatment] = useState<SplitContextType>({
+    showExperiment: () => false,
+    client: null,
+    splitUser,
+    setSplitUser,
+  });
 
   useEffect(() => {
     if (!(splitBrowserKey && splitUser && splitClientFeatures.length)) return;
 
     window["split"] = SplitFactory({
-        core: {
-          authorizationKey: splitBrowserKey,
-          key: splitUser,
-        },
-        debug: false,
-      });
+      core: {
+        authorizationKey: splitBrowserKey,
+        key: splitUser,
+      },
+      debug: false,
+    });
 
     // This branch runs only on the client-side
     const splitClient = window["split"].client();
@@ -59,7 +69,8 @@ const SplitContextProvider = ({
       await splitClient.ready();
 
       setSplitTreatment({
-        showExperiment: (featName: string) => splitClient.getTreatment(featName) === "on",
+        showExperiment: (featName: string) =>
+          splitClient.getTreatment(featName) === "on",
         client: splitClient,
         splitUser,
         setSplitUser,

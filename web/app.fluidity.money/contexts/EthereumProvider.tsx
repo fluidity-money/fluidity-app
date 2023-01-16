@@ -60,8 +60,8 @@ const EthereumFacade = ({
   useEffect(() => {
     if (!account) return;
 
-    setSplitUser(account)
-  }, [account])
+    setSplitUser(account);
+  }, [account]);
 
   const getBalance = async (
     contractAddress: string

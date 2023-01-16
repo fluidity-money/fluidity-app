@@ -235,8 +235,8 @@ function App() {
     }
   }, []);
 
-  const [ splitUser, setSplitUser ] = useState(splitUserKey);
-  
+  const [splitUser, setSplitUser] = useState(splitUserKey);
+
   return (
     <html lang="en">
       <head>
