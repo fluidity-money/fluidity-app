@@ -1,41 +1,38 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
+import "./openzeppelin/IERC20.sol";
+import "./openzeppelin/SafeERC20.sol";
+
 /// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
 /// @author Fluidity Money
 /// @author Modified from Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol)
-/// @notice Modified to support proxy initialisation and to reflect our internal style
+/// @notice Modified to support proxy initialisation and to reflect our internal style (lack of getter functions)
 /// @dev Do not manually set balances without updating totalSupply, as the sum of all user balances must not exceed it.
-contract ERC20 {
-    /*//////////////////////////////////////////////////////////////
-                                 EVENTS
-    //////////////////////////////////////////////////////////////*/
-
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-
-    event Approval(address indexed owner, address indexed spender, uint256 amount);
+contract GovToken is IERC20 {
+    using SafeERC20 for IERC20;
 
     /*//////////////////////////////////////////////////////////////
                             METADATA STORAGE
     //////////////////////////////////////////////////////////////*/
 
-    uint8 version_;
+    uint8 private version_;
 
-    string public name_;
+    string private name_;
 
-    string public symbol_;
+    string private symbol_;
 
-    uint8 public decimals_;
+    uint8 private decimals_;
 
     /*//////////////////////////////////////////////////////////////
                               ERC20 STORAGE
     //////////////////////////////////////////////////////////////*/
 
-    uint256 public totalSupply_;
+    uint256 private totalSupply_;
 
-    mapping(address => uint256) public balanceOf_;
+    mapping(address => uint256) private balanceOf_;
 
-    mapping(address => mapping(address => uint256)) public allowance_;
+    mapping(address => mapping(address => uint256)) private allowance_;
 
     /*//////////////////////////////////////////////////////////////
                             EIP-2612 STORAGE
@@ -51,7 +48,7 @@ contract ERC20 {
                                   INITIALISE
     //////////////////////////////////////////////////////////////*/
 
-    function initialise(
+    function init(
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
@@ -117,6 +114,18 @@ contract ERC20 {
         emit Transfer(_from, _to, _amount);
 
         return true;
+    }
+
+    function allowance(address _owner, address _spender) public view returns (uint256) {
+        return allowance_[_owner][_spender];
+    }
+
+    function balanceOf(address _spender) public view returns (uint256) {
+        return balanceOf_[_spender];
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return totalSupply_;
     }
 
     /*//////////////////////////////////////////////////////////////
