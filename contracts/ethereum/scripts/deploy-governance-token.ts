@@ -3,12 +3,16 @@ import { mustEnv } from "../script-utils";
 import type { ethers } from "ethers";
 import { BigNumber} from "ethers";
 
+const ENV_OPERATOR = `FLU_ETHEREUM_OPERATOR_ADDRESS`;
+
 const name = "Fluidity Money";
 const symbol = "FLUID";
 const decimals = 18;
 const totalSupply = BigNumber.from("1000000000000000000000000000"); // 1_000_000_000 FLUID tokens
 
 const main = async () => {
+    const operator = mustEnv(ENV_OPERATOR);
+
     const factory = await hre.ethers.getContractFactory("GovToken");
     const proxy = await hre.upgrades.deployProxy(factory);
 
