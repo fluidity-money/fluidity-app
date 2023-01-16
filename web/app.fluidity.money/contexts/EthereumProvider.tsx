@@ -31,6 +31,7 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
+import { Particle } from "~/util/chainUtils/ethereum/particle";
 
 const EthereumFacade = ({
   children,
@@ -69,7 +70,6 @@ const EthereumFacade = ({
   // find and activate corresponding connector
   const useConnectorType = (type: "metamask" | "walletconnect" | "particle" | string) => {
     let connector: any;
-    console.log("hello")
     switch (type) {
       case "metamask":
         connector = connectors.find(
@@ -86,11 +86,11 @@ const EthereumFacade = ({
         window.Buffer = Buffer;
         return connector?.activate();
       case "particle":
-        console.log("part")
         connector = connectors.find(
-          (connector) => connector[0] instanceof ParticleConnect
+          (connector) => connector[0] instanceof Particle
         )?.[0];
-        console.log("part", connector);
+        window.Buffer = Buffer;
+        console.log("connector", connector)
         return connector?.connect();
       default:
         console.warn("Unsupported connector", type);
@@ -306,55 +306,16 @@ const EthereumFacade = ({
 export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
   const Provider = ({ children }: { children: React.ReactNode }) => {
     const connectors = useMemo(() => {
-      const connectKit = new ParticleConnect({
-        projectId: 'de16eeaa-a811-4449-82c4-a876a8bdd323',
-        clientKey: 'cGgPX2XGtmWIyc6GeK8XoxdH59BBRqbjKC946Aku',
-        appId: '8f540914-5b47-4e10-aa6d-43004cd367c3',
-        chains: [
-            {
-                id: 1,
-                name: 'Ethereum',
-            }
-        ],
-        wallets: evmWallets({ qrcode: false }),
-      });
-
-      console.log("blah", connectKit);
-
-      //connect registered wallet
-      connectKit.connect('particle');
-      // window["blah"] = connectKit;
-      console.log("hello");
-
-      //connect to particle
-      // connectKit.connect('particle', options);
-
-      //disconnect wallet
-      // connectKit.disconnect();
-
-      //connect last wallet
-      // connectKit.connectToCachedProvider();
-
-      //listen provider event
-      // connectKit.on('connect', (provider) => {});
-      // connectKit.on('disconnect', () => {});
-      // connectKit.on('chainChanged', (chain) => {});
-      // connectKit.on('accountsChanged', (accounts) => {});
-
-      //switch chain
-      // connectKit.switchChain(chain);
-
-      //get registered wallet metadata
-      // connectKit.walletMetas();
-
-      //get evm default wallets
-      // evmWallets();   //you can also custom wallet order
-
-      //get browser injected evm wallet 
-      // evmInjectedWallet();
-
-      //get browser injected wallet metadata
-      // getInjectedProvider();
+      const [particle, particleHooks] = initializeConnector<Particle>(
+        (actions) => new Particle({
+          actions,
+          options: {
+            projectId: 'de16eeaa-a811-4449-82c4-a876a8bdd323',
+            clientKey: 'cGgPX2XGtmWIyc6GeK8XoxdH59BBRqbjKC946Aku',
+            appId: '8f540914-5b47-4e10-aa6d-43004cd367c3',
+          }
+        })
+      )
 
       const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
         (actions) => new MetaMask({ actions })
@@ -376,6 +337,7 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
       const connectors: [any, Web3ReactHooks][] = [
         [metaMask, metamaskHooks],
         [walletConnect, walletconnectHooks],
+        [particle, particleHooks],
       ];
 
       return connectors;
