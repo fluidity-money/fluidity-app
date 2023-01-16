@@ -15,15 +15,18 @@ declare let window: SplitWindow;
 type SplitContextType = {
   showExperiment: (featName: string) => boolean;
   client: SplitClient | null;
+  splitUser: string;
+  setSplitUser: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const initContext = () => ({ showExperiment: () => false, client: null });
+const initContext = () => ({ showExperiment: () => false, client: null, splitUser: "",  setSplitUser: () => {return} });
 
 const SplitContext = createContext<SplitContextType>(initContext());
 
 type ISplitContextProvider = React.PropsWithChildren<{
   splitBrowserKey: string;
   splitUser: string;
+  setSplitUser: React.Dispatch<React.SetStateAction<string>>;
   splitClientFeatures: string[];
 }>;
 
@@ -31,18 +34,17 @@ const SplitContextProvider = ({
   children,
   splitBrowserKey,
   splitUser,
+  setSplitUser,
   splitClientFeatures = [],
 }: ISplitContextProvider) => {
   const [splitTreatment, setSplitTreatment] = useState<SplitContextType>(
-    initContext()
+    { showExperiment: () => false, client: null, splitUser,  setSplitUser }
   );
 
   useEffect(() => {
     if (!(splitBrowserKey && splitUser && splitClientFeatures.length)) return;
 
-    window["split"] =
-      window["split"] ||
-      SplitFactory({
+    window["split"] = SplitFactory({
         core: {
           authorizationKey: splitBrowserKey,
           key: splitUser,
@@ -56,20 +58,14 @@ const SplitContextProvider = ({
     (async () => {
       await splitClient.ready();
 
-      const featureFlags = splitClientFeatures.reduce(
-        (flags, featName) => ({
-          ...flags,
-          [featName]: splitClient.getTreatment(featName),
-        }),
-        {} as { [featName: string]: string }
-      );
-
       setSplitTreatment({
-        showExperiment: (featName: string) => featureFlags[featName] === "on",
+        showExperiment: (featName: string) => splitClient.getTreatment(featName) === "on",
         client: splitClient,
+        splitUser,
+        setSplitUser,
       });
     })();
-  }, []);
+  }, [splitUser]);
 
   return (
     <SplitContext.Provider value={splitTreatment}>

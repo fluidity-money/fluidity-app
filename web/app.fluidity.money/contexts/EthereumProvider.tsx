@@ -29,6 +29,8 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
+import { SplitContext } from "~/util/split";
+import { useContext } from "react";
 
 const EthereumFacade = ({
   children,
@@ -52,6 +54,14 @@ const EthereumFacade = ({
       return false;
     });
   }, []);
+
+  const { setSplitUser } = useContext(SplitContext);
+
+  useEffect(() => {
+    if (!account) return;
+
+    setSplitUser(account)
+  }, [account])
 
   const getBalance = async (
     contractAddress: string
@@ -86,6 +96,7 @@ const EthereumFacade = ({
         console.warn("Unsupported connector", type);
         break;
     }
+
     connector?.activate();
   };
 
