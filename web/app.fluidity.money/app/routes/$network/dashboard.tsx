@@ -169,29 +169,32 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
-  const chainNameMap = showExperiment("enable-arbitrum") ? {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    arbitrum: {
-      name: "ARB",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  } :  {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  }
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
+    showExperiment("enable-arbitrum")
+      ? {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          arbitrum: {
+            name: "ARB",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        }
+      : {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        };
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
