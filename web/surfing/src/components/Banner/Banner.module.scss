@@ -1,0 +1,20 @@
+.container {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba($color: #fff, $alpha: 0.5);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (min-width: 768px) {
+        padding: 1.5rem;
+    }
+
+    .positionFixed {
+        position: fixed;
+        z-index: 1000;
+    }
+}

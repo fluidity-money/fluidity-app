@@ -1,25 +1,24 @@
 import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
 
-import CookieConsent from "./CookieConsent";
+import Banner from "./Banner";
 
-<Meta title="Modal/CookieConsent" component={CookieConsent} />
+<Meta title="Modal/Banner" component={Banner} />
 
 export const Template = (args) => (
-    <CookieConsent {...args}/>
+    <Banner {...args}/>
 );
 
-<Title>Cookie Modal</Title>
+<Title>Banner</Title>
 <Subtitle>Beautiful typography for beautiful things.</Subtitle>
 
-<ArgsTable of={CookieConsent} default />
+<ArgsTable of={Banner} default />
 
 <Canvas>
     <Story
         name="Cookies"
         args={{
-            activated: false,
-            url: '/privacy',
-            callBack: () => { return }
+            positionFixed: true,
+            children: <h1>This is a message</h1>
         }}
     >
         {Template.bind({})}
