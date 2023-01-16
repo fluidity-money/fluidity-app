@@ -235,6 +235,8 @@ function App() {
     }
   }, []);
 
+  const [splitUser, setSplitUser] = useState(splitUserKey);
+
   return (
     <html lang="en">
       <head>
@@ -255,7 +257,8 @@ function App() {
           <ToolProvider>
             <SplitContextProvider
               splitBrowserKey={splitBrowserKey}
-              splitUser={splitUserKey}
+              splitUser={splitUser}
+              setSplitUser={setSplitUser}
               splitClientFeatures={splitClientFeatures}
             >
               <Outlet />

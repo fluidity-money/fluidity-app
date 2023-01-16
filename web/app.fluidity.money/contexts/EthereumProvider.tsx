@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useContext } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -31,6 +31,7 @@ import makeContractSwap, {
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
 import useWindow from "~/hooks/useWindow";
+import { SplitContext } from "~/util/split";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -63,6 +64,14 @@ const EthereumFacade = ({
       return false;
     });
   }, []);
+
+  const { setSplitUser } = useContext(SplitContext);
+
+  useEffect(() => {
+    if (!account) return;
+
+    setSplitUser(account);
+  }, [account]);
 
   const getBalance = async (
     contractAddress: string
@@ -110,6 +119,7 @@ const EthereumFacade = ({
         console.warn("Unsupported connector", type);
         break;
     }
+
     connector?.activate();
   };
 
