@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import styles from "./Partner.module.scss";
-import { ReactComponent as ExternalLinkIcon } from '~/assets/images/Group.svg';
+import { ReactComponent as ExternalLinkIcon } from "~/assets/images/Group.svg";
 
 interface IPropsPartner {
   img: string;

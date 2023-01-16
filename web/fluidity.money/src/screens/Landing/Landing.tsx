@@ -8,7 +8,7 @@ import {
   Heading,
   useViewport,
   IntroTile,
-  Video
+  Video,
 } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import styles from "./Landing.module.scss";

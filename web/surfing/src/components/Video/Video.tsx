@@ -15,19 +15,19 @@ interface IPropsVideo {
   videoKey?: string;
   scale?: number;
   opacity?: number;
-  margin? : string;
+  margin?: string;
   onLoad?: VoidFunction;
   onEnded?: VoidFunction;
   className?: string;
   mimeType?: string;
   playbackRate?: number;
-  
+
   // Width of container
   //   dynamic - Change explicit scale
   //   auto - Automatically scale container width
   //   number - Fixed width
   width?: "dynamic" | "auto" | string | number;
-  
+
   // Height of container
   //   auto - Automatically scale container height
   //   number - Fixed height
@@ -40,38 +40,33 @@ export const Video = ({
   type,
   mimeType = "video/mp4",
   loop,
-  display="inline",
-  preload="auto",
-  scale=1,
-  opacity=1,
+  display = "inline",
+  preload = "auto",
+  scale = 1,
+  opacity = 1,
   margin = `0px 0px 0px 0px`,
-  onEnded=() => {},
-  onLoad=() => {},
+  onEnded = () => {},
+  onLoad = () => {},
   className,
-  width="dynamic",
-  height=900,
+  width = "dynamic",
+  height = 900,
   playbackRate = 1,
   ...props
 }: IPropsVideo) => {
-  
   const classProps = className || "";
-  
-  const dynamicWidth = isFirefox
-    ? `${scale * 400}px`
-    : `${scale * 100}%`;
-  
+
+  const dynamicWidth = isFirefox ? `${scale * 400}px` : `${scale * 100}%`;
+
   let widthProp = width;
-  
+
   if (widthProp === "dynamic") {
     widthProp = dynamicWidth;
   } else if (typeof widthProp === "number") {
     widthProp = `${widthProp}px`;
   }
-  
-  const heightProp = typeof height === "number"
-    ? `${height}px`
-    : height;
-  
+
+  const heightProp = typeof height === "number" ? `${height}px` : height;
+
   const vidRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     vidRef.current?.play();
@@ -82,7 +77,7 @@ export const Video = ({
       vidRef.current.playbackRate = playbackRate;
     }
   }, [playbackRate]);
-  
+
   return (
     <>
       <video
@@ -92,7 +87,7 @@ export const Video = ({
         preload={preload}
         muted
         playsInline
-        src={src} 
+        src={src}
         className={`${styles.videoContainer} ${styles[type]} ${classProps}`}
         style={{
           display: display,
@@ -104,7 +99,7 @@ export const Video = ({
         onEnded={onEnded}
         onLoad={onLoad}
         {...props}
-      /> 
+      />
     </>
   );
 };

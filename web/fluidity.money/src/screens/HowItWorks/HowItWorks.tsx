@@ -9,7 +9,7 @@ import {
   LinkButton,
   Text,
   useViewport,
-  Video
+  Video,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
 import Link from "next/link";

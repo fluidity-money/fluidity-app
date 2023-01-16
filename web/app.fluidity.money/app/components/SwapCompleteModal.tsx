@@ -16,7 +16,7 @@ import {
   Text,
   numberToMonetaryString,
   stringifiedNumberToMonetaryString,
-  Video
+  Video,
 } from "@fluidity-money/surfing";
 import BloomEffect from "~/components/BloomEffect";
 import {
