@@ -54,7 +54,7 @@ contract GovToken is IERC20 {
         uint8 _decimals,
         uint256 _totalSupply
     ) public {
-        require(version_ != 1, "already initialised");
+        require(version_ == 0, "already initialised");
 
         version_ = 1;
 
