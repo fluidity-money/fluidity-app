@@ -1,4 +1,4 @@
-import { ReactNode, useState, useContext } from "react";
+import { ReactNode, useContext } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";

@@ -92,7 +92,7 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary({ error }) {
+function ErrorBoundary({ error }: { error : any }) {
   console.error(error);
   return (
     <div>
