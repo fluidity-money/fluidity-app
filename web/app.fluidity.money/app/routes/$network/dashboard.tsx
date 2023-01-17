@@ -444,7 +444,7 @@ export default function Dashboard() {
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
-                  navigate("../fluidify");
+                  navigate(`/${network}/fluidify`);
                 }}
               >
                 <b>Fluidify{isMobile ? "" : " Money"}</b>
@@ -461,8 +461,8 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
-                  ? navigate("./rewards")
-                  : navigate("./rewards/unclaimed")
+                  ? navigate(`/${network}/dashboard/rewards`)
+                  : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
             >
@@ -517,7 +517,7 @@ export default function Dashboard() {
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
-              navigate("../fluidify");
+              navigate(`/${network}/fluidify`);
             }}
           >
             <Heading as="h5">
@@ -583,10 +583,11 @@ export default function Dashboard() {
             </a>
 
             {/* Source code */}
-            { showExperiment("enable-source-code") &&
-                <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                  <Text>Source code</Text>
-                </a> }
+            {showExperiment("enable-source-code") && (
+              <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                <Text>Source code</Text>
+              </a>
+            )}
           </section>
 
           {/* Socials */}

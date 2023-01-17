@@ -323,49 +323,49 @@ const EthereumFacade = ({
 
 export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
   const Provider = ({ children }: { children: React.ReactNode }) => {
-    
     // Custom key logic
     const okxWallet = useWindow("okxwallet");
-    
+
     // Listen for changes to the injected connectors / Setup the injected connectors.
-    const [connectors, key]: [[Connector, Web3ReactHooks][], string] = useMemo(() => {
-      const _key: string[] = [];
-      const _connectors: [Connector, Web3ReactHooks][] = [];
-      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-        (actions) => new MetaMask({ actions })
-      );
-      _connectors.push([metaMask, metamaskHooks]);
-      _key.push("MetaMask");
-      
-      const [walletConnect, walletconnectHooks] =
-        initializeConnector<WalletConnect>(
-          (actions) =>
-            new WalletConnect({
-              actions,
-              options: {
-                rpc: {
-                  1: rpcUrl,
-                },
-              },
-            })
+    const [connectors, key]: [[Connector, Web3ReactHooks][], string] =
+      useMemo(() => {
+        const _key: string[] = [];
+        const _connectors: [Connector, Web3ReactHooks][] = [];
+        const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+          (actions) => new MetaMask({ actions })
         );
+        _connectors.push([metaMask, metamaskHooks]);
+        _key.push("MetaMask");
+
+        const [walletConnect, walletconnectHooks] =
+          initializeConnector<WalletConnect>(
+            (actions) =>
+              new WalletConnect({
+                actions,
+                options: {
+                  rpc: {
+                    1: rpcUrl,
+                  },
+                },
+              })
+          );
         _connectors.push([walletConnect, walletconnectHooks]);
         _key.push("WalletConnect");
-  
-      if (okxWallet) {
-        const [okx, okxHooks] = initializeConnector<EIP1193>(
-          (actions) =>
-            new EIP1193({
-              actions,
-              provider: okxWallet as Provider,
-            })
-        );
-        _connectors.push([okx, okxHooks]);
-        _key.push("OKX");
-      }
-  
-      return [_connectors, _key.join(",")];
-    }, [okxWallet]);
+
+        if (okxWallet) {
+          const [okx, okxHooks] = initializeConnector<EIP1193>(
+            (actions) =>
+              new EIP1193({
+                actions,
+                provider: okxWallet as Provider,
+              })
+          );
+          _connectors.push([okx, okxHooks]);
+          _key.push("OKX");
+        }
+
+        return [_connectors, _key.join(",")];
+      }, [okxWallet]);
     return (
       <>
         <Web3ReactProvider connectors={connectors} key={key}>
