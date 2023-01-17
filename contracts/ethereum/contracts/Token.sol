@@ -386,14 +386,29 @@ contract Token is IERC20, ITransferWithBeneficiary {
             Winner memory winner = rewards[i];
 
             if (manualRewardDebt_[winner.winner] != 0) {
+
+        	    // if a batch reward was caught in the mempool, and a user
+    		    // manages to reward once before the batch and once
+    		    // after the batch
+
+    		    // if the win amount exceeds the manual reward debt,
+    		    // then we deduct the entire reward debt, otherwise
+    		    // they more debt than the winnings from this batch,
+    		    // we remove the winnings from this batch, then we
+    		    // remove the amount from their debt
+
                 uint amount = winner.amount > manualRewardDebt_[winner.winner] ?
                     manualRewardDebt_[winner.winner] :
                     winner.amount;
+
+                // and we update that debt and the win amount
+
                 winner.amount -= amount;
                 manualRewardDebt_[winner.winner] -= amount;
             }
 
             require(poolAmount >= winner.amount, "reward pool empty");
+
             poolAmount = poolAmount - winner.amount;
 
             rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
