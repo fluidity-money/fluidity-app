@@ -583,10 +583,11 @@ export default function Dashboard() {
             </a>
 
             {/* Source code */}
-            { showExperiment("enable-source-code") &&
-                <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                  <Text>Source code</Text>
-                </a> }
+            {showExperiment("enable-source-code") && (
+              <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                <Text>Source code</Text>
+              </a>
+            )}
           </section>
 
           {/* Socials */}

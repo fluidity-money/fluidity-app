@@ -153,7 +153,7 @@ export default function MobileModal({
                   }, 800);
                   unclaimedRewards
                     ? navigate(`/${network}/dashboard/rewards/unclaimed`)
-                    : navigate(`/${network}/dashboard/rewards`)
+                    : navigate(`/${network}/dashboard/rewards`);
                 }}
                 icon={<Trophy />}
               >
@@ -259,7 +259,7 @@ export default function MobileModal({
                   }, 800);
                   unclaimedRewards
                     ? navigate(`/${network}/dashboard/rewards/unclaimed`)
-                    : navigate(`/${network}/dashboard/rewards`)
+                    : navigate(`/${network}/dashboard/rewards`);
                 }}
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"

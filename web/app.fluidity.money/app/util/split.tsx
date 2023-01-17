@@ -69,7 +69,8 @@ const SplitContextProvider = ({
       await splitClient.ready();
 
       setSplitTreatment({
-        showExperiment: (featName: string) => splitClient.getTreatment(featName) === "on",
+        showExperiment: (featName: string) =>
+          splitClient.getTreatment(featName) === "on",
         client: splitClient,
         splitUser,
         setSplitUser,
