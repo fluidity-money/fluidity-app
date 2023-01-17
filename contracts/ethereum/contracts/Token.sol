@@ -558,6 +558,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
             "reward already given for part of this range"
         );
 
+        require(lastBlock >= firstBlock, "invalid block range in payload!");
+
         for (uint i = firstBlock; i <= lastBlock; i++) {
             require(manualRewardedBlocks_[winner][i] == 0, "reward already given for part of this range");
             manualRewardedBlocks_[winner][i] = BLOCK_REWARDED;
