@@ -128,7 +128,7 @@ export default function MobileModal({
                   setTimeout(() => {
                     setIsOpen(false);
                   }, 800);
-                  navigate("./home");
+                  navigate(`/${network}/dashboard/home`);
                 }}
               >
                 <img
@@ -152,8 +152,8 @@ export default function MobileModal({
                     setIsOpen(false);
                   }, 800);
                   unclaimedRewards
-                    ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards");
+                    ? navigate(`/${network}/dashboard/rewards/unclaimed`)
+                    : navigate(`/${network}/dashboard/rewards`)
                 }}
                 icon={<Trophy />}
               >
@@ -258,8 +258,8 @@ export default function MobileModal({
                     setIsOpen(false);
                   }, 800);
                   unclaimedRewards
-                    ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards");
+                    ? navigate(`/${network}/dashboard/rewards/unclaimed`)
+                    : navigate(`/${network}/dashboard/rewards`)
                 }}
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"
@@ -281,7 +281,7 @@ export default function MobileModal({
                   setTimeout(() => {
                     setIsOpen(false);
                   }, 800);
-                  navigate("../fluidify");
+                  navigate(`/${network}/fluidify`);
                 }}
                 className="fluidify-money-button"
               >

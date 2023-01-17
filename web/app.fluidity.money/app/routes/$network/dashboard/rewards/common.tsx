@@ -44,7 +44,7 @@ const UserRewards = ({
   const onClick = async () => {
     if (networkNotEth) return;
 
-    if (!claimNow) return navigate("../unclaimed");
+    if (!claimNow) return navigate(`/${network}/dashboard/rewards/unclaimed`);
 
     if (claiming) return;
 
@@ -183,7 +183,7 @@ const UserRewards = ({
           </div>
           <br />
 
-          <Link to="..">
+          <Link to={`/${network}/dashboard/rewards`}>
             <LinkButton
               size={"small"}
               type={"internal"}
