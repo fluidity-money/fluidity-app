@@ -7,7 +7,7 @@ import "./openzeppelin/SafeERC20.sol";
 /// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
 /// @author Fluidity Money
 /// @author Modified from Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol)
-/// @notice Modified to support proxy initialisation and to reflect our internal style (lack of getter functions)
+/// @notice Modified to support proxy initialisation and to support some extra functions, as well as mint from the initial amount
 /// @dev Do not manually set balances without updating totalSupply, as the sum of all user balances must not exceed it.
 contract GovToken is IERC20 {
     using SafeERC20 for IERC20;
@@ -82,6 +82,8 @@ contract GovToken is IERC20 {
     }
 
     function transfer(address _to, uint256 _amount) public virtual returns (bool) {
+        require(_to != address(0), "can't send to null account");
+
         balanceOf_[msg.sender] -= _amount;
 
         // Cannot overflow because the sum of all user
@@ -113,6 +115,23 @@ contract GovToken is IERC20 {
         }
 
         emit Transfer(_from, _to, _amount);
+
+        return true;
+    }
+
+    function increaseAllowance(address _spender, uint256 _amount) public returns (bool) {
+        approve(_spender, allowance_[msg.sender][_spender] + _amount);
+        return true;
+    }
+
+    function decreaseAllowance(address _spender, uint256 _amount) public returns (bool) {
+        uint256 newAmount = allowance_[msg.sender][_spender] - _amount;
+
+        require(newAmount >= 0, "allowance decreased past 0");
+
+        unchecked {
+            approve(_spender, newAmount);
+        }
 
         return true;
     }
