@@ -66,8 +66,7 @@ contract GovToken is IERC20 {
 
         initialDomainSeparator_ = computeDomainSeparator();
 
-        totalSupply_ = _totalSupply;
-        balanceOf_[msg.sender] = _totalSupply;
+        _mint(msg.sender, _totalSupply);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -128,6 +127,18 @@ contract GovToken is IERC20 {
 
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
+    }
+
+    function name() public view returns (string memory) {
+        return name_;
+    }
+
+    function symbol() public view returns (string memory) {
+        return symbol_;
+    }
+
+    function decimals() public view returns (uint8) {
+        return decimals_;
     }
 
     /*//////////////////////////////////////////////////////////////
