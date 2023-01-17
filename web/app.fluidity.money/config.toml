@@ -289,6 +289,12 @@ id = "walletconnect"
 description = "WalletConnect allows you to connect your wallet to any dApp using a QR code."
 logo = "/assets/wallets/walletconnect.svg"
 
+[[config.ethereum.wallets]]
+name = "OKX Wallet"
+id = "okxwallet"
+description = "OKX Wallet allows you to connect your wallet to any dApp, and supports a variety of blockchains."
+logo = "/assets/wallets/okx.svg"
+
 [[contract.solana]]
 name = "Mainnet"
 address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"

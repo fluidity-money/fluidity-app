@@ -85,8 +85,7 @@ function ErrorBoundary() {
   );
 }
 
-export const meta: MetaFunction = ({ data }) => ({
-  ...data,
+export const meta: MetaFunction = () => ({
   title: "Fluidity - Dashboard",
 });
 

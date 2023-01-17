@@ -7,7 +7,7 @@ import {
   ReusableGrid,
   GeneralButton,
   useViewport,
-  Video
+  Video,
 } from "@fluidity-money/surfing";
 import HowItWorksTemplate from "components/HowItWorksTemplate";
 import styles from "./Roadmap.module.scss";
