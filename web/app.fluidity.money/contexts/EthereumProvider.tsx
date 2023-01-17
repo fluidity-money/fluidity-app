@@ -46,10 +46,6 @@ const EthereumFacade = ({
   tokens: Token[];
   connectors: [Connector, Web3ReactHooks][];
 }) => {
-  console.log(
-    "EthereumFacade",
-    connectors
-  )
   const { isActive, provider, account, connector } = useWeb3React();
   const okxWallet = useWindow("okxwallet");
 
@@ -86,7 +82,6 @@ const EthereumFacade = ({
 
   // find and activate corresponding connector
   const useConnectorType = (type: "metamask" | "walletconnect" | string) => {
-    console.log("useConnectorType", type);
     let connector: Connector | undefined;
     switch (type) {
       case "metamask":
@@ -104,14 +99,12 @@ const EthereumFacade = ({
         window.Buffer = Buffer;
         break;
       case "okxwallet":
-        console.log("okxWallet ConnectorType", okxWallet);
         !okxWallet && window?.open("https://www.okx.com/web3", "_blank");
         console.log(connectors);
         connector = connectors.find((connector) => {
           const _connector = (connector[0].provider as OKXWallet)?.isOkxWallet
             ? connector[0]
             : undefined;
-          console.log("connector", _connector);
           return _connector;
         })?.[0];
         break;
@@ -338,14 +331,12 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
     const [connectors, key]: [[Connector, Web3ReactHooks][], string] = useMemo(() => {
       const _key: string[] = [];
       const _connectors: [Connector, Web3ReactHooks][] = [];
-      console.log("Setup mm");
       const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
         (actions) => new MetaMask({ actions })
       );
       _connectors.push([metaMask, metamaskHooks]);
       _key.push("MetaMask");
       
-      console.log("Setup wc");
       const [walletConnect, walletconnectHooks] =
         initializeConnector<WalletConnect>(
           (actions) =>
@@ -369,12 +360,10 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
               provider: okxWallet as Provider,
             })
         );
-        console.log("okx", okx);
         _connectors.push([okx, okxHooks]);
         _key.push("OKX");
       }
   
-      console.log("endMemo", _connectors);
       return [_connectors, _key.join(",")];
     }, [okxWallet]);
     return (
