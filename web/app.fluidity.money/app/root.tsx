@@ -21,6 +21,7 @@ import { SplitContextProvider } from "./util/split";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
+import Moralis from "moralis";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -130,6 +131,13 @@ export const loader: LoaderFunction = async ({
     nodeEnv === "production" && host === "app.fluidity.money";
   const isStaging =
     nodeEnv === "production" && host === "staging.app.fluidity.money";
+
+  if (!Moralis.Core.isStarted) {
+    Moralis.start({
+      formatEvmAddress: "checksum",
+      apiKey: process.env.FLU_MORALIS_TOKEN || ""
+    })
+  }
 
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
