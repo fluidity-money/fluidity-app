@@ -29,6 +29,7 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
+import { Coin98Connector } from "~/util/chainUtils/ethereum/coin98";
 
 const EthereumFacade = ({
   children,
@@ -65,7 +66,7 @@ const EthereumFacade = ({
   };
 
   // find and activate corresponding connector
-  const useConnectorType = (type: "metamask" | "walletconnect" | string) => {
+  const useConnectorType = (type: "metamask" | "walletconnect" | "coin98" | string) => {
     let connector: Connector | undefined;
     switch (type) {
       case "metamask":
@@ -81,6 +82,11 @@ const EthereumFacade = ({
         // We manually re-add Node.Buffer to client
         // https://github.com/WalletConnect/web3modal/issues/455
         window.Buffer = Buffer;
+        break;
+      case "coin98":
+        connector = connectors.find(
+          (connector) => connector[0] instanceof Coin98Connector
+        )?.[0];
         break;
       default:
         console.warn("Unsupported connector", type);
@@ -314,9 +320,14 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
             })
         );
 
+      const [coin98, coin98Hooks] = initializeConnector<Coin98Connector>(
+        (actions) => new Coin98Connector({ actions })
+      );
+
       const connectors: [Connector, Web3ReactHooks][] = [
         [metaMask, metamaskHooks],
         [walletConnect, walletconnectHooks],
+        [coin98, coin98Hooks],
       ];
 
       return connectors;
