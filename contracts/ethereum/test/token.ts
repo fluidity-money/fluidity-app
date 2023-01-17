@@ -14,7 +14,6 @@ describe("Token", async function () {
         if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
             return this.skip();
         }
-        await console.log("FUSDST OPERATOR ADDR: " + await fUsdtOperator.op())
     });
 
     it("supports disabling wraps and rewards with emergency mode", async function () {
@@ -112,43 +111,5 @@ describe("Token", async function () {
         );
         const newChange = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(newChange).to.equal(blockedBalance);
-    });
-
-    it("prevents minting over user cap", async function () {
-        await fUsdtOperator.enableMintLimits(true);
-
-        await fUsdtOracle.updateMintLimits(1000, 100);
-
-        await expect(fUsdtAccount.erc20In(101))
-            .to.be.revertedWith("mint amount exceeds user limit!");
-
-        // Cleanup
-        await fUsdtOperator.enableMintLimits(false)
-    });
-
-    it("prevents minting over global cap", async function () {
-        await fUsdtOperator.enableMintLimits(true);
-        await fUsdtOracle.updateMintLimits(100, 1000);
-
-        await expect(fUsdtAccount.erc20In(101))
-            .to.be.revertedWith("mint amount exceeds global limit!");
-
-        // Cleanup
-        await fUsdtOperator.enableMintLimits(false);
-    });
-
-    it("tracks global mint limits globally", async function () {
-        await fUsdtOperator.enableMintLimits(true);
-        await fUsdtOracle.updateMintLimits(1000, 600);
-
-        await expect(fUsdtAccount.erc20In(600))
-            .to.not.be.revertedWith("mint amount exceeds global limit!");
-        await expect(fUsdtAccount2.erc20In(600))
-            .to.be.revertedWith("mint amount exceeds global limit!");
-        await expect(fUsdtAccount2.erc20In(400))
-            .to.not.be.revertedWith("mint amount exceeds global limit!");
-
-        // Cleanup
-        await fUsdtOperator.enableMintLimits(false);
     });
 });

@@ -29,12 +29,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
-    bool constant DEFAULT_MINT_LIMITS_ENABLED = false;
-
-    uint constant DEFAULT_GLOBAL_MINT_LIMIT = 1000000;
-
-    uint constant DEFAULT_USER_MINT_LIMIT = 10000;
-
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
     uint private constant BLOCK_REWARDED = 1;
@@ -80,9 +74,11 @@ contract Token is IERC20, ITransferWithBeneficiary {
     event MaxUncheckedRewardLimitChanged(uint amount);
 
     /// @notice global mint limit changed by setRestrictions
+    /// @notice deprecated, mint limits no longer exist
     event GlobalMintLimitChanged(uint amount);
 
     /// @notice user mint limits changed by setRestrictions
+    /// @notice deprecated, mint limits no longer exist
     event UserMintLimitChanged(uint amount);
 
     /// @notice worker config changed, either by disabling emergency
@@ -95,6 +91,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     /// @notice emitted when the mint limits are enabled or disabled
     /// @notice by enableMintLimits
+    /// @notice deprecated, mint limits no longer exist
     event MintLimitsStateChanged(bool indexed status);
 
     // erc20 props
@@ -138,25 +135,18 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /// @dev [address] => [number of tokens the user won that have been quarantined]
     mapping (address => uint) blockedRewards_;
 
-    /// @dev are the asset minting limits enabled?
-    bool mintLimitsEnabled_;
-
-    /// @dev [user] => [amount the user has minted]
-    mapping (address => uint) userAmountMinted_;
-
-    /// @dev [user] => [last block the user minted on]
-    /// @dev (if this is <userMintResetBlock_, reset the amount minted to 0)
-    mapping (address => uint) userLastMintedBlock_;
-
-    /// @dev the mint limit per user
-    uint userMintLimit_;
-
-    /// @dev amount of fluid tokens that can be minted
-    /// @dev only editable by the oracle
-    uint remainingGlobalMint_;
-
-    /// @dev the block number in which user mint limits were last reset
-    uint userMintResetBlock_;
+    /// @notice deprecated, mint limits no longer exist
+    bool __deprecated_1;
+    /// @notice deprecated, mint limits no longer exist
+    mapping (address => uint) __deprecated_2;
+    /// @notice deprecated, mint limits no longer exist
+    mapping (address => uint) __deprecated_3;
+    /// @notice deprecated, mint limits no longer exist
+    uint __deprecated_4;
+    /// @notice deprecated, mint limits no longer exist
+    uint __deprecated_5;
+    /// @notice deprecated, mint limits no longer exist
+    uint __deprecated_6;
 
     /**
      * @notice initialiser function - sets the contract's data
@@ -208,40 +198,10 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
         // initialise mint limits
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
-        mintLimitsEnabled_ = DEFAULT_MINT_LIMITS_ENABLED;
-        remainingGlobalMint_ = DEFAULT_GLOBAL_MINT_LIMIT;
-        userMintLimit_ = DEFAULT_USER_MINT_LIMIT;
-
-        userMintResetBlock_ = block.number;
     }
 
     function op() public view returns (address) {
         return operator_;
-    }
-    /*
-     * @param _maxUncheckedReward that can be paid out before a quarantine happens
-     * @param _mintLimitsEnabled to prevent users from minting a large amount
-     * @param _globalMint that is the global amount that users can cumulatively mint without restriction
-     * @param _userMint that is the amount that each individual user can mint without restriction
-     */
-    function setRestrictions(
-    	uint _maxUncheckedReward,
-    	bool _mintLimitsEnabled,
-    	uint _globalMint,
-    	uint _userMint
-    ) public {
-        require(msg.sender == operator_, "only operator can use this function!");
-
-        maxUncheckedReward_ = _maxUncheckedReward;
-        mintLimitsEnabled_ = _mintLimitsEnabled;
-        remainingGlobalMint_ = _globalMint;
-        userMintLimit_ = _userMint;
-        userMintResetBlock_ = block.number;
-
-        emit MaxUncheckedRewardLimitChanged(_maxUncheckedReward);
-        emit MintLimitsStateChanged(_mintLimitsEnabled);
-        emit GlobalMintLimitChanged(_globalMint);
-        emit UserMintLimitChanged(_userMint);
     }
 
     /**
@@ -319,28 +279,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /// @notice updates and resets mint limits if called by the oracle
-    function updateMintLimits(uint global, uint user) public {
-        require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == oracle(), "only the oracle account can use this");
-
-        remainingGlobalMint_ = global;
-        userMintLimit_ = user;
-        userMintResetBlock_ = block.number;
-
-        emit GlobalMintLimitChanged(global);
-        emit UserMintLimitChanged(userMintLimit_);
-    }
-
-    /// @notice enables or disables mint limits with the operator account
-    function enableMintLimits(bool enable) public {
-        require(msg.sender == operator_, "only the operator account can use this");
-
-        mintLimitsEnabled_ = enable;
-
-        emit MintLimitsStateChanged(enable);
-    }
-
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
      * @notice requires you to have called the ERC20 `approve` method
@@ -351,33 +289,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
      */
     function erc20In(uint amount) public returns (uint) {
         require(noEmergencyMode(), "emergency mode!");
-
-        if (mintLimitsEnabled_) {
-            // update global limit
-            require(amount <= remainingGlobalMint_, "mint amount exceeds global limit!");
-
-            remainingGlobalMint_ -= amount;
-
-            uint userMint;
-
-            bool userHasntMinted = userLastMintedBlock_[msg.sender] < userMintResetBlock_;
-
-            if (userHasntMinted) {
-                // user hasn't minted since the reset, reset their count
-                userMint = amount;
-            } else {
-                // user has, add the amount they're minting
-                userMint = userAmountMinted_[msg.sender] + amount;
-            }
-
-            require(userMint <= userMintLimit_, "mint amount exceeds user limit!");
-
-            // update the user's count
-            userAmountMinted_[msg.sender] = userMint;
-
-            // update the user's block
-            userLastMintedBlock_[msg.sender] = block.number;
-        }
 
         // take underlying tokens from the user
         uint originalBalance = pool_.underlying_().balanceOf(address(this));
@@ -475,11 +386,29 @@ contract Token is IERC20, ITransferWithBeneficiary {
             Winner memory winner = rewards[i];
 
             if (manualRewardDebt_[winner.winner] != 0) {
-                winner.amount -= manualRewardDebt_[winner.winner];
-                manualRewardDebt_[winner.winner] = 0;
+
+                // if a batch reward was caught in the mempool, and a user
+                // manages to reward once before the batch and once
+                // after the batch
+
+                // if the win amount exceeds the manual reward debt,
+                // then we deduct the entire reward debt, otherwise
+                // they more debt than the winnings from this batch,
+                // we remove the winnings from this batch, then we
+                // remove the amount from their debt
+
+                uint amount = winner.amount > manualRewardDebt_[winner.winner] ?
+                    manualRewardDebt_[winner.winner] :
+                    winner.amount;
+
+                // and we update that debt and the win amount
+
+                winner.amount -= amount;
+                manualRewardDebt_[winner.winner] -= amount;
             }
 
             require(poolAmount >= winner.amount, "reward pool empty");
+
             poolAmount = poolAmount - winner.amount;
 
             rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
@@ -558,6 +487,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
             "reward already given for part of this range"
         );
 
+        require(lastBlock >= firstBlock, "invalid block range in payload!");
+
         for (uint i = firstBlock; i <= lastBlock; i++) {
             require(manualRewardedBlocks_[winner][i] == 0, "reward already given for part of this range");
             manualRewardedBlocks_[winner][i] = BLOCK_REWARDED;
@@ -617,20 +548,21 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     /*
      * @notice returns whether mint limits are enabled
+     * @notice mint limits no longer exist, this always `false`
      */
-    function mintLimitsEnabled() public view returns (bool) { return mintLimitsEnabled_; }
+    function mintLimitsEnabled() public pure returns (bool) { return false; }
 
     /*
      * @notice returns the mint limit per user
+     * @notice mint limits no longer exist, this always `uint256.max`
      */
-    function userMintLimit() public view returns (uint) { return userMintLimit_; }
+    function userMintLimit() public pure returns (uint) { return type(uint).max; }
 
     /*
      * @notice returns the remaining global mint limit
+     * @notice mint limits no longer exist, this always `uint256.max`
      */
-    function remainingGlobalMintLimit() public view returns (uint) {
-        return remainingGlobalMint_;
-    }
+    function remainingGlobalMintLimit() public pure returns (uint) { return type(uint).max; }
 
     /**
      * @notice return the max unchecked reward that's currently set
@@ -644,20 +576,11 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     /*
      * @notice returns how much `account` has minted
+     * @notice mint limits no longer exist, this always `0`
      *
      * @param the account to check
      */
-    function userAmountMinted(address account) public view returns (uint) {
-        bool userHasntMinted = userLastMintedBlock_[account] < userMintResetBlock_;
-
-        if (userHasntMinted) {
-            // user hasn't minted since the reset
-            return 0;
-        } else {
-            // user has minted
-            return userAmountMinted_[account];
-        }
-    }
+    function userAmountMinted(address /* account */) public pure returns (uint) { return 0; }
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
 
