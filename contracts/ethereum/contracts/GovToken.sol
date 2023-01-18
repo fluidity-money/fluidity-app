@@ -235,6 +235,7 @@ contract GovToken is IERC20 {
         // assuming this is okay since it's not possible for the token to
         // go below 0 in _burn
         _burn(msg.sender, _amount);
+        return true;
     }
 
     /*//////////////////////////////////////////////////////////////
