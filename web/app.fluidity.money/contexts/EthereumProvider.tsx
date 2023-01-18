@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
-import type { Connector } from "@web3-react/types";
+import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
@@ -29,7 +29,10 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
-import { Coin98Connector } from "~/util/chainUtils/ethereum/coin98";
+
+type Coin98Wallet = {
+  isCoin98Wallet?: boolean
+} & Provider
 
 const EthereumFacade = ({
   children,
@@ -85,7 +88,7 @@ const EthereumFacade = ({
         break;
       case "coin98":
         connector = connectors.find(
-          (connector) => connector[0] instanceof Coin98Connector
+          (connector) => connector[0] instanceof MetaMask
         )?.[0];
         break;
       default:
@@ -320,8 +323,8 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
             })
         );
 
-      const [coin98, coin98Hooks] = initializeConnector<Coin98Connector>(
-        (actions) => new Coin98Connector({ actions })
+      const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
+        (actions) => new MetaMask({ actions })
       );
 
       const connectors: [Connector, Web3ReactHooks][] = [
