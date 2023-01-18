@@ -127,7 +127,7 @@ contract GovToken is IERC20 {
     function decreaseAllowance(address _spender, uint256 _amount) public returns (bool) {
         uint256 newAmount = allowance_[msg.sender][_spender] - _amount;
 
-        require(newAmount >= 0, "allowance decreased past 0");
+        require(newAmount >= _amount, "allowance decreased past 0");
 
         unchecked {
             approve(_spender, newAmount);
