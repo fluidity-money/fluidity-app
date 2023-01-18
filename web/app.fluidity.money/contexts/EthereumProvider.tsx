@@ -361,6 +361,12 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
         _connectors.push([walletConnect, walletconnectHooks]);
         _key.push("WalletConnect");
 
+        const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
+          (actions) => new MetaMask({ actions })
+        );
+        _connectors.push([coin98, coin98Hooks]);
+        _key.push("Coin98");
+
         if (okxWallet) {
           const [okx, okxHooks] = initializeConnector<EIP1193>(
             (actions) =>
