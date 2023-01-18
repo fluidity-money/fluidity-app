@@ -38,7 +38,7 @@ type OKXWallet = {
 } & Provider;
 
 type Coin98Wallet = {
-  isCoin98Wallet?: boolean
+  isCoin98?: boolean
 } & Provider
 
 const EthereumFacade = ({
@@ -52,6 +52,7 @@ const EthereumFacade = ({
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
   const okxWallet = useWindow("okxwallet");
+  const browserWallet = useWindow("ethereum") as Coin98Wallet
 
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
@@ -85,8 +86,9 @@ const EthereumFacade = ({
   };
 
   // find and activate corresponding connector
-  const useConnectorType = (type: "metamask" | "walletconnect" | "coin98" | string) => {
+  const useConnectorType = (type: "metamask" | "walletconnect" | "coin98" | "okxwallet" | string) => {
     let connector: Connector | undefined;
+
     switch (type) {
       case "metamask":
         connector = connectors.find(
@@ -113,8 +115,15 @@ const EthereumFacade = ({
         })?.[0];
         break;
       case "coin98":
+        (!browserWallet || !browserWallet.isCoin98) && window?.open("https://wallet.coin98.com/", "_blank");
+        console.log(connectors)
         connector = connectors.find(
-          (connector) => connector[0] instanceof MetaMask
+          (connector) => {
+            const _connector = (connector[0].provider as Coin98Wallet)?.isCoin98
+            ? connector[0]
+            : undefined;
+          return _connector;
+          }
         )?.[0];
         break;
       default:
