@@ -7,10 +7,10 @@ import {
   ContinuousCarousel,
   Heading,
   useViewport,
+  IntroTile,
+  Video,
 } from "@fluidity-money/surfing";
-import IntroTile from "components/IntroTile";
 import { motion } from "framer-motion";
-import Video from "components/Video";
 import styles from "./Landing.module.scss";
 import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
 

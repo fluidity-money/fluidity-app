@@ -20,6 +20,7 @@ interface IPropsVideo {
   onEnded?: VoidFunction;
   className?: string;
   mimeType?: string;
+  playbackRate?: number;
 
   // Width of container
   //   dynamic - Change explicit scale
@@ -49,6 +50,7 @@ export const Video = ({
   className,
   width = "dynamic",
   height = 900,
+  playbackRate = 1,
   ...props
 }: IPropsVideo) => {
   const classProps = className || "";
@@ -65,10 +67,16 @@ export const Video = ({
 
   const heightProp = typeof height === "number" ? `${height}px` : height;
 
-  const vidRef = useRef(null);
+  const vidRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
-    vidRef.current.play();
+    vidRef.current?.play();
   });
+
+  useEffect(() => {
+    if (vidRef.current) {
+      vidRef.current.playbackRate = playbackRate;
+    }
+  }, [playbackRate]);
 
   return (
     <>

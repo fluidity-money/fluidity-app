@@ -6,6 +6,7 @@ interface Chain {
 interface ISupportedChains {
   ETH: Chain;
   SOL: Chain;
+  ARB: Chain;
 }
 
 export type SupportedChainsList = keyof ISupportedChains;
@@ -18,6 +19,10 @@ export const SupportedChains: ISupportedChains = {
   SOL: {
     name: "solana",
     short: "SOL",
+  },
+  ARB: {
+    name: "arbitrum",
+    short: "ARB",
   },
   // Unused
   // CMPD = {

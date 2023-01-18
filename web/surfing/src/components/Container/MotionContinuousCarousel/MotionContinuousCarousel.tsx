@@ -1,15 +1,22 @@
-import { motion, useTransform, useMotionValue, useAnimationFrame } from 'framer-motion';
-import { wrap } from '@motionone/utils';
-import { ReactNode } from 'react';
+import {
+  motion,
+  useTransform,
+  useMotionValue,
+  useAnimationFrame,
+} from "framer-motion";
+import { wrap } from "@motionone/utils";
+import { ReactNode } from "react";
 import styles from "./MotionContinuousCarousel.module.scss";
 
 interface IMCC {
   children: ReactNode;
   baseVelocity?: number;
-  
 }
 
- export const MotionContinuousCarousel = ({ children, baseVelocity = 1 }: IMCC) => {
+export const MotionContinuousCarousel = ({
+  children,
+  baseVelocity = 1,
+}: IMCC) => {
   /**
    * Will create a continuous carousel in 1 of 2 directions based on children
    * This is a wrapping for the length of the text
@@ -20,15 +27,15 @@ interface IMCC {
    */
 
   const baseX = useMotionValue(0);
-  const min = -20
-  const max = -45
+  const min = -20;
+  const max = -45;
   const x = useTransform(baseX, (v) => `${wrap(min, max, v)}%`);
 
-  const callback = (_time: number, delta:number) => {
+  const callback = (_time: number, delta: number) => {
     let moveBy = baseVelocity * (delta / 5000);
     moveBy += moveBy;
     baseX.set(baseX.get() + moveBy);
-  }
+  };
 
   useAnimationFrame(callback as any);
 

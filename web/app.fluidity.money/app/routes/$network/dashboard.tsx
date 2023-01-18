@@ -85,8 +85,7 @@ function ErrorBoundary() {
   );
 }
 
-export const meta: MetaFunction = ({ data }) => ({
-  ...data,
+export const meta: MetaFunction = () => ({
   title: "Fluidity - Dashboard",
 });
 
@@ -169,16 +168,32 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
-  const chainNameMap = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
+    showExperiment("enable-arbitrum")
+      ? {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          arbitrum: {
+            name: "ARB",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        }
+      : {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        };
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
@@ -429,7 +444,7 @@ export default function Dashboard() {
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
-                  navigate("../fluidify");
+                  navigate(`/${network}/fluidify`);
                 }}
               >
                 <b>Fluidify{isMobile ? "" : " Money"}</b>
@@ -446,8 +461,8 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
-                  ? navigate("./rewards")
-                  : navigate("./rewards/unclaimed")
+                  ? navigate(`/${network}/dashboard/rewards`)
+                  : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
             >
@@ -502,7 +517,7 @@ export default function Dashboard() {
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
-              navigate("../fluidify");
+              navigate(`/${network}/fluidify`);
             }}
           >
             <Heading as="h5">
@@ -566,6 +581,13 @@ export default function Dashboard() {
             <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
             </a>
+
+            {/* Source code */}
+            {showExperiment("enable-source-code") && (
+              <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                <Text>Source code</Text>
+              </a>
+            )}
           </section>
 
           {/* Socials */}

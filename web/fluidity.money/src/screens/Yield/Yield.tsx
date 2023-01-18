@@ -2,10 +2,9 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
+import { ReusableGrid, useViewport, Video } from "@fluidity-money/surfing";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Yield.module.scss";
-import Video from "components/Video";
 
 const Yield = () => {
   // to set order correct when in column layout

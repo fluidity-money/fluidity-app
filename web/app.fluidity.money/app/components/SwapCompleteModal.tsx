@@ -16,9 +16,9 @@ import {
   Text,
   numberToMonetaryString,
   stringifiedNumberToMonetaryString,
+  Video,
 } from "@fluidity-money/surfing";
 import BloomEffect from "~/components/BloomEffect";
-import Video from "~/components/Video";
 import {
   addDecimalToBn,
   getUsdFromTokenAmount,
@@ -196,7 +196,7 @@ const SwapCompleteModal = ({
             </LinkButton>
 
             {/* Dashboard Button */}
-            <Link to="../../dashboard/home">
+            <Link to={`/${network}/dashboard/home`}>
               <GeneralButton
                 buttontype="text"
                 size="medium"

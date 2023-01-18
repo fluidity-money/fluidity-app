@@ -15,10 +15,10 @@ import { useEffect, useState } from "react";
 import NavBar from "components/NavBar";
 import MobileNavBar from "components/MobileNavBar";
 import "@fluidity-money/surfing/dist/style.css";
-import "styles/app.global.scss"
+import "styles/app.global.scss";
 import { CookieConsent } from "@fluidity-money/surfing";
-import { useRouter } from 'next/router';
-import * as gtag from 'utils/gtag'
+import { useRouter } from "next/router";
+import * as gtag from "utils/gtag";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -58,7 +58,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       setCookieConsent(false);
     }
   }, []);
-  
+
   useEffect(() => {
     const script = document.createElement("script");
     if (width >= breakpoint) {
@@ -84,9 +84,18 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
               <Component {...pageProps} />
             </div>
-        </ChainContextProvider>
-      </ApolloProvider>
-      <CookieConsent  activated={cookieConsent} url= {'https://static.fluidity.money/assets/fluidity-privacy-policy.pdf'} callBack={()=>{setCookieConsent(true)}}/>
-    </div>
-  </>
-)}
+          </ChainContextProvider>
+        </ApolloProvider>
+        <CookieConsent
+          activated={cookieConsent}
+          url={
+            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+          }
+          callBack={() => {
+            setCookieConsent(true);
+          }}
+        />
+      </div>
+    </>
+  );
+}

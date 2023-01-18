@@ -176,7 +176,7 @@ export const NotificationSubscription = ({
       }}
       callback={() => {
         handleCloseViewRewardDetailModal();
-        navigate("./rewards/unclaimed");
+        navigate(`/${network}/dashboard/rewards/unclaimed`);
       }}
       tokenSymbol={detailedRewardObject.token}
       img={detailedRewardObject.img}

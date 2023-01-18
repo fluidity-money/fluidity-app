@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { ReactNode, useContext } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -13,6 +13,7 @@ import {
 } from "@web3-react/core";
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
+import { EIP1193 } from "@web3-react/eip1193";
 import FluidityFacadeContext from "./FluidityFacade";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
@@ -29,6 +30,12 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
+import useWindow from "~/hooks/useWindow";
+import { SplitContext } from "~/util/split";
+
+type OKXWallet = {
+  isOkxWallet: boolean;
+} & Provider;
 
 type Coin98Wallet = {
   isCoin98Wallet?: boolean
@@ -44,6 +51,7 @@ const EthereumFacade = ({
   connectors: [Connector, Web3ReactHooks][];
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
+  const okxWallet = useWindow("okxwallet");
 
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
@@ -56,6 +64,14 @@ const EthereumFacade = ({
       return false;
     });
   }, []);
+
+  const { setSplitUser } = useContext(SplitContext);
+
+  useEffect(() => {
+    if (!account) return;
+
+    setSplitUser(account);
+  }, [account]);
 
   const getBalance = async (
     contractAddress: string
@@ -86,6 +102,16 @@ const EthereumFacade = ({
         // https://github.com/WalletConnect/web3modal/issues/455
         window.Buffer = Buffer;
         break;
+      case "okxwallet":
+        !okxWallet && window?.open("https://www.okx.com/web3", "_blank");
+        console.log(connectors);
+        connector = connectors.find((connector) => {
+          const _connector = (connector[0].provider as OKXWallet)?.isOkxWallet
+            ? connector[0]
+            : undefined;
+          return _connector;
+        })?.[0];
+        break;
       case "coin98":
         connector = connectors.find(
           (connector) => connector[0] instanceof MetaMask
@@ -95,6 +121,7 @@ const EthereumFacade = ({
         console.warn("Unsupported connector", type);
         break;
     }
+
     connector?.activate();
   };
 
@@ -305,40 +332,52 @@ const EthereumFacade = ({
 
 export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
   const Provider = ({ children }: { children: React.ReactNode }) => {
-    const connectors = useMemo(() => {
-      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-        (actions) => new MetaMask({ actions })
-      );
+    // Custom key logic
+    const okxWallet = useWindow("okxwallet");
 
-      const [walletConnect, walletconnectHooks] =
-        initializeConnector<WalletConnect>(
-          (actions) =>
-            new WalletConnect({
-              actions,
-              options: {
-                rpc: {
-                  1: rpcUrl,
-                },
-              },
-            })
+    // Listen for changes to the injected connectors / Setup the injected connectors.
+    const [connectors, key]: [[Connector, Web3ReactHooks][], string] =
+      useMemo(() => {
+        const _key: string[] = [];
+        const _connectors: [Connector, Web3ReactHooks][] = [];
+        const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+          (actions) => new MetaMask({ actions })
         );
+        _connectors.push([metaMask, metamaskHooks]);
+        _key.push("MetaMask");
 
-      const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
-        (actions) => new MetaMask({ actions })
-      );
+        const [walletConnect, walletconnectHooks] =
+          initializeConnector<WalletConnect>(
+            (actions) =>
+              new WalletConnect({
+                actions,
+                options: {
+                  rpc: {
+                    1: rpcUrl,
+                  },
+                },
+              })
+          );
+        _connectors.push([walletConnect, walletconnectHooks]);
+        _key.push("WalletConnect");
 
-      const connectors: [Connector, Web3ReactHooks][] = [
-        [metaMask, metamaskHooks],
-        [walletConnect, walletconnectHooks],
-        [coin98, coin98Hooks],
-      ];
+        if (okxWallet) {
+          const [okx, okxHooks] = initializeConnector<EIP1193>(
+            (actions) =>
+              new EIP1193({
+                actions,
+                provider: okxWallet as Provider,
+              })
+          );
+          _connectors.push([okx, okxHooks]);
+          _key.push("OKX");
+        }
 
-      return connectors;
-    }, []);
-
+        return [_connectors, _key.join(",")];
+      }, [okxWallet]);
     return (
       <>
-        <Web3ReactProvider connectors={connectors}>
+        <Web3ReactProvider connectors={connectors} key={key}>
           <EthereumFacade tokens={tokens} connectors={connectors}>
             {children}
           </EthereumFacade>

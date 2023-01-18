@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Heading } from "@fluidity-money/surfing";
+import { Heading } from "../";
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 import styles from "./IntroTile.module.scss";

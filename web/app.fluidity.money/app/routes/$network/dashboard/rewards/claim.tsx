@@ -56,7 +56,7 @@ const ClaimedRewards = () => {
 
   const navigate = useNavigate();
 
-  if (!connected) return navigate("../../home");
+  if (!connected) return navigate(`/${network}/dashboard/home`);
 
   return (
     <div id="claim-container" className="cover">
@@ -74,7 +74,7 @@ const ClaimedRewards = () => {
         <LinkButton
           size={"small"}
           type={"internal"}
-          handleClick={() => navigate("..")}
+          handleClick={() => navigate(`/${network}/dashboard/rewards`)}
         >
           Close
         </LinkButton>
@@ -124,7 +124,7 @@ const ClaimedRewards = () => {
           buttontype={"text"}
           size={"large"}
           handleClick={() => {
-            navigate("../../../fluidify");
+            navigate(`/${network}/dashboard/fluidify`);
           }}
         >
           Fluidify Your Money
@@ -148,7 +148,7 @@ const ClaimedRewards = () => {
         <LinkButton
           size={"small"}
           type={"internal"}
-          handleClick={() => navigate("..")}
+          handleClick={() => navigate(`/${network}/dashboard/rewards`)}
         >
           Rewards History
         </LinkButton>

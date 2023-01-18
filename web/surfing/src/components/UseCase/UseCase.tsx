@@ -2,11 +2,11 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Heading, Text, useViewport } from "@fluidity-money/surfing";
-import React from "react";
+import { Heading, Text } from "../";
 import styles from "./UseCase.module.scss";
 
 interface UseCaseProps {
+  viewportWidth: number;
   useCase: {
     img: string;
     title: string;
@@ -14,8 +14,7 @@ interface UseCaseProps {
   };
 }
 
-const UseCase = ({ useCase }: UseCaseProps) => {
-  const { width } = useViewport();
+const UseCase = ({ viewportWidth: width, useCase }: UseCaseProps) => {
   return (
     <div className={styles.container}>
       <img src={useCase.img} alt="text representation" />

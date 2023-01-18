@@ -3,9 +3,8 @@
 // LICENSE.md file.
 
 import HowItWorksTemplate from "components/HowItWorksTemplate";
-import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
+import { ReusableGrid, useViewport, Video } from "@fluidity-money/surfing";
 import styles from "./Wrap.module.scss";
-import Video from "components/Video";
 
 const Wrap = () => {
   // to set order correct when in column layout

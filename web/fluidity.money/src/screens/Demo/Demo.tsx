@@ -9,8 +9,8 @@ import {
   numberToMonetaryString,
   GeneralButton,
   useViewport,
+  Video,
 } from "@fluidity-money/surfing";
-import Video from "components/Video";
 import styles from "./Demo.module.scss";
 
 const Demo = () => {
