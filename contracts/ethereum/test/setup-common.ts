@@ -16,6 +16,7 @@ export let configOperatorSigner: ethers.Signer;
 export let configCouncilSigner: ethers.Signer;
 export let rewardPoolsOperatorSigner: ethers.Signer;
 export let govOperatorSigner: ethers.Signer;
+export let govTokenSigner: ethers.Signer;
 export let govTokenAddr: string;
 
 before(async function () {
@@ -45,5 +46,7 @@ before(async function () {
     await configCouncilSigner.getAddress(),
   );
 
-  govTokenAddr = await deployGovToken(hre);
+  govTokenSigner = await deployGovToken(hre, govOperatorSigner);
+
+  govTokenAddr = govTokenSigner.address;
 });

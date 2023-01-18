@@ -58,9 +58,11 @@ export const deployWorkerConfig = async (
 };
 
 export const deployGovToken = async (
-  hre: HardhatRuntimeEnvironment
+  hre: HardhatRuntimeEnvironment,
+  govOperatorSigner: ethers.Signer
 ): Promise<string> => {
-  const factory = await hre.ethers.getContractFactory("GovToken");
+  const factory = await (await hre.ethers.getContractFactory("GovToken"))
+    .connect(govOperatorSigner);
 
   const govToken = await factory.deploy();
 
@@ -73,7 +75,7 @@ export const deployGovToken = async (
     BigNumber.from("1000000000000000000000000000")
   );
 
-  return govToken.address;
+  return govToken;
 };
 
 export type TokenAddresses = {
