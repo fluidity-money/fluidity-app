@@ -128,11 +128,7 @@ contract GovToken is IERC20 {
         // no check cause solidity reverts when it goes under 0
         uint256 newAmount = allowance_[msg.sender][_spender] - _amount;
 
-        unchecked {
-            approve(_spender, newAmount);
-        }
-
-        return true;
+        return approve(_spender, newAmount);
     }
 
     function allowance(address _owner, address _spender) public view returns (uint256) {
