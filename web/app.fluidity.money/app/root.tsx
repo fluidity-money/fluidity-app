@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import {
   useLoaderData,
@@ -20,7 +21,8 @@ import { ToolProvider } from "./components/ToolTip";
 import { SplitContextProvider } from "./util/split";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
-import { CookieConsent } from "@fluidity-money/surfing";
+import { CookieConsent, Banner } from "@fluidity-money/surfing";
+import { SplitContext } from "~/util/split";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -235,7 +237,25 @@ function App() {
     }
   }, []);
 
+  const { showExperiment, client } = useContext(SplitContext);
+
   const [splitUser, setSplitUser] = useState(splitUserKey);
+
+  // show the user a banner if they're on our "bother"
+  // list for being interesting
+
+  const [showTargetedBanner, setShowTargetedBanner] = useState(false);
+
+  useEffect(() => {
+    if (!showExperiment("target-banner")) {
+      return;
+    }
+
+    const _targetedBannerSeen = localStorage.getItem("targetedBanner");
+    if (!_targetedBannerSeen) {
+      setShowTargetedBanner(false);
+    }
+  });
 
   return (
     <html lang="en">
@@ -244,6 +264,14 @@ function App() {
         <Links />
       </head>
       <body>
+        <Banner activated={showTargetedBanner}>
+          <p>Hey there...</p>
+          <h2>Thank you for using the app!</h2>
+          <p>
+            We'd love to sign *YOU* up to our beta program, could you visit
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">this link?</a>
+          </p>
+        </Banner>;
         <CookieConsent
           activated={cookieConsent}
           url={
@@ -253,6 +281,7 @@ function App() {
             setCookieConsent(true);
           }}
         />
+        
         <CacheProvider sha={gitSha}>
           <ToolProvider>
             <SplitContextProvider
