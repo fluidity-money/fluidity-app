@@ -8,8 +8,9 @@ pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "./openzeppelin/Address.sol";
+import "./Registry.sol";
 
-contract WorkerConfig {
+contract Operator {
     using Address for address;
 
     struct OracleUpdate {
@@ -23,48 +24,52 @@ contract WorkerConfig {
     /// @notice emitted when an emergency is declared!
     event Emergency(bool indexed enabled);
 
-    /// @dev if false, emergency mode is active!
-    bool private noGlobalEmergency_;
+    /// @dev deprecated, emergency mode is part of the registry now
+    bool private __deprecated_1;
 
     /// @dev for migrations
     uint256 private version_;
 
-    /// @dev can set emergency mode
-    address private emergencyCouncil_;
+    /// @dev deprecated, emergency mode is part of the registry now
+    address private __deprecated_2;
 
-    /// @dev can set emergency mode and update contract props
+    /// @dev can update contract props and oracles
     address private operator_;
 
     /// @dev token => oracle
     mapping(address => address) private oracles_;
 
+    Registry private registry_;
+
     /**
      * @notice intialise the worker config for each of the tokens in the map
      *
      * @param _operator to use that can update the worker config
-     * @param _emergencyCouncil to use that can set emergency mode
      */
     function init(
         address _operator,
-        address _emergencyCouncil
+        address /* _emergencyCouncil */
     ) public {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
 
         operator_ = _operator;
 
-        emergencyCouncil_ = _emergencyCouncil;
+        //emergencyCouncil_ = _emergencyCouncil;
 
-        noGlobalEmergency_ = true;
+        //noGlobalEmergency_ = true;
     }
 
-    function noGlobalEmergency() public view returns (bool) {
-        return noGlobalEmergency_;
+    function migrate_1(Registry _registry) public {
+        require(version_ == 1, "contract needs to be version 1");
+        version_ = 2;
+
+        registry_ = _registry;
     }
 
     /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory newOracles) public {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(registry_.noGlobalEmergency(), "emergency mode!");
         require(msg.sender == operator_, "only operator account can use this");
 
         for (uint i = 0; i < newOracles.length; i++) {
@@ -77,34 +82,22 @@ contract WorkerConfig {
     }
 
     function getWorkerAddress(address contractAddr) public view returns (address) {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(registry_.noGlobalEmergency(), "emergency mode!");
 
         return oracles_[contractAddr];
     }
 
     function getWorkerAddress() public view returns (address) {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(registry_.noGlobalEmergency(), "emergency mode!");
 
         return oracles_[msg.sender];
     }
 
-    function enableEmergencyMode() public {
-        bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil_;
-        require(authorised, "only the operator or emergency council can use this");
+    /// @dev oracle function to reward
+    function reward(address token, FluidityReward[] calldata rewards, uint firstBlock, uint lastBlock) public {
+        address oracle = oracles_[token];
+        require(msg.sender == oracle, "not authorised to use this!");
 
-        noGlobalEmergency_ = false;
-        emit Emergency(true);
-    }
-
-    /**
-     * @notice disables emergency mode, following presumably a contract upgrade
-     * @notice (operator only)
-     */
-    function disableEmergencyMode() public {
-        require(msg.sender == operator_, "only the operator account can use this");
-
-        noGlobalEmergency_ = true;
-
-        emit Emergency(false);
+        registry_.reward(token, rewards, firstBlock, lastBlock);
     }
 }

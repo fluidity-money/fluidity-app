@@ -13,17 +13,11 @@ import "./openzeppelin/Address.sol";
 
 import "./ITransferWithBeneficiary.sol";
 
+import "./Fluidity.sol";
 import "./LiquidityProvider.sol";
-import "./WorkerConfig.sol";
-
-/// @dev parameter for the batchReward function
-struct Winner {
-    address winner;
-    uint256 amount;
-}
 
 /// @title The fluid token ERC20 contract
-contract Token is IERC20, ITransferWithBeneficiary {
+contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -32,14 +26,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
     uint private constant BLOCK_REWARDED = 1;
-
-    /// @notice emitted when any reward is paid out
-    event Reward(
-        address indexed winner,
-        uint amount,
-        uint startBlock,
-        uint endBlock
-    );
 
     /// @notice emitted when a reward is quarantined for being too large
     event BlockedReward(
@@ -81,10 +67,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /// @notice deprecated, mint limits no longer exist
     event UserMintLimitChanged(uint amount);
 
-    /// @notice worker config changed, either by disabling emergency
-    /// @notice mode or updateWorkerConfig
-    event WorkerConfigUpdated(address indexed newConfig);
-
     /// @notice updating the reward quarantine before manual signoff
     /// @notice by the multisig (with updateRewardQuarantineThreshold)
     event RewardQuarantineThresholdUpdated(uint amount);
@@ -111,7 +93,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     LiquidityProvider private pool_;
 
-    WorkerConfig private workerConfig_;
+    /// @dev deprecated, worker config is now handled externally
+    address private __deprecated_7;
 
     /// @dev emergency council that can activate emergency mode
     address private emergencyCouncil_;
@@ -181,7 +164,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
         emergencyCouncil_ = _emergencyCouncil;
 
         // remember the worker config to look up the addresses for each rng oracle
-        workerConfig_ = WorkerConfig(_workerConfig);
+        //workerConfig_ = WorkerConfig(_workerConfig);
 
         // remember the liquidity provider to deposit tokens into
         pool_ = LiquidityProvider(_liquidityProvider);
@@ -217,16 +200,16 @@ contract Token is IERC20, ITransferWithBeneficiary {
     }
 
     function noEmergencyMode() public view returns (bool) {
-        return noEmergencyMode_
-            && workerConfig_.noGlobalEmergency();
+        return noEmergencyMode_;
     }
 
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
+     * @notice deprecated, returns address(0)
      */
     function oracle() public view returns (address) {
-        return workerConfig_.getWorkerAddress(address(this));
+        return address(0);
     }
 
     /**
@@ -243,8 +226,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
         noEmergencyMode_ = false;
 
-        workerConfig_ = WorkerConfig(address(0));
-
         emit Emergency(true);
     }
 
@@ -252,22 +233,12 @@ contract Token is IERC20, ITransferWithBeneficiary {
      * @notice disables emergency mode, following presumably a contract upgrade
      * @notice (operator only)
      */
-    function disableEmergencyMode(address _workerConfig) public {
+    function disableEmergencyMode() public {
         require(msg.sender == operator_, "only the operator account can use this");
 
         noEmergencyMode_ = true;
 
-        updateWorkerConfig(_workerConfig);
-
         emit Emergency(false);
-    }
-
-    function updateWorkerConfig(address _workerConfig) public {
-        require(msg.sender == operator_, "only the operator account can use this");
-
-        workerConfig_ = WorkerConfig(_workerConfig);
-
-        emit WorkerConfigUpdated(_workerConfig);
     }
 
     /// @notice updates the reward quarantine threshold if called by the operator
@@ -368,10 +339,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
         _mint(winner, amount);
     }
 
-    /** @notice pays out several rewards
-     * @notice only usable by the trusted oracle account
-     *
-     * @param rewards the array of rewards to pay out
+    /**
+     * @inheritdoc IFluidity
      */
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");
@@ -413,6 +382,19 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
             rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
         }
+    }
+
+    function getTrfVars() external returns (TrfVars memory) {
+        TrfVars memory vars = TrfVars({
+            poolSizeNative: rewardPoolAmount(),
+            tokenDecimalScale: 10**decimals(),
+            exchangeRateNum: 1,
+            exchangeRateDenom: 1,
+            deltaWeightNum: TRF_VAR_NOT_AVAILABLE,
+            deltaWeightDenom: TRF_VAR_NOT_AVAILABLE
+        });
+
+        return vars;
     }
 
     /**
