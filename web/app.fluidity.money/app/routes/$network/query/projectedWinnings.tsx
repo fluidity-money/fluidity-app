@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const tokenAddrs = tokens
     .filter((t) => !t.isFluidOf)
-    .map(({ address }) => address);
+    .reduce((previous, token) => ({...previous, [token.address]: token.symbol}), {});
 
   try {
     const { data: userTransactionsData, errors: userTransactionsErr } =
@@ -39,7 +39,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         },
       });
 
-      return new Error("Server could not fulfill request");
+      return new Error("Server could not fulfil request");
     }
 
     const {
