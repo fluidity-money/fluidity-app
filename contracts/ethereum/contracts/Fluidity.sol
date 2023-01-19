@@ -8,7 +8,7 @@ struct Winner {
 }
 
 /// @dev returned in the TrfVars struct to indicate a variable wasn't available onchain
-uint constant TRF_VAR_NOT_AVAILABLE = type(uint256).max - 1;
+uint constant TRF_VAR_NOT_AVAILABLE = type(uint256).max;
 
 /// @dev returned from the getTrfVars function to calculate distribution amounts
 struct TrfVars {
