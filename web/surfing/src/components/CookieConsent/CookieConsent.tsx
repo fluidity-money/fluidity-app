@@ -10,7 +10,7 @@ export type CookieConsentProps = {
 
 const CookieConsent = ({ activated, url, callBack }: CookieConsentProps) => {
   return (
-    <Banner activated={ activated }>
+    <Banner activated={ activated } positionFixed={true} callBack={callBack}>
       <div className={styles.text}>
         <h4>Hi there! 👋</h4>
         Fluidity uses cookies to ensure that we give you the best experience
