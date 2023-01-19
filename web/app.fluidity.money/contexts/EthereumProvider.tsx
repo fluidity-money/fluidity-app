@@ -17,11 +17,13 @@ import { EIP1193 } from "@web3-react/eip1193";
 import FluidityFacadeContext from "./FluidityFacade";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import {
   getTotalPrizePool,
   getUserMintLimit,
   userMintLimitEnabled,
   manualRewardToken,
+  getUserDegenScore,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -272,6 +274,11 @@ const EthereumFacade = ({
     );
   };
 
+  /**
+   * getPrizePool attempts to watch asset.
+   *
+   * Will fail on non-Metamask compliant wallets.
+   */
   const addToken = async (symbol: string) => {
     const token = tokens.find((t) => t.symbol === symbol);
 
@@ -289,6 +296,7 @@ const EthereumFacade = ({
     return connector?.watchAsset?.(watchToken);
   };
 
+  // getPrizePool returns total prize pool.
   const getPrizePool = async (): Promise<number> => {
     const signer = provider?.getSigner();
 
@@ -300,6 +308,7 @@ const EthereumFacade = ({
     return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi);
   };
 
+  // getFluidTokens returns FLUID tokens user holds.
   const getFluidTokens = async (): Promise<string[]> => {
     const fluidTokenAddrs = tokens
       .filter((t) => !!t.isFluidOf)
@@ -316,6 +325,28 @@ const EthereumFacade = ({
       .map(([addr]) => addr);
   };
 
+  /**
+   * getDegenScore returns the "DegenScore" of a user.
+   *
+   * Source: https://degenscore.com.
+   */
+  const getDegenScore = async (address: string): Promise<number> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return 0;
+    }
+
+    const degenScoreAddr = "0x0521FA0bf785AE9759C7cB3CBE7512EbF20Fbdaa";
+
+    return getUserDegenScore(
+      signer.provider,
+      address,
+      degenScoreAddr,
+      DegenScoreAbi
+    );
+  };
+
   return (
     <FluidityFacadeContext.Provider
       value={{
@@ -330,6 +361,7 @@ const EthereumFacade = ({
         rawAddress: account ?? "",
         address: account?.toLowerCase() ?? "",
         manualReward,
+        getDegenScore,
         addToken,
         connected: isActive,
       }}
