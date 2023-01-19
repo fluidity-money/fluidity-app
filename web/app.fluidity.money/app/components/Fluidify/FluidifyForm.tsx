@@ -214,7 +214,7 @@ export const FluidifyForm = ({
         size="large"
         buttontype="text"
         type={"submit"}
-        handleClick={() => null}
+        handleClick={() => client?.track("user", swapping ? "click_swapping" : "click_reverting")}
         disabled={!assertCanSwap}
         className={"fluidify-form-submit"}
       >
