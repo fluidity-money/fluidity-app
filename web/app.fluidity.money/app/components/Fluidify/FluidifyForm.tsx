@@ -214,7 +214,7 @@ export const FluidifyForm = ({
         size="large"
         buttontype="text"
         type={"submit"}
-        handleClick={() => ()}
+        handleClick={() => null}
         disabled={!assertCanSwap}
         className={"fluidify-form-submit"}
       >
