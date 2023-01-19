@@ -178,10 +178,47 @@ const workerConfigAbiString = `[
   }
 ]`
 
+const registryAbiString = `[
+{
+  "inputs": [
+    { "internalType": "address", "name": "token", "type": "address" },
+    { "internalType": "string[]", "name": "names", "type": "string[]" }
+  ],
+  "name": "getTrfVars",
+  "outputs": [
+    {
+      "components": [
+        {
+          "components": [
+            { "internalType": "uint256", "name": "poolSizeNative", "type": "uint256" },
+            { "internalType": "uint256", "name": "tokenDecimalScale", "type": "uint256" },
+            { "internalType": "uint256", "name": "exchangeRateNum", "type": "uint256" },
+            { "internalType": "uint256", "name": "exchangeRateDenom", "type": "uint256" },
+            { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
+            { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
+          ],
+          "internalType": "struct TrfVars",
+          "name": "vars",
+          "type": "tuple"
+        },
+        { "internalType": "bool", "name": "found", "type": "bool" },
+        { "internalType": "string", "name": "name", "type": "string" }
+      ],
+      "internalType": "struct Registry.ScannedTrfVar[]",
+      "name": "",
+      "type": "tuple[]"
+    }
+  ],
+  "stateMutability": "nonpayable",
+  "type": "function"
+}
+]`
+
 var (
 	FluidityContractAbi ethAbi.ABI
 	WorkerConfigAbi     ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
+	RegistryAbi         ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles

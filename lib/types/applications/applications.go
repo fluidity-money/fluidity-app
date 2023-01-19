@@ -25,8 +25,14 @@ var applicationNames = []string{
     "curve",
     "multichain",
     "xy_finance",
-	"apeswap",
+    "apeswap",
 }
+
+// Supported utilities, should map to an entry in the onchain Registry
+type Utility string
+
+// UtilityFluid is the special utility name for the fluid token itself
+var UtilityFluid Utility = "fluidity"
 
 func (app Application) String() string {
 	return applicationNames[app]

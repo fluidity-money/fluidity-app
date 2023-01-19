@@ -20,6 +20,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -36,6 +37,9 @@ const (
 const (
 	// EnvContractAddress to use to find the Fluid contract to identify transfers
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
+
+	// EnvRegistryAddress to query to get utility info
+	EnvRegistryAddress = `FLU_ETHEREUM_REGISTRY_ADDR`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
@@ -65,6 +69,7 @@ func main() {
 	var (
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
+		registryAddress          = mustEthereumAddressFromEnv(EnvRegistryAddress)
 		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
@@ -130,6 +135,11 @@ func main() {
 			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
 			atxBufferSize                = workerConfig.AtxBufferSize
+		)
+
+		var (
+			defaultDeltaWeightNum   = big.NewInt(1)
+			defaultDeltaWeightDenom = big.NewInt(31536000)
 		)
 
 		var (
@@ -375,39 +385,69 @@ func main() {
 					senderAddress    = transfer.SenderAddress
 					recipientAddress = transfer.RecipientAddress
 					appEmission      = transfer.AppEmissions
+
+					fluidClients = []appTypes.Utility{ appTypes.UtilityFluid }
 				)
 
-				application := applications.ApplicationNone 
+				application := applications.ApplicationNone
 
 				if transfer.Decorator != nil {
-					applicationFeeUsd := transfer.Decorator.ApplicationFee
+					var (
+						applicationFeeUsd = transfer.Decorator.ApplicationFee
+						utility = transfer.Decorator.UtilityName
+					)
+
 					application = transfer.Decorator.Application
 
 					transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+
+					if utility != "" {
+						fluidClients = append(fluidClients, utility)
+					}
+				}
+
+				pools, err, poolErrs := fluidity.GetTrfVars(
+					gethClient,
+					registryAddress,
+					contractAddress,
+					fluidClients,
+					defaultDeltaWeightNum,
+					defaultDeltaWeightDenom,
+				)
+
+				if err != nil {
+					log.Fatal(func (k *log.Log) {
+						k.Message = "Failed to get trf vars from chain!"
+						k.Payload = err
+					})
+				}
+
+				// not fatal but nice to know about, might be a
+				// misbehaving contract or a misconfiguration
+				for _, poolErr := range poolErrs {
+					log.Debug(func (k *log.Log) {
+						k.Message = "Pool error fetching trf vars from chain!"
+						k.Payload = poolErr
+					})
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
 
 				var (
 					winningClasses   = fluidity.WinningClasses
-					deltaWeightNum   = fluidity.DeltaWeightNum
-					deltaWeightDenom = fluidity.DeltaWeightDenom
 					payoutFreqNum    = fluidity.PayoutFreqNum
 					payoutFreqDenom  = fluidity.PayoutFreqDenom
 				)
 
 				var (
-					deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
 					payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
 				)
 
 				randomN, randomPayouts, _ := probability.WinningChances(
 					transferFeeNormal,
 					currentAtx,
-					sizeOfThePool,
-					underlyingTokenDecimalsRat,
 					payoutFreq,
-					deltaWeight,
+					pools,
 					winningClasses,
 					btx,
 					secondsSinceLastBlock,

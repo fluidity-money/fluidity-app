@@ -23,7 +23,7 @@ type (
 		FromAddress     ethereum.Address           `json:"from_address"`
 		ToAddress       ethereum.Address           `json:"to_address"`
 		SourceRandom    []uint32                   `json:"random_source"`
-		SourcePayouts   []*misc.BigInt             `json:"random_payouts"`
+		SourcePayouts   map[string][]*misc.BigInt  `json:"random_payouts"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
 		Emissions       Emission                   `json:"emissions"`
 		Application     applications.Application   `json:"application"`
@@ -75,6 +75,8 @@ type (
 	EthereumWorkerDecorator struct {
 		// Enum corresponding to the application
 		Application	   applications.Application `json:"application"`
+		// optional utility corresponding to the application
+		UtilityName    applications.Utility     `json:"utility"`
 		// Application fee in USD
 		ApplicationFee *big.Rat                 `json:"application_fee"`
 	}
