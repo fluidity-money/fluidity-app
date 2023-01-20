@@ -17,10 +17,11 @@ import {
   useFetcher,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
-import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "~/util/split";
+import config from "~/webapp.config.server";
 import {
   DashboardIcon,
   GeneralButton,
@@ -42,7 +43,6 @@ import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-import { SplitContext } from "~/util/split";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
