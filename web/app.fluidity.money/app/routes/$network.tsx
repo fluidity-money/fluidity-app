@@ -92,7 +92,8 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(err) {
+  console.log(err)
   return (
     <div>
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />

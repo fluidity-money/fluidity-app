@@ -3,8 +3,6 @@ import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
-import { useConnectModal } from "@particle-network/connect-react-ui"
-import { evmWallets, ParticleConnect } from "@particle-network/connect";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
 import { useMemo, useEffect } from "react";
@@ -40,18 +38,21 @@ const EthereumFacade = ({
 }: {
   children: ReactNode;
   tokens: Token[];
-  connectors: [Connector, Web3ReactHooks][];
+  connectors: Map<string, [Connector, Web3ReactHooks]>;
 }) => {
   const { isActive, provider, account, connector } = useWeb3React();
 
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
-    connectors.every(([connector]) => {
-      connector?.connectEagerly?.()?.catch(() => {
+    Object.values(connectors)
+      .every(([connector]) => {
+        connector?.connectEagerly?.()
+      .catch(() => {
         return true;
       });
 
+      console.log(connector)
       return false;
     });
   }, []);
@@ -69,31 +70,17 @@ const EthereumFacade = ({
 
   // find and activate corresponding connector
   const useConnectorType = (type: "metamask" | "walletconnect" | "particle" | string) => {
-    let connector: any;
-    switch (type) {
-      case "metamask":
-        connector = connectors.find(
-          (connector) => connector[0] instanceof MetaMask
-        )?.[0];
-      case "walletconnect":
-        connector = connectors.find(
-          (connector) => connector[0] instanceof WalletConnect
-        )?.[0];
-        // Node Polyfills are no longer bundled with webpack
-        // We manually re-add Node.Buffer to client
-        // https://github.com/WalletConnect/web3modal/issues/455
-        window.Buffer = Buffer;
-      case "particle":
-        connector = connectors.find(
-          (connector) => connector[0] instanceof Particle
-        )?.[0];
-        window.Buffer = Buffer;
-      default:
-        console.warn("Unsupported connector", type);
-        break;
+    const connectorHooks = connectors.get(type);
+
+    if (!connectorHooks) {
+      console.warn("Unsupported connector", type);
+
+      return;
     }
 
-    return connector?.activate();
+    const connector = connectorHooks[0];
+
+    return connector.activate();
   };
 
   const deactivate = async (): Promise<void> => {
@@ -308,9 +295,9 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
         (actions) => new Particle({
           actions,
           options: {
-            projectId: 'de16eeaa-a811-4449-82c4-a876a8bdd323',
-            clientKey: 'cGgPX2XGtmWIyc6GeK8XoxdH59BBRqbjKC946Aku',
-            appId: '8f540914-5b47-4e10-aa6d-43004cd367c3',
+            projectId: '6a421bdd-4f91-4241-9d43-21e1bb530514',
+            clientKey: 'c5svM9jG1FV9LlCsrC6c0jEFGg1G6Q5ZJAgXmdzy',
+            appId: '2b345803-cad7-402f-b1e1-c3a1933ad332',
           }
         })
       )
@@ -332,18 +319,19 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
             })
         );
 
-      const connectors: [any, Web3ReactHooks][] = [
-        [metaMask, metamaskHooks],
-        [walletConnect, walletconnectHooks],
-        [particle, particleHooks],
-      ];
+      const connectors: Map<string, [Connector, Web3ReactHooks]> = new Map([
+        ["metamask", [metaMask, metamaskHooks]],
+        ["walletconnect", [walletConnect, walletconnectHooks]],
+        ["particle", [particle, particleHooks]],
+      ]);
+
 
       return connectors;
     }, []);
 
     return (
       <>
-        <Web3ReactProvider connectors={connectors}>
+        <Web3ReactProvider connectors={Object.values(connectors)}>
           <EthereumFacade tokens={tokens} connectors={connectors}>
             {children}
           </EthereumFacade>

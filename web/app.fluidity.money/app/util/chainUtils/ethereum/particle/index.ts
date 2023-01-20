@@ -64,6 +64,7 @@ export class Particle extends Connector {
 
       if (provider) {
         this.provider = provider as ParticleProvider
+
         this.provider?.on('connect', (): void => {
           this.actions.update({ chainId: 1 });
         })
@@ -91,29 +92,23 @@ export class Particle extends Connector {
 
   /** {@inheritdoc Connector.connectEagerly} */
   public async connectEagerly(): Promise<void> {
-    const cancelActivation = this.actions.startActivation()
+    const cancelActivation = this.actions.startActivation();
 
-    await this.isomorphicInitialize()
-    if (!this.provider) return cancelActivation()
+    await this.isomorphicInitialize();
 
-    return Promise.all([
-      this.provider.request({ method: 'eth_chainId' }) as Promise<string>,
-      this.provider.request({ method: 'eth_accounts' }) as Promise<string[]>,
-    ])
-      .then(([chainId, accounts]) => {
+    if (this.provider) return cancelActivation();
 
-        if (accounts.length) {
-          this.actions.update({ chainId: parseChainId(chainId), accounts })
-        } else {
-          throw new Error('No accounts returned')
-        }
+    return this.connectKit.connectToCachedProvider()
+      .then((provider) => {
+        console.log("provider", provider)
+        if (!provider) throw new Error('No Cached Particle Provider');
+      
+        this.actions.update({chainId: 1});
       })
       .catch((error) => {
-        console.debug('Could not connect eagerly', error)
-        // we should be able to use `cancelActivation` here, but on mobile, metamask emits a 'connect'
-        // event, meaning that chainId is updated, and cancelActivation doesn't work because an intermediary
-        // update has occurred, so we reset state instead
-        this.actions.resetState()
+        console.debug('Could not connect with Particle eagerly', error)
+
+        this.actions.resetState();
       })
   }
 
@@ -138,6 +133,8 @@ export class Particle extends Connector {
           this.provider.request({ method: 'eth_chainId' }) as Promise<string>,
           this.provider.request({ method: 'eth_requestAccounts' }) as Promise<string[]>,
         ]).then(([chainId, accounts]) => {
+            console.log(chainId, accounts)
+
           const receivedChainId = parseChainId(chainId)
           const desiredChainId =
             typeof desiredChainIdOrChainParameters === 'number'
