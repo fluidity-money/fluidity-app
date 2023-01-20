@@ -17,10 +17,13 @@ import Head from "next/head";
 const HowItWorksPage = () => {
   return (
     <div className={styles.pageContainer}>
-       <Head>
-          <title>How it works - Fluidity</title>
-          <meta name="description" content="Fluidity is a platfrom that incentivises user activity through yield - See how." />
-        </Head>
+      <Head>
+        <title>How it works - Fluidity</title>
+        <meta
+          name="description"
+          content="Fluidity is a platfrom that incentivises user activity through yield - See how."
+        />
+      </Head>
       <div className={styles.screensContainer}>
         <Navigation
           page={"howitworks"}

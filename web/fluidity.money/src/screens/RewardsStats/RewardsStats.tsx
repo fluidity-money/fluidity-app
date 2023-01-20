@@ -1,15 +1,18 @@
-import type { LargestDailyWinner } from "data/monthlyLargestWinners";
+import { useEffect, useState } from "react";
 
 import {
   Heading,
   LineChart,
   numberToMonetaryString,
   trimAddress,
+  useViewport,
 } from "@fluidity-money/surfing";
+
+import type { LargestDailyWinner } from "data/monthlyLargestWinners";
 import RewardsInfoBox from "components/RewardsInfoBox";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
+
 import styles from "./RewardsStats.module.scss";
 
 interface IProps {
@@ -17,24 +20,33 @@ interface IProps {
 }
 
 type DailyWinner = LargestDailyWinner & {
-  awarded_date: Date,
-}
+  awarded_day: Date;
+};
 
 const RewardsStats = ({ changeScreen }: IProps) => {
-  const { apiState } = useChainContext();
-  const { txCount, largestDailyWinnings } = apiState;
+  const { apiState, chain } = useChainContext();
+  const { largestDailyWinnings, onChainData } = apiState;
+
   const { width } = useViewport();
   const breakpoint = 620;
-  
-  // NOTE: Dummy data
-  const parsedDailyWinnings = largestDailyWinnings
-    .map(({awarded_day, ...reward}) => (
-      {
-        ...reward,
-        awarded_date: new Date(awarded_day),
-      }
-    ))
-  
+
+  const [prizePool, setPrizePool] = useState<number>(
+    onChainData.data?.ethPool || 0
+  );
+
+  useEffect(() => {
+    chain === `ETH` && setPrizePool(onChainData.data?.ethPool || 0);
+
+    chain === `SOL` && setPrizePool(onChainData.data?.solPool || 0);
+  }, [onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
+
+  const parsedDailyWinnings = largestDailyWinnings.map(
+    ({ awarded_day, ...reward }) => ({
+      ...reward,
+      awarded_day: new Date(awarded_day),
+    })
+  );
+
   // information on top of second screen
   const InfoStats = () => (
     <div className={styles.info}>
@@ -50,7 +62,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       </div>
       <div className={styles.infoSingle}>
         {/* hard coded on launch */}
-        <Heading as={width > breakpoint ? "h2" : "h3"}>12</Heading>
+        <Heading as={width > breakpoint ? "h2" : "h3"}>5</Heading>
         <Heading as={width > breakpoint ? "h5" : "h6"}>
           Fluid asset pairs
         </Heading>
@@ -58,7 +70,7 @@ const RewardsStats = ({ changeScreen }: IProps) => {
       {width > breakpoint && (
         <div className={styles.infoSingle}>
           {/* NOTE: Dummy data */}
-          <Heading as="h2">$100,000</Heading>
+          <Heading as="h2">{numberToMonetaryString(Number(prizePool))}</Heading>
           <Heading as="h5">Reward Pool</Heading>
         </div>
       )}
@@ -77,47 +89,52 @@ const RewardsStats = ({ changeScreen }: IProps) => {
           <InfoStats />
         </div>
         <div style={{ height: 254, width: "100%" }}></div>
-
         <RewardsInfoBox
-          // NOTE: Dummy data
-          rewardPool={100000}
-          totalTransactions={txCount}
+          totalTransactions={onChainData.data?.totalTransactions}
           changeScreen={changeScreen}
           type="transparent"
+          rewardPool={prizePool}
+          loading={onChainData.loading}
+          key={`${onChainData.loading}-${prizePool}`}
         />
-    
         {!!parsedDailyWinnings.length && (
           <div className={styles.rewardsChart}>
-            <LineChart 
-              data= {parsedDailyWinnings}
-              lineLabel='dailyWinnings'
+            <LineChart
+              data={parsedDailyWinnings}
+              lineLabel="dailyWinnings"
               accessors={{
-                xAccessor: (d: DailyWinner) => d.awarded_date,
-                yAccessor: (d: DailyWinner) => d.winning_amount_scaled,
+                xAccessor: (w: LargestDailyWinner) => w.awarded_day,
+                yAccessor: (w: LargestDailyWinner) =>
+                  w.winning_amount_scaled * 1000000 + 1,
               }}
-              renderTooltip={({datum}: {datum: DailyWinner}) => {
+              renderTooltip={({ datum }: { datum: DailyWinner }) => {
                 return (
                   <div className={styles.tooltip}>
                     <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {`${datum.awarded_date.getDate()}`.padStart(2,'0')}/
-                      {`${datum.awarded_date.getMonth() + 1}`.padStart(2,'0')}/
-                      {`${datum.awarded_date.getUTCFullYear() % 100}`.padStart(2,'0')}
+                      {`${datum.awarded_day.getDate()}`.padStart(2, "0")}/
+                      {`${datum.awarded_day.getMonth() + 1}`.padStart(2, "0")}/
+                      {`${datum.awarded_day.getUTCFullYear() % 100}`.padStart(
+                        2,
+                        "0"
+                      )}
                     </span>
-                    <br/>
+                    <br />
                     <br />
                     <span>
                       <span>{trimAddress(datum.winning_address)}</span>
                     </span>
-                    <br/>
-                    <br/>
+                    <br />
+                    <br />
                     <span>
-                      <span>{numberToMonetaryString(datum.winning_amount_scaled)}{" "}</span>
+                      <span>
+                        {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                      </span>
                       <span style={{ color: "rgba(2555,255,255, 50%)" }}>
                         prize awarded
                       </span>
                     </span>
                   </div>
-                )
+                );
               }}
             />
           </div>
@@ -128,4 +145,3 @@ const RewardsStats = ({ changeScreen }: IProps) => {
 };
 
 export default RewardsStats;
-

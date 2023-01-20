@@ -1,20 +1,37 @@
-import { LoaderFunction, json, redirect } from "@remix-run/node";
-
+import type Transaction from "~/types/Transaction";
 import {
-  useUserTransactionAllCount,
-  useUserTransactionByAddressCount,
+  PendingWinner,
+  useUserPendingRewardsAll,
+  useUserPendingRewardsByAddress,
+  Winner,
+} from "~/queries/useUserRewards";
+
+import { LoaderFunction, json } from "@remix-run/node";
+import config from "~/webapp.config.server";
+import {
+  useUserRewardsAll,
+  useUserRewardsByAddress,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
 } from "~/queries";
 import { captureException } from "@sentry/react";
+import { MintAddress } from "~/types/MintAddress";
+import { getTokenForNetwork } from "~/util";
 
-export type UserTransaction = {
+type UserTransaction = {
   sender: string;
   receiver: string;
   hash: string;
   timestamp: number;
   value: number;
   currency: string;
+};
+
+export type TransactionsLoaderData = {
+  transactions: Transaction[];
+  page: number;
+  count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -28,62 +45,129 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const page = parseInt(page_);
 
-  if (!page || page < 1) return new Error("Invalid Request");
+  if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const [
-      { data: userTransactionCountData, errors: userTransactionCountErr },
-      { data: userTransactionsData, errors: userTransactionsErr },
-    ] = await Promise.all(
-      address
-        ? [
-            useUserTransactionByAddressCount(network, address),
-            useUserTransactionsByAddress(network, address, page),
-          ]
-        : [
-            useUserTransactionAllCount(network),
-            useUserTransactionsAll(network, page),
-          ]
+    const { data: winnersData, errors: winnersErr } = address
+      ? await useUserRewardsByAddress(network ?? "", address)
+      : await useUserRewardsAll(network ?? "");
+
+    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
+      ? await useUserPendingRewardsByAddress(network ?? "", address)
+      : await useUserPendingRewardsAll(network ?? "");
+
+    if (
+      winnersErr ||
+      !winnersData ||
+      !pendingWinnersData ||
+      pendingWinnersErr
+    ) {
+      throw winnersErr;
+    }
+
+    // winnersMap looks up if a transaction was the send that caused a win
+    const winnersMap = winnersData.winners.reduce(
+      (map, winner) => ({
+        ...map,
+        [winner.send_transaction_hash]: {
+          ...winner,
+          win_amount:
+            winner.winning_amount +
+            (map[winner.transaction_hash]?.winning_amount || 0),
+        },
+      }),
+      {} as { [key: string]: Winner }
     );
 
-    if (!userTransactionCountData || userTransactionCountErr) {
-      captureException(
-        new Error(
-          `Could not fetch Transactions count for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
+    // winnersMap looks up if a transaction was the send that caused a win
+    const pendingWinnersMap =
+      pendingWinnersData.ethereum_pending_winners.reduce(
+        (map, winner) => ({
+          ...map,
+          [winner.transaction_hash]: {
+            ...winner,
+            win_amount:
+              winner.win_amount +
+              (map[winner.transaction_hash]?.win_amount || 0),
           },
-        }
+        }),
+        {} as { [key: string]: PendingWinner }
       );
 
-      return new Error("Server could not fulfill request");
-    }
+    const jointWinnersMap = {
+      ...pendingWinnersMap,
+      ...winnersMap,
+    };
 
-    const {
+    // payoutsMap looks up if a transaction was a payout transaction
+    const winnersPayoutAddrs = winnersData.winners.map(
+      ({ transaction_hash }) => transaction_hash
+    );
+
+    const pendingWinnersPayoutAddrs = winnersData.winners.map(
+      ({ transaction_hash }) => transaction_hash
+    );
+
+    // Because every ethereum_pending_winners is present in winner
+    // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
+    const JointPayoutAddrs = [
+      ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
+    ];
+
+    const userTransactionsData = {
       [network as string]: {
-        transfers: [{ count: txCount }],
+        transfers: [],
       },
-    } = userTransactionCountData;
+    };
 
-    if (Math.ceil(txCount / 12) < page && txCount > 0) {
-      return redirect(`./`, 301);
-    }
+    // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
+    // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
+    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+      const { data: transactionsData, errors: transactionsErr } =
+        await (async () => {
+          switch (true) {
+            case !!address: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+              return useUserTransactionsByAddress(
+                network,
+                getTokenForNetwork(network),
+                page,
+                address as string,
+                JointPayoutAddrs.slice(i, i + 99),
+                limit === Infinity ? 12 : limit
+              );
+            }
+            default: {
+              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+              return useUserTransactionsAll(
+                network,
+                getTokenForNetwork(network),
+                page,
+                JointPayoutAddrs.slice(i, i + 99),
+                limit === Infinity ? 12 : limit
+              );
+            }
+          }
+        })();
 
-    if (!userTransactionsData || userTransactionsErr) {
-      captureException(
-        new Error(
-          `Could not fetch User Transactions for ${address}, on ${network}`
-        ),
-        {
-          tags: {
-            section: "dashboard",
-          },
-        }
+      if (!transactionsData || transactionsErr) {
+        captureException(
+          new Error(
+            `Could not fetch User Transactions for ${address}, on ${network}`
+          ),
+          {
+            tags: {
+              section: "dashboard",
+            },
+          }
+        );
+
+        return new Error("Server could not fulfill request");
+      }
+      Array.prototype.push.apply(
+        userTransactionsData[network as string].transfers,
+        transactionsData[network as string].transfers
       );
-
-      return new Error("Server could not fulfill request");
     }
 
     const {
@@ -91,7 +175,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     } = userTransactionsData;
 
     // Destructure GraphQL data
-    const sanitizedTransactions: UserTransaction[] = transactions.map(
+    const userTransactions: UserTransaction[] = transactions.map(
       (transaction) => {
         const {
           sender: { address: sender },
@@ -120,10 +204,66 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }
     );
 
-    return json({
-      transactions: sanitizedTransactions,
-      count: txCount,
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenLogoMap = tokens.reduce(
+      (map, token) => ({
+        ...map,
+        [token.symbol]: token.logo,
+      }),
+      {} as Record<string, string>
+    );
+
+    const defaultLogo = "/assets/tokens/usdt.svg";
+
+    const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
+      const swapType =
+        tx.sender === MintAddress
+          ? "in"
+          : tx.receiver === MintAddress
+          ? "out"
+          : undefined;
+
+      const winner = jointWinnersMap[tx.hash];
+      const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
+
+      return {
+        sender: tx.sender,
+        receiver: tx.receiver,
+        winner: isFromPendingWin
+          ? ((winner as PendingWinner)?.address as unknown as string)
+          : ((winner as Winner)?.winning_address as unknown as string) ?? "",
+        reward: winner
+          ? (isFromPendingWin
+              ? (winner as PendingWinner).win_amount
+              : (winner as Winner).winning_amount) /
+            10 ** winner.token_decimals
+          : 0,
+        hash: tx.hash,
+        rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
+        currency: tx.currency,
+        value: tx.value,
+        timestamp: tx.timestamp,
+        logo: tokenLogoMap[tx.currency] || defaultLogo,
+        provider:
+          (network === "ethereum"
+            ? !isFromPendingWin
+              ? (winner as Winner)?.ethereum_application
+              : (winner as Winner)?.solana_application
+            : "Fluidity") ?? "Fluidity",
+        swapType,
+      };
     });
+
+    return json({
+      page,
+      transactions: mergedTransactions,
+      count: Object.keys(winnersMap).length,
+    } as TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

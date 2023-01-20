@@ -3,12 +3,11 @@ import { useDrag } from "react-dnd";
 type Props = {
   dragItem: unknown;
   type: string;
-  key: string;
   children: React.ReactNode;
 };
 
 const Draggable = (props: Props) => {
-  const { dragItem, type, children, key } = props;
+  const { dragItem, type, children } = props;
 
   const drag = useDrag(() => {
     return {
@@ -20,11 +19,7 @@ const Draggable = (props: Props) => {
     };
   }, [dragItem])[1];
 
-  return (
-    <div ref={drag} key={key}>
-      {children}
-    </div>
-  );
+  return <div ref={drag}>{children}</div>;
 };
 
 export default Draggable;

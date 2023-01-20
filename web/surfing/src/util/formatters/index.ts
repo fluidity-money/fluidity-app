@@ -5,7 +5,10 @@
 export {
   numberToMonetaryString,
   numberToCommaSeparated,
+  stringifiedNumberToMonetaryString,
   toSignificantDecimals,
+  decimalTrim,
+  shorthandAmountFormatter,
 } from "./numberConverters";
 export {
   normaliseAddress,

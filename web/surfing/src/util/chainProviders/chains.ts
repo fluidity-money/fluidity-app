@@ -6,9 +6,10 @@ interface Chain {
 interface ISupportedChains {
   ETH: Chain;
   SOL: Chain;
+  ARB: Chain;
 }
 
-export type SupportedChainsList = keyof ISupportedChains
+export type SupportedChainsList = keyof ISupportedChains;
 
 export const SupportedChains: ISupportedChains = {
   ETH: {
@@ -19,6 +20,10 @@ export const SupportedChains: ISupportedChains = {
     name: "solana",
     short: "SOL",
   },
+  ARB: {
+    name: "arbitrum",
+    short: "ARB",
+  },
   // Unused
   // CMPD = {
   //   name: "compound",
@@ -28,5 +33,4 @@ export const SupportedChains: ISupportedChains = {
   //   name: "polygon",
   //   short: "POL"
   // },
-}
-
+};

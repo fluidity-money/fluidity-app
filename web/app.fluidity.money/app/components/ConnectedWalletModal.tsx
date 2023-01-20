@@ -118,9 +118,14 @@ export const ConnectedWalletModal = ({
                   Disconnect Wallet
                 </GeneralButton>
                 <Text size="xs" className="legal">
-                  By connecting a wallet, you agree to Fluidity Money&aposs{" "}
-                  <a className="link-text">Terms of Service</a> and acknowledge
-                  that you have read and understand the{" "}
+                  By connecting a wallet, you agree to Fluidity Money&apos;s{" "}
+                  <a
+                    className="link-text"
+                    href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+                  >
+                    Terms of Service
+                  </a>{" "}
+                  and acknowledge that you have read and understand the{" "}
                   <a className="link-text">Disclaimer</a>
                 </Text>
               </div>

@@ -2,4 +2,7 @@ export {
   getTransactionsObservableForIn,
   getObservableForAddress,
 } from "./utils";
-export { getHasuraTransactionObservable } from "./hasura";
+export {
+  winnersTransactionObservable,
+  pendingWinnersTransactionObservables,
+} from "./hasura";

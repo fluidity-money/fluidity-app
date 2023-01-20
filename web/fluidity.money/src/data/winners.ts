@@ -2,77 +2,104 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import { gql, useSubscription } from "@apollo/client";
 import { onData } from "./apolloClient";
 
 export interface Winner {
-  awarded_time: string,
-  token_decimals: number,
-  token_short_name: string,
-  transaction_hash: string,
-  winning_amount: number,
-  winning_address: string,
+  awarded_time: string;
+  token_decimals: number;
+  token_short_name: string;
+  transaction_hash: string;
+  winning_amount: number;
+  winning_address: string;
 }
 
 export interface WinnersRes {
-  winners: Winner[],
+  winners: Winner[];
 }
-
 
 const winningTransactionsByAddressSubscription = gql`
-subscription winnersGetWinningTransactionsByAddressSubscription($network: network_blockchain!, $address: String!, $date: timestamp!) {
-  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, winning_address: {_eq: $address}, awarded_time: {_gte: $date}}) {
-    awarded_time
-    transaction_hash
-    token_short_name
-    winning_amount
-    token_decimals
-    winning_address
+  subscription winnersGetWinningTransactionsByAddressSubscription(
+    $network: network_blockchain!
+    $address: String!
+    $date: timestamp!
+  ) {
+    winners(
+      order_by: { awarded_time: desc }
+      where: {
+        network: { _eq: $network }
+        winning_address: { _eq: $address }
+        awarded_time: { _gte: $date }
+      }
+    ) {
+      awarded_time
+      transaction_hash
+      token_short_name
+      winning_amount
+      token_decimals
+      winning_address
+    }
   }
-}
 `;
 
 const winningTransactionsAllSubscription = gql`
-subscription winnersGetWinningTransactionsAllSubscription($network: network_blockchain!, $date: timestamp!) {
-  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}, awarded_time: {_gte: $date}}) {
-    awarded_time
-    transaction_hash
-    token_short_name
-    winning_amount
-    token_decimals
-    winning_address
+  subscription winnersGetWinningTransactionsAllSubscription(
+    $network: network_blockchain!
+    $date: timestamp!
+  ) {
+    winners(
+      order_by: { awarded_time: desc }
+      where: { network: { _eq: $network }, awarded_time: { _gte: $date } }
+    ) {
+      awarded_time
+      transaction_hash
+      token_short_name
+      winning_amount
+      token_decimals
+      winning_address
+    }
   }
-}
 `;
 
 const winningTransactionsAnyTimeAllSubscription = gql`
-subscription winnersGetWinningTransactionsAnyTimeAllSubscription($network: network_blockchain!) {
-  winners(order_by: {awarded_time: desc}, where: {network: {_eq: $network}}) {
-    awarded_time
-    transaction_hash
-    token_short_name
-    winning_amount
-    token_decimals
-    winning_address
+  subscription winnersGetWinningTransactionsAnyTimeAllSubscription(
+    $network: network_blockchain!
+  ) {
+    winners(
+      order_by: { awarded_time: desc }
+      where: { network: { _eq: $network } }
+      limit: 360
+    ) {
+      awarded_time
+      transaction_hash
+      token_short_name
+      winning_amount
+      token_decimals
+      winning_address
+    }
   }
-}
 `;
 
-export const useWinningTransactions = (onNext: (winnings: WinnersRes) => void, network: string, date?: string, address?: string) => {
+export const useWinningTransactions = (
+  onNext: (winnings: WinnersRes) => void,
+  network: string,
+  date?: string,
+  address?: string
+) => {
   const { subscription, options } = useMemo(() => {
     if (!date) {
-      return ({
+      return {
         subscription: winningTransactionsAnyTimeAllSubscription,
         options: {
           variables: {
             network,
           },
           onData: onData(onNext),
-        }
-      })
-    };
-    
+        },
+      };
+    }
+
     if (!address) {
       return {
         subscription: winningTransactionsAllSubscription,
@@ -83,9 +110,9 @@ export const useWinningTransactions = (onNext: (winnings: WinnersRes) => void, n
           },
           onData: onData(onNext),
         },
-      }
-    };
-    
+      };
+    }
+
     return {
       subscription: winningTransactionsByAddressSubscription,
       options: {
@@ -96,9 +123,8 @@ export const useWinningTransactions = (onNext: (winnings: WinnersRes) => void, n
         },
         onData: onData(onNext),
       },
-    }
+    };
   }, [network, address, date]);
-  
-  return useSubscription(subscription, options as any);
-}
 
+  return useSubscription(subscription, options as any);
+};

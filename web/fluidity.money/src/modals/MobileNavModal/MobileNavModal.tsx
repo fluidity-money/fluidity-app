@@ -14,26 +14,21 @@ interface IMobileNavModalProps {
 
 const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
   const links = navLinks.map((link) => (
-    <Link
-      href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
-      passHref
-    >
+    <Link href={`/${link.replace(/\s+/g, "").toLowerCase()}`} passHref>
       <a
         className={styles.button}
         href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
+        onClick={() => setIsOpen(false)}
       >
-        <Heading as="h3">{link}</Heading>
+        <Heading as="h5">{link}</Heading>
       </a>
     </Link>
   ));
 
   return (
     <div className={styles.container}>
-      <Link
-        href={"/"}
-        passHref
-      >
-        <a href={"/"}>
+      <Link href={"/"} passHref>
+        <a href={"/"} className={styles.logo} onClick={() => setIsOpen(false)}>
           <Image
             src="/assets/images/logoMetallic.png"
             alt="logo"
@@ -111,7 +106,7 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
         href={`https://app.fluidity.money`}
         onClick={() => setIsOpen(false)}
       >
-        <Heading className={styles.black} black={true} as="h3">
+        <Heading color="black" as="h3">
           LAUNCH FLUIDITY
         </Heading>
       </a>

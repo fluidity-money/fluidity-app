@@ -1,16 +1,18 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 import type { IRow } from "~/components/Table";
+import type {
+  UnclaimedLoaderData,
+  TokenUnclaimedReward,
+} from "../../query/dashboard/unclaimed";
 
 import config from "~/webapp.config.server";
 import { LoaderFunction, json } from "@remix-run/node";
-import { captureException } from "@sentry/react";
-import { useLoaderData, useLocation } from "@remix-run/react";
-import { useState, useEffect, useContext } from "react";
+import { useFetcher, useLoaderData, useLocation } from "@remix-run/react";
+import { useState, useContext, useEffect } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { UserRewards } from "./common";
 import { getTxExplorerLink, getAddressExplorerLink } from "~/util";
-import { useUserUnclaimedRewards, useUserRewardsByAddress } from "~/queries";
 
 import { motion } from "framer-motion";
 import { Table } from "~/components";
@@ -19,8 +21,8 @@ import {
   numberToMonetaryString,
   Text,
   trimAddress,
+  useViewport,
 } from "@fluidity-money/surfing";
-import useViewport from "~/hooks/useViewport";
 import { getBlockExplorerLink } from "~/util/chainUtils/links";
 
 export const unstable_shouldReload = () => false;
@@ -70,31 +72,38 @@ type LoaderData = {
   network: Chain;
 };
 
-type TokenUnclaimedReward = {
-  symbol: string;
-  reward: number;
+const SAFE_DEFAULT = {
+  unclaimedTxs: [],
+  unclaimedTokens: [],
+  userUnclaimedRewards: 0,
+  userClaimedRewards: 0,
 };
 
 const UnclaimedWinnings = () => {
   const { network, fluidTokenMap, tokenDetailsMap } =
     useLoaderData<LoaderData>();
 
-  const { connected, address } = useContext(FluidityFacadeContext);
+  const { address } = useContext(FluidityFacadeContext);
 
-  const [
-    { userUnclaimedRewards, unclaimedTxs, unclaimedTokens },
-    setUnclaimedRewardsRes,
-  ] = useState<{
-    unclaimedTxs: UserUnclaimedReward[];
-    unclaimedTokens: TokenUnclaimedReward[];
-    userUnclaimedRewards: number;
-  }>({
-    unclaimedTxs: [],
-    unclaimedTokens: [],
-    userUnclaimedRewards: 0,
-  });
+  const unclaimedData = useFetcher<UnclaimedLoaderData>();
 
-  const [userTotalRewards, setUserTotalRewards] = useState(0);
+  useEffect(() => {
+    if (!address) return;
+
+    unclaimedData.load(
+      `/${network}/query/dashboard/unclaimed?address=${address}`
+    );
+  }, [address]);
+
+  const {
+    unclaimedTxs,
+    unclaimedTokens,
+    userUnclaimedRewards,
+    userClaimedRewards,
+  } = {
+    ...SAFE_DEFAULT,
+    ...unclaimedData.data,
+  };
 
   const [{ networkFee, gasFee }] = useState({
     networkFee: 0,
@@ -112,99 +121,7 @@ const UnclaimedWinnings = () => {
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
-  useEffect(() => {
-    if (!connected || !address) return;
-
-    // Get Unclaimed Rewards - Expect to fail if Solana
-    (async () => {
-      try {
-        const { data, error } = await useUserUnclaimedRewards(
-          network,
-          address ?? ""
-        );
-
-        if (!data || error) return;
-
-        const { ethereum_pending_winners: rewards } = data;
-
-        const userUnclaimedRewards = rewards.reduce((sum, transaction) => {
-          const { win_amount, token_decimals } = transaction;
-
-          const decimals = 10 ** token_decimals;
-          return sum + win_amount / decimals;
-        }, 0);
-
-        const unclaimedTokens = Object.entries(
-          rewards.reduce((map, transaction) => {
-            const { win_amount, token_decimals, token_short_name } =
-              transaction;
-            const reward =
-              (map[token_short_name] ?? 0) + win_amount / 10 ** token_decimals;
-
-            return {
-              ...map,
-              [token_short_name]: reward,
-            };
-          }, {} as { [tokenName: string]: number })
-        ).map(([symbol, reward]) => ({ symbol, reward }));
-
-        setUnclaimedRewardsRes({
-          unclaimedTxs: rewards,
-          unclaimedTokens: unclaimedTokens,
-          userUnclaimedRewards,
-        });
-      } catch (err) {
-        captureException(
-          new Error(
-            `Could not fetch Transactions count for ${address}, on ${network}`
-          ),
-          {
-            tags: {
-              section: "dashboard",
-            },
-          }
-        );
-        return;
-      }
-    })();
-
-    // Get claimed Rewards
-    (async () => {
-      try {
-        const { data, errors } = await useUserRewardsByAddress(
-          network,
-          address
-        );
-
-        if (errors || !data) {
-          throw errors;
-        }
-
-        const { winners } = data;
-
-        const totalRewards = winners.reduce(
-          (sum, { winning_amount, token_decimals }) =>
-            sum + winning_amount / 10 ** token_decimals,
-          0
-        );
-
-        setUserTotalRewards(totalRewards);
-      } catch (err) {
-        captureException(
-          new Error(
-            `Could not fetch Transactions count for ${address}, on ${network}`
-          ),
-          {
-            tags: {
-              section: "dashboard",
-            },
-          }
-        );
-        return;
-      }
-    })();
-  }, [connected, address]);
-
+  // Get claimed Rewards
   const unclaimedRewardColumns = isSmallMobile
     ? [{ name: "TOKEN" }, { name: "REWARD" }]
     : [
@@ -228,8 +145,8 @@ const UnclaimedWinnings = () => {
   const [winningTableViewIndex, setWinningTableViewIndex] = useState(0);
 
   const winningTableViews = [
-    { name: "Your Breakdown", filter: () => true },
-    { name: "Your Winnings", filter: () => true },
+    { name: "My Breakdown", filter: () => true },
+    { name: "My Winnings", filter: () => true },
   ];
 
   const RewardRow = (chain: Chain): IRow<UserUnclaimedReward> =>
@@ -284,11 +201,7 @@ const UnclaimedWinnings = () => {
 
           {/* Reward */}
           <td>
-            <Text>
-              {rewardUsd >= 0.01
-                ? numberToMonetaryString(rewardUsd)
-                : `$${rewardUsd}`}
-            </Text>
+            <Text prominent>{numberToMonetaryString(rewardUsd)}</Text>
           </td>
 
           {/* Transaction */}
@@ -307,7 +220,7 @@ const UnclaimedWinnings = () => {
           {!isSmallMobile && (
             <td>
               <a
-                className="table-activity"
+                style={{ textDecoration: "underline" }}
                 href={getBlockExplorerLink(network, block_number)}
               >
                 <Text>{block_number}</Text>
@@ -359,9 +272,7 @@ const UnclaimedWinnings = () => {
 
           {/* Reward */}
           <td>
-            <Text>
-              {reward >= 0.01 ? numberToMonetaryString(reward) : `$${reward}`}
-            </Text>
+            <Text prominent>{numberToMonetaryString(reward)}</Text>
           </td>
         </motion.tr>
       );
@@ -374,7 +285,7 @@ const UnclaimedWinnings = () => {
         <UserRewards
           claimNow={true}
           unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={userTotalRewards}
+          claimedRewards={userClaimedRewards}
           network={network}
           networkFee={networkFee}
           gasFee={gasFee}
@@ -382,6 +293,12 @@ const UnclaimedWinnings = () => {
             ({ symbol }) => fluidTokenMap[symbol]
           )}
         />
+      )}
+
+      {!!address && unclaimedData.state === "loading" && (
+        <div style={{ marginBottom: "12px" }}>
+          <Text>Loading data...</Text>
+        </div>
       )}
 
       <Heading as={"h2"}>
@@ -412,7 +329,7 @@ const UnclaimedWinnings = () => {
               page: txTablePage,
               rowsPerPage: 12,
             }}
-            itemName={"unclaimed columns"}
+            itemName={"unclaimed wins"}
             headings={unclaimedRewardColumns}
             count={unclaimedTxs.length}
             data={unclaimedTxs}

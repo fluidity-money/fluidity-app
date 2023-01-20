@@ -19,11 +19,13 @@ export const getBalanceOfERC20 = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-) => {
+): Promise<BN> => {
   const contract = getContract(ABI, contractAddress, signer);
-  if (!contract) return "0";
+  if (!contract) return new BN(0);
+
   const userAddress = await signer.getAddress();
-  return (await contract.balanceOf(userAddress)).toString();
+
+  return new BN((await contract.balanceOf(userAddress)).toString());
 };
 
 // get ERC20 balance for the given token, divided by its decimals
@@ -43,7 +45,7 @@ export const usdBalanceOfERC20 = async (
 };
 
 // whether the per-user mint limit is enabled for the contract
-export const userMintLimitedEnabled = async (
+export const userMintLimitEnabled = async (
   provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
@@ -64,10 +66,10 @@ export const getUserMintLimit = async (
   provider: JsonRpcProvider,
   contractAddress: string,
   ABI: ContractInterface
-): Promise<string> => {
+): Promise<BN> => {
   const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return "0";
-  return (await contract.userMintLimit()).toString();
+  if (!contract) return new BN(0);
+  return new BN((await contract.userMintLimit()).toString());
 };
 
 // the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
@@ -91,10 +93,11 @@ export const getAmountMinted = async (
   contractAddress: string,
   ABI: ContractInterface,
   userAddress: string
-): Promise<string> => {
+): Promise<BN> => {
   const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return "0";
-  return (await contract.userAmountMinted(userAddress)).toString();
+  if (!contract) return new BN(0);
+
+  return new BN((await contract.userAmountMinted(userAddress)).toString());
 };
 
 // the amount towards the mint limit the given user has currently minted scaled by decimals
@@ -144,7 +147,7 @@ const makeContractSwap = async (
   try {
     const fromAddress = await signer.getAddress();
     const balance: BigNumber = await fromContract.balanceOf(fromAddress);
-    if (balance.lte(amount)) {
+    if (balance.lt(amount)) {
       throw new Error(`You don't have enough ${from.symbol}`);
     }
 
@@ -204,6 +207,10 @@ type ManualRewardRes = {
       win_amount: number;
       first_block: number;
       last_block: number;
+      token_details: {
+        token_decimals: number;
+        token_short_name: string;
+      };
     };
     signature: string;
   };
@@ -233,7 +240,13 @@ export const manualRewardToken = async (
 
   // Call eth contract
 
-  const { winner, win_amount, first_block, last_block } = payload.reward;
+  const { winner, win_amount, first_block, last_block, token_details } =
+    payload.reward;
+
+  const { token_decimals } = token_details;
+  const decimals = BigNumber.from(10).pow(token_decimals);
+
+  const winningAmount = BigNumber.from(`${win_amount}`);
 
   const { signature: b64Signature } = payload;
 
@@ -241,32 +254,39 @@ export const manualRewardToken = async (
   const uint8Signature = B64ToUint8Array(b64Signature);
   const hexSignature = bytesToHex(Array.from(uint8Signature));
 
-  const tokenContract = getContract(token.ABI, token.address, signer);
+  const mainnetId = 1;
 
-  const contractTx: ContractTransaction = await tokenContract.manualReward(
-    // contractAddress
-    token.address,
-    // chainid
-    0,
-    // winnerAddress
-    winner,
-    // winAmount
-    win_amount,
-    // firstBlock
-    first_block,
-    // lastBlock
-    last_block,
-    // sig
-    hexSignature
-  );
+  try {
+    const tokenContract = getContract(token.ABI, token.address, signer);
 
-  const res = await contractTx.wait();
+    const contractTx: ContractTransaction = await tokenContract.manualReward(
+      // contractAddress
+      token.address,
+      // chainid
+      mainnetId,
+      // winnerAddress
+      winner,
+      // winAmount
+      winningAmount,
+      // firstBlock
+      first_block,
+      // lastBlock
+      last_block,
+      // sig
+      hexSignature
+    );
 
-  return {
-    networkFee: res.gasUsed.toNumber(),
-    gasFee: res.gasUsed.toNumber(),
-    amount: win_amount,
-  };
+    const res = await contractTx.wait();
+
+    return {
+      networkFee: res.gasUsed.toNumber(),
+      gasFee: res.gasUsed.toNumber(),
+      amount: parseFloat(winningAmount.div(decimals).toString()),
+    };
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return { amount: 0, gasFee: 0, networkFee: 0 };
+  }
 };
 
 type PrizePool = {
@@ -304,6 +324,38 @@ export const getTotalPrizePool = async (
     }, new BN(0));
 
     return totalPrizePool.toNumber();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
+  }
+};
+
+// Returns total prize pool from aggregated contract
+export const getUserDegenScore = async (
+  provider: JsonRpcProvider,
+  userAddr: string,
+  degenScoreAddr: string,
+  degenScoreAbi: ContractInterface
+): Promise<number> => {
+  try {
+    const degenScoreContract = new Contract(
+      degenScoreAddr,
+      degenScoreAbi,
+      provider
+    );
+
+    if (!degenScoreContract)
+      throw new Error(`Could not instantiate DegenScore at ${degenScoreAddr}`);
+
+    const degenScoreTraitId = "121371448299756538184036965";
+
+    const score = await degenScoreContract.callStatic.getTrait(
+      userAddr,
+      degenScoreTraitId,
+      0
+    );
+
+    return score.toNumber();
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return 0;

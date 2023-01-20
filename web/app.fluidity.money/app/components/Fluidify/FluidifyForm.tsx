@@ -1,16 +1,18 @@
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
 import { useContext, useState } from "react";
+import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import {
-  Text,
-  GeneralButton,
-  numberToMonetaryString,
-} from "@fluidity-money/surfing";
+import { Text, GeneralButton } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
+import {
+  addDecimalToBn,
+  getTokenAmountFromUsd,
+  getUsdFromTokenAmount,
+} from "~/util/chainUtils/tokens";
 
 interface IFluidifyFormProps {
-  handleSwap: (receipt: TransactionResponse, amount: number) => void;
+  handleSwap: (receipt: TransactionResponse, amount: string) => void;
   assetToken: AugmentedToken;
   toToken: AugmentedToken;
   swapping: boolean;
@@ -26,38 +28,64 @@ export const FluidifyForm = ({
 
   const fluidTokenAddress = assetToken.isFluidOf ?? toToken.isFluidOf ?? "";
 
-  const [swapInput, setSwapInput] = useState<string>("0");
+  const tokenDecimals = assetToken.decimals;
+
+  const [swapInput, setSwapInput] = useState<string>("");
+
+  const parseSwapInputToTokenAmount = (input: string): BN => {
+    const [whole, dec] = input.split(".");
+
+    const wholeBn = getTokenAmountFromUsd(new BN(whole || 0), assetToken);
+
+    if (dec === undefined) {
+      return wholeBn;
+    }
+
+    const decimalsBn = new BN(dec).mul(
+      new BN(10).pow(new BN(assetToken.decimals - dec.length))
+    );
+
+    return wholeBn.add(decimalsBn);
+  };
 
   // Snap the smallest of token balance, remaining mint limit, or swap amt
-  const snapToValidValue = (input: string): number =>
-    assetToken?.userMintLimit
-      ? Math.min(
-          parseFloat(input) || 0,
-          (assetToken?.userMintLimit || 0) - (assetToken?.userMintedAmt || 0),
-          assetToken.userTokenBalance || 0
-        )
-      : Math.min(parseFloat(input) || 0, assetToken.userTokenBalance || 0);
+  const snapToValidValue = (input: string): BN => {
+    const usdBn = parseSwapInputToTokenAmount(input);
 
-  const swapAmount: number = snapToValidValue(swapInput);
+    const maxUserPayable = BN.min(usdBn, assetToken.userTokenBalance);
+
+    if (!assetToken.userMintLimit) {
+      return maxUserPayable;
+    }
+
+    const maxMintable = assetToken.userMintLimit.sub(
+      assetToken.userMintedAmt || new BN(0)
+    );
+
+    return BN.min(maxUserPayable, maxMintable);
+  };
+
+  const swapAmount: BN = snapToValidValue(swapInput);
 
   const assertCanSwap =
     connected &&
     !!address &&
     !!fluidTokenAddress &&
     !!swap &&
-    !!assetToken?.userTokenBalance &&
-    !!swapAmount &&
-    swapAmount <= (assetToken?.userTokenBalance || 0) &&
+    !!assetToken.userTokenBalance &&
+    swapAmount.gt(new BN(0)) &&
+    swapAmount.lte(assetToken.userTokenBalance) &&
     (assetToken.userMintLimit === undefined ||
-      swapAmount + (assetToken.userMintedAmt || 0) <= assetToken.userMintLimit);
+      swapAmount.lte(
+        assetToken.userMintLimit.sub(assetToken.userMintedAmt || new BN(0))
+      ));
 
   const handleChangeSwapInput: React.ChangeEventHandler<HTMLInputElement> = (
     e
   ) => {
     const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [whole, dec, _invalid] = numericChars.split(".");
+    const [whole, dec] = numericChars.split(".");
 
     const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
@@ -65,7 +93,18 @@ export const FluidifyForm = ({
       return setSwapInput(`${unpaddedWhole}`);
     }
 
-    return setSwapInput([whole, dec].join("."));
+    const limitedDecimals = dec.slice(0 - tokenDecimals);
+
+    return setSwapInput([whole, limitedDecimals].join("."));
+  };
+
+  const inputMaxBalance = () => {
+    return setSwapInput(
+      addDecimalToBn(
+        snapToValidValue(assetToken.userTokenBalance.toString()),
+        assetToken.decimals
+      )
+    );
   };
 
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
@@ -79,15 +118,11 @@ export const FluidifyForm = ({
 
     if (!assetToken) return;
 
-    const rawTokenAmount = `${Math.floor(
-      swapAmount * 10 ** assetToken.decimals
-    )}`;
-
     try {
-      const receipt = await swap(rawTokenAmount.toString(), assetToken.address);
+      const receipt = await swap(swapAmount.toString(), assetToken.address);
 
       if (receipt) {
-        handleSwap(receipt, swapAmount);
+        handleSwap(receipt, addDecimalToBn(swapAmount, assetToken.decimals));
       }
     } catch (e) {
       // Expect error on fail
@@ -109,39 +144,67 @@ export const FluidifyForm = ({
           className={`fluidify-form-logo ${
             tokenIsFluid ? "fluid-token-form-logo" : ""
           }`}
-          src={assetToken?.logo || ""}
+          src={assetToken.logo || ""}
         />
         {/* Swap Field */}
         <input
           className={"fluidify-input"}
-          min={"0"}
+          min={""}
           value={swapInput}
-          onBlur={(e) => setSwapInput(`${snapToValidValue(e.target.value)}`)}
+          onBlur={(e) =>
+            setSwapInput(
+              addDecimalToBn(
+                snapToValidValue(e.target.value),
+                assetToken.decimals
+              )
+            )
+          }
           onChange={handleChangeSwapInput}
-          placeholder=""
+          placeholder="0"
           step="any"
         />
-        <Text size="lg">{assetToken?.symbol || ""}</Text>
+
+        <Text size="lg">{assetToken.symbol || ""}</Text>
+
+        <GeneralButton
+          version={"transparent"}
+          size="small"
+          buttontype="text"
+          type={"button"}
+          handleClick={inputMaxBalance}
+          disabled={
+            assetToken.userTokenBalance.eq(new BN(0)) ||
+            swapAmount.eq(assetToken.userTokenBalance)
+          }
+        >
+          max
+        </GeneralButton>
       </section>
 
       <hr className={"fluidify-form-el"} />
 
       {/* Creating / Remaining Tokens */}
       <Text>
-        Creating ${swapAmount} {toToken?.symbol || ""}
+        Creating {addDecimalToBn(swapAmount, toToken.decimals)}{" "}
+        {toToken.symbol || ""}
       </Text>
       {/* Tokens User Holds */}
       <Text prominent>
-        {assetToken.userTokenBalance} {assetToken?.symbol || ""} (
-        {numberToMonetaryString(assetToken.userTokenBalance || 0)}) remaining in
-        wallet.
+        {addDecimalToBn(assetToken.userTokenBalance, assetToken.decimals)}{" "}
+        {assetToken.symbol || ""} ($
+        {getUsdFromTokenAmount(assetToken.userTokenBalance, assetToken)})
+        remaining in wallet.
       </Text>
 
       {/* Daily Limit */}
-      {!!assetToken?.userMintLimit && (
+      {!!assetToken.userMintLimit && (
         <Text>
-          Daily {assetToken.symbol} limit: {assetToken.userMintedAmt || 0}/
-          {assetToken.userMintLimit}
+          Daily {assetToken.symbol} limit:{" "}
+          {addDecimalToBn(
+            assetToken.userMintedAmt || new BN(0),
+            assetToken.decimals
+          )}
+          /{addDecimalToBn(assetToken.userMintLimit, assetToken.decimals)}
         </Text>
       )}
 
@@ -158,14 +221,18 @@ export const FluidifyForm = ({
         {tokenIsFluid
           ? !swapping
             ? "Revert Fluid Asset"
-            : `Reverting ${assetToken?.symbol}`
+            : `Reverting ${assetToken.symbol}`
           : !swapping
           ? "Create Fluid Asset"
-          : `Creating ${toToken?.symbol || ""}...`}
+          : `Creating ${toToken.symbol || ""}...`}
       </GeneralButton>
 
       <Text size="sm" className="swap-footer-text">
-        By pressing the button you agree to our <a>terms of service</a>.
+        By pressing the button you agree to our{" "}
+        <a href="https://static.fluidity.money/assets/fluidity-website-tc.pdf">
+          terms of service
+        </a>
+        .
       </Text>
     </form>
   );

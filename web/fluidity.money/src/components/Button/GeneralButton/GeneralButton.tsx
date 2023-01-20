@@ -30,15 +30,24 @@ const GeneralButton = ({
           {children.toLocaleUpperCase()}
         </button>
       ) : version === "primary" && type === "icon before" ? (
-        <button onClick={handleClick} className={`${styles.GeneralButton} ${styles.primary}`}>
+        <button
+          onClick={handleClick}
+          className={`${styles.GeneralButton} ${styles.primary}`}
+        >
           {children.toLocaleUpperCase()}
         </button>
       ) : version === "primary" && type === "icon after" ? (
-        <button onClick={handleClick} className={`${styles.GeneralButton} ${styles.primary}`}>
+        <button
+          onClick={handleClick}
+          className={`${styles.GeneralButton} ${styles.primary}`}
+        >
           {children.toLocaleUpperCase()}
         </button>
       ) : type === "icon only" ? (
-        <button onClick={handleClick} className={`${styles.GeneralButton} ${styles.iconOnly}`}>
+        <button
+          onClick={handleClick}
+          className={`${styles.GeneralButton} ${styles.iconOnly}`}
+        >
           {children}
         </button>
       ) : (

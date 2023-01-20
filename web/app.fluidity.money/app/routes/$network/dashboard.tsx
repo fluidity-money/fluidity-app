@@ -3,7 +3,6 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import type { UserUnclaimedReward } from "~/queries/useUserUnclaimedRewards";
 
 import { json } from "@remix-run/node";
 import {
@@ -15,14 +14,14 @@ import {
   useMatches,
   useTransition,
   useLocation,
+  useFetcher,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
-import useViewport from "~/hooks/useViewport";
-import { useUserUnclaimedRewards } from "~/queries";
-import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "~/util/split";
+import config from "~/webapp.config.server";
 import {
   DashboardIcon,
   GeneralButton,
@@ -32,6 +31,7 @@ import {
   ChainSelectorButton,
   BlockchainModal,
   numberToMonetaryString,
+  useViewport,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -42,6 +42,7 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
+import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -54,9 +55,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
+  const tokensConfig = config.config;
+
   return json({
     network,
     provider,
+    tokensConfig,
     ethereumWallets,
   });
 };
@@ -81,8 +85,7 @@ function ErrorBoundary() {
   );
 }
 
-export const meta: MetaFunction = ({ data }) => ({
-  ...data,
+export const meta: MetaFunction = () => ({
   title: "Fluidity - Dashboard",
 });
 
@@ -108,6 +111,7 @@ type LoaderData = {
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
+  tokensConfig: typeof config.config;
 };
 
 export default function Dashboard() {
@@ -118,6 +122,8 @@ export default function Dashboard() {
   const { connected, address, rawAddress, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
+
+  const { showExperiment, client } = useContext(SplitContext);
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -162,16 +168,32 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
-  const chainNameMap = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
+    showExperiment("enable-arbitrum")
+      ? {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          arbitrum: {
+            name: "ARB",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        }
+      : {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        };
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
@@ -195,36 +217,19 @@ export default function Dashboard() {
   };
 
   // Rewards User has yet to claim - Ethereum feature
-  const [unclaimedRewards, setUnclaimedRewards] = useState(0);
+
+  const userUnclaimedData = useFetcher<UnclaimedRewardsLoaderData>();
+
+  const unclaimedRewards = userUnclaimedData.data
+    ? userUnclaimedData.data.userUnclaimedRewards
+    : 0;
 
   useEffect(() => {
-    (async () => {
-      if (!address) return;
+    if (!address) return;
 
-      if (network !== "ethereum") return;
-
-      const { data, error } = await useUserUnclaimedRewards(network, address);
-
-      if (error || !data) return;
-
-      const { ethereum_pending_winners: rewards } = data;
-
-      const sanitisedRewards = rewards.filter(
-        (transaction: UserUnclaimedReward) => !transaction.reward_sent
-      );
-
-      const totalUnclaimedRewards = sanitisedRewards.reduce(
-        (sum: number, transaction: UserUnclaimedReward) => {
-          const { win_amount, token_decimals } = transaction;
-
-          const decimals = 10 ** token_decimals;
-          return sum + win_amount / decimals;
-        },
-        0
-      );
-
-      setUnclaimedRewards(totalUnclaimedRewards);
-    })();
+    userUnclaimedData.load(
+      `/${network}/query/dashboard/unclaimedRewards?address=${address}`
+    );
   }, [address]);
 
   const handleScroll = () => {
@@ -258,19 +263,24 @@ export default function Dashboard() {
     document.body.style.position = "static";
   }, [currentPath]);
 
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
+
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
-        <a onClick={() => navigate("./home")}>
+        <Link to={"./home"}>
           <img
             style={{ width: "5.5em", height: "2.5em" }}
             src="/images/outlinedLogo.svg"
             alt="Fluidity"
           />
-        </a>
+        </Link>
 
         <br />
         <br />
@@ -398,7 +408,7 @@ export default function Dashboard() {
           </div>
 
           {/* Navigation Buttons */}
-          <div>
+          <div id="top-navbar-right">
             {/* Send */}
             {/*
             <GeneralButton
@@ -425,16 +435,19 @@ export default function Dashboard() {
             </GeneralButton>
             */}
 
-            {/* Fluidify */}
-            {!isMobile && (
+            {/* Fluidify button */}
+            {showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
-                className="fluidify-button-dashboard"
+                className="fluidify-button-dashboard "
                 version={"primary"}
                 buttontype="text"
                 size={"small"}
-                handleClick={() => navigate("../fluidify")}
+                handleClick={() => {
+                  client?.track("user", "click_fluidify");
+                  navigate(`/${network}/fluidify`);
+                }}
               >
-                <b>Fluidify Money</b>
+                <b>Fluidify{isMobile ? "" : " Money"}</b>
               </GeneralButton>
             )}
 
@@ -447,24 +460,16 @@ export default function Dashboard() {
               buttontype="icon after"
               size={"small"}
               handleClick={() =>
-                unclaimedRewards
-                  ? navigate("./rewards/unclaimed")
-                  : navigate("./rewards")
+                unclaimedRewards < 0.000005
+                  ? navigate(`/${network}/dashboard/rewards`)
+                  : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.01
-                ? `$${unclaimedRewards}`
+              {unclaimedRewards < 0.000005
+                ? `$0`
                 : numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
-
-            {/* Modal on hover */}
-            {(hoverModal || showModal) && !isMobile && (
-              <UnclaimedRewardsHoverModal
-                unclaimedRewards={unclaimedRewards}
-                setShowModal={setShowModal}
-              />
-            )}
 
             {(isTablet || isMobile) && (
               <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
@@ -493,16 +498,31 @@ export default function Dashboard() {
         {/* Provide Luquidity*/}
         {!openMobModal && <ProvideLiquidity />}
 
-        {/* Mobile fluidify button */}
-        {isMobile && (
+        {/* Modal on hover */}
+        {unclaimedRewards >= 0.000005 &&
+          (hoverModal || showModal) &&
+          !isMobile && (
+            <UnclaimedRewardsHoverModal
+              unclaimedRewards={unclaimedRewards}
+              setShowModal={setShowModal}
+            />
+          )}
+
+        {/* Default Fluidify button */}
+        {!showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
-            className="fluidify-button-dashboard-mobile"
+            className="fluidify-button-dashboard-mobile rainbow "
             version={"primary"}
             buttontype="text"
             size={"medium"}
-            handleClick={() => navigate("../fluidify")}
+            handleClick={() => {
+              client?.track("user", "click_fluidify");
+              navigate(`/${network}/fluidify`);
+            }}
           >
-            <b>FLUIDIFY MONEY</b>
+            <Heading as="h5">
+              <b>Fluidify Money</b>
+            </Heading>
           </GeneralButton>
         )}
 
@@ -527,22 +547,47 @@ export default function Dashboard() {
           {/* Links */}
           <section>
             {/* Version */}
-            <Text>Fluidity Money</Text>
-
-            {/* Terms */}
             <a href={"/"}>
+              <Text>Fluidity Money</Text>
+            </a>
+            {/* Terms */}
+            <a
+              href={
+                "https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+              }
+            >
               <Text>Terms</Text>
             </a>
 
             {/* Privacy Policy */}
-            <a href={"/"}>
+            <a
+              href={
+                "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+              }
+            >
               <Text>Privacy policy</Text>
+            </a>
+
+            {/* Audits Completed */}
+            <a
+              href={
+                "https://docs.fluidity.money/docs/security/audits-completed"
+              }
+            >
+              <Text>Audits Completed</Text>
             </a>
 
             {/* Roadmap */}
             <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
             </a>
+
+            {/* Source code */}
+            {showExperiment("enable-source-code") && (
+              <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                <Text>Source code</Text>
+              </a>
+            )}
           </section>
 
           {/* Socials */}

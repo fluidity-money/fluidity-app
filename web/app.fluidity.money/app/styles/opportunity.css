@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .index-page {
   width: 100%;
   mix-blend-mode: lighten;
@@ -35,19 +39,22 @@
 }
 
 .opportunity-bottom {
+  position: relative;
   padding-top: 1em;
+  margin-bottom: 2em;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 1em;
+  z-index: 1;
+  overflow-y: auto;
 }
 
 .opportunity-graph {
   box-sizing: border-box;
   width: 100%;
   text-align: center;
-  padding: 2em;
 }
 
 .connected {
@@ -147,7 +154,7 @@
 .connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background-color: transparent;
   position: absolute;
   top: 0;
   left: 0;
@@ -406,4 +413,32 @@
   text-decoration: underline;
   color: white;
   cursor: pointer;
+}
+
+.graph-tooltip {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 160px;
+  gap: 0.4em;
+}
+
+.graph-tooltip-container {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.05);
+  width: min-content;
+  white-space: nowrap;
+  padding: 10px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: Aeonik, sans-serif;
+  color: white;
+  font-size: 14px;
+  text-align: center;
+}
+
+.loader-dots {
+  padding: 32px;
 }

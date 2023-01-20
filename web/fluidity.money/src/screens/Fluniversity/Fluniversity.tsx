@@ -8,9 +8,9 @@ import {
   LinkButton,
   ManualCarousel,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./Fluniversity.module.scss";
-import useViewport from "hooks/useViewport";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -37,7 +37,7 @@ const Fluniversity = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         FLUNIVERSITY FLUNIVERSITY
       </Heading>
       <Heading as="h4" className={styles.text}>

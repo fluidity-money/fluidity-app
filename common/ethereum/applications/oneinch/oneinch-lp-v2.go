@@ -16,6 +16,11 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+const (
+	oneInchLPV2SwapLogTopic = "0xbd99c6719f088aa0abd9e7b7a4a635d1f931601e9f304b538dc42be25d8c65c6"
+	oneInchLPV1SwapLogTopic = "0x2a368c7f33bb86e2d999940a3989d849031aff29b750f67947e6b8e8c3d2ffd6"
+)
+
 const oneInchLiquidityPoolV2AbiString = `[
 {
 	"inputs": [],
@@ -113,6 +118,20 @@ var oneInchLiquidityPoolV2Abi ethAbi.ABI
 // GetOneInchLPFees implements 1InchLPv1.0/1.1 fee structure.
 // Fees are split into static fees and slippage fees, controlled by 1Inch governance
 func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	// ignore v1 swaps
+	if logTopic == oneInchLPV1SwapLogTopic {
+		return nil, nil
+	}
+
+	if logTopic != oneInchLPV2SwapLogTopic && logTopic != oneInchLPV1SwapLogTopic {
+		return nil, nil
+	}
 
 	if len(transfer.Log.Topics) != 4 {
 		return nil, fmt.Errorf(
@@ -121,6 +140,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			transfer.TransactionHash,
 		)
 	}
+
 
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed

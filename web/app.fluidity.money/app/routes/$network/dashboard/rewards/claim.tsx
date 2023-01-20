@@ -11,9 +11,11 @@ import {
   GeneralButton,
   LinkButton,
   Heading,
+  Twitter,
 } from "@fluidity-money/surfing";
 
 import claimStyles from "~/styles/dashboard/rewards/claim.css";
+import { generateTweet } from "~/util/tweeter";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: claimStyles }];
@@ -54,21 +56,7 @@ const ClaimedRewards = () => {
 
   const navigate = useNavigate();
 
-  if (!connected) return navigate("../../home");
-
-  const generateTweet = () => {
-    const twitterUrl = new URL("https://twitter.com/intent/tweet?text=");
-
-    const tweetMsg = `I just redeemed ${numberToMonetaryString(reward)}`;
-
-    twitterUrl.searchParams.set("text", tweetMsg);
-
-    const fluTwitterHandle = `fluiditymoney`;
-
-    twitterUrl.searchParams.set("via", fluTwitterHandle);
-
-    return twitterUrl.href;
-  };
+  if (!connected) return navigate(`/${network}/dashboard/home`);
 
   return (
     <div id="claim-container" className="cover">
@@ -86,7 +74,7 @@ const ClaimedRewards = () => {
         <LinkButton
           size={"small"}
           type={"internal"}
-          handleClick={() => navigate("..")}
+          handleClick={() => navigate(`/${network}/dashboard/rewards`)}
         >
           Close
         </LinkButton>
@@ -129,14 +117,14 @@ const ClaimedRewards = () => {
       </GeneralButton>
       */}
 
-        {/* Share on Twitter */}
+        {/* Fluidify Button */}
         <GeneralButton
           className="spread"
           version={"primary"}
           buttontype={"text"}
           size={"large"}
           handleClick={() => {
-            navigate("../../../fluidify");
+            navigate(`/${network}/dashboard/fluidify`);
           }}
         >
           Fluidify Your Money
@@ -145,20 +133,22 @@ const ClaimedRewards = () => {
         {/* Share on Twitter */}
         <GeneralButton
           className="spread"
-          version={"secondary"}
-          buttontype={"icon before"}
-          icon={<img src="/images/socials/twitter.svg" />}
-          size={"large"}
+          size="large"
+          version="transparent"
+          buttontype="icon before"
+          icon={<Twitter />}
           handleClick={() => {
-            navigate(generateTweet());
+            window.open(generateTweet(reward, "claim"));
           }}
         >
-          Share
+          SHARE
         </GeneralButton>
+
+        {/* Rewards History */}
         <LinkButton
           size={"small"}
           type={"internal"}
-          handleClick={() => navigate("..")}
+          handleClick={() => navigate(`/${network}/dashboard/rewards`)}
         >
           Rewards History
         </LinkButton>

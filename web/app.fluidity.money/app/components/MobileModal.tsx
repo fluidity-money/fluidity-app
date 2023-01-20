@@ -11,6 +11,7 @@ import {
   Heading,
   BlockchainModal,
   Trophy,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
@@ -67,6 +68,11 @@ export default function MobileModal({
       : setTimeout(() => (document.body.style.position = "fixed"), 1000);
   }, [walletModalVisibility]);
 
+  useEffect(() => {
+    // stop modal pop-up if connected
+    connected && setWalletModalVisibility(false);
+  }, [connected]);
+
   if (walletModalVisibility) {
     return (
       <ConnectWalletModal
@@ -122,7 +128,7 @@ export default function MobileModal({
                   setTimeout(() => {
                     setIsOpen(false);
                   }, 800);
-                  navigate("./home");
+                  navigate(`/${network}/dashboard/home`);
                 }}
               >
                 <img
@@ -146,12 +152,12 @@ export default function MobileModal({
                     setIsOpen(false);
                   }, 800);
                   unclaimedRewards
-                    ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards");
+                    ? navigate(`/${network}/dashboard/rewards/unclaimed`)
+                    : navigate(`/${network}/dashboard/rewards`);
                 }}
                 icon={<Trophy />}
               >
-                ${unclaimedRewards}
+                {numberToMonetaryString(unclaimedRewards)}
               </GeneralButton>
 
               <BurgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -252,8 +258,8 @@ export default function MobileModal({
                     setIsOpen(false);
                   }, 800);
                   unclaimedRewards
-                    ? navigate("./rewards/unclaimed")
-                    : navigate("./rewards");
+                    ? navigate(`/${network}/dashboard/rewards/unclaimed`)
+                    : navigate(`/${network}/dashboard/rewards`);
                 }}
                 icon={<img src="/images/icons/arrowRightWhite.svg" />}
                 className="unclaimed-button"
@@ -261,7 +267,7 @@ export default function MobileModal({
                 <Text size="lg" prominent={true}>
                   Unclaimed $FLUID{" "}
                   <Heading as="h5" className="no-margin">
-                    {unclaimedFluid}
+                    {numberToMonetaryString(unclaimedFluid)}
                   </Heading>
                 </Text>
               </GeneralButton>
@@ -275,7 +281,7 @@ export default function MobileModal({
                   setTimeout(() => {
                     setIsOpen(false);
                   }, 800);
-                  navigate("../fluidify");
+                  navigate(`/${network}/fluidify`);
                 }}
                 className="fluidify-money-button"
               >

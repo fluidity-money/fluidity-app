@@ -1,7 +1,7 @@
 
 import { promisify } from 'util';
 import { readFile as readFileCb } from 'fs';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 export const readFile = promisify(readFileCb);
 
@@ -23,7 +23,6 @@ export type Token = {
       aaveAddress: string,
     }
 );
-
 
 export const mustEnv = (env: string): string => {
   const e = process.env[env];
@@ -56,7 +55,28 @@ export const deployWorkerConfig = async (
   await workerConfig.init(operator, emergencyCouncil);
 
   return workerConfig.address;
-}
+};
+
+export const deployGovToken = async (
+  hre: HardhatRuntimeEnvironment,
+  govOperatorSigner: ethers.Signer
+): Promise<string> => {
+  const factory = await (await hre.ethers.getContractFactory("GovToken"))
+    .connect(govOperatorSigner);
+
+  const govToken = await factory.deploy();
+
+  await govToken.deployed();
+
+  await govToken.init(
+    "Fluidity Money",
+    "FLUID",
+    18,
+    BigNumber.from("1000000000000000000000000000")
+  );
+
+  return govToken;
+};
 
 export type TokenAddresses = {
   [symbol: string]: {
@@ -141,6 +161,7 @@ export const deployTokens = async (
 
     await deployedToken.deployed();
 
+    console.log(`init ${operatorAddress}`)
     await deployedToken.functions.init(
       deployedPool.address,
       token.decimals,
@@ -162,6 +183,18 @@ export const deployTokens = async (
     compoundBeacon,
     tokens: tokenAddresses,
   };
+};
+
+export const deployRewardPools = async (
+  hre: HardhatRuntimeEnvironment,
+  operatorAddress: string,
+  tokens: Token[]
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("RewardPools");
+  const beacon = await hre.upgrades.deployProxy(factory);
+  await beacon.deployed();
+  await beacon.init(operatorAddress, tokens);
+  return beacon;
 };
 
 export const forknetTakeFunds = async (

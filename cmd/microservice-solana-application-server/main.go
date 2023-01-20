@@ -56,7 +56,7 @@ func main() {
 		aldrinProgramIdV1   = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
 		aldrinProgramIdV2   = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
 		lifinityProgramId   = util.GetEnvOrFatal(EnvLifinityProgramId)
-		mercurialProgramId   = util.GetEnvOrFatal(EnvMercurialProgramId)
+		mercurialProgramId  = util.GetEnvOrFatal(EnvMercurialProgramId)
 
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)

@@ -12,8 +12,8 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	test_utils "github.com/fluidity-money/fluidity-app/tests/integrations/ethereum/util"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -100,6 +100,9 @@ func init() {
 
 	sushiswapTests := unmarshalJsonTestOrFatal(integrationTestSushiswap)
 	tests = append(tests, sushiswapTests...)
+
+	apeswapTests := unmarshalJsonTestOrFatal(integrationTestApeSwap)
+	tests = append(tests, apeswapTests...)
 }
 
 func TestIntegrations(t *testing.T) {

@@ -1,6 +1,6 @@
 import { Link, useTransition } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { GeneralButton, Text } from "@fluidity-money/surfing";
+import { GeneralButton, LoadingDots, Text } from "@fluidity-money/surfing";
 
 type Filter<T> = {
   filter: (item: T) => boolean; // eslint-disable-line no-unused-vars
@@ -41,10 +41,15 @@ type ITable<T> = {
   onFilter?: React.Dispatch<React.SetStateAction<number>>;
 
   activeFilterIndex?: number;
+
+  loaded?: boolean | undefined;
+
+  showLoadingAnimation?: boolean;
 };
 
 const Table = <T,>(props: ITable<T>) => {
   const {
+    count,
     itemName,
     pagination,
     data,
@@ -53,19 +58,20 @@ const Table = <T,>(props: ITable<T>) => {
     filters,
     onFilter,
     activeFilterIndex,
+    loaded,
+    showLoadingAnimation = false,
   } = props;
 
   const { rowsPerPage, page } = pagination;
 
   const isTransition = useTransition();
 
-  const pageCount = Math.ceil(data.length / rowsPerPage);
+  const cappedPageCount = Math.min(240, count);
+
+  const pageCount = Math.ceil(cappedPageCount / rowsPerPage);
 
   const startIndex = (page - 1) * rowsPerPage + 1;
-  const endIndex = Math.min(page * rowsPerPage, data.length);
-
-  const rowStartIndex = (page - 1) * rowsPerPage;
-  const rowEndIndex = rowStartIndex + 12;
+  const endIndex = Math.min(page * rowsPerPage, cappedPageCount);
 
   return (
     <div>
@@ -74,18 +80,6 @@ const Table = <T,>(props: ITable<T>) => {
         {filters && (
           <div className={"transaction-filters"}>
             {filters.map((filter, i) => (
-              // <button
-              //   key={`filter-${filter.name}`}
-              //   onClick={() => onFilter?.(i)}
-              // >
-              //   <Text
-              //     size="lg"
-              //     prominent={activeFilterIndex === i}
-              //     className={activeFilterIndex === i ? "active-filter" : ""}
-              //   >
-              //     {filter.name}
-              //   </Text>
-              // </button>
               <GeneralButton
                 key={`filter-${filter.name}`}
                 version={"secondary"}
@@ -106,116 +100,139 @@ const Table = <T,>(props: ITable<T>) => {
 
         {/* Item Count */}
         <Text>
-          {data.length > 0 ? `${startIndex} - ${endIndex}` : 0} of {data.length}{" "}
-          {itemName}
+          {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+          {cappedPageCount} {itemName}
         </Text>
       </div>
 
       {/* Table */}
-      <table className="transaction-table">
-        {/* Table Headings */}
-        <thead>
-          <tr>
-            {headings.map((heading) => {
-              const alignProps = heading.alignRight
-                ? "alignRight"
-                : "alignLeft";
-              const classProps = `heading ${alignProps}`;
+      {data.length === 0 ? (
+        loaded !== true ? (
+          <>
+            Fetching table data...
+            <div className="center-table-loading-anim loader-dots">
+              {showLoadingAnimation && <LoadingDots />}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="center-table-loading-anim loader-dots">
+              <Text size="lg">No reward record found!</Text>
+            </div>
+          </>
+        )
+      ) : (
+        <table className="transaction-table">
+          {/* Table Headings */}
+          <thead>
+            <tr>
+              {headings.map((heading) => {
+                const alignProps = heading.alignRight
+                  ? "alignRight"
+                  : "alignLeft";
+                const classProps = `heading ${alignProps}`;
 
-              return (
-                <th className={classProps} key={heading.name}>
-                  <Text>{heading.name}</Text>
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
+                return (
+                  <th className={classProps} key={heading.name}>
+                    <Text>{heading.name}</Text>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
 
-        {/* Table Body */}
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.tbody
-            key={`page-${page}`}
-            initial="enter"
-            animate={isTransition.state === "idle" ? "enter" : "transitioning"}
-            exit="exit"
-            variants={{
-              enter: {
-                opacity: 1,
-                transition: {
-                  when: "beforeChildren",
-                  staggerChildren: 0.05,
+          {/* Table Body */}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.tbody
+              key={`page-${page}`}
+              initial="enter"
+              animate={
+                isTransition.state === "idle" ? "enter" : "transitioning"
+              }
+              exit="exit"
+              variants={{
+                enter: {
+                  opacity: 1,
+                  transition: {
+                    when: "beforeChildren",
+                    staggerChildren: 0.05,
+                  },
                 },
-              },
-              exit: {
-                opacity: 0,
-                transition: {
-                  when: "afterChildren",
-                  staggerChildren: 0.05,
+                exit: {
+                  opacity: 0,
+                  transition: {
+                    when: "afterChildren",
+                    staggerChildren: 0.05,
+                  },
                 },
-              },
-              transitioning: {},
-            }}
-          >
-            {data
-              .slice(rowStartIndex, rowEndIndex)
-              .map((row, i) => renderRow({ data: row, index: i }))}
-          </motion.tbody>
-        </AnimatePresence>
-      </table>
-
+                transitioning: {},
+              }}
+            >
+              {data.map((row, i) => renderRow({ data: row, index: i }))}
+            </motion.tbody>
+          </AnimatePresence>
+        </table>
+      )}
       {/* Pagination */}
-      <motion.div className="pagination" layout="position">
-        <div className="pagination-numbers">
-          {/* Pagination Numbers */}
-          <Link
-            className={page === 1 ? "current-pagination" : "pagination-number"}
-            key={`page-${1}`}
-            to={`?${pagination.pageQuery || "page"}=${1}`}
-          >
-            {1}
-          </Link>
-
-          {/* ... */}
-          {pageCount > 5 && page > 3 && <span>...</span>}
-
-          {Array(5)
-            .fill(1)
-            // Start pagination from page - 1
-            .map((_, i) => i + page - 2)
-            // Keep values between 2 and pageCount - 1
-            .filter((pageNo) => pageNo > 1 && pageNo < pageCount)
-            .map((pageNo) => {
-              return (
-                <Link
-                  className={
-                    page === pageNo ? "current-pagination" : "pagination-number"
-                  }
-                  key={`page-${pageNo}`}
-                  to={`?${pagination.pageQuery || "page"}=${pageNo}`}
-                >
-                  {pageNo}
-                </Link>
-              );
-            })}
-
-          {/* ... */}
-          {pageCount > 5 && page < pageCount - 2 && <span>...</span>}
-
-          {pageCount > 1 && (
+      {pageCount > 0 && (
+        <motion.div className="pagination" layout="position">
+          <div className="pagination-numbers">
+            {/* Pagination Numbers */}
             <Link
               className={
-                page === pageCount ? "current-pagination" : "pagination-number"
+                page === 1 ? "current-pagination" : "pagination-number"
               }
-              key={`page-${pageCount}`}
-              to={`?${pagination.pageQuery || "page"}=${pageCount}`}
+              key={`page-${1}`}
+              to={`?${pagination.pageQuery || "page"}=${1}`}
             >
-              {pageCount}
+              {1}
             </Link>
-          )}
-        </div>
 
-        {/* Pagination Arrows */}
-        {pageCount > 0 && (
+            {/* ... */}
+            {pageCount > 4 && page > 4 && <span>...</span>}
+
+            {Array(5)
+              .fill(1)
+              // Start pagination from page - 1
+              .map((_, i) => i + page - 2)
+              // Keep values between 2 and pageCount - 1
+              .filter((pageNo) => pageNo > 1 && pageNo < pageCount)
+              .map((pageNo) => {
+                return (
+                  <Link
+                    className={
+                      page === pageNo
+                        ? "current-pagination"
+                        : "pagination-number"
+                    }
+                    key={`page-${pageNo}`}
+                    to={`?${pagination.pageQuery || "page"}=${pageNo}`}
+                  >
+                    {pageNo}
+                  </Link>
+                );
+              })}
+
+            {/* ... */}
+            {pageCount > 4 && page < pageCount - 3 && <span>...</span>}
+
+            {pageCount > 1 && (
+              <Link
+                className={
+                  page === pageCount
+                    ? "current-pagination"
+                    : "pagination-number"
+                }
+                key={`page-${pageCount}`}
+                to={`?${pagination.pageQuery || "page"}=${pageCount}`}
+              >
+                {pageCount}
+              </Link>
+            )}
+          </div>
+
+          {/* Pagination Arrows */}
+
           <div className="pagination-arrows">
             <Link
               to={
@@ -259,8 +276,8 @@ const Table = <T,>(props: ITable<T>) => {
               />
             </Link>
           </div>
-        )}
-      </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 };

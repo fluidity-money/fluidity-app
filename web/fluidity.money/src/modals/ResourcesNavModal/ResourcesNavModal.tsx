@@ -24,11 +24,11 @@ const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
     <div className={styles.container}>
       {navLinks.map((link) => (
         <h4>
-          <Link
-            href={`/resources#${link.children}`}
-            passHref
-          >
-            <a onClick={() => handleModal()} href={`/resources#${link.children}`}>
+          <Link href={`/resources#${link.children}`} passHref>
+            <a
+              onClick={() => handleModal()}
+              href={`/resources#${link.children}`}
+            >
               <LinkButton
                 size={link.size}
                 type={link.type}

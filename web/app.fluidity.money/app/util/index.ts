@@ -1,7 +1,7 @@
 export type { Queryable } from "./api/graphql";
 
 export { gql } from "./api/graphql";
-export { jsonPost } from "./api/rpc";
+export { jsonPost, jsonGet } from "./api/rpc";
 export { getTokenForNetwork, getTokenFromAddress } from "./chainUtils/tokens";
 export {
   getAddressExplorerLink,

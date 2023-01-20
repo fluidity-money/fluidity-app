@@ -4,12 +4,14 @@
 
 // export { default as Web3Provider, useWallet } from "./hooks/useWeb3State";
 // export { fluRelayEnvironment, useWinningTransactions } from './api';
+export { useViewport } from "./hooks";
 export type { SupportedChainsList } from "./chainProviders";
 
 export { SupportedChains } from "./chainProviders";
 export {
   toSignificantDecimals,
   numberToMonetaryString,
+  stringifiedNumberToMonetaryString,
   numberToCommaSeparated,
   formatTo12HrDate,
   formatToGraphQLDate,
@@ -18,4 +20,6 @@ export {
   trimAddressShort,
   appendLeading0x,
   trimLeading0x,
+  decimalTrim,
+  shorthandAmountFormatter,
 } from "./formatters";

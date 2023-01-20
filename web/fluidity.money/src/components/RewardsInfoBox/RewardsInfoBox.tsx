@@ -1,31 +1,37 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
-
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useChainContext } from "hooks/ChainContext";
-import useViewport from "hooks/useViewport";
 import {
   BlockchainModal,
   ChainSelectorButton,
-  numberToMonetaryString,
   SupportedChains,
   Heading,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
+import dynamic from "next/dynamic";
+import { motion } from "framer-motion";
 
 interface IRewardBoxProps {
-  rewardPool: number;
   totalTransactions: number;
   changeScreen: () => void;
   type: "black" | "transparent";
+  rewardPool?: number;
+  loading: boolean;
 }
 
+const AnimatedNumbers = dynamic(() => import("react-animated-numbers"), {
+  ssr: false,
+});
+
 const RewardsInfoBox = ({
-  rewardPool,
   totalTransactions,
   changeScreen,
   type,
+  rewardPool,
+  loading,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
 
@@ -45,6 +51,12 @@ const RewardsInfoBox = ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
   }));
+
+  const [prizePool, setPrizePool] = useState<number>(0);
+
+  useEffect(() => {
+    setPrizePool(rewardPool);
+  }, [loading]);
 
   return (
     <div
@@ -66,15 +78,41 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={changeScreen}>
+        <div onClick={!loading ? changeScreen : () => {}}>
           <Heading as="h1">
-            {showRewardPool
-              ? numberToMonetaryString(rewardPool)
-              : totalTransactions}
+            {showRewardPool ? (
+              <Suspense>
+                {!loading ? (
+                  <>
+                    $
+                    <AnimatedNumbers animateToNumber={prizePool} includeComma />
+                  </>
+                ) : (
+                  <img
+                    height="70"
+                    width="70"
+                    src="assets/images/LoopAnim.webp"
+                    alt="loading"
+                  />
+                )}
+              </Suspense>
+            ) : (
+              totalTransactions
+            )}
           </Heading>
         </div>
         <Heading as="h4" className={styles.alignCenter}>
-          {showRewardPool ? "Reward pool" : "Total transactions (on testing)"}
+          {!loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+            >
+              {showRewardPool
+                ? !loading && "Reward pool"
+                : "Total transactions"}
+            </motion.div>
+          )}
         </Heading>
         {showModal && (
           <BlockchainModal
@@ -86,7 +124,7 @@ const RewardsInfoBox = ({
             className={styles.overlap}
             options={options}
             setOption={setChain}
-            mobile={width <= mobileBreakpoint}
+            mobile={width <= mobileBreakpoint && width > 0}
           />
         )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>

@@ -1,19 +1,21 @@
-import { getTokenForNetwork, gql, Queryable, jsonPost } from "~/util";
+import { gql, Queryable, jsonPost } from "~/util";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
-    query getTransactions(
-      $fluidCurrencies: [String!]
+    query getTransactionsByAddress(
+      $tokens: [String!]
       $address: String!
       $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
     ) {
       ethereum {
         transfers(
-          currency: { in: $fluidCurrencies }
+          currency: { in: $tokens }
           any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
           options: {
             desc: "block.timestamp.unixtime"
-            limit: 12
+            limit: $limit
             offset: $offset
           }
         ) {
@@ -27,16 +29,13 @@ const queryByAddress: Queryable = {
           currency {
             symbol
           }
-          transaction {
+          transaction(txHash: { notIn: $filterHashes }) {
             hash
           }
           block {
             timestamp {
               unixtime
             }
-          }
-          transaction {
-            hash
           }
         }
       }
@@ -44,21 +43,23 @@ const queryByAddress: Queryable = {
   `,
 
   solana: gql`
-    query getTransactions(
-      $fluidCurrencies: [String!]
+    query getTransactionsByAddress(
+      $tokens: [String!]
       $address: String!
       $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
     ) {
       solana {
         transfers(
-          currency: { in: $fluidCurrencies }
+          currency: { in: $tokens }
           any: [
             { senderAddress: { is: $address } }
             { receiverAddress: { is: $address } }
           ]
           options: {
             desc: "block.timestamp.unixtime"
-            limit: 12
+            limit: $limit
             offset: $offset
           }
         ) {
@@ -77,7 +78,79 @@ const queryByAddress: Queryable = {
               unixtime
             }
           }
-          transaction {
+          transaction(txHash: { notIn: $filterHashes }) {
+            hash: signature
+          }
+        }
+      }
+    }
+  `,
+};
+
+const queryByTxHash: Queryable = {
+  ethereum: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $tokens: [String!] = []
+      $limit: Int = 12
+    ) {
+      ethereum {
+        transfers(
+          options: { desc: "block.timestamp.unixtime", limit: $limit }
+          txHash: { in: $transactions }
+          currency: { in: $tokens }
+        ) {
+          sender {
+            address
+          }
+          receiver {
+            address
+          }
+          amount
+          currency {
+            symbol
+          }
+          transaction(txHash: { notIn: $filterHashes }) {
+            hash
+          }
+          block {
+            timestamp {
+              unixtime
+            }
+          }
+        }
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      solana {
+        transfers(
+          options: { desc: "block.timestamp.unixtime", limit: $limit }
+          signature: { in: $transactions }
+        ) {
+          sender {
+            address
+          }
+          receiver {
+            address
+          }
+          amount
+          currency {
+            symbol
+          }
+          block {
+            timestamp {
+              unixtime
+            }
+          }
+          transaction(txHash: { notIn: $filterHashes }) {
             hash: signature
           }
         }
@@ -88,11 +161,20 @@ const queryByAddress: Queryable = {
 
 const queryAll: Queryable = {
   ethereum: gql`
-    query getTransactions($fluidCurrencies: [String!]) {
+    query getTransactions(
+      $tokens: [String!]
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
       ethereum {
         transfers(
-          currency: { in: $fluidCurrencies }
-          options: { desc: "block.timestamp.unixtime", limit: 240 }
+          currency: { in: $tokens }
+          options: {
+            desc: "block.timestamp.unixtime"
+            limit: $limit
+            offset: $offset
+          }
         ) {
           sender {
             address
@@ -104,13 +186,13 @@ const queryAll: Queryable = {
           currency {
             symbol
           }
+          transaction(txHash: { notIn: $filterHashes }) {
+            hash
+          }
           block {
             timestamp {
               unixtime
             }
-          }
-          transaction {
-            hash
           }
         }
       }
@@ -118,11 +200,20 @@ const queryAll: Queryable = {
   `,
 
   solana: gql`
-    query getTransactions($fluidCurrencies: [String!]) {
+    query getTransactions(
+      $tokens: [String!]
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
       solana {
         transfers(
-          currency: { in: $fluidCurrencies }
-          options: { desc: "block.timestamp.unixtime", limit: 240 }
+          currency: { in: $tokens }
+          options: {
+            desc: "block.timestamp.unixtime"
+            limit: $limit
+            offset: $offset
+          }
         ) {
           sender {
             address
@@ -139,7 +230,7 @@ const queryAll: Queryable = {
               unixtime
             }
           }
-          transaction {
+          transaction(txHash: { notIn: $filterHashes }) {
             hash: signature
           }
         }
@@ -153,7 +244,16 @@ type UserTransactionsByAddressBody = {
   variables: {
     address: string;
     offset: number;
-    fluidCurrencies: string[];
+    tokens: string[];
+    filterHashes?: string[];
+  };
+};
+
+type UserTransactionsByTxHashBody = {
+  query: string;
+  variables: {
+    transactions: string[];
+    filterHashes?: string[];
   };
 };
 
@@ -161,7 +261,8 @@ type UserTransactionsAllBody = {
   query: string;
   variables: {
     offset: number;
-    fluidCurrencies: string[];
+    tokens: string[];
+    filterHashes?: string[];
   };
 };
 
@@ -187,13 +288,18 @@ export type UserTransaction = {
 
 const useUserTransactionsByAddress = async (
   network: string,
+  tokens: string[],
+  page: number,
   address: string,
-  page = 1
+  filterHashes: string[],
+  limit = 12
 ) => {
   const variables = {
     address: address,
     offset: (page - 1) * 12,
-    fluidCurrencies: getTokenForNetwork(network),
+    tokens,
+    filterHashes,
+    limit,
   };
 
   const body = {
@@ -205,15 +311,51 @@ const useUserTransactionsByAddress = async (
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
 
-const useUserTransactionsAll = async (network: string, page = 1) => {
+const useUserTransactionsByTxHash = async (
+  network: string,
+  transactions: string[],
+  filterHashes: string[],
+  tokens: string[],
+  limit = 12
+) => {
   const variables = {
+    transactions,
+    filterHashes,
+    tokens,
+    limit,
+  };
+
+  const body = {
+    query: queryByTxHash[network],
+    variables,
+  };
+
+  return jsonPost<UserTransactionsByTxHashBody, UserTransactionsRes>(
+    "https://graphql.bitquery.io",
+    body,
+    {
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
+    }
+  );
+};
+
+const useUserTransactionsAll = async (
+  network: string,
+  tokens: string[],
+  page: number,
+  filterHashes: string[],
+  limit = 12
+) => {
+  const variables = {
+    tokens,
     offset: (page - 1) * 12,
-    fluidCurrencies: getTokenForNetwork(network),
+    filterHashes,
+    limit,
   };
 
   const body = {
@@ -225,9 +367,13 @@ const useUserTransactionsAll = async (network: string, page = 1) => {
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
 
-export { useUserTransactionsAll, useUserTransactionsByAddress };
+export {
+  useUserTransactionsAll,
+  useUserTransactionsByAddress,
+  useUserTransactionsByTxHash,
+};

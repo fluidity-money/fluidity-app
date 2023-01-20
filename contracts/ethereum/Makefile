@@ -33,7 +33,7 @@ run: docker ${FILES}
 		-e FLU_ETHEREUM_ORACLE_ADDRESS=0x50Ab74ed0dac2f82924D6E748Ce22eBeE339184c \
 		-i ${TAG}
 test:
-	${HARDHAT} test
+	@HARDHAT="${HARDHAT}" ./tests.sh
 
 clean:
 	@rm -rf docker artifacts
@@ -49,7 +49,6 @@ analysis/docker-slither: ${FILES}
 run-slither: analysis/docker-slither ${FILES}
 	@# slither returns the number of results as its exit status; ignore that
 	@${DOCKER} run ${TAG}/slither; true
-
 
 analysis/docker-semgrep: ${FILES}
 	@${DOCKER} build \

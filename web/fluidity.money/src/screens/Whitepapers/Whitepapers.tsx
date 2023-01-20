@@ -2,16 +2,13 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import { ContinuousCarousel, Heading, Text } from "@fluidity-money/surfing";
 import styles from "./Whitepapers.module.scss";
 
 const Whitepapers = () => {
-
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         WHITEPAPERS WHITEPAPERS
       </Heading>
       <Heading as="h4" className={styles.text}>

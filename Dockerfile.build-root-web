@@ -4,4 +4,13 @@ FROM alpine:3.16 AS build
 RUN apk add --no-cache \
 	nodejs \
 	npm \
-	make
+	yarn \
+	make \
+	libc6-compat \
+	python3 \
+	build-base
+
+# Libc6-compat is needed for Turbo to work
+# Python/Build-base to remain platform agnostic (node-gyp pre-requisite)
+
+RUN npm install -g turbo

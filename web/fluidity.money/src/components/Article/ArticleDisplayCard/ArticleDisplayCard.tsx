@@ -6,8 +6,8 @@ import {
   Heading,
   LinkButton,
   Text,
+  useViewport,
 } from "@fluidity-money/surfing";
-import useViewport from "hooks/useViewport";
 import Link from "next/link";
 import styles from "./ArticleDisplayCard.module.scss";
 
@@ -27,13 +27,9 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
 
   return (
     <div className={styles.cardContainer}>
-      <Link
-        href={article.link}
-        passHref
-      >
+      <Link href={article.link} passHref>
         <a href={article.link}>
-
-          <img src={article.img} alt="Article-Image"/>
+          <img src={article.img} alt={`${article.title}`} />
 
           <Heading as="h4" className={styles.leftMargin10px}>
             {article.title}
@@ -62,10 +58,7 @@ const ArticleDisplayCard = (article: ArticleDisplayCardType) => {
             </LinkButton>
           </a>
         ) : (
-          <Link
-            href="/resources"
-            passHref
-          >
+          <Link href="/resources" passHref>
             <a href="/resources" rel="noopener noreferrer" target="_blank">
               <LinkButton
                 type={"internal"}

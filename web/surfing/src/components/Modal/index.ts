@@ -1,1 +1,1 @@
-export { BlockchainModal } from './BlockchainModal';
+export { BlockchainModal } from "./BlockchainModal";

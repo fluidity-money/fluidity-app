@@ -1,5 +1,7 @@
 import type { OnDataOptions } from "@apollo/client";
 
+import ws from "ws";
+
 import { ApolloClient, InMemoryCache, HttpLink, split } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
@@ -9,43 +11,39 @@ const httpLink = new HttpLink({
   uri: "https://fluidity.hasura.app/v1/graphql",
 });
 
-// Only run on Client
-const wsLink = typeof window !== "undefined"
-  ? new GraphQLWsLink(createClient({
-    url: 'wss://fluidity.hasura.app/v1/graphql',
-  }))
-  : null;
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: "wss://fluidity.hasura.app/v1/graphql",
+    webSocketImpl:
+      typeof window !== "undefined" ? WebSocket : (await import("ws")).default,
+  })
+);
 
-const splitLink = typeof window !== "undefined" && wsLink != null
-  ? split(
-    ({ query }) => {
-      const definition = getMainDefinition(query);
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      );
-    },
-    wsLink,
-    httpLink,
-  )
-  : httpLink;
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink
+);
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: splitLink,
   cache: new InMemoryCache(),
+  ssrMode: false,
 });
 
 const onData = <T>(
   next: (data: T) => void,
   onError: (e: Error) => void = () => {}
 ) => {
-  return ( { data }: OnDataOptions) => {
-    data.error || data.data === null
-      ? onError(data.error)
-      : next(data.data)
-  }
-}
-
-export default client;
+  return ({ data }: OnDataOptions) => {
+    data.error || data.data === null ? onError(data.error) : next(data.data);
+  };
+};
 
 export { onData };

@@ -1,9 +1,11 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import config from "../../webapp.config.js";
 import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useContext } from "react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "~/util/split";
+import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
@@ -33,7 +35,7 @@ const Provider = ({
 }) => {
   const providers: ProviderMap = {
     ethereum: EthereumProvider(ethRpc, tokens),
-    solana: SolanaProvider(solRpc),
+    solana: SolanaProvider(solRpc, tokens),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
@@ -56,7 +58,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   // Prevent unknown network params
   const { network } = params;
   const { tokens, explorer } =
-    serverConfig.config[network as unknown as string];
+    serverConfig.config[network as unknown as string] ?? {};
 
   const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
   const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
@@ -79,6 +81,32 @@ export const loader: LoaderFunction = async ({ params }) => {
   };
 };
 
+const ProviderOutlet = () => {
+  const { connected, address, getDegenScore } = useContext(
+    FluidityFacadeContext
+  );
+
+  const { client } = useContext(SplitContext);
+
+  useEffect(() => {
+    if (!(address && connected)) return;
+
+    if (!getDegenScore) return;
+
+    (async () => {
+      const degenScore = await getDegenScore(address);
+
+      client?.track("connected-user-degen-score", address, degenScore);
+    })();
+  }, [address]);
+
+  return (
+    <>
+      <Outlet />
+    </>
+  );
+};
+
 type LoaderData = {
   network: string;
   explorer: string;
@@ -92,7 +120,8 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary({ error }: { error: string }) {
+  console.error(error);
   return (
     <div>
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
@@ -104,8 +133,7 @@ function ErrorBoundary() {
 }
 
 export default function Network() {
-  const { network, tokens, rpcUrls, colors, explorer } =
-    useLoaderData<LoaderData>();
+  const { network, tokens, rpcUrls, colors } = useLoaderData<LoaderData>();
 
   // Hardcode solana to redirect to ethereum
   if (network === "solana") throw new Error("Solana not supported");
@@ -119,11 +147,10 @@ export default function Network() {
     >
       <NotificationSubscription
         network={network}
-        explorer={explorer}
         tokens={tokens}
         colorMap={colors}
       />
-      <Outlet />
+      <ProviderOutlet />
     </Provider>
   );
 }

@@ -13,6 +13,7 @@ const query: Queryable = {
         token_short_name
         transaction_hash
         win_amount
+        block_number
       }
     }
   `,
@@ -59,7 +60,12 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
 
   return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
     fluGqlEndpoint,
-    body
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
+      : {}
   );
 };
 

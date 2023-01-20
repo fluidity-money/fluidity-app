@@ -1,16 +1,19 @@
-import { createContext } from "react";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
+import type BN from "bn.js";
+
+import { createContext } from "react";
 
 export interface IFluidityFacade {
   swap: (
     amount: string,
     tokenAddr: string
   ) => Promise<TransactionResponse | undefined>;
-  limit: (tokenAddr: string) => Promise<number | undefined>;
-  amountMinted: (tokenAddr: string) => Promise<number | undefined>;
-  balance: (tokenAddr: string) => Promise<number>;
+  limit: (tokenAddr: string) => Promise<BN | undefined>;
+  amountMinted: (tokenAddr: string) => Promise<BN | undefined>;
+  balance: (tokenAddr: string) => Promise<BN | undefined>;
   disconnect: () => Promise<void>;
   prizePool: () => Promise<number>;
+  tokens: () => Promise<string[]>;
 
   connected: boolean;
   connecting: boolean;
@@ -23,7 +26,7 @@ export interface IFluidityFacade {
   rawAddress: string;
 
   // Ethereum only
-  manualReward: (
+  manualReward?: (
     fluidTokenAddrs: string[],
     userAddr: string
   ) => Promise<
@@ -31,7 +34,9 @@ export interface IFluidityFacade {
     | undefined
   >;
 
-  addToken: (symbol: string) => Promise<boolean | undefined>;
+  getDegenScore?: (address: string) => Promise<number>;
+
+  addToken?: (symbol: string) => Promise<boolean | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

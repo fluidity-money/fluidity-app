@@ -14,10 +14,7 @@ const MobileNavBar = () => {
   return (
     <div className={styles.container}>
       <div className={`${styles.nav} opacity-5x`}>
-        <Link
-          href={"/"}
-          passHref
-        >
+        <Link href={"/"} passHref>
           <a className={open ? styles.hidden : styles.fluidity} href={"/"}>
             <img src="/assets/images/textLogo.svg" alt="home page" />
           </a>
@@ -25,7 +22,12 @@ const MobileNavBar = () => {
 
         <BurgerMenu isOpen={open} setIsOpen={setIsOpen} />
       </div>
-      {open && <MobileNavModal navLinks={["How it works", "Resources"]} setIsOpen={setIsOpen} />}
+      {open && (
+        <MobileNavModal
+          navLinks={["How it works", "Resources"]}
+          setIsOpen={setIsOpen}
+        />
+      )}
     </div>
   );
 };

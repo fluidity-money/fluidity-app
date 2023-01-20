@@ -1,11 +1,15 @@
-import type { HighestRewardResponse } from "~/queries/useHighestRewardStatistics";
+import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
-import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
-import useViewport from "~/hooks/useViewport";
+import {
+  json,
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { useHighestRewardStatisticsAll } from "~/queries/useHighestRewardStatistics";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { getAddressExplorerLink, networkMapper } from "~/util";
 import {
   Display,
@@ -19,13 +23,15 @@ import {
   trimAddressShort,
   numberToMonetaryString,
   appendLeading0x,
+  Video,
+  useViewport,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
-import Video from "~/components/Video";
 import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
+import { generateMeta } from "~/util/tweeter";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -48,10 +54,7 @@ export const loader: LoaderFunction = async () => {
     });
   }
 
-  const highestRewards = data.highest_rewards_monthly.map((reward) => ({
-    ...reward,
-    awardedDate: new Date(reward.awarded_day),
-  }));
+  const highestRewards = data.highest_rewards_monthly;
 
   if (!Object.keys(data.highest_reward_winner_totals).length) {
     return json({
@@ -90,6 +93,15 @@ export const loader: LoaderFunction = async () => {
   });
 };
 
+export const meta: MetaFunction = ({ location }) => {
+  const reActionQuery = /action=[\w]*/;
+  const queryString = location.search;
+  const actionString = queryString.match(reActionQuery)?.[0];
+  const action = actionString?.split("=")[1];
+
+  return generateMeta(action ?? "");
+};
+
 type WinnerWinnings = {
   [Address: string]: {
     network: string;
@@ -98,14 +110,9 @@ type WinnerWinnings = {
   };
 };
 
-type HighestRewards =
-  HighestRewardResponse["data"]["highest_rewards_monthly"][0] & {
-    awardedDate: Date;
-  };
-
 type LoaderData = {
   winnerTotals: WinnerWinnings;
-  highestRewards: HighestRewards;
+  highestRewards: HighestRewardMonthly[];
   highestWinner: {
     address: string;
     network: string;
@@ -164,7 +171,58 @@ export default function IndexPage() {
         type={"none"}
         loop={true}
       />
+
       <div className="index-page">
+        {/* Bg Line Chart */}
+        <div
+          className="opportunity-graph"
+          style={{
+            width: "100%",
+            height: "400px",
+            bottom: "-50px",
+            position: "fixed",
+          }}
+        >
+          <LineChart
+            data={highestRewards.map(
+              (reward: HighestRewardMonthly, i: number) => ({
+                ...reward,
+                x: i,
+              })
+            )}
+            lineLabel="transactions"
+            accessors={{
+              xAccessor: (d: HighestRewardMonthly & { x: number }) => d.x,
+              yAccessor: (d: HighestRewardMonthly) =>
+                d.winning_amount_scaled * 1000000 + 1,
+            }}
+            renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
+              <div className={"graph-tooltip-container"}>
+                <div className={"graph-tooltip"}>
+                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
+                    {format(parseISO(datum.awarded_day), "dd/MM/yy")}
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>{trimAddress(datum.winning_address)}</span>
+                  </span>
+                  <br />
+                  <br />
+                  <span>
+                    <span>
+                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                    </span>
+                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
+                      prize awarded
+                    </span>
+                  </span>
+                </div>
+              </div>
+            )}
+          />
+        </div>
+
         {/* Navigation Buttons */}
         <div className="header-buttons">
           {/* Fluidity Website Button */}
@@ -273,42 +331,6 @@ export default function IndexPage() {
               mobile={width <= mobileBreakpoint}
             />
           </Modal>
-
-          <div
-            className="opportunity-graph"
-            style={{ width: "100%", height: "400px" }}
-          >
-            <LineChart
-              data={highestRewards}
-              lineLabel="transactions"
-              accessors={{
-                xAccessor: (d: HighestRewards) => d.awardedDate,
-                yAccessor: (d: HighestRewards) => d.winning_amount_scaled,
-              }}
-              renderTooltip={({ datum }: { datum: HighestRewards }) => (
-                <div className={"tooltip"}>
-                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                    {format(datum.awardedDate, "dd/mm/yy")}
-                  </span>
-                  <br />
-                  <br />
-                  <span>
-                    <span>{trimAddress(datum.winning_address)}</span>
-                  </span>
-                  <br />
-                  <br />
-                  <span>
-                    <span>
-                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
-                    </span>
-                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                      prize awarded
-                    </span>
-                  </span>
-                </div>
-              )}
-            />
-          </div>
         </div>
       </div>
     </>

@@ -8,8 +8,10 @@
 
   img {
     width: 97%;
-    max-height: 350px;
     margin: 10px 10px 10px 10px;
+    aspect-ratio: 2/1;
+    max-height: 500px;
+    max-width: 1000px;
   }
 
   h4 {
@@ -20,11 +22,6 @@
   p {
     margin-bottom: 20px;
     padding-left: 10px;
-
-    // font-size: 20px;
-    @include max-560px {
-      // font-size: 18px;
-    }
   }
 
   p:nth-last-child(2) {

@@ -26,7 +26,7 @@ func ethAbiMustArgument(name, typ string) ethAbi.Argument {
 }
 
 func init() {
-	reader := strings.NewReader(fluidityContractAbiString)
+	reader := strings.NewReader(tokenContractAbiString)
 
 	var err error
 
@@ -37,6 +37,12 @@ func init() {
 	reader = strings.NewReader(workerConfigAbiString)
 
 	if WorkerConfigAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
+
+	reader = strings.NewReader(rewardPoolAbiString)
+
+	if RewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }

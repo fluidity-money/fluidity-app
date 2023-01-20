@@ -14,9 +14,9 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        includePaths: [resolve(__dirname, './src')],
-      }
-    }
+        includePaths: [resolve(__dirname, "./src")],
+      },
+    },
   },
   build: {
     lib: {

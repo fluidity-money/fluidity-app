@@ -3,6 +3,8 @@ main > section#graph {
 }
 
 section#transactions {
+  width: auto;
+  max-width: 100%;
   min-height: 5vh;
 }
 
@@ -26,9 +28,17 @@ section#transactions {
   gap: 1em;
 }
 
+.top-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1em;
+}
+
 .dashboard-identifier {
-  margin-top: 0;
+  margin: 0;
   width: max-content;
+  white-space: nowrap;
 }
 
 .graph-ceiling > div:last-child {
@@ -47,12 +57,18 @@ section#transactions {
 }
 
 .transaction-table {
-  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 850px) {
   .graph-ceiling {
     align-items: flex-end;
+  }
+}
+
+@media (max-width: 550px) {
+  .top-text {
+    flex-direction: column-reverse;
   }
 }
 

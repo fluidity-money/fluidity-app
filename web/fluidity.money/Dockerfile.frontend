@@ -1,7 +1,7 @@
 
 FROM fluidity/build-web-container:latest AS build
 
-WORKDIR /usr/local/src/fluidity/web/fluidity.money
+WORKDIR /usr/local/src/fluidity/web
 
 ENV PRODUCTION ${PRODUCTION}
 
@@ -9,28 +9,30 @@ ARG CI
 
 ARG GITHUB_TOKEN
 
+ARG NEXT_PUBLIC_FLU_ETH_RPC_HTTP
+
 ENV CI $CI
 
 ENV PATH /app/node_modules.bin:$PATH
 
-COPY .npmrc package.json package-lock.json ./
-
-RUN npm set //npm.pkg.github.com/:_authToken $GITHUB_TOKEN
-
-RUN npm i
-
 COPY . ./
 
-ARG REACT_APP_SENTRY_DSN
+RUN yarn
+
+ARG FLU_SENTRY_DSN
+
+WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
 RUN make frontend
 
 FROM fluidity/runtime-web-container:latest
 
-WORKDIR /usr/local/src/fluidity/web/fluidity.money
+WORKDIR /usr/local/src/fluidity/web
 
-COPY --from=build /usr/local/src/fluidity/web/fluidity.money .
+COPY --from=build /usr/local/src/fluidity/web .
+
+WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]

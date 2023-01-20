@@ -1,5 +1,4 @@
-import { Text, Display } from "@fluidity-money/surfing";
-import useViewport from "~/hooks/useViewport";
+import { Text, Display, useViewport } from "@fluidity-money/surfing";
 import styles from "./styles.css";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];

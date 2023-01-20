@@ -1,0 +1,23 @@
+@use "common" as *;
+
+.parallax {
+  overflow: hidden;
+  margin: 0;
+  white-space: nowrap;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.scroller {
+  display: flex;
+  white-space: nowrap;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+section {
+  position:relative;
+  width:100%;
+}
+
+

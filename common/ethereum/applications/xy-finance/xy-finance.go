@@ -21,6 +21,8 @@ import (
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
+const xyFinanceSourceChainSwap = "0xe1e8548aad4bfb08650f3a6c68acd84675a69fb72d77b1f744b8a643c406b608"
+
 const xyFinanceAbiString = `[
 {
 	"inputs": [
@@ -220,6 +222,16 @@ var xyFeeTable = map[int]xyFee{
 // approximated via `xyFeeTable`
 // xyFeeTable is sourced here: https://docs.xy.finance/products/x-swap/fee-structure
 func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+	if len(transfer.Log.Topics) < 1 {
+		return nil, fmt.Errorf("No log topics passed!")
+	}
+
+	logTopic := transfer.Log.Topics[0].String()
+
+	if logTopic != xyFinanceSourceChainSwap {
+		return nil, nil
+	}
+
 	unpacked, err := xyFinanceAbi.Unpack("SourceChainSwap", transfer.Log.Data)
 
 	if err != nil {

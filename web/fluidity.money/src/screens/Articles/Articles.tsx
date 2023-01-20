@@ -2,7 +2,6 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useEffect } from "react";
 import {
   ArticleCard,
   ArticleList,
@@ -21,7 +20,7 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         RESOURCES RESOURCES RESOURCES
       </Heading>
       <Heading as="h4" className={styles.text}>
@@ -33,9 +32,8 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
   return (
     <div className={styles.outerContainer}>
       <div className={styles.carousel}>
-        {
-          !(isResourcesPage) ? (
-            <ContinuousCarousel direction={"right"}>
+        {!isResourcesPage ? (
+          <ContinuousCarousel direction={"right"}>
             <div>
               {callout}
               {callout}
@@ -49,13 +47,15 @@ const Articles = ({ isResourcesPage }: IArticleProps) => {
               {callout}
               {callout}
             </div>
-          </ContinuousCarousel>): ''
-        }
+          </ContinuousCarousel>
+        ) : (
+          ""
+        )}
       </div>
       <div className={styles.container} id="articles">
         <ArticleCard
           id={0}
-          img={"https://miro.medium.com/max/700/1*lyOtA25-N4ldnJKK4J4tKA.png"}
+          img={"https://miro.medium.com/max/1400/1*0vULqpeqlIiivFQhlPxhOg.webp"}
           title={arr.articles[0].title}
           desc={arr.articles[0].desc}
           info={arr.articles[0].info}
@@ -74,6 +74,24 @@ const arr: ArticleListProps = {
   articles: [
     {
       id: 0,
+      title:
+        "Payments, Metaverse, P2E games and DeFi derivatives: A deep dive into Fluidity’s use cases",
+      desc: `Imagine a protocol — an avant-garde DeFi yield primitive that turns all previous dogma related to earning yields on its head; instead of lockin...`,
+      info: "19 min read DEFI",
+      link: "https://blog.fluidity.money/payments-metaverse-p2e-games-and-defi-derivatives-a-deep-dive-into-fluiditys-use-cases-767910d6a39c",
+      linkTitle: "",
+    },
+    {
+      id: 1,
+      title:
+        "Fluidity announces $1.3 Million Seed Round led by Multicoin Capital",
+      desc: `Fluidity is excited to announce that we have raised $1.3 million in a seed round led by Multicoin Capital, with participation from Circle Ventures...`,
+      info: "3 min read CRYPTOCURRENCY",
+      link: "https://blog.fluidity.money/fluidity-announces-1-3-million-seed-round-led-by-multicoin-capital-943ee3fbe0e6",
+      linkTitle: "",
+    },
+    {
+      id: 2,
       title: "With Fluidity, supercharge your arbitrage trades",
       desc: `Crypto assets worth billions of dollars are traded every single day. Arbitrage traders take advantage of the volatility and pricing imperfections, exploiting different values for the same asset across different markets. Take...`,
       info: "9 min read ARBITRAGE",
@@ -81,7 +99,7 @@ const arr: ArticleListProps = {
       linkTitle: "",
     },
     {
-      id: 1,
+      id: 3,
       title: "The Hunting of the zk-SNARK: Homomorphic Hidings",
       desc: `“But the Judge said he never had summed up before; So the Snark undertook it instead, And summed it so well that it came to far more Than the Witnesses ever had said!” Lewis Carroll Zero-knowledge succinct non...`,
       info: "5 min read CRYPTOCURRENCY",
@@ -89,7 +107,7 @@ const arr: ArticleListProps = {
       linkTitle: "",
     },
     {
-      id: 2,
+      id: 4,
       title: "An alternative solution to Uniswap’s “fee switch” problem",
       desc: `In the past few months, there has been a lot of discussion in the Uniswap Governance Forum about activating the “fee switch”, a piece of code that...`,
       info: "6 min read UNISWAP",
@@ -97,15 +115,16 @@ const arr: ArticleListProps = {
       linkTitle: "",
     },
     {
-      id: 3,
-      title: "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
+      id: 5,
+      title:
+        "Tiki Talk Minutes: Fluidity x DOPEX x Arbitrum and the evolving boundaries of DeFi",
       desc: `The year 2020 marked the explosion of DeFi protocols in public imagination, driven largely by the rise of liquidity mining — Compound...`,
       info: "5 min  read ARBITRUM",
       link: "https://blog.fluidity.money/tiki-talk-minutes-fluidity-x-dopex-x-arbitrum-and-the-evolving-boundaries-of-defi-ea7f1110f741",
       linkTitle: "",
     },
     {
-      id: 4,
+      id: 6,
       title: "Ghost in the machine: Fluidity Partners with AAVE Grants DAO",
       desc: `“2022 has been a wild year for Decentralized Finance. Novel concepts were introduced and big scandals were reported, but most importantly, DeFi has...`,
       info: "5 min read CRYPTOCURRENCY",
@@ -113,8 +132,8 @@ const arr: ArticleListProps = {
       linkTitle: "",
     },
     {
-      id: 5,
-      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money", 
+      id: 7,
+      title: "Fluidity 🌊💸— Using Chainlink VRF to power the future of money",
       desc: `Providing Users With a Secure Source of Verifiable Randomness Fluidity — Next-Generation Assets If your money’s on the move, exposure to DeFi can...`,
       info: "4 min read FLUIDITY",
       link: "https://blog.fluidity.money/fluidity-using-chainlink-vrf-to-power-the-future-of-money-11882c51ae89",

@@ -19,9 +19,30 @@
 .SPtext {
   position: absolute;
   z-index: 0;
+
+  &.mobile {
+    position: relative;
+    margin-bottom: 1em;
+  }
 }
 
 .card:hover {
   filter: none !important;
   opacity: 1;
+}
+
+.deck {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  min-height: 400px;
+  padding-bottom: 1em;
+
+  & > * {
+    margin-right: 1em;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
 }

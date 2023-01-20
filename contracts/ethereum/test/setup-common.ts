@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, deployWorkerConfig, forknetTakeFunds } from "../script-utils";
+import { deployTokens, deployWorkerConfig, deployGovToken, forknetTakeFunds } from "../script-utils";
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
 export let configAddr: string;
@@ -14,6 +14,10 @@ export let tokenOperatorSigner: ethers.Signer;
 export let tokenCouncilSigner: ethers.Signer;
 export let configOperatorSigner: ethers.Signer;
 export let configCouncilSigner: ethers.Signer;
+export let rewardPoolsOperatorSigner: ethers.Signer;
+export let govOperatorSigner: ethers.Signer;
+export let govTokenSigner: ethers.Signer;
+export let govTokenAddr: string;
 
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
@@ -30,6 +34,8 @@ before(async function () {
     tokenCouncilSigner,
     configOperatorSigner,
     configCouncilSigner,
+    rewardPoolsOperatorSigner,
+    govOperatorSigner
   ] = await hre.ethers.getSigners();
 
   accountAddr = await accountSigner.getAddress();
@@ -39,4 +45,8 @@ before(async function () {
     await configOperatorSigner.getAddress(),
     await configCouncilSigner.getAddress(),
   );
+
+  govTokenSigner = await deployGovToken(hre, govOperatorSigner);
+
+  govTokenAddr = govTokenSigner.address;
 });

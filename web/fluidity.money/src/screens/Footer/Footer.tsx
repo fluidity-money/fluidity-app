@@ -2,14 +2,15 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import useViewport from "hooks/useViewport";
-import Socials from "../../components/Socials";
 import {
+  Socials,
   ContinuousCarousel,
   GeneralButton,
   FooterItem,
   Text,
   Heading,
+  LinkButton,
+  useViewport,
 } from "@fluidity-money/surfing";
 import styles from "./Footer.module.scss";
 import { LaunchButton } from "components/Button";
@@ -27,7 +28,7 @@ const Footer = () => {
 
   const callout = (
     <div className={styles.callout}>
-      <Heading hollow={true} as="h4" className={styles.text}>
+      <Heading as="h4" className={styles.text}>
         USE YIELD WIN
       </Heading>
       <Heading as="h4" className={styles.text}>
@@ -67,7 +68,9 @@ const Footer = () => {
               LAUNCH FLUIDITY
             </LaunchButton>
             <GeneralButton
-              handleClick={() => {window.location.href = "mailto:contact@fluidity.money"}}
+              handleClick={() => {
+                window.location.href = "mailto:contact@fluidity.money";
+              }}
               version={"secondary"}
               buttontype={"text"}
               size={
@@ -82,6 +85,36 @@ const Footer = () => {
             </GeneralButton>
           </div>
           <div className={styles.legal}>
+            <LinkButton
+              size="small"
+              type="external"
+              handleClick={() => {
+                window.location.href =
+                  "https://static.fluidity.money/assets/fluidity-website-tc.pdf";
+              }}
+            >
+              Terms of Service
+            </LinkButton>
+            <LinkButton
+              size="small"
+              type="external"
+              handleClick={() => {
+                window.location.href =
+                  "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf";
+              }}
+            >
+              Privacy Policy
+            </LinkButton>
+            <LinkButton
+              size="small"
+              type="external"
+              handleClick={() => {
+                window.location.href =
+                  "https://docs.fluidity.money/docs/security/audits-completed";
+              }}
+            >
+              AUDITS COMPLETED
+            </LinkButton>
             <Text as="p" size="xs">
               © 2022 Fluidity Money. All Rights Reserved.
             </Text>
@@ -112,24 +145,34 @@ const Footer = () => {
 
 export default Footer;
 
-const howItWorks: IItem[] = [{ title: "Roadmap", src: "https://docs.fluidity.money/docs/fundamentals/roadmap", type: "external" }];
-
-const ecosystem: IItem[] = [
-  { title: "DeFi", src: "", type: "internal" },
-  { title: "DEX", src: "", type: "internal" },
-  { title: "Transactions", src: "", type: "internal" },
-  { title: "NFTs", src: "", type: "external" },
+const howItWorks: IItem[] = [
+  {
+    title: "Roadmap",
+    src: "https://docs.fluidity.money/docs/fundamentals/roadmap",
+    type: "external",
+  },
 ];
 
-const fluidStats: IItem[] = [
-  { title: "Overview", src: "", type: "internal" },
-  { title: "Rewards", src: "", type: "internal" },
-  { title: "Transactions", src: "", type: "internal" },
-];
+// const ecosystem: IItem[] = [
+//   { title: "DeFi", src: "", type: "internal" },
+//   { title: "DEX", src: "", type: "internal" },
+//   { title: "Transactions", src: "", type: "internal" },
+//   { title: "NFTs", src: "", type: "external" },
+// ];
+
+// const fluidStats: IItem[] = [
+//   { title: "Overview", src: "", type: "internal" },
+//   { title: "Rewards", src: "", type: "internal" },
+//   { title: "Transactions", src: "", type: "internal" },
+// ];
 
 const resources: IItem[] = [
   { title: "Articles", src: "", type: "internal" },
   { title: "Fluniversity", src: "", type: "internal" },
   { title: "Whitepapers", src: "", type: "internal" },
-  { title: "Documentation", src: "https://docs.fluidity.money/", type: "external" },
+  {
+    title: "Documentation",
+    src: "https://docs.fluidity.money/",
+    type: "external",
+  },
 ];
