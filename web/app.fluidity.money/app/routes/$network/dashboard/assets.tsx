@@ -1,19 +1,42 @@
-import { Text, Display, Heading, ManualCarousel } from "@fluidity-money/surfing"
-import { Link, Outlet, useParams } from "@remix-run/react"
+import type { LoaderFunction } from "@remix-run/node";
+
+import { json } from "@remix-run/node";
+import { Text, Display, Heading, ManualCarousel, TabButton } from "@fluidity-money/surfing"
+import { Link, Outlet, useLoaderData } from "@remix-run/react"
 import ProviderCard, { Provider } from "~/components/ProviderCard"
 import { useCache } from "~/hooks/useCache"
 import { Rewarders } from "~/util/rewardAggregates"
 
-import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
+import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
 
 export const links = () => {
   return [
-    { rel: "stylesheet", href: dashboardRewardsStyle },
+    { rel: "stylesheet", href: dashboardAssetsStyle },
   ];
 };
 
+export const loader: LoaderFunction = ( {request, params} ) => {
+  const url = new URL(request.url);
+  const urlPaths = url.pathname.split("/");
+  const pathname = urlPaths.pop() ?? "";
+  const showFluidToken = pathname === "assets";
+
+  const { network } = params ?? "";
+
+  
+  return json({
+    showFluidToken,
+    network,
+  })
+}
+
+type LoaderData = {
+  showFluidToken: boolean,
+  network: string,
+}
+
 const AssetsRoot = () => {
-    const { network } = useParams()
+    const { network, showFluidToken } = useLoaderData<LoaderData>();
 
     const urlRoot = `/${network}/dashboard/assets`;
 
@@ -25,23 +48,49 @@ const AssetsRoot = () => {
       all: bestPerformingRewarders,
     } = rewarders || { all: [] }
 
-    return <div className="pad-main">
-        <>
-            <Text>
-                Total Balance
-            </Text>
-            <Display>
-                $0.00
-            </Display>
-        </>
-        <>
+    const navigationMap = [
+      {
+        name: "Fluid Assets",
+        link: urlRoot,
+      },
+      {
+        name: "Regular Assets",
+        link: `${urlRoot}/regular`,
+      },
+    ]
+
+    return (
+      <div className="pad-main">
+        <div>
+          <>
+              <Text>
+                  Total Balance
+              </Text>
+              <Display size="sm">
+                  $0.00
+              </Display>
+          </>
+          <>
             <Link to={urlRoot}>
-                Fluid Assets
+              <Text
+                size="lg"
+                prominent={showFluidToken}
+                className={showFluidToken ? "active-filter" : ""}
+              >
+                  Fluid Assets
+              </Text>
             </Link>
             <Link to={`${urlRoot}/regular`}>
-                Regular Assets
+              <Text
+                size="lg"
+                prominent={!showFluidToken}
+                className={!showFluidToken ? "active-filter" : ""}
+              >
+                  Regular Assets
+              </Text>
             </Link>
-        </>
+          </>
+        </div>
         <Outlet />
         <section id="rewarders">
           <Heading className="highest-rewarders" as={"h2"}>
@@ -61,6 +110,7 @@ const AssetsRoot = () => {
           </ManualCarousel>
         </section>
     </div>
+  );
 }
 
 export default AssetsRoot;
