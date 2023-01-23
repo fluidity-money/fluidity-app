@@ -677,15 +677,15 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     /// @notice drain the reward pool of the amount given without touching any principal amounts
     /// @dev this is intended to only be used to retrieve initial liquidity provided by the team OR by the DAO to allocate funds
-    function drainRewardPool(uint256 _amount) public {
+    function drainRewardPool(address _recipient, uint256 _amount) public {
         require(noEmergencyMode(), "emergency mode");
         require(msg.sender == operator_, "only operator can use this function");
 
         uint256 rewardPool = this.rewardPoolAmount();
 
-        require(rewardPool >= _amount, "amount to drain greater than prize pool");
+        require(rewardPool > _amount, "amount to drain greater than prize pool");
 
-        rewardInternal(msg.sender, _amount);
+        rewardInternal(_recipient, _amount);
     }
 
     function _transfer(
