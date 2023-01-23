@@ -59,7 +59,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     emergencyCouncilAddress,
   );
 
-  await deployTokens(
+  const { tokens } = await deployTokens(
     hre,
     shouldDeploy.map(token => TokenList[token]),
     AAVE_V2_POOL_PROVIDER_ADDR,
@@ -67,6 +67,11 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     emergencyCouncilAddress,
     operatorAddress,
     workerConfigAddress,
+  );
+
+  await setOracles(
+    hre,
+    Object.values(tokens).map(t => t.deployedToken.address),
   );
 
   console.log(`deployment complete`);

@@ -18,6 +18,9 @@ struct FluidityReward {
 contract Registry {
     using Address for address;
 
+    /// @dev the utility name of the fluid token
+    string constant FLUID_TOKEN = "FLUID";
+
     /// @dev return type from getTrfVars
     struct ScannedTrfVar {
         TrfVars vars;

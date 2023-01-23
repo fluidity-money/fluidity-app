@@ -131,6 +131,9 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
     /// @notice deprecated, mint limits no longer exist
     uint __deprecated_6;
 
+    /// @dev account that can call the reward function, should be the /registry/ contract
+    address oracle_;
+
     /**
      * @notice initialiser function - sets the contract's data
      * @dev we pass in the metadata explicitly instead of sourcing from the
@@ -206,10 +209,10 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
-     * @notice deprecated, returns address(0)
+     * @dev individual oracles are now recorded in the operator, this now should return the registry contract
      */
     function oracle() public view returns (address) {
-        return address(0);
+        return oracle_;
     }
 
     /**
@@ -348,33 +351,8 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
 
         uint poolAmount = rewardPoolAmount();
 
-        // this might not happen if our transactions go through out of order
-        if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
-
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
-
-            if (manualRewardDebt_[winner.winner] != 0) {
-
-                // if a batch reward was caught in the mempool, and a user
-                // manages to reward once before the batch and once
-                // after the batch
-
-                // if the win amount exceeds the manual reward debt,
-                // then we deduct the entire reward debt, otherwise
-                // they more debt than the winnings from this batch,
-                // we remove the winnings from this batch, then we
-                // remove the amount from their debt
-
-                uint amount = winner.amount > manualRewardDebt_[winner.winner] ?
-                    manualRewardDebt_[winner.winner] :
-                    winner.amount;
-
-                // and we update that debt and the win amount
-
-                winner.amount -= amount;
-                manualRewardDebt_[winner.winner] -= amount;
-            }
 
             require(poolAmount >= winner.amount, "reward pool empty");
 
@@ -442,26 +420,6 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
         uint lastBlock,
         bytes memory sig
     ) external {
-        require(noEmergencyMode(), "emergency mode!");
-
-        // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
-        //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
-        bytes32 hash = keccak256(abi.encode(
-            contractAddress,
-            chainid,
-            winner,
-            winAmount,
-            firstBlock,
-            lastBlock
-        ));
-
-        // ECDSA verification
-        require(recover(hash, sig) == oracle(), "invalid rng signature");
-
-        // now reward the user
-
-        require(contractAddress == address(this), "payload is for the wrong contract");
-        require(chainid == block.chainid, "payload is for the wrong chain");
 
         // user decided to frontrun
         require(
@@ -481,51 +439,6 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
         require(rewardPoolAmount() >= winAmount, "reward pool empty");
 
         rewardFromPool(firstBlock, lastBlock, winner, winAmount);
-    }
-
-    /**
-     * @dev ECrecover with checks for signature malleability
-     * @dev adapted from openzeppelin's ECDSA library
-     */
-    function recover(
-        bytes32 hash,
-        bytes memory signature
-    ) internal pure returns (address) {
-        require(signature.length == 65, "invalid rng format (length)");
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-        // ecrecover takes the signature parameters, and the only way to get them
-        // currently is to use assembly.
-        /// @solidity memory-safe-assembly
-        assembly {
-            r := mload(add(signature, 0x20))
-            s := mload(add(signature, 0x40))
-            v := byte(0, mload(add(signature, 0x60)))
-        }
-        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
-        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
-        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
-        // signatures from current libraries generate a unique signature with an s-value in the lower half order.
-        //
-        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
-        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
-        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
-        // these malleable signatures as well.
-        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
-            revert("invalid signature (s)");
-        }
-        if (v != 27 && v != 28) {
-            revert("invalid signature (v)");
-        }
-
-        // If the signature is valid (and not malleable), return the signer address
-        address signer = ecrecover(hash, v, r, s);
-        if (signer == address(0)) {
-            revert("invalid signature");
-        }
-
-        return signer;
     }
 
     /*

@@ -61,7 +61,7 @@ export const deployGovToken = async (
   hre: HardhatRuntimeEnvironment,
   govOperatorSigner: ethers.Signer
 ): Promise<string> => {
-  const factory = await (await hre.ethers.getContractFactory("GovToken"))
+  const factory = (await hre.ethers.getContractFactory("GovToken"))
     .connect(govOperatorSigner);
 
   const govToken = await factory.deploy();
@@ -75,7 +75,7 @@ export const deployGovToken = async (
     BigNumber.from("1000000000000000000000000000")
   );
 
-  return govToken;
+  return govToken.address;
 };
 
 export type TokenAddresses = {
@@ -245,5 +245,12 @@ export const forknetTakeFunds = async (
   }
 };
 
+const setOracles = async (
+  hre: HardhatRuntimeEnvironment,
+  tokenAddresses: string[],
+  oracle: string,
+) => {
+
+}
 // statically ensure an object can't exist (ie, all enum varients are handled)
 function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }
