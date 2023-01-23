@@ -683,7 +683,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
         uint256 rewardPool = this.rewardPoolAmount();
 
-        require(rewardPool > _amount, "amount to drain greater than prize pool");
+        require(amount_ > rewardPool, "amount to drain greater than prize pool");
 
         rewardInternal(_recipient, _amount);
     }
