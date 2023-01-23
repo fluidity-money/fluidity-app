@@ -65,15 +65,15 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
   };
 
   switch (chainType(network)) {
-    case "evm":
+    case "evm": {
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
         chain: resolveMoralisChainName(network as Chain)
       });
       return transfers.raw.total;
+    }
 
-    case "solana":
-
+    case "solana": {
       const body = {
         query: queryByAddress[network],
         variables,
@@ -86,6 +86,8 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
           "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
         }
       );
+    }
+
     default:
       return {
         errors: `Unsupported network ${network}`
@@ -110,7 +112,7 @@ const useUserTransactionAllCount = async(network: string) => {
         return await count + transfers;
     }, Promise.resolve(0))
 
-    case "solana":
+    case "solana": {
       const body = {
         query: queryAll[network],
         variables,
@@ -123,6 +125,7 @@ const useUserTransactionAllCount = async(network: string) => {
           "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
         }
       );
+    }
 
     default:
       return {

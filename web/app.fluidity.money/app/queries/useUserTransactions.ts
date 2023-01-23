@@ -193,7 +193,7 @@ const useUserTransactionsByAddress = async (
   };
 
   switch (chainType(network)) {
-    case "evm":
+    case "evm": {
       // fetch first page of transfers since <=12 are needed
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address, chain: resolveMoralisChainName(network as Chain)
@@ -203,7 +203,7 @@ const useUserTransactionsByAddress = async (
         data: {
           ethereum: {
             transfers: transfers.result
-              .filter(t => 
+              .filter(t =>
                 // is a fluid token
                 Object.keys(tokens).includes(t.address.checksum) &&
                 // is not a filtered hash
@@ -225,8 +225,9 @@ const useUserTransactionsByAddress = async (
       };
 
       return filteredTransactions;
+    }
 
-    case "solana":
+    case "solana": {
       const body = {
         query: queryByAddress[network],
         variables,
@@ -239,11 +240,13 @@ const useUserTransactionsByAddress = async (
           "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
         }
       );
+    }
+
     default:
       return {
         errors: `Unsupported network ${network}`
       }
-  };
+  }
 };
 
 const useUserTransactionsByTxHash = async (
@@ -256,7 +259,7 @@ const useUserTransactionsByTxHash = async (
 ) => {
 
   switch (chainType(network)) {
-    case "evm":
+    case "evm": {
       const transfers = (await Promise.all(Object.keys(tokens)
         // fetch all transfers for all tokens
         .map(async address => {
@@ -288,7 +291,7 @@ const useUserTransactionsByTxHash = async (
         // sort descending by block timestamp
         .sort((a, b) =>
           new Date(b.blockTimestamp).getTime() - new Date(a.blockTimestamp).getTime()
-        // avoid unnecessary processing as soon as possible
+          // avoid unnecessary processing as soon as possible
         ).slice(0, limit)
 
       const filteredTransactions: UserTransactionsRes = {
@@ -306,8 +309,9 @@ const useUserTransactionsByTxHash = async (
         }
       };
       return filteredTransactions;
+    }
 
-    case "solana":
+    case "solana": {
       const variables = {
         transactions,
         filterHashes,
@@ -325,6 +329,8 @@ const useUserTransactionsByTxHash = async (
           "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
         }
       );
+    }
+
     default:
       return {
         errors: `Unsupported network ${network}`
@@ -344,7 +350,7 @@ const useUserTransactionsAll = async (
 
  
   switch (chainType(network)) {
-    case "evm":
+    case "evm": {
       const transfers = (await Promise.all(Object.keys(tokens)
         // fetch first page of transfers for all tokens
         .map(async address => (
@@ -359,8 +365,8 @@ const useUserTransactionsAll = async (
         // sort descending by block timestamp
         .sort((a, b) =>
           new Date(b.blockTimestamp).getTime() - new Date(a.blockTimestamp).getTime()
-      // avoid unnecessary processing as soon as possible
-      ).slice(offset, offset + limit)
+          // avoid unnecessary processing as soon as possible
+        ).slice(offset, offset + limit)
 
       const filteredTransactions: UserTransactionsRes = {
         data: {
@@ -377,7 +383,9 @@ const useUserTransactionsAll = async (
         }
       };
       return filteredTransactions;
-    case "solana":
+    }
+
+    case "solana": {
       const variables = {
         tokens: Object.values(tokens),
         offset,
@@ -397,6 +405,8 @@ const useUserTransactionsAll = async (
           "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
         }
       );
+    }
+
     default:
       return {
         errors: `Unsupported network ${network}`
