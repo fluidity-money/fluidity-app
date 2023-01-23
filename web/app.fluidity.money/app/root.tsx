@@ -135,8 +135,8 @@ export const loader: LoaderFunction = async ({
   if (!Moralis.Core.isStarted) {
     Moralis.start({
       formatEvmAddress: "checksum",
-      apiKey: process.env.FLU_MORALIS_TOKEN || ""
-    })
+      apiKey: process.env.FLU_MORALIS_TOKEN || "",
+    });
   }
 
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";

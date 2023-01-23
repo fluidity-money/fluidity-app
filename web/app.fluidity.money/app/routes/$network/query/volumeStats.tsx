@@ -14,7 +14,7 @@ export type Volume = {
   receiver: string;
 };
 
-type UnprocessedVolume = Omit<Volume, 'amount'> & {amount: string};
+type UnprocessedVolume = Omit<Volume, "amount"> & { amount: string };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
@@ -22,10 +22,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
 
-
-    const tokenDecimals = config.config[network ?? ""].tokens
-      .filter((entry) => entry.isFluidOf !== undefined)
-      .reduce((previous, token) => ({...previous, [token.symbol]: token.decimals}), {} as {[symbol: string]: number});
+  const tokenDecimals = config.config[network ?? ""].tokens
+    .filter((entry) => entry.isFluidOf !== undefined)
+    .reduce(
+      (previous, token) => ({ ...previous, [token.symbol]: token.decimals }),
+      {} as { [symbol: string]: number }
+    );
 
   // Postprocess res
   const postprocess = (volume: UnprocessedVolume) => {
@@ -41,7 +43,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const fluidAssets = config.config[network ?? ""].tokens
     .filter((entry) => entry.isFluidOf !== undefined)
-    .reduce((previous, token) => ({...previous, [token.address]: token.symbol}), {});
+    .reduce(
+      (previous, token) => ({ ...previous, [token.address]: token.symbol }),
+      {}
+    );
 
   if (!fluidAssets) return;
 

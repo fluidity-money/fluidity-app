@@ -17,7 +17,7 @@ import {
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
-import {UserTransaction} from "~/queries/useUserTransactions";
+import { UserTransaction } from "~/queries/useUserTransactions";
 
 type ProcesedUserTransaction = {
   sender: string;
@@ -35,23 +35,26 @@ export type TransactionsLoaderData = {
   loaded: boolean;
 };
 
-export const decimalsPostprocess = (amount : string | number, symbol: string, tokenDecimals: number) => {
+export const decimalsPostprocess = (
+  amount: string | number,
+  symbol: string,
+  tokenDecimals: number
+) => {
   // numbers are from Bitquery
   // Bitquery stores DAI decimals (6) incorrectly (should be 18)
   if (typeof amount === "number") {
-    return symbol === "DAI" || symbol === "fDAI"
-      ? amount / 10 ** 12
-      : amount; 
+    return symbol === "DAI" || symbol === "fDAI" ? amount / 10 ** 12 : amount;
   }
   // otherwise adjust for decimals as Moralis returns raw
   const bn = new BN(amount);
   const decimals = new BN(10).pow(new BN(tokenDecimals));
   // separate whole and decimal part
-  const {div, mod} = bn.divmod(decimals);
+  const { div, mod } = bn.divmod(decimals);
   // take 3 digits to round to 2
   const modString = "0." + mod.toString().slice(0, 3);
   // convert decimals to number and round
-  const modNumber = Math.round((parseFloat(modString) + Number.EPSILON) * 100) / 100
+  const modNumber =
+    Math.round((parseFloat(modString) + Number.EPSILON) * 100) / 100;
   // add as number
   return div.toNumber() + modNumber;
 };
@@ -149,7 +152,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         await (async () => {
           const tokens = config.config[network ?? ""].tokens
             .filter((entry) => entry.isFluidOf !== undefined)
-            .reduce((previous, token) => ({...previous, [token.address]: token.symbol}), {});
+            .reduce(
+              (previous, token) => ({
+                ...previous,
+                [token.address]: token.symbol,
+              }),
+              {}
+            );
           const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
 
           switch (true) {
@@ -207,7 +216,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const tokenDecimals = config.config[network ?? ""].tokens
       .filter((entry) => entry.isFluidOf !== undefined)
-      .reduce((previous, token) => ({...previous, [token.symbol]: token.decimals}), {} as {[symbol: string]: number});
+      .reduce(
+        (previous, token) => ({ ...previous, [token.symbol]: token.decimals }),
+        {} as { [symbol: string]: number }
+      );
 
     // Destructure GraphQL data
     const userTransactions: ProcesedUserTransaction[] = transactions.map(
@@ -222,7 +234,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           amount: value,
           currency: { symbol: currency },
         } = transaction;
-
 
         return {
           sender,

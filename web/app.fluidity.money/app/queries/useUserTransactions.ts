@@ -1,7 +1,11 @@
 import Moralis from "moralis";
 import MoralisUtils from "@moralisweb3/common-evm-utils";
 import { gql, Queryable, jsonPost } from "~/util";
-import {Chain, chainType, resolveMoralisChainName} from "~/util/chainUtils/chains";
+import {
+  Chain,
+  chainType,
+  resolveMoralisChainName,
+} from "~/util/chainUtils/chains";
 
 const queryByAddress: Queryable = {
   solana: gql`
@@ -176,13 +180,13 @@ export type UserTransaction = {
 const useUserTransactionsByAddress = async (
   network: string,
   // address: token symbol
-  tokens: {[address: string]: string},
+  tokens: { [address: string]: string },
   page: number,
   address: string,
   filterHashes: string[],
   limit = 12
 ): Promise<UserTransactionsRes> => {
-  const offset = (page - 1) * 12
+  const offset = (page - 1) * 12;
 
   const variables = {
     address: address,
@@ -196,32 +200,36 @@ const useUserTransactionsByAddress = async (
     case "evm": {
       // fetch first page of transfers since <=12 are needed
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
-        address, chain: resolveMoralisChainName(network as Chain)
+        address,
+        chain: resolveMoralisChainName(network as Chain),
       });
-      
+
       const filteredTransactions: UserTransactionsRes = {
         data: {
           ethereum: {
             transfers: transfers.result
-              .filter(t =>
-                // is a fluid token
-                Object.keys(tokens).includes(t.address.checksum) &&
-                // is not a filtered hash
-                !filterHashes.includes(t.transactionHash) &&
-                // address is sender or receiver
-                (t.fromAddress.equals(address) || t.toAddress.equals(address))
+              .filter(
+                (t) =>
+                  // is a fluid token
+                  Object.keys(tokens).includes(t.address.checksum) &&
+                  // is not a filtered hash
+                  !filterHashes.includes(t.transactionHash) &&
+                  // address is sender or receiver
+                  (t.fromAddress.equals(address) || t.toAddress.equals(address))
               )
               .slice(offset, offset + limit)
-              .map(t => ({
-                sender: {address: t.fromAddress.format()},
-                receiver: {address: t.toAddress.format()},
-                block: {timestamp: {unixtime: new Date(t.blockTimestamp).getTime()}},
-                transaction: {hash: t.transactionHash},
+              .map((t) => ({
+                sender: { address: t.fromAddress.format() },
+                receiver: { address: t.toAddress.format() },
+                block: {
+                  timestamp: { unixtime: new Date(t.blockTimestamp).getTime() },
+                },
+                transaction: { hash: t.transactionHash },
                 amount: t.value.toString(),
-                currency: {symbol: tokens[t.address.checksum]}
-              }))
-          }
-        }
+                currency: { symbol: tokens[t.address.checksum] },
+              })),
+          },
+        },
       };
 
       return filteredTransactions;
@@ -244,8 +252,8 @@ const useUserTransactionsByAddress = async (
 
     default:
       return {
-        errors: `Unsupported network ${network}`
-      }
+        errors: `Unsupported network ${network}`,
+      };
   }
 };
 
@@ -254,59 +262,72 @@ const useUserTransactionsByTxHash = async (
   transactions: string[],
   filterHashes: string[],
   // address: token symbol
-  tokens: {[address: string]: string},
+  tokens: { [address: string]: string },
   limit = 12
 ) => {
-
   switch (chainType(network)) {
     case "evm": {
-      const transfers = (await Promise.all(Object.keys(tokens)
-        // fetch all transfers for all tokens
-        .map(async address => {
-          let cursor: string | undefined;
-          const transfers: MoralisUtils.Erc20Transfer[] = [];
-          do {
-            try {
-              const response = (await Moralis.EvmApi.token.getTokenTransfers({
-                address: address
-              }))
-              transfers.push(...response.result)
-              cursor = response.pagination.cursor
-            } catch (e) {
-              console.error(e)
-              break;
-            }
-          } while (cursor);
+      const transfers = (
+        await Promise.all(
+          Object.keys(tokens)
+            // fetch all transfers for all tokens
+            .map(async (address) => {
+              let cursor: string | undefined;
+              const transfers: MoralisUtils.Erc20Transfer[] = [];
+              do {
+                try {
+                  const response = await Moralis.EvmApi.token.getTokenTransfers(
+                    {
+                      address: address,
+                    }
+                  );
+                  transfers.push(...response.result);
+                  cursor = response.pagination.cursor;
+                } catch (e) {
+                  console.error(e);
+                  break;
+                }
+              } while (cursor);
 
-          return transfers;
-        })
-        // flatten into single array
-      )).flat()
-        .filter(transfer =>
-          // is one of the given transactions
-          transactions.includes(transfer.transactionHash) &&
-          // is not a filtered hash
-          !filterHashes.includes(transfer.transactionHash)
+              return transfers;
+            })
+          // flatten into single array
+        )
+      )
+        .flat()
+        .filter(
+          (transfer) =>
+            // is one of the given transactions
+            transactions.includes(transfer.transactionHash) &&
+            // is not a filtered hash
+            !filterHashes.includes(transfer.transactionHash)
         )
         // sort descending by block timestamp
-        .sort((a, b) =>
-          new Date(b.blockTimestamp).getTime() - new Date(a.blockTimestamp).getTime()
+        .sort(
+          (a, b) =>
+            new Date(b.blockTimestamp).getTime() -
+            new Date(a.blockTimestamp).getTime()
           // avoid unnecessary processing as soon as possible
-        ).slice(0, limit)
+        )
+        .slice(0, limit);
 
       const filteredTransactions: UserTransactionsRes = {
         data: {
           ethereum: {
-            transfers: transfers.map(t => ({
-              sender: {address: t.fromAddress.format()},
-              receiver: {address: t.toAddress.format() || ""},
-              block: {timestamp: {unixtime: new Date(t.blockTimestamp).getTime() / 1000}},
-              transaction: {hash: t.transactionHash},
+            transfers: transfers.map((t) => ({
+              sender: { address: t.fromAddress.format() },
+              receiver: { address: t.toAddress.format() || "" },
+              block: {
+                timestamp: {
+                  unixtime: new Date(t.blockTimestamp).getTime() / 1000,
+                },
+              },
+              transaction: { hash: t.transactionHash },
               amount: t.value.toString(),
-              currency: {symbol: tokens[t.address.checksum]}
-            }))
-          }
-        }
+              currency: { symbol: tokens[t.address.checksum] },
+            })),
+          },
+        },
       };
       return filteredTransactions;
     }
@@ -333,54 +354,67 @@ const useUserTransactionsByTxHash = async (
 
     default:
       return {
-        errors: `Unsupported network ${network}`
-      }
+        errors: `Unsupported network ${network}`,
+      };
   }
 };
 
 const useUserTransactionsAll = async (
   network: string,
   // address: token symbol
-  tokens: {[address: string]: string},
+  tokens: { [address: string]: string },
   page: number,
   filterHashes: string[],
   limit = 12
 ) => {
-  const offset = (page - 1) * 12
+  const offset = (page - 1) * 12;
 
- 
   switch (chainType(network)) {
     case "evm": {
-      const transfers = (await Promise.all(Object.keys(tokens)
-        // fetch first page of transfers for all tokens
-        .map(async address => (
-          (await Moralis.EvmApi.token.getTokenTransfers({
-            address: address
-          })).result
-        ))
-        // flatten into single array
-      )).flat()
+      const transfers = (
+        await Promise.all(
+          Object.keys(tokens)
+            // fetch first page of transfers for all tokens
+            .map(
+              async (address) =>
+                (
+                  await Moralis.EvmApi.token.getTokenTransfers({
+                    address: address,
+                  })
+                ).result
+            )
+          // flatten into single array
+        )
+      )
+        .flat()
         // filter ignored hashes
-        .filter(transfer => !filterHashes.includes(transfer.transactionHash))
+        .filter((transfer) => !filterHashes.includes(transfer.transactionHash))
         // sort descending by block timestamp
-        .sort((a, b) =>
-          new Date(b.blockTimestamp).getTime() - new Date(a.blockTimestamp).getTime()
+        .sort(
+          (a, b) =>
+            new Date(b.blockTimestamp).getTime() -
+            new Date(a.blockTimestamp).getTime()
           // avoid unnecessary processing as soon as possible
-        ).slice(offset, offset + limit)
+        )
+        .slice(offset, offset + limit);
 
       const filteredTransactions: UserTransactionsRes = {
         data: {
           ethereum: {
-            transfers: transfers.map(t => ({
-              sender: {address: t.fromAddress.format()},
-              receiver: {address: t.toAddress.format() || ""},
-              block: {timestamp: {unixtime: new Date(t.blockTimestamp).getTime() / 1000}},
-              transaction: {hash: t.transactionHash},
+            transfers: transfers.map((t) => ({
+              sender: { address: t.fromAddress.format() },
+              receiver: { address: t.toAddress.format() || "" },
+              block: {
+                timestamp: {
+                  unixtime: new Date(t.blockTimestamp).getTime() / 1000,
+                },
+              },
+              transaction: { hash: t.transactionHash },
               amount: t.value.toString(),
-              currency: {symbol: tokens[t.address.checksum]}
-            }))
-          }
-        }
+              currency: { symbol: tokens[t.address.checksum] },
+            })),
+          },
+        },
       };
       return filteredTransactions;
     }
@@ -409,8 +443,8 @@ const useUserTransactionsAll = async (
 
     default:
       return {
-        errors: `Unsupported network ${network}`
-      }
+        errors: `Unsupported network ${network}`,
+      };
   }
 };
 

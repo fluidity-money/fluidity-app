@@ -12,7 +12,7 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
-import {decimalsPostprocess} from "./userTransactions";
+import { decimalsPostprocess } from "./userTransactions";
 
 type ProcessedUserTransaction = {
   sender: string;
@@ -94,7 +94,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const ethereumTokens = config.config["ethereum"].tokens
       .filter((entry) => entry.isFluidOf !== undefined)
-      .reduce((previous, token) => ({...previous, [token.address]: token.symbol}), {});
+      .reduce(
+        (previous, token) => ({ ...previous, [token.address]: token.symbol }),
+        {}
+      );
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
       await useUserTransactionsByTxHash(
@@ -125,7 +128,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const tokenDecimals = config.config[network ?? ""].tokens
       .filter((entry) => entry.isFluidOf !== undefined)
-      .reduce((prev, curr) => ({...prev, [curr.symbol]: curr.decimals}), {} as {[symbol: string]: number});
+      .reduce(
+        (prev, curr) => ({ ...prev, [curr.symbol]: curr.decimals }),
+        {} as { [symbol: string]: number }
+      );
 
     // Destructure GraphQL data
     const userTransactions: ProcessedUserTransaction[] = transactions.map(

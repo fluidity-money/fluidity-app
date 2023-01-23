@@ -1,6 +1,10 @@
 import Moralis from "moralis";
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
-import {Chain, chainType, resolveMoralisChainName} from "~/util/chainUtils/chains";
+import {
+  Chain,
+  chainType,
+  resolveMoralisChainName,
+} from "~/util/chainUtils/chains";
 
 const queryByAddress: Queryable = {
   solana: gql`
@@ -58,7 +62,10 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionByAddressCount = async(network: string, address: string) => {
+const useUserTransactionByAddressCount = async (
+  network: string,
+  address: string
+) => {
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
@@ -68,7 +75,7 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
     case "evm": {
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
-        chain: resolveMoralisChainName(network as Chain)
+        chain: resolveMoralisChainName(network as Chain),
       });
       return transfers.raw.total;
     }
@@ -79,23 +86,22 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
         variables,
       };
 
-      return jsonPost<UserTransactionCountByAddressBody, UserTransactionCountRes>(
-        "https://graphql.bitquery.io",
-        body,
-        {
-          "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-        }
-      );
+      return jsonPost<
+        UserTransactionCountByAddressBody,
+        UserTransactionCountRes
+      >("https://graphql.bitquery.io", body, {
+        "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
+      });
     }
 
     default:
       return {
-        errors: `Unsupported network ${network}`
-      }
+        errors: `Unsupported network ${network}`,
+      };
   }
 };
 
-const useUserTransactionAllCount = async(network: string) => {
+const useUserTransactionAllCount = async (network: string) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
   };
@@ -104,13 +110,15 @@ const useUserTransactionAllCount = async(network: string) => {
     case "evm":
       // fetch for each token and return the sum
       return await variables.fluidCurrencies.reduce(async (count, token) => {
-        const {raw: {total}} = (await Moralis.EvmApi.token.getTokenTransfers({
-          address: token
-        }));
+        const {
+          raw: { total },
+        } = await Moralis.EvmApi.token.getTokenTransfers({
+          address: token,
+        });
         const transfers = total || 0;
-      
-        return await count + transfers;
-    }, Promise.resolve(0))
+
+        return (await count) + transfers;
+      }, Promise.resolve(0));
 
     case "solana": {
       const body = {
@@ -129,8 +137,8 @@ const useUserTransactionAllCount = async(network: string) => {
 
     default:
       return {
-        errors: `Unsupported network ${network}`
-      }
+        errors: `Unsupported network ${network}`,
+      };
   }
 };
 
