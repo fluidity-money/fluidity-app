@@ -589,7 +589,7 @@ export default function Home() {
                     )?.total_reward || 0
                   )}
                 </Display>
-                <Link to={"../rewards"}>
+                <Link to={`/${network}/dashboard/rewards`}>
                   <LinkButton
                     size="medium"
                     type="internal"

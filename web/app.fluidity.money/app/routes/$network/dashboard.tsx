@@ -17,10 +17,11 @@ import {
   useFetcher,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
-import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "~/util/split";
+import config from "~/webapp.config.server";
 import {
   DashboardIcon,
   GeneralButton,
@@ -42,7 +43,6 @@ import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-import { SplitContext } from "~/util/split";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -444,7 +444,7 @@ export default function Dashboard() {
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
-                  navigate("../fluidify");
+                  navigate(`/${network}/fluidify`);
                 }}
               >
                 <b>Fluidify{isMobile ? "" : " Money"}</b>
@@ -461,8 +461,8 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
-                  ? navigate("./rewards")
-                  : navigate("./rewards/unclaimed")
+                  ? navigate(`/${network}/dashboard/rewards`)
+                  : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
             >
@@ -517,7 +517,7 @@ export default function Dashboard() {
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
-              navigate("../fluidify");
+              navigate(`/${network}/fluidify`);
             }}
           >
             <Heading as="h5">
@@ -583,10 +583,11 @@ export default function Dashboard() {
             </a>
 
             {/* Source code */}
-            { showExperiment("enable-source-code") &&
-                <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                  <Text>Source code</Text>
-                </a> }
+            {showExperiment("enable-source-code") && (
+              <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                <Text>Source code</Text>
+              </a>
+            )}
           </section>
 
           {/* Socials */}

@@ -1,7 +1,7 @@
 
 import { promisify } from 'util';
 import { readFile as readFileCb } from 'fs';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 export const readFile = promisify(readFileCb);
 
@@ -23,7 +23,6 @@ export type Token = {
       aaveAddress: string,
     }
 );
-
 
 export const mustEnv = (env: string): string => {
   const e = process.env[env];
@@ -56,7 +55,28 @@ export const deployWorkerConfig = async (
   await workerConfig.init(operator, emergencyCouncil);
 
   return workerConfig.address;
-}
+};
+
+export const deployGovToken = async (
+  hre: HardhatRuntimeEnvironment,
+  govOperatorSigner: ethers.Signer
+): Promise<string> => {
+  const factory = await (await hre.ethers.getContractFactory("GovToken"))
+    .connect(govOperatorSigner);
+
+  const govToken = await factory.deploy();
+
+  await govToken.deployed();
+
+  await govToken.init(
+    "Fluidity Money",
+    "FLUID",
+    18,
+    BigNumber.from("1000000000000000000000000000")
+  );
+
+  return govToken;
+};
 
 export type TokenAddresses = {
   [symbol: string]: {

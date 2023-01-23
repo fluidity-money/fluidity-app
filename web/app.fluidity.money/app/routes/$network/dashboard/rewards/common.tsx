@@ -44,7 +44,7 @@ const UserRewards = ({
   const onClick = async () => {
     if (networkNotEth) return;
 
-    if (!claimNow) return navigate("../unclaimed");
+    if (!claimNow) return navigate(`/${network}/dashboard/rewards/unclaimed`);
 
     if (claiming) return;
 
@@ -79,7 +79,7 @@ const UserRewards = ({
       const gasFee = rewards.reduce((sum, res) => sum + (res?.gasFee || 0), 0);
 
       return navigate(
-        `../claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
+        `/${network}/dashboard/rewards/claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
       );
     } catch (e) {
       console.error(e);
@@ -183,7 +183,7 @@ const UserRewards = ({
           </div>
           <br />
 
-          <Link to="..">
+          <Link to={`/${network}/dashboard/rewards`}>
             <LinkButton
               size={"small"}
               type={"internal"}

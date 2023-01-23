@@ -196,7 +196,7 @@ const SwapCompleteModal = ({
             </LinkButton>
 
             {/* Dashboard Button */}
-            <Link to="../../dashboard/home">
+            <Link to={`/${network}/dashboard/home`}>
               <GeneralButton
                 buttontype="text"
                 size="medium"

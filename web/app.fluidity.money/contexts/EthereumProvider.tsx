@@ -17,11 +17,13 @@ import { EIP1193 } from "@web3-react/eip1193";
 import FluidityFacadeContext from "./FluidityFacade";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import {
   getTotalPrizePool,
   getUserMintLimit,
   userMintLimitEnabled,
   manualRewardToken,
+  getUserDegenScore,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -254,6 +256,11 @@ const EthereumFacade = ({
     );
   };
 
+  /**
+   * getPrizePool attempts to watch asset.
+   *
+   * Will fail on non-Metamask compliant wallets.
+   */
   const addToken = async (symbol: string) => {
     const token = tokens.find((t) => t.symbol === symbol);
 
@@ -271,6 +278,7 @@ const EthereumFacade = ({
     return connector?.watchAsset?.(watchToken);
   };
 
+  // getPrizePool returns total prize pool.
   const getPrizePool = async (): Promise<number> => {
     const signer = provider?.getSigner();
 
@@ -282,6 +290,7 @@ const EthereumFacade = ({
     return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi);
   };
 
+  // getFluidTokens returns FLUID tokens user holds.
   const getFluidTokens = async (): Promise<string[]> => {
     const fluidTokenAddrs = tokens
       .filter((t) => !!t.isFluidOf)
@@ -298,6 +307,28 @@ const EthereumFacade = ({
       .map(([addr]) => addr);
   };
 
+  /**
+   * getDegenScore returns the "DegenScore" of a user.
+   *
+   * Source: https://degenscore.com.
+   */
+  const getDegenScore = async (address: string): Promise<number> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return 0;
+    }
+
+    const degenScoreAddr = "0x0521FA0bf785AE9759C7cB3CBE7512EbF20Fbdaa";
+
+    return getUserDegenScore(
+      signer.provider,
+      address,
+      degenScoreAddr,
+      DegenScoreAbi
+    );
+  };
+
   return (
     <FluidityFacadeContext.Provider
       value={{
@@ -312,6 +343,7 @@ const EthereumFacade = ({
         rawAddress: account ?? "",
         address: account?.toLowerCase() ?? "",
         manualReward,
+        getDegenScore,
         addToken,
         connected: isActive,
       }}
@@ -323,49 +355,49 @@ const EthereumFacade = ({
 
 export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
   const Provider = ({ children }: { children: React.ReactNode }) => {
-    
     // Custom key logic
     const okxWallet = useWindow("okxwallet");
-    
+
     // Listen for changes to the injected connectors / Setup the injected connectors.
-    const [connectors, key]: [[Connector, Web3ReactHooks][], string] = useMemo(() => {
-      const _key: string[] = [];
-      const _connectors: [Connector, Web3ReactHooks][] = [];
-      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-        (actions) => new MetaMask({ actions })
-      );
-      _connectors.push([metaMask, metamaskHooks]);
-      _key.push("MetaMask");
-      
-      const [walletConnect, walletconnectHooks] =
-        initializeConnector<WalletConnect>(
-          (actions) =>
-            new WalletConnect({
-              actions,
-              options: {
-                rpc: {
-                  1: rpcUrl,
-                },
-              },
-            })
+    const [connectors, key]: [[Connector, Web3ReactHooks][], string] =
+      useMemo(() => {
+        const _key: string[] = [];
+        const _connectors: [Connector, Web3ReactHooks][] = [];
+        const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+          (actions) => new MetaMask({ actions })
         );
+        _connectors.push([metaMask, metamaskHooks]);
+        _key.push("MetaMask");
+
+        const [walletConnect, walletconnectHooks] =
+          initializeConnector<WalletConnect>(
+            (actions) =>
+              new WalletConnect({
+                actions,
+                options: {
+                  rpc: {
+                    1: rpcUrl,
+                  },
+                },
+              })
+          );
         _connectors.push([walletConnect, walletconnectHooks]);
         _key.push("WalletConnect");
-  
-      if (okxWallet) {
-        const [okx, okxHooks] = initializeConnector<EIP1193>(
-          (actions) =>
-            new EIP1193({
-              actions,
-              provider: okxWallet as Provider,
-            })
-        );
-        _connectors.push([okx, okxHooks]);
-        _key.push("OKX");
-      }
-  
-      return [_connectors, _key.join(",")];
-    }, [okxWallet]);
+
+        if (okxWallet) {
+          const [okx, okxHooks] = initializeConnector<EIP1193>(
+            (actions) =>
+              new EIP1193({
+                actions,
+                provider: okxWallet as Provider,
+              })
+          );
+          _connectors.push([okx, okxHooks]);
+          _key.push("OKX");
+        }
+
+        return [_connectors, _key.join(",")];
+      }, [okxWallet]);
     return (
       <>
         <Web3ReactProvider connectors={connectors} key={key}>
