@@ -1,4 +1,5 @@
 import type Transaction from "~/types/Transaction";
+import BN from "bn.js";
 import {
   PendingWinner,
   useUserPendingRewardsAll,
@@ -16,9 +17,9 @@ import {
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
-import { getTokenForNetwork } from "~/util";
+import { UserTransaction } from "~/queries/useUserTransactions";
 
-type UserTransaction = {
+type ProcesedUserTransaction = {
   sender: string;
   receiver: string;
   hash: string;
@@ -32,6 +33,30 @@ export type TransactionsLoaderData = {
   page: number;
   count: number;
   loaded: boolean;
+};
+
+export const decimalsPostprocess = (
+  amount: string | number,
+  symbol: string,
+  tokenDecimals: number
+) => {
+  // numbers are from Bitquery
+  // Bitquery stores DAI decimals (6) incorrectly (should be 18)
+  if (typeof amount === "number") {
+    return symbol === "DAI" || symbol === "fDAI" ? amount / 10 ** 12 : amount;
+  }
+  // otherwise adjust for decimals as Moralis returns raw
+  const bn = new BN(amount);
+  const decimals = new BN(10).pow(new BN(tokenDecimals));
+  // separate whole and decimal part
+  const { div, mod } = bn.divmod(decimals);
+  // take 3 digits to round to 2
+  const modString = "0." + mod.toString().slice(0, 3);
+  // convert decimals to number and round
+  const modNumber =
+    Math.round((parseFloat(modString) + Number.EPSILON) * 100) / 100;
+  // add as number
+  return div.toNumber() + modNumber;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -116,7 +141,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const userTransactionsData = {
       [network as string]: {
-        transfers: [],
+        transfers: [] as UserTransaction[],
       },
     };
 
@@ -125,12 +150,22 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
       const { data: transactionsData, errors: transactionsErr } =
         await (async () => {
+          const tokens = config.config[network ?? ""].tokens
+            .filter((entry) => entry.isFluidOf !== undefined)
+            .reduce(
+              (previous, token) => ({
+                ...previous,
+                [token.address]: token.symbol,
+              }),
+              {}
+            );
+          const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
+
           switch (true) {
             case !!address: {
-              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsByAddress(
                 network,
-                getTokenForNetwork(network),
+                tokens,
                 page,
                 address as string,
                 JointPayoutAddrs.slice(i, i + 99),
@@ -138,10 +173,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               );
             }
             default: {
-              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsAll(
                 network,
-                getTokenForNetwork(network),
+                tokens,
                 page,
                 JointPayoutAddrs.slice(i, i + 99),
                 limit === Infinity ? 12 : limit
@@ -174,8 +208,21 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
 
+    const {
+      config: {
+        [network as string]: { tokens },
+      },
+    } = config;
+
+    const tokenDecimals = config.config[network ?? ""].tokens
+      .filter((entry) => entry.isFluidOf !== undefined)
+      .reduce(
+        (previous, token) => ({ ...previous, [token.symbol]: token.decimals }),
+        {} as { [symbol: string]: number }
+      );
+
     // Destructure GraphQL data
-    const userTransactions: UserTransaction[] = transactions.map(
+    const userTransactions: ProcesedUserTransaction[] = transactions.map(
       (transaction) => {
         const {
           sender: { address: sender },
@@ -194,21 +241,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           hash,
           // Normalise timestamp to ms
           timestamp: timestamp * 1000,
-          // Bitquery stores DAI decimals (6) incorrectly (should be 18)
-          value:
-            currency === "DAI" || currency === "fDAI"
-              ? value / 10 ** 12
-              : value,
+          value: decimalsPostprocess(value, currency, tokenDecimals[currency]),
           currency,
         };
       }
     );
-
-    const {
-      config: {
-        [network as string]: { tokens },
-      },
-    } = config;
 
     const tokenLogoMap = tokens.reduce(
       (map, token) => ({
