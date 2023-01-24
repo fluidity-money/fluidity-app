@@ -21,6 +21,16 @@ const options = {
         },
       },
     ],
+    arbitrum: [
+      {
+        label: "Arbitrum",
+        testnet: false,
+        rpc: {
+          http: "",
+          ws: "",
+        },
+      },
+    ],
   },
 };
 

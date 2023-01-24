@@ -11,6 +11,11 @@ server = "https://api.ethereum.fluidity.money"
 # rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
 # server = "https://api.solana.fluidity.money"
 
+[[drivers.arbitrum]]
+label = "Arbitrum"
+testnet = false
+rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -153,6 +158,65 @@ address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 decimals = 6
+
+[config.arbitrum]
+explorer = "https://etherscan.io"
+fluidAssets = [
+    "0x386a41F5b8787003dd508521Bf310C08632C6C4f",
+    "0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9",
+    "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387",
+]
+
+[[config.arbitrum.tokens]]
+symbol = "USDC"
+name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
+address = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+colour = "#2775ca"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0x386a41F5b8787003dd508521Bf310C08632C6C4f"
+colour = "#2775ca"
+isFluidOf = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "USDT"
+name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
+address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+colour = "#12946c"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDT"
+name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
+address = "0x4adF9Ea105Bda268EB94C63b6677850fBCe25fd9"
+colour = "#12946c"
+isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "DAI"
+name = "Dai Stablecoin"
+logo = "/assets/tokens/dai.svg"
+address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+colour = "#825902"
+decimals = 18
+
+[[config.arbitrum.tokens]]
+symbol = "fDAI"
+name = "Fluid DAI"
+logo = "/assets/tokens/fDAI.svg"
+address = "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
+colour = "#825902"
+isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+decimals = 18
 
 # liquidity_providers Configurations 
 # eth providers
