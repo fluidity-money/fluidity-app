@@ -39,28 +39,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const [
       totalPrizePool,
-      { volume },
+      /*{ volume }*/,
       { data: rewardsData, errors: rewardsErr },
     ] = await Promise.all([
       getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
-      address
-        ? jsonGet<{ address: string }, { volume: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`,
-            {
-              address,
-            }
-          )
-        : jsonGet<Record<string, string>, { volume: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`
-          ),
+      // address
+      //   ? jsonGet<{ address: string }, { volume: Volume[] }>(
+      //       `${url.origin}/${network}/query/volumeStats`,
+      //       {
+      //         address,
+      //       }
+      //     )
+      //   : jsonGet<Record<string, string>, { volume: Volume[] }>(
+      //       `${url.origin}/${network}/query/volumeStats`
+      //     ),
+      async () => { return {}; },
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),
     ]);
 
-    if (!volume) {
-      throw new Error("Could not fetch volume data");
-    }
+    // if (!volume) {
+    //   throw new Error("Could not fetch volume data");
+    // }
 
     if (rewardsErr || !rewardsData) {
       throw new Error("Could not fetch rewards data");
@@ -69,7 +70,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return json({
       totalPrizePool,
       rewards: rewardsData,
-      volume: volume,
+      //volume: volume,
       totalFluidPairs: fluidPairs,
       network,
       timestamp,
