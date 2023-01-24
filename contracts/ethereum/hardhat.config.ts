@@ -4,7 +4,7 @@ import "hardhat-docgen";
 import { task, subtask } from "hardhat/config";
 import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-import { deployTokens, deployWorkerConfig, forknetTakeFunds, mustEnv } from './script-utils';
+import { deployTokens, deployWorkerConfig, setOracles, forknetTakeFunds, mustEnv } from './script-utils';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -43,14 +43,6 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
 subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   if (!shouldDeploy.length) return;
 
-  if (!oracleAddress)
-    throw new Error(
-      `Set env variable ${oracleKey} to an 0x123 encoded public key.`);
-
-  if (!emergencyCouncilAddress)
-    throw new Error(
-      `Set env variable ${emergencyCouncilKey} to an 0x123 encoded public key.`);
-
   await hre.run("forknet:take-usdt");
 
   const workerConfigAddress = await deployWorkerConfig(
@@ -72,6 +64,8 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   await setOracles(
     hre,
     Object.values(tokens).map(t => t.deployedToken.address),
+    oracleAddress,
+    operatorAddress,
   );
 
   console.log(`deployment complete`);

@@ -41,21 +41,34 @@ export const optionalEnv = (env: string, fallback: string): string => {
   return e;
 };
 
-export const deployWorkerConfig = async (
+const deployAndInit = async (
+  hre: HardhatRuntimeEnvironment,
+  contract: String,
+  ...args: any[]
+) => {
+  const factory = await hre.ethers.getContractFactory("WorkerConfig");
+  if (!factory) throw new Error(`Contract '${contract} ' not found!`);
+  const c = await factory.deploy();
+  await c.deployed();
+  await c.init(...args);
+  return c.address;
+}
+
+export const deployRegistry = async (
   hre: HardhatRuntimeEnvironment,
   operator: string,
   emergencyCouncil: string,
 ): Promise<string> => {
-  const factory = await hre.ethers.getContractFactory("WorkerConfig");
-
-  const workerConfig = await factory.deploy();
-
-  await workerConfig.deployed();
-
-  await workerConfig.init(operator, emergencyCouncil);
-
-  return workerConfig.address;
+  return deployAndInit(hre, "Registry", operator, emergencyCouncil);
 };
+
+export const deployOperator = async (
+  hre: HardhatRuntimeEnvironment,
+  operator: string,
+  registry: string,
+): Promise<string> => {
+  return deployAndInit(hre, "Operator", operator, registry);
+}
 
 export const deployGovToken = async (
   hre: HardhatRuntimeEnvironment,
@@ -65,7 +78,6 @@ export const deployGovToken = async (
     .connect(govOperatorSigner);
 
   const govToken = await factory.deploy();
-
   await govToken.deployed();
 
   await govToken.init(
@@ -74,7 +86,6 @@ export const deployGovToken = async (
     18,
     BigNumber.from("1000000000000000000000000000")
   );
-
   return govToken.address;
 };
 
@@ -245,12 +256,13 @@ export const forknetTakeFunds = async (
   }
 };
 
-const setOracles = async (
+export const setOracles = async (
   hre: HardhatRuntimeEnvironment,
   tokenAddresses: string[],
   oracle: string,
 ) => {
-
+  for (const address of tokenAddresses) {
+  }
 }
 // statically ensure an object can't exist (ie, all enum varients are handled)
 function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }
