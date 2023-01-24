@@ -181,7 +181,7 @@ export default function FluidifyToken() {
     if (address && !swapping) {
       (async () => {
         switch (network) {
-          case "ethereum": {
+          case "ethereum" || "arbitrum": {
             const [tokensMinted, userTokenBalance, mintLimit] =
               await Promise.all([
                 Promise.all(
