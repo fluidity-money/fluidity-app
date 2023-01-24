@@ -4,7 +4,7 @@ import type { TimeSepUserYield } from "~/queries/useUserYield";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { LoaderFunction, json } from "@remix-run/node";
-import { jsonGet } from "~/util";
+// import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
