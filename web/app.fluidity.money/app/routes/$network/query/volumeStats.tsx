@@ -65,7 +65,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const parsedVolume = volumesRes.data.ethereum.transfers.map((transfer) => ({
     symbol: transfer.currency.symbol,
     amount: transfer.amount,
-    timestamp: transfer.block.timestamp.unixtime * 1000,
+    timestamp: transfer.block.timestamp.unixtime,
     sender: transfer.sender.address,
     receiver: transfer.receiver.address,
   }));
