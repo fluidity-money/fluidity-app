@@ -73,11 +73,25 @@ const useUserTransactionByAddressCount = async (
 
   switch (chainType(network)) {
     case "evm": {
+      try {
+        console.log(
+          "[Call] Moralis.EvmApi.token.getWalletTokenTransfers for address: ",
+          address,
+          " on network: ",
+          network
+        );
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
         chain: resolveMoralisChainName(network as Chain),
       });
       return transfers.raw.total;
+      } catch (e) {
+        console.error(e);
+        return {
+          errors:
+            "Error fetching transactions: This is an upstream issue and we're working with the Moralis team to resolve it. Sit tight!",
+        };
+      }
     }
 
     case "solana": {
@@ -109,7 +123,14 @@ const useUserTransactionAllCount = async (network: string) => {
   switch (chainType(network)) {
     case "evm":
       // fetch for each token and return the sum
+      try {
       return await variables.fluidCurrencies.reduce(async (count, token) => {
+        console.log(
+          "[Call] Moralis.EvmApi.token.getTokenTransfers for address: ",
+          token,
+          " on network: ",
+          network
+        );
         const {
           raw: { total },
         } = await Moralis.EvmApi.token.getTokenTransfers({
@@ -119,6 +140,13 @@ const useUserTransactionAllCount = async (network: string) => {
 
         return (await count) + transfers;
       }, Promise.resolve(0));
+      } catch (e) {
+        console.error(e);
+        return {
+          errors:
+            "Error fetching transactions: This is an upstream issue and we're working with the Moralis team to resolve it. Sit tight!",
+        };
+      }
 
     case "solana": {
       const body = {

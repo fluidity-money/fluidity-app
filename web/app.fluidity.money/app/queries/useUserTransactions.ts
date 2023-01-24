@@ -199,40 +199,56 @@ const useUserTransactionsByAddress = async (
   switch (chainType(network)) {
     case "evm": {
       // fetch first page of transfers since <=12 are needed
-      const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
-        address,
-        chain: resolveMoralisChainName(network as Chain),
-      });
+      try {
+        console.log(
+          "[Call] Moralis.EvmApi.token.getWalletTokenTransfers for address: ",
+          address,
+          " on network: ",
+          network
+        );
+        const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
+          address,
+          chain: resolveMoralisChainName(network as Chain),
+        });
 
-      const filteredTransactions: UserTransactionsRes = {
-        data: {
-          ethereum: {
-            transfers: transfers.result
-              .filter(
-                (t) =>
-                  // is a fluid token
-                  Object.keys(tokens).includes(t.address.checksum) &&
-                  // is not a filtered hash
-                  !filterHashes.includes(t.transactionHash) &&
-                  // address is sender or receiver
-                  (t.fromAddress.equals(address) || t.toAddress.equals(address))
-              )
-              .slice(offset, offset + limit)
-              .map((t) => ({
-                sender: { address: t.fromAddress.format() },
-                receiver: { address: t.toAddress.format() },
-                block: {
-                  timestamp: { unixtime: new Date(t.blockTimestamp).getTime() },
-                },
-                transaction: { hash: t.transactionHash },
-                amount: t.value.toString(),
-                currency: { symbol: tokens[t.address.checksum] },
-              })),
+        const filteredTransactions: UserTransactionsRes = {
+          data: {
+            ethereum: {
+              transfers: transfers.result
+                .filter(
+                  (t) =>
+                    // is a fluid token
+                    Object.keys(tokens).includes(t.address.checksum) &&
+                    // is not a filtered hash
+                    !filterHashes.includes(t.transactionHash) &&
+                    // address is sender or receiver
+                    (t.fromAddress.equals(address) ||
+                      t.toAddress.equals(address))
+                )
+                .slice(offset, offset + limit)
+                .map((t) => ({
+                  sender: { address: t.fromAddress.format() },
+                  receiver: { address: t.toAddress.format() },
+                  block: {
+                    timestamp: {
+                      unixtime: new Date(t.blockTimestamp).getTime(),
+                    },
+                  },
+                  transaction: { hash: t.transactionHash },
+                  amount: t.value.toString(),
+                  currency: { symbol: tokens[t.address.checksum] },
+                })),
+            },
           },
-        },
-      };
-
-      return filteredTransactions;
+        };
+        return filteredTransactions;
+      } catch (e) {
+        console.error(e);
+        return {
+          errors:
+            "Error fetching transactions: This is an upstream issue and we're working with the Moralis team to resolve it. Sit tight!",
+        };
+      }
     }
 
     case "solana": {
@@ -276,6 +292,12 @@ const useUserTransactionsByTxHash = async (
               const transfers: MoralisUtils.Erc20Transfer[] = [];
               do {
                 try {
+                  console.log(
+                    "[Call] Moralis.EvmApi.token.getTokenTransfers for address: ",
+                    address,
+                    " on network: ",
+                    network
+                  );
                   const response = await Moralis.EvmApi.token.getTokenTransfers(
                     {
                       address: address,
@@ -371,53 +393,67 @@ const useUserTransactionsAll = async (
 
   switch (chainType(network)) {
     case "evm": {
-      const transfers = (
-        await Promise.all(
-          Object.keys(tokens)
-            // fetch first page of transfers for all tokens
-            .map(
-              async (address) =>
-                (
-                  await Moralis.EvmApi.token.getTokenTransfers({
-                    address: address,
-                  })
-                ).result
-            )
-          // flatten into single array
-        )
-      )
-        .flat()
-        // filter ignored hashes
-        .filter((transfer) => !filterHashes.includes(transfer.transactionHash))
-        // sort descending by block timestamp
-        .sort(
-          (a, b) =>
-            new Date(b.blockTimestamp).getTime() -
-            new Date(a.blockTimestamp).getTime()
-          // avoid unnecessary processing as soon as possible
+      try {
+      const reqTransfers = await Promise.all(
+        Object.keys(tokens)
+          // fetch first page of transfers for all tokens
+          .map(async (address) => {
+            console.log(
+              "[Call] Moralis.EvmApi.token.getTokenTransfers for address: ",
+              address,
+              " on network: ",
+              network
+            );
+            return (
+              await Moralis.EvmApi.token.getTokenTransfers({
+                address: address,
+              })
+            ).result;
+          })
+        // flatten into single array
+      );
+      
+      const transfers = reqTransfers
+      .flat()
+      // filter ignored hashes
+      .filter((transfer) => !filterHashes.includes(transfer.transactionHash))
+      // sort descending by block timestamp
+      .sort(
+        (a, b) =>
+        new Date(b.blockTimestamp).getTime() -
+        new Date(a.blockTimestamp).getTime()
+        // avoid unnecessary processing as soon as possible
         )
         .slice(offset, offset + limit);
-
-      const filteredTransactions: UserTransactionsRes = {
-        data: {
-          ethereum: {
-            transfers: transfers.map((t) => ({
-              sender: { address: t.fromAddress.format() },
-              receiver: { address: t.toAddress.format() || "" },
-              block: {
-                timestamp: {
-                  unixtime: new Date(t.blockTimestamp).getTime() / 1000,
+        
+        const filteredTransactions: UserTransactionsRes = {
+          data: {
+            ethereum: {
+              transfers: transfers.map((t) => ({
+                sender: { address: t.fromAddress.format() },
+                receiver: { address: t.toAddress.format() || "" },
+                block: {
+                  timestamp: {
+                    unixtime: new Date(t.blockTimestamp).getTime() / 1000,
+                  },
                 },
-              },
-              transaction: { hash: t.transactionHash },
-              amount: t.value.toString(),
-              currency: { symbol: tokens[t.address.checksum] },
-            })),
+                transaction: { hash: t.transactionHash },
+                amount: t.value.toString(),
+                currency: { symbol: tokens[t.address.checksum] },
+              })),
+            },
           },
-        },
-      };
-      return filteredTransactions;
-    }
+        };
+        return filteredTransactions;
+      }
+      catch (e) {
+        console.error(e);
+        return {
+          errors:
+            "Error fetching transactions: This is an upstream issue and we're working with the Moralis team to resolve it. Sit tight!",
+        };
+      }
+      }
 
     case "solana": {
       const variables = {

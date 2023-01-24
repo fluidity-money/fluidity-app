@@ -34,12 +34,27 @@ const useVolumeTxByAddressTimestamp = async (
   let cursor: string | undefined;
   const transfers: MoralisUtils.Erc20Transfer[] = [];
   do {
+    console.log(
+      "[Call] Moralis.EvmApi.token.getTokenTransfers for address: ",
+      address
+    );
+    try {
     const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
       address,
       cursor,
     });
     transfers.push(...response.result);
     cursor = response.pagination.cursor;
+    } catch (e) {
+      console.error(e);
+      return {
+        data: {
+          ethereum: {
+            transfers: [],
+          },
+        },
+      };
+    }
   } while (cursor);
 
   const filteredTransactions: VolumeTxsResponse = {
@@ -81,12 +96,17 @@ const useVolumeTxByTimestamp = async (
   fluidAssets: { [address: string]: string },
   iso8601Timestamp: string
 ) => {
+  try {
   const transfers = (
     await Promise.all(
       Object.keys(fluidAssets).flatMap(async (address) => {
         let cursor: string | undefined;
         const transfers: MoralisUtils.Erc20Transfer[] = [];
         do {
+          console.log(
+            "[Call] Moralis.EvmApi.token.getTokenTransfers for address: ",
+            address
+          );
           const response = await Moralis.EvmApi.token.getTokenTransfers({
             address,
             cursor,
@@ -100,6 +120,15 @@ const useVolumeTxByTimestamp = async (
   )
     .filter((t) => !!t)
     .flat() as MoralisUtils.Erc20Transfer[];
+  } catch (e) {
+    console.error(e);
+    return {
+      data: {
+        ethereum: {
+          transfers: [],
+        },
+      },
+    };
 
   const filteredTransactions: VolumeTxsResponse = {
     data: {
