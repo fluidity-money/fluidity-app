@@ -5,9 +5,11 @@ import {
     fUsdtOperator,
     fUsdtCouncil,
 } from './setup-mainnet';
-import { accountAddr, configAddr } from './setup-common'
+import { accountAddr, configAddr } from './setup-common';
 import * as ethers from 'ethers';
+import { BigNumber } from 'ethers';
 import { expect } from "chai";
+import { expectEq, expectGt } from './test-utils';
 
 describe("Token", async function () {
     before(async function () {
@@ -111,5 +113,32 @@ describe("Token", async function () {
         );
         const newChange = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(newChange).to.equal(blockedBalance);
+    });
+
+    it("supports taking amounts from the prize pool that isn't anyone's liquidity", async () => {
+        const initialAmount = await fUsdtOperator.balanceOf(accountAddr);
+
+        expectGt(initialAmount, 0);
+
+        const initialRewardPool = await fUsdtOperator.callStatic.rewardPoolAmount();
+
+        const drainGangAmount = BigNumber.from(500);
+
+        // reward pool > 500
+        expectGt(initialRewardPool, drainGangAmount);
+
+        await fUsdtOperator.drainRewardPool(accountAddr, drainGangAmount);
+
+        const newRewardPool = await fUsdtOperator.callStatic.rewardPoolAmount();
+
+        const newAmount = await fUsdtOperator.balanceOf(accountAddr);
+
+        // expect that the new prize pool is greater than the old amount
+        // minus the drain gang amount to compensate for a tick appreciating
+        // the value of the prize pool
+
+        expectGt(newRewardPool, initialRewardPool.sub(drainGangAmount));
+
+        expectEq(initialAmount.add(drainGangAmount), newAmount);
     });
 });
