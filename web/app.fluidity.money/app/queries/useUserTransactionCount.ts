@@ -84,15 +84,17 @@ export type UserTransactionCountRes = {
 
 const useUserTransactionByAddressCount = async (
   network: string,
-  address: string
+  address: string,
+  useMoralis = true,
 ) => {
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
   };
 
-  switch (network) {
-    case "arbitrum": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
         chain: resolveMoralisChainName(network as Chain),
@@ -100,8 +102,8 @@ const useUserTransactionByAddressCount = async (
       return transfers.raw.total;
     }
 
-    case "ethereum":
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const body = {
         query: queryByAddress[network],
         variables,
@@ -122,17 +124,18 @@ const useUserTransactionByAddressCount = async (
   }
 };
 
-const useUserTransactionAllCount = async (network: string) => {
+const useUserTransactionAllCount = async (network: string, useMoralis = true) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
   };
 
-  switch (network) {
-    case "arbitrum":
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       // fetch for each token and return the sum
       return await variables.fluidCurrencies.reduce(async (count, token) => {
         const {
-          raw: { total },
+          raw: {total},
         } = await Moralis.EvmApi.token.getTokenTransfers({
           address: token,
         });
@@ -140,9 +143,10 @@ const useUserTransactionAllCount = async (network: string) => {
 
         return (await count) + transfers;
       }, Promise.resolve(0));
+    }
 
-    case "ethereum":
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const body = {
         query: queryAll[network],
         variables,

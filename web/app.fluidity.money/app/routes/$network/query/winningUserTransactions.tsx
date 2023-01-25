@@ -104,7 +104,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         network,
         winnerAddrs,
         [],
-        ethereumTokens
+        ethereumTokens,
+        useMoralis,
       );
 
     if (!userTransactionsData || userTransactionsErr) {

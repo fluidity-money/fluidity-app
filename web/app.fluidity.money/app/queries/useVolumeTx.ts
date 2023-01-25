@@ -108,31 +108,13 @@ const useVolumeTxByAddressTimestamp = async (
   // address: token symbol
   fluidAssets: { [address: string]: string },
   address: string,
-  iso8601Timestamp: string
+  iso8601Timestamp: string,
+  useMoralis = true
 ): Promise<VolumeTxsResponse> => {
 
-  switch (network) {
-    case "ethereum":
-    case "solana": {
-      const variables = {
-        fluidAssets: Object.keys(fluidAssets),
-        address,
-        timestamp: iso8601Timestamp
-      };
-      const url = "https://graphql.bitquery.io";
-      const body = {
-        variables,
-        query: queryByAddressTimestamp,
-      };
-      return jsonPost<VolumeTxsBodyByAddressTimestamp, VolumeTxsResponse>(
-        url,
-        body,
-        {
-          "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-        }
-      );
-    }
-    case "arbitrum": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       let cursor: string | undefined;
       const transfers: MoralisUtils.Erc20Transfer[] = [];
       do {
@@ -177,6 +159,26 @@ const useVolumeTxByAddressTimestamp = async (
       };
       return filteredTransactions;
     }
+    case network === "ethereum":
+    case network === "solana": {
+      const variables = {
+        fluidAssets: Object.keys(fluidAssets),
+        address,
+        timestamp: iso8601Timestamp
+      };
+      const url = "https://graphql.bitquery.io";
+      const body = {
+        variables,
+        query: queryByAddressTimestamp,
+      };
+      return jsonPost<VolumeTxsBodyByAddressTimestamp, VolumeTxsResponse>(
+        url,
+        body,
+        {
+          "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
+        }
+      );
+    }
     default:
       return {
         errors: `Unsupported network ${network}`,
@@ -188,30 +190,12 @@ const useVolumeTxByTimestamp = async (
   network: string,
   // address: token symbol
   fluidAssets: { [address: string]: string },
-  iso8601Timestamp: string
+  iso8601Timestamp: string,
+  useMoralis = true
 ) => {
-  switch (network) {
-    case "ethereum":
-    case "solana": {
-      const variables = {
-        fluidAssets: Object.keys(fluidAssets),
-        timestamp: iso8601Timestamp
-      };
-
-      const url = "https://graphql.bitquery.io";
-      const body = {
-        variables,
-        query: queryByTimestamp,
-      };
-      return jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(
-        url,
-        body,
-        {
-          "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-        }
-      );
-    }
-    case "arbitrum": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
   const transfers = (
     await Promise.all(
       Object.keys(fluidAssets).flatMap(async (address) => {
@@ -261,6 +245,26 @@ const useVolumeTxByTimestamp = async (
     },
   };
   return filteredTransactions;
+    }
+    case network === "ethereum":
+    case network === "solana": {
+      const variables = {
+        fluidAssets: Object.keys(fluidAssets),
+        timestamp: iso8601Timestamp
+      };
+
+      const url = "https://graphql.bitquery.io";
+      const body = {
+        variables,
+        query: queryByTimestamp,
+      };
+      return jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(
+        url,
+        body,
+        {
+          "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
+        }
+      );
     }
     default:
       return {

@@ -296,6 +296,7 @@ const useUserTransactionsByAddress = async (
   page: number,
   address: string,
   filterHashes: string[],
+  useMoralis = true,
   limit = 12
 ): Promise<UserTransactionsRes> => {
   const offset = (page - 1) * 12;
@@ -308,8 +309,9 @@ const useUserTransactionsByAddress = async (
     limit,
   };
 
-  switch (network) {
-    case "arbitrum": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       // fetch first page of transfers since <=12 are needed
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
@@ -347,8 +349,8 @@ const useUserTransactionsByAddress = async (
       return filteredTransactions;
     }
 
-    case "ethereum":
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const body = {
         query: queryByAddress[network],
         variables,
@@ -376,10 +378,12 @@ const useUserTransactionsByTxHash = async (
   filterHashes: string[],
   // address: token symbol
   tokens: { [address: string]: string },
+  useMoralis = true,
   limit = 12
 ) => {
-  switch (network) {
-    case "arbitrum": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       const transfers = (
         await Promise.all(
           Object.keys(tokens)
@@ -445,8 +449,8 @@ const useUserTransactionsByTxHash = async (
       return filteredTransactions;
     }
 
-    case "ethereum":
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const variables = {
         transactions,
         filterHashes,
@@ -479,12 +483,14 @@ const useUserTransactionsAll = async (
   tokens: { [address: string]: string },
   page: number,
   filterHashes: string[],
+  useMoralis = true,
   limit = 12
 ) => {
   const offset = (page - 1) * 12;
 
-  switch (network) {
-    case "arbitrum": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       const transfers = (
         await Promise.all(
           Object.keys(tokens)
@@ -533,8 +539,8 @@ const useUserTransactionsAll = async (
       return filteredTransactions;
     }
 
-    case "ethereum":
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const variables = {
         tokens: Object.values(tokens),
         offset,

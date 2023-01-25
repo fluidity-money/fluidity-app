@@ -5,6 +5,7 @@ import {
   useVolumeTxByAddressTimestamp,
   useVolumeTxByTimestamp,
 } from "~/queries/useVolumeTx";
+import {useSplitExperiment} from "~/util/server/split";
 import config from "~/webapp.config.server";
 
 export type Volume = {
@@ -22,6 +23,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
+  const useMoralis = useSplitExperiment("enable-moralis", true);
 
   if (!network)
     return;
@@ -63,8 +65,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const prevYearIso = prevYearDate.toISOString();
 
   const {data: volumeData, errors: volumeErr }= address
-    ? await useVolumeTxByAddressTimestamp(network, fluidAssets, address, prevYearIso)
-    : await useVolumeTxByTimestamp(network, fluidAssets, prevYearIso);
+    ? await useVolumeTxByAddressTimestamp(network, fluidAssets, address, prevYearIso, useMoralis)
+    : await useVolumeTxByTimestamp(network, fluidAssets, prevYearIso, useMoralis);
 
     if (!volumeData || volumeErr) {
       captureException(
