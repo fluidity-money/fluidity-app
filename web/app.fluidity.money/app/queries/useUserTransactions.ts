@@ -2,6 +2,7 @@ import Moralis from "moralis";
 import MoralisUtils from "@moralisweb3/common-evm-utils";
 import { gql, Queryable, jsonPost } from "~/util";
 import { Chain, resolveMoralisChainName } from "~/util/chainUtils/chains";
+import {defaultQueryOptions} from ".";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -293,10 +294,11 @@ const useUserTransactionsByAddress = async (
   page: number,
   address: string,
   filterHashes: string[],
-  useMoralis = true,
+  queryOptions = defaultQueryOptions,
   limit = 12
 ): Promise<UserTransactionsRes> => {
   const offset = (page - 1) * 12;
+  const {useMoralis} = queryOptions;
 
   const variables = {
     address: address,
@@ -374,10 +376,12 @@ const useUserTransactionsByTxHash = async (
   transactions: string[],
   filterHashes: string[],
   // address: token symbol
-  tokens: { [address: string]: string },
-  useMoralis = true,
+  tokens: {[address: string]: string},
+  queryOptions = defaultQueryOptions,
   limit = 12
 ) => {
+  const {useMoralis} = queryOptions;
+
   switch (true) {
     case network === "arbitrum":
     case network === "ethereum" && useMoralis: {
@@ -480,9 +484,10 @@ const useUserTransactionsAll = async (
   tokens: { [address: string]: string },
   page: number,
   filterHashes: string[],
-  useMoralis = true,
+  queryOptions = defaultQueryOptions,
   limit = 12
 ) => {
+  const {useMoralis} = queryOptions;
   const offset = (page - 1) * 12;
 
   switch (true) {

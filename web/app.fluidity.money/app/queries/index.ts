@@ -1,3 +1,11 @@
+type QueryOptions = {
+  useMoralis: boolean
+}
+
+const defaultQueryOptions: QueryOptions = {
+  useMoralis: true
+}
+
 import {
   useUserTransactionAllCount,
   useUserTransactionByAddressCount,
@@ -16,7 +24,12 @@ import {
 } from "./useUserRewards";
 import { useUserYieldAll, useUserYieldByAddress } from "./useUserYield";
 
+export type {
+  QueryOptions
+};
+
 export {
+  defaultQueryOptions,
   useUserTransactionAllCount,
   useUserTransactionByAddressCount,
   useUserTransactionsAll,

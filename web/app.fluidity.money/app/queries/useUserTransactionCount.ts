@@ -1,6 +1,7 @@
 import Moralis from "moralis";
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
 import { Chain, resolveMoralisChainName } from "~/util/chainUtils/chains";
+import {defaultQueryOptions} from ".";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -82,8 +83,10 @@ export type UserTransactionCountRes = {
 const useUserTransactionByAddressCount = async (
   network: string,
   address: string,
-  useMoralis = true
+  queryOptions = defaultQueryOptions,
 ) => {
+  const {useMoralis} = queryOptions;
+
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
@@ -123,8 +126,10 @@ const useUserTransactionByAddressCount = async (
 
 const useUserTransactionAllCount = async (
   network: string,
-  useMoralis = true
+  queryOptions = defaultQueryOptions,
 ) => {
+  const {useMoralis} = queryOptions;
+
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
   };

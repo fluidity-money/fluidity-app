@@ -42,7 +42,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         1,
         address,
         [],
-        useMoralis,
+        {useMoralis},
         50
       );
 

@@ -36,7 +36,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
   const page_ = url.searchParams.get("page");
-  const useMoralis = useSplitExperiment("enable-moralis", true);
+  const useMoralis = !!useSplitExperiment("enable-moralis", true);
 
   if (!network || !page_) return new Error("Invalid Request");
 
@@ -107,7 +107,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         winnerAddrs,
         [],
         ethereumTokens,
-        useMoralis
+        {useMoralis}
       );
 
     if (!userTransactionsData || userTransactionsErr) {

@@ -1,6 +1,7 @@
 import { gql, jsonPost } from "~/util";
 import Moralis from "moralis";
 import MoralisUtils from "@moralisweb3/common-evm-utils";
+import {defaultQueryOptions} from ".";
 
 const queryByAddressTimestamp = gql`
   query VolumeTxs(
@@ -103,14 +104,17 @@ export type VolumeTxsResponse = {
   errors?: unknown;
 };
 
+
 const useVolumeTxByAddressTimestamp = async (
   network: string,
   // address: token symbol
   fluidAssets: { [address: string]: string },
   address: string,
   iso8601Timestamp: string,
-  useMoralis = true
+  queryOptions = defaultQueryOptions,
 ): Promise<VolumeTxsResponse> => {
+  const {useMoralis} = queryOptions;
+
   switch (true) {
     case network === "arbitrum":
     case network === "ethereum" && useMoralis: {
@@ -191,8 +195,10 @@ const useVolumeTxByTimestamp = async (
   // address: token symbol
   fluidAssets: { [address: string]: string },
   iso8601Timestamp: string,
-  useMoralis = true
+  queryOptions = defaultQueryOptions
 ) => {
+  const {useMoralis} = queryOptions;
+
   switch (true) {
     case network === "arbitrum":
     case network === "ethereum" && useMoralis: {
