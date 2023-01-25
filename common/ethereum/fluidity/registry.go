@@ -51,11 +51,9 @@ type (
 		Found bool    `abi:"found"`
 		Name  string  `abi:"name"`
 	}
-	scannedTrfVars struct {
-
-	}
 )
 
+// GetTrfVars from a list of utilities, returning if any failed
 func GetTrfVars(client *ethclient.Client, registryAddress, tokenAddress ethCommon.Address, fluidityClients []applications.Utility, defaultDeltaWeightNum, defaultDeltaWeightDenom *big.Int) ([]worker.PoolDetails, error, []error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		registryAddress,
@@ -96,7 +94,8 @@ func GetTrfVars(client *ethclient.Client, registryAddress, tokenAddress ethCommo
 		var (
 			scannedVars = scanned.Vars
 			found = scanned.Found
-			name = scanned.Name
+			// this cast is valid since it's passed straight through from fluidityClients
+			name = applications.Utility(scanned.Name)
 
 			poolSizeNative    = scannedVars.PoolSizeNative
 			tokenDecimalScale = scannedVars.TokenDecimalScale

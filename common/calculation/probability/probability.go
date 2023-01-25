@@ -7,6 +7,7 @@ package probability
 import (
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -167,7 +168,7 @@ func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.E
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.PoolDetails, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[string][]*misc.BigInt, probabilities []*big.Rat) {
+func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.PoolDetails, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[applications.Utility][]worker.Payout, probabilities []*big.Rat) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 
@@ -175,7 +176,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 
 	n := calculateN(winningClasses, payoutFreq, atx, emission)
 
-	payouts = make(map[string][]*misc.BigInt)
+	payouts = make(map[applications.Utility][]worker.Payout)
 
 	poolBpys := make([]*big.Rat, len(distributionPools))
 
@@ -185,7 +186,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 	for i, pool := range distributionPools {
 		name := pool.Name
 
-		payouts[name] = make([]*misc.BigInt, winningClasses)
+		payouts[name] = make([]worker.Payout, winningClasses)
 
 		bpy := calculateBpy(blockTimeRat, pool)
 
@@ -241,6 +242,9 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 			// amount of the total payout (in usd) that the token gets
 			tokenPayout.Mul(tokenPayout, frac)
 
+			// store the usd value
+			usdPayout, _ := tokenPayout.Float64();
+
 			// amount of the total payout in amount of the token
 			tokenPayout.Quo(tokenPayout, exchangeRate)
 
@@ -252,7 +256,10 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 
 			payoutBigInt := misc.NewBigIntFromInt(*leftSide)
 
-			payouts[poolName][i] = &payoutBigInt
+			payouts[poolName][i] = worker.Payout{
+				Native: payoutBigInt,
+				Usd: usdPayout,
+			}
 		}
 	}
 

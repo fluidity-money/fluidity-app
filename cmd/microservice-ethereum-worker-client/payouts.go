@@ -7,23 +7,51 @@ package main
 import (
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 // returns the amount won by the sender and receiver with given balls and payouts
-func calculatePayouts(sourcePayouts []*misc.BigInt, winningBalls int) (*misc.BigInt, *misc.BigInt) {
+func calculatePayouts(sourcePayouts map[applications.Utility][]worker.Payout, winningBalls int) (map[applications.Utility]worker.Payout, map[applications.Utility]worker.Payout) {
 	var (
-		totalPayout = sourcePayouts[winningBalls-1]
-		payoutInt   = &totalPayout.Int
-		fiveInt     = big.NewInt(5)
-
-		fromAmount misc.BigInt
-		toAmount   misc.BigInt
+		fromAmounts = make(map[applications.Utility]worker.Payout)
+		toAmounts = make(map[applications.Utility]worker.Payout)
 	)
-	// 20%
-	toAmount.Div(payoutInt, fiveInt)
 
-	fromAmount.Sub(payoutInt, &toAmount.Int)
+	for utility, payout := range sourcePayouts {
+		var (
+			totalPayout = payout[winningBalls-1]
 
-	return &fromAmount, &toAmount
+			payoutNative = &totalPayout.Native.Int
+			payoutUsd    = totalPayout.Usd
+
+			fiveInt = big.NewInt(5)
+
+			fromAmountNative misc.BigInt
+			toAmountNative   misc.BigInt
+
+			fromAmountUsd float64
+			toAmountUsd   float64
+		)
+		// 20%
+		toAmountNative.Div(payoutNative, fiveInt)
+		toAmountUsd = payoutUsd / 5
+
+		// 80%
+		fromAmountNative.Sub(payoutNative, &toAmountNative.Int)
+		fromAmountUsd = payoutUsd - fromAmountUsd
+
+		toAmounts[utility] = worker.Payout{
+			Native: toAmountNative,
+			Usd:    toAmountUsd,
+		}
+
+		fromAmounts[utility] = worker.Payout{
+			Native: fromAmountNative,
+			Usd:    fromAmountUsd,
+		}
+	}
+
+	return fromAmounts, toAmounts
 }

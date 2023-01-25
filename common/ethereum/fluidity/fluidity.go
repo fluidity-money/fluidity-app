@@ -30,24 +30,6 @@ const tokenContractAbiString = `[
 },
 {
 	"inputs": [
-		{
-			"components": [
-				{ "internalType": "address", "name": "winner", "type": "address" },
-				{ "internalType": "uint256", "name": "winAmount", "type": "uint256" }
-			],
-			"internalType": "struct Winner[]",
-			"name": "rewards",
-			"type": "tuple[]"
-		},
-		{ "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
-		{ "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
-	],
-	"name": "batchReward",
-	"outputs": [],
-	"type": "function"
-},
-{
-	"inputs": [
 		{ "internalType": "address", "name": "to", "type": "address" },
 		{ "internalType": "uint256", "name": "amount", "type": "uint256" }
 	],
@@ -89,29 +71,6 @@ const tokenContractAbiString = `[
 	],
 	"name": "UnblockReward",
 	"type": "event"
-},
-{
-	"inputs": [
-		{ "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
-		{ "internalType": "address", "name": "from", "type": "address" },
-		{ "internalType": "address", "name": "to", "type": "address" },
-		{ "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
-		{ "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
-	],
-	"name": "reward",
-	"outputs": [],
-	"stateMutability": "nonpayable",
-	"type": "function"
-},
-{
-	"inputs": [
-		{ "internalType": "uint256", "name": "global", "type": "uint256" },
-		{ "internalType": "uint256", "name": "user", "type": "uint256" }
-	],
-	"name": "updateMintLimits",
-	"outputs": [],
-	"stateMutability": "nonpayable",
-	"type": "function"
 },
 {
 	"inputs": [
@@ -158,7 +117,7 @@ const tokenContractAbiString = `[
 ]
 `
 
-const workerConfigAbiString = `[
+const operatorAbiString = `[
   {
       "inputs": [
         {
@@ -175,8 +134,36 @@ const workerConfigAbiString = `[
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+	  "inputs": [
+		  { "internalType": "address", "name": "token", "type": "address" },
+		  {
+			  "components": [
+				  { "internalType": "string", "name": "clientName", "type": "string" },
+				  {
+				  "components": [
+					  { "internalType": "address", "name": "winner", "type": "address" },
+					  { "internalType": "uint256", "name": "amount", "type": "uint256" }
+				  ],
+				  "internalType": "struct Winner[]",
+				  "name": "rewards",
+				  "type": "tuple[]"
+			  }
+			  ],
+			  "internalType": "struct FluidityReward[]",
+			  "name": "rewards",
+			  "type": "tuple[]"
+		  },
+		  { "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
+		  { "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
+	  ],
+	  "name": "reward",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
   }
-]`
+  ]`
 
 const registryAbiString = `[
 {
@@ -216,22 +203,29 @@ const registryAbiString = `[
 
 var (
 	FluidityContractAbi ethAbi.ABI
-	WorkerConfigAbi     ethAbi.ABI
+	OperatorAbi         ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
 	RegistryAbi         ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles
-type OracleUpdate struct {
+type abiOracleUpdate struct {
 	ContractAddress ethCommon.Address `abi:"contractAddr"`
 	NewOracle       ethCommon.Address `abi:"newOracle"`
 }
 
-// the Reward struct from solidity, to be passed to batchReward
-type RewardArg struct {
-	Winner     ethCommon.Address `abi:"winner"`
-	WinAmount  *big.Int          `abi:"winAmount"`
-}
+type (
+	// the Winner struct from solidity, to be passed to batchReward
+	abiWinner struct {
+		Winner     ethCommon.Address `abi:"winner"`
+		WinAmount  *big.Int          `abi:"winAmount"`
+	}
+	// the FluidityReward struct from solidit, to be passed to batchReward
+	abiFluidityReward struct {
+		ClientName string `abi:"clientName"`
+		Winners []abiWinner `abi:"rewards"`
+	}
+)
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
@@ -275,62 +269,53 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
+func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
-		fluidityAddress,
-		FluidityContractAbi,
+		operatorAddress,
+		OperatorAbi,
 		client,
 		client,
 		client,
 	)
 
 	var (
-		rewards          = make([]RewardArg, len(announcement))
-		globalFirstBlock = new(big.Int)
-		globalLastBlock  = new(big.Int)
+		firstBlock = &announcement.FirstBlock.Int
+		lastBlock = &announcement.LastBlock.Int
+		batchedRewards = announcement.Rewards
+
+		rewards []abiFluidityReward
 	)
 
-	// set a default for the min block
-	globalFirstBlock.Set(&announcement[0].FirstBlock.Int)
+	for utility, reward := range batchedRewards {
+		winners := make([]abiWinner, len(reward))
 
-	for i, reward := range announcement {
-		var (
-			winner_       = reward.Winner
-			amountInt     = reward.WinAmount
-			firstBlockInt = reward.FirstBlock
-			lastBlockInt  = reward.LastBlock
+		for winnerAddress, winAmount := range reward {
+			winner := abiWinner{
+				Winner:    ethereum.ConvertInternalAddress(winnerAddress),
+				WinAmount: &winAmount.Int,
+			}
 
-			winner     = ethereum.ConvertInternalAddress(winner_)
-			amount     = &amountInt.Int
-			firstBlock = &firstBlockInt.Int
-			lastBlock  = &lastBlockInt.Int
-		)
-
-		if firstBlock.Cmp(globalFirstBlock) < 0 {
-			globalFirstBlock.Set(firstBlock)
+			winners = append(winners, winner)
 		}
 
-		if lastBlock.Cmp(globalLastBlock) > 0 {
-			globalLastBlock.Set(lastBlock)
+		reward := abiFluidityReward{
+			ClientName: string(utility),
+			Winners:    winners,
 		}
 
-		rewardArg := RewardArg{
-			Winner:     winner,
-			WinAmount:  amount,
-		}
-
-		rewards[i] = rewardArg
+		rewards = append(rewards, reward)
 	}
 
 	gas, err := ethereum.EstimateGas(
 		client,
-		&FluidityContractAbi,
+		&OperatorAbi,
 		transactionOptions,
-		&fluidityAddress,
-		"batchReward",
+		&operatorAddress,
+		"reward",
+		tokenAddress,
 		rewards,
-		globalFirstBlock,
-		globalLastBlock,
+		firstBlock,
+		lastBlock,
 	)
 
 	if err != nil {
@@ -345,10 +330,11 @@ func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Add
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,
 		transactionOptions,
-		"batchReward",
+		"reward",
+		tokenAddress,
 		rewards,
-		globalFirstBlock,
-		globalLastBlock,
+		firstBlock,
+		lastBlock,
 	)
 
 	if err != nil {

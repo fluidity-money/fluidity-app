@@ -9,7 +9,7 @@ import (
 )
 
 func TestBatchReward(t *testing.T) {
-	testRewardBatch := []RewardArg{
+	testRewardBatch := []abiWinner{
 		{
 			Winner:     common.HexToAddress("0x6221A9c005F6e47EB398fD867784CacfDcFFF4E7"),
 			WinAmount:  big.NewInt(100),

@@ -20,6 +20,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 const (
@@ -376,7 +377,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 
 // Ethereum Specific
 // InsertPendingRewardType to store the reward type and application of a pending win
-func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount misc.BigInt, recipientAddress ethereum.Address, recipientWinAmount misc.BigInt, application Application) {
+func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.Utility]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.Utility]worker.Payout, application Application) {
 
 	timescaleClient := timescale.Client()
 
@@ -389,7 +390,9 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			is_sender,
 			application,
 			block_number,
-			win_amount
+			win_amount,
+			usd_win_amount,
+			utility
 		)
 
 		VALUES (
@@ -400,62 +403,81 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			$5,
 			$6,
 			$7,
-			$8
+			$8,
+			$9,
+			$10
 		);`,
 
 		TablePendingRewardType,
 	)
 
-	// insert the sender's value
-	_, err := timescaleClient.Exec(
-		statementText,
-		net,
-		token.TokenShortName,
-		sendTransactionHash,
-		senderAddress,
-		true,
-		application.String(),
-		blockNumber,
-		senderWinAmount,
-	)
+	for utility, payout := range senderWinAmount {
+		var (
+			winAmountNative = payout.Native
+			winAmountUsd    = payout.Usd
+		)
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
+		// insert the sender's value
+		_, err := timescaleClient.Exec(
+			statementText,
+			net,
+			token.TokenShortName,
+			sendTransactionHash,
+			senderAddress,
+			true,
+			application.String(),
+			blockNumber,
+			winAmountNative,
+			winAmountUsd,
+			utility,
+		)
 
-			k.Format(
-				"Failed to insert pending reward type with hash %v!",
-				sendTransactionHash,
-			)
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
 
-			k.Payload = err
-		})
+				k.Format(
+					"Failed to insert pending reward type with hash %v!",
+					sendTransactionHash,
+				)
+
+				k.Payload = err
+			})
+		}
 	}
 
-	// insert the recipient's value
-	_, err = timescaleClient.Exec(
-		statementText,
-		net,
-		token.TokenShortName,
-		sendTransactionHash,
-		recipientAddress,
-		false,
-		application.String(),
-		blockNumber,
-		recipientWinAmount,
-	)
+	for utility, payout := range recipientWinAmount {
+		var (
+			winAmountNative = payout.Native
+			winAmountUsd    = payout.Usd
+		)
+		// insert the recipient's value
+		_, err := timescaleClient.Exec(
+			statementText,
+			net,
+			token.TokenShortName,
+			sendTransactionHash,
+			recipientAddress,
+			false,
+			application.String(),
+			blockNumber,
+			winAmountNative,
+			winAmountUsd,
+			utility,
+		)
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
 
-			k.Format(
-				"Failed to insert pending reward type with hash %v!",
-				sendTransactionHash,
-			)
+				k.Format(
+					"Failed to insert pending reward type with hash %v!",
+					sendTransactionHash,
+				)
 
-			k.Payload = err
-		})
+				k.Payload = err
+			})
+		}
 	}
 }
 

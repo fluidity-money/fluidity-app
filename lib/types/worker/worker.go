@@ -9,6 +9,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -18,8 +19,8 @@ type (
 	// PoolDetails to store the amount of token and its distribution rate, for payout calculations
 	PoolDetails struct {
 		// Name is the unique onchain id for this utility
-		Name string `json:"utility_name"`
-		// PoolSizeNative is the amount of token to distribute in usd
+		Name applications.Utility `json:"utility_name"`
+		// PoolSizeNative is the amount of token to distribute in native tokens
 		PoolSizeNative *big.Rat `json:"pool_size"`
 
 		TokenDecimals *big.Rat `json:"token_decimals"`
@@ -28,6 +29,15 @@ type (
 		// DeltaWeight is the frequency with which to distribute tokens
 		// For normal tokens, this is the number of seconds in a year (31536000)
 		DeltaWeight *big.Rat `json:"delta_weight"`
+	}
+
+	// Payout to store details on payouts in different token units
+	Payout struct {
+		// amount in native tokens, can be passed to chain
+		Native misc.BigInt
+
+		// amount normalised to usd (native/1e(decimals)*exchangeRate) for the spooler
+		Usd float64
 	}
 
 	// WorkerConfigEthereum to be used with any EVM chains to store config

@@ -23,6 +23,9 @@ import (
 )
 
 const (
+	// EnvOperatorAddress is the contract where the fluidity operator is located
+	EnvOperatorAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
+
 	// EnvContractAddress is the contract to call when a winner's been found!
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
@@ -57,6 +60,7 @@ type win = struct{
 func main() {
 	var (
 		contractAddrString   = util.GetEnvOrFatal(EnvContractAddress)
+		operatorAddrString   = util.GetEnvOrFatal(EnvOperatorAddress)
 		gethHttpUrl          = util.GetEnvOrFatal(EnvEthereumHttpUrl)
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
@@ -111,7 +115,10 @@ func main() {
 
 	defer ethClient.Close()
 
-	contractAddress_ := ethCommon.HexToAddress(contractAddrString)
+	var (
+		contractAddress_ = ethCommon.HexToAddress(contractAddrString)
+		operatorAddress_ = ethCommon.HexToAddress(operatorAddrString)
+	)
 
 	transactionOptions, err := ethereum.NewTransactionOptions(ethClient, privateKey)
 
@@ -124,7 +131,7 @@ func main() {
 
 	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
 
-		var announcement []worker.EthereumSpooledRewards
+		var announcement worker.EthereumSpooledRewards
 
 		message.Decode(&announcement)
 
@@ -135,53 +142,14 @@ func main() {
 			})
 		}
 
-		// get send transaction hash and winner address from announcement
-		wins := make([]win, len(announcement))
-
-		for i, reward := range announcement {
-			var (
-				winnerAddress 		= reward.Winner
-				sendTransactionHash = reward.TransactionHash
-			)
-			wins[i] = win{winnerAddress: winnerAddress, sendTransactionHash: sendTransactionHash}
-		}
-
 		rewardTransactionArguments := callRewardArguments{
-			containerAnnouncement: announcement,
 			transactionOptions:    transactionOptions,
+			containerAnnouncement: announcement,
+			operatorAddress:       operatorAddress_,
 			contractAddress:       contractAddress_,
 			client:                ethClient,
 			useHardhatFix:         useHardhatFix,
 			hardcodedGasLimit:     gasLimit,
-		}
-
-		if useLegacyContract {
-			transactions, err := callLegacyRewardFunction(rewardTransactionArguments)
-
-			if err != nil {
-			    log.Fatal(func(k *log.Log) {
-			        k.Format(
-						"Failed to call the legacy reward function! %v!",
-						err,
-					)
-			    })
-			}
-
-			hashes := make([]string, len(transactions))
-
-			for i, transaction := range transactions {
-				hashes[i] = transaction.Hash().Hex()
-
-				// populate with reward transaction hashes
-				wins[i].rewardTransactionHash = typesEth.HashFromString(transaction.Hash().Hex())
-			}
-
-			log.App(func(k *log.Log) {
-				k.Message = "Successfully called the legacy reward function with hashes"
-				k.Payload = hashes
-			})
-
-			return
 		}
 
 		transactionHash, err := callRewardFunction(rewardTransactionArguments)
@@ -195,11 +163,6 @@ func main() {
 
 				k.Payload = err
 			})
-		}
-
-		// populate all with the same hash
-		for i := range wins {
-			wins[i].rewardTransactionHash = typesEth.HashFromString(transactionHash.Hash().Hex())
 		}
 
 		log.App(func(k *log.Log) {
