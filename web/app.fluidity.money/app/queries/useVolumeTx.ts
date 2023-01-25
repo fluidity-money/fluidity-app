@@ -111,7 +111,6 @@ const useVolumeTxByAddressTimestamp = async (
   iso8601Timestamp: string,
   useMoralis = true
 ): Promise<VolumeTxsResponse> => {
-
   switch (true) {
     case network === "arbitrum":
     case network === "ethereum" && useMoralis: {
@@ -135,7 +134,8 @@ const useVolumeTxByAddressTimestamp = async (
                   // is a fluid token
                   Object.keys(fluidAssets).includes(t.address.format()) &&
                   // address is sender or receiver
-                  (t.fromAddress.equals(address) || t.toAddress.equals(address)) &&
+                  (t.fromAddress.equals(address) ||
+                    t.toAddress.equals(address)) &&
                   // is after timestamp
                   new Date(t.blockTimestamp) > new Date(iso8601Timestamp)
                 // sort descending by block timestamp
@@ -146,13 +146,13 @@ const useVolumeTxByAddressTimestamp = async (
                   new Date(a.blockTimestamp).getTime()
               )
               .map((t) => ({
-                sender: {address: t.fromAddress.format()},
-                receiver: {address: t.toAddress.format()},
+                sender: { address: t.fromAddress.format() },
+                receiver: { address: t.toAddress.format() },
                 block: {
-                  timestamp: {unixtime: new Date(t.blockTimestamp).getTime()},
+                  timestamp: { unixtime: new Date(t.blockTimestamp).getTime() },
                 },
                 amount: t.value.toString(),
-                currency: {symbol: fluidAssets[t.address.checksum]},
+                currency: { symbol: fluidAssets[t.address.checksum] },
               })),
           },
         },
@@ -164,7 +164,7 @@ const useVolumeTxByAddressTimestamp = async (
       const variables = {
         fluidAssets: Object.keys(fluidAssets),
         address,
-        timestamp: iso8601Timestamp
+        timestamp: iso8601Timestamp,
       };
       const url = "https://graphql.bitquery.io";
       const body = {
@@ -196,61 +196,61 @@ const useVolumeTxByTimestamp = async (
   switch (true) {
     case network === "arbitrum":
     case network === "ethereum" && useMoralis: {
-  const transfers = (
-    await Promise.all(
-      Object.keys(fluidAssets).flatMap(async (address) => {
-        let cursor: string | undefined;
-        const transfers: MoralisUtils.Erc20Transfer[] = [];
-        do {
-          const response = await Moralis.EvmApi.token.getTokenTransfers({
-            address,
-            cursor,
-          });
-          transfers.push(...response.result);
-          cursor = response.pagination.cursor;
-        } while (cursor);
-        return transfers;
-      })
-    )
-  )
-    .filter((t) => !!t)
-    .flat() as MoralisUtils.Erc20Transfer[];
+      const transfers = (
+        await Promise.all(
+          Object.keys(fluidAssets).flatMap(async (address) => {
+            let cursor: string | undefined;
+            const transfers: MoralisUtils.Erc20Transfer[] = [];
+            do {
+              const response = await Moralis.EvmApi.token.getTokenTransfers({
+                address,
+                cursor,
+              });
+              transfers.push(...response.result);
+              cursor = response.pagination.cursor;
+            } while (cursor);
+            return transfers;
+          })
+        )
+      )
+        .filter((t) => !!t)
+        .flat() as MoralisUtils.Erc20Transfer[];
 
-  const filteredTransactions: VolumeTxsResponse = {
-    data: {
-      ethereum: {
-        transfers: transfers
-          .filter(
-            (t) =>
-              // is after timestamp
-              new Date(t.blockTimestamp) > new Date(iso8601Timestamp)
-            // sort descending by block timestamp
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.blockTimestamp).getTime() -
-              new Date(a.blockTimestamp).getTime()
-          )
-          .map((t) => ({
-            sender: { address: t.fromAddress.format() },
-            receiver: { address: t.toAddress.format() || "" },
-            block: {
-              timestamp: { unixtime: new Date(t.blockTimestamp).getTime() },
-            },
-            transaction: { hash: t.transactionHash },
-            amount: t.value.toString(),
-            currency: { symbol: fluidAssets[t.address.checksum] },
-          })),
-      },
-    },
-  };
-  return filteredTransactions;
+      const filteredTransactions: VolumeTxsResponse = {
+        data: {
+          ethereum: {
+            transfers: transfers
+              .filter(
+                (t) =>
+                  // is after timestamp
+                  new Date(t.blockTimestamp) > new Date(iso8601Timestamp)
+                // sort descending by block timestamp
+              )
+              .sort(
+                (a, b) =>
+                  new Date(b.blockTimestamp).getTime() -
+                  new Date(a.blockTimestamp).getTime()
+              )
+              .map((t) => ({
+                sender: { address: t.fromAddress.format() },
+                receiver: { address: t.toAddress.format() || "" },
+                block: {
+                  timestamp: { unixtime: new Date(t.blockTimestamp).getTime() },
+                },
+                transaction: { hash: t.transactionHash },
+                amount: t.value.toString(),
+                currency: { symbol: fluidAssets[t.address.checksum] },
+              })),
+          },
+        },
+      };
+      return filteredTransactions;
     }
     case network === "ethereum":
     case network === "solana": {
       const variables = {
         fluidAssets: Object.keys(fluidAssets),
-        timestamp: iso8601Timestamp
+        timestamp: iso8601Timestamp,
       };
 
       const url = "https://graphql.bitquery.io";
@@ -258,13 +258,9 @@ const useVolumeTxByTimestamp = async (
         variables,
         query: queryByTimestamp,
       };
-      return jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(
-        url,
-        body,
-        {
-          "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-        }
-      );
+      return jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(url, body, {
+        "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
+      });
     }
     default:
       return {

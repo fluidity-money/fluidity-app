@@ -1,13 +1,10 @@
 import Moralis from "moralis";
 import MoralisUtils from "@moralisweb3/common-evm-utils";
 import { gql, Queryable, jsonPost } from "~/util";
-import {
-  Chain,
-  resolveMoralisChainName,
-} from "~/util/chainUtils/chains";
+import { Chain, resolveMoralisChainName } from "~/util/chainUtils/chains";
 
 const queryByAddress: Queryable = {
-   ethereum: gql`
+  ethereum: gql`
     query getTransactionsByAddress(
       $tokens: [String!]
       $address: String!
@@ -93,7 +90,7 @@ const queryByAddress: Queryable = {
 };
 
 const queryByTxHash: Queryable = {
-   ethereum: gql`
+  ethereum: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
       $filterHashes: [String!] = []
@@ -164,7 +161,7 @@ const queryByTxHash: Queryable = {
 };
 
 const queryAll: Queryable = {
-   ethereum: gql`
+  ethereum: gql`
     query getTransactions(
       $tokens: [String!]
       $offset: Int = 0

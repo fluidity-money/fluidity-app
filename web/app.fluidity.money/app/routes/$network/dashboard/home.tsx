@@ -641,8 +641,7 @@ export default function Home() {
                     size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                     style={{ margin: 0 }}
                   >
-                    -
-                    {/* numberToMonetaryString(volume) */}
+                    -{/* numberToMonetaryString(volume) */}
                   </Display>
                   <Text>Will be back soon!</Text>
                 </div>

@@ -14,8 +14,8 @@ const jsonPost = async <Req, Res>(
     });
 
     if (res.status !== 200) {
-      const {statusText} = res;
-      
+      const { statusText } = res;
+
       throw statusText;
     }
 
@@ -52,8 +52,8 @@ const jsonGet = async <
     });
 
     if (res.status !== 200) {
-      const {statusText} = res;
-      
+      const { statusText } = res;
+
       throw statusText;
     }
 

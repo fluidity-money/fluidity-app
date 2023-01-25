@@ -18,7 +18,7 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { UserTransaction } from "~/queries/useUserTransactions";
-import {useSplitExperiment} from "~/util/server/split";
+import { useSplitExperiment } from "~/util/server/split";
 
 type ProcesedUserTransaction = {
   sender: string;

@@ -39,8 +39,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const [
       totalPrizePool,
-      /*{ volume }*/,
-      { data: rewardsData, errors: rewardsErr },
+      ,
+      /*{ volume }*/ { data: rewardsData, errors: rewardsErr },
     ] = await Promise.all([
       getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
       // address
@@ -53,7 +53,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       //   : jsonGet<Record<string, string>, { volume: Volume[] }>(
       //       `${url.origin}/${network}/query/volumeStats`
       //     ),
-      async () => { return {}; },
+      async () => {
+        return {};
+      },
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),

@@ -1,12 +1,9 @@
 import Moralis from "moralis";
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
-import {
-  Chain,
-  resolveMoralisChainName,
-} from "~/util/chainUtils/chains";
+import { Chain, resolveMoralisChainName } from "~/util/chainUtils/chains";
 
 const queryByAddress: Queryable = {
-    ethereum: gql`
+  ethereum: gql`
     query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
       ethereum {
         transfers(
@@ -36,7 +33,7 @@ const queryByAddress: Queryable = {
 };
 
 const queryAll: Queryable = {
-    ethereum: gql`
+  ethereum: gql`
     query getTransactionCount($fluidCurrencies: [String!]) {
       ethereum {
         transfers(currency: { in: $fluidCurrencies }) {
@@ -85,7 +82,7 @@ export type UserTransactionCountRes = {
 const useUserTransactionByAddressCount = async (
   network: string,
   address: string,
-  useMoralis = true,
+  useMoralis = true
 ) => {
   const variables = {
     address: address,
@@ -124,7 +121,10 @@ const useUserTransactionByAddressCount = async (
   }
 };
 
-const useUserTransactionAllCount = async (network: string, useMoralis = true) => {
+const useUserTransactionAllCount = async (
+  network: string,
+  useMoralis = true
+) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
   };
@@ -135,7 +135,7 @@ const useUserTransactionAllCount = async (network: string, useMoralis = true) =>
       // fetch for each token and return the sum
       return await variables.fluidCurrencies.reduce(async (count, token) => {
         const {
-          raw: {total},
+          raw: { total },
         } = await Moralis.EvmApi.token.getTokenTransfers({
           address: token,
         });
