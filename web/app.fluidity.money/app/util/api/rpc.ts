@@ -13,6 +13,12 @@ const jsonPost = async <Req, Res>(
       body: JSON.stringify(body),
     });
 
+    if (res.status !== 200) {
+      const {statusText} = res;
+      
+      throw statusText;
+    }
+
     const json = await res.json();
 
     return json;
@@ -44,6 +50,12 @@ const jsonGet = async <
         ...(headers ? headers : {}),
       },
     });
+
+    if (res.status !== 200) {
+      const {statusText} = res;
+      
+      throw statusText;
+    }
 
     const json = await res.json();
 
