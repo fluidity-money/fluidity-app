@@ -20,8 +20,7 @@
 | WorkerConfig                | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
 | AAVE liquidity provider     | 0x66F78314d8c1e67342465dfCc6406F739F5Afc32 |
 | aToken address              | 0x6ab707aca953edaefbc4fd23ba73294241490620 |
-| Current worker              |  |
-| Emergency council           |  |
+| Emergency council           | 0x5bC5DB835Af82Ab2333b1a60f529038F6508c94C |
 | Decimals                    | 6                                          |
 | Short name                  | fUSDT                                      |
 | Name                        | Fluid USDT                                 |
@@ -34,8 +33,7 @@
 | WorkerConfig                | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
 | AAVE liquidity provider     | 0xe56B40Cb8E3F7cf85E8cc6d0a8535Acbca8b18b5 |
 | aToken address              | 0x625e7708f30ca75bfd92586e17077590c60eb4cd |
-| Current worker              |  |
-| Emergency council           |  |
+| Emergency council           | 0x5bC5DB835Af82Ab2333b1a60f529038F6508c94C |
 | Decimals                    | 6                                          |
 | Short name                  | fUSDC                                      |
 | Name                        | Fluid USDC                                 |
@@ -48,8 +46,7 @@
 | WorkerConfig            | 0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F |
 | AAVE liquidity provider | 0xFC66c25dbDb0606e7F9cA1d2754Eb0A0f8306dA9 |
 | aToken address          | 0x82e64f49ed5ec1bc6e43dad4fc8af9bb3a2312ee |
-| Current worker          |  |
-| Emergency council       |  |
+| Emergency council       | 0x5bC5DB835Af82Ab2333b1a60f529038F6508c94C |
 | Decimals                | 18                                         |
 | Short name              | fDAI                                       |
 | Name                    | Fluid DAI                                  |
