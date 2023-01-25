@@ -57,7 +57,7 @@ jobs:
   rollback-app:
     if: ${{ github.event.inputs.skip_app_rollback == 'false' }}
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: mainnet
     steps:
       - uses: actions/checkout@v3
         with:
@@ -112,7 +112,7 @@ jobs:
   rollback-db:
     if: ${{ github.event.inputs.rollback_timescale == 'true' || github.event.inputs.rollback_postgres == 'true' }}
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: mainnet
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS Credentials
