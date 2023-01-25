@@ -1,9 +1,11 @@
 import { json, LoaderFunction } from "@remix-run/node";
+import { captureException } from "@sentry/remix";
 import BN from "bn.js";
 import {
   useVolumeTxByAddressTimestamp,
   useVolumeTxByTimestamp,
 } from "~/queries/useVolumeTx";
+import { useSplitExperiment } from "~/util/server/split";
 import config from "~/webapp.config.server";
 
 export type Volume = {
@@ -21,6 +23,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
+  const useMoralis = !!useSplitExperiment("enable-moralis", true);
+
+  if (!network) return;
 
   const tokenDecimals = config.config[network ?? ""].tokens
     .filter((entry) => entry.isFluidOf !== undefined)
@@ -58,11 +63,37 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const prevYearIso = prevYearDate.toISOString();
 
-  const volumesRes = address
-    ? await useVolumeTxByAddressTimestamp(fluidAssets, address, prevYearIso)
-    : await useVolumeTxByTimestamp(fluidAssets, prevYearIso);
+  const { data: volumeData, errors: volumeErr } = address
+    ? await useVolumeTxByAddressTimestamp(
+        network,
+        fluidAssets,
+        address,
+        prevYearIso,
+        {useMoralis}
+      )
+    : await useVolumeTxByTimestamp(
+        network,
+        fluidAssets,
+        prevYearIso,
+        {useMoralis}
+      );
 
-  const parsedVolume = volumesRes.data.ethereum.transfers.map((transfer) => ({
+  if (!volumeData || volumeErr) {
+    captureException(
+      new Error(
+        `Could not fetch User Transactions for ${address}, on ${network}`
+      ),
+      {
+        tags: {
+          section: "dashboard",
+        },
+      }
+    );
+
+    return new Error("Server could not fulfill request");
+  }
+
+  const parsedVolume = volumeData[network].transfers.map((transfer) => ({
     symbol: transfer.currency.symbol,
     amount: transfer.amount,
     timestamp: transfer.block.timestamp.unixtime,

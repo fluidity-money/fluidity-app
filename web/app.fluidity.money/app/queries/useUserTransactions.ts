@@ -1,13 +1,50 @@
 import Moralis from "moralis";
 import MoralisUtils from "@moralisweb3/common-evm-utils";
 import { gql, Queryable, jsonPost } from "~/util";
-import {
-  Chain,
-  chainType,
-  resolveMoralisChainName,
-} from "~/util/chainUtils/chains";
+import { Chain, resolveMoralisChainName } from "~/util/chainUtils/chains";
+import {defaultQueryOptions} from ".";
 
 const queryByAddress: Queryable = {
+  ethereum: gql`
+    query getTransactionsByAddress(
+      $tokens: [String!]
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      ethereum {
+        transfers(
+          currency: { in: $tokens }
+          any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
+          options: {
+            desc: "block.timestamp.unixtime"
+            limit: $limit
+            offset: $offset
+          }
+        ) {
+          sender {
+            address
+          }
+          receiver {
+            address
+          }
+          amount
+          currency {
+            symbol
+          }
+          transaction(txHash: { notIn: $filterHashes }) {
+            hash
+          }
+          block {
+            timestamp {
+              unixtime
+            }
+          }
+        }
+      }
+    }
+  `,
   solana: gql`
     query getTransactionsByAddress(
       $tokens: [String!]
@@ -54,6 +91,41 @@ const queryByAddress: Queryable = {
 };
 
 const queryByTxHash: Queryable = {
+  ethereum: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $tokens: [String!] = []
+      $limit: Int = 12
+    ) {
+      ethereum {
+        transfers(
+          options: { desc: "block.timestamp.unixtime", limit: $limit }
+          txHash: { in: $transactions }
+          currency: { in: $tokens }
+        ) {
+          sender {
+            address
+          }
+          receiver {
+            address
+          }
+          amount
+          currency {
+            symbol
+          }
+          transaction(txHash: { notIn: $filterHashes }) {
+            hash
+          }
+          block {
+            timestamp {
+              unixtime
+            }
+          }
+        }
+      }
+    }
+  `,
   solana: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -90,6 +162,44 @@ const queryByTxHash: Queryable = {
 };
 
 const queryAll: Queryable = {
+  ethereum: gql`
+    query getTransactions(
+      $tokens: [String!]
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      ethereum {
+        transfers(
+          currency: { in: $tokens }
+          options: {
+            desc: "block.timestamp.unixtime"
+            limit: $limit
+            offset: $offset
+          }
+        ) {
+          sender {
+            address
+          }
+          receiver {
+            address
+          }
+          amount
+          currency {
+            symbol
+          }
+          transaction(txHash: { notIn: $filterHashes }) {
+            hash
+          }
+          block {
+            timestamp {
+              unixtime
+            }
+          }
+        }
+      }
+    }
+  `,
   solana: gql`
     query getTransactions(
       $tokens: [String!]
@@ -184,9 +294,11 @@ const useUserTransactionsByAddress = async (
   page: number,
   address: string,
   filterHashes: string[],
+  queryOptions = defaultQueryOptions,
   limit = 12
 ): Promise<UserTransactionsRes> => {
   const offset = (page - 1) * 12;
+  const {useMoralis} = queryOptions;
 
   const variables = {
     address: address,
@@ -196,8 +308,9 @@ const useUserTransactionsByAddress = async (
     limit,
   };
 
-  switch (chainType(network)) {
-    case "evm": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       // fetch first page of transfers since <=12 are needed
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
@@ -235,7 +348,8 @@ const useUserTransactionsByAddress = async (
       return filteredTransactions;
     }
 
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const body = {
         query: queryByAddress[network],
         variables,
@@ -262,11 +376,15 @@ const useUserTransactionsByTxHash = async (
   transactions: string[],
   filterHashes: string[],
   // address: token symbol
-  tokens: { [address: string]: string },
+  tokens: {[address: string]: string},
+  queryOptions = defaultQueryOptions,
   limit = 12
 ) => {
-  switch (chainType(network)) {
-    case "evm": {
+  const {useMoralis} = queryOptions;
+
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       const transfers = (
         await Promise.all(
           Object.keys(tokens)
@@ -332,7 +450,8 @@ const useUserTransactionsByTxHash = async (
       return filteredTransactions;
     }
 
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const variables = {
         transactions,
         filterHashes,
@@ -365,12 +484,15 @@ const useUserTransactionsAll = async (
   tokens: { [address: string]: string },
   page: number,
   filterHashes: string[],
+  queryOptions = defaultQueryOptions,
   limit = 12
 ) => {
+  const {useMoralis} = queryOptions;
   const offset = (page - 1) * 12;
 
-  switch (chainType(network)) {
-    case "evm": {
+  switch (true) {
+    case network === "arbitrum":
+    case network === "ethereum" && useMoralis: {
       const transfers = (
         await Promise.all(
           Object.keys(tokens)
@@ -419,7 +541,8 @@ const useUserTransactionsAll = async (
       return filteredTransactions;
     }
 
-    case "solana": {
+    case network === "ethereum":
+    case network === "solana": {
       const variables = {
         tokens: Object.values(tokens),
         offset,

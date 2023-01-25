@@ -390,7 +390,6 @@ export default function Home() {
     count,
     totalCount,
     rewards,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     volume,
     transactions,
     graphTransformedTransactions,
@@ -641,10 +640,8 @@ export default function Home() {
                     size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                     style={{ margin: 0 }}
                   >
-                    -
-                    {/* numberToMonetaryString(volume) */}
+                    {numberToMonetaryString(volume)}
                   </Display>
-                  <Text>Will be back soon!</Text>
                 </div>
               ) : (
                 <div className="statistics-set">

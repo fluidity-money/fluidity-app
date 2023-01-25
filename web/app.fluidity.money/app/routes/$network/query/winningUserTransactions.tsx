@@ -13,6 +13,7 @@ import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
 import { decimalsPostprocess } from "./userTransactions";
+import { useSplitExperiment } from "~/util/server/split";
 
 type ProcessedUserTransaction = {
   sender: string;
@@ -35,6 +36,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
   const page_ = url.searchParams.get("page");
+  const useMoralis = !!useSplitExperiment("enable-moralis", true);
 
   if (!network || !page_) return new Error("Invalid Request");
 
@@ -104,7 +106,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         network,
         winnerAddrs,
         [],
-        ethereumTokens
+        ethereumTokens,
+        {useMoralis}
       );
 
     if (!userTransactionsData || userTransactionsErr) {

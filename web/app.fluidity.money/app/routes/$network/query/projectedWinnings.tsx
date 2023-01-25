@@ -3,6 +3,7 @@ import { captureException } from "@sentry/react";
 import config from "~/webapp.config.server";
 import { useUserTransactionsByAddress } from "~/queries";
 import { decimalsPostprocess } from "./userTransactions";
+import { useSplitExperiment } from "~/util/server/split";
 
 export type ProjectedWinData = {
   projectedWin: number;
@@ -13,6 +14,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
+  const useMoralis = !!useSplitExperiment("enable-moralis", true);
 
   const { tokens } = config.config[network ?? ""];
 
@@ -40,6 +42,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         1,
         address,
         [],
+        {useMoralis},
         50
       );
 
