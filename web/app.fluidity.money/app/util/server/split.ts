@@ -1,21 +1,6 @@
-import { isArray, isObject } from "lodash";
+import { isArray, isFunction, isObject } from "lodash";
 import { SplitFactory } from "@splitsoftware/splitio";
 import { Attributes } from "@splitsoftware/splitio/types/splitio";
-
-/**
- * @description
- * Can return the input value if the experiment is active.
- * Otherwise it will return an empty array or an empty object.
-*/
-type TypeResult<T> = 
-    T extends string ? string | undefined : 
-    T extends number ? number | undefined : 
-    T extends boolean ? boolean | undefined : 
-    T extends Array<infer U> ? Array<U> : 
-    T extends object ? object & Record<string, unknown> :
-    never;
-
-type ExperimentalValue<T> = string | number | boolean | Array<T> | object;
 
 const sdk = SplitFactory({
     core: {
@@ -32,32 +17,39 @@ const client = sdk.client();
  * 
  * @description
  * Server only version of the split experiment hook
- * @returns {T} the value you passed in or an empty array, object or undefined
+ * @returns {T} the value you passed in or an empty array, function, object or undefined
  */
-function useSplitExperiment<T>(
-    experiment: string, 
-    value: ExperimentalValue<T>,
-    args?: Attributes
-): TypeResult<T> {
+
+function useSplitExperiment<T extends (...vargs: unknown[]) => unknown>(experiment: string, value: T, args?: Attributes): T | (() => void);
+function useSplitExperiment<T>(experiment: string, value: T[], args?: Attributes): T[];
+function useSplitExperiment<T extends object>(experiment: string, value: object, args?: Attributes): T & { [key: string]: unknown };
+function useSplitExperiment<T>(experiment: string, value: T, args?: Attributes): T | undefined;
+function useSplitExperiment(experiment: string, value: unknown, args?: Attributes): unknown | undefined
+{
   if (process.env.NODE_ENV !== "production") {
-    return value as TypeResult<T>;
+    return value;
   }
 
-  const enabled = client.getTreatment(experiment, args) === "on";
+  const enabled = client.getTreatment(experiment, args)  === "on";
 
   if (!enabled) {
+    if (isFunction(value)) {
+        console.log("Returning empty function");
+        return (() => { return; });
+    }
+    
     if (isArray(value)) {
         return [];
     }
 
     if (isObject(value)) {
-        return {} as TypeResult<T>;
+        return {};
     }
 
     return undefined;
-}
+  }
 
-  return value as TypeResult<T>;
+  return value;
 }
 
 export { 
