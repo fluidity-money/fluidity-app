@@ -2,11 +2,22 @@ import Moralis from "moralis";
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
 import {
   Chain,
-  chainType,
   resolveMoralisChainName,
 } from "~/util/chainUtils/chains";
 
 const queryByAddress: Queryable = {
+    ethereum: gql`
+    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+      ethereum {
+        transfers(
+          currency: { in: $fluidCurrencies }
+          any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
+        ) {
+          count
+        }
+      }
+    }
+  `,
   solana: gql`
     query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
       solana {
@@ -25,6 +36,15 @@ const queryByAddress: Queryable = {
 };
 
 const queryAll: Queryable = {
+    ethereum: gql`
+    query getTransactionCount($fluidCurrencies: [String!]) {
+      ethereum {
+        transfers(currency: { in: $fluidCurrencies }) {
+          count
+        }
+      }
+    }
+  `,
   solana: gql`
     query getTransactionCount($fluidCurrencies: [String!]) {
       solana {
@@ -71,8 +91,8 @@ const useUserTransactionByAddressCount = async (
     fluidCurrencies: getTokenForNetwork(network),
   };
 
-  switch (chainType(network)) {
-    case "evm": {
+  switch (network) {
+    case "arbitrum": {
       const transfers = await Moralis.EvmApi.token.getWalletTokenTransfers({
         address,
         chain: resolveMoralisChainName(network as Chain),
@@ -80,6 +100,7 @@ const useUserTransactionByAddressCount = async (
       return transfers.raw.total;
     }
 
+    case "ethereum":
     case "solana": {
       const body = {
         query: queryByAddress[network],
@@ -106,8 +127,8 @@ const useUserTransactionAllCount = async (network: string) => {
     fluidCurrencies: getTokenForNetwork(network),
   };
 
-  switch (chainType(network)) {
-    case "evm":
+  switch (network) {
+    case "arbitrum":
       // fetch for each token and return the sum
       return await variables.fluidCurrencies.reduce(async (count, token) => {
         const {
@@ -120,6 +141,7 @@ const useUserTransactionAllCount = async (network: string) => {
         return (await count) + transfers;
       }, Promise.resolve(0));
 
+    case "ethereum":
     case "solana": {
       const body = {
         query: queryAll[network],
