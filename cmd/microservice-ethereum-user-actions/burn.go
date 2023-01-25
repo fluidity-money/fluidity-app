@@ -13,11 +13,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-user-actions/lib"
 )
 
-func handleBurn(transactionHash ethereum.Hash, topics []ethereum.Hash, data misc.Blob, time time.Time, tokenShortName string, tokenDecimals int) {
+func handleBurn(network_ network.BlockchainNetwork, transactionHash ethereum.Hash, topics []ethereum.Hash, data misc.Blob, time time.Time, tokenShortName string, tokenDecimals int) {
 	if lenTopics := len(topics); lenTopics != 1 {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
@@ -28,7 +29,7 @@ func handleBurn(transactionHash ethereum.Hash, topics []ethereum.Hash, data misc
 	}
 
 	var (
-		addressPadded = string(topics[0])
+		addressPadded = topics[0].String()
 		amountPadded  = hex.EncodeToString(data)
 	)
 
@@ -44,10 +45,10 @@ func handleBurn(transactionHash ethereum.Hash, topics []ethereum.Hash, data misc
 		})
 	}
 
-	burn := user_actions.NewSwap(
-		networkEthereum,
-		address,
-		string(transactionHash),
+	burn := user_actions.NewSwapEthereum(
+		network_,
+		ethereum.AddressFromString(address),
+		transactionHash,
 		*amount,
 		false,
 		tokenShortName,

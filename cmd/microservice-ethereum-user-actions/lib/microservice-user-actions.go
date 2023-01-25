@@ -10,13 +10,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
-const (
-	// NetworkEthereum that's having its transactions decoded
-	NetworkEthereum = `ethereum`
 
-	// Context used in logging the signature for the desired events
-	Context = "MICORSERVICE_USER_ACTIONS"
-)
+// Context used in logging the signature for the desired events
+const Context = "MICROSERVICE_USER_ACTIONS"
 
 // DecodeTwoLog containing address and a uint from their padded versions
 func DecodeTwoLog(addressPadded, amountPadded string) (string, *misc.BigInt, error) {
@@ -34,7 +30,7 @@ func DecodeTwoLog(addressPadded, amountPadded string) (string, *misc.BigInt, err
 	}
 
 	var (
-		amount     = misc.NewBigInt(*amountBig)
+		amount     = misc.NewBigIntFromInt(*amountBig)
 		addressHex = address.Hex()
 	)
 

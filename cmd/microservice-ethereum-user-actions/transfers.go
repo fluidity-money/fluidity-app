@@ -29,8 +29,8 @@ func handleTransfer(transactionHash ethereum.Hash, logTopics []ethereum.Hash, da
 	}
 
 	var (
-		fromAddressPadded = string(logTopics[0])
-		toAddressPadded   = string(logTopics[1])
+		fromAddressPadded = logTopics[0].String()
+		toAddressPadded   = logTopics[1].String()
 	)
 
 	transfer, err := microservice_user_actions.DecodeTransfer(

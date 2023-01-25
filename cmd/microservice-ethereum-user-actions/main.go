@@ -31,9 +31,10 @@ const (
 	// user representation
 	EnvTokenDecimals = `FLU_ETHEREUM_TOKEN_DECIMALS`
 
-	topicUserActions = user_actions.TopicUserActionsEthereum
+	// EnvNetwork to track (ethereum or arbitrum) in this microservice
+	EnvNetwork  = `FLU_ETHEREUM_NETWORK`
 
-	networkEthereum = network.NetworkEthereum
+	topicUserActions = user_actions.TopicUserActionsEthereum
 )
 
 func main() {
@@ -41,6 +42,7 @@ func main() {
 		filterAddress_ = util.GetEnvOrFatal(EnvFilterAddress)
 		tokenShortName = util.GetEnvOrFatal(EnvTokenShortName)
 		tokenDecimals_ = util.GetEnvOrFatal(EnvTokenDecimals)
+		network__ = util.GetEnvOrFatal(EnvNetwork)
 	)
 
 	filterAddress := ethereumTypes.AddressFromString(filterAddress_)
@@ -52,6 +54,20 @@ func main() {
 			k.Format(
 				"Failed to convert %#v to a number!",
 				tokenDecimals_,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	network_, err := network.ParseEthereumNetwork(network__)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to parse Ethereum network (%#v) in env %v!",
+				network__,
+				EnvNetwork,
 			)
 
 			k.Payload = err
@@ -88,7 +104,7 @@ func main() {
 		}
 
 		var (
-			topicHead      = string(logTopics[0])
+			topicHead      = logTopics[0].String()
 			topicRemaining = logTopics[1:]
 		)
 
@@ -133,6 +149,7 @@ func main() {
 			)
 
 			handleMint(
+				network_,
 				transactionHash,
 				topicRemaining,
 				logData,
@@ -148,6 +165,7 @@ func main() {
 			)
 
 			handleBurn(
+				network_,
 				transactionHash,
 				topicRemaining,
 				logData,

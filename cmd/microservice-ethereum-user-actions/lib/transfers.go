@@ -65,14 +65,14 @@ func DecodeTransfer(transactionHash ethereum.Hash, fromAddressPadded, toAddressP
 	var (
 		fromAddressHex = fromAddress.Hex()
 		toAddressHex   = toAddress.Hex()
-		amount         = misc.NewBigInt(*amountBigInt)
+		amount         = misc.NewBigIntFromInt(*amountBigInt)
 	)
 
-	send := user_actions.NewSend(
+	send := user_actions.NewSendEthereum(
 		network.NetworkEthereum,
-		fromAddressHex,
-		toAddressHex,
-		string(transactionHash),
+		ethereum.AddressFromString(fromAddressHex),
+		ethereum.AddressFromString(toAddressHex),
+		transactionHash,
 		amount,
 		tokenShortName,
 		tokenDecimals,

@@ -14,6 +14,7 @@ and Transfer events.
 | `FLU_ETHEREUM_CONTRACT_ADDR`  | Track interactions with the contract at this address.                        |
 | `FLU_ETHEREUM_TOKEN_NAME`     | Token name to use when tracking the token for user representation.           |
 | `FLU_ETHEREUM_TOKEN_DECIMALS` | Token decimals to use when tracking user actions and sending them down AMQP. |
+| `FLU_ETHEREUM_NETWORK`        | Name of the Ethereum network being used (ethereum|arbitrum).                 |
 
 ## Building
 
