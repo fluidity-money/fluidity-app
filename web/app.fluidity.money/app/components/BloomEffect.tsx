@@ -12,12 +12,7 @@ type BloomEffectProps = {
 };
 
 const BloomEffect = (props: BloomEffectProps) => {
-  const {
-    color: colorStr = "#fff",
-    type = "static",
-    blendMode,
-    width = 70,
-  } = props;
+  const { color: colorStr = "#fff", type = "static", blendMode, width = 70 } = props;
 
   const [colorStart, colorEnd] = useMemo(() => {
     const _color = new color(colorStr);

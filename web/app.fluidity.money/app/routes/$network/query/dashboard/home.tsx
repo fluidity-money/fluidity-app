@@ -4,7 +4,7 @@ import type { TimeSepUserYield } from "~/queries/useUserYield";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { LoaderFunction, json } from "@remix-run/node";
-// import { jsonGet } from "~/util";
+import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
@@ -39,31 +39,28 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const [
       totalPrizePool,
-      ,
-      /*{ volume }*/ { data: rewardsData, errors: rewardsErr },
+      { volume },
+      { data: rewardsData, errors: rewardsErr },
     ] = await Promise.all([
       getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
-      // address
-      //   ? jsonGet<{ address: string }, { volume: Volume[] }>(
-      //       `${url.origin}/${network}/query/volumeStats`,
-      //       {
-      //         address,
-      //       }
-      //     )
-      //   : jsonGet<Record<string, string>, { volume: Volume[] }>(
-      //       `${url.origin}/${network}/query/volumeStats`
-      //     ),
-      async () => {
-        return {};
-      },
+      address
+        ? jsonGet<{ address: string }, { volume: Volume[] }>(
+            `${url.origin}/${network}/query/volumeStats`,
+            {
+              address,
+            }
+          )
+        : jsonGet<Record<string, string>, { volume: Volume[] }>(
+            `${url.origin}/${network}/query/volumeStats`
+          ),
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),
     ]);
 
-    // if (!volume) {
-    //   throw new Error("Could not fetch volume data");
-    // }
+    if (!volume) {
+      throw new Error("Could not fetch volume data");
+    }
 
     if (rewardsErr || !rewardsData) {
       throw new Error("Could not fetch rewards data");
@@ -72,7 +69,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return json({
       totalPrizePool,
       rewards: rewardsData,
-      //volume: volume,
+      volume: volume,
       totalFluidPairs: fluidPairs,
       network,
       timestamp,

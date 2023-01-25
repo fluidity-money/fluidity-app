@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
-  const useMoralis = useSplitExperiment("enable-moralis", true);
+  const useMoralis = !!useSplitExperiment("enable-moralis", true);
 
   const { tokens } = config.config[network ?? ""];
 
