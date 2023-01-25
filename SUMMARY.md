@@ -16,6 +16,7 @@
     * [How to get testnet funds?](docs/learning-and-getting-started/tutorials/how-to-get-testnet-funds.md)
 * [🏡 Addresses](docs/addresses/README.md)
   * [💠 Ethereum](docs/addresses/ethereum.md)
+  * [💠 Arbitrum](/docs/addresses/arbitrum.md)
   * [☀ Solana](docs/addresses/solana.md)
 * [🔠 Fundamentals](docs/fundamentals/README.md)
   * [📄 FAQ](docs/fundamentals/faq.md)
