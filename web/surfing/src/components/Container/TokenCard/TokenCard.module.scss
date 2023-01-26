@@ -1,0 +1,23 @@
+@use 'common' as *;
+
+.token-card-container {
+  padding: 14px 28px;
+  display: inline-grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: auto auto auto 1fr auto;
+  gap: 10%;
+  align-items: center;
+  justify-content: left;
+}
+
+.token {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+}
+
+.tokenImg {
+  height: auto;
+  width: 64px;
+}

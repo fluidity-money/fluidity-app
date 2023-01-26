@@ -1,0 +1,21 @@
+@use 'common' as *;
+
+.token-details-container {
+  padding-left: 5px;
+  padding-bottom: 45px;
+  display: inline-grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: auto 1fr 1fr;
+  align-items: bottom;
+  justify-content: right;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.tokenImg {
+  height: auto;
+  width: 64px;
+}

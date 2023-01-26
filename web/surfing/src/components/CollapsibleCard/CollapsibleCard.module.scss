@@ -1,0 +1,11 @@
+@use "common" as *;
+
+.collapsible-card {
+  width: 100%;
+}
+
+.collapsible-card-header {
+  display: grid;
+  grid-template-columns: 8fr 1fr;
+  justify-content: center;
+}

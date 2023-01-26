@@ -1,0 +1,23 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+import CollapsibleCard from "./CollapsibleCard";
+
+<Meta title="CollapsibleCard/CollapsibleCard" component={CollapsibleCard} />
+
+export const Template = () => {
+  return (
+    <CollapsibleCard />
+  )
+}
+
+<Canvas columns={1}  withSource="open" withToolbar>
+  <Title>Data Table</Title>
+  <Subtitle>Table to show logs</Subtitle>
+    <Story
+    name="Assets"
+    args={{
+      children:<div/>
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
