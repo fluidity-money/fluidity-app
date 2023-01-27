@@ -260,8 +260,16 @@ export const setOracles = async (
   hre: HardhatRuntimeEnvironment,
   tokenAddresses: string[],
   oracle: string,
+  registry: string,
+  operator: string,
 ) => {
   for (const address of tokenAddresses) {
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [operator],
+    });
+
+
   }
 }
 // statically ensure an object can't exist (ie, all enum varients are handled)

@@ -227,7 +227,7 @@ func main() {
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
 
 			for _, transfer := range transfers {
-				fee, emission, err := applications.GetApplicationFee(
+				fee, utility, emission, err := applications.GetApplicationFee(
 					transfer,
 					gethClient,
 					contractAddress,
@@ -256,7 +256,8 @@ func main() {
 				}
 
 				decorator := &worker.EthereumWorkerDecorator{
-					Application: transfer.Application,
+					Application:    transfer.Application,
+					UtilityName:    utility,
 					ApplicationFee: fee,
 				}
 

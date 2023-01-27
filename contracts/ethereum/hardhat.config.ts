@@ -4,7 +4,7 @@ import "hardhat-docgen";
 import { task, subtask } from "hardhat/config";
 import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-import { deployTokens, deployWorkerConfig, setOracles, forknetTakeFunds, mustEnv } from './script-utils';
+import { deployTokens, deployRegistry, setOracles, forknetTakeFunds, mustEnv } from './script-utils';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -45,7 +45,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
   await hre.run("forknet:take-usdt");
 
-  const workerConfigAddress = await deployWorkerConfig(
+  const workerConfigAddress = await deployRegistry(
     hre,
     operatorAddress,
     emergencyCouncilAddress,
@@ -56,8 +56,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     shouldDeploy.map(token => TokenList[token]),
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
-    emergencyCouncilAddress,
-    operatorAddress,
+    registryAddress,
     workerConfigAddress,
   );
 

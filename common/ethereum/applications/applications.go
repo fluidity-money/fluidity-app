@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -40,15 +41,17 @@ const (
 	ApplicationMultichain
 	ApplicationXyFinance
 	ApplicationApeswap
+	ApplicationTest
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, applications.Utility, worker.EthereumAppFees, error) {
 	var (
 		fee      *big.Rat
+		utility  applications.Utility
 		emission worker.EthereumAppFees
 		err      error
 	)
@@ -156,6 +159,10 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 
 		emission.Apeswap += util.MaybeRatToFloat(fee)
 
+	case ApplicationTest:
+		fee = big.NewRat(1, 1)
+		utility = applications.UtilityTest
+
 	default:
 		err = fmt.Errorf(
 			"Transfer #%v did not contain an application",
@@ -163,7 +170,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 	}
 
-	return fee, emission, err
+	return fee, utility, emission, err
 }
 
 // GetApplicationTransferParties to find the parties considered for payout from an application interaction.
@@ -211,6 +218,9 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+
+	case ApplicationTest:
+		return transaction.From, transaction.To, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
