@@ -152,6 +152,9 @@ func main() {
 			fluidity.FluidityContractAbi.Events["Reward"].ID,
 			fluidity.FluidityContractAbi.Events["BlockedReward"].ID,
 			fluidity.FluidityContractAbi.Events["UnblockReward"].ID,
+			fluidity.FluidityContractAbi.Events["Transfer"].ID,
+			fluidity.FluidityContractAbi.Events["MintFluid"].ID,
+			fluidity.FluidityContractAbi.Events["BurnFluid"].ID,
 		},
 	}
 
@@ -283,6 +286,7 @@ func main() {
 		lastBlockSeen uint64 = 0
 
 		logsSeen = make(map[uint]bool)
+
 		lastBlockEmitted uint64
 	)
 

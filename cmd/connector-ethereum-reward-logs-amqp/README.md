@@ -1,7 +1,19 @@
 
 # connector-ethereum-reward-logs-amqp
 
-Watches for `Reward`, `BlockedReward`, and `UnblockReward` events on the geth websocket and sends them down AMQP.
+Watches for the following events over the Geth websocket:
+
+- `Reward`
+
+- `BlockedReward`
+
+- `UnblockReward`
+
+- `Transfer`
+
+- `MintFluid`
+
+- `BurnFluid`
 
 ## Environment variables
 
