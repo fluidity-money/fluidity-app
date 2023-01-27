@@ -92,6 +92,11 @@ contract Operator {
         return oracles_[msg.sender];
     }
 
+    function updateUtilityClients(Registry.FluidityClientChange[] calldata clients) public {
+        require(msg.sender == operator_, "not authorised to use this!");
+        registry_.updateUtilityClients(clients);
+    }
+
     /// @dev oracle function to reward
     function reward(address token, FluidityReward[] calldata rewards, uint firstBlock, uint lastBlock) public {
         address oracle = oracles_[token];

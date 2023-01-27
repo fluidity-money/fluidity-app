@@ -41,34 +41,40 @@ export const optionalEnv = (env: string, fallback: string): string => {
   return e;
 };
 
-const deployAndInit = async (
+const deploy = async (
   hre: HardhatRuntimeEnvironment,
-  contract: String,
-  ...args: any[]
+  contract: string,
 ) => {
-  const factory = await hre.ethers.getContractFactory("WorkerConfig");
-  if (!factory) throw new Error(`Contract '${contract} ' not found!`);
+  const factory = await hre.ethers.getContractFactory(contract);
+  if (!factory) throw new Error(`Contract '${contract}' not found!`);
   const c = await factory.deploy();
   await c.deployed();
+  return c;
+}
+
+const deployAndInit = async (
+  hre: HardhatRuntimeEnvironment,
+  contract: string,
+  ...args: any[]
+) => {
+  let c = await deploy(hre, contract);
   await c.init(...args);
-  return c.address;
+  return c;
 }
 
-export const deployRegistry = async (
+export const deployOperatorRegistry = async (
   hre: HardhatRuntimeEnvironment,
-  operator: string,
+  userOperator: string,
   emergencyCouncil: string,
-): Promise<string> => {
-  return deployAndInit(hre, "Registry", operator, emergencyCouncil);
-};
+): Promise<[ethers.Contract, ethers.Contract]> => {
+  const operator = await deploy(hre, "Operator");
+  const registry = await deploy(hre, "Registry");
 
-export const deployOperator = async (
-  hre: HardhatRuntimeEnvironment,
-  operator: string,
-  registry: string,
-): Promise<string> => {
-  return deployAndInit(hre, "Operator", operator, registry);
-}
+  await operator.init(userOperator, registry.address);
+  await registry.init(operator.address, emergencyCouncil);
+
+  return [operator, registry];
+};
 
 export const deployGovToken = async (
   hre: HardhatRuntimeEnvironment,
@@ -89,6 +95,31 @@ export const deployGovToken = async (
   return govToken.address;
 };
 
+export const deployTestUtility = async (
+  hre: HardhatRuntimeEnvironment,
+  operator: ethers.Contract,
+  externalOperator: string,
+  registry: ethers.Contract,
+  token: string,
+) => {
+  const factory = await hre.ethers.getContractFactory("TestClient");
+  const client = await factory.deploy(registry.address);
+  await client.deployed();
+
+  await addUtilityClient(
+    hre,
+    operator,
+    externalOperator,
+    [{
+      name: "test",
+      overwrite: false,
+      token,
+      client: client.address,
+    }],
+  );
+  return client;
+};
+
 export type TokenAddresses = {
   [symbol: string]: {
     deployedToken: ethers.Contract,
@@ -101,9 +132,10 @@ export const deployTokens = async (
   tokens: Token[],
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
-  emergencyCouncilAddress: string,
-  operatorAddress: string,
-  workerConfigAddress: string
+  registryAddress: string,
+  councilAddress: string,
+  operator: ethers.Contract,
+  externalOperator: string,
 ): Promise<{
   tokenBeacon: ethers.Contract,
   aaveV2Beacon: ethers.Contract,
@@ -172,15 +204,26 @@ export const deployTokens = async (
 
     await deployedToken.deployed();
 
-    console.log(`init ${operatorAddress}`)
     await deployedToken.functions.init(
       deployedPool.address,
       token.decimals,
       token.name,
       token.symbol,
-      emergencyCouncilAddress,
-      operatorAddress,
-      workerConfigAddress,
+      councilAddress,
+      registryAddress,
+      registryAddress,
+    );
+
+    await addUtilityClient(
+      hre,
+      operator,
+      externalOperator,
+      [{
+        name: "FLUID",
+        overwrite: false,
+        token: deployedToken.address,
+        client: deployedToken.address,
+      }],
     );
 
     tokenAddresses[token.symbol] = {deployedToken, deployedPool};
@@ -210,7 +253,7 @@ export const deployRewardPools = async (
 
 export const forknetTakeFunds = async (
   hre: HardhatRuntimeEnvironment,
-  accounts: ethers.Signer[],
+  accounts: string[],
   tokens: {name: string, owner: string, address: string}[],
 ) => {
   for (const token of tokens) {
@@ -223,7 +266,7 @@ export const forknetTakeFunds = async (
     });
 
     const impersonatedToken = await hre.ethers.getContractAt(
-      "IERC20",
+      "Token",
       token.address,
       await hre.ethers.getSigner(token.owner),
     );
@@ -239,9 +282,9 @@ export const forknetTakeFunds = async (
     const amount = initialUsdtBalance.div(accounts.length);
 
     const promises = accounts.map(async address => {
-      await impersonatedToken.transfer(await address.getAddress(), amount);
+      await impersonatedToken.transfer(address, amount);
 
-      if (!(await impersonatedToken.balanceOf(await address.getAddress())).eq(amount))
+      if (!(await impersonatedToken.balanceOf(address)).eq(amount))
         throw new Error(`failed to take token ${token.name} ${token.address}`);
     });
 
@@ -259,18 +302,56 @@ export const forknetTakeFunds = async (
 export const setOracles = async (
   hre: HardhatRuntimeEnvironment,
   tokenAddresses: string[],
+  externalOperator: string,
   oracle: string,
-  registry: string,
-  operator: string,
+  operator: ethers.Contract,
 ) => {
-  for (const address of tokenAddresses) {
-    await hre.network.provider.request({
-      method: "hardhat_impersonateAccount",
-      params: [operator],
-    });
+  await hre.network.provider.request({
+    method: "hardhat_impersonateAccount",
+    params: [externalOperator],
+  });
 
+  let impersonatedOperator = operator.connect(await hre.ethers.getSigner(externalOperator));
 
-  }
+  let oracles = tokenAddresses.map(token => {
+    return {contractAddr: token, newOracle: oracle};
+  });
+
+  await impersonatedOperator.updateOracles(oracles);
+
+  await hre.network.provider.request({
+    method: "hardhat_stopImpersonatingAccount",
+    params: [externalOperator],
+  });
+}
+
+export type FluidityClientChange = {
+  name: string,
+  overwrite: boolean,
+  token: string,
+  client: string,
+};
+
+export const addUtilityClient = async(
+  hre: HardhatRuntimeEnvironment,
+  operator: ethers.Contract,
+  externalOperator: string,
+  changes: FluidityClientChange[]
+) => {
+  await hre.network.provider.request({
+    method: "hardhat_impersonateAccount",
+    params: [externalOperator],
+  });
+
+  let impersonatedOperator = operator.connect(await hre.ethers.getSigner(externalOperator));
+
+  console.log(`setting util client ${JSON.stringify(changes)}`);
+  await impersonatedOperator.updateUtilityClients(changes);
+
+  await hre.network.provider.request({
+    method: "hardhat_stopImpersonatingAccount",
+    params: [externalOperator],
+  });
 }
 // statically ensure an object can't exist (ie, all enum varients are handled)
 function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }

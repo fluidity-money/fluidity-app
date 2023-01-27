@@ -391,7 +391,6 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			application,
 			block_number,
 			win_amount,
-			usd_win_amount,
 			utility
 		)
 
@@ -404,8 +403,7 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			$6,
 			$7,
 			$8,
-			$9,
-			$10
+			$9
 		);`,
 
 		TablePendingRewardType,
@@ -414,7 +412,6 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 	for utility, payout := range senderWinAmount {
 		var (
 			winAmountNative = payout.Native
-			winAmountUsd    = payout.Usd
 		)
 
 		// insert the sender's value
@@ -428,7 +425,6 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			application.String(),
 			blockNumber,
 			winAmountNative,
-			winAmountUsd,
 			utility,
 		)
 
@@ -449,8 +445,8 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 	for utility, payout := range recipientWinAmount {
 		var (
 			winAmountNative = payout.Native
-			winAmountUsd    = payout.Usd
 		)
+
 		// insert the recipient's value
 		_, err := timescaleClient.Exec(
 			statementText,
@@ -462,7 +458,6 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			application.String(),
 			blockNumber,
 			winAmountNative,
-			winAmountUsd,
 			utility,
 		)
 

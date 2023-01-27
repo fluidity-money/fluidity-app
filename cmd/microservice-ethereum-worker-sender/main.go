@@ -24,7 +24,7 @@ import (
 
 const (
 	// EnvOperatorAddress is the contract where the fluidity operator is located
-	EnvOperatorAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
+	EnvOperatorAddress = `FLU_ETHEREUM_OPERATOR_ADDR`
 
 	// EnvContractAddress is the contract to call when a winner's been found!
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`

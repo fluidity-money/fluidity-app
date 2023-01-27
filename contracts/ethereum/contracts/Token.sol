@@ -146,7 +146,7 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
      * @param _symbol the fluid token's symbol
      * @param _emergencyCouncil address that can activate emergency mode
      * @param _operator address that can release quarantine payouts and activate emergency mode
-     * @param _workerConfig to use for retrieving RNG oracle address
+     * @param _registry address that can call the reward function
      */
     function init(
         address _liquidityProvider,
@@ -155,7 +155,7 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
         string memory _symbol,
         address _emergencyCouncil,
         address _operator,
-        address _workerConfig
+        address _registry
     ) public {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
@@ -163,11 +163,10 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
         // remember the operator for signing off on oracle changes, large payouts
         operator_ = _operator;
 
+        oracle_ = _registry;
+
         // remember the emergency council for shutting down this token
         emergencyCouncil_ = _emergencyCouncil;
-
-        // remember the worker config to look up the addresses for each rng oracle
-        //workerConfig_ = WorkerConfig(_workerConfig);
 
         // remember the liquidity provider to deposit tokens into
         pool_ = LiquidityProvider(_liquidityProvider);

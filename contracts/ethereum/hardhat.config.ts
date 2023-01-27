@@ -4,7 +4,7 @@ import "hardhat-docgen";
 import { task, subtask } from "hardhat/config";
 import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-import { deployTokens, deployRegistry, setOracles, forknetTakeFunds, mustEnv } from './script-utils';
+import { deployTokens, deployOperatorRegistry, setOracles, forknetTakeFunds, mustEnv, deployTestUtility } from './script-utils';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -18,7 +18,7 @@ let oracleAddress: string;
 
 let emergencyCouncilAddress: string;
 
-let operatorAddress: string;
+let externalOperatorAddress: string;
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
 
@@ -27,7 +27,7 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
   .setAction(async (args, hre) => {
     oracleAddress = mustEnv(oracleKey);
     emergencyCouncilAddress = mustEnv(emergencyCouncilKey);
-    operatorAddress = mustEnv(operatorKey);
+    externalOperatorAddress = mustEnv(operatorKey);
 
     shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
 
@@ -43,11 +43,20 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
 subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   if (!shouldDeploy.length) return;
 
+  for (const address of [oracleAddress, emergencyCouncilAddress, externalOperatorAddress]) {
+    await hre.network.provider.send(
+      "hardhat_setBalance",
+      [
+        address,
+        "0x1000000000000000000000000000000000000000000000000000000000000000",
+      ],
+    );
+  }
   await hre.run("forknet:take-usdt");
 
-  const workerConfigAddress = await deployRegistry(
+  const [operator, registry] = await deployOperatorRegistry(
     hre,
-    operatorAddress,
+    externalOperatorAddress,
     emergencyCouncilAddress,
   );
 
@@ -56,22 +65,28 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     shouldDeploy.map(token => TokenList[token]),
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
-    registryAddress,
-    workerConfigAddress,
+    registry.address,
+    emergencyCouncilAddress,
+    operator,
+    externalOperatorAddress,
   );
 
   await setOracles(
     hre,
     Object.values(tokens).map(t => t.deployedToken.address),
+    externalOperatorAddress,
     oracleAddress,
-    operatorAddress,
+    operator,
   );
+
+  const testClient = await deployTestUtility(hre, operator, externalOperatorAddress, registry, tokens["fUSDt"].deployedToken.address);
+  console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDt"].deployedToken.address}`);
 
   console.log(`deployment complete`);
 });
 
 subtask("forknet:take-usdt", async (_taskArgs, hre) => {
-  const accounts = (await hre.ethers.getSigners()).slice(0, 10);
+  const accounts = [oracleAddress, ...(await hre.ethers.getSigners()).slice(0, 1).map(a => a.address)];
 
   await forknetTakeFunds(
     hre,

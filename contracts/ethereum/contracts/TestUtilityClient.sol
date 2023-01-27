@@ -2,15 +2,23 @@ pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "./Fluidity.sol";
-import "./openzeppelin/IERC20Metadata.sol";
+import "./GovToken.sol";
 
 contract TestClient is IFluidity {
     address operator_;
-    IERC20Metadata govToken_;
+    GovToken govToken_;
 
-    constructor(IERC20Metadata g, address o) {
-        govToken_ = g;
+    event GotTransfered(address indexed from, address indexed to, uint amount);
+
+    constructor(address o) {
         operator_ = o;
+        govToken_ = new GovToken();
+        govToken_.init("Test utility token!", "UTILCLIENT", 8, 2 * (10 ** 8));
+    }
+
+    function transferFrom(GovToken token, uint amount) external {
+        emit GotTransfered(msg.sender, address(token), amount);
+        token.transferFrom(msg.sender, address(this), amount);
     }
 
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) external {

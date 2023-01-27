@@ -66,8 +66,7 @@ contract Registry {
      */
     function init(
         address _operator,
-        address _emergencyCouncil,
-        FluidityClientChange[] memory clients
+        address _emergencyCouncil
     ) public {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
@@ -77,8 +76,6 @@ contract Registry {
         emergencyCouncil_ = _emergencyCouncil;
 
         noGlobalEmergency_ = true;
-
-        updateUtilityClients(clients);
     }
 
     function noGlobalEmergency() public view returns (bool) {
@@ -106,13 +103,15 @@ contract Registry {
     }
 
     function updateUtilityClients(FluidityClientChange[] memory clients) public {
+        require(msg.sender == operator_, "only the operator account can use this");
+
         for (uint i = 0; i < clients.length; i++) {
             FluidityClientChange memory change = clients[i];
 
             address oldClient = address(fluidityClients_[change.token][change.name]);
 
             require(
-                oldClient != address(0) || change.overwrite,
+                oldClient == address(0) || change.overwrite,
                 "trying to overwrite a client without the overwrite option set!"
             );
 
