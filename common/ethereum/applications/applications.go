@@ -41,7 +41,6 @@ const (
 	ApplicationMultichain
 	ApplicationXyFinance
 	ApplicationApeswap
-	ApplicationTest
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -159,10 +158,6 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 
 		emission.Apeswap += util.MaybeRatToFloat(fee)
 
-	case ApplicationTest:
-		fee = big.NewRat(1, 1)
-		utility = applications.UtilityTest
-
 	default:
 		err = fmt.Errorf(
 			"Transfer #%v did not contain an application",
@@ -218,9 +213,6 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
-
-	case ApplicationTest:
-		return transaction.From, transaction.To, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
