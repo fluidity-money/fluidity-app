@@ -1,4 +1,4 @@
-export const GA_TRACKING_ID = "GT-NM2HFZW";
+export const GA_TRACKING_ID = process.env["GA_WEBSITE_ANALYTICS_ID"];
 
 export const pageview = (url: URL) => {
   if (typeof window.gtag === "undefined") return;
