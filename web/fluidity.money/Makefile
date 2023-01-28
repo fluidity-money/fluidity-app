@@ -14,7 +14,7 @@ FRONTEND_SRC := ${FRONTEND_SRC_TS} ${FRONTEND_SRC_SASS}
 
 include ../../web.mk
 
-NEXTJS_BUILD := npm run build
+NEXTJS_BUILD := cd ..  && turbo build --filter website
 
 nextjs:
 	${NEXTJS_BUILD}
@@ -22,13 +22,14 @@ nextjs:
 ${FRONTEND_BUILD}: nextjs
 	@touch ${FRONTEND_BUILD}
 
+# No the double dot is not a typo. Turbo builds are from the monorepo root.
 docker-frontend: ${FRONTEND_SRC}
 	@${DOCKER_BUILD} \
 		${DOCKERFLAGS} \
 		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/${REPO}-frontend" \
 		-f Dockerfile.frontend \
-		.
+		..
 
 	@touch docker-frontend
 

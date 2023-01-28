@@ -7,11 +7,8 @@ import {
   wrapExpressCreateRequestHandler,
 } from "@sentry/remix";
 import { createRequestHandler } from "@remix-run/express";
-
 import { Server } from "socket.io";
-
 import { createServer } from "http";
-
 import config from "~/webapp.config.server";
 import { Observable, Subscription } from "rxjs";
 import { PipedTransaction } from "drivers/types";
@@ -30,11 +27,9 @@ const io = new Server(httpServer);
 
 const createSentryRequestHandler =
   wrapExpressCreateRequestHandler(createRequestHandler);
-
 app.use((req, res, next) => {
   // helpful headers:
   res.set("Strict-Transport-Security", `max-age=${60 * 60 * 24 * 365 * 100}`);
-
   // /clean-urls/ -> /clean-urls
   if (req.path.endsWith("/") && req.path.length > 1) {
     const query = req.url.slice(req.path.length);
@@ -44,22 +39,17 @@ app.use((req, res, next) => {
   }
   next();
 });
-
 app.use(compression());
-
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
 app.disable("x-powered-by");
-
 // Remix fingerprints its assets so we can cache forever.
 app.use(
   "/build",
   express.static("public/build", { immutable: true, maxAge: "1y" })
 );
-
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
 app.use(express.static("public", { maxAge: "1h" }));
-
 app.use(morgan("tiny"));
 
 const BUILD_DIR = path.join(process.cwd(), "build");
@@ -175,18 +165,14 @@ app.all(
         return requestHandler(...args);
       }
 );
-
 const port = process.env.PORT || 3000;
-
 const server = httpServer.listen(port, () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
   console.log(`✅ app ready: http://localhost:${port}`);
 });
-
 server.keepAliveTimeout = 65000;
 server.headersTimeout = 66000;
-
 function purgeRequireCache() {
   // purge require cache on requests for "server side HMR" this won't let
   // you have in-memory objects between requests in development,

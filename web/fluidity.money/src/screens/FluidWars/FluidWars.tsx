@@ -3,40 +3,39 @@
 // LICENSE.md file.
 
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
-import Video from "components/Video";
+import { ReusableGrid, useViewport, Video } from "@fluidity-money/surfing";
 import styles from "./FluidWars.module.scss";
 
 const FluidWars = () => {
   const { width } = useViewport();
   const breakpoint = 860;
-  
+
   const left =
-  width > breakpoint ? (
-    <>
-      <Video
-        src={'/assets/videos/FluidityFluidWars.mp4'}
-        type={"fit"}
-        loop={true}
-        scale={2.0}
-        margin={"0 0 0 270px"}
-      />
-    </>
+    width > breakpoint ? (
+      <>
+        <Video
+          src={"/assets/videos/FluidityFluidWars.mp4"}
+          type={"fit"}
+          loop={true}
+          scale={2.0}
+          margin={"0 0 0 270px"}
+        />
+      </>
+    ) : (
+      <>
+        <Video
+          src={"/assets/videos/FluidityFluidWars.mp4"}
+          type={"fit"}
+          loop={true}
+        />
+      </>
+    );
 
-  ) : (
-    <>
-      <Video
-        src={'/assets/videos/FluidityFluidWars.mp4'}
-        type={"fit"}
-        loop={true}
-      />
-    </>
+  const right = (
+    <HowItWorksTemplate header={header} info={info}>
+      Fluidity wars
+    </HowItWorksTemplate>
   );
-
-  const right =
-  <HowItWorksTemplate header={header} info={info}>
-    Fluidity wars
-  </HowItWorksTemplate>
 
   return (
     <div className={styles.container} id="fluiditywars">

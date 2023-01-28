@@ -3,13 +3,13 @@
 // LICENSE.md file.
 
 import { useEffect, useState } from "react";
-import Video from "components/Video";
 import {
   ContinuousCarousel,
   Heading,
   LinkButton,
   Text,
   useViewport,
+  Video,
 } from "@fluidity-money/surfing";
 import styles from "./HowItWorks.module.scss";
 import Link from "next/link";
@@ -102,10 +102,7 @@ const HowItWorks = () => {
           <Text as={"p"} prominent={currentImageIndex === 2}>
             The user is incentivised through governance.
           </Text>
-          <Link
-            href="/howitworks"
-            passHref
-          >
+          <Link href="/howitworks" passHref>
             <a href="/howitworks">
               <LinkButton
                 type={"internal"}

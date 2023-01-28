@@ -1,0 +1,26 @@
+import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
+
+import CookieConsent from "./CookieConsent";
+
+<Meta title="Modal/CookieConsent" component={CookieConsent} />
+
+export const Template = (args) => (
+    <CookieConsent {...args}/>
+);
+
+<Title>Cookie Modal</Title>
+<Subtitle>Beautiful typography for beautiful things.</Subtitle>
+
+<ArgsTable of={CookieConsent} default />
+
+<Canvas>
+    <Story
+        name="Cookies"
+        args={{
+            activated: false,
+            url: '/privacy'
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

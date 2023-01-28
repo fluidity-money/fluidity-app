@@ -13,7 +13,6 @@ on:
         description: 'Network'
         options: 
           - 'ethereum'
-          - 'solana'
           - 'arbitrum'
           - 'fluidity'
       group:

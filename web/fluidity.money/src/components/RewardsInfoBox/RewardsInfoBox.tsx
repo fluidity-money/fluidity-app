@@ -92,7 +92,7 @@ const RewardsInfoBox = ({
                     height="70"
                     width="70"
                     src="assets/images/LoopAnim.webp"
-                    alt='loading'
+                    alt="loading"
                   />
                 )}
               </Suspense>

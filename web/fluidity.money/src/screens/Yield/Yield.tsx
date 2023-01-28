@@ -2,46 +2,44 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
+import { ReusableGrid, useViewport, Video } from "@fluidity-money/surfing";
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
 import styles from "./Yield.module.scss";
-import Video from "components/Video";
 
 const Yield = () => {
-
   // to set order correct when in column layout
   const { width } = useViewport();
   const breakpoint = 860;
-  
+
   const left =
-  width <= breakpoint ? (
-    <>
-      <Video
-        src={"/assets/videos/FluidityYield.mp4"}
-        type={"fit"}
-        loop={true}
-      />
-    </>
-  ) : (
-    <HowItWorksTemplate header={header} info={info}>
-      Yield through utility
-    </HowItWorksTemplate>
-  );
+    width <= breakpoint ? (
+      <>
+        <Video
+          src={"/assets/videos/FluidityYield.mp4"}
+          type={"fit"}
+          loop={true}
+        />
+      </>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        Yield through utility
+      </HowItWorksTemplate>
+    );
 
   const right =
-  width > breakpoint ? (
-    <>
-      <Video
-        src={"/assets/videos/FluidityYield.mp4"}
-        type={"fit"}
-        loop={true}
-      />
-    </>
-  ) : (
-    <HowItWorksTemplate header={header} info={info}>
-      Yield through utility
-    </HowItWorksTemplate>
-  );
+    width > breakpoint ? (
+      <>
+        <Video
+          src={"/assets/videos/FluidityYield.mp4"}
+          type={"fit"}
+          loop={true}
+        />
+      </>
+    ) : (
+      <HowItWorksTemplate header={header} info={info}>
+        Yield through utility
+      </HowItWorksTemplate>
+    );
 
   return (
     <div className={styles.container} id="yield&win">

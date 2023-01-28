@@ -1,26 +1,29 @@
-import { Html, Head, Main, NextScript } from 'next/document'
-import { GA_TRACKING_ID } from 'utils/gtag'
+import { Html, Head, Main, NextScript } from "next/document";
+import { GA_DEST_ID, GA_TRACKING_ID } from "utils/gtag";
 
 const baseDocument = () => {
   return (
     <Html>
       <Head>
-        {process.env.NODE_ENV === 'production' && (
+        {process.env.NODE_ENV === "production" && (
           <>
             <script
               async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_DEST_ID}`}
             />
             <script
               dangerouslySetInnerHTML={{
                 __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_TRACKING_ID}', {
-              page_path: window.location.pathname,
-            });
-          `,
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_DEST_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                  gtag('config', '${GA_TRACKING_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
               }}
             />
             <script
@@ -34,7 +37,7 @@ const baseDocument = () => {
                       r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
                       a.appendChild(r);
                   })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-                `
+                `,
               }}
             />
           </>
@@ -45,7 +48,7 @@ const baseDocument = () => {
         <NextScript />
       </body>
     </Html>
-  )
-}
+  );
+};
 
-export default baseDocument
+export default baseDocument;

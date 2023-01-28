@@ -3,7 +3,11 @@ FROM alpine:3.16.1
 RUN apk add --no-cache \
     nodejs \
     npm \
-    nginx
+    yarn \
+    nginx \
+    libc6-compat
+
+# Libc6-compat is needed for Turbo to work
 
 RUN npm -g install \
     sharp

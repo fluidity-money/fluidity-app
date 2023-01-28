@@ -2,8 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { ManualCarousel, useViewport } from "@fluidity-money/surfing";
-import UseCase from "components/UseCase";
+import { ManualCarousel, UseCase, useViewport } from "@fluidity-money/surfing";
 import styles from "./UseCases.module.scss";
 
 const UseCases = () => {
@@ -38,12 +37,9 @@ const UseCases = () => {
         />
       )}
 
-      <ManualCarousel
-        className={styles.map}
-        scrollBar={true}
-      >
+      <ManualCarousel className={styles.map} scrollBar={true}>
         {items.map((item, i) => (
-          <UseCase key={`usecase-${i}`} useCase={item} />
+          <UseCase key={`usecase-${i}`} useCase={item} viewportWidth={width} />
         ))}
       </ManualCarousel>
     </div>

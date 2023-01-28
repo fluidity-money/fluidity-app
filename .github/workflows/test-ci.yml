@@ -45,7 +45,7 @@ jobs:
 
   test-contracts:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: mainnet
     steps:
       - uses: actions/checkout@v3
         with:
@@ -85,17 +85,17 @@ jobs:
 
   test-npm:
     runs-on: ubuntu-latest
-    # environment: dev
     steps:
       - uses: actions/checkout@v3
+        with:
+          lfs: true
       - uses: actions/setup-node@v3
         with:
           node-version: 16
       - name: npm test
-        working-directory: web/app.fluidity.money
+        working-directory: web
         run: |
-          npm set //npm.pkg.github.com/:_authToken ${{ secrets.GH_SUPER_TOKEN }}
-          npm install
+          yarn
           npm test
       - name: Discord
         uses: ./scripts/actions

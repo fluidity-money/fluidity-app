@@ -26,7 +26,7 @@ export interface IFluidityFacade {
   rawAddress: string;
 
   // Ethereum only
-  manualReward: (
+  manualReward?: (
     fluidTokenAddrs: string[],
     userAddr: string
   ) => Promise<
@@ -34,7 +34,9 @@ export interface IFluidityFacade {
     | undefined
   >;
 
-  addToken: (symbol: string) => Promise<boolean | undefined>;
+  getDegenScore?: (address: string) => Promise<number>;
+
+  addToken?: (symbol: string) => Promise<boolean | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

@@ -2,19 +2,14 @@ REPO := fluidity.money
 
 include ../../web.mk
 
-REMIX_BUILD := npm run prod
+REMIX_BUILD := cd ..  && turbo build --filter webapp
 
-GRAPHQL_BUILD := npm run graphql
-
-.PHONY: remix graphql
+.PHONY: remix
 
 remix:
 	${REMIX_BUILD}
 
-graphql:
-	${GRAPHQL_BUILD}
-
-${FRONTEND_BUILD}: graphql remix
+${FRONTEND_BUILD}: remix
 	@touch ${FRONTEND_BUILD}
 
 docker-frontend:
@@ -23,7 +18,7 @@ docker-frontend:
 		${DOCKER_BUILD_ARGS} \
 		-t "${ORG_ROOT}/app.${REPO}-frontend" \
 		-f Dockerfile.frontend \
-		.
+		..
 
 	@touch docker-frontend
 

@@ -389,7 +389,7 @@ export default function FluidifyToken() {
                 Create or revert <br /> fluid assets
               </Display>
             </section>
-            <Link to="../../dashboard/home">
+            <Link to={`/${network}/dashboard/home`}>
               <LinkButton
                 handleClick={() => null}
                 size="large"

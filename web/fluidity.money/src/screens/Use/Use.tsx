@@ -3,24 +3,21 @@
 // LICENSE.md file.
 
 import HowItWorksTemplate from "../../components/HowItWorksTemplate";
-import { ReusableGrid, useViewport } from "@fluidity-money/surfing";
+import { ReusableGrid, useViewport, Video } from "@fluidity-money/surfing";
 import styles from "./Use.module.scss";
-import Video from "components/Video";
 
 const Use = () => {
   // to set order correct when in column layout
 
-  const right =
-  <HowItWorksTemplate header={header} info={info}>
-    Fluid asset use-cases
-  </HowItWorksTemplate>
+  const right = (
+    <HowItWorksTemplate header={header} info={info}>
+      Fluid asset use-cases
+    </HowItWorksTemplate>
+  );
 
-  const left =
-  <Video
-    src={"/assets/videos/FluidityUse.mp4"}
-    type={"fit"}
-    loop={true}
-  />
+  const left = (
+    <Video src={"/assets/videos/FluidityUse.mp4"} type={"fit"} loop={true} />
+  );
   return (
     <div className={styles.container} id="useassets">
       <ReusableGrid left={left} right={right} />

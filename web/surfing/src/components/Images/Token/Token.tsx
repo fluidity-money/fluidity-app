@@ -12,28 +12,31 @@ export type Tokens =
   | "DAI"
   | "fDAI";
 
-
 const baseImgPath = "https://static.fluidity.money/assets/tokens";
 
 const tokenImgMap: { [K in Tokens]: string } = {
-  "USDC": "usdc.svg",
-  "fUSDC": "fUSDC.svg",
-  "USDT": "usdt.svg",
-  "fUSDT": "fUSDT.svg",
-  "TUSD": "tusd.svg",
-  "fTUSD": "fTUSD.svg",
-  "FRAX": "frax.svg",
-  "fFRAX": "fFRAX.svg",
-  "DAI": "dai.svg",
-  "fDAI": "fDAI.svg",
+  USDC: "usdc.svg",
+  fUSDC: "fUSDC.svg",
+  USDT: "usdt.svg",
+  fUSDT: "fUSDT.svg",
+  TUSD: "tusd.svg",
+  fTUSD: "fTUSD.svg",
+  FRAX: "frax.svg",
+  fFRAX: "fFRAX.svg",
+  DAI: "dai.svg",
+  fDAI: "fDAI.svg",
 };
 
 type IToken = HTMLImageElement & {
   token: Tokens;
 };
 
-const Token = ({ token, className }: IToken) => 
-  <img className={`${style.token} ${className}`} src={`${baseImgPath}/${tokenImgMap[token]}`} alt={token} />
+const Token = ({ token, className }: IToken) => (
+  <img
+    className={`${style.token} ${className}`}
+    src={`${baseImgPath}/${tokenImgMap[token]}`}
+    alt={token}
+  />
+);
 
 export default Token;
-

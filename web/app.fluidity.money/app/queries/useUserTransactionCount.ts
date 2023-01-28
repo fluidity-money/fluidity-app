@@ -92,7 +92,7 @@ const useUserTransactionByAddressCount = (network: string, address: string) => {
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
@@ -111,7 +111,7 @@ const useUserTransactionAllCount = (network: string) => {
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
