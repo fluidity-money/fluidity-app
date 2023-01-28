@@ -13,20 +13,11 @@ export type Volume = {
   receiver: string;
 };
 
-type UnprocessedVolume = Omit<Volume, "amount"> & { amount: string };
-
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
-
-  const tokenDecimals = config.config[network ?? ""].tokens
-    .filter((entry) => entry.isFluidOf !== undefined)
-    .reduce(
-      (previous, token) => ({ ...previous, [token.symbol]: token.decimals }),
-      {} as { [symbol: string]: number }
-    );
 
   // Postprocess res
   const fdaiPostprocess = (volume: Volume) => {
@@ -40,12 +31,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     };
   };
 
-  const fluidAssets = config.config[network ?? ""].tokens
-    .filter((entry) => entry.isFluidOf !== undefined)
-    .reduce(
-      (previous, token) => ({ ...previous, [token.address]: token.symbol }),
-      {}
-    );
+  const { fluidAssets } = config.config[network ?? ""];
 
   if (!fluidAssets) return;
 
@@ -63,15 +49,17 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const parsedVolume = volumesRes.data.ethereum.transfers.map((transfer) => ({
     symbol: transfer.currency.symbol,
-    amount: transfer.amount,
-    timestamp: transfer.block.timestamp.unixtime,
+    amount: parseFloat(transfer.amount) || 0,
+    timestamp: transfer.block.timestamp.unixtime * 1000,
     sender: transfer.sender.address,
     receiver: transfer.receiver.address,
   }));
 
-  const sanitisedVolumes = parsedVolume.map(postprocess);
+  const daiSanitisedVolumes = parsedVolume.map((volume) =>
+    volume.symbol === "fDAI" ? fdaiPostprocess(volume) : volume
+  );
 
   return json({
-    volume: sanitisedVolumes,
+    volume: daiSanitisedVolumes,
   });
 };

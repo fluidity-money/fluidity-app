@@ -12,9 +12,8 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
-import { decimalsPostprocess } from "./userTransactions";
 
-type ProcessedUserTransaction = {
+type UserTransaction = {
   sender: string;
   receiver: string;
   hash: string;
@@ -94,10 +93,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const ethereumTokens = config.config["ethereum"].tokens
       .filter((entry) => entry.isFluidOf !== undefined)
-      .reduce(
-        (previous, token) => ({ ...previous, [token.address]: token.symbol }),
-        {}
-      );
+      .map((entry) => entry.symbol);
 
     const { data: userTransactionsData, errors: userTransactionsErr } =
       await useUserTransactionsByTxHash(
@@ -126,15 +122,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       [network as string]: { transfers: transactions },
     } = userTransactionsData;
 
-    const tokenDecimals = config.config[network ?? ""].tokens
-      .filter((entry) => entry.isFluidOf !== undefined)
-      .reduce(
-        (prev, curr) => ({ ...prev, [curr.symbol]: curr.decimals }),
-        {} as { [symbol: string]: number }
-      );
-
     // Destructure GraphQL data
-    const userTransactions: ProcessedUserTransaction[] = transactions.map(
+    const userTransactions: UserTransaction[] = transactions.map(
       (transaction) => {
         const {
           sender: { address: sender },
@@ -153,7 +142,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           hash,
           // Normalise timestamp to ms
           timestamp: timestamp * 1000,
-          value: decimalsPostprocess(value, currency, tokenDecimals[currency]),
+          // Bitquery stores DAI decimals (6) incorrectly (should be 18)
+          value:
+            currency === "DAI" || currency === "fDAI"
+              ? value / 10 ** 12
+              : value,
           currency,
         };
       }
@@ -180,7 +173,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         ...map,
         [tx.hash]: tx,
       }),
-      {} as Record<string, ProcessedUserTransaction>
+      {} as Record<string, UserTransaction>
     );
 
     const mergedTransactions: Transaction[] = winners

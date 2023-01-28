@@ -2,7 +2,6 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
 import config from "~/webapp.config.server";
 import { useUserTransactionsByAddress } from "~/queries";
-import { decimalsPostprocess } from "./userTransactions";
 
 export type ProjectedWinData = {
   projectedWin: number;
@@ -20,17 +19,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const tokenAddrs = tokens
     .filter((t) => !t.isFluidOf)
-    .reduce(
-      (previous, token) => ({ ...previous, [token.address]: token.symbol }),
-      {}
-    );
-
-  const tokenDecimals = tokens
-    .filter((entry) => entry.isFluidOf !== undefined)
-    .reduce(
-      (previous, token) => ({ ...previous, [token.symbol]: token.decimals }),
-      {} as { [symbol: string]: number }
-    );
+    .map(({ address }) => address);
 
   try {
     const { data: userTransactionsData, errors: userTransactionsErr } =
@@ -50,7 +39,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         },
       });
 
-      return new Error("Server could not fulfil request");
+      return new Error("Server could not fulfill request");
     }
 
     const {
@@ -65,11 +54,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       } = transaction;
 
       // Bitquery stores DAI decimals (6) incorrectly (should be 18)
-      const normalisedValue = decimalsPostprocess(
-        value,
-        currency,
-        tokenDecimals[currency]
-      );
+      const normalisedValue =
+        currency === "DAI" || currency === "fDAI" ? value / 10 ** 12 : value;
 
       return sum + normalisedValue;
     }, 0);
