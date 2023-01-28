@@ -95,7 +95,7 @@ const SwapCompleteModal = ({
           <BloomEffect
             type={"static"}
             color={colorMap[tokenPair.symbol] ?? "#fff"}
-            width={50}
+            width={60}
           />
           <motion.img
             variants={variants}
