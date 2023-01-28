@@ -13,6 +13,7 @@ SERVICES:
       CPU_LIMIT: 512
       MEM_LIMIT: 1024
       SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
+      ENV_GA_WEBSITE_ANALYTICS_ID: G-EF68MNJRJ7
       
       DOCKER_ARGS:
         SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
