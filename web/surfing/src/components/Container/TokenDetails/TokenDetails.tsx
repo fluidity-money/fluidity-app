@@ -36,11 +36,11 @@ const TokenDetails = ({
           <Text size={"lg"}>Your top prize</Text>
         </div>
         <div>
-          <Text size="xl" prominent>{numberToMonetaryString(topPrize)}</Text>
+          <Text size="xl" prominent>{numberToMonetaryString(avgPrize)}</Text>
           <Text size={"lg"}>Your avg. prize</Text>
         </div>
         <div>
-          <Text size="xl" prominent>{numberToMonetaryString(topPrize)}</Text>
+          <Text size="xl" prominent>{numberToMonetaryString(topAssetPrize)}</Text>
           <Text size={"lg"}>Top asset prize</Text>
         </div>
       </div>
@@ -55,47 +55,40 @@ const TokenDetails = ({
             <th>Transaction</th>
           </tr>
         </thead>
-        <tbody>
-          {
-          rewards.length ? rewards.map(({desc, value, reward, transaction}) => (
-            <>
-  <tr>
-    <td>{desc}</td>
-    <td>{numberToMonetaryString(value)}</td>
-    <td>{numberToMonetaryString(reward)}</td>
-    <td>{transaction}</td>
-  </tr>
-            <hr />
-</>
-)) : <Text>No Recent Activity Found</Text>
-        }
-        </tbody>
+        { rewards.length && (
+          <tbody>
+            {rewards.slice(0,3).map(({desc, value, reward, transaction}) => (
+              <>
+                <tr>
+                  <td>{desc}</td>
+                  <td>{numberToMonetaryString(value)}</td>
+                  <td>{numberToMonetaryString(reward)}</td>
+                  <td>{transaction}</td>
+                </tr>
+                <hr />
+              </>
+            ))}
+          </tbody>
+        )}
+        {!rewards.length && (
+          <Text>No Recent Activity Found</Text>        
+        )} 
       </table>
     </div>
 
     {/* Reward Graph */}
     <div style={{height: "100%"}}>
-  // data: Datum[];
-  // xLabel: string;
-  // yLabel: string;
-  // lineLabel: string;
-  // accessors: {
-  //   xAccessor: (d: Datum) => number | Date;
-  //   yAccessor: (d: Datum) => number;
-  // };
-  // renderTooltip: ({ datum }: { datum: Datum } & Element) => React.ReactNode;
       <LineChart 
         datum={rewards.map((r,i) => ({...r, i:i}))}
-  xLabel={""}
-  yLabel={""}
-  lineLabel={""}
-  accessors={{
-    xAccessor: ({i}) => i,
-    yAccessor: ({reward}) => reward,
-  }}
-  tooltip={() => <></>}
+        xLabel={""}
+        yLabel={""}
+        lineLabel={""}
+        accessors={{
+          xAccessor: ({i}: any) => i,
+          yAccessor: ({reward}: any) => reward,
+        }}
+        tooltip={() => (<></>)}
         />
-
     </div>
 
     <LinkButton type="internal" size="medium" handleClick={() => 1} >Full History</LinkButton>

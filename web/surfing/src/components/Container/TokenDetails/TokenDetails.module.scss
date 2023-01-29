@@ -5,12 +5,15 @@
   padding-bottom: 45px;
   display: inline-grid;
   grid-template-rows: 1fr;
-  grid-template-columns: auto 1fr 1fr;
+  grid-template-columns: 2em 1fr 1fr;
   align-items: bottom;
   justify-content: right;
+  gap: 5px;
 }
 
 .vertical-text {
+  display: flex;
+  align-items: end;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 }

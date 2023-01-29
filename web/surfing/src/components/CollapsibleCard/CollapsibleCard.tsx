@@ -27,7 +27,7 @@ const CollapsibleCard = ({
       </button>
       <>
       {isOpen && (
-          <TokenDetails token="USDC" topPrize={0} avgPrize={0} topAssetPrize={0} activity={[]} />
+          <TokenDetails topPrize={0} avgPrize={0} topAssetPrize={0} rewards={[]} />
       )}
 </>
     </Card>
