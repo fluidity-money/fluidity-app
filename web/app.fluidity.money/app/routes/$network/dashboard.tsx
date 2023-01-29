@@ -43,7 +43,6 @@ import MobileModal from "~/components/MobileModal";
 import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-import { createPortal } from "react-dom";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -66,8 +65,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   });
 };
 
-function ErrorBoundary({error}) {
-  console.log(error)
+function ErrorBoundary() {
   return (
     <div
       className="pad-main"
