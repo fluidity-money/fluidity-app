@@ -32,7 +32,7 @@ const BloomEffect = (props: BloomEffectProps) => {
       background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 0%)`,
     },
     static: {
-      background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} ${width}%)`,
+      background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} min(${width}%, 450px))`,
     },
     pulsing: {
       transition: {
