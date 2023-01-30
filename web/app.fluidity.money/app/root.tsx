@@ -237,7 +237,7 @@ function App() {
     }
   }, []);
 
-  const { showExperiment, client } = useContext(SplitContext);
+  const { showExperiment } = useContext(SplitContext);
 
   const [splitUser, setSplitUser] = useState(splitUserKey);
 
