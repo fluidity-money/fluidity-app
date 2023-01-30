@@ -367,7 +367,7 @@ export default function FluidifyToken() {
               handleClick={() => {
                 trackCancelFluidify();
                 setOpenMobModal(false);
-              }
+              }}
               size="large"
               type="internal"
               left={true}
