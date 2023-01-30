@@ -330,6 +330,38 @@ export const getTotalPrizePool = async (
   }
 };
 
+// Returns total prize pool from aggregated contract
+export const getUserDegenScore = async (
+  provider: JsonRpcProvider,
+  userAddr: string,
+  degenScoreAddr: string,
+  degenScoreAbi: ContractInterface
+): Promise<number> => {
+  try {
+    const degenScoreContract = new Contract(
+      degenScoreAddr,
+      degenScoreAbi,
+      provider
+    );
+
+    if (!degenScoreContract)
+      throw new Error(`Could not instantiate DegenScore at ${degenScoreAddr}`);
+
+    const degenScoreTraitId = "121371448299756538184036965";
+
+    const score = await degenScoreContract.callStatic.getTrait(
+      userAddr,
+      degenScoreTraitId,
+      0
+    );
+
+    return score.toNumber();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
+  }
+};
+
 type ErrorType = {
   data: { message: string };
 } & { message: string };
