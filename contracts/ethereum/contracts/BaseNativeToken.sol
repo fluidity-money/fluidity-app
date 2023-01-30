@@ -105,9 +105,11 @@ abstract contract BaseNativeToken is IERC20 {
         address _to,
         uint256 _amount
     ) public returns (bool) {
-        uint256 allowed = allowance_[_from][msg.sender]; // Saves gas for limited approvals.
+        // Saves gas for limited approvals.
+        uint256 allowed = allowance_[_from][msg.sender];
 
-        if (allowed != type(uint256).max) allowance_[_from][msg.sender] = allowed - _amount;
+        if (allowed != type(uint256).max)
+            allowance_[_from][msg.sender] = allowed - _amount;
 
         require(balanceOf(_from) >= _amount, "not enough balance");
 
@@ -124,23 +126,42 @@ abstract contract BaseNativeToken is IERC20 {
         return true;
     }
 
-    function increaseAllowance(address _spender, uint256 _amount) public returns (bool) {
+    function increaseAllowance(
+        address _spender,
+        uint256 _amount
+    )
+        public returns (bool)
+    {
         approve(_spender, allowance_[msg.sender][_spender] + _amount);
         return true;
     }
 
-    function decreaseAllowance(address _spender, uint256 _amount) public returns (bool) {
+    function decreaseAllowance(
+        address _spender,
+        uint256 _amount
+    )
+        public returns (bool)
+    {
         // no check cause solidity reverts when it goes under 0
         uint256 newAmount = allowance_[msg.sender][_spender] - _amount;
 
         return approve(_spender, newAmount);
     }
 
-    function allowance(address _owner, address _spender) public view returns (uint256) {
+    function allowance(
+        address _owner,
+        address _spender
+    )
+        public view returns (uint256)
+    {
         return allowance_[_owner][_spender];
     }
 
-    function balanceOf(address _spender) public virtual view returns (uint256) {
+    function balanceOf(
+        address _spender
+    )
+        public virtual view returns (uint256)
+    {
         return balanceOf_[_spender];
     }
 

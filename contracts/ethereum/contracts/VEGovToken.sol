@@ -24,13 +24,25 @@ contract VEGovToken is BaseNativeToken {
         return (block.timestamp - epochBlocktime_) * decayAmount_;
     }
 
-    function balanceOf(address _spender) public override view returns (uint256) {
+    function realBalanceOf(address _spender) public view returns (uint256) {
+        return balanceOf_[_spender];
+    }
+
+    function convertToRealBalance(uint256 _balance) public view returns (uint256) {
+    	return _balance + getExchangeRate();
+    }
+
+    function convertFromRealBalance(uint256 _realAmount) public view returns (uint256) {
         uint256 exchangeRate = getExchangeRate();
 
-        if (balanceOf_[_spender] < exchangeRate) {
+        if (_realAmount < exchangeRate) {
             return 0;
         } else {
-            return balanceOf_[_spender] - exchangeRate;
+            return _realAmount - exchangeRate;
         }
+    }
+
+    function balanceOf(address _spender) public override view returns (uint256) {
+        return convertBalance(balanceOf_[_spender]);
     }
 }
