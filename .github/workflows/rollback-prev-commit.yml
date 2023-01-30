@@ -49,6 +49,6 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            
+           
             echo ${{ env.PREVIOUS_COMMIT }}
 
