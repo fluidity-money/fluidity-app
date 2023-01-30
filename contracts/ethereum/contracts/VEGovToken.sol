@@ -20,12 +20,12 @@ contract VEGovToken is BaseNativeToken {
     ///      governance token)
     mapping(address => uint256) private balanceOf_;
 
-    function calculateExchangeRate() public view returns (uint256) {
-        return epochBlocktime_ - block.timestamp * decayAmount_;
+    function getExchangeRate() public view returns (uint256) {
+        return (block.timestamp - epochBlocktime_) * decayAmount_;
     }
 
     function balanceOf(address _spender) public override view returns (uint256) {
-        uint256 exchangeRate = calculateExchangeRate();
+        uint256 exchangeRate = getExchangeRate();
 
         if (balanceOf_[_spender] < exchangeRate) {
             return 0;
