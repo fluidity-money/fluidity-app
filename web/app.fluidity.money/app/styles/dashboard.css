@@ -241,6 +241,14 @@ main > footer > section {
   background: transparent;
 }
 
+.z-0 {
+  z-index: 0;
+}
+
+.z-1 {
+  z-index: 1;
+}
+
 .selector-button {
   padding: 1px 2px;
 }
