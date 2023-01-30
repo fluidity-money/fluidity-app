@@ -19,6 +19,7 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: mainnet
+    needs: [cut-lib-release]
     outputs:
       file_exists: ${{ steps.deployment_list.outputs.exist }} 
     steps:
