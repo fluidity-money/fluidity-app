@@ -3,6 +3,8 @@ main > section#graph {
 }
 
 section#transactions {
+  width: auto;
+  max-width: 100%;
   min-height: 5vh;
 }
 
@@ -55,7 +57,7 @@ section#transactions {
 }
 
 .transaction-table {
-  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 850px) {

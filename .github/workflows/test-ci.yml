@@ -45,7 +45,7 @@ jobs:
 
   test-contracts:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: mainnet
     steps:
       - uses: actions/checkout@v3
         with:
@@ -85,7 +85,6 @@ jobs:
 
   test-npm:
     runs-on: ubuntu-latest
-    # environment: dev
     steps:
       - uses: actions/checkout@v3
         with:
@@ -96,7 +95,7 @@ jobs:
       - name: npm test
         working-directory: web
         run: |
-          npm install
+          yarn
           npm test
       - name: Discord
         uses: ./scripts/actions

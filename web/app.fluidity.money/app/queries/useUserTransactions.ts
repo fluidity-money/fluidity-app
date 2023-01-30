@@ -311,7 +311,7 @@ const useUserTransactionsByAddress = async (
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
@@ -339,7 +339,7 @@ const useUserTransactionsByTxHash = async (
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };
@@ -367,7 +367,7 @@ const useUserTransactionsAll = async (
     "https://graphql.bitquery.io",
     body,
     {
-      "X-API-KEY": process.env.BITQUERY_TOKEN ?? "",
+      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
     }
   );
 };

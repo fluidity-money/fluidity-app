@@ -7,9 +7,9 @@ import {
   Card,
   Heading,
   ManualCarousel,
+  Partner,
   useViewport,
 } from "@fluidity-money/surfing";
-import Partner from "components/Partner";
 import styles from "./SponsorsPartners.module.scss";
 
 const SponsorsPartners = () => {

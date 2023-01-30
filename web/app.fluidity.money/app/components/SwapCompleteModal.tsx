@@ -16,9 +16,9 @@ import {
   Text,
   numberToMonetaryString,
   stringifiedNumberToMonetaryString,
+  Video,
 } from "@fluidity-money/surfing";
 import BloomEffect from "~/components/BloomEffect";
-import Video from "~/components/Video";
 import {
   addDecimalToBn,
   getUsdFromTokenAmount,
@@ -95,6 +95,7 @@ const SwapCompleteModal = ({
           <BloomEffect
             type={"static"}
             color={colorMap[tokenPair.symbol] ?? "#fff"}
+            width={60}
           />
           <motion.img
             variants={variants}
@@ -125,7 +126,8 @@ const SwapCompleteModal = ({
                   className="swapping-video"
                   src={"/videos/LoadingOther.webm"}
                   loop={false}
-                  type="none"
+                  type="fill"
+                  height={"auto"}
                   onEnded={() => {
                     setPlayVideo(false);
                   }}
@@ -196,7 +198,7 @@ const SwapCompleteModal = ({
             </LinkButton>
 
             {/* Dashboard Button */}
-            <Link to="../../dashboard/home">
+            <Link to={`/${network}/dashboard/home`}>
               <GeneralButton
                 buttontype="text"
                 size="medium"

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import Video from "~/components/Video";
+import { Video } from "@fluidity-money/surfing";
 import FluidityHotSpot from "~/components/Fluidify/FluidifyHotSpot";
 import AugmentedToken from "~/types/AugmentedToken";
 import BloomEffect from "~/components/BloomEffect";

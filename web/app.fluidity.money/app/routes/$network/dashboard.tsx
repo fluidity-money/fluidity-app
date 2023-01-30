@@ -17,10 +17,11 @@ import {
   useFetcher,
 } from "@remix-run/react";
 import { useState, useEffect, useContext } from "react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import { motion } from "framer-motion";
-import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "~/util/split";
+import config from "~/webapp.config.server";
 import {
   DashboardIcon,
   GeneralButton,
@@ -84,8 +85,7 @@ function ErrorBoundary() {
   );
 }
 
-export const meta: MetaFunction = ({ data }) => ({
-  ...data,
+export const meta: MetaFunction = () => ({
   title: "Fluidity - Dashboard",
 });
 
@@ -122,6 +122,8 @@ export default function Dashboard() {
   const { connected, address, rawAddress, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
+
+  const { showExperiment, client } = useContext(SplitContext);
 
   const url = useLocation();
   const urlPaths = url.pathname.split("/");
@@ -166,16 +168,32 @@ export default function Dashboard() {
     // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
-  const chainNameMap = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
+    showExperiment("enable-arbitrum")
+      ? {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          arbitrum: {
+            name: "ARB",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        }
+      : {
+          ethereum: {
+            name: "ETH",
+            icon: <img src="/assets/chains/ethIcon.svg" />,
+          },
+          solana: {
+            name: "SOL",
+            icon: <img src="/assets/chains/solanaIcon.svg" />,
+          },
+        };
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
@@ -417,6 +435,22 @@ export default function Dashboard() {
             </GeneralButton>
             */}
 
+            {/* Fluidify button */}
+            {showExperiment("Fluidify-Button-Placement") && (
+              <GeneralButton
+                className="fluidify-button-dashboard "
+                version={"primary"}
+                buttontype="text"
+                size={"small"}
+                handleClick={() => {
+                  client?.track("user", "click_fluidify");
+                  navigate(`/${network}/fluidify`);
+                }}
+              >
+                <b>Fluidify{isMobile ? "" : " Money"}</b>
+              </GeneralButton>
+            )}
+
             {/* Prize Money */}
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
@@ -427,8 +461,8 @@ export default function Dashboard() {
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
-                  ? navigate("./rewards")
-                  : navigate("./rewards/unclaimed")
+                  ? navigate(`/${network}/dashboard/rewards`)
+                  : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
             >
@@ -474,18 +508,23 @@ export default function Dashboard() {
             />
           )}
 
-        {/* Fluidify button */}
-        <GeneralButton
-          className="fluidify-button-dashboard-mobile rainbow "
-          version={"primary"}
-          buttontype="text"
-          size={"medium"}
-          handleClick={() => navigate("../fluidify")}
-        >
-          <Heading as="h5">
-            <b>Fluidify Money</b>
-          </Heading>
-        </GeneralButton>
+        {/* Default Fluidify button */}
+        {!showExperiment("Fluidify-Button-Placement") && (
+          <GeneralButton
+            className="fluidify-button-dashboard-mobile rainbow "
+            version={"primary"}
+            buttontype="text"
+            size={"medium"}
+            handleClick={() => {
+              client?.track("user", "click_fluidify");
+              navigate(`/${network}/fluidify`);
+            }}
+          >
+            <Heading as="h5">
+              <b>Fluidify Money</b>
+            </Heading>
+          </GeneralButton>
+        )}
 
         {/* Mobile Menu Modal */}
         {openMobModal && (
@@ -542,6 +581,13 @@ export default function Dashboard() {
             <a href={"https://docs.fluidity.money/docs/fundamentals/roadmap"}>
               <Text>Roadmap</Text>
             </a>
+
+            {/* Source code */}
+            {showExperiment("enable-source-code") && (
+              <a href={"https://github.com/fluidity-money/fluidity-app"}>
+                <Text>Source code</Text>
+              </a>
+            )}
           </section>
 
           {/* Socials */}

@@ -10,3 +10,10 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/connector-common-emissions-timescale
       DOCKER_IMAGE: connector-common-emissions-timescale
       ENV_FLU_WORKER_ID: ethereum-solana-connector-common-emissions-timescale
+
+  - CONNECTORS_COMMON_USER_ACTIONS_TIMESCALE:
+      SERVICE_NAME: connector-user-actions-timescale-common-ethereum
+      DOCKER_IMAGE: connector-user-actions-timescale
+      DOCKERFILE_PATH: ./cmd/connector-user-actions-timescale
+      ENV_FLU_WORKER_ID: ethereum-solana-connector-user-actions-timescale
+
