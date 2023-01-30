@@ -51,4 +51,35 @@ jobs:
           command: |
            
             echo ${{ env.PREVIOUS_COMMIT }}
-
+            flu build-docker \
+              --network ${{ github.event.inputs.network }} \
+              --group all \
+              --service all \
+              --environment ${{ github.event.inputs.environment }} \
+              --build-root-container true \
+              --build-build-container true \
+              --tag ${{ env.PREVIOUS_COMMIT }}
+      
+      - name: Deploy
+        id: deploy
+        uses: ./scripts/actions
+        with:
+          command: |
+      
+            flu deploy-service \
+              --network ${{ github.event.inputs.network }} \
+              --group all \
+              --service all \
+              --environment ${{ github.event.inputs.environment }} \
+              --debug false \
+              --tag ${{ env.PREVIOUS_COMMIT }}
+      
+      - name: Discord
+        uses: ./scripts/actions
+        if: always()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with: 
+          command: |
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
+     
