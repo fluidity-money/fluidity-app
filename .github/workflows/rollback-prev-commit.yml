@@ -39,6 +39,7 @@ jobs:
           git checkout HEAD~1
           PREVIOUS_COMMIT=$(git log -1 --format='%H')
 
+          echo "PREVIOUS_COMMIT=$PREVIOUS_COMMIT" >> $GITHUB_ENV
           echo ""
           echo "CommitHash: $(git log -1 --format='%H')"
           echo ""
@@ -48,6 +49,6 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-            
-            echo $PREVIOUS_COMMIT
+           
+            echo ${{ env.PREVIOUS_COMMIT }}
 
