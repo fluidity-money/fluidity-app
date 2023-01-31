@@ -312,6 +312,17 @@ img= "/images/providers/Jupiter.svg"
 fUSDC = "https://www.jup.ag/"
 fUSDT = "https://www.jup.ag/"
 
+[liquidity_providers.arbitrum]
+
+[[liquidity_providers.arbitrum.providers]]
+name= "aave"
+img= "/images/providers/Aave.svg"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
+fUSDT = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
+fDAI = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
+
 # provider icons
 [provider_icons]
 Aave= "/images/providers/aave-aave-logo.png"
