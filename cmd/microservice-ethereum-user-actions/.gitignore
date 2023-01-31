@@ -1,0 +1,4 @@
+*.out
+lint
+docker
+test

@@ -9,7 +9,7 @@ import {
   numberToMonetaryString,
   GeneralButton,
   useViewport,
-  Video
+  Video,
 } from "@fluidity-money/surfing";
 import styles from "./Demo.module.scss";
 

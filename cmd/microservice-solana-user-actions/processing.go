@@ -150,8 +150,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 			return nil, nil, nil, nil, nil
 		}
 
-		swapWrap_ := user_actions.NewSwap(
-			network.NetworkSolana,
+		swapWrap_ := user_actions.NewSwapSolana(
 			senderAddress,
 			transactionHash,
 			swapAmount,
@@ -186,8 +185,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 		swapAmount := misc.BigIntFromUint64(swapAmount_)
 
-		swapUnwrap_ := user_actions.NewSwap(
-			network.NetworkSolana,
+		swapUnwrap_ := user_actions.NewSwapSolana(
 			senderAddress,
 			transactionHash,
 			swapAmount,
@@ -258,8 +256,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 
 			transferAmount := misc.BigIntFromUint64(transferAmount_)
 
-			transfer_ := user_actions.NewSend(
-				network.NetworkSolana,
+			transfer_ := user_actions.NewSendSolana(
 				senderAddress,
 				recipientAddress,
 				transactionHash,
@@ -308,8 +305,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 
 		if !tokenIsMintEvent {
 
-			transfer_ := user_actions.NewSend(
-				network.NetworkSolana,
+			transfer_ := user_actions.NewSendSolana(
 				senderAddress,
 				recipientAddress,
 				transactionHash,

@@ -1,9 +1,11 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import config from "../../webapp.config.js";
 import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useContext } from "react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "~/util/split";
+import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";
 import SolanaProvider from "contexts/SolanaProvider";
@@ -79,6 +81,32 @@ export const loader: LoaderFunction = async ({ params }) => {
   };
 };
 
+const ProviderOutlet = () => {
+  const { connected, address, getDegenScore } = useContext(
+    FluidityFacadeContext
+  );
+
+  const { client } = useContext(SplitContext);
+
+  useEffect(() => {
+    if (!(address && connected)) return;
+
+    if (!getDegenScore) return;
+
+    (async () => {
+      const degenScore = await getDegenScore(address);
+
+      client?.track("connected-user-degen-score", address, degenScore);
+    })();
+  }, [address]);
+
+  return (
+    <>
+      <Outlet />
+    </>
+  );
+};
+
 type LoaderData = {
   network: string;
   explorer: string;
@@ -92,7 +120,8 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary({ error }: { error: string }) {
+  console.error(error);
   return (
     <div>
       <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
@@ -121,7 +150,7 @@ export default function Network() {
         tokens={tokens}
         colorMap={colors}
       />
-      <Outlet />
+      <ProviderOutlet />
     </Provider>
   );
 }

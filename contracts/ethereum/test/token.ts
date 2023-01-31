@@ -5,16 +5,17 @@ import {
     fUsdtOperator,
     fUsdtCouncil,
 } from './setup-mainnet';
-import { accountAddr, configAddr } from './setup-common'
+import { accountAddr, configAddr } from './setup-common';
 import * as ethers from 'ethers';
+import { BigNumber } from 'ethers';
 import { expect } from "chai";
+import { expectEq, expectGt } from './test-utils';
 
 describe("Token", async function () {
     before(async function () {
         if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
             return this.skip();
         }
-        await console.log("FUSDST OPERATOR ADDR: " + await fUsdtOperator.op())
     });
 
     it("supports disabling wraps and rewards with emergency mode", async function () {
@@ -114,41 +115,30 @@ describe("Token", async function () {
         expect(newChange).to.equal(blockedBalance);
     });
 
-    it("prevents minting over user cap", async function () {
-        await fUsdtOperator.enableMintLimits(true);
+    it("supports taking amounts from the prize pool that isn't anyone's liquidity", async () => {
+        const initialAmount = await fUsdtOperator.balanceOf(accountAddr);
 
-        await fUsdtOracle.updateMintLimits(1000, 100);
+        expectGt(initialAmount, 0);
 
-        await expect(fUsdtAccount.erc20In(101))
-            .to.be.revertedWith("mint amount exceeds user limit!");
+        const initialRewardPool = await fUsdtOperator.callStatic.rewardPoolAmount();
 
-        // Cleanup
-        await fUsdtOperator.enableMintLimits(false)
-    });
+        const drainGangAmount = BigNumber.from(500);
 
-    it("prevents minting over global cap", async function () {
-        await fUsdtOperator.enableMintLimits(true);
-        await fUsdtOracle.updateMintLimits(100, 1000);
+        // reward pool > 500
+        expectGt(initialRewardPool, drainGangAmount);
 
-        await expect(fUsdtAccount.erc20In(101))
-            .to.be.revertedWith("mint amount exceeds global limit!");
+        await fUsdtOperator.drainRewardPool(accountAddr, drainGangAmount);
 
-        // Cleanup
-        await fUsdtOperator.enableMintLimits(false);
-    });
+        const newRewardPool = await fUsdtOperator.callStatic.rewardPoolAmount();
 
-    it("tracks global mint limits globally", async function () {
-        await fUsdtOperator.enableMintLimits(true);
-        await fUsdtOracle.updateMintLimits(1000, 600);
+        const newAmount = await fUsdtOperator.balanceOf(accountAddr);
 
-        await expect(fUsdtAccount.erc20In(600))
-            .to.not.be.revertedWith("mint amount exceeds global limit!");
-        await expect(fUsdtAccount2.erc20In(600))
-            .to.be.revertedWith("mint amount exceeds global limit!");
-        await expect(fUsdtAccount2.erc20In(400))
-            .to.not.be.revertedWith("mint amount exceeds global limit!");
+        // expect that the new prize pool is greater than the old amount
+        // minus the drain gang amount to compensate for a tick appreciating
+        // the value of the prize pool
 
-        // Cleanup
-        await fUsdtOperator.enableMintLimits(false);
+        expectGt(newRewardPool, initialRewardPool.sub(drainGangAmount));
+
+        expectEq(initialAmount.add(drainGangAmount), newAmount);
     });
 });

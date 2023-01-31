@@ -1,5 +1,4 @@
 import { json, LoaderFunction } from "@remix-run/node";
-import BN from "bn.js";
 import {
   useVolumeTxByAddressTimestamp,
   useVolumeTxByTimestamp,
@@ -22,13 +21,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   // Postprocess res
   const fdaiPostprocess = (volume: Volume) => {
-    const bn = new BN(volume.amount);
-    const decimals = new BN(10).pow(new BN(12));
-    const amount = bn.div(decimals).toNumber();
+    // const bn = new BN(volume.amount);
+    // const decimals = new BN(10).pow(new BN(12));
+    // const amount = bn.div(decimals).toNumber();
 
     return {
       ...volume,
-      amount: amount,
+      amount: volume.amount / 10 ** 12,
     };
   };
 

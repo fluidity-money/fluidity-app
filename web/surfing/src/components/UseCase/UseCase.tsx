@@ -2,11 +2,11 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Heading, Text } from '../'
+import { Heading, Text } from "../";
 import styles from "./UseCase.module.scss";
 
 interface UseCaseProps {
-  viewportWidth: number
+  viewportWidth: number;
   useCase: {
     img: string;
     title: string;
@@ -16,15 +16,15 @@ interface UseCaseProps {
 
 const UseCase = ({ viewportWidth: width, useCase }: UseCaseProps) => {
   return (
-      <div className={styles.container}>
-        <img src={useCase.img} alt="text representation" />
-        <div className={styles.text}>
-          <Heading as="h3">{useCase.title}</Heading>
-          <Text as="p" size={width < 500 && width > 0 ? "sm" : "lg"}>
-            {useCase.info}
-          </Text>
-        </div>
+    <div className={styles.container}>
+      <img src={useCase.img} alt="text representation" />
+      <div className={styles.text}>
+        <Heading as="h3">{useCase.title}</Heading>
+        <Text as="p" size={width < 500 && width > 0 ? "sm" : "lg"}>
+          {useCase.info}
+        </Text>
       </div>
+    </div>
   );
 };
 
