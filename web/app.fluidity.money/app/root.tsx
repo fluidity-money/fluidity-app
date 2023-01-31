@@ -252,8 +252,11 @@ function App() {
     }
 
     const _targetedBannerSeen = localStorage.getItem("targetedBanner");
+
     if (!_targetedBannerSeen) {
-      setShowTargetedBanner(false);
+      setShowTargetedBanner(true);
+    
+      localStorage.setItem("targetedBanner", "true");
     }
   });
 
