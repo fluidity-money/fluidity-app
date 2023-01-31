@@ -8,21 +8,19 @@ import { Card, TokenCard, ArrowUp, TokenDetails } from "~/components";
 
 import styles from "./CollapsibleCard.module.scss";
 
-type ICollapsibleCard = HTMLDivElement & {
+type ICollapsibleCard = React.FC & {
   header: React.ReactNode,
-  children: React.ReactNode,
 }
 
 const CollapsibleCard = ({
-  header,
-  children,
+  header
 }: ICollapsibleCard) => {
   const [isOpen, setIsOpen] = useState(true)
 
   return (
     <Card component="div" rounded={true} type={"gray"} className={styles["collapsible-card"]} >
       <button className={styles["collapsible-card-header"]} onClick={() => setIsOpen(isOpen => !isOpen)} >
-        <TokenCard token="USDC" fluidAmt={10} regAmt={10} value={1} />
+        <TokenCard token="fUSDT" fluidAmt={10} regAmt={10} value={1} />
         <ArrowUp fill={"white"} style={{transform: `rotate(${isOpen ? "180deg" : "0"})`}}/>
       </button>
       <>
