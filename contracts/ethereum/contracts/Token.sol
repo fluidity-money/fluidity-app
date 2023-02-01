@@ -399,47 +399,6 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         }
     }
 
-    /**
-     * @notice lets a user frontrun our worker, paying their own gas
-     * @notice requires a signature of the random numbers generated
-     * @notice by the trusted oracle
-     *
-     * @param winner the address of the user being rewarded
-     * @param winAmount the amount won
-     * @param firstBlock the first block in the range being rewarded for
-     * @param lastBlock the last block in the range being rewarded for
-     * @param sig the signature of the above parameters, provided by the oracle
-     */
-    function manualReward(
-        address contractAddress,
-        uint256 chainid,
-        address winner,
-        uint256 winAmount,
-        uint firstBlock,
-        uint lastBlock,
-        bytes memory sig
-    ) external {
-
-        // user decided to frontrun
-        require(
-            firstBlock > lastRewardedBlock_,
-            "reward already given for part of this range"
-        );
-
-        require(lastBlock >= firstBlock, "invalid block range in payload!");
-
-        for (uint i = firstBlock; i <= lastBlock; i++) {
-            require(manualRewardedBlocks_[winner][i] == 0, "reward already given for part of this range");
-            manualRewardedBlocks_[winner][i] = BLOCK_REWARDED;
-        }
-
-        manualRewardDebt_[winner] += winAmount;
-
-        require(rewardPoolAmount() >= winAmount, "reward pool empty");
-
-        rewardFromPool(firstBlock, lastBlock, winner, winAmount);
-    }
-
     /*
      * @notice returns whether mint limits are enabled
      * @notice mint limits no longer exist, this always `false`
