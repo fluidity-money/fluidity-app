@@ -131,7 +131,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
     /// @notice deprecated, mint limits no longer exist
     uint __deprecated_6;
 
-    /// @dev account that can call the reward function, should be the /registry/ contract
+    /// @dev account that can call the reward function, should be the /operator contract/
     address oracle_;
 
     /**
