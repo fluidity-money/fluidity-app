@@ -1,4 +1,5 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
+import {fetchGqlEndpoint} from "~/util/api/graphql";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -77,7 +78,7 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionByAddressCount = (network: string, address: string) => {
+const useUserTransactionByAddressCount = async(network: string, address: string) => {
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
@@ -88,16 +89,27 @@ const useUserTransactionByAddressCount = (network: string, address: string) => {
     variables,
   };
 
-  return jsonPost<UserTransactionCountByAddressBody, UserTransactionCountRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionCountByAddressBody, UserTransactionCountRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers,
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
+
+  return result; 
 };
 
-const useUserTransactionAllCount = (network: string) => {
+const useUserTransactionAllCount = async(network: string) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
   };
@@ -107,13 +119,24 @@ const useUserTransactionAllCount = (network: string) => {
     variables,
   };
 
-  return jsonPost<UserTransactionCountAllBody, UserTransactionCountRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionCountAllBody, UserTransactionCountRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers,
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
+
+  return result; 
 };
 
 export { useUserTransactionAllCount, useUserTransactionByAddressCount };

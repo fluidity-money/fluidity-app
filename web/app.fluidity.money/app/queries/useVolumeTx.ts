@@ -1,6 +1,8 @@
-import { gql, jsonPost } from "~/util";
+import { gql, jsonPost, Queryable } from "~/util";
+import {fetchGqlEndpoint} from "~/util/api/graphql";
 
-const queryByAddressTimestamp = gql`
+const queryByAddressTimestamp: Queryable = {
+  ethereum: gql`
   query VolumeTxs(
     $fluidAssets: [String!]
     $address: String!
@@ -30,9 +32,11 @@ const queryByAddressTimestamp = gql`
       }
     }
   }
-`;
+`
+};
 
-const queryByTimestamp = gql`
+const queryByTimestamp: Queryable = {
+  ethereum: gql`
   query VolumeTxs($fluidAssets: [String!], $timestamp: ISO8601DateTime!) {
     ethereum {
       transfers(
@@ -58,7 +62,8 @@ const queryByTimestamp = gql`
       }
     }
   }
-`;
+`
+};
 
 type VolumeTxsBodyByTimestamp = {
   query: string;
@@ -79,7 +84,7 @@ type VolumeTxsBodyByAddressTimestamp = {
 
 export type VolumeTxsResponse = {
   data: {
-    ethereum: {
+    [network: string]: {
       transfers: [
         {
           amount: string;
@@ -104,40 +109,64 @@ export type VolumeTxsResponse = {
 };
 
 const useVolumeTxByAddressTimestamp = async (
+  network: string,
   fluidAssets: string[],
   address: string,
-  iso8601Timestamp: string
+  iso8601Timestamp: string,
 ) => {
   const variables = { fluidAssets, address, timestamp: iso8601Timestamp };
-  const url = "https://graphql.bitquery.io";
   const body = {
     variables,
-    query: queryByAddressTimestamp,
+    query: queryByAddressTimestamp[network],
   };
 
-  return jsonPost<VolumeTxsBodyByAddressTimestamp, VolumeTxsResponse>(
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<VolumeTxsBodyByAddressTimestamp, VolumeTxsResponse>(
     url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers, 
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
 };
 
 const useVolumeTxByTimestamp = async (
+  network: string,
   fluidAssets: string[],
-  iso8601Timestamp: string
+  iso8601Timestamp: string,
 ) => {
   const variables = { fluidAssets, timestamp: iso8601Timestamp };
-  const url = "https://graphql.bitquery.io";
   const body = {
     variables,
-    query: queryByTimestamp,
+    query: queryByTimestamp[network],
   };
 
-  return jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(url, body, {
-    "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-  });
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<VolumeTxsBodyByTimestamp, VolumeTxsResponse>(
+    url,
+    body,
+    headers,
+  );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
+
+  return result; 
 };
 
 export { useVolumeTxByTimestamp, useVolumeTxByAddressTimestamp };

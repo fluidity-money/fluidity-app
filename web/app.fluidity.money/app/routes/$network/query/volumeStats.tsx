@@ -16,6 +16,9 @@ export type Volume = {
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
+  if (!network)
+    return;
+
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
 
@@ -44,8 +47,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const prevYearIso = prevYearDate.toISOString();
 
   const volumesRes = address
-    ? await useVolumeTxByAddressTimestamp(fluidAssets, address, prevYearIso)
-    : await useVolumeTxByTimestamp(fluidAssets, prevYearIso);
+    ? await useVolumeTxByAddressTimestamp(network, fluidAssets, address, prevYearIso)
+    : await useVolumeTxByTimestamp(network, fluidAssets, prevYearIso);
 
   const parsedVolume = volumesRes.data.ethereum.transfers.map((transfer) => ({
     symbol: transfer.currency.symbol,
