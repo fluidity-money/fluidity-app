@@ -20,8 +20,16 @@ contract VEGovToken is BaseNativeToken {
     ///      governance token)
     mapping(address => uint256) private balanceOf_;
 
-    function getExchangeRate() public view returns (uint256) {
-        return (block.timestamp - epochBlocktime_) * decayAmount_;
+    function calculateGovToVEGov(uint256 _fluidAmount, uint256 _lockTime, uint256 _maxLockTime) public pure returns (uint256) {
+        return (_fluidAmount * _lockTime) / _maxLockTime;
+    }
+
+    function calculateLinearDecay(uint256 _VEFluidAtLock, uint256 _lockTime, uint256 _timeSinceLockInDays) public pure returns (uint256) {
+        return ((_VEFluidAtLock / _lockTime) * _timeSinceLockInDays) + _VEFluidAtLock;
+    }
+
+    function calculateMaxLiquidityBack(uint256 _timeSinceLockInDays, uint256 _lockTime) public pure returns (uint256) {
+        return _timeSinceLockInDays / _lockTime;
     }
 
     function realBalanceOf(address _spender) public view returns (uint256) {
