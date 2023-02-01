@@ -8,11 +8,11 @@ import { Card, TokenCard, ArrowUp, TokenDetails } from "~/components";
 
 import styles from "./CollapsibleCard.module.scss";
 
-type ICollapsibleCard = React.FC & {
+interface ICollapsibleCard {
   header: React.ReactNode,
 }
 
-const CollapsibleCard = ({
+const CollapsibleCard: React.FC<ICollapsibleCard> = ({
   header
 }: ICollapsibleCard) => {
   const [isOpen, setIsOpen] = useState(true)

@@ -39,7 +39,7 @@ const CacheProvider = ({
   return (
     <>
       {useCacheProvider ? (
-        <SWRConfig value={{ provider: () => useCacheProvider }}>
+        <SWRConfig value={{ provider: () => useCacheProvider, suspense: true }}>
           {children}
         </SWRConfig>
       ) : (

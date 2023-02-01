@@ -1,10 +1,10 @@
-import { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
 import { LoaderFunction } from "react-router-dom";
 import { useUserTransactionsByAddress } from "~/queries";
 import useAssetStatistics from "~/queries/useAssetStatistics";
+import { Token } from "~/util/chainUtils/tokens";
 
 export type ITokenHeader = {
-  token: Tokens,
+  token: Token,
   fluidAmt: number,
   regAmt: number,
   // From Hasura
@@ -46,7 +46,7 @@ export const loader: LoaderFunction = async ({ request, params }): Promise<IToke
     [
       useAssetStatistics(network, token, address),
       useUserTransactionsByAddress(network, [token], 1, address, [], 3).then(
-        (res) => res.data?.[network].transfers.map((tx) => {
+        (res) => res.data?.[network].transfers?.map((tx) => {
           const desc = tx.sender.address === address ? "Sent" : "Received"
           const value = tx.amount
           const reward = 1000
