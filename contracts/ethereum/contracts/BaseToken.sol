@@ -16,14 +16,10 @@ import "./ITransferWithBeneficiary.sol";
 import "./LiquidityProvider.sol";
 import "./WorkerConfig.sol";
 
-/// @dev parameter for the batchReward function
-struct Winner {
-    address winner;
-    uint256 amount;
-}
+import "./IToken.sol";
 
 /// @title The fluid token ERC20 contract
-contract Token is IERC20, ITransferWithBeneficiary {
+abstract contract BaseToken is IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -592,11 +588,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
        return balances_[account];
     }
 
-    function setDecimals(uint8 _decimals) public {
-      require(msg.sender == operator_, "only operator can use this function!");
-      decimals_ = _decimals;
-    }
-
     function transfer(address to, uint256 amount) public returns (bool) {
         _transfer(msg.sender, to, amount);
         return true;
@@ -632,10 +623,10 @@ contract Token is IERC20, ITransferWithBeneficiary {
     ) external override returns (bool) {
         bool rc;
 
-        rc = Token(token).transferFrom(msg.sender, address(this), amount);
+        rc = IERC20(token).transferFrom(msg.sender, address(this), amount);
         if (!rc) return false;
 
-        rc = Token(token).transfer(beneficiary, amount);
+        rc = IERC20(token).transfer(beneficiary, amount);
 
         return rc;
     }

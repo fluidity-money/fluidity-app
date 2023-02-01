@@ -7,7 +7,7 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./Token.sol";
+import "./IToken.sol";
 
 /// @notice quick reward pool structure that getPools returns
 struct RewardPool {
@@ -24,14 +24,14 @@ contract RewardPools {
   address operator_;
 
   /// @dev tokens that're tracked by this contract
-  Token[] tokens_;
+  IToken[] tokens_;
 
   /**
    * @notice initialiser function
    * @param _operator the address able to call functions including "addToken"
    * @param _tokens to track initially using the init function
    */
-  function init(address _operator, Token[] memory _tokens) public {
+  function init(address _operator, IToken[] memory _tokens) public {
     require(version_ == 0, "contract is already initialised");
     version_ = 1;
     operator_ = _operator;
@@ -45,7 +45,7 @@ contract RewardPools {
    * @notice `addToken` to the list of tokens that we support
    * @param t `Token` to add to the list of tracked tokens
    */
-  function addToken(Token t) public {
+  function addToken(IToken t) public {
     require(msg.sender == operator_, "only operator can use this function!");
     tokens_.push(t);
   }
@@ -58,7 +58,7 @@ contract RewardPools {
     rewardPool = new RewardPool[](tokens_.length);
 
     for (uint i = 0; i < tokens_.length; i++) {
-      Token token = tokens_[i];
+      IToken token = tokens_[i];
       RewardPool memory pool;
 
       pool.amount = token.rewardPoolAmount();
