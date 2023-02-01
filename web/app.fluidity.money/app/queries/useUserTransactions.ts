@@ -85,6 +85,36 @@ const queryByAddress: Queryable = {
       }
     }
   `,
+
+  arbitrum: gql`
+    query getTransactionsByAddress(
+      $network: network_blockchain!, 
+      $tokens: [String!], 
+      $address: String!, 
+      $offset: Int = 0, 
+      $filterHashes: [String!] = [], 
+      $limit: Int = 12
+    ) {
+    arbitrum: user_actions(
+      where: {
+        network:{ _eq: "arbitrum" },
+       _not: { transaction_hash: { _in: $filterHashes } }, 
+       token_short_name: { _in: $tokens }, 
+       sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
+      }, 
+      order_by: {time: desc},
+      limit: $limit, 
+      offset: $offset
+    ) {
+      sender_address
+      recipient_address
+      token_short_name
+      time
+      transaction_hash
+      amount
+    }
+  }
+`
 };
 
 const queryByTxHash: Queryable = {
@@ -157,6 +187,32 @@ const queryByTxHash: Queryable = {
       }
     }
   `,
+
+  arbitrum: gql`
+    query getTransactionsByTxHash(
+      $network: network_blockchain!, 
+      $transactions: [String!],
+      $filterHashes: [String!] = [], 
+      $limit: Int = 12
+    ) {
+    arbitrum: user_actions(
+      where: {
+        network: { _eq: "arbitrum" },
+       _not: { transaction_hash: {_in: $filterHashes } },
+       transaction_hash: { in: $transactions }
+      }, 
+      order_by: {time: desc},
+      limit: $limit, 
+      offset: $offset
+    ) {
+      sender_address
+      recipient_address
+      token_short_name
+      time
+      transaction_hash
+      amount
+    }
+  }`
 };
 
 const queryAll: Queryable = {
@@ -237,6 +293,34 @@ const queryAll: Queryable = {
       }
     }
   `,
+
+  arbitrum: gql`
+    query getTransactions(
+      $network: network_blockchain!, 
+      $tokens: [String!], 
+      $offset: Int = 0, 
+      $filterHashes: [String!] = [], 
+      $limit: Int = 12
+    ) {
+    arbitrum: user_actions(
+      where: {
+        network: { _eq: "arbitrum" },
+       _not: { transaction_hash: { _in: $filterHashes } }, 
+       token_short_name: { _in: $tokens }
+      }, 
+      order_by: { time: desc },
+      limit: $limit, 
+      offset: $offset
+    ) {
+      sender_address
+      recipient_address
+      token_short_name
+      time
+      transaction_hash
+      amount
+    }
+  }
+`
 };
 
 type UserTransactionsByAddressBody = {
@@ -286,6 +370,24 @@ export type UserTransaction = {
   currency: { symbol: string };
 };
 
+const fetchGqlEndpoint = (network: string): {url: string, headers: {[key: string]: string}} | null => {
+  switch (network) {
+    case "ethereum":
+    case "solana":
+      return {
+        url: "https://graphql.bitquery.io",
+        headers: {"X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? ""},
+      }
+    case "arbitrum":
+      return {
+        url: "https://fluidity.hasura.app/v1/graphql",
+        headers: {"x-hasura-admin-secret": process.env.FLU_HASURA_SECRET ?? ""},
+      }
+    default:
+      return null
+  }
+}
+
 const useUserTransactionsByAddress = async (
   network: string,
   tokens: string[],
@@ -307,13 +409,24 @@ const useUserTransactionsByAddress = async (
     variables,
   };
 
-  return jsonPost<UserTransactionsByAddressBody, UserTransactionsRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionsByAddressBody, UserTransactionsRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers, 
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
+
+  return result; 
 };
 
 const useUserTransactionsByTxHash = async (
@@ -335,13 +448,24 @@ const useUserTransactionsByTxHash = async (
     variables,
   };
 
-  return jsonPost<UserTransactionsByTxHashBody, UserTransactionsRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionsByTxHashBody, UserTransactionsRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers,
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
+
+  return result; 
 };
 
 const useUserTransactionsAll = async (
@@ -363,13 +487,24 @@ const useUserTransactionsAll = async (
     variables,
   };
 
-  return jsonPost<UserTransactionsAllBody, UserTransactionsRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionsAllBody, UserTransactionsRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers,
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = (result as any).data.transfers;
+  }
+
+  return result; 
 };
 
 export {
