@@ -13,11 +13,11 @@ import "./openzeppelin/Address.sol";
 
 import "./ITransferWithBeneficiary.sol";
 
-import "./Fluidity.sol";
+import "./IFluidClient.sol";
 import "./LiquidityProvider.sol";
 
 /// @title The fluid token ERC20 contract
-contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
+contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -342,7 +342,7 @@ contract Token is IFluidity, IERC20, ITransferWithBeneficiary {
     }
 
     /**
-     * @inheritdoc IFluidity
+     * @inheritdoc IFluidClient
      */
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");

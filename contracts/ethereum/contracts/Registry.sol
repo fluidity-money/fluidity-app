@@ -8,7 +8,7 @@ pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "./openzeppelin/Address.sol";
-import "./Fluidity.sol";
+import "./IFluidClient.sol";
 
 struct FluidityReward {
     string clientName;
@@ -32,7 +32,7 @@ contract Registry {
         string name;
         bool overwrite;
         address token;
-        IFluidity client;
+        IFluidClient client;
     }
 
     /// @notice emitted when a fluidity client is updated
@@ -54,7 +54,7 @@ contract Registry {
     address private operator_;
 
     /// @dev token => utility name => fluid client
-    mapping(address => mapping(string => IFluidity)) private fluidityClients_;
+    mapping(address => mapping(string => IFluidClient)) private fluidityClients_;
 
     // trf vars go here !
 
@@ -134,7 +134,7 @@ contract Registry {
         for (uint i = 0; i < rewards.length; i++) {
             FluidityReward memory fluidReward = rewards[i];
 
-            IFluidity client = fluidityClients_[token][fluidReward.clientName];
+            IFluidClient client = fluidityClients_[token][fluidReward.clientName];
 
             // this will revert if client == address(0)
             client.batchReward(fluidReward.rewards, firstBlock, lastBlock);
@@ -153,7 +153,7 @@ contract Registry {
         for (uint i = 0; i < names.length; i++) {
             string memory name = names[i];
             vars[i].name = name;
-            IFluidity utility = fluidityClients_[token][name];
+            IFluidClient utility = fluidityClients_[token][name];
 
             if (address(utility) == address(0)) {
                 vars[i].found = false;

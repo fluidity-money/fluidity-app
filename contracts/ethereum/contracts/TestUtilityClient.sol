@@ -1,10 +1,10 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./Fluidity.sol";
+import "./IFluidClient.sol";
 import "./GovToken.sol";
 
-contract TestClient is IFluidity {
+contract TestClient is IFluidClient {
     address operator_;
     GovToken govToken_;
 
