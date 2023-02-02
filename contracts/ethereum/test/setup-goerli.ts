@@ -2,7 +2,7 @@ import * as hre from "hardhat";
 import { ethers } from "ethers";
 import { deployTokens, forknetTakeFunds, Token } from "../script-utils";
 import { AAVE_V3_GOERLI_POOL_PROVIDER_ADDR, GoerliTokenList } from "../test-constants";
-import { accountSigner, configAddr, tokenCouncilSigner, tokenOperatorSigner } from "./setup-common";
+import { accountSigner, operatorAddr, tokenCouncilSigner, externalOperatorSigner as externalOperatorSigner } from "./setup-common";
 
 export let usdcAccount: ethers.Contract;
 export let fAUsdcAccount: ethers.Contract;
@@ -16,7 +16,7 @@ before(async function() {
   const toDeploy = [GoerliTokenList["usdc"]];
 
   // deploy fUsdc
-  await forknetTakeFunds(hre, [accountSigner], [GoerliTokenList["usdc"]]);
+  await forknetTakeFunds(hre, [await accountSigner.getAddress()], [GoerliTokenList["usdc"]]);
 
   const {tokens} = await deployTokens(
     hre,
@@ -24,8 +24,8 @@ before(async function() {
     "no v2 tokens here",
     AAVE_V3_GOERLI_POOL_PROVIDER_ADDR,
     await tokenCouncilSigner.getAddress(),
-    await tokenOperatorSigner.getAddress(),
-    configAddr,
+    operatorAddr,
+    await externalOperatorSigner.getAddress(),
   );
 
   let usdcAddr = GoerliTokenList.usdc.address;

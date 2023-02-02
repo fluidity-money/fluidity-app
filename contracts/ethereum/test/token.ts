@@ -1,11 +1,10 @@
 import {
     fUsdtAccount,
-    fUsdtAccount2,
     fUsdtOracle,
     fUsdtOperator,
     fUsdtCouncil,
 } from './setup-mainnet';
-import { accountAddr, configAddr } from './setup-common';
+import { accountAddr, operatorAddr } from './setup-common'
 import * as ethers from 'ethers';
 import { BigNumber } from 'ethers';
 import { expect } from "chai";
@@ -35,7 +34,7 @@ describe("Token", async function () {
             101,
         )).to.be.revertedWith("emergency mode!");
 
-        await fUsdtOperator.disableEmergencyMode(configAddr);
+        await fUsdtOperator.disableEmergencyMode(operatorAddr);
 
         await expect(fUsdtAccount.erc20In(1))
             .to.not.be.revertedWith("emergency mode!");
@@ -48,18 +47,18 @@ describe("Token", async function () {
 
         await expect(fUsdtAccount.erc20Out(1)).to.not.be.revertedWith("emergency mode!");
 
-        await fUsdtOperator.disableEmergencyMode(configAddr);
+        await fUsdtOperator.disableEmergencyMode(operatorAddr);
     });
 
     it("lets emergency mode be enabled by the three authorities", async function () {
         await fUsdtOperator.enableEmergencyMode();
-        await fUsdtOperator.disableEmergencyMode(configAddr);
+        await fUsdtOperator.disableEmergencyMode(operatorAddr);
 
         await fUsdtOracle.enableEmergencyMode();
-        await fUsdtOperator.disableEmergencyMode(configAddr);
+        await fUsdtOperator.disableEmergencyMode(operatorAddr);
 
         await fUsdtCouncil.enableEmergencyMode();
-        await fUsdtOperator.disableEmergencyMode(configAddr);
+        await fUsdtOperator.disableEmergencyMode(operatorAddr);
 
         await expect(fUsdtAccount.enableEmergencyMode())
             .to.be.revertedWith("can't enable emergency mode!");
@@ -69,11 +68,11 @@ describe("Token", async function () {
         await fUsdtOperator.enableEmergencyMode();
 
         for (const user of [fUsdtOracle, fUsdtCouncil, fUsdtAccount]) {
-            await expect(user.disableEmergencyMode(configAddr))
+            await expect(user.disableEmergencyMode())
                 .to.be.revertedWith("only the operator account can use this");
         }
 
-        await fUsdtOperator.disableEmergencyMode(configAddr);
+        await fUsdtOperator.disableEmergencyMode();
     });
 
     it("allows small rewards", async function () {

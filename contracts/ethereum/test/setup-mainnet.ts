@@ -4,9 +4,9 @@ import { deployTokens, deployRewardPools, forknetTakeFunds } from "../script-uti
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
 import {
-  configAddr,
+  operatorAddr,
   tokenOracleSigner,
-  tokenOperatorSigner,
+  externalOperatorSigner,
   tokenCouncilSigner,
   configOperatorSigner,
   configCouncilSigner,
@@ -37,8 +37,8 @@ export let fUsdtOracle: ethers.Contract;
 export let fUsdtOperator: ethers.Contract;
 export let fUsdtCouncil: ethers.Contract;
 
-export let configOperator: ethers.Contract;
-export let configCouncil: ethers.Contract;
+export let operatorOperator: ethers.Contract;
+export let operatorCouncil: ethers.Contract;
 
 export let rewardPoolsOperator: ethers.Contract;
 
@@ -52,31 +52,31 @@ before(async function () {
 
   await forknetTakeFunds(
     hre,
-    [accountSigner],
+    [await accountSigner.getAddress()],
     toDeploy,
   );
 
-  console.log("signer" + tokenOperatorSigner)
-  console.log("addr" + await tokenOperatorSigner.getAddress())
+  console.log("signer" + externalOperatorSigner)
+  console.log("addr" + await externalOperatorSigner.getAddress())
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
     await tokenCouncilSigner.getAddress(),
-    await tokenOperatorSigner.getAddress(),
-    configAddr,
+    operatorAddr,
+    await externalOperatorSigner.getAddress(),
   );
 
-  configOperator = await hre.ethers.getContractAt(
-    "WorkerConfig",
-    configAddr,
-    configOperatorSigner,
+  operatorOperator = await hre.ethers.getContractAt(
+    "Operator",
+    operatorAddr,
+    externalOperatorSigner,
   );
 
-  configCouncil = await hre.ethers.getContractAt(
-    "WorkerConfig",
-    configAddr,
+  operatorCouncil = await hre.ethers.getContractAt(
+    "Operator",
+    operatorAddr,
     configCouncilSigner,
   );
 
@@ -85,7 +85,7 @@ before(async function () {
   const oracles = Object.values(tokens)
     .map(t => [t.deployedToken.address, tokenOracleAddress]);
 
-  await configOperator.updateOracles(oracles);
+  await operatorOperator.updateOracles(oracles);
 
   usdtAddr = TokenList["usdt"].address;
   fUsdtAddr = tokens.fUSDt.deployedToken.address;
@@ -107,7 +107,7 @@ before(async function () {
   fDaiAccount = await hre.ethers.getContractAt("Token", fDaiAddr, accountSigner);
 
   fUsdtOracle = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOracleSigner);
-  fUsdtOperator = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOperatorSigner);
+  fUsdtOperator = await hre.ethers.getContractAt("Token", fUsdtAddr, externalOperatorSigner);
   fUsdtCouncil = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenCouncilSigner);
 
   rewardPoolsOperator = await deployRewardPools(

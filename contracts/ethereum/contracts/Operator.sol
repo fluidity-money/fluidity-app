@@ -59,7 +59,7 @@ contract Operator {
     address private emergencyCouncil_;
 
     /// @dev can update contract props and oracles
-    address private operator_;
+    address public operator_;
 
     /// @dev token => oracle
     mapping(address => address) private oracles_;
@@ -73,12 +73,16 @@ contract Operator {
      * @param _operator to use that can update the worker config
      */
     function init(
-        address _operator
+        address _operator,
+        address _emergencyCouncil
     ) public {
         require(version_ == 0, "contract is already initialised");
         version_ = 2;
 
         operator_ = _operator;
+        emergencyCouncil_ = _emergencyCouncil;
+
+        noGlobalEmergency_ = true;
     }
 
     function noGlobalEmergency() public view returns (bool) {

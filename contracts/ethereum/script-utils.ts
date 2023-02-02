@@ -62,18 +62,17 @@ const deployAndInit = async (
   return c;
 }
 
-export const deployOperatorRegistry = async (
+export const deployOperator = async (
   hre: HardhatRuntimeEnvironment,
-  userOperator: string,
-  emergencyCouncil: string,
-): Promise<[ethers.Contract, ethers.Contract]> => {
-  const operator = await deploy(hre, "Operator");
-  const registry = await deploy(hre, "Registry");
-
-  await operator.init(userOperator, registry.address);
-  await registry.init(operator.address, emergencyCouncil);
-
-  return [operator, registry];
+  externalOperator: string,
+  council: string,
+): Promise<ethers.Contract> => {
+  return deployAndInit(
+    hre,
+    "Operator",
+    externalOperator,
+    council,
+  )
 };
 
 export const deployGovToken = async (
@@ -99,16 +98,15 @@ export const deployTestUtility = async (
   hre: HardhatRuntimeEnvironment,
   operator: ethers.Contract,
   externalOperator: string,
-  registry: ethers.Contract,
   token: string,
 ) => {
   const factory = await hre.ethers.getContractFactory("TestClient");
-  const client = await factory.deploy(registry.address);
+  const client = await factory.deploy(operator.address);
   await client.deployed();
 
   await addUtilityClient(
     hre,
-    operator,
+    operator.address,
     externalOperator,
     [{
       name: "test",
@@ -132,9 +130,8 @@ export const deployTokens = async (
   tokens: Token[],
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
-  registryAddress: string,
   councilAddress: string,
-  operator: ethers.Contract,
+  operator: string,
   externalOperator: string,
 ): Promise<{
   tokenBeacon: ethers.Contract,
@@ -210,8 +207,8 @@ export const deployTokens = async (
       token.name,
       token.symbol,
       councilAddress,
-      registryAddress,
-      registryAddress,
+      externalOperator,
+      operator,
     );
 
     await addUtilityClient(
@@ -242,7 +239,7 @@ export const deployTokens = async (
 export const deployRewardPools = async (
   hre: HardhatRuntimeEnvironment,
   operatorAddress: string,
-  tokens: Token[]
+  tokens: string[]
 ): Promise<ethers.Contract> => {
   const factory = await hre.ethers.getContractFactory("RewardPools");
   const beacon = await hre.upgrades.deployProxy(factory);
@@ -334,7 +331,7 @@ export type FluidityClientChange = {
 
 export const addUtilityClient = async(
   hre: HardhatRuntimeEnvironment,
-  operator: ethers.Contract,
+  operator: string,
   externalOperator: string,
   changes: FluidityClientChange[]
 ) => {
@@ -343,10 +340,18 @@ export const addUtilityClient = async(
     params: [externalOperator],
   });
 
-  let impersonatedOperator = operator.connect(await hre.ethers.getSigner(externalOperator));
+  let impersonatedOperator = await hre.ethers.getContractAt(
+    "Operator",
+    operator,
+    await hre.ethers.getSigner(externalOperator),
+  );
+
+  console.log(`op: ${await impersonatedOperator.operator_()}`);
+  console.log(`calling from: ${await impersonatedOperator.signer.getAddress()}`);
 
   console.log(`setting util client ${JSON.stringify(changes)}`);
   await impersonatedOperator.updateUtilityClients(changes);
+  console.log("done");
 
   await hre.network.provider.request({
     method: "hardhat_stopImpersonatingAccount",
