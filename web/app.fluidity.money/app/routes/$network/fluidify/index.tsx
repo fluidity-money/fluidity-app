@@ -177,8 +177,7 @@ export default function FluidifyToken() {
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
-  const trackCancelFluidify = () =>
-    client?.track("user", "cancel_fluidify");
+  const trackCancelFluidify = () => client?.track("user", "cancel_fluidify");
 
   // get token data once user is connected
   useEffect(() => {
@@ -287,10 +286,7 @@ export default function FluidifyToken() {
 
     setSwapping(true);
 
-    client?.track(
-      "user",
-      swapping ? "click_swapping" : "click_reverting"
-    );
+    client?.track("user", swapping ? "click_swapping" : "click_reverting");
 
     try {
       const success = await transaction.confirmTx();
