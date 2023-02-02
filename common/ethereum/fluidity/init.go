@@ -45,10 +45,4 @@ func init() {
 	if RewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
-
-	reader = strings.NewReader(registryAbiString)
-
-	if RegistryAbi, err = ethAbi.JSON(reader); err != nil {
-		panic(err)
-	}
 }

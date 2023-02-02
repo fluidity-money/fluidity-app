@@ -15,7 +15,6 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -163,50 +162,46 @@ const operatorAbiString = `[
 	  "outputs": [],
 	  "stateMutability": "nonpayable",
 	  "type": "function"
+  },
+  {
+	  "inputs": [
+	  { "internalType": "address", "name": "token", "type": "address" },
+	  { "internalType": "string[]", "name": "names", "type": "string[]" }
+	  ],
+	  "name": "getTrfVars",
+	  "outputs": [
+	  {
+		  "components": [
+		  {
+			  "components": [
+			  { "internalType": "uint256", "name": "poolSizeNative", "type": "uint256" },
+			  { "internalType": "uint256", "name": "tokenDecimalScale", "type": "uint256" },
+			  { "internalType": "uint256", "name": "exchangeRateNum", "type": "uint256" },
+			  { "internalType": "uint256", "name": "exchangeRateDenom", "type": "uint256" },
+			  { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
+			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
+			  ],
+			  "internalType": "struct TrfVars",
+			  "name": "vars",
+			  "type": "tuple"
+		  },
+		  { "internalType": "bool", "name": "found", "type": "bool" },
+		  { "internalType": "string", "name": "name", "type": "string" }
+		  ],
+		  "internalType": "struct Registry.ScannedTrfVar[]",
+		  "name": "",
+		  "type": "tuple[]"
+	  }
+	  ],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
   }
-  ]`
-
-const registryAbiString = `[
-{
-  "inputs": [
-    { "internalType": "address", "name": "token", "type": "address" },
-    { "internalType": "string[]", "name": "names", "type": "string[]" }
-  ],
-  "name": "getTrfVars",
-  "outputs": [
-    {
-      "components": [
-        {
-          "components": [
-            { "internalType": "uint256", "name": "poolSizeNative", "type": "uint256" },
-            { "internalType": "uint256", "name": "tokenDecimalScale", "type": "uint256" },
-            { "internalType": "uint256", "name": "exchangeRateNum", "type": "uint256" },
-            { "internalType": "uint256", "name": "exchangeRateDenom", "type": "uint256" },
-            { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
-            { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
-          ],
-          "internalType": "struct TrfVars",
-          "name": "vars",
-          "type": "tuple"
-        },
-        { "internalType": "bool", "name": "found", "type": "bool" },
-        { "internalType": "string", "name": "name", "type": "string" }
-      ],
-      "internalType": "struct Registry.ScannedTrfVar[]",
-      "name": "",
-      "type": "tuple[]"
-    }
-  ],
-  "stateMutability": "nonpayable",
-  "type": "function"
-}
 ]`
 
 var (
 	FluidityContractAbi ethAbi.ABI
 	OperatorAbi         ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
-	RegistryAbi         ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles
@@ -216,7 +211,7 @@ type abiOracleUpdate struct {
 }
 
 type (
-	// the Winner struct from solidity, to be passed to batchReward
+	// the Winner struct from solidity, to be passed (in the abiFluidityReward struct) to batchReward
 	abiWinner struct {
 		Winner     ethCommon.Address `abi:"winner"`
 		WinAmount  *big.Int          `abi:"winAmount"`
@@ -271,8 +266,6 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 }
 
 func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
-	log.Debugf("tbr called")
-
 	boundContract := ethAbiBind.NewBoundContract(
 		operatorAddress,
 		OperatorAbi,
@@ -311,7 +304,6 @@ func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress
 		rewards = append(rewards, reward)
 	}
 
-	log.Debugf("estimating gas calling %s", operatorAddress.String())
 	gas, err := ethereum.EstimateGas(
 		client,
 		&OperatorAbi,

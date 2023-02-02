@@ -54,10 +54,10 @@ type (
 )
 
 // GetTrfVars from a list of utilities, returning if any failed
-func GetTrfVars(client *ethclient.Client, registryAddress, tokenAddress ethCommon.Address, fluidityClients []applications.Utility, defaultDeltaWeightNum, defaultDeltaWeightDenom *big.Int) ([]worker.PoolDetails, error, []error) {
+func GetTrfVars(client *ethclient.Client, operatorAddress, tokenAddress ethCommon.Address, fluidityClients []applications.Utility, defaultDeltaWeightNum, defaultDeltaWeightDenom *big.Int) ([]worker.PoolDetails, error, []error) {
 	boundContract := ethAbiBind.NewBoundContract(
-		registryAddress,
-		RegistryAbi,
+		operatorAddress,
+		OperatorAbi,
 		client,
 		client,
 		client,
