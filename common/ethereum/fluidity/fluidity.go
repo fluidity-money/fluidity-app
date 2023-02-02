@@ -19,259 +19,142 @@ import (
 )
 
 const tokenContractAbiString = `[
-  {
-    "inputs": [],
-    "name": "rewardPoolAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "winner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "winAmount",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Winner[]",
-        "name": "rewards",
-        "type": "tuple[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "firstBlock",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "lastBlock",
-        "type": "uint256"
-      }
-    ],
-    "name": "batchReward",
-    "outputs": [],
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "transfer",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "winner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "startBlock",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "endBlock",
-        "type": "uint256"
-      }
-    ],
-    "name": "Reward",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "winner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "startBlock",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "endBlock",
-        "type": "uint256"
-      }
-    ],
-    "name": "BlockedReward",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "originalRewardTx",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "winner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "startBlock",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "endBlock",
-        "type": "uint256"
-      }
-    ],
-    "name": "UnblockReward",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "txHash",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "balls",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "payouts",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "reward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "global",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "user",
-        "type": "uint256"
-      }
-    ],
-    "name": "updateMintLimits",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "rewardTx",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bool",
-        "name": "payout",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint256",
-        "name": "firstBlock",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "lastBlock",
-        "type": "uint256"
-      }
-    ],
-    "name": "unblockReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
+{
+	"inputs": [],
+	"name": "rewardPoolAmount",
+	"outputs": [
+		{ "internalType": "uint256", "name": "", "type": "uint256" }
+	],
+	"stateMutability": "nonpayable",
+	"type": "function"
+},
+{
+	"inputs": [
+		{
+			"components": [
+				{ "internalType": "address", "name": "winner", "type": "address" },
+				{ "internalType": "uint256", "name": "winAmount", "type": "uint256" }
+			],
+			"internalType": "struct Winner[]",
+			"name": "rewards",
+			"type": "tuple[]"
+		},
+		{ "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
+		{ "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
+	],
+	"name": "batchReward",
+	"outputs": [],
+	"type": "function"
+},
+{
+	"inputs": [
+		{ "internalType": "address", "name": "to", "type": "address" },
+		{ "internalType": "uint256", "name": "amount", "type": "uint256" }
+	],
+	"name": "transfer",
+	"outputs": [],
+	"stateMutability": "nonpayable",
+	"type": "function"
+},
+{
+	"anonymous": false,
+	"inputs": [
+		{ "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
+		{ "indexed": false, "internalType": "uint256", "name": "startBlock", "type": "uint256" },
+		{ "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
+	],
+	"name": "Reward",
+	"type": "event"
+},
+{
+	"anonymous": false,
+	"inputs": [
+		{ "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
+		{ "indexed": false, "internalType": "uint256", "name": "startBlock", "type": "uint256" },
+		{ "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
+	],
+	"name": "BlockedReward",
+	"type": "event"
+},
+{
+	"anonymous": false,
+	"inputs": [
+		{ "indexed": true, "internalType": "bytes32", "name": "originalRewardTx", "type": "bytes32" },
+		{ "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
+		{ "indexed": false, "internalType": "uint256", "name": "startBlock", "type": "uint256" },
+		{ "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
+	],
+	"name": "UnblockReward",
+	"type": "event"
+},
+{
+	"inputs": [
+		{ "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
+		{ "internalType": "address", "name": "from", "type": "address" },
+		{ "internalType": "address", "name": "to", "type": "address" },
+		{ "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
+		{ "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
+	],
+	"name": "reward",
+	"outputs": [],
+	"stateMutability": "nonpayable",
+	"type": "function"
+},
+{
+	"inputs": [
+		{ "internalType": "uint256", "name": "global", "type": "uint256" },
+		{ "internalType": "uint256", "name": "user", "type": "uint256" }
+	],
+	"name": "updateMintLimits",
+	"outputs": [],
+	"stateMutability": "nonpayable",
+	"type": "function"
+},
+{
+	"inputs": [
+		{ "internalType": "bytes32", "name": "rewardTx", "type": "bytes32" },
+		{ "internalType": "address", "name": "user", "type": "address" },
+		{ "internalType": "uint256", "name": "amount", "type": "uint256" },
+		{ "internalType": "bool", "name": "payout", "type": "bool" },
+		{ "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
+		{ "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
+	],
+	"name": "unblockReward",
+	"outputs": [],
+	"stateMutability": "nonpayable",
+	"type": "function"
+},
+{
+	"anonymous": false,
+	"inputs": [
+		{ "indexed": true, "internalType": "address", "name": "addr", "type": "address" },
+		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+	],
+	"name": "BurnFluid",
+	"type": "event"
+},
+{
+	"anonymous": false,
+	"inputs": [
+		{ "indexed": true, "internalType": "address", "name": "addr", "type": "address" },
+		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+	],
+	"name": "MintFluid",
+	"type": "event"
+},
+{
+	"anonymous": false,
+	"inputs": [
+		{ "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+		{ "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+		{ "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
+	],
+	"name": "Transfer",
+	"type": "event"
+}
 ]
 `
 
