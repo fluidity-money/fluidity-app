@@ -141,7 +141,7 @@ func GetTrfVars(client *ethclient.Client, registryAddress, tokenAddress ethCommo
 		trfVar := worker.PoolDetails{
 			Name:           name,
 			PoolSizeNative: poolSizeNativeRat,
-			TokenDecimals:  tokenDecimalScaleRat,
+			TokenDecimalsScale:  tokenDecimalScaleRat,
 			ExchangeRate:   exchangeRateRat,
 			DeltaWeight:    deltaWeightRat,
 		}

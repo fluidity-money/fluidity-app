@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-package main
+package probability
 
 import (
 	"math/big"
@@ -12,8 +12,28 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+func CalculatePayoutsCombined(sourcePayouts map[applications.Utility][]worker.Payout, winningBalls int) map[applications.Utility]worker.Payout {
+	payouts := make(map[applications.Utility]worker.Payout)
+
+	for utility, payout := range sourcePayouts {
+		var (
+			totalPayout = payout[winningBalls-1]
+
+			payoutNative = totalPayout.Native
+			payoutUsd    = totalPayout.Usd
+		)
+
+		payouts[utility] = worker.Payout{
+			Native: payoutNative,
+			Usd:    payoutUsd,
+		}
+	}
+
+	return payouts
+}
+
 // returns the amount won by the sender and receiver with given balls and payouts
-func calculatePayouts(sourcePayouts map[applications.Utility][]worker.Payout, winningBalls int) (map[applications.Utility]worker.Payout, map[applications.Utility]worker.Payout) {
+func CalculatePayoutsSplit(sourcePayouts map[applications.Utility][]worker.Payout, winningBalls int) (map[applications.Utility]worker.Payout, map[applications.Utility]worker.Payout) {
 	var (
 		fromAmounts = make(map[applications.Utility]worker.Payout)
 		toAmounts = make(map[applications.Utility]worker.Payout)

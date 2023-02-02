@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	worker_types "github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -186,13 +187,21 @@ func main() {
 				)
 			}
 
+			pools := []worker_types.PoolDetails{
+				{
+					Name:               applications.UtilityFluid,
+					PoolSizeNative:     sizeOfThePool,
+					TokenDecimalsScale: decimalPlacesRat,
+					ExchangeRate:       big.NewRat(1, 1),
+					DeltaWeight:        deltaWeight,
+				},
+			}
+
 			randomN, randomPayouts, _ := probability.WinningChances(
 				solanaTransactionFeesNormalised,
 				atx,
-				sizeOfThePool,
-				decimalPlacesRat,
 				payoutFreq,
-				deltaWeight,
+				pools,
 				winningClasses,
 				fluidTransfers,
 				solanaBlockTime,
@@ -225,18 +234,27 @@ func main() {
 				continue
 			}
 
-			winningAmountBigInt := randomPayouts[matchedBalls-1]
 
-			if !winningAmountBigInt.IsUint64() {
+			payouts := probability.CalculatePayoutsCombined(randomPayouts, matchedBalls)
+			payout, exists := payouts[applications.UtilityFluid]
+
+			if !exists {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "No payout for the fluid token found!"
+					k.Payload = randomPayouts
+				})
+			}
+
+			if !payout.Native.IsUint64() {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
 						"Winning amount %s is too large to be represented as a u64!",
-						winningAmountBigInt.String(),
+						payout.Native.String(),
 					)
 				})
 			}
 
-			winningAmount := winningAmountBigInt.Uint64()
+			winningAmount := payout.Native.Uint64()
 
 			log.Debug(func(k *log.Log) {
 				k.Format(

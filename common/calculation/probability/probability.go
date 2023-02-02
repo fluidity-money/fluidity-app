@@ -229,7 +229,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 		for poolIdx, pool := range distributionPools {
 			var (
 				poolName = pool.Name
-				tokenDecimals = pool.TokenDecimals
+				tokenDecimals = pool.TokenDecimalsScale
 				exchangeRate = pool.ExchangeRate
 				bpy = poolBpys[poolIdx]
 

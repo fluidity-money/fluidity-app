@@ -23,7 +23,9 @@ type (
 		// PoolSizeNative is the amount of token to distribute in native tokens
 		PoolSizeNative *big.Rat `json:"pool_size"`
 
-		TokenDecimals *big.Rat `json:"token_decimals"`
+		// TokenDecimalsScale is 1e(decimals)
+		TokenDecimalsScale *big.Rat `json:"token_decimals"`
+		// ExchangeRate is the number for which (native value)*(exchange rate) = (usd value)
 		ExchangeRate *big.Rat `json:"exchange_rate"`
 
 		// DeltaWeight is the frequency with which to distribute tokens

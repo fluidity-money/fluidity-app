@@ -118,7 +118,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			continue
 		}
 
-		fromWinAmounts, toWinAmounts := calculatePayouts(sourcePayouts, winningBalls)
+		fromWinAmounts, toWinAmounts := probability.CalculatePayoutsSplit(sourcePayouts, winningBalls)
 
 		log.App(func(k *log.Log) {
 			k.Format(
