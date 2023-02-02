@@ -32,11 +32,13 @@ contract VEGovToken is BaseNativeToken {
         return _timeSinceLockInDays / _lockTime;
     }
 
-    function realBalanceOf(address _spender) public view returns (uint256) {
-        return balanceOf_[_spender];
+    function transfer(address _recipient, uint256 _value) public override returns (bool) {
+        revert("not able to be transferred");
+        return false;
     }
 
-    function convertToRealBalance(uint256 _balance) public view returns (uint256) {
-    	return _balance + getExchangeRate();
+    function transferFrom(address _from, address _to, uint256 _value) public override returns (bool) {
+        revert("not able to be transferred");
+        return false;
     }
 }

@@ -19,18 +19,13 @@ enum ProposalStatus {
     FAILED
 }
 
-struct Vote {
-    address spender;
-    uint256 amount;
-}
-
 struct Proposal {
     address targetContract;
     uint256 ratificationTs;
     uint256 votesFor;
     uint256 votesAgainst;
     bytes data;
-    Vote[] votes;
+    mapping(address => uint256) votes;
 }
 
 contract DAO {
@@ -52,8 +47,6 @@ contract DAO {
     address registry_;
 
     mapping(bytes20 => Proposal) proposals_;
-
-    mapping(address => uint256) credits_;
 
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
@@ -78,32 +71,17 @@ contract DAO {
         return getRatificationTs(_ipfsHash) == 0;
     }
 
-    function _transferFrom(address _sender, uint256 _amount) internal {
-        bool rc = governanceToken_.transferFrom(msg.sender, address(this), _amount);
-
-        require(rc, "transferFrom returned false");
-    }
-
-    function recordVoter(bytes20 _hash, address _spender, uint256 _amount) internal {
-        Vote memory vote;
-
-        vote.spender = _spender;
-        vote.amount = _amount;
-
-        proposals_[_hash].votes.push(vote);
+    function getAmountAlreadyVoted(bytes20 _ipfsHash, address _spender) public view returns (uint256) {
+      proposals_[_ipfsHash].votes[_spender];
     }
 
     function _voteFor(address _sender, bytes20 _ipfsHash, uint256 _amount) internal {
-        _transferFrom(_sender, _amount);
         proposals_[_ipfsHash].votesFor += _amount;
-        recordVoter(_ipfsHash, _sender, _amount);
         emit VotedFor(_ipfsHash, _sender, _amount);
     }
 
     function _voteAgainst(address _sender, bytes20 _ipfsHash, uint256 _amount) internal {
-        _transferFrom(_sender, _amount);
         proposals_[_ipfsHash].votesAgainst += _amount;
-        recordVoter(_ipfsHash, _sender, _amount);
         emit VotedAgainst(_ipfsHash, _sender, _amount);
     }
 
@@ -125,7 +103,7 @@ contract DAO {
     {
         require(_target != address(0), "null address");
 
-        Proposal memory proposal = proposals_[_ipfsHash];
+        Proposal storage proposal = proposals_[_ipfsHash];
 
         require(!getProposalExists(_ipfsHash), "proposal already exists");
 
@@ -211,14 +189,10 @@ contract DAO {
         return getProposalStatus(_ipfsHash) == ProposalStatus.FAILED;
     }
 
-    /// @param _ipfsHash proposal to move each balance to credit for
-    function proposalRestoreCredits(bytes20 _ipfsHash) internal {
-        Proposal storage proposal = proposals_[_ipfsHash];
+    function getAmountUserCanVote(bytes20 _ipfsHash, address _spender, uint256 _amount) public view returns (uint256) {
+        uint256 spent = proposals_[_ipfsHash].votes[_spender];
 
-        for (uint256 i = 0; i < proposal.votes.length; i++) {
-            Vote storage vote = proposal.votes[i];
-            credits_[vote.spender] += vote.amount;
-        }
+        return spent > _amount ? spent : _amount;
     }
 
     /// @notice voteFor the Vote given for the amount given, increasing
@@ -230,6 +204,11 @@ contract DAO {
         require(getProposalExists(_ipfsHash), "proposal does not exist");
         require(getProposalVoteable(_ipfsHash), "proposal frozen");
 
+        require(
+          getAmountUserCanVote(_ipfsHash, msg.sender, _amount) <= _amount,
+          "user trying to vote more they can"
+        );
+
         _voteFor(msg.sender, _ipfsHash, _amount);
     }
 
@@ -240,14 +219,12 @@ contract DAO {
         require(getProposalExists(_ipfsHash), "proposal does not exist");
         require(getProposalVoteable(_ipfsHash), "proposal frozen");
 
-        _voteAgainst(msg.sender, _ipfsHash, _amount);
-    }
+        require(
+          getAmountUserCanVote(_ipfsHash, msg.sender, _amount) <= _amount,
+          "user trying to vote more they can"
+        );
 
-    /// @notice getProposal for the ipfs hash given, returning
-    ///         information about it
-    /// @dev _hash to get proposal information on
-    function getVoteInfo(bytes20 _hash) public view returns (Proposal memory) {
-        return proposals_[_hash];
+        _voteAgainst(msg.sender, _ipfsHash, _amount);
     }
 
     function noReentrancy() internal view returns (bool) {
@@ -279,7 +256,7 @@ contract DAO {
         require(noReentrancy(), "reentrant");
         require(getProposalReadyToExecute(_ipfsHash), "proposal can't execute");
 
-        Proposal memory proposal = proposals_[_ipfsHash];
+        Proposal storage proposal = proposals_[_ipfsHash];
 
         setReentrancyGuard(true);
 
@@ -292,7 +269,7 @@ contract DAO {
         // if the return success was false, and the return size is below
         // 68 (size for a revert statement), then error out
 
-        require(rc && returnSize >= 68, "call failed");
+        require(rc && returnDataSize >= 68, "call failed");
 
         if (!rc) {
             // an error happened, so we revert with the revert data from before
@@ -303,41 +280,9 @@ contract DAO {
 
         setReentrancyGuard(false);
 
-        // assume this updates everyone's balances, so we don't update
-        // the votes recorded to 0
-
-        proposalRestoreCredits(_ipfsHash);
-
         // mark the contract as executed
 
         proposal.targetContract = address(0);
-    }
-
-    /// @notice restoreFailedProposalCredits if the proposal has failed
-    ///         but is still marked as executable
-    function restoreFailedProposalCredits(bytes20 _ipfsHash) public {
-        require(getProposalFailed(_ipfsHash), "proposal didn't fail");
-        require(getProposalReadyToExecute(_ipfsHash), "proposal can't execute");
-
-        proposalRestoreCredits(_ipfsHash);
-
-        proposals_[_ipfsHash].targetContract = address(0);
-    }
-
-    function redeemCredits(address _spender) public returns (bool) {
-        bool rc = governanceToken_.transfer(_spender, credits_[_spender]);
-
-        require(rc, "failed to transfer credits back");
-
-        credits_[_spender] = 0;
-    }
-
-    function createCredits(address _spender, uint256 _amount) public {
-        bool rc = _transferFrom(_spender, _amount);
-
-         require(rc, "failed to transfer from");
-
-         credits_[_spender] += _amount;
     }
 
     /*

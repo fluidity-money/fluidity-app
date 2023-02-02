@@ -80,7 +80,7 @@ abstract contract BaseNativeToken is IERC20 {
         return true;
     }
 
-    function transfer(address _to, uint256 _amount) public returns (bool) {
+    function transfer(address _to, uint256 _amount) public virtual returns (bool) {
         require(_to != address(0), "can't send to null account");
 
         // explicitly call balanceOf so decay possible via implementor
@@ -104,7 +104,7 @@ abstract contract BaseNativeToken is IERC20 {
         address _from,
         address _to,
         uint256 _amount
-    ) public returns (bool) {
+    ) public virtual returns (bool) {
         // Saves gas for limited approvals.
         uint256 allowed = allowance_[_from][msg.sender];
 
