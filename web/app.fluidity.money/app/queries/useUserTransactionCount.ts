@@ -29,6 +29,21 @@ const queryByAddress: Queryable = {
       }
     }
   `,
+  arbitrum: gql`
+    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+      arbitrum: user_actions_aggregate(
+        where: {
+          network: { _eq: "arbitrum" },
+          token_short_name: { _in: $tokens },
+          sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
+        }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+  `,
 };
 
 const queryAll: Queryable = {
@@ -45,6 +60,20 @@ const queryAll: Queryable = {
     query getTransactionCount($fluidCurrencies: [String!]) {
       solana {
         transfers(currency: { in: $fluidCurrencies }) {
+          count
+        }
+      }
+    }
+  `,
+  arbitrum: gql`
+    query getTransactionCount($fluidCurrencies: [String!]) {
+      arbitrum: user_actions_aggregate(
+        where: {
+          network: { _eq: "arbitrum" },
+          token_short_name: { _in: $tokens },
+        }
+      ) {
+        aggregate {
           count
         }
       }
@@ -103,7 +132,7 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    result.data[network].transfers = (result as any).data.transfers;
+    result.data[network].transfers = [(result as any).data.aggregate];
   }
 
   return result; 
@@ -133,7 +162,7 @@ const useUserTransactionAllCount = async(network: string) => {
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    result.data[network].transfers = (result as any).data.transfers;
+    result.data[network].transfers = [(result as any).data.aggregate];
   }
 
   return result; 

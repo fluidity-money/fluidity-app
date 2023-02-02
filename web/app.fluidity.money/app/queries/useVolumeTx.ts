@@ -32,7 +32,33 @@ const queryByAddressTimestamp: Queryable = {
       }
     }
   }
-`
+`,
+  arbitrum: gql`
+    query getTransactionsByAddress(
+      $network: network_blockchain!, 
+      $fluidAssets: [String!], 
+      $address: String!, 
+      $filterHashes: [String!] = [], 
+      $timestamp: ISO8601DateTime!
+    ) {
+    arbitrum: user_actions(
+      where: {
+        network: { _eq: "arbitrum" },
+       _not: { transaction_hash: { _in: $filterHashes } }, 
+       token_short_name: { _in: $fluidAssets }, 
+       time: { _gt: $timestamp },
+       sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
+      }, 
+      order_by: {time: desc},
+    ) {
+      sender_address
+      recipient_address
+      token_short_name
+      time
+      transaction_hash
+      amount
+    }
+  }`
 };
 
 const queryByTimestamp: Queryable = {
@@ -61,8 +87,31 @@ const queryByTimestamp: Queryable = {
         }
       }
     }
-  }
-`
+  }`,
+  arbitrum: gql`
+    query getTransactionsByAddress(
+      $network: network_blockchain!, 
+      $fluidAssets: [String!], 
+      $filterHashes: [String!] = [], 
+      $timestamp: ISO8601DateTime!
+    ) {
+    arbitrum: user_actions(
+      where: {
+        network: { _eq: "arbitrum" },
+       _not: { transaction_hash: { _in: $filterHashes } }, 
+       token_short_name: { _in: $fluidAssets }, 
+       time: { _gt: $timestamp },
+      }, 
+      order_by: {time: desc},
+    ) {
+      sender_address
+      recipient_address
+      token_short_name
+      time
+      transaction_hash
+      amount
+    }
+  }`
 };
 
 type VolumeTxsBodyByTimestamp = {

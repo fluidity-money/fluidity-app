@@ -98,7 +98,7 @@ const queryByAddress: Queryable = {
     ) {
     arbitrum: user_actions(
       where: {
-        network:{ _eq: "arbitrum" },
+        network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
        token_short_name: { _in: $tokens }, 
        sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
@@ -114,8 +114,7 @@ const queryByAddress: Queryable = {
       transaction_hash
       amount
     }
-  }
-`
+  }`
 };
 
 const queryByTxHash: Queryable = {
