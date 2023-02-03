@@ -4,15 +4,16 @@
 
 import type { Tokens } from "~/components/Images/Token/Token";
 
-import { Heading, Display, Text, Token } from "~/components";
+import { Heading, Display, Text, Token as TokenSymbol } from "~/components";
 import { numberToMonetaryString, numberToCommaSeparated } from "~/util";
 import styles from "./TokenCard.module.scss";
+import { Token } from "~/components/CollapsibleCard/CollapsibleCard";
 
-type ITokenCard = Partial<HTMLDivElement> & {
-  token: Tokens,
-  fluidAmt: number,
-  regAmt: number,
-  value: number,
+export type ITokenCard = {
+  token: Token
+  fluidAmt: number
+  regAmt: number
+  value: number
 }
 
 const TokenCard = ({
@@ -23,9 +24,9 @@ const TokenCard = ({
 }: ITokenCard) => (
   <div className={`${styles["token-card-container"]}`}>
     <div className={styles.token}>
-      <Token token={token} alt={token} className={styles.tokenImg}/>
+      <TokenSymbol token={token.symbol as Tokens} alt={token.name} className={styles.tokenImg}/>
       <Heading as="h3">
-        {token}
+        {token.symbol}
       </Heading>
     </div>
     <Text size="lg" prominent>{numberToCommaSeparated(fluidAmt)}</Text>

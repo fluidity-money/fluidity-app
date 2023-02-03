@@ -3,26 +3,33 @@
 // LICENSE.md file.
 
 import { LabelledValue, Text, LinkButton, LineChart } from "~/components";
-import { numberToMonetaryString } from "~/util";
+import { numberToMonetaryString, trimAddress } from "~/util";
 import styles from "./TokenDetails.module.scss";
 
-type ITokenDetails = Partial<HTMLDivElement> & {
-  topPrize: number,
-  avgPrize: number,
-  topAssetPrize: number,
-  rewards: Array<{
-    desc: string;
-    value: number;
-    reward: number;
-    transaction: string;
-  }>
+export type ITokenDetails = {
+  topPrize: { 
+    winning_amount: number
+    transaction_hash: string
+  }
+  avgPrize: number
+  topAssetPrize: { 
+    winning_amount: number
+    transaction_hash: string
+  }
+  activity: {
+    desc: string
+    value: number
+    reward: number
+    transaction: string
+  }[]
 }
+
 
 const TokenDetails = ({
   topPrize,
   avgPrize,
   topAssetPrize,
-  rewards,
+  activity,
 }: ITokenDetails) => (
   <div className={`${styles["token-details-container"]}`}>
     <Text size="md" className={styles["vertical-text"]}>LATEST ACTIVITY</Text>
@@ -32,7 +39,7 @@ const TokenDetails = ({
       {/* Prize */}
       <div >
         <div>
-          <Text size="xl" prominent>{numberToMonetaryString(topPrize)}</Text>
+          <Text size="xl" prominent>{numberToMonetaryString(topPrize.winning_amount)}</Text>
           <Text size={"lg"}>Your top prize</Text>
         </div>
         <div>
@@ -40,7 +47,7 @@ const TokenDetails = ({
           <Text size={"lg"}>Your avg. prize</Text>
         </div>
         <div>
-          <Text size="xl" prominent>{numberToMonetaryString(topAssetPrize)}</Text>
+          <Text size="xl" prominent>{numberToMonetaryString(topAssetPrize.winning_amount)}</Text>
           <Text size={"lg"}>Top asset prize</Text>
         </div>
       </div>
@@ -55,22 +62,22 @@ const TokenDetails = ({
             <th>Transaction</th>
           </tr>
         </thead>
-        { rewards.length && (
+        { activity.length && (
           <tbody>
-            {rewards.slice(0,3).map(({desc, value, reward, transaction}) => (
+            {activity.slice(0,3).map(({desc, value, reward, transaction}) => (
               <>
                 <tr>
                   <td>{desc}</td>
                   <td>{numberToMonetaryString(value)}</td>
                   <td>{numberToMonetaryString(reward)}</td>
-                  <td>{transaction}</td>
+                  <td>{trimAddress(transaction)}</td>
                 </tr>
                 <hr />
               </>
             ))}
           </tbody>
         )}
-        {!rewards.length && (
+        {!activity.length && (
           <Text>No Recent Activity Found</Text>        
         )} 
       </table>
@@ -79,7 +86,7 @@ const TokenDetails = ({
     {/* Reward Graph */}
     <div style={{height: "100%"}}>
       <LineChart 
-        datum={rewards.map((r,i) => ({...r, i:i}))}
+        datum={activity.map((r,i) => ({...r, i:i}))}
         xLabel={""}
         yLabel={""}
         lineLabel={""}
