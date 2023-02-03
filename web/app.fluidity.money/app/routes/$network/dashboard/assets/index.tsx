@@ -1,26 +1,22 @@
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { Suspense, useContext, useEffect, useState } from "react"
-import { CollapsibleCard } from "@fluidity-money/surfing"
-import { useFetcher, useLoaderData, useParams } from "@remix-run/react"
-import { getTokenFromSymbol, getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
+import { Suspense, useContext, useEffect, useMemo, useState } from "react"
+import { CollapsibleCard, TokenCard, TokenDetails } from "@fluidity-money/surfing"
+import { useLoaderData, useParams } from "@remix-run/react"
+import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
-import useSWR from "swr";
 import { useCache } from "~/hooks/useCache";
-import { RemixErrorBoundary } from "@remix-run/react/dist/errorBoundaries";
 import { ErrorBoundary as SentryErrorBoundary } from "@sentry/react";
-import { useRouteError } from "react-router-dom";
 import BN from "bn.js";
+import { ITokenStatistics } from "../../query/dashboard/assets";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
   const { tokens } =
     serverConfig.config[network as unknown as string] ?? {};
 
-  const fluidTokens = tokens.filter((token) => token.isFluidOf !== undefined);
-
   return {
-    tokens: fluidTokens,
+    tokens,
   };
 };
 
@@ -63,25 +59,17 @@ const FluidAssets = () => {
   // get the tokens from the loader
   const { tokens } = useLoaderData<LoaderData>();
 
-
   return (
     <>
-      <h1>Fluid Assets</h1>
-      <pre id="json">
-        {/* <code>{connected && 'hello'}</code> */}
-        {/* <code>
-          {JSON.stringify(tokens, null, 2)}
-        </code> */}
-        <SentryErrorBoundary fallback={(err) => <TempErrorMessage error={err.error} />}>
-          <Suspense  fallback={'loading'}>
-            {
-              tokens.map((t, i) => {
-                return  <CardWrapper key={i} token={t} />
-              })
-            }
-          </Suspense>
-        </SentryErrorBoundary>
-      </pre>
+      <SentryErrorBoundary fallback={(err) => <TempErrorMessage error={err.error} />}>
+        <Suspense  fallback={'loading'}>
+          {
+            tokens.map((t, i) => {
+              return  <CardWrapper key={i} token={t} />
+            })
+          }
+        </Suspense>
+      </SentryErrorBoundary>
     </>
   );
 };
@@ -98,15 +86,19 @@ type Quantities = {
 const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const { token } = props
+  const { tokens } = useLoaderData<LoaderData>();
+
+  const regularToken = useMemo(() => tokens.find((t) => t.address === token.isFluidOf), [token, tokens])
 
   const { network } = useParams()
-  const { connected, balance, address } = useContext(FluidityFacadeContext)
-
-  const tokenAmt = balance?.(token.address)
+  const { connected, balance } = useContext(FluidityFacadeContext)
 
   const [quantities, setQuantities] = useState<Quantities>({fluidAmt: new BN(0), regAmt: new BN(0)})
 
-  const regularContract: string = token.isFluidOf as string
+  const regularContract = regularToken?.address
+
+  if (!network) return <div></div>
+  if (!regularContract) return <div></div>
 
   useEffect(() => {
     if (!connected) return
@@ -117,7 +109,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
         balance?.(regularContract)
       ])
 
-
       setQuantities({
         fluidAmt: fluidAmt || new BN(0),
         regAmt: regAmt || new BN(0)
@@ -126,27 +117,42 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   }, [connected])
 
-  // const address = "0x6221a9c005f6e47eb398fd867784cacfdcfff4e7" // Test address
+  const address = "0x6221a9c005f6e47eb398fd867784cacfdcfff4e7" // Test address
 
-  const { data } = useCache(address ? `/${network}/query/dashboard/assets?address=${address}&token=USDT` : '', true)
-  console.log('data', data)
+  const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${regularToken.symbol}` : '', true)
 
-  return<>
-    <h1>{token.symbol}</h1> 
-    Token address: {token.address}<br/>
-    Token balance: {quantities.fluidAmt?.toString()}<br/>
-    Regular address: {JSON.stringify(token.isFluidOf)}
-    Token balance: {quantities.regAmt?.toString()}<br/>
-    USD: {getUsdFromTokenAmount(quantities.fluidAmt as BN, token)}
-    USD (reg): {getUsdFromTokenAmount(quantities.regAmt as BN, token)}
-    {connected && <p>Connected</p>}
-    <pre>
-      <code>
-        {JSON.stringify(data, null, 2)}
-        {JSON.stringify(quantities, null, 2)}
-      </code>
-    </pre>
-  </>
+  if (!data) return <div></div>
+
+  const { topPrize, avgPrize, topAssetPrize, activity } = data
+
+  const decimals = new BN(10).pow(new BN(token.decimals))
+
+  return (
+    <CollapsibleCard expanded={true}>
+      <CollapsibleCard.Summary>
+        <TokenCard 
+          token={token}
+          fluidAmt={quantities.fluidAmt?.div(decimals).toNumber() || 0}
+          regAmt={quantities.regAmt?.div(decimals).toNumber() || 0}
+          value={getUsdFromTokenAmount(quantities.fluidAmt as BN, token)}
+        />
+      </CollapsibleCard.Summary>
+      <CollapsibleCard.Details>
+        <TokenDetails 
+          topPrize={{
+            winning_amount: topPrize.winning_amount / 10 ** token.decimals,
+            transaction_hash: topPrize.transaction_hash
+          }}
+          avgPrize={avgPrize / 10 ** token.decimals}
+          topAssetPrize={{
+            winning_amount: topAssetPrize.winning_amount / 10 ** token.decimals,
+            transaction_hash: topAssetPrize.transaction_hash
+          }}
+          activity={activity}
+        />
+      </CollapsibleCard.Details>
+    </CollapsibleCard>
+  )
 }
 
 export default FluidAssets;

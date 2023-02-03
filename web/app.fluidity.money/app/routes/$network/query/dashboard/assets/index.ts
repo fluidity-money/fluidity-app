@@ -1,32 +1,32 @@
+import BN from "bn.js";
 import { LoaderFunction } from "react-router-dom";
 import { useUserTransactionsByAddress } from "~/queries";
 import useAssetStatistics from "~/queries/useAssetStatistics";
-import { Token } from "~/util/chainUtils/tokens";
+import { getTokenFromSymbol, Token } from "~/util/chainUtils/tokens";
 
 export type ITokenHeader = {
-  token: Token,
-  fluidAmt: number,
-  regAmt: number,
-  // From Hasura
-  value: number,
+  token: Token
+  fluidAmt: BN
+  regAmt: BN
+  value: number
   topPrize: { 
-    winning_amount: number,
+    winning_amount: number
     transaction_hash: string
-  },
-  avgPrize: number,
+  }
+  avgPrize: number
   topAssetPrize: { 
-    winning_amount: number;
-    transaction_hash: string;
-  },
-  activity: Array<{
-    desc: string;
-    value: number;
-    reward: number;
-    transaction: string;
-  }>
+    winning_amount: number
+    transaction_hash: string
+  }
+  activity: {
+    desc: string
+    value: number
+    reward: number
+    transaction: string
+  }[]
 }
 
-type ITokenStatistics = Omit<ITokenHeader, "token" | "fluidAmt" | "regAmt" | "value">
+export type ITokenStatistics = Omit<ITokenHeader, "token" | "fluidAmt" | "regAmt" | "value">
 
 export const loader: LoaderFunction = async ({ request, params }): Promise<ITokenStatistics> => {
 
@@ -45,7 +45,7 @@ export const loader: LoaderFunction = async ({ request, params }): Promise<IToke
   ] = await Promise.all(
     [
       useAssetStatistics(network, token, address),
-      useUserTransactionsByAddress(network, [token], 1, address, [], 3).then(
+      useUserTransactionsByAddress(network, [token], 1, address, [], 12).then(
         (res) => res.data?.[network].transfers?.map((tx) => {
           const desc = tx.sender.address === address ? "Sent" : "Received"
           const value = tx.amount
@@ -60,9 +60,9 @@ export const loader: LoaderFunction = async ({ request, params }): Promise<IToke
   if (!assetStatistics.data) throw new Error("Couldn't fetch asset data.")
   if (!activity) throw new Error("Couldn't fetch activity data.")
 
-  const topPrize = assetStatistics.data.global.aggregate.max
+  const topPrize = assetStatistics.data.user.aggregate.max
   const avgPrize = assetStatistics.data.user.aggregate.avg.winning_amount
-  const topAssetPrize = assetStatistics.data.user.aggregate.max
+  const topAssetPrize = assetStatistics.data.global.aggregate.max
 
   return {
     topPrize,
