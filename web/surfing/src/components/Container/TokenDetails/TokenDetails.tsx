@@ -62,7 +62,7 @@ const TokenDetails = ({
               <th><Text size='xs' bold >Transaction</Text></th>
             </tr>
           </thead>
-          { activity.length && (
+          { !!activity.length && (
             <tbody>
               {activity.slice(0,3).map(({desc, value, reward, transaction}) => (
                 <tr>
@@ -75,7 +75,7 @@ const TokenDetails = ({
             </tbody>
           )}
           {!activity.length && (
-            <Text>No Recent Activity Found</Text>        
+            <Text>No recent activity found.</Text>        
           )} 
         </table>
       </div>

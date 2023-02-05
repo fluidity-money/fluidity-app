@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 import { Text, Display, Heading, ManualCarousel, TabButton } from "@fluidity-money/surfing"
-import { Link, Outlet, useLoaderData } from "@remix-run/react"
+import { Link, Outlet, useLoaderData, useLocation, useParams } from "@remix-run/react"
 import ProviderCard, { Provider } from "~/components/ProviderCard"
 import { useCache } from "~/hooks/useCache"
 import { Rewarders } from "~/util/rewardAggregates"
@@ -15,30 +15,14 @@ export const links = () => {
   ];
 };
 
-export const loader: LoaderFunction = ( {request, params} ) => {
-  const url = new URL(request.url);
-  const urlPaths = url.pathname.split("/");
-  const pathname = urlPaths.pop() ?? "";
-  const showFluidToken = pathname === "assets";
-
-  const { network } = params ?? "";
-
-  
-  return json({
-    showFluidToken,
-    network,
-  })
-}
-
-type LoaderData = {
-  showFluidToken: boolean,
-  network: string,
-}
-
 const AssetsRoot = () => {
-    const { network, showFluidToken } = useLoaderData<LoaderData>();
-
+    const { network } = useParams()
+    
     const urlRoot = `/${network}/dashboard/assets`;
+
+    const currentPage = useLocation().pathname;
+
+    const isFluidAssets = currentPage === urlRoot;
 
     const {
       data: rewarders,
@@ -61,21 +45,21 @@ const AssetsRoot = () => {
 
     return (
       <div className="pad-main">
-        <div>
-          <>
+        <div className="assets-header">
+          <div className="assets-balance">
               <Text>
-                  Total Balance
+                  Total balance
               </Text>
               <Display size="sm">
                   $0.00
               </Display>
-          </>
-          <>
+          </div>
+          <div className="assets-navigation">
             <Link to={urlRoot}>
               <Text
                 size="lg"
-                prominent={showFluidToken}
-                className={showFluidToken ? "active-filter" : ""}
+                prominent={isFluidAssets}
+                className={isFluidAssets ? "active-filter" : ""}
               >
                   Fluid Assets
               </Text>
@@ -83,13 +67,13 @@ const AssetsRoot = () => {
             <Link to={`${urlRoot}/regular`}>
               <Text
                 size="lg"
-                prominent={!showFluidToken}
-                className={!showFluidToken ? "active-filter" : ""}
+                prominent={!isFluidAssets}
+                className={!isFluidAssets ? "active-filter" : ""}
               >
                   Regular Assets
               </Text>
             </Link>
-          </>
+          </div>
         </div>
         <Outlet />
         <section id="rewarders">

@@ -91,7 +91,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const regularToken = useMemo(() => tokens.find((t) => t.address === token.isFluidOf), [token, tokens])
 
   const { network } = useParams()
-  const { connected, balance } = useContext(FluidityFacadeContext)
+  const { connected, balance, address } = useContext(FluidityFacadeContext)
 
   const [quantities, setQuantities] = useState<Quantities>({fluidAmt: new BN(0), regAmt: new BN(0)})
 
@@ -117,7 +117,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   }, [connected])
 
-  const address = "0x6221a9c005f6e47eb398fd867784cacfdcfff4e7" // Test address
+  // const address = "0x6221a9c005f6e47eb398fd867784cacfdcfff4e7" // Test address
 
   const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${regularToken.symbol}` : '', true)
 
