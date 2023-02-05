@@ -1,11 +1,21 @@
 @use "common" as *;
 
-.collapsible-card {
+.CollapsibleCard {
   width: 100%;
-}
 
-.collapsible-card-header {
-  display: grid;
-  grid-template-columns: 8fr 1fr;
-  justify-content: center;
+  .Summary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    cursor: pointer;
+
+    .content {
+      flex-grow: 1;
+    }
+
+    svg {
+      margin-right: 4em;
+      margin-left: 2em;
+    }
+  }
 }

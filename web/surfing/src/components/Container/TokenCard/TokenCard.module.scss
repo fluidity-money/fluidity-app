@@ -1,23 +1,33 @@
 @use 'common' as *;
 
-.token-card-container {
-  padding: 14px 28px;
-  display: inline-grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: auto auto auto 1fr auto;
-  gap: 10%;
-  align-items: center;
-  justify-content: left;
-}
+.TokenCard {
+  img {
+    width: 64px;
+    position: absolute;
+    left: 32px;
+    top: 2em;
+  }
 
-.token {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 28px;
-}
+  span:first-child {
+    justify-self: start;
+  }
 
-.tokenImg {
-  height: auto;
-  width: 64px;
+  h4 {
+    justify-self: start;
+  }
+
+  h1, h4 {
+    margin: 0;
+  }
+
+  column-gap: 4em;
+
+  position: relative;
+  padding: 2em;
+  padding-left: 128px;
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  justify-items: end;
 }

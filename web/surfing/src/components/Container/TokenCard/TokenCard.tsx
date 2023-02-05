@@ -14,6 +14,7 @@ export type ITokenCard = {
   fluidAmt: number
   regAmt: number
   value: number
+  showLabels?: boolean
 }
 
 const TokenCard = ({
@@ -21,18 +22,28 @@ const TokenCard = ({
   fluidAmt,
   regAmt,
   value,
+  showLabels = false
 }: ITokenCard) => (
-  <div className={`${styles["token-card-container"]}`}>
-    <div className={styles.token}>
+  <div className={`${styles.TokenCard}`}>
+
+    {showLabels && (
+      <>
+        <Text size="sm">ASSET</Text>
+        <Text size="sm">FLUID</Text>
+        <Text size="sm">REGULAR</Text>
+        <Text size="sm">VALUE</Text>
+        <Text size="sm">TOTAL</Text>
+      </>
+    )}
       <TokenSymbol token={token.symbol as Tokens} alt={token.name} className={styles.tokenImg}/>
-      <Heading as="h3">
+
+      <Heading as="h4">
         {token.symbol}
       </Heading>
-    </div>
-    <Text size="lg" prominent>{numberToCommaSeparated(fluidAmt)}</Text>
-    <Text size="lg">{numberToCommaSeparated(regAmt)}</Text>
-    <Text size="lg">{numberToMonetaryString(value)}</Text>
-    <Display size="sm">{numberToMonetaryString(fluidAmt + regAmt)}</Display>
+    <Text className={styles.stat} size="md" prominent>{numberToCommaSeparated(fluidAmt)}</Text>
+    <Text className={styles.stat} size="md">{numberToCommaSeparated(regAmt)}</Text>
+    <Text className={styles.stat} size="md">{numberToMonetaryString(value)}</Text>
+    <Display size="xs">{numberToMonetaryString(fluidAmt + regAmt)}</Display>
   </div>
 );
 

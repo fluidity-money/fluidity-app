@@ -1,24 +1,95 @@
 @use 'common' as *;
 
-.token-details-container {
-  padding-left: 5px;
-  padding-bottom: 45px;
-  display: inline-grid;
-  grid-template-rows: 1fr;
-  grid-template-columns: 2em 1fr 1fr;
-  align-items: bottom;
-  justify-content: right;
-  gap: 5px;
-}
-
-.vertical-text {
+.TokenDetails {
+  padding: 2em;
+  padding-top: 0;
+  padding-left: 128px;
   display: flex;
-  align-items: end;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-}
+  flex-direction: row;
+  justify-content: left;
+  position: relative;
 
-.tokenImg {
-  height: auto;
-  width: 64px;
+  a {
+    color: $textGrey;
+    text-decoration: none;
+    border-bottom: 1px solid $textGrey;
+    padding-bottom: 1px;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+
+    .prizes {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 1em;
+  
+      .prize {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        white-space: nowrap;
+        margin-right: 2em;
+
+        &:last-child {
+          margin-right: 0;
+          padding-left: 2em;
+          border-left: 1px solid $backgroundGrey;
+        }
+      }
+    }
+
+    .activity {
+      position: relative;
+      margin-bottom: 1.5em;
+
+      .vertical-text {
+        display: flex;
+        font-family: 'Whyte Inktrap', serif;
+        color: $backgroundGrey;
+        align-items: end;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        position: absolute;
+        bottom: 0;
+        left: calc(-0.5em - 64px);
+      }
+
+      table {
+        width: 100%;
+        border: none;
+        border-collapse: inherit;
+        border-spacing: 0;
+        border-color: inherit;
+        margin: 0;
+  
+        thead {
+          text-transform: uppercase;
+          text-align: left;
+          th {
+            border-bottom: 1px solid $backgroundGrey;
+            padding: 0.5em 0;
+          }
+  
+        }
+      
+        tbody {
+          tr {
+            // margin-bottom: 1em;
+            td {
+              padding: 0.5em 0;
+              border: none;
+              border-bottom: 1px solid $backgroundGrey;
+              padding-right: 5em;
+            }
+          }
+        }
+      }
+    }
+  }
+    
+
+  .graph {
+  }
 }

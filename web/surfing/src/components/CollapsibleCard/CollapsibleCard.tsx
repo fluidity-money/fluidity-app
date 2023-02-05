@@ -56,12 +56,13 @@ interface IDetails {
 interface ICollapsibleCard {
   children: (ReactElement<ISummary> | ReactElement<IDetails>)[]
   expanded: boolean
+  type?: 'gray' | 'box' | 'holobox' | 'transparent'
 }
 
 const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive }) => {
   return (
-    <div className={styles["collapsible-card-summary"]} onClick={onClick}>
-      {children}
+    <div className={styles.Summary} onClick={onClick}>
+      <div className={styles.content}>{children}</div>
       {canExpand && <ArrowUp fill={"white"} style={{transform: `rotate(${isActive ? "180deg" : "0"})`}}/>}
     </div>
   )
@@ -69,7 +70,7 @@ const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive })
 
 const Details: React.FC<IDetails> = ({ children }) => {
   return (
-    <div className={styles["collapsible-card-details"]}>
+    <div className={styles.Details}>
       {children}
     </div>
   )
@@ -78,19 +79,17 @@ const Details: React.FC<IDetails> = ({ children }) => {
 const CollapsibleCard: React.FC<ICollapsibleCard> = ({
   children,
   expanded = false,
+  type = 'gray',
 }: ICollapsibleCard) => {
 
   const [isOpen, setIsOpen] = useState(expanded)
-
-  // If children is ReactElement<ISummary> then there is just a header
-  // in which case the card should never expand
 
   const isHeaderOnly = children.length === 1 && children[0].type === Summary
   const summary = children.find((child) => child.type === Summary)
 
   if (isHeaderOnly) {
     return (
-      <Card component="div" rounded={true} type={"gray"} className={styles["collapsible-card"]} >
+      <Card component="div" rounded={true} type={"gray"} className={styles.CollapsibleCard} >
         <Summary>
           {summary?.props.children}
         </Summary>
@@ -101,8 +100,8 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
   const details = children.find((child) => child.type === Details)
 
   return (
-    <Card component="div" rounded={true} type={"gray"} className={styles["collapsible-card"]} >
-      <Summary>
+    <Card component="div" rounded={true} type={type} className={styles.CollapsibleCard} >
+      <Summary canExpand onClick={() => {setIsOpen(prev => !prev)}} isActive={isOpen}>
         {summary?.props.children}
       </Summary>
       <>

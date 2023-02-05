@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { LabelledValue, Text, LinkButton, LineChart } from "~/components";
+import { LabelledValue, Text, LinkButton, LineChart, DataTable } from "~/components";
 import { numberToMonetaryString, trimAddress } from "~/util";
 import styles from "./TokenDetails.module.scss";
 
@@ -31,75 +31,78 @@ const TokenDetails = ({
   topAssetPrize,
   activity,
 }: ITokenDetails) => (
-  <div className={`${styles["token-details-container"]}`}>
-    <Text size="md" className={styles["vertical-text"]}>LATEST ACTIVITY</Text>
-
+  <div className={styles.TokenDetails}>
     {/* Prize & Activity */}
-    <div >
+    <div className={styles.details}>
       {/* Prize */}
-      <div >
-        <div>
-          <Text size="xl" prominent>{numberToMonetaryString(topPrize.winning_amount)}</Text>
-          <Text size={"lg"}>Your top prize</Text>
+      <div className={styles.prizes}>
+        <div className={styles.prize}>
+          <Text size="lg" prominent>{numberToMonetaryString(topPrize.winning_amount)}</Text>
+          <Text >Your top prize</Text>
         </div>
-        <div>
-          <Text size="xl" prominent>{numberToMonetaryString(avgPrize)}</Text>
-          <Text size={"lg"}>Your avg. prize</Text>
+        <div className={styles.prize}>
+          <Text size="lg" prominent>{numberToMonetaryString(avgPrize)}</Text>
+          <Text>Your avg. prize</Text>
         </div>
-        <div>
-          <Text size="xl" prominent>{numberToMonetaryString(topAssetPrize.winning_amount)}</Text>
-          <Text size={"lg"}>Top asset prize</Text>
+        <div className={styles.prize}>
+          <Text size="lg" prominent>{numberToMonetaryString(topAssetPrize.winning_amount)}</Text>
+          <Text >Top asset prize</Text>
         </div>
       </div>
 
       {/* Activity */}
-      <table >
-        <thead>
-          <tr>
-            <th>Activity</th>
-            <th>Value</th>
-            <th>Reward</th>
-            <th>Transaction</th>
-          </tr>
-        </thead>
-        { activity.length && (
-          <tbody>
-            {activity.slice(0,3).map(({desc, value, reward, transaction}) => (
-              <>
+      <div className={styles.activity}>
+        <Text size="sm" className={styles["vertical-text"]}>LATEST ACTIVITY</Text>
+        <table >
+          <thead>
+            <tr>
+              <th><Text size='xs' bold >Activity</Text></th>
+              <th><Text size='xs' bold >Value</Text></th>
+              <th><Text size='xs' bold >Reward</Text></th>
+              <th><Text size='xs' bold >Transaction</Text></th>
+            </tr>
+          </thead>
+          { activity.length && (
+            <tbody>
+              {activity.slice(0,3).map(({desc, value, reward, transaction}) => (
                 <tr>
-                  <td>{desc}</td>
-                  <td>{numberToMonetaryString(value)}</td>
-                  <td>{numberToMonetaryString(reward)}</td>
-                  <td>{trimAddress(transaction)}</td>
+                  <td><Text>{desc}</Text></td>
+                  <td><Text>{numberToMonetaryString(value)}</Text></td>
+                  <td><Text prominent>{numberToMonetaryString(reward)}</Text></td>
+                  <td><Text><a href={'#'}>{trimAddress(transaction)}</a></Text></td>
                 </tr>
-                <hr />
-              </>
-            ))}
-          </tbody>
-        )}
-        {!activity.length && (
-          <Text>No Recent Activity Found</Text>        
-        )} 
-      </table>
-    </div>
+              ))}
+            </tbody>
+          )}
+          {!activity.length && (
+            <Text>No Recent Activity Found</Text>        
+          )} 
+        </table>
+      </div>
 
-    {/* Reward Graph */}
-    <div style={{height: "100%"}}>
+      <LinkButton type="internal" size="small" handleClick={() => 1} >Full History</LinkButton>
+    </div>
+    <div className={styles.graph}>
       <LineChart 
-        datum={activity.map((r,i) => ({...r, i:i}))}
+        datum={activity.map((a, i) => {
+          return {
+            x: i,
+            y: a.reward,
+          }
+        })}
         xLabel={""}
         yLabel={""}
         lineLabel={""}
         accessors={{
-          xAccessor: ({i}: any) => i,
-          yAccessor: ({reward}: any) => reward,
+          xAccessor: ({x}: any) => x.x,
+          yAccessor: ({x}: any) => x.y,
         }}
         tooltip={() => (<></>)}
-        />
+      />
     </div>
-
-    <LinkButton type="internal" size="medium" handleClick={() => 1} >Full History</LinkButton>
   </div>
 );
+
+// export const getWalletValueAtTransaction = ()
 
 export default TokenDetails;

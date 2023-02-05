@@ -62,10 +62,10 @@ const FluidAssets = () => {
   return (
     <>
       <SentryErrorBoundary fallback={(err) => <TempErrorMessage error={err.error} />}>
-        <Suspense  fallback={'loading'}>
+        <Suspense fallback={'loading'}>
           {
             tokens.map((t, i) => {
-              return  <CardWrapper key={i} token={t} />
+              return <CardWrapper key={i} token={t}/>
             })
           }
         </Suspense>
@@ -128,9 +128,11 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const decimals = new BN(10).pow(new BN(token.decimals))
 
   return (
+    <div style={{marginBottom: '1em'}}>
     <CollapsibleCard expanded={true}>
       <CollapsibleCard.Summary>
         <TokenCard 
+          showLabels
           token={token}
           fluidAmt={quantities.fluidAmt?.div(decimals).toNumber() || 0}
           regAmt={quantities.regAmt?.div(decimals).toNumber() || 0}
@@ -152,6 +154,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
         />
       </CollapsibleCard.Details>
     </CollapsibleCard>
+    </div>
   )
 }
 
