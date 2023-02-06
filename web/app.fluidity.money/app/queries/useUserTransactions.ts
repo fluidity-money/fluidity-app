@@ -370,6 +370,19 @@ export type UserTransaction = {
   currency: { symbol: string };
 };
 
+export type HasuraUserTransaction = {
+  sender_address: string,
+  recipient_address: string,
+  amount: number,
+  token_short_name: string,
+  transaction_hash: string,
+  time: number
+};
+
+export type HasuraUserTransactionRes = {
+  data: { transfers: HasuraUserTransaction[] }
+};
+
 
 const useUserTransactionsByAddress = async (
   network: string,
@@ -406,7 +419,15 @@ const useUserTransactionsByAddress = async (
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    result.data[network].transfers = (result as any).data.transfers;
+    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
+    result.data[network].transfers = hasuraTransfers.map(transfer => ({
+      sender: { address: transfer.sender_address },
+      receiver: { address: transfer.recipient_address },
+      amount: transfer.amount,
+      currency: { symbol: transfer.token_short_name },
+      transaction: { hash: transfer.transaction_hash },
+      block: { timestamp: { unixtime: transfer.time } }
+    }))
   }
 
   return result; 
