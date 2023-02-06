@@ -141,7 +141,7 @@ contract Operator {
      *
      * @return an array of utility vars
      */
-    function getUtilityVars(address token, string[] memory names) public returns (ScannedUtilityVar[] memory) {
+    function getUtilityVars(address token, string[] memory names) public returns (ScannedUtilityVars[] memory) {
         ScannedUtilityVars[] memory vars = new ScannedUtilityVars[](names.length);
         for (uint i = 0; i < names.length; i++) {
             string memory name = names[i];
@@ -184,7 +184,7 @@ contract Operator {
     function reward(address token, FluidityReward[] calldata rewards, uint firstBlock, uint lastBlock) public {
         require(noGlobalEmergency(), "emergency mode!");
 
-        require(msg.sender == operator_, "only the operator can use this");
+        require(msg.sender == oracles_[token], "only the token's oracle can use this");
 
         for (uint i = 0; i < rewards.length; i++) {
             FluidityReward memory fluidReward = rewards[i];

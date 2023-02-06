@@ -35,8 +35,9 @@ before(async function() {
     "no v2 tokens here",
     AAVE_V3_GOERLI_POOL_PROVIDER_ADDR,
     signers.token.emergencyCouncil,
-    commonContracts.operator,
     signers.token.externalOperator,
+    commonBindings.operator.externalOperator,
+    signers.token.externalOracle,
   );
 
   contracts = {

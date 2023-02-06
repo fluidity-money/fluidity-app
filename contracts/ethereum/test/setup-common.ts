@@ -47,6 +47,7 @@ before(async function () {
   const [
     account1Signer,
     account2Signer,
+    externalOracleSigner,
     tokenCouncilSigner,
     tokenOperatorSigner,
     operatorCouncilSigner,
@@ -68,6 +69,7 @@ before(async function () {
     token: {
       emergencyCouncil: tokenCouncilSigner,
       externalOperator: tokenOperatorSigner,
+      externalOracle: externalOracleSigner,
     },
     operator: {
       emergencyCouncil: operatorCouncilSigner,

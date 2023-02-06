@@ -5,21 +5,22 @@ import { bindings } from "./setup-mainnet";
 import { signers } from "./setup-common";
 
 describe("token aave integration", async function () {
-  const {
-    fei: {
-      base: feiAccount,
-      fluid: fFeiAccount,
-    }
-  } = bindings;
-
-  const {
-    userAccount1: accountAddr,
-  } = signers;
+  let feiAccount: ethers.Contract;
+  let fFeiAccount: ethers.Contract;
+  let accountAddr: string;
 
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();
     }
+
+    ({
+      fei: {
+        base: feiAccount,
+        fluid: fFeiAccount,
+      }
+    } = bindings);
+    accountAddr = await signers.userAccount1.getAddress();
   });
 
   it("should allow depositing erc20 tokens", async function () {

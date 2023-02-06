@@ -1,17 +1,29 @@
 import * as hre from 'hardhat';
 import * as ethers from 'ethers';
-import { fUsdtOperator, fDaiAccount, fFeiAccount, rewardPoolsOperator, fUsdtAccount } from './setup-mainnet';
 import { assert } from 'chai';
+import { bindings } from './setup-mainnet';
 
 describe("reward pools", async function () {
+  let fUsdt: ethers.Contract;
+  let fDai: ethers.Contract;
+  let fFei: ethers.Contract;
+  let rewardPoolsOperator: ethers.Contract;
+
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();
     }
+
+    ({
+      usdt: { fluidAccount1: fUsdt },
+      dai: { fluid: fDai },
+      fei: { fluid: fFei },
+      rewardPools: { operator: rewardPoolsOperator },
+    } = bindings);
   });
 
   it("consistent reward pools", async function () {
-    const manualAmount_ = [ fUsdtOperator, fDaiAccount, fFeiAccount ]
+    const manualAmount_ = [ fUsdt, fDai, fFei ]
       .map(v => Promise.all([v.callStatic.rewardPoolAmount(), v.decimals()]) as Promise<[number, number]>);
 
     let manualAmounts = await Promise.all(manualAmount_);

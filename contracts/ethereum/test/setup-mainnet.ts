@@ -64,8 +64,9 @@ before(async function () {
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
     signers.token.emergencyCouncil,
-    commonContracts.operator,
     signers.token.externalOperator,
+    commonBindings.operator.externalOperator,
+    signers.token.externalOracle,
   );
 
   const tokenOracleAddress = await signers.token.externalOracle.getAddress();
@@ -83,9 +84,9 @@ before(async function () {
 
   contracts = {
     ...commonContracts,
-    usdt: tokens["usdt"],
-    fei: tokens["fei"],
-    dai: tokens["dai"],
+    usdt: tokens["fUSDt"],
+    fei: tokens["fFei"],
+    dai: tokens["fDAI"],
     rewardPools,
   };
   bindings = {

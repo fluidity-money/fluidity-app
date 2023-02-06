@@ -96,24 +96,20 @@ export const deployGovToken = async (
 
 export const deployTestUtility = async (
   hre: HardhatRuntimeEnvironment,
-  operator: ethers.Contract,
-  externalOperator: string,
+  boundOperatorOperator: ethers.Contract,
   token: string,
 ) => {
   const factory = await hre.ethers.getContractFactory("TestClient");
-  const client = await factory.deploy(operator.address);
+  const client = await factory.deploy(boundOperatorOperator.address);
   await client.deployed();
 
-  await addUtilityClient(
-    hre,
-    operator.address,
-    externalOperator,
-    [{
-      name: "test",
-      overwrite: false,
-      token,
-    }],
-  );
+  await boundOperatorOperator.updateUtilityClients([{
+    name: "test",
+    overwrite: false,
+    token,
+    client,
+  }]);
+
   return client;
 };
 
@@ -130,8 +126,9 @@ export const deployTokens = async (
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
   council: ethers.Signer,
-  operator: ethers.Contract,
   externalOperator: ethers.Signer,
+  boundOperatorOperator: ethers.Contract,
+  externalOracle: ethers.Signer,
 ): Promise<{
   tokenBeacon: ethers.Contract,
   aaveV2Beacon: ethers.Contract,
@@ -205,22 +202,22 @@ export const deployTokens = async (
       token.decimals,
       token.name,
       token.symbol,
-      councilAddress,
-      externalOperator,
-      operator,
+      await council.getAddress(),
+      await externalOperator.getAddress(),
+      boundOperatorOperator.address,
     );
 
-    await addUtilityClient(
-      hre,
-      operator,
-      externalOperator,
-      [{
-        name: "FLUID",
-        overwrite: false,
-        token: deployedToken.address,
-        client: deployedToken.address,
-      }],
-    );
+    await boundOperatorOperator.updateUtilityClients([{
+      name: "FLUID",
+      overwrite: false,
+      token: deployedToken.address,
+      client: deployedToken.address,
+    }]);
+
+    await boundOperatorOperator.updateOracles([{
+      contractAddr: deployedToken.address,
+      newOracle: externalOracle.getAddress(),
+    }]);
 
     tokenAddresses[token.symbol] = {deployedToken, deployedPool};
 
@@ -329,34 +326,5 @@ export type FluidityClientChange = {
   client: string,
 };
 
-export const addUtilityClient = async(
-  hre: HardhatRuntimeEnvironment,
-  operator: string,
-  externalOperator: string,
-  changes: FluidityClientChange[]
-) => {
-  await hre.network.provider.request({
-    method: "hardhat_impersonateAccount",
-    params: [externalOperator],
-  });
-
-  let impersonatedOperator = await hre.ethers.getContractAt(
-    "Operator",
-    operator,
-    await hre.ethers.getSigner(externalOperator),
-  );
-
-  console.log(`op: ${await impersonatedOperator.operator_()}`);
-  console.log(`calling from: ${await impersonatedOperator.signer.getAddress()}`);
-
-  console.log(`setting util client ${JSON.stringify(changes)}`);
-  await impersonatedOperator.updateUtilityClients(changes);
-  console.log("done");
-
-  await hre.network.provider.request({
-    method: "hardhat_stopImpersonatingAccount",
-    params: [externalOperator],
-  });
-}
 // statically ensure an object can't exist (ie, all enum varients are handled)
 function assertNever(_: never): never { throw new Error(`assertNever called: ${arguments}`); }
