@@ -54,14 +54,14 @@ interface IDetails {
 }
 
 interface ICollapsibleCard {
-  children: (ReactElement<ISummary> | ReactElement<IDetails>)[]
+  children: ReactElement<ISummary> | (ReactElement<ISummary> | ReactElement<IDetails>)[]
   expanded: boolean
   type?: 'gray' | 'box' | 'holobox' | 'transparent'
 }
 
 const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive }) => {
   return (
-    <div className={styles.Summary} onClick={onClick}>
+    <div className={`${styles.Summary} ${canExpand ? styles.pointer : ''}`} onClick={onClick}>
       <div className={styles.content}>{children}</div>
       {canExpand && <ArrowUp fill={"white"} style={{transform: `rotate(${isActive ? "180deg" : "0"})`}}/>}
     </div>
@@ -84,30 +84,32 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
 
   const [isOpen, setIsOpen] = useState(expanded)
 
-  const isHeaderOnly = children.length === 1 && children[0].type === Summary
-  const summary = children.find((child) => child.type === Summary)
+  const isHeaderOnly = typeof(children) === 'object' && !Array.isArray(children) && children.type === Summary
+
+  const summary: ReactElement<ISummary> = isHeaderOnly ? children : ((children as ReactElement[]).find((child) => child.type === Summary) as ReactElement<ISummary>)
+  const details: ReactElement<IDetails> | null = isHeaderOnly ? null : ((children as ReactElement[]).find((child) => child.type === Details) as ReactElement<IDetails>)
 
   if (isHeaderOnly) {
     return (
-      <Card component="div" rounded={true} type={"gray"} className={styles.CollapsibleCard} >
+      <Card component="div" rounded={true} type={type} className={styles.CollapsibleCard} >
         <Summary>
-          {summary?.props.children}
+          {summary.props.children}
         </Summary>
       </Card>
     )
   }
 
-  const details = children.find((child) => child.type === Details)
+  if (!details) return null
 
   return (
     <Card component="div" rounded={true} type={type} className={styles.CollapsibleCard} >
       <Summary canExpand onClick={() => {setIsOpen(prev => !prev)}} isActive={isOpen}>
-        {summary?.props.children}
+        {summary.props.children}
       </Summary>
       <>
         {isOpen && (
           <Details>
-            {details?.props.children}
+            {details.props.children}
           </Details>
         )}
       </>

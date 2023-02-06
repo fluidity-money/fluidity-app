@@ -2,7 +2,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { Suspense, useContext, useEffect, useMemo, useState } from "react"
 import { CollapsibleCard, TokenCard, TokenDetails } from "@fluidity-money/surfing"
 import { useLoaderData, useParams } from "@remix-run/react"
-import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
+import { Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useCache } from "~/hooks/useCache";
@@ -88,16 +88,13 @@ const getAugmentedWalletActivity = (activity: Activity[], walletValue: number): 
 const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const { token } = props
-  const { tokens } = useLoaderData<LoaderData>();
-
-  const regularToken = useMemo(() => tokens.find((t) => t.address === token.isFluidOf), [token, tokens])
 
   const { network } = useParams()
   const { connected, balance } = useContext(FluidityFacadeContext)
 
   const [quantities, setQuantities] = useState<Quantities>({fluidAmt: new BN(0), regAmt: new BN(0)})
 
-  const regularContract = regularToken?.address
+  const regularContract = token.isFluidOf
 
   if (!network) return <div></div>
   if (!regularContract) return <div></div>
@@ -121,7 +118,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const address = "0xb0d6DAD7D483DA4F4B069499fC56AD05E35d2b8a" // Test address
 
-  const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${regularToken.symbol}` : '', true)
+  const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}` : '', true)
 
   if (!data) return <div></div>
 
@@ -157,9 +154,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
           />
         </CollapsibleCard.Details>
       </CollapsibleCard>
-      <pre>
-        {JSON.stringify(augmentedActivity, null, 2)}
-      </pre>
     </div>
   )
 }

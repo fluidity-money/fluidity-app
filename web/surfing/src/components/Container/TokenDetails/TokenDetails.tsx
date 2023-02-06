@@ -62,26 +62,33 @@ const TokenDetails = ({
           <thead>
             <tr>
               <th><Text size='xs' bold >Activity</Text></th>
-              <th><Text size='xs' bold >Value</Text></th>
-              <th><Text size='xs' bold >Reward</Text></th>
-              <th><Text size='xs' bold >Transaction</Text></th>
+              {
+                !!activity.length && (
+                  <>
+                    <th><Text size='xs' bold >Value</Text></th>
+                    <th><Text size='xs' bold >Reward</Text></th>
+                    <th><Text size='xs' bold >Transaction</Text></th>
+                  </>
+                )
+              }
             </tr>
           </thead>
-          { !!activity.length && (
-            <tbody>
-              {activity.slice(0,3).map(({desc, value, reward, transaction}) => (
+          <tbody>
+          { activity.length ? (
+              activity.slice(0,3).map(({desc, value, reward, transaction}) => (
                 <tr>
                   <td><Text>{desc}</Text></td>
                   <td><Text>{numberToMonetaryString(value)}</Text></td>
                   <td><Text prominent>{numberToMonetaryString(reward)}</Text></td>
                   <td><Text><a href={getTxExplorerLink('ethereum', transaction)}>{trimAddress(transaction)}</a></Text></td>
                 </tr>
-              ))}
-            </tbody>
-          )}
-          {!activity.length && (
-            <Text>No recent activity found.</Text>        
+              ))
+          ) : (
+              <tr>
+                <td><Text>No recent activity found.</Text>        </td>
+              </tr>
           )} 
+          </tbody>
         </table>
       </div>
 
