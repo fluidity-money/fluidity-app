@@ -13,12 +13,12 @@ SERVICES:
       CPU_LIMIT: 512
       MEM_LIMIT: 1024
       SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
-      ENV_GA_WEBSITE_ANALYTICS_ID: G-EF68MNJRJ7
-      
+      ENV_GA_WEBSITE_ANALYTICS_ID: GTM-W7QJGR2
+
       DOCKER_ARGS:
         SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
-  
+
   - BACKEND:
       SERVICE_NAME: fluidity-money-backend
       DOCKER_IMAGE: fluidity.money-backend
