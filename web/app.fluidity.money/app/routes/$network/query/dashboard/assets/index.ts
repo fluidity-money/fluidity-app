@@ -23,6 +23,7 @@ export type ITokenHeader = {
     value: number
     reward: number
     transaction: string
+    time: number
   }[]
 }
 
@@ -51,7 +52,8 @@ export const loader: LoaderFunction = async ({ request, params }): Promise<IToke
           const value = tx.amount
           const reward = 1000
           const transaction = tx.transaction.hash
-          return { desc, value, reward, transaction }
+          const time = tx.block.timestamp.unixtime 
+          return { desc, value, reward, transaction, time }
         })
       )
     ]

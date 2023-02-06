@@ -6,7 +6,6 @@ import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useCache } from "~/hooks/useCache";
-import { ErrorBoundary as SentryErrorBoundary } from "@sentry/react";
 import BN from "bn.js";
 import { ITokenStatistics } from "../../query/dashboard/assets";
 
@@ -24,26 +23,7 @@ type LoaderData = {
   tokens: Token[]
 }
 
-interface ITempErrorMessage {
-  error: Error
-}
-
-const TempErrorMessage: React.FC<ITempErrorMessage> = (props: ITempErrorMessage) => {
-  const { error } = props
-  return (
-    <div>
-      <h1>Error</h1>
-      <p>{error.message}</p>
-      <pre>{JSON.stringify(error)}</pre>
-      <p>The stack trace is:</p>
-      <pre>{error.stack}</pre>
-    </div>
-  );
-}
-
-type e = {error: Error}
-
-export const ErrorBoundary: React.FC<e> = (props: e) => {
+export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) => {
   return (
     <div>
       <h1>Error</h1>
@@ -55,24 +35,20 @@ export const ErrorBoundary: React.FC<e> = (props: e) => {
 }
 
 const FluidAssets = () => {
-
-  // get the tokens from the loader
-  const { tokens } = useLoaderData<LoaderData>();
+  const { tokens } = useLoaderData<LoaderData>()
 
   return (
     <>
-      <SentryErrorBoundary fallback={(err) => <TempErrorMessage error={err.error} />}>
-        <Suspense fallback={'loading'}>
-          {
-            tokens.map((t, i) => {
-              return <CardWrapper key={i} token={t}/>
-            })
-          }
-        </Suspense>
-      </SentryErrorBoundary>
+      <Suspense fallback={'loading'}>
+        {
+          tokens.map((t, i) => {
+            return <CardWrapper key={i} token={t}/>
+          })
+        }
+      </Suspense>
     </>
-  );
-};
+  )
+}
 
 interface ICardWrapper {
   token: Token
@@ -83,6 +59,32 @@ type Quantities = {
   regAmt: BN | undefined
 }
 
+type Activity = {
+  desc: string
+  value: number
+  reward: number
+  transaction: string
+  time: number
+}
+
+type AugmentedActivity = Activity & { 
+  totalWalletValue: number 
+}
+
+const getAugmentedWalletActivity = (activity: Activity[], walletValue: number): AugmentedActivity[] => {
+  activity.sort((a, b) => a.time - b.time)
+
+  return activity.map((a, i) => {
+    const totalWalletValueDelta = activity.slice(0, i + 1).reduce((acc, curr) => {
+      return curr.desc === 'Sent' ? acc - curr.value : acc + curr.value
+    }, walletValue)
+    return {
+      ...a,
+      totalWalletValue: totalWalletValueDelta
+    }
+  })
+}
+
 const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const { token } = props
@@ -91,7 +93,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const regularToken = useMemo(() => tokens.find((t) => t.address === token.isFluidOf), [token, tokens])
 
   const { network } = useParams()
-  const { connected, balance, address } = useContext(FluidityFacadeContext)
+  const { connected, balance } = useContext(FluidityFacadeContext)
 
   const [quantities, setQuantities] = useState<Quantities>({fluidAmt: new BN(0), regAmt: new BN(0)})
 
@@ -117,43 +119,47 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   }, [connected])
 
-  // const address = "0x6221a9c005f6e47eb398fd867784cacfdcfff4e7" // Test address
+  const address = "0xb0d6DAD7D483DA4F4B069499fC56AD05E35d2b8a" // Test address
 
   const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${regularToken.symbol}` : '', true)
 
   if (!data) return <div></div>
 
   const { topPrize, avgPrize, topAssetPrize, activity } = data
-
   const decimals = new BN(10).pow(new BN(token.decimals))
+
+  const augmentedActivity = getAugmentedWalletActivity(activity, quantities.fluidAmt?.toNumber() || 0)
 
   return (
     <div style={{marginBottom: '1em'}}>
-    <CollapsibleCard expanded={true}>
-      <CollapsibleCard.Summary>
-        <TokenCard 
-          showLabels
-          token={token}
-          fluidAmt={quantities.fluidAmt?.div(decimals).toNumber() || 0}
-          regAmt={quantities.regAmt?.div(decimals).toNumber() || 0}
-          value={getUsdFromTokenAmount(quantities.fluidAmt as BN, token)}
-        />
-      </CollapsibleCard.Summary>
-      <CollapsibleCard.Details>
-        <TokenDetails 
-          topPrize={{
-            winning_amount: topPrize.winning_amount / 10 ** token.decimals,
-            transaction_hash: topPrize.transaction_hash
-          }}
-          avgPrize={avgPrize / 10 ** token.decimals}
-          topAssetPrize={{
-            winning_amount: topAssetPrize.winning_amount / 10 ** token.decimals,
-            transaction_hash: topAssetPrize.transaction_hash
-          }}
-          activity={activity}
-        />
-      </CollapsibleCard.Details>
-    </CollapsibleCard>
+      <CollapsibleCard expanded={true}>
+        <CollapsibleCard.Summary>
+          <TokenCard 
+            showLabels
+            token={token}
+            fluidAmt={quantities.fluidAmt?.div(decimals).toNumber() || 0}
+            regAmt={quantities.regAmt?.div(decimals).toNumber() || 0}
+            value={1}
+          />
+        </CollapsibleCard.Summary>
+        <CollapsibleCard.Details>
+          <TokenDetails 
+            topPrize={{
+              winning_amount: topPrize.winning_amount / 10 ** token.decimals,
+              transaction_hash: topPrize.transaction_hash
+            }}
+            avgPrize={avgPrize / 10 ** token.decimals}
+            topAssetPrize={{
+              winning_amount: topAssetPrize.winning_amount / 10 ** token.decimals,
+              transaction_hash: topAssetPrize.transaction_hash
+            }}
+            activity={augmentedActivity}
+          />
+        </CollapsibleCard.Details>
+      </CollapsibleCard>
+      <pre>
+        {JSON.stringify(augmentedActivity, null, 2)}
+      </pre>
     </div>
   )
 }

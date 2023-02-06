@@ -43,7 +43,7 @@ const TokenCard = ({
     <Text className={styles.stat} size="md" prominent>{numberToCommaSeparated(fluidAmt)}</Text>
     <Text className={styles.stat} size="md">{numberToCommaSeparated(regAmt)}</Text>
     <Text className={styles.stat} size="md">{numberToMonetaryString(value)}</Text>
-    <Display size="xs">{numberToMonetaryString(fluidAmt + regAmt)}</Display>
+    <Display size="xs">{numberToMonetaryString(fluidAmt*value)}</Display>
   </div>
 );
 

@@ -21,9 +21,14 @@ export type ITokenDetails = {
     value: number
     reward: number
     transaction: string
+    totalWalletValue: number
   }[]
 }
 
+const getTxExplorerLink = (chain: 'ethereum' | 'solana', address: string) =>
+  chain === "ethereum"
+    ? `https://etherscan.io/tx/${address}`
+    : `https://explorer.solana.com/tx/${address}`;
 
 const TokenDetails = ({
   topPrize,
@@ -69,7 +74,7 @@ const TokenDetails = ({
                   <td><Text>{desc}</Text></td>
                   <td><Text>{numberToMonetaryString(value)}</Text></td>
                   <td><Text prominent>{numberToMonetaryString(reward)}</Text></td>
-                  <td><Text><a href={'#'}>{trimAddress(transaction)}</a></Text></td>
+                  <td><Text><a href={getTxExplorerLink('ethereum', transaction)}>{trimAddress(transaction)}</a></Text></td>
                 </tr>
               ))}
             </tbody>
@@ -84,20 +89,18 @@ const TokenDetails = ({
     </div>
     <div className={styles.graph}>
       <LineChart 
-        datum={activity.map((a, i) => {
+        data={activity.map((a, i) => {
           return {
             x: i,
-            y: a.reward,
+            y: a.totalWalletValue,
           }
         })}
-        xLabel={""}
-        yLabel={""}
-        lineLabel={""}
+        lineLabel={"activity"}
         accessors={{
-          xAccessor: ({x}: any) => x.x,
-          yAccessor: ({x}: any) => x.y,
+          xAccessor: ({x}: {x: number, y: number}) => x,
+          yAccessor: ({y}: {x: number, y: number}) => y,
         }}
-        tooltip={() => (<></>)}
+        renderTooltip={() => {<></>}}
       />
     </div>
   </div>

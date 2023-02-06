@@ -9,7 +9,7 @@ export const Template = () => {
     <>
       <CollapsibleCard
         expanded
-        type="box"
+        type="gray"
       >
         <CollapsibleCard.Summary>
           <TokenCard 
@@ -24,7 +24,7 @@ export const Template = () => {
             }}
             fluidAmt={2100}
             regAmt={234}
-            value={4.97}
+            value={1.00}
           />
         </CollapsibleCard.Summary>
         <CollapsibleCard.Details>
@@ -43,18 +43,21 @@ export const Template = () => {
                 value: 420,
                 reward: 0.53,
                 transaction: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f',
+                totalWalletValue: 0,
               },
               {
                 desc: 'Received',
                 value: 220,
                 reward: 16.18,
                 transaction: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f',
+                totalWalletValue: 5,
               },
               {
                 desc: 'Sent',
                 value: 820,
                 reward: 0.00,
                 transaction: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f',
+                totalWalletValue: 15,
               }]}
             />
         </CollapsibleCard.Details>

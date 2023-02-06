@@ -19,6 +19,8 @@
   .details {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+    margin-right: 2em;
 
     .prizes {
       display: flex;
@@ -81,7 +83,6 @@
               padding: 0.5em 0;
               border: none;
               border-bottom: 1px solid $backgroundGrey;
-              padding-right: 5em;
             }
           }
         }
@@ -89,7 +90,8 @@
     }
   }
     
-
   .graph {
+    flex-basis: 30%;
+    mix-blend-mode: screen;
   }
 }
