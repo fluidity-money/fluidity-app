@@ -55,7 +55,6 @@
     * [🌊 Providing liquidity for a Fluid Asset](docs/developers/whitepaper-source-code/providing-liquidity-for-a-fluid-asset.md)
   * [📔 Whitepapers](docs/developers/whitepaper-source-code/README.md)
 * [💪 Security](docs/security/README.md)
-  * [🔮 Oracle Key Rotation](docs/security/oracle-key-rotation.md)
   * [📥 Dropboxes](docs/security/dropboxes.md)
   * [💰 Bounty program](docs/security/bounty-program.md)
   * [📜 Audits completed](docs/security/audits-completed.md)
