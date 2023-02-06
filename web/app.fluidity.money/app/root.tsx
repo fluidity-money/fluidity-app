@@ -167,6 +167,14 @@ function ErrorBoundary(err: Error) {
           alignItems: "center",
         }}
       >
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-W7QJGR2"
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+          ></iframe>
+        </noscript>
         <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
         <h1>Something went wrong!</h1>
         <br />
