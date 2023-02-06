@@ -13,17 +13,11 @@ import "./openzeppelin/Address.sol";
 
 import "./ITransferWithBeneficiary.sol";
 
+import "./IFluidClient.sol";
 import "./LiquidityProvider.sol";
-import "./WorkerConfig.sol";
-
-/// @dev parameter for the batchReward function
-struct Winner {
-    address winner;
-    uint256 amount;
-}
 
 /// @title The fluid token ERC20 contract
-contract Token is IERC20, ITransferWithBeneficiary {
+contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
     using SafeERC20 for IERC20;
     using Address for address;
 
@@ -32,14 +26,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
     uint private constant BLOCK_REWARDED = 1;
-
-    /// @notice emitted when any reward is paid out
-    event Reward(
-        address indexed winner,
-        uint amount,
-        uint startBlock,
-        uint endBlock
-    );
 
     /// @notice emitted when a reward is quarantined for being too large
     event BlockedReward(
@@ -81,10 +67,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /// @notice deprecated, mint limits no longer exist
     event UserMintLimitChanged(uint amount);
 
-    /// @notice worker config changed, either by disabling emergency
-    /// @notice mode or updateWorkerConfig
-    event WorkerConfigUpdated(address indexed newConfig);
-
     /// @notice updating the reward quarantine before manual signoff
     /// @notice by the multisig (with updateRewardQuarantineThreshold)
     event RewardQuarantineThresholdUpdated(uint amount);
@@ -111,7 +93,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
     LiquidityProvider private pool_;
 
-    WorkerConfig private workerConfig_;
+    /// @dev deprecated, worker config is now handled externally
+    address private __deprecated_7;
 
     /// @dev emergency council that can activate emergency mode
     address private emergencyCouncil_;
@@ -148,6 +131,9 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /// @notice deprecated, mint limits no longer exist
     uint __deprecated_6;
 
+    /// @dev account that can call the reward function, should be the /operator contract/
+    address oracle_;
+
     /**
      * @notice initialiser function - sets the contract's data
      * @dev we pass in the metadata explicitly instead of sourcing from the
@@ -160,7 +146,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
      * @param _symbol the fluid token's symbol
      * @param _emergencyCouncil address that can activate emergency mode
      * @param _operator address that can release quarantine payouts and activate emergency mode
-     * @param _workerConfig to use for retrieving RNG oracle address
+     * @param _oracle address that can call the reward function
      */
     function init(
         address _liquidityProvider,
@@ -169,7 +155,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
         string memory _symbol,
         address _emergencyCouncil,
         address _operator,
-        address _workerConfig
+        address _oracle
     ) public {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
@@ -177,11 +163,10 @@ contract Token is IERC20, ITransferWithBeneficiary {
         // remember the operator for signing off on oracle changes, large payouts
         operator_ = _operator;
 
+        oracle_ = _oracle;
+
         // remember the emergency council for shutting down this token
         emergencyCouncil_ = _emergencyCouncil;
-
-        // remember the worker config to look up the addresses for each rng oracle
-        workerConfig_ = WorkerConfig(_workerConfig);
 
         // remember the liquidity provider to deposit tokens into
         pool_ = LiquidityProvider(_liquidityProvider);
@@ -217,16 +202,16 @@ contract Token is IERC20, ITransferWithBeneficiary {
     }
 
     function noEmergencyMode() public view returns (bool) {
-        return noEmergencyMode_
-            && workerConfig_.noGlobalEmergency();
+        return noEmergencyMode_;
     }
 
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
+     * @dev individual oracles are now recorded in the operator, this now should return the registry contract
      */
     function oracle() public view returns (address) {
-        return workerConfig_.getWorkerAddress(address(this));
+        return oracle_;
     }
 
     /**
@@ -243,8 +228,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
         noEmergencyMode_ = false;
 
-        workerConfig_ = WorkerConfig(address(0));
-
         emit Emergency(true);
     }
 
@@ -252,22 +235,12 @@ contract Token is IERC20, ITransferWithBeneficiary {
      * @notice disables emergency mode, following presumably a contract upgrade
      * @notice (operator only)
      */
-    function disableEmergencyMode(address _workerConfig) public {
+    function disableEmergencyMode() public {
         require(msg.sender == operator_, "only the operator account can use this");
 
         noEmergencyMode_ = true;
 
-        updateWorkerConfig(_workerConfig);
-
         emit Emergency(false);
-    }
-
-    function updateWorkerConfig(address _workerConfig) public {
-        require(msg.sender == operator_, "only the operator account can use this");
-
-        workerConfig_ = WorkerConfig(_workerConfig);
-
-        emit WorkerConfigUpdated(_workerConfig);
     }
 
     /// @notice updates the reward quarantine threshold if called by the operator
@@ -379,10 +352,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
         _mint(winner, amount);
     }
 
-    /** @notice pays out several rewards
-     * @notice only usable by the trusted oracle account
-     *
-     * @param rewards the array of rewards to pay out
+    /**
+     * @inheritdoc IFluidClient
      */
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");
@@ -390,33 +361,8 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
         uint poolAmount = rewardPoolAmount();
 
-        // this might not happen if our transactions go through out of order
-        if (lastBlock > lastRewardedBlock_) lastRewardedBlock_ = lastBlock;
-
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
-
-            if (manualRewardDebt_[winner.winner] != 0) {
-
-                // if a batch reward was caught in the mempool, and a user
-                // manages to reward once before the batch and once
-                // after the batch
-
-                // if the win amount exceeds the manual reward debt,
-                // then we deduct the entire reward debt, otherwise
-                // they more debt than the winnings from this batch,
-                // we remove the winnings from this batch, then we
-                // remove the amount from their debt
-
-                uint amount = winner.amount > manualRewardDebt_[winner.winner] ?
-                    manualRewardDebt_[winner.winner] :
-                    winner.amount;
-
-                // and we update that debt and the win amount
-
-                winner.amount -= amount;
-                manualRewardDebt_[winner.winner] -= amount;
-            }
 
             require(poolAmount >= winner.amount, "reward pool empty");
 
@@ -424,6 +370,19 @@ contract Token is IERC20, ITransferWithBeneficiary {
 
             rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
         }
+    }
+
+    function getUtilityVars() external returns (UtilityVars memory) {
+        UtilityVars memory vars = UtilityVars({
+            poolSizeNative: rewardPoolAmount(),
+            tokenDecimalScale: 10**decimals(),
+            exchangeRateNum: 1,
+            exchangeRateDenom: 1,
+            deltaWeightNum: 1,
+            deltaWeightDenom: 31536000
+        });
+
+        return vars;
     }
 
     /**
@@ -449,112 +408,6 @@ contract Token is IERC20, ITransferWithBeneficiary {
             rewardInternal(user, amount);
             emit UnblockReward(rewardTx, user, amount, firstBlock, lastBlock);
         }
-    }
-
-    /**
-     * @notice lets a user frontrun our worker, paying their own gas
-     * @notice requires a signature of the random numbers generated
-     * @notice by the trusted oracle
-     *
-     * @param winner the address of the user being rewarded
-     * @param winAmount the amount won
-     * @param firstBlock the first block in the range being rewarded for
-     * @param lastBlock the last block in the range being rewarded for
-     * @param sig the signature of the above parameters, provided by the oracle
-     */
-    function manualReward(
-        address contractAddress,
-        uint256 chainid,
-        address winner,
-        uint256 winAmount,
-        uint firstBlock,
-        uint lastBlock,
-        bytes memory sig
-    ) external {
-        require(noEmergencyMode(), "emergency mode!");
-
-        // web based signers (ethers, metamask, etc) add this prefix to stop you signing arbitrary data
-        //bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", sha256(rngRlp)));
-        bytes32 hash = keccak256(abi.encode(
-            contractAddress,
-            chainid,
-            winner,
-            winAmount,
-            firstBlock,
-            lastBlock
-        ));
-
-        // ECDSA verification
-        require(recover(hash, sig) == oracle(), "invalid rng signature");
-
-        // now reward the user
-
-        require(contractAddress == address(this), "payload is for the wrong contract");
-        require(chainid == block.chainid, "payload is for the wrong chain");
-
-        // user decided to frontrun
-        require(
-            firstBlock > lastRewardedBlock_,
-            "reward already given for part of this range"
-        );
-
-        require(lastBlock >= firstBlock, "invalid block range in payload!");
-
-        for (uint i = firstBlock; i <= lastBlock; i++) {
-            require(manualRewardedBlocks_[winner][i] == 0, "reward already given for part of this range");
-            manualRewardedBlocks_[winner][i] = BLOCK_REWARDED;
-        }
-
-        manualRewardDebt_[winner] += winAmount;
-
-        require(rewardPoolAmount() >= winAmount, "reward pool empty");
-
-        rewardFromPool(firstBlock, lastBlock, winner, winAmount);
-    }
-
-    /**
-     * @dev ECrecover with checks for signature malleability
-     * @dev adapted from openzeppelin's ECDSA library
-     */
-    function recover(
-        bytes32 hash,
-        bytes memory signature
-    ) internal pure returns (address) {
-        require(signature.length == 65, "invalid rng format (length)");
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-        // ecrecover takes the signature parameters, and the only way to get them
-        // currently is to use assembly.
-        /// @solidity memory-safe-assembly
-        assembly {
-            r := mload(add(signature, 0x20))
-            s := mload(add(signature, 0x40))
-            v := byte(0, mload(add(signature, 0x60)))
-        }
-        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
-        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
-        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
-        // signatures from current libraries generate a unique signature with an s-value in the lower half order.
-        //
-        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
-        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
-        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
-        // these malleable signatures as well.
-        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
-            revert("invalid signature (s)");
-        }
-        if (v != 27 && v != 28) {
-            revert("invalid signature (v)");
-        }
-
-        // If the signature is valid (and not malleable), return the signer address
-        address signer = ecrecover(hash, v, r, s);
-        if (signer == address(0)) {
-            revert("invalid signature");
-        }
-
-        return signer;
     }
 
     /*
@@ -684,6 +537,19 @@ contract Token is IERC20, ITransferWithBeneficiary {
         }
 
         return true;
+    }
+
+    /// @notice drain the reward pool of the amount given without touching any principal amounts
+    /// @dev this is intended to only be used to retrieve initial liquidity provided by the team OR by the DAO to allocate funds
+    function drainRewardPool(address _recipient, uint256 _amount) public {
+        require(noEmergencyMode(), "emergency mode");
+        require(msg.sender == operator_, "only operator can use this function");
+
+        uint256 rewardPool = this.rewardPoolAmount();
+
+        require(rewardPool >= _amount, "amount to drain greater than prize pool");
+
+        rewardInternal(_recipient, _amount);
     }
 
     function _transfer(

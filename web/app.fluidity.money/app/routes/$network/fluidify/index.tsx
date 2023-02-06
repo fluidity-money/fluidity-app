@@ -31,6 +31,7 @@ import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { Chain } from "~/util/chainUtils/chains";
 import config, { colors } from "~/webapp.config.server";
+import { SplitContext } from "~/util/split";
 
 type LoaderData = {
   tokens: Token[];
@@ -176,6 +177,8 @@ export default function FluidifyToken() {
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
+  const trackCancelFluidify = () => client?.track("user", "cancel_fluidify");
+
   // get token data once user is connected
   useEffect(() => {
     if (address && !swapping) {
@@ -270,6 +273,8 @@ export default function FluidifyToken() {
       setAssetToken(tokens.find((t) => t.address === assetToken.address));
   }, [tokens]);
 
+  const { client } = useContext(SplitContext);
+
   const handleRedirect = async (
     transaction: TransactionResponse,
     amount: string
@@ -278,7 +283,10 @@ export default function FluidifyToken() {
       amount: amount,
       txHash: transaction.txHash,
     });
+
     setSwapping(true);
+
+    client?.track("user", swapping ? "click_swapping" : "click_reverting");
 
     try {
       const success = await transaction.confirmTx();
@@ -352,7 +360,10 @@ export default function FluidifyToken() {
         <div className="mob-swap-modal">
           <div>
             <LinkButton
-              handleClick={() => setOpenMobModal(false)}
+              handleClick={() => {
+                trackCancelFluidify();
+                setOpenMobModal(false);
+              }}
               size="large"
               type="internal"
               left={true}
@@ -391,7 +402,7 @@ export default function FluidifyToken() {
             </section>
             <Link to={`/${network}/dashboard/home`}>
               <LinkButton
-                handleClick={() => null}
+                handleClick={trackCancelFluidify}
                 size="large"
                 type="internal"
                 left={true}

@@ -7,7 +7,6 @@ package spooler
 import (
 	"database/sql"
 	"fmt"
-	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
@@ -50,6 +49,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			transaction_hash,
 			address,
 			win_amount,
+			usd_win_amount,
+			utility_name,
 			block_number,
 			network,
 			reward_type
@@ -63,71 +64,91 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			$5,
 			$6,
 			$7,
-			$8
+			$8,
+			$9,
+			$10
 		);`,
 
 		TablePendingWinners,
 	)
 
-	// insert the sender's winnings
-	_, err := timescaleClient.Exec(
-		statementText,
-		tokenShortName,
-		tokenDecimals,
-		hash,
-		senderAddress,
-		senderWinAmount,
-		blockNumber,
-		network_,
-		"send",
-	)
+	for utility, payout := range senderWinAmount {
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+		)
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
+		// insert the sender's winnings
+		_, err := timescaleClient.Exec(
+			statementText,
+			tokenShortName,
+			tokenDecimals,
+			hash,
+			senderAddress,
+			nativeWinAmount,
+			usdWinAmount,
+			utility,
+			blockNumber,
+			network_,
+			"send",
+		)
 
-			k.Format(
-				"Failed to insert pending winner %+v!",
-				winner,
-			)
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
 
-			k.Payload = err
-		})
+				k.Format(
+					"Failed to insert pending winner %+v!",
+					winner,
+				)
+
+				k.Payload = err
+			})
+		}
 	}
 
-	// insert the recipient's winnings
-	_, err = timescaleClient.Exec(
-		statementText,
-		tokenShortName,
-		tokenDecimals,
-		hash,
-		recipientAddress,
-		recipientWinAmount,
-		blockNumber,
-		network_,
-		"receive",
-	)
+	for utility, payout := range recipientWinAmount {
+		// insert the recipient's winnings
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+		)
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
+		_, err := timescaleClient.Exec(
+			statementText,
+			tokenShortName,
+			tokenDecimals,
+			hash,
+			recipientAddress,
+			nativeWinAmount,
+			usdWinAmount,
+			utility,
+			blockNumber,
+			network_,
+			"receive",
+		)
 
-			k.Format(
-				"Failed to insert pending winner %+v!",
-				winner,
-			)
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
 
-			k.Payload = err
-		})
+				k.Format(
+					"Failed to insert pending winner %+v!",
+					winner,
+				)
+
+				k.Payload = err
+			})
+		}
 	}
 }
 
-func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) *big.Int {
+func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) float64 {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
 		`SELECT
-			SUM(win_amount)
+			SUM(usd_win_amount)
 
 		FROM %s
 		WHERE
@@ -145,12 +166,12 @@ func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_deta
 		token.TokenShortName,
 	)
 
-	var total misc.BigInt
+	var total float64
 
 	err := row.Scan(&total)
 
 	if err == sql.ErrNoRows {
-		return big.NewInt(0)
+		return 0
 	}
 
 	if err != nil {
@@ -166,7 +187,7 @@ func UnpaidWinningsForToken(network_ network.BlockchainNetwork, token token_deta
 		})
 	}
 
-	return &total.Int
+	return total
 }
 
 func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {
@@ -188,7 +209,8 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			transaction_hash,
 			address,
 			win_amount,
-			block_number
+			block_number,
+			utility_name
 		;`,
 
 		TablePendingWinners,
@@ -230,6 +252,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			&winner.Winner,
 			&winner.WinAmount,
 			&winner.BlockNumber,
+			&winner.Utilityname,
 		)
 
 		if err != nil {
