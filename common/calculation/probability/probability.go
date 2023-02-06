@@ -46,7 +46,7 @@ func probability(m, n, b int64) *big.Rat {
 }
 
 // calculateBpy given a block time, pool, and delta weight returns how much of the token should be distributed
-func calculateBpy(blockTimeRat *big.Rat, pool worker.PoolDetails) *big.Rat {
+func calculateBpy(blockTimeRat *big.Rat, pool worker.UtilityVars) *big.Rat {
 	var (
 		rewardPoolNative = pool.PoolSizeNative
 		exchangeRate     = pool.ExchangeRate
@@ -168,7 +168,7 @@ func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.E
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.PoolDetails, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[applications.Utility][]worker.Payout, probabilities []*big.Rat) {
+func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.UtilityVars, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[applications.UtilityName][]worker.Payout, probabilities []*big.Rat) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 
@@ -176,7 +176,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 
 	n := calculateN(winningClasses, payoutFreq, atx, emission)
 
-	payouts = make(map[applications.Utility][]worker.Payout)
+	payouts = make(map[applications.UtilityName][]worker.Payout)
 
 	poolBpys := make([]*big.Rat, len(distributionPools))
 

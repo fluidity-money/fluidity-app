@@ -187,7 +187,8 @@ func main() {
 				)
 			}
 
-			pools := []worker_types.PoolDetails{
+			// we mock this instead of fetching from chain because solana doesn't support utility mining yet
+			pools := []worker_types.UtilityVars{
 				{
 					Name:               applications.UtilityFluid,
 					PoolSizeNative:     sizeOfThePool,

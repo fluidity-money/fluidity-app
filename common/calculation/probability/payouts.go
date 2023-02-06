@@ -12,8 +12,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-func CalculatePayoutsCombined(sourcePayouts map[applications.Utility][]worker.Payout, winningBalls int) map[applications.Utility]worker.Payout {
-	payouts := make(map[applications.Utility]worker.Payout)
+func CalculatePayoutsCombined(sourcePayouts map[applications.UtilityName][]worker.Payout, winningBalls int) map[applications.UtilityName]worker.Payout {
+	payouts := make(map[applications.UtilityName]worker.Payout)
 
 	for utility, payout := range sourcePayouts {
 		var (
@@ -33,10 +33,10 @@ func CalculatePayoutsCombined(sourcePayouts map[applications.Utility][]worker.Pa
 }
 
 // returns the amount won by the sender and receiver with given balls and payouts
-func CalculatePayoutsSplit(sourcePayouts map[applications.Utility][]worker.Payout, winningBalls int) (map[applications.Utility]worker.Payout, map[applications.Utility]worker.Payout) {
+func CalculatePayoutsSplit(sourcePayouts map[applications.UtilityName][]worker.Payout, winningBalls int) (map[applications.UtilityName]worker.Payout, map[applications.UtilityName]worker.Payout) {
 	var (
-		fromAmounts = make(map[applications.Utility]worker.Payout)
-		toAmounts = make(map[applications.Utility]worker.Payout)
+		fromAmounts = make(map[applications.UtilityName]worker.Payout)
+		toAmounts = make(map[applications.UtilityName]worker.Payout)
 	)
 
 	for utility, payout := range sourcePayouts {

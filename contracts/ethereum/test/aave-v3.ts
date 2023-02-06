@@ -1,8 +1,7 @@
 import * as hre from "hardhat";
 import { expectEq, expectGt } from "./test-utils";
-import { fAUsdcAccount, usdcAccount } from "./setup-goerli";
-import { accountAddr } from "./setup-common";
-
+import { bindings } from "./setup-goerli";
+import { signers } from "./setup-common";
 
 describe("token aave v3 integration", async function () {
   before(async function () {
@@ -10,6 +9,16 @@ describe("token aave v3 integration", async function () {
       return this.skip();
     }
   });
+
+  const {
+    usdc: {
+      base: usdcAccount,
+      fluid: fAUsdcAccount,
+    }
+  } = bindings;
+  const {
+    userAccount1: accountAddr,
+  } = signers;
 
   it("should allow depositing erc20 tokens", async function () {
     const originalDaiBalance = (await usdcAccount.balanceOf(accountAddr));

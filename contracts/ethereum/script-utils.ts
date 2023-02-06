@@ -64,21 +64,21 @@ const deployAndInit = async (
 
 export const deployOperator = async (
   hre: HardhatRuntimeEnvironment,
-  externalOperator: string,
-  council: string,
+  externalOperator: ethers.Signer,
+  council: ethers.Signer,
 ): Promise<ethers.Contract> => {
   return deployAndInit(
     hre,
     "Operator",
-    externalOperator,
-    council,
+    await externalOperator.getAddress(),
+    await council.getAddress(),
   )
 };
 
 export const deployGovToken = async (
   hre: HardhatRuntimeEnvironment,
   govOperatorSigner: ethers.Signer
-): Promise<string> => {
+): Promise<ethers.Contract> => {
   const factory = (await hre.ethers.getContractFactory("GovToken"))
     .connect(govOperatorSigner);
 
@@ -91,7 +91,7 @@ export const deployGovToken = async (
     18,
     BigNumber.from("1000000000000000000000000000")
   );
-  return govToken.address;
+  return govToken;
 };
 
 export const deployTestUtility = async (
@@ -112,7 +112,6 @@ export const deployTestUtility = async (
       name: "test",
       overwrite: false,
       token,
-      client: client.address,
     }],
   );
   return client;
@@ -130,9 +129,9 @@ export const deployTokens = async (
   tokens: Token[],
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
-  councilAddress: string,
-  operator: string,
-  externalOperator: string,
+  council: ethers.Signer,
+  operator: ethers.Contract,
+  externalOperator: ethers.Signer,
 ): Promise<{
   tokenBeacon: ethers.Contract,
   aaveV2Beacon: ethers.Contract,
@@ -238,14 +237,15 @@ export const deployTokens = async (
 
 export const deployRewardPools = async (
   hre: HardhatRuntimeEnvironment,
-  operatorAddress: string,
-  tokens: string[]
+  externalOperator: ethers.Signer,
+  tokens: ethers.Contract[]
 ): Promise<ethers.Contract> => {
-  const factory = await hre.ethers.getContractFactory("RewardPools");
-  const beacon = await hre.upgrades.deployProxy(factory);
-  await beacon.deployed();
-  await beacon.init(operatorAddress, tokens);
-  return beacon;
+  return deployAndInit(
+    hre,
+    "RewardPools",
+    await externalOperator.getAddress(),
+    tokens.map(e => e.address),
+  );
 };
 
 export const forknetTakeFunds = async (

@@ -33,10 +33,9 @@ contract Operator {
         IFluidClient client;
     }
 
-    /// @dev return type from getTrfVars
-    struct ScannedTrfVar {
-        TrfVars vars;
-        bool found;
+    /// @dev return type from getUtilityVars
+    struct ScannedUtilityVars {
+        UtilityVars vars;
         string name;
     }
 
@@ -117,6 +116,8 @@ contract Operator {
 
             address oldClient = address(fluidityClients_[change.token][change.name]);
 
+            // either the old client must be unset (setting a completely new client)
+            // or the overwrite option must be set
             require(
                 oldClient == address(0) || change.overwrite,
                 "trying to overwrite a client without the overwrite option set!"
@@ -134,25 +135,21 @@ contract Operator {
     }
 
     /**
-     * @notice fetches trf vars for several contracts by name
+     * @notice fetches utility vars for several contracts by name
      * @param token the token for which to fetch utilities
      * @param names the list of names of utilities to fetch for
      *
-     * @return an array of trf vars
+     * @return an array of utility vars
      */
-    function getTrfVars(address token, string[] memory names) public returns (ScannedTrfVar[] memory) {
-        ScannedTrfVar[] memory vars = new ScannedTrfVar[](names.length);
+    function getUtilityVars(address token, string[] memory names) public returns (ScannedUtilityVar[] memory) {
+        ScannedUtilityVars[] memory vars = new ScannedUtilityVars[](names.length);
         for (uint i = 0; i < names.length; i++) {
             string memory name = names[i];
             vars[i].name = name;
             IFluidClient utility = fluidityClients_[token][name];
 
-            if (address(utility) == address(0)) {
-                vars[i].found = false;
-            } else {
-                vars[i].found = true;
-                vars[i].vars = utility.getTrfVars();
-            }
+            // reverts if utility == 0 !
+            vars[i].vars = utility.getUtilityVars();
         }
 
         return vars;

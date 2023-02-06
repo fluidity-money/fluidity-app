@@ -1,17 +1,17 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./IFluidClient.sol";
-import "./GovToken.sol";
+import "../IFluidClient.sol";
+import "../GovToken.sol";
 
 contract TestClient is IFluidClient {
-    address operator_;
+    address oracle_;
     GovToken govToken_;
 
     event GotTransfered(address indexed from, address indexed to, uint amount);
 
     constructor(address o) {
-        operator_ = o;
+        oracle_ = o;
         govToken_ = new GovToken();
         govToken_.init("Test utility token!", "UTILCLIENT", 8, 2 * (10 ** 8));
     }
@@ -22,7 +22,7 @@ contract TestClient is IFluidClient {
     }
 
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) external {
-        require(msg.sender == operator_, "only the operator can use this");
+        require(msg.sender == oracle_, "only the operator can use this");
 
         for (uint i = 0; i < rewards.length; i++) {
             govToken_.transfer(rewards[i].winner, rewards[i].amount);
@@ -30,14 +30,14 @@ contract TestClient is IFluidClient {
         }
     }
 
-    function getTrfVars() external returns (TrfVars memory) {
-        return TrfVars({
+    function getUtilityVars() external returns (UtilityVars memory) {
+        return UtilityVars({
             poolSizeNative: govToken_.balanceOf(address(this)),
             tokenDecimalScale: 10 ** govToken_.decimals(),
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
-            deltaWeightNum: TRF_VAR_NOT_AVAILABLE,
-            deltaWeightDenom: TRF_VAR_NOT_AVAILABLE
+            deltaWeightNum: 1,
+            deltaWeightDenom: 31536000
         });
     }
 }

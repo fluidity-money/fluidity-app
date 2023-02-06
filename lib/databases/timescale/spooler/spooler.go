@@ -50,7 +50,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			address,
 			win_amount,
 			usd_win_amount,
-			utility,
+			utility_name,
 			block_number,
 			network,
 			reward_type
@@ -210,7 +210,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			address,
 			win_amount,
 			block_number,
-			utility
+			utility_name
 		;`,
 
 		TablePendingWinners,
@@ -252,7 +252,7 @@ func GetAndRemoveRewardsForToken(network_ network.BlockchainNetwork, token token
 			&winner.Winner,
 			&winner.WinAmount,
 			&winner.BlockNumber,
-			&winner.Utility,
+			&winner.Utilityname,
 		)
 
 		if err != nil {

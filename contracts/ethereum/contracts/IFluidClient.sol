@@ -7,11 +7,8 @@ struct Winner {
     uint256 amount;
 }
 
-/// @dev returned in the TrfVars struct to indicate a variable wasn't available onchain
-uint constant TRF_VAR_NOT_AVAILABLE = type(uint256).max;
-
-/// @dev returned from the getTrfVars function to calculate distribution amounts
-struct TrfVars {
+/// @dev returned from the getUtilityVars function to calculate distribution amounts
+struct UtilityVars {
     uint256 poolSizeNative;
     uint256 tokenDecimalScale;
     uint256 exchangeRateNum;
@@ -39,7 +36,7 @@ interface IFluidClient {
 
     /**
      * @notice gets stats on the token being distributed
-     * @return the variables for the trf, or TRF_VAR_NOT_AVAILABLE
+     * @return the variables for the trf
      */
-    function getTrfVars() external returns (TrfVars memory);
+    function getUtilityVars() external returns (UtilityVars memory);
 }

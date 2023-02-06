@@ -10,7 +10,7 @@ import (
 
 // formatPayouts takes a map of utility => payout and returns a string
 // representation of the payouts for logging
-func formatPayouts(payouts map[applications.Utility]worker.Payout) string {
+func formatPayouts(payouts map[applications.UtilityName]worker.Payout) string {
 	payoutsStrings := make([]string, len(payouts))
 
 	i := 0

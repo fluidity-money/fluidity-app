@@ -29,10 +29,10 @@ var applicationNames = []string{
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
-type Utility string
+type UtilityName string
 
 // UtilityFluid is the special utility name for the fluid token itself
-var UtilityFluid Utility = "FLUID"
+var UtilityFluid UtilityName = "FLUID"
 
 func (app Application) String() string {
 	return applicationNames[app]

@@ -361,14 +361,14 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         }
     }
 
-    function getTrfVars() external returns (TrfVars memory) {
-        TrfVars memory vars = TrfVars({
+    function getUtilityVars() external returns (UtilityVars memory) {
+        UtilityVars memory vars = UtilityVars({
             poolSizeNative: rewardPoolAmount(),
             tokenDecimalScale: 10**decimals(),
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
-            deltaWeightNum: TRF_VAR_NOT_AVAILABLE,
-            deltaWeightDenom: TRF_VAR_NOT_AVAILABLE
+            deltaWeightNum: 1,
+            deltaWeightDenom: 31536000
         });
 
         return vars;

@@ -168,7 +168,7 @@ const operatorAbiString = `[
 	  { "internalType": "address", "name": "token", "type": "address" },
 	  { "internalType": "string[]", "name": "names", "type": "string[]" }
 	  ],
-	  "name": "getTrfVars",
+	  "name": "getUtilityVars",
 	  "outputs": [
 	  {
 		  "components": [
@@ -181,14 +181,13 @@ const operatorAbiString = `[
 			  { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
 			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
 			  ],
-			  "internalType": "struct TrfVars",
+			  "internalType": "struct UtilityVars",
 			  "name": "vars",
 			  "type": "tuple"
 		  },
-		  { "internalType": "bool", "name": "found", "type": "bool" },
 		  { "internalType": "string", "name": "name", "type": "string" }
 		  ],
-		  "internalType": "struct Registry.ScannedTrfVar[]",
+		  "internalType": "struct Operator.ScannedUtilityVars[]",
 		  "name": "",
 		  "type": "tuple[]"
 	  }

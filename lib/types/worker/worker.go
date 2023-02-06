@@ -16,16 +16,18 @@ import (
 )
 
 type (
-	// PoolDetails to store the amount of token and its distribution rate, for payout calculations
-	PoolDetails struct {
+	// UtilityVars to store the amount of token and its distribution rate, for payout calculations
+	UtilityVars struct {
 		// Name is the unique onchain id for this utility
-		Name applications.Utility `json:"utility_name"`
+		Name applications.UtilityName `json:"utility_name"`
+
 		// PoolSizeNative is the amount of token to distribute in native tokens
 		PoolSizeNative *big.Rat `json:"pool_size"`
 
 		// TokenDecimalsScale is 1e(decimals)
 		TokenDecimalsScale *big.Rat `json:"token_decimals"`
-		// ExchangeRate is the number for which (native value)*(exchange rate) = (usd value)
+
+		// ExchangeRate is the number for which (usd value)*(exchange rate) = (native amount)
 		ExchangeRate *big.Rat `json:"exchange_rate"`
 
 		// DeltaWeight is the frequency with which to distribute tokens
@@ -39,6 +41,7 @@ type (
 		Native misc.BigInt
 
 		// amount normalised to usd (native/1e(decimals)*exchangeRate) for the spooler
+		// this is a float and might be imprecise!
 		Usd float64
 	}
 

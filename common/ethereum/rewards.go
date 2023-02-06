@@ -17,10 +17,10 @@ import (
 
 // BatchWinningsByUser batches winnings that have the same token, returning
 // the total winnings each user has earned
-func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details.TokenDetails) (misc.BigInt, misc.BigInt, map[applications.Utility]map[ethereum.Address]misc.BigInt, error) {
+func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details.TokenDetails) (misc.BigInt, misc.BigInt, map[applications.UtilityName]map[ethereum.Address]misc.BigInt, error) {
 
 	// utility => address => winnings
-	rewards := make(map[applications.Utility]map[ethereum.Address]misc.BigInt)
+	rewards := make(map[applications.UtilityName]map[ethereum.Address]misc.BigInt)
 
 	var (
 		firstRewardBlock = winnings[0].BlockNumber
@@ -34,7 +34,7 @@ func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details
 			token       = reward.TokenDetails
 			winner      = reward.Winner
 			winAmount   = &reward.WinAmount.Int
-			utility     = reward.Utility
+			utility     = reward.Utilityname
 			blockNumber = &reward.BlockNumber.Int
 		)
 

@@ -70,8 +70,8 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			blockNumber                 = announcement.BlockNumber
 			fromAddress                 = announcement.FromAddress
 			toAddress                   = announcement.ToAddress
-			sourceRandom                = announcement.SourceRandom
-			sourcePayouts               = announcement.SourcePayouts
+			sourceRandom                = announcement.RandomSource
+			sourcePayouts               = announcement.RandomPayouts
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
 			application                 = announcement.Application

@@ -377,7 +377,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 
 // Ethereum Specific
 // InsertPendingRewardType to store the reward type and application of a pending win
-func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.Utility]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.Utility]worker.Payout, application Application) {
+func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.UtilityName]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.UtilityName]worker.Payout, application Application) {
 
 	timescaleClient := timescale.Client()
 
@@ -391,7 +391,7 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			application,
 			block_number,
 			win_amount,
-			utility
+			utility_name
 		)
 
 		VALUES (

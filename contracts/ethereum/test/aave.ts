@@ -1,10 +1,21 @@
 import * as hre from "hardhat";
 import * as ethers from 'ethers';
-import { feiAccount, fFeiAccount } from './setup-mainnet';
 import { expectEq, expectGt } from "./test-utils";
-import { accountAddr } from "./setup-common";
+import { bindings } from "./setup-mainnet";
+import { signers } from "./setup-common";
 
 describe("token aave integration", async function () {
+  const {
+    fei: {
+      base: feiAccount,
+      fluid: fFeiAccount,
+    }
+  } = bindings;
+
+  const {
+    userAccount1: accountAddr,
+  } = signers;
+
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();

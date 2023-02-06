@@ -386,7 +386,8 @@ func main() {
 					recipientAddress = transfer.RecipientAddress
 					appEmission      = transfer.AppEmissions
 
-					fluidClients = []appTypes.Utility{ appTypes.UtilityFluid }
+					// the fluid token is always included
+					fluidClients = []appTypes.UtilityName{ appTypes.UtilityFluid }
 				)
 
 				application := applications.ApplicationNone
@@ -406,7 +407,8 @@ func main() {
 					}
 				}
 
-				pools, err, poolErrs := fluidity.GetTrfVars(
+				// fetch the token amount, exchange rate, etc from chain
+				pools, err := fluidity.GetUtilityVars(
 					gethClient,
 					operatorAddress,
 					contractAddress,
@@ -419,15 +421,6 @@ func main() {
 					log.Fatal(func (k *log.Log) {
 						k.Message = "Failed to get trf vars from chain!"
 						k.Payload = err
-					})
-				}
-
-				// not fatal but nice to know about, might be a
-				// misbehaving contract or a misconfiguration
-				for _, poolErr := range poolErrs {
-					log.Debug(func (k *log.Log) {
-						k.Message = "Pool error fetching trf vars from chain!"
-						k.Payload = poolErr
 					})
 				}
 
@@ -472,15 +465,15 @@ func main() {
 					BlockNumber:     &blockNumber,
 					FromAddress:     senderAddress,
 					ToAddress:       recipientAddress,
-					SourceRandom:    randomSource,
-					SourcePayouts:   randomPayouts,
+					RandomSource:    randomSource,
+					RandomPayouts:   randomPayouts,
 					TokenDetails:    tokenDetails,
 					Application:     application,
 				}
 
 				// Fill in emission.NaiveIsWinning
 
-				_ = probability.NaiveIsWinning(announcement.SourceRandom, emission)
+				_ = probability.NaiveIsWinning(announcement.RandomSource, emission)
 
 				log.Debug(func(k *log.Log) {
 					k.Format("Source payouts: %v", randomSource)
