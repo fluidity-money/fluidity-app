@@ -23,7 +23,10 @@ export let fFeiAddr: string;
 export let daiAddr: string;
 export let fDaiAddr: string;
 
-export let usdtAccount: ethers.Contract
+export let wEthAddr: string;
+export let fwEthAddr: string;
+
+export let usdtAccount: ethers.Contract;
 export let fUsdtAccount: ethers.Contract;
 export let fUsdtAccount2: ethers.Contract;
 
@@ -32,6 +35,9 @@ export let fFeiAccount: ethers.Contract;
 
 export let daiAccount: ethers.Contract;
 export let fDaiAccount: ethers.Contract;
+
+export let wEthAccount: ethers.Contract;
+export let fwEthAccount: ethers.Contract;
 
 export let fUsdtOracle: ethers.Contract;
 export let fUsdtOperator: ethers.Contract;
@@ -48,7 +54,12 @@ before(async function () {
     return;
   }
 
-  const toDeploy = [TokenList["usdt"], TokenList["fei"], TokenList["dai"]];
+  const toDeploy = [
+    TokenList["usdt"],
+    TokenList["fei"],
+    TokenList["dai"],
+    TokenList["weth"]
+  ];
 
   await forknetTakeFunds(
     hre,
@@ -56,8 +67,9 @@ before(async function () {
     toDeploy,
   );
 
-  console.log("signer" + tokenOperatorSigner)
-  console.log("addr" + await tokenOperatorSigner.getAddress())
+  console.log("signer" + tokenOperatorSigner);
+  console.log("addr" + await tokenOperatorSigner.getAddress());
+
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
@@ -96,6 +108,9 @@ before(async function () {
   daiAddr = TokenList["dai"].address;
   fDaiAddr = tokens.fDAI.deployedToken.address;
 
+  wEthAddr = TokenList["weth"].address;
+  fwEthAddr = tokens.fwETH.deployedToken.address;
+
   usdtAccount = await hre.ethers.getContractAt("IERC20", usdtAddr, accountSigner);
   fUsdtAccount = await hre.ethers.getContractAt("Token", fUsdtAddr, accountSigner);
   fUsdtAccount2 = await hre.ethers.getContractAt("Token", fUsdtAddr, account2Signer);
@@ -105,6 +120,9 @@ before(async function () {
 
   daiAccount = await hre.ethers.getContractAt("IERC20", daiAddr, accountSigner);
   fDaiAccount = await hre.ethers.getContractAt("Token", fDaiAddr, accountSigner);
+
+  wEthAccount = await hre.ethers.getContractAt("IERC20", wEthAddr, accountSigner);
+  fwEthAccount = await hre.ethers.getContractAt("Token", fwEthAddr, accountSigner);
 
   fUsdtOracle = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOracleSigner);
   fUsdtOperator = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOperatorSigner);
@@ -116,7 +134,8 @@ before(async function () {
     [
       fUsdtAddr,
       fFeiAddr,
-      fDaiAddr
+      fDaiAddr,
+      fwEthAddr
     ]
   );
 });

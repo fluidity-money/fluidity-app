@@ -282,7 +282,7 @@ contract Token is IERC20, ITransferWithBeneficiary {
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
      * @notice requires you to have called the ERC20 `approve` method
-     * @notice targeting this contract first
+     * @notice targeting this contract first on the underlying asset
      *
      * @param amount the number of tokens to wrap
      * @return the number of tokens wrapped
@@ -307,6 +307,17 @@ contract Token is IERC20, ITransferWithBeneficiary {
         _mint(msg.sender, realAmount);
         emit MintFluid(msg.sender, realAmount);
         return realAmount;
+    }
+
+    /**
+     * @notice wraps the `amount` given and transfers the tokens to `receiver`
+     *
+     * @param recipient of the wrapped assets
+     * @param amount to wrap and send to the recipient
+     */
+    function erc20InFor(address recipient, uint256 amount) public {
+        erc20In(amount);
+        transfer(recipient, amount);
     }
 
     /**
