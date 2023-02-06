@@ -22,6 +22,8 @@ import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
 
+import { GTM_ID, GTAG_ID } from "./constants";
+
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
   return [
@@ -169,7 +171,7 @@ function ErrorBoundary(err: Error) {
       >
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-W7QJGR2"
+            src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}"
             height="0"
             width="0"
             style="display:none;visibility:hidden"
@@ -250,10 +252,10 @@ function App() {
       <head>
         <Meta />
         <Links />
-        {gaToken && isProduction && (
+        {isProduction && (
               <>
                 <script
-                  src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
+                  src={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`}
                   async
                 />
                 <script
@@ -262,7 +264,7 @@ function App() {
                       window.dataLayer = window.dataLayer || [];
                       function gtag(){dataLayer.push(arguments);}
                       gtag('js', new Date());
-                      gtag('config', '${gaToken}');
+                      gtag('config', '${GTAG_ID}');
                     `,
                   }}
                 />
