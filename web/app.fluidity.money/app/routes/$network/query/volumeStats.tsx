@@ -50,7 +50,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ? await useVolumeTxByAddressTimestamp(network, fluidAssets, address, prevYearIso)
     : await useVolumeTxByTimestamp(network, fluidAssets, prevYearIso);
 
-  const parsedVolume = volumesRes.data.ethereum.transfers.map((transfer) => ({
+  const parsedVolume = volumesRes.data?.[network].transfers.map((transfer) => ({
     symbol: transfer.currency.symbol,
     amount: parseFloat(transfer.amount) || 0,
     timestamp: transfer.block.timestamp.unixtime * 1000,
@@ -58,7 +58,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     receiver: transfer.receiver.address,
   }));
 
-  const daiSanitisedVolumes = parsedVolume.map((volume) =>
+  const daiSanitisedVolumes = parsedVolume?.map((volume) =>
     volume.symbol === "fDAI" ? fdaiPostprocess(volume) : volume
   );
 

@@ -131,7 +131,7 @@ type VolumeTxsBodyByAddressTimestamp = {
 };
 
 export type VolumeTxsResponse = {
-  data: {
+  data?: {
     [network: string]: {
       transfers: 
         {
@@ -153,6 +153,7 @@ export type VolumeTxsResponse = {
         }[];
     };
   };
+  errors?: unknown
 };
 
 export type HasuraVolumeTransaction = {
@@ -164,7 +165,7 @@ export type HasuraVolumeTransaction = {
 };
 
 export type HasuraVolumeTxsResponse = {
-  data: { transfers: HasuraVolumeTransaction[] }
+  data: { transfers?: HasuraVolumeTransaction[] }
 };
 
 const useVolumeTxByAddressTimestamp = async (
@@ -193,7 +194,7 @@ const useVolumeTxByAddressTimestamp = async (
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    const hasuraTransfers = (result as unknown as HasuraVolumeTxsResponse).data.transfers;
+    const hasuraTransfers = (result as HasuraVolumeTxsResponse).data.transfers || [];
     result.data[network].transfers = hasuraTransfers.map(transfer => ({
       sender: { address: transfer.sender_address },
       receiver: { address: transfer.recipient_address },
@@ -202,6 +203,8 @@ const useVolumeTxByAddressTimestamp = async (
       block: { timestamp: { unixtime: transfer.time } }
     }))
   }
+
+  return result;
 };
 
 const useVolumeTxByTimestamp = async (
