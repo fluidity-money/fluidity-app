@@ -17,7 +17,7 @@ const baseDocument = () => {
             />
             <script
               async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_DEST_ID}`} 
+              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`} 
             /> 
             <script
               dangerouslySetInnerHTML={{

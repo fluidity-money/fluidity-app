@@ -18,9 +18,6 @@ RUN make frontend
 
 FROM fluidity/runtime-web-container:latest
 
-ENV GTAG_ID ${GTAG_ID}
-ENV GTM_ID ${GTM_ID}
-
 WORKDIR /usr/local/src/fluidity/web
 
 COPY --from=build /usr/local/src/fluidity/web .

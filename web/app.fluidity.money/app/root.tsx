@@ -22,8 +22,6 @@ import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
 
-import { GTM_ID, GTAG_ID } from "./constants";
-
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
   return [
@@ -124,7 +122,6 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
   const sentryDsn = process.env?.FLU_SENTRY_DSN ?? "";
-  const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
   const host = request.headers.get("Host") ?? "unknown-host";
 
@@ -139,10 +136,14 @@ export const loader: LoaderFunction = async ({
   const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
 
+  const GTAG_ID = process.env["FLU_GTAG_ID"];
+  const GTM_ID = process.env["FLU_GTM_ID"];
+
   return {
     nodeEnv,
     sentryDsn,
-    gaToken,
+    GTAG_ID,
+    GTM_ID,
     isProduction,
     isStaging,
     host,
@@ -193,7 +194,8 @@ function ErrorBoundary(err: Error) {
 type LoaderData = {
   nodeEnv: string;
   sentryDsn: string;
-  gaToken?: string;
+  GTAG_ID?: string;
+  GTM_ID?: string;
   isProduction: boolean;
   isStaging: boolean;
   gitSha?: string;
@@ -207,7 +209,8 @@ function App() {
   const {
     nodeEnv,
     sentryDsn,
-    gaToken,
+    GTAG_ID,
+    GTM_ID,
     isProduction,
     gitSha = "unknown",
     splitBrowserKey,
@@ -233,12 +236,12 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (gaToken && typeof window.gtag !== "undefined") {
-      window.gtag("config", gaToken, {
+    if (GTAG_ID && typeof window.gtag !== "undefined") {
+      window.gtag("config", GTAG_ID, {
         page_path: new URL(window.location.href),
       });
     }
-  }, [location, gaToken]);
+  }, [location, GTAG_ID]);
 
   const [cookieConsent, setCookieConsent] = useState(true);
   useEffect(() => {
@@ -255,7 +258,7 @@ function App() {
       <head>
         <Meta />
         <Links />
-        {isProduction && (
+        {GTAG_ID && GTM_ID && isProduction && (
               <>
                 <script dangerouslySetInnerHTML={{
                   __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
