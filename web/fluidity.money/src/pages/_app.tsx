@@ -80,7 +80,10 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           src="https://www.googletagmanager.com/ns.html?id=GTM-W7QJGR2"
           height="0"
           width="0"
-          style="display:none;visibility:hidden"
+          style={{
+            display: "none",
+            visibility: "hidden"
+          }}
         ></iframe>
       </noscript>
       <div id={"fluid"} />
