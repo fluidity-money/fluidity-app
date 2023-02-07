@@ -19,6 +19,7 @@ import "styles/app.global.scss";
 import { CookieConsent } from "@fluidity-money/surfing";
 import { useRouter } from "next/router";
 import * as gtag from "utils/gtag";
+import { GTM_ID } from "utils/gtag";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -75,6 +76,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+          height="0"
+          width="0"
+          style={{
+            display: "none",
+            visibility: "hidden"
+          }}
+        ></iframe>
+      </noscript>
       <div id={"fluid"} />
       <div id="shade" />
       <div id="root">

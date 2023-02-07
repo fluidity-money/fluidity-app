@@ -122,7 +122,6 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
   const sentryDsn = process.env?.FLU_SENTRY_DSN ?? "";
-  const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
   const host = request.headers.get("Host") ?? "unknown-host";
 
@@ -137,10 +136,14 @@ export const loader: LoaderFunction = async ({
   const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
 
+  const GTAG_ID = process.env["FLU_GTAG_ID"];
+  const GTM_ID = process.env["FLU_GTM_ID"];
+
   return {
     nodeEnv,
     sentryDsn,
-    gaToken,
+    GTAG_ID,
+    GTM_ID,
     isProduction,
     isStaging,
     host,
@@ -167,6 +170,17 @@ function ErrorBoundary(err: Error) {
           alignItems: "center",
         }}
       >
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}"
+            height="0"
+            width="0"
+            style={{
+              display: "none",
+              visibility: "hidden"
+            }}
+          ></iframe>
+        </noscript>
         <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
         <h1>Something went wrong!</h1>
         <br />
@@ -180,7 +194,8 @@ function ErrorBoundary(err: Error) {
 type LoaderData = {
   nodeEnv: string;
   sentryDsn: string;
-  gaToken?: string;
+  GTAG_ID?: string;
+  GTM_ID?: string;
   isProduction: boolean;
   isStaging: boolean;
   gitSha?: string;
@@ -194,7 +209,8 @@ function App() {
   const {
     nodeEnv,
     sentryDsn,
-    gaToken,
+    GTAG_ID,
+    GTM_ID,
     isProduction,
     gitSha = "unknown",
     splitBrowserKey,
@@ -220,12 +236,12 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (gaToken && typeof window.gtag !== "undefined") {
-      window.gtag("config", gaToken, {
+    if (GTAG_ID && typeof window.gtag !== "undefined") {
+      window.gtag("config", GTAG_ID, {
         page_path: new URL(window.location.href),
       });
     }
-  }, [location, gaToken]);
+  }, [location, GTAG_ID]);
 
   const [cookieConsent, setCookieConsent] = useState(true);
   useEffect(() => {
@@ -242,19 +258,27 @@ function App() {
       <head>
         <Meta />
         <Links />
-        {gaToken && isProduction && (
+        {GTAG_ID && GTM_ID && isProduction && (
               <>
-                <script
-                  src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
-                  async
+                <script dangerouslySetInnerHTML={{
+                  __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                    })(window,document,'script','dataLayer','${GTM_ID}');`,
+                }} 
                 />
+                <script
+                  async
+                  src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`} 
+                /> 
                 <script
                   dangerouslySetInnerHTML={{
                     __html: `
                       window.dataLayer = window.dataLayer || [];
                       function gtag(){dataLayer.push(arguments);}
                       gtag('js', new Date());
-                      gtag('config', '${gaToken}');
+                      gtag('config', '${GTAG_ID}');
                     `,
                   }}
                 />

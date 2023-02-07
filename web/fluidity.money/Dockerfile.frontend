@@ -5,6 +5,7 @@ WORKDIR /usr/local/src/fluidity/web
 
 ENV PRODUCTION ${PRODUCTION}
 
+
 ARG CI
 
 ARG GITHUB_TOKEN
