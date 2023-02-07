@@ -34,12 +34,11 @@ const queryByAddressTimestamp: Queryable = {
   }
 `,
   arbitrum: gql`
-    query getTransactionsByAddress(
-      $network: network_blockchain!, 
+    query VolumeTxs(
       $fluidAssets: [String!], 
       $address: String!, 
       $filterHashes: [String!] = [], 
-      $timestamp: ISO8601DateTime!
+      $timestamp: timestamp!
     ) {
     arbitrum: user_actions(
       where: {
@@ -88,12 +87,12 @@ const queryByTimestamp: Queryable = {
       }
     }
   }`,
+
   arbitrum: gql`
-    query getTransactionsByAddress(
-      $network: network_blockchain!, 
+    query VolumeTxs(
       $fluidAssets: [String!], 
       $filterHashes: [String!] = [], 
-      $timestamp: ISO8601DateTime!
+      $timestamp: timestamp!
     ) {
     arbitrum: user_actions(
       where: {

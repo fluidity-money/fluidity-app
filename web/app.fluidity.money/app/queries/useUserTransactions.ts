@@ -89,7 +89,6 @@ const queryByAddress: Queryable = {
 
   arbitrum: gql`
     query getTransactionsByAddress(
-      $network: network_blockchain!, 
       $tokens: [String!], 
       $address: String!, 
       $offset: Int = 0, 
@@ -190,7 +189,6 @@ const queryByTxHash: Queryable = {
 
   arbitrum: gql`
     query getTransactionsByTxHash(
-      $network: network_blockchain!, 
       $transactions: [String!],
       $filterHashes: [String!] = [], 
       $limit: Int = 12
@@ -296,7 +294,6 @@ const queryAll: Queryable = {
 
   arbitrum: gql`
     query getTransactions(
-      $network: network_blockchain!, 
       $tokens: [String!], 
       $offset: Int = 0, 
       $filterHashes: [String!] = [], 
