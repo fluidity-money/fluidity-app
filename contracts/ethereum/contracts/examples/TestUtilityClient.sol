@@ -13,7 +13,12 @@ contract TestClient is IFluidClient {
     constructor(address o) {
         oracle_ = o;
         govToken_ = new GovToken();
-        govToken_.init("Test utility token!", "UTILCLIENT", 8, 2 * (10 ** 8));
+
+        govToken_.init(
+            "Test utility token!",
+            "UTILCLIENT",
+            8
+        );
     }
 
     function transferFrom(GovToken token, uint amount) external {

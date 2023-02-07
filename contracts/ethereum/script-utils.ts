@@ -89,7 +89,8 @@ export const deployGovToken = async (
     "Fluidity Money",
     "FLUID",
     18,
-    BigNumber.from("1000000000000000000000000000")
+    BigNumber.from("1000000000000000000000000000"),
+    "0x0000000000000000000000000000000000000000"
   );
   return govToken;
 };

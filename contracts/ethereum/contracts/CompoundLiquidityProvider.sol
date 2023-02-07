@@ -35,7 +35,7 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         address compoundToken,
         address owner
     ) external {
-        require(version_ == 0, "contract is already initialized");
+        require(version_ == 0, "contract is already initialised");
         version_ = 1;
 
         owner_ = owner;

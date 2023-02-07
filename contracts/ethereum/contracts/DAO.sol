@@ -1,7 +1,7 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-import "./VEGovToken.sol";
+import "./VEGovLockup.sol";
 
 type VoteIdentifier is uint256;
 
@@ -40,7 +40,7 @@ contract DAO {
 
     uint8 version_;
 
-    VEGovToken governanceToken_;
+    VEGovLockup governanceLockup_;
 
     address emergencyCouncil_;
 
@@ -60,7 +60,7 @@ contract DAO {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
         emergencyCouncil_ = _emergencyCouncil;
-        governanceToken_ = _governanceToken;
+        governanceLockup_ = _governanceLockup;
     }
 
     function getRatificationTs(bytes20 _ipfsHash) public view returns (uint256) {

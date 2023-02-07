@@ -38,7 +38,7 @@ contract AaveV2LiquidityProvider is LiquidityProvider {
         address aToken,
         address owner
     ) external {
-        require(version_ == 0, "contract is already initialized");
+        require(version_ == 0, "contract is already initialised");
         version_ = 1;
 
         owner_ = owner;

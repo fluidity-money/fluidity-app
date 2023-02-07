@@ -51,8 +51,7 @@ abstract contract BaseNativeToken is IERC20 {
     function init(
         string memory _name,
         string memory _symbol,
-        uint8 _decimals,
-        uint256 _totalSupply
+        uint8 _decimals
     ) virtual public {
         require(version_ == 0, "already initialised");
 
@@ -61,7 +60,6 @@ abstract contract BaseNativeToken is IERC20 {
         name_ = _name;
         symbol_ = _symbol;
         decimals_ = _decimals;
-        _totalSupply = _totalSupply;
 
         initialChainId_ = block.chainid;
 
