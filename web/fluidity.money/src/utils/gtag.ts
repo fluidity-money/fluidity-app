@@ -1,10 +1,10 @@
-export const GA_DEST_ID = 'G-EF68MNJRJ7';
-export const GA_TRACKING_ID = 'GT-NM2HFZW';
+export const GTAG_ID = process.env["FLU_GTAG_ID"];
+export const GTM_ID = process.env["FLU_GTM_ID"];
 
 export const pageview = (url: URL) => {
   if (typeof window.gtag === "undefined") return;
 
-  window.gtag("config", GA_TRACKING_ID, {
+  window.gtag("config", GTAG_ID, {
     page_path: url,
   });
 };
