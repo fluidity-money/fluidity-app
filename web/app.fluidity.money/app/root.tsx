@@ -133,7 +133,6 @@ export const loader: LoaderFunction = async ({
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
   const splitBrowserKey = process.env?.FLU_SPLIT_BROWSER_KEY ?? "";
-  const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
 
   const GTAG_ID = process.env["FLU_GTAG_ID"];
@@ -149,7 +148,6 @@ export const loader: LoaderFunction = async ({
     host,
     gitSha,
     splitBrowserKey,
-    splitClientFeatures,
     splitUserKey,
   };
 };
@@ -201,7 +199,6 @@ type LoaderData = {
   gitSha?: string;
   host?: string;
   splitBrowserKey: string;
-  splitClientFeatures: string[];
   splitUserKey: string;
 };
 
