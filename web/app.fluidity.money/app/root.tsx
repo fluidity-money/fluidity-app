@@ -174,7 +174,10 @@ function ErrorBoundary(err: Error) {
             src="https://www.googletagmanager.com/ns.html?id=${GTM_ID}"
             height="0"
             width="0"
-            style="display:none;visibility:hidden"
+            style={{
+              display: "none",
+              visibility: "hidden"
+            }}
           ></iframe>
         </noscript>
         <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
