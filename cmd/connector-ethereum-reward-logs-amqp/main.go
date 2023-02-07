@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -257,6 +258,23 @@ func main() {
 			"address": tokens,
 			"topics":  topics,
 		}
+
+		logsFilterJson, err := json.Marshal(logsFilter)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to marshal the filter query to json!"
+				k.Payload = err
+			})
+		}
+
+
+		log.Debug(func(k *log.Log) {
+			k.Format(
+				"Filtering for logs with filter: %s",
+				logsFilterJson,
+			)
+		})
 
 		subscription, err := rpcClient.EthSubscribe(
 			context.Background(),

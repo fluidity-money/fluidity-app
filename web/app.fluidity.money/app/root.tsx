@@ -242,30 +242,7 @@ function App() {
       <head>
         <Meta />
         <Links />
-      </head>
-      <body>
-        <CookieConsent
-          activated={cookieConsent}
-          url={
-            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
-          }
-          callBack={() => {
-            setCookieConsent(true);
-          }}
-        />
-        <CacheProvider sha={gitSha}>
-          <ToolProvider>
-            <SplitContextProvider
-              splitBrowserKey={splitBrowserKey}
-              splitUser={splitUser}
-              setSplitUser={setSplitUser}
-              splitClientFeatures={splitClientFeatures}
-            >
-              <Outlet />
-            </SplitContextProvider>
-            <ScrollRestoration />
-            <Scripts />
-            {gaToken && isProduction && (
+        {gaToken && isProduction && (
               <>
                 <script
                   src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
@@ -321,6 +298,29 @@ function App() {
                 />
               </>
             )}
+      </head>
+      <body>
+        <CookieConsent
+          activated={cookieConsent}
+          url={
+            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+          }
+          callBack={() => {
+            setCookieConsent(true);
+          }}
+        />
+        <CacheProvider sha={gitSha}>
+          <ToolProvider>
+            <SplitContextProvider
+              splitBrowserKey={splitBrowserKey}
+              splitUser={splitUser}
+              setSplitUser={setSplitUser}
+              splitClientFeatures={splitClientFeatures}
+            >
+              <Outlet />
+            </SplitContextProvider>
+            <ScrollRestoration />
+            <Scripts />
             <LiveReload />
           </ToolProvider>
         </CacheProvider>
