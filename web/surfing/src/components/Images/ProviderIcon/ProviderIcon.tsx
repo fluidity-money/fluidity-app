@@ -47,7 +47,7 @@ const providerImgMap: { [K in Providers]: string } = {
   Solend: "solend.png",
   Uniswap: "Uniswap.svg",
   Sushiswap: "Sushiswap.svg",
-  Fluidity: "/images/logoMetallic.png",
+  Fluidity: "logoMetallic.png",
   Oneinch: "1inch.svg",
   Balancer: "balancer.svg",
   Mooniswap: "mooniswap.png",
@@ -59,7 +59,7 @@ const providerImgMap: { [K in Providers]: string } = {
   Mercurial: "mercurial.png",
 };
 
-type IProviderIcon = HTMLImageElement & {
+type IProviderIcon = Partial<HTMLImageElement> & {
   provider: Providers;
 };
 

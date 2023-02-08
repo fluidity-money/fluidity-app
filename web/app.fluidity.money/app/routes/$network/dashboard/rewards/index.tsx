@@ -5,6 +5,8 @@ import type { LinksFunction, LoaderFunction } from "@remix-run/node";
 import type { TransactionsLoaderData } from "../../query/userTransactions";
 import type { RewardsLoaderData } from "../../query/dashboard/rewards";
 import type { UnclaimedRewardsLoaderData } from "../../query/dashboard/unclaimedRewards";
+import type { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
+import type { Providers } from "@fluidity-money/surfing/dist/types/components/Images/ProviderIcon/ProviderIcon";
 
 import {
   transactionActivityLabel,
@@ -15,7 +17,7 @@ import {
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { UserRewards } from "./common";
+import { NoUserRewards, UserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { MintAddress } from "~/types/MintAddress";
 import {
@@ -26,12 +28,16 @@ import {
   trimAddress,
   LinkButton,
   useViewport,
+  Token,
+  HoverButton,
+  Card,
+  ProviderIcon,
+  Display,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
   LabelledValue,
   ProviderCard,
-  ProviderIcon,
   ToolTipContent,
   useToolTip,
 } from "~/components";
@@ -72,7 +78,8 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(error) {
+  console.log(error)
   return (
     <div
       className="pad-main"
@@ -117,6 +124,12 @@ const SAFE_DEFAULT: CacheData = {
   },
   rewards: {
     day: [],
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
+  tokenPerformance: {
     week: [],
     month: [],
     year: [],
@@ -281,6 +294,8 @@ export default function Rewards() {
     userUnclaimedRewards,
     unclaimedTokenAddrs,
     weeklyRewards,
+    activeTokenPerformance,
+    hasTokenPerformance,
   } = useMemo(() => {
     const {
       fluidPairs,
@@ -293,40 +308,29 @@ export default function Rewards() {
       rewards,
       userUnclaimedRewards,
       unclaimedTokenAddrs,
+      tokenPerformance,
     } = activeTableFilterIndex ? data.user : data.global;
 
-    const {
-      week: weeklyYield,
-      month: monthlyYield,
-      year: yearlyYield,
-      all: allYield,
-    } = rewards;
-
-    const {
-      week: weeklyRewards,
-      month: monthlyRewards,
-      year: yearlyRewards,
-      all: allRewards,
-    } = rewarders;
-
-    const [activeRewards, activeYield] = (() => {
+    const [activeRewards, activeYield, activeTokenPerformance] = (() => {
       switch (activeRewardFilterIndex) {
         case 1:
-          return [weeklyRewards, weeklyYield];
+          return [rewarders.week, rewards.week, tokenPerformance.week];
         case 2:
-          return [monthlyRewards, monthlyYield];
+          return [rewarders.month, rewards.month, tokenPerformance.month];
         case 3:
-          return [yearlyRewards, yearlyYield];
+          return [rewarders.year, rewards.year, tokenPerformance.year];
         case 0:
         default:
-          return [allRewards, allYield];
+          return [rewarders.all, rewards.all, tokenPerformance.all];
       }
     })();
 
     const hasRewarders = !!activeRewards.length;
 
+    const hasTokenPerformance = !!activeTokenPerformance.length;
+
     return {
-      count: allYield.length ? allYield[0].count : 0,
+      count: rewards.all[0]?.count || 0,
       hasRewarders,
       fluidPairs,
       networkFee,
@@ -334,11 +338,13 @@ export default function Rewards() {
       transactions,
       rewarders: activeRewards,
       timestamp,
-      activeYield: activeYield.length ? activeYield[0].total_reward : 0,
+      activeYield: activeYield[0]?.total_reward || 0,
       totalPrizePool,
       userUnclaimedRewards,
       unclaimedTokenAddrs,
-      weeklyRewards,
+      weeklyRewards: rewarders.week,
+      activeTokenPerformance,
+      hasTokenPerformance,
     };
   }, [
     activeTableFilterIndex,
@@ -474,7 +480,7 @@ export default function Rewards() {
       {/* Info Cards */}
       {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
         <UserRewards
-          claimNow={mobileView}
+          claimNow={false}
           unclaimedRewards={userUnclaimedRewards}
           claimedRewards={activeYield}
           network={network}
@@ -483,30 +489,8 @@ export default function Rewards() {
           tokenAddrs={unclaimedTokenAddrs}
         />
       ) : (
-        <div className="no-user-rewards">
-          <section id="spend-to-earn">
-            <Heading className="spendToEarnHeading" as="h2">
-              Spend to earn
-            </Heading>
-            <Text size="lg">
-              Use, send and receive fluid assets <br />
-              to generate yield.
-            </Text>
-          </section>
-          <section>
-            {weeklyRewards?.length > 0 && (
-              <>
-                <Text size="md">Highest reward distribution this week</Text>
-
-                <ProviderCard
-                  name={weeklyRewards[0].name}
-                  prize={weeklyRewards[0].prize}
-                  avgPrize={weeklyRewards[0].avgPrize}
-                  size="lg"
-                />
-              </>
-            )}
-          </section>
+        <div>
+          <NoUserRewards prizePool={totalPrizePool} />
         </div>
       )}
       <div className="reward-ceiling">
@@ -534,7 +518,7 @@ export default function Rewards() {
 
       {/* Reward Performance */}
       <section id="performance">
-        <div style={{ marginBottom: "12px" }}>
+        <div>
           <Text>
             {isFirstLoad || !timestamp
               ? "Loading data..."
@@ -550,24 +534,16 @@ export default function Rewards() {
             </LabelledValue>
           </div>
 
-          {hasRewarders && (
+          {hasTokenPerformance && (
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <ProviderIcon provider={rewarders[0]?.name} />
-                  {rewarders[0]?.name === "Fluidity"
-                    ? "Transacting ƒAssets"
-                    : rewarders[0]?.name}
+                  <Token token={`f${activeTokenPerformance[0].token}` as Tokens} />
+                  {`f${activeTokenPerformance[0].token}` as Tokens}
                 </div>
               </LabelledValue>
             </div>
           )}
-
-          <div className="statistics-set">
-            <LabelledValue label={"Total prize pool"}>
-              {numberToMonetaryString(totalPrizePool)}
-            </LabelledValue>
-          </div>
 
           <div className="statistics-set">
             <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
@@ -583,7 +559,46 @@ export default function Rewards() {
               </LinkButton>
             </Link>
           </div>
+
+        {hasRewarders && (
+          <div className="statistics-set">
+            <LabelledValue label={"Highest Reward Distribution"}>
+              <div className="highest-performer-child">
+                <ProviderIcon provider={rewarders[0]?.name as Providers} />
+                {rewarders[0]?.name === "Fluidity"
+                  ? "Transacting ƒAssets"
+                  : rewarders[0]?.name}
+              </div>
+            </LabelledValue>
+            <HoverButton size="medium" hoverComp={
+              <>
+                <ProviderIcon provider={rewarders[0]?.name} />
+                <section>
+                  <Heading as="h5" style={{margin: "1em 0px 1em 0px"}}>
+                    {rewarders[0]?.name === "Fluidity"
+                      ? "Transacting ƒAssets"
+                      : rewarders[0]?.name}
+                  </Heading>
+                  <Text>Fluidity wraps assets into fluid assets and generates yield every time fluid assets are used</Text>
+                </section>
+                <section>
+                  <div>
+                    <Text prominent>{numberToMonetaryString(rewarders[0].avgPrize)}</Text>
+                    <Text>Avg prize/trans</Text>
+                  </div>
+                  <div>
+                    <Text prominent>{numberToMonetaryString(rewarders[0].prize)}</Text>
+                    <Text>Top prize</Text>
+                  </div>
+                </section>
+              </>
+            }>
+              Hover for Details
+            </HoverButton>
+          </div>
+        )}
         </div>
+
       </section>
 
       <section id="table">

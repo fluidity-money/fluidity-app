@@ -27,7 +27,7 @@ const tokenImgMap: { [K in Tokens]: string } = {
   fDAI: "fDAI.svg",
 };
 
-type IToken = HTMLImageElement & {
+type IToken = Partial<HTMLImageElement> & {
   token: Tokens;
 };
 

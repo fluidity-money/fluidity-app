@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "@remix-run/react";
 import {
   Card,
@@ -8,7 +8,7 @@ import {
   GeneralButton,
   LinkButton,
   Heading,
-  Spinner,
+  useViewport,
 } from "@fluidity-money/surfing";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 
@@ -31,62 +31,11 @@ const UserRewards = ({
   gasFee,
   tokenAddrs = [],
 }: IUserRewards) => {
-  const { manualReward, address } = useContext(FluidityFacadeContext);
-
   const navigate = useNavigate();
 
-  const [claiming, setClaiming] = useState(false);
-
-  const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
-
-  const networkNotEth = network !== "ethereum";
-
   const onClick = async () => {
-    if (networkNotEth) return;
-
-    if (!claimNow) return navigate(`/${network}/dashboard/rewards/unclaimed`);
-
-    if (claiming) return;
-
-    setClaiming(true);
-
-    try {
-      const rewards = await manualReward?.(tokenAddrs, address ?? "");
-
-      if (!rewards?.length) {
-        // Toast Error
-
-        return;
-      }
-
-      const rewardedSum = rewards.reduce(
-        (sum, res) => sum + (res?.amount || 0),
-        0
-      );
-
-      if (!rewardedSum) {
-        // Toast Error
-        setClaiming(false);
-
-        return;
-      }
-
-      const networkFee = rewards.reduce(
-        (sum, res) => sum + (res?.networkFee || 0),
-        0
-      );
-
-      const gasFee = rewards.reduce((sum, res) => sum + (res?.gasFee || 0), 0);
-
-      return navigate(
-        `/${network}/dashboard/rewards/claim?reward=${rewardedSum}&networkfee=${networkFee}&gasfee=${gasFee}`
-      );
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setClaiming(false);
-    }
-  };
+    navigate('unclaimed')
+  }; 
 
   return (
     <>
@@ -114,16 +63,7 @@ const UserRewards = ({
               <Display className="unclaimed-total" size={"sm"}>
                 {numberToMonetaryString(unclaimedRewards)}
               </Display>
-              {claiming ? (
-                <GeneralButton
-                  size={"large"}
-                  version={"primary"}
-                  buttontype="icon only"
-                  icon={<Spinner />}
-                  handleClick={onClick}
-                  className="view-breakdown-button"
-                />
-              ) : (
+              {!claimNow && (
                 <GeneralButton
                   size={"large"}
                   version={"primary"}
@@ -131,9 +71,10 @@ const UserRewards = ({
                   handleClick={onClick}
                   className="view-breakdown-button"
                 >
-                  {networkNotEth ? "Coming Soon!" : buttonText}
+                  View Breakdown
                 </GeneralButton>
-              )}
+              )
+            }
             </section>
           </section>
 
@@ -200,4 +141,39 @@ const UserRewards = ({
   );
 };
 
-export { UserRewards };
+type INoUserRewards = {
+  prizePool: number
+}
+
+const NoUserRewards = ({prizePool}: INoUserRewards) => {
+  const { width } = useViewport();
+
+  const isMobile = width < 500 && width > 0;
+
+  return (
+    <Card
+      id="no-user-rewards"
+      className="card-outer"
+      component="div"
+      rounded={true}
+      type={isMobile ? "transparent" : "box"}
+    >
+      <div className="card-inner unclaimed-inner">
+        <section id="unclaimed-left">
+          <Text>Total Prize Pool</Text>
+          <Display size={"sm"}><strong>{numberToMonetaryString(prizePool)}</strong></Display>
+        </section>
+
+        {/* Auto-claims infobox */}
+        <section id="infobox">
+          <Heading as="h5">No Unclaimed Rewards</Heading>
+          <Text>You currently have no unclaimed rewards</Text>
+          <br/>
+          <Text>Use, Send & Receive Fluid Assets to gain yield</Text>
+        </section>
+      </div>
+    </Card>
+  )
+}
+
+export { UserRewards, NoUserRewards };

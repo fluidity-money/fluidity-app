@@ -11,6 +11,7 @@ import { DaoIcon } from "./Dao";
 import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
 import { Token } from "./Token";
+import { InfoCircle } from "./InfoCircle";
 
 export {
   ArrowRight,
@@ -26,4 +27,5 @@ export {
   AssetsIcon,
   ProviderIcon,
   Token,
+  InfoCircle,
 };

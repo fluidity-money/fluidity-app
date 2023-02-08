@@ -15,6 +15,7 @@ import {
   useUserPendingRewardsByAddress,
 } from "./useUserRewards";
 import { useUserYieldAll, useUserYieldByAddress } from "./useUserYield";
+import useTokenRewardStatistics from "./useTokenRewardStatistics";
 
 export {
   useUserTransactionAllCount,
@@ -29,4 +30,5 @@ export {
   useUserPendingRewardsByAddress,
   useUserYieldAll,
   useUserYieldByAddress,
+  useTokenRewardStatistics,
 };
