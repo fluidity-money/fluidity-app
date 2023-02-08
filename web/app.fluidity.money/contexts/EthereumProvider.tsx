@@ -48,7 +48,7 @@ const EthereumFacade = ({
   tokens: Token[];
   connectors: [Connector, Web3ReactHooks][];
 }) => {
-  const { isActive, provider, account, connector } = useWeb3React();
+  const { isActive, provider, account, connector, isActivating } = useWeb3React();
   const okxWallet = useWindow("okxwallet");
 
   // attempt to connect eagerly on mount
@@ -346,6 +346,7 @@ const EthereumFacade = ({
         getDegenScore,
         addToken,
         connected: isActive,
+        connecting: isActivating
       }}
     >
       {children}

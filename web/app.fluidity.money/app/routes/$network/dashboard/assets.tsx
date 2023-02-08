@@ -1,11 +1,14 @@
-import { Text, Display, Heading, ManualCarousel } from "@fluidity-money/surfing"
-import { Link, Outlet, useLocation, useParams } from "@remix-run/react"
+import { Text, Display, Heading, ManualCarousel, numberToMonetaryString } from "@fluidity-money/surfing"
+import { Link, Outlet, useLoaderData, useLocation, useParams } from "@remix-run/react"
 import ProviderCard from "~/components/ProviderCard"
 import { useCache } from "~/hooks/useCache"
 import { Rewarders } from "~/util/rewardAggregates"
 
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
 import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
+import FluidityFacadeContext from "contexts/FluidityFacade"
+import { useContext, useEffect, useState } from "react"
+import { LoaderFunction } from "@remix-run/node"
 
 export const links = () => {
   return [
@@ -13,9 +16,41 @@ export const links = () => {
   ];
 };
 
+import serverConfig from "~/webapp.config.server";
+import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens"
+import BN from "bn.js"
+
+
+export const loader: LoaderFunction = async ({ params }) => {
+  const { network } = params;
+  const { tokens } =
+    serverConfig.config[network as unknown as string] ?? {};
+
+  return {
+    tokens,
+  };
+};
+
+const getValueOfAssets = async (tokens: Token[], assetType: 'fluid' | 'regular', getBalance: (tokenAddr: string) => Promise<BN | undefined>) => {
+
+  const totalBalance = tokens.reduce(async (acc, token) => {
+    if (assetType === 'fluid' && !token.isFluidOf) return acc
+    if (assetType === 'regular' && token.isFluidOf) return acc
+
+    const balance: BN | undefined = await getBalance(token.address)
+
+    if (balance) {
+      return (await acc) + (getUsdFromTokenAmount(balance, token))
+    }
+    return acc
+  }, Promise.resolve(0))
+
+  return totalBalance
+}
+
 const AssetsRoot = () => {
     const { network } = useParams()
-    
+    const {tokens} = useLoaderData()
     const urlRoot = `/${network}/dashboard/assets`;
 
     const currentPage = useLocation().pathname;
@@ -41,16 +76,30 @@ const AssetsRoot = () => {
       },
     ]
 
+    const { connected, connecting, balance } = useContext(FluidityFacadeContext)
+
+    const [totalWalletValue, setTotalWalletValue] = useState<number | undefined>(undefined)
+
+    useEffect(() => {
+      if (!connected || !balance ) return
+  
+      (async () => {
+        const total = await getValueOfAssets(tokens, isFluidAssets ? 'fluid' : 'regular', balance)
+        setTotalWalletValue(total)
+      })()
+    }, [connected, isFluidAssets])
+
     return (
       <div className="pad-main">
         <div className="assets-header">
           <div className="assets-balance">
               <Text>
-                  Total balance
+                  Total balance of {isFluidAssets ? 'Fluid' : 'Regular'} Assets
               </Text>
               <Display size="sm">
-                  $0.00
+                {numberToMonetaryString(totalWalletValue ?? 0)}
               </Display>
+
           </div>
           <AnimateSharedLayout>
             <div className="assets-navigation">
@@ -76,7 +125,7 @@ const AssetsRoot = () => {
           </AnimateSharedLayout>
         </div>
         <AnimatePresence>
-          <Outlet />
+          {!connecting ? (connected ? <Outlet/> : <div>Looks like you haven&apos;t connected your wallet yet.</div>) : 'loading'}
         </AnimatePresence>
         <section id="rewarders">
           <Heading className="highest-rewarders" as={"h2"}>
