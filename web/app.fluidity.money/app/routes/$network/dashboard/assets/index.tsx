@@ -181,6 +181,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
       <CollapsibleCard expanded={false}>
         <CollapsibleCard.Summary>
           <TokenCard 
+            isFluid
             showLabels
             token={token}
             fluidAmt={quantities.fluidAmt?.div(decimals).toNumber() || 0}

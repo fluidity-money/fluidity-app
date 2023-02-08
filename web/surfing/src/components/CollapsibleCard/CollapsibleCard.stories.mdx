@@ -4,7 +4,7 @@ import { TokenDetails, TokenCard } from "../";
 
 <Meta title="Container/CollapsibleCard" component={CollapsibleCard} />
 
-export const Template = () => {
+export const FluidTemplate = () => {
   return (
     <>
       <CollapsibleCard
@@ -13,6 +13,7 @@ export const Template = () => {
       >
         <CollapsibleCard.Summary>
           <TokenCard 
+            isFluid
             showLabels
             token={{
               symbol: 'fUSDC',
@@ -66,12 +67,44 @@ export const Template = () => {
   )
 }
 
+export const RegularTemplate = () => {
+  return (
+    <>
+      <CollapsibleCard
+        type="box"
+      >
+        <CollapsibleCard.Summary>
+          <TokenCard 
+            showLabels
+            token={{
+              symbol: 'USDC',
+              name: 'USD Coin',
+              logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04068DA6C83AFCFA0e13ba15A6696662335D5B75/logo.png',
+              address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75',
+              decimals: 6,
+              colour: '#fff'
+            }}
+            fluidAmt={2100}
+            regAmt={234}
+            value={1.00}
+          />
+        </CollapsibleCard.Summary>
+      </CollapsibleCard>
+    </>
+    )
+}
+
 <Canvas columns={1}  withSource="open" withToolbar>
   <Title>Data Table</Title>
   <Subtitle>Table to show logs</Subtitle>
-    <Story
-    name="Assets"
+  <Story
+    name="Fluid Asset"
   >
-    {Template.bind({})}
+    {FluidTemplate.bind({})}
+  </Story>
+  <Story
+    name="Regular Asset"
+  >
+    {RegularTemplate.bind({})}
   </Story>
 </Canvas>

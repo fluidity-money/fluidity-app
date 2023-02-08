@@ -1,10 +1,12 @@
 import { Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
-import { useLoaderData } from "@remix-run/react";
-import { Suspense } from "react";
+import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import { CollapsibleCard, TokenCard } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
+import BN from "bn.js";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -97,6 +99,24 @@ const assetVariants = {
 
 const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
   const { token } = props;
+  const navigate = useNavigate()
+  const { network } = useParams()
+
+  const {connected, balance} = useContext(FluidityFacadeContext)
+
+  const [amount, setAmount] = useState<BN>(new BN(0))
+
+  useEffect(() => {
+    if (!connected) return
+
+    (async () => {
+      const amt = await balance?.(token.address) ?? new BN(0)
+      setAmount(amt)
+    })()
+
+  }, [connected])
+
+  const decimals = new BN(10).pow(new BN(token.decimals))
 
   return (
     <motion.div variants={assetVariants} style={{marginBottom: '1em'}}>
@@ -106,10 +126,11 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
       >
         <CollapsibleCard.Summary>
           <TokenCard 
+            showLabels
             token={token}
-            fluidAmt={0}
-            regAmt={0}
-            value={0}
+            regAmt={amount.div(decimals).toNumber() || 0}
+            value={1}
+            onButtonPress={() => navigate(`/${network}/fluidify`)}
           />
         </CollapsibleCard.Summary>
       </CollapsibleCard>

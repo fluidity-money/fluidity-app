@@ -20,7 +20,6 @@ import serverConfig from "~/webapp.config.server";
 import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens"
 import BN from "bn.js"
 
-
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
   const { tokens } =
