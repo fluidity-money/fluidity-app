@@ -1,14 +1,11 @@
-import type { LoaderFunction } from "@remix-run/node";
-
-import { json } from "@remix-run/node";
-import { Text, Display, Heading, ManualCarousel, TabButton } from "@fluidity-money/surfing"
-import { Link, Outlet, useLoaderData, useLocation, useParams } from "@remix-run/react"
-import ProviderCard, { Provider } from "~/components/ProviderCard"
+import { Text, Display, Heading, ManualCarousel } from "@fluidity-money/surfing"
+import { Link, Outlet, useLocation, useParams } from "@remix-run/react"
+import ProviderCard from "~/components/ProviderCard"
 import { useCache } from "~/hooks/useCache"
 import { Rewarders } from "~/util/rewardAggregates"
 
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
 
 export const links = () => {
   return [
@@ -55,26 +52,28 @@ const AssetsRoot = () => {
                   $0.00
               </Display>
           </div>
-          <div className="assets-navigation">
-            <Link to={urlRoot}>
-              <Text
-                size="lg"
-                prominent={isFluidAssets}
-                className={isFluidAssets ? "active-filter" : ""}
-              >
-                  Fluid Assets
-              </Text>
-            </Link>
-            <Link to={`${urlRoot}/regular`}>
-              <Text
-                size="lg"
-                prominent={!isFluidAssets}
-                className={!isFluidAssets ? "active-filter" : ""}
-              >
-                  Regular Assets
-              </Text>
-            </Link>
-          </div>
+          <AnimateSharedLayout>
+            <div className="assets-navigation">
+              {navigationMap.map((l, i) => {
+                const selected = currentPage === l.link;
+                return (
+                  <Link key={i} to={l.link}>
+                    <Text
+                      size="lg"
+                      prominent={selected}
+                      className={selected ? "assets-active-filter" : ""}
+                    >
+                      {l.name}
+                    </Text>
+                    { selected && <motion.div
+                      className="assets-active-filter-underline"
+                      layoutId="underline"
+                    />}
+                  </Link>
+                );
+              })}
+            </div>
+          </AnimateSharedLayout>
         </div>
         <AnimatePresence>
           <Outlet />
