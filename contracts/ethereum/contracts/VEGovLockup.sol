@@ -6,10 +6,11 @@ import "./BaseNativeToken.sol";
 import "./GovToken.sol";
 
 import "@balancer-labs/v2-interfaces/contracts/solidity-utils/helpers/BalancerErrors.sol";
-import "@balancer-labs/v2-interfaces/contracts/solidity-utils/openzeppelin/IERC20.sol";
-import "@balancer-labs/v2-interfaces/contracts/pool-weighted/WeightedPoolUserData.sol";
-import "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
-import "@balancer-labs/v2-interfaces/contracts/vault/IAsset.sol";
+import { WeightedPoolUserData } from "@balancer-labs/v2-interfaces/contracts/pool-weighted/WeightedPoolUserData.sol";
+import { IVault } from "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
+import { IAsset } from "@balancer-labs/v2-interfaces/contracts/vault/IAsset.sol";
+
+import {_asIAsset } from "@balancer-labs/v2-solidity-utils/contracts/helpers/ERC20Helpers.sol";
 
 struct Lockup {
 	/// @dev lockTime that the token was locked at
@@ -26,11 +27,11 @@ struct Lockup {
 }
 
 contract VEGovLockup {
-	uint8 version_;
+    uint8 version_;
 
-	address operator_;
+    address operator_;
 
-	address emergencyCouncil_;
+    address emergencyCouncil_;
 
     bool noEmergencyMode_;
 
@@ -66,10 +67,10 @@ contract VEGovLockup {
     }
 
     function noEmergencyMode() public view returns (bool) {
-    	return _noEmergencyMode;
+    	return noEmergencyMode_;
     }
 
-    function lockup(uint256 _govTokenAmount, uint256 _fwEthAmount, uint256 _maxLockTime) {
+    function lockup(uint256 _govTokenAmount, uint256 _fwEthAmount, uint256 _maxLockTime) public {
     	require(noEmergencyMode(), "emergency mode");
 
 		// 20% of the provided tokens must be in fw eth (assuming
@@ -87,6 +88,10 @@ contract VEGovLockup {
 
     	govToken_.transferFrom(msg.sender, address(this), _govTokenAmount);
     	fwEthToken_.transferFrom(msg.sender, address(this), _fwEthAmount);
+
+    	uint256[] amountsIn = [_govTokenAmount, _fwEthAmount];
+
+    	uint256 minBptAmountOut = 0;
 
         bytes memory userData = abi.encode(
             WeightedPoolUserData.JoinKind.EXACT_TOKENS_IN_FOR_BPT_OUT,
