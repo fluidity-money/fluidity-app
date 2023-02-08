@@ -2,6 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useState } from "react";
 
 import { Card, TokenCard, ArrowUp, TokenDetails } from "~/components";
@@ -70,9 +71,15 @@ const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive })
 
 const Details: React.FC<IDetails> = ({ children }) => {
   return (
-    <div className={styles.Details}>
+    <motion.div 
+      className={styles.Details}
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
+    >
       {children}
-    </div>
+    </motion.div>
   )
 }
 
@@ -106,13 +113,13 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
       <Summary canExpand onClick={() => {setIsOpen(prev => !prev)}} isActive={isOpen}>
         {summary.props.children}
       </Summary>
-      <>
+      <AnimatePresence>
         {isOpen && (
           <Details>
             {details.props.children}
           </Details>
         )}
-      </>
+      </AnimatePresence>
     </Card>
   );
 };

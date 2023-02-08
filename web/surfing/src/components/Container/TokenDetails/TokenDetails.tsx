@@ -2,6 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { motion } from "framer-motion";
 import { LabelledValue, Text, LinkButton, LineChart, DataTable } from "~/components";
 import { numberToMonetaryString, trimAddress } from "~/util";
 import styles from "./TokenDetails.module.scss";
@@ -94,7 +95,13 @@ const TokenDetails = ({
 
       <LinkButton type="internal" size="small" handleClick={() => 1} >Full History</LinkButton>
     </div>
-    <div className={styles.graph}>
+    <motion.div 
+      className={styles.graph}
+      initial={{ opacity: 0, }}
+      animate={{ opacity: 1, }}
+      exit={{ opacity: 0, }}
+      transition={{ delay: 0.2, duration: 0.3, ease: 'easeInOut' }}
+    >
       <LineChart 
         data={activity.map((a, i) => {
           return {
@@ -109,7 +116,7 @@ const TokenDetails = ({
         }}
         renderTooltip={() => {<></>}}
       />
-    </div>
+    </motion.div>
   </div>
 );
 

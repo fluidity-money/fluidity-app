@@ -8,6 +8,7 @@ import { useCache } from "~/hooks/useCache"
 import { Rewarders } from "~/util/rewardAggregates"
 
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
+import { AnimatePresence } from "framer-motion";
 
 export const links = () => {
   return [
@@ -75,7 +76,9 @@ const AssetsRoot = () => {
             </Link>
           </div>
         </div>
-        <Outlet />
+        <AnimatePresence>
+          <Outlet />
+        </AnimatePresence>
         <section id="rewarders">
           <Heading className="highest-rewarders" as={"h2"}>
             Highest Rewarders

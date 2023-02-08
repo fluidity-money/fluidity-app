@@ -8,6 +8,7 @@ import serverConfig from "~/webapp.config.server";
 import { useCache } from "~/hooks/useCache";
 import BN from "bn.js";
 import { ITokenStatistics } from "../../query/dashboard/assets";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -34,19 +35,46 @@ export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) =
   );
 }
 
+const allAssetsVariants = {
+  hidden: {
+  },
+  visible: {
+    left: 0,
+    transition: {
+      duration: 1,
+      staggerChildren: 0.1,
+      staggerDirection: 1,
+    }
+  },
+  exit: {
+    left: -100,
+    opacity: 0,
+    transition: {
+      duration: 5,
+      staggerChildren: 0.1,
+      staggerDirection: -1
+    }
+  }
+}
+
 const FluidAssets = () => {
   const { tokens } = useLoaderData<LoaderData>()
 
   return (
-    <>
-      <Suspense fallback={'loading'}>
-        {
-          tokens.map((t, i) => {
-            return <CardWrapper key={i} token={t}/>
-          })
-        }
-      </Suspense>
-    </>
+      <motion.div
+        variants={allAssetsVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
+        <Suspense fallback={'loading'}>
+          {
+            tokens.map((t, i) => {
+              return <CardWrapper key={i} token={t}/>
+            })
+          }
+        </Suspense>
+      </motion.div>
   )
 }
 
@@ -83,6 +111,25 @@ const getAugmentedWalletActivity = (activity: Activity[], walletValue: number): 
       totalWalletValue: totalWalletValueDelta
     }
   })
+}
+
+const assetVariants = {
+  hidden: {
+    opacity: 0,
+    y: 100
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: 'easeInOut'
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: 20
+  }
 }
 
 const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
@@ -128,8 +175,10 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const augmentedActivity = getAugmentedWalletActivity(activity, quantities.fluidAmt?.toNumber() || 0)
 
   return (
-    <div style={{marginBottom: '1em'}}>
-      <CollapsibleCard expanded={true}>
+    <motion.div style={{marginBottom: '1em'}} 
+      variants={assetVariants}
+    >
+      <CollapsibleCard expanded={false}>
         <CollapsibleCard.Summary>
           <TokenCard 
             showLabels
@@ -154,7 +203,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
           />
         </CollapsibleCard.Details>
       </CollapsibleCard>
-    </div>
+    </motion.div>
   )
 }
 
