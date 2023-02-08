@@ -95,7 +95,7 @@ const queryByAddress: Queryable = {
       $filterHashes: [String!] = [], 
       $limit: Int = 12
     ) {
-    arbitrum: user_actions(
+    transfers: user_actions(
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
@@ -193,7 +193,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = [], 
       $limit: Int = 12
     ) {
-    arbitrum: user_actions(
+    transfers: user_actions(
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: {_in: $filterHashes } },
@@ -299,7 +299,7 @@ const queryAll: Queryable = {
       $filterHashes: [String!] = [], 
       $limit: Int = 12
     ) {
-    arbitrum: user_actions(
+    transfers: user_actions(
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
@@ -511,14 +511,18 @@ const useUserTransactionsAll = async (
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
-    result.data[network].transfers = hasuraTransfers.map(transfer => ({
-      sender: { address: transfer.sender_address },
-      receiver: { address: transfer.recipient_address },
-      amount: transfer.amount,
-      currency: { symbol: transfer.token_short_name },
-      transaction: { hash: transfer.transaction_hash },
-      block: { timestamp: { unixtime: transfer.time } }
-    }))
+    result.data = {
+      arbitrum: {
+        transfers: hasuraTransfers.map(transfer => ({
+          sender: {address: transfer.sender_address},
+          receiver: {address: transfer.recipient_address},
+          amount: transfer.amount,
+          currency: {symbol: transfer.token_short_name},
+          transaction: {hash: transfer.transaction_hash},
+          block: {timestamp: {unixtime: transfer.time}}
+        }))
+      }
+    }
   }
 
   return result; 
