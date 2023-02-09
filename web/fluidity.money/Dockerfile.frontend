@@ -5,6 +5,7 @@ WORKDIR /usr/local/src/fluidity/web
 
 ENV PRODUCTION ${PRODUCTION}
 
+
 ARG CI
 
 ARG GITHUB_TOKEN
@@ -29,8 +30,8 @@ FROM fluidity/runtime-web-container:latest
 
 WORKDIR /usr/local/src/fluidity/web
 
-ENV NEXT_APP_FLU_GTAG_ID ${FLU_GTAG_ID}
-ENV NEXT_APP_FLU_GTM_ID ${FLU_GTM_ID}
+ENV NEXT_PUBLIC_FLU_GTAG_ID ${FLU_GTAG_ID}
+ENV NEXT_PUBLIC_FLU_GTM_ID ${FLU_GTM_ID}
 
 COPY --from=build /usr/local/src/fluidity/web .
 
