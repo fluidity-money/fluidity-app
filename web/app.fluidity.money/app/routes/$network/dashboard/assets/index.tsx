@@ -1,5 +1,5 @@
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { Suspense, useContext, useEffect, useMemo, useState } from "react"
+import { Suspense, useContext, useEffect, useState } from "react"
 import { CollapsibleCard, TokenCard, TokenDetails } from "@fluidity-money/surfing"
 import { useLoaderData, useParams } from "@remix-run/react"
 import { Token } from "~/util/chainUtils/tokens";
@@ -39,7 +39,8 @@ const allAssetsVariants = {
   hidden: {
   },
   visible: {
-    left: 0,
+    x: 0,
+    opacity: 1,
     transition: {
       duration: 1,
       staggerChildren: 0.1,
@@ -47,13 +48,7 @@ const allAssetsVariants = {
     }
   },
   exit: {
-    left: -100,
-    opacity: 0,
-    transition: {
-      duration: 5,
-      staggerChildren: 0.1,
-      staggerDirection: -1
-    }
+    x:-100,
   }
 }
 
@@ -62,6 +57,7 @@ const FluidAssets = () => {
 
   return (
       <motion.div
+        key='fluid-assets'
         variants={allAssetsVariants}
         initial="hidden"
         animate="visible"
@@ -128,7 +124,11 @@ const assetVariants = {
   },
   exit: {
     opacity: 0,
-    y: 20
+    x: -200,
+    transition: {
+      duration: 0.5,
+      ease: 'easeInOut'
+    }
   }
 }
 
@@ -137,7 +137,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const { token } = props
 
   const { network } = useParams()
-  const { connected, balance } = useContext(FluidityFacadeContext)
+  const { connected, balance, address } = useContext(FluidityFacadeContext)
 
   const [quantities, setQuantities] = useState<Quantities>({fluidAmt: new BN(0), regAmt: new BN(0)})
 
@@ -162,8 +162,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     })()
 
   }, [connected])
-
-  const address = "0xb0d6DAD7D483DA4F4B069499fC56AD05E35d2b8a" // Test address
 
   const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}` : '', true)
 
