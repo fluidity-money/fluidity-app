@@ -32,7 +32,7 @@ func shouldIgnoreTransfer(from ethereum.Address, to ethereum.Address) bool {
 }
 
 // Get transfer receipts
-func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethCommon.Address) ([]worker.EthereumDecoratedTransfer) {
+func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, blockHash ethereum.Hash, fluidContractAddress ethCommon.Address, utilities map[ethereum.Address]applications.UtilityName) ([]worker.EthereumDecoratedTransfer) {
 	var (
 		contractAddress = fluidContractAddress.String()
 		loweredContractAddress = strings.ToLower(contractAddress)
@@ -106,11 +106,27 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			continue
 		}
 
+		var decorator *worker.EthereumWorkerDecorator
+
+		utility, exists := utilities[ethereum.AddressFromString(transferContractAddress)]
+
+		log.Debugf("comparing %s, exists %v", ethereum.AddressFromString(transferContractAddress), exists)
+		for k, v := range utilities {
+			log.Debugf("against %s %s", k, v)
+		}
+
+		if exists {
+			decorator = &worker.EthereumWorkerDecorator{
+				UtilityName:    utility,
+			}
+			log.Debugf("setting decorator to %s %+v", utility, decorator)
+		}
+
 		transfer := worker.EthereumDecoratedTransfer{
 			SenderAddress:    fromAddress,
 			RecipientAddress: toAddress,
 			TransactionHash:  transactionHash,
-			Decorator:        nil,
+			Decorator:        decorator,
 		}
 
 		transfers = append(transfers, transfer)

@@ -1,0 +1,26 @@
+FROM debian:latest
+
+RUN apt-get update && apt-get -y install curl git socat
+
+RUN curl -L https://foundry.paradigm.xyz | bash
+
+ENV PATH="$PATH:/root/.foundry/bin"
+
+RUN foundryup
+
+RUN ls /root/.foundry/bin
+
+WORKDIR /app
+
+RUN mkdir ./lib/
+
+RUN ["forge", "install", "foundry-rs/forge-std", "--no-git", "--no-commit"]
+
+COPY ./contracts/ ./contracts
+
+RUN forge build --contracts=contracts
+
+COPY ./foundry-scripts/ ./foundry-scripts
+COPY run-foundry.sh .
+
+CMD ["./run-foundry.sh"]
