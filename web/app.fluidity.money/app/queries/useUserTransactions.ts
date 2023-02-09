@@ -1,5 +1,5 @@
 import { gql, Queryable, jsonPost } from "~/util";
-import {fetchGqlEndpoint} from "~/util/api/graphql";
+import {fetchGqlEndpoint, hasuraDateToUnix} from "~/util/api/graphql";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -89,7 +89,6 @@ const queryByAddress: Queryable = {
 
   arbitrum: gql`
     query getTransactionsByAddress(
-      $tokens: [String!], 
       $address: String!, 
       $offset: Int = 0, 
       $filterHashes: [String!] = [], 
@@ -99,7 +98,6 @@ const queryByAddress: Queryable = {
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
-       token_short_name: { _in: $tokens }, 
        sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
       }, 
       order_by: {time: desc},
@@ -294,7 +292,6 @@ const queryAll: Queryable = {
 
   arbitrum: gql`
     query getTransactions(
-      $tokens: [String!], 
       $offset: Int = 0, 
       $filterHashes: [String!] = [], 
       $limit: Int = 12
@@ -303,7 +300,6 @@ const queryAll: Queryable = {
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
-       token_short_name: { _in: $tokens }
       }, 
       order_by: { time: desc },
       limit: $limit, 
@@ -325,7 +321,7 @@ type UserTransactionsByAddressBody = {
   variables: {
     address: string;
     offset: number;
-    tokens: string[];
+    tokens?: string[];
     filterHashes?: string[];
   };
 };
@@ -342,7 +338,7 @@ type UserTransactionsAllBody = {
   query: string;
   variables: {
     offset: number;
-    tokens: string[];
+    tokens?: string[];
     filterHashes?: string[];
   };
 };
@@ -371,9 +367,10 @@ export type HasuraUserTransaction = {
   sender_address: string,
   recipient_address: string,
   amount: number,
+  token_decimals: number,
   token_short_name: string,
   transaction_hash: string,
-  time: number
+  time: string, 
 };
 
 export type HasuraUserTransactionRes = {
@@ -392,9 +389,9 @@ const useUserTransactionsByAddress = async (
   const variables = {
     address: address,
     offset: (page - 1) * 12,
-    tokens,
     filterHashes,
     limit,
+    ...(network !== "arbitrum" && {tokens}),
   };
 
   const body = {
@@ -423,7 +420,7 @@ const useUserTransactionsByAddress = async (
       amount: transfer.amount,
       currency: { symbol: transfer.token_short_name },
       transaction: { hash: transfer.transaction_hash },
-      block: { timestamp: { unixtime: transfer.time } }
+      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
     }))
   }
 
@@ -440,8 +437,8 @@ const useUserTransactionsByTxHash = async (
   const variables = {
     transactions,
     filterHashes,
-    tokens,
     limit,
+    ...(network !== "arbitrum" && {tokens}),
   };
 
   const body = {
@@ -470,7 +467,7 @@ const useUserTransactionsByTxHash = async (
       amount: transfer.amount,
       currency: { symbol: transfer.token_short_name },
       transaction: { hash: transfer.transaction_hash },
-      block: { timestamp: { unixtime: transfer.time } }
+      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
     }))
   }
 
@@ -485,10 +482,10 @@ const useUserTransactionsAll = async (
   limit = 12
 ) => {
   const variables = {
-    tokens,
     offset: (page - 1) * 12,
     filterHashes,
     limit,
+    ...(network !== "arbitrum" && {tokens}),
   };
 
   const body = {
@@ -519,7 +516,9 @@ const useUserTransactionsAll = async (
           amount: transfer.amount,
           currency: {symbol: transfer.token_short_name},
           transaction: {hash: transfer.transaction_hash},
-          block: {timestamp: {unixtime: transfer.time}}
+          block: {
+            timestamp: {unixtime: hasuraDateToUnix(transfer.time)}
+          }
         }))
       }
     }

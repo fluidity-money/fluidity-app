@@ -1,5 +1,5 @@
 import { gql, jsonPost, Queryable } from "~/util";
-import {fetchGqlEndpoint} from "~/util/api/graphql";
+import {fetchGqlEndpoint, hasuraDateToUnix} from "~/util/api/graphql";
 
 const queryByAddressTimestamp: Queryable = {
   ethereum: gql`
@@ -35,7 +35,6 @@ const queryByAddressTimestamp: Queryable = {
 `,
   arbitrum: gql`
     query VolumeTxs(
-      $fluidAssets: [String!], 
       $address: String!, 
       $filterHashes: [String!] = [], 
       $timestamp: timestamp!
@@ -44,7 +43,6 @@ const queryByAddressTimestamp: Queryable = {
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
-       token_short_name: { _in: $fluidAssets }, 
        time: { _gt: $timestamp },
        sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
       }, 
@@ -90,7 +88,6 @@ const queryByTimestamp: Queryable = {
 
   arbitrum: gql`
     query VolumeTxs(
-      $fluidAssets: [String!], 
       $filterHashes: [String!] = [], 
       $timestamp: timestamp!
     ) {
@@ -98,7 +95,6 @@ const queryByTimestamp: Queryable = {
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
-       token_short_name: { _in: $fluidAssets }, 
        time: { _gt: $timestamp },
       }, 
       order_by: {time: desc},
@@ -116,7 +112,7 @@ const queryByTimestamp: Queryable = {
 type VolumeTxsBodyByTimestamp = {
   query: string;
   variables: {
-    fluidAssets: string[];
+    fluidAssets?: string[];
     timestamp: string;
   };
 };
@@ -124,7 +120,7 @@ type VolumeTxsBodyByTimestamp = {
 type VolumeTxsBodyByAddressTimestamp = {
   query: string;
   variables: {
-    fluidAssets: string[];
+    fluidAssets?: string[];
     address: string;
     timestamp: string;
   };
@@ -174,7 +170,12 @@ const useVolumeTxByAddressTimestamp = async (
   address: string,
   iso8601Timestamp: string,
 ) => {
-  const variables = { fluidAssets, address, timestamp: iso8601Timestamp };
+  const variables = {
+    address, 
+    timestamp: iso8601Timestamp,
+    ...(network !== "arbitrum" && {fluidAssets}),
+  };
+
   const body = {
     variables,
     query: queryByAddressTimestamp[network],
@@ -200,7 +201,7 @@ const useVolumeTxByAddressTimestamp = async (
       receiver: { address: transfer.recipient_address },
       amount: String(transfer.amount),
       currency: { symbol: transfer.token_short_name },
-      block: { timestamp: { unixtime: transfer.time } }
+      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
     }))
   }
 
@@ -212,7 +213,11 @@ const useVolumeTxByTimestamp = async (
   fluidAssets: string[],
   iso8601Timestamp: string,
 ) => {
-  const variables = { fluidAssets, timestamp: iso8601Timestamp };
+  const variables = {
+    timestamp: iso8601Timestamp,
+    ...(network !== "arbitrum" && {fluidAssets}),
+  };
+
   const body = {
     variables,
     query: queryByTimestamp[network],
@@ -238,7 +243,7 @@ const useVolumeTxByTimestamp = async (
       receiver: { address: transfer.recipient_address },
       amount: String(transfer.amount),
       currency: { symbol: transfer.token_short_name },
-      block: { timestamp: { unixtime: transfer.time } }
+      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
     }))
   }
 

@@ -30,11 +30,10 @@ const queryByAddress: Queryable = {
     }
   `,
   arbitrum: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount($address: String!) {
       arbitrum: user_actions_aggregate(
         where: {
           network: { _eq: "arbitrum" },
-          token_short_name: { _in: $tokens },
           sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
         }
       ) {
@@ -66,11 +65,10 @@ const queryAll: Queryable = {
     }
   `,
   arbitrum: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount {
       arbitrum: user_actions_aggregate(
         where: {
           network: { _eq: "arbitrum" },
-          token_short_name: { _in: $tokens },
         }
       ) {
         aggregate {
@@ -85,14 +83,14 @@ type UserTransactionCountByAddressBody = {
   query: string;
   variables: {
     address: string;
-    fluidCurrencies: string[];
+    fluidCurrencies?: string[];
   };
 };
 
 type UserTransactionCountAllBody = {
   query: string;
   variables: {
-    fluidCurrencies: string[];
+    fluidCurrencies?: string[];
   };
 };
 
@@ -110,7 +108,7 @@ export type UserTransactionCountRes = {
 const useUserTransactionByAddressCount = async(network: string, address: string) => {
   const variables = {
     address: address,
-    fluidCurrencies: getTokenForNetwork(network),
+    ...(network !== "arbitrum" && {fluidCurrencies: getTokenForNetwork(network)}),
   };
 
   const body = {
@@ -140,7 +138,7 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
 
 const useUserTransactionAllCount = async(network: string) => {
   const variables = {
-    fluidCurrencies: getTokenForNetwork(network),
+    ...(network !== "arbitrum" && {fluidCurrencies: getTokenForNetwork(network)}),
   };
 
   const body = {

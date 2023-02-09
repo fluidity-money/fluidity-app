@@ -21,3 +21,6 @@ export const fetchGqlEndpoint = (network: string): {url: string, headers: {[key:
       return null
   }
 }
+
+export const hasuraDateToUnix = (date: String | number): number =>
+  Math.round(Date.parse(String(date) + "Z") / 1000);
