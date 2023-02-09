@@ -212,7 +212,6 @@ function App() {
     gitSha = "unknown",
     splitBrowserKey,
     splitUserKey,
-    splitClientFeatures,
   } = useLoaderData<LoaderData>();
 
   switch (true) {
@@ -336,7 +335,6 @@ function App() {
               splitBrowserKey={splitBrowserKey}
               splitUser={splitUser}
               setSplitUser={setSplitUser}
-              splitClientFeatures={splitClientFeatures}
             >
               <Outlet />
             </SplitContextProvider>

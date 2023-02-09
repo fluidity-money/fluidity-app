@@ -20,6 +20,8 @@ import { CookieConsent } from "@fluidity-money/surfing";
 import { useRouter } from "next/router";
 import * as gtag from "utils/gtag";
 import { GTM_ID } from "utils/gtag";
+import { SPLIT_BROWSER_KEY } from "hooks/SplitContext";
+import { SplitContextProvider } from "hooks/SplitContext";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -74,6 +76,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
   }, [width, breakpoint]);
 
+  const splitUser = 
+    process.env.NODE_ENV === "development" ||
+    (!!location && location.hostname.includes('staging')) 
+      ? "dev"
+      : "user";
+
   return (
     <>
       <noscript>
@@ -92,10 +100,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <div id="root">
         <ApolloProvider client={client}>
           <ChainContextProvider>
-            <div className="App">
-              {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
-              <Component {...pageProps} />
-            </div>
+            <SplitContextProvider splitBrowserKey={SPLIT_BROWSER_KEY} splitUser={splitUser} >
+              <div className="App">
+                {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
+                <Component {...pageProps} />
+              </div>
+            </SplitContextProvider>
           </ChainContextProvider>
         </ApolloProvider>
         <CookieConsent

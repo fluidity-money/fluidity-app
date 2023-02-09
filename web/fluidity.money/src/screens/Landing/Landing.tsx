@@ -22,7 +22,7 @@ const Landing = () => {
       : ["/assets/videos/FluidityHomeloop.webm"]
   ).map((link) => link);
 
-  const [state, setState] = useState({
+  const [state] = useState({
     src: vidSources[0],
     mimeType: type,
     key: "video-0",
