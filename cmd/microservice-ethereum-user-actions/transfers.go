@@ -11,6 +11,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 
 	"github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-user-actions/lib"
 )
@@ -18,7 +19,7 @@ import (
 // ZeroAddress is ignored when sent to by ending handleTransfer early
 const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
-func handleTransfer(transactionHash ethereum.Hash, logTopics []ethereum.Hash, data []byte, time time.Time, tokenShortName string, tokenDecimals int) {
+func handleTransfer(network_ network.BlockchainNetwork, transactionHash ethereum.Hash, logTopics []ethereum.Hash, data []byte, time time.Time, tokenShortName string, tokenDecimals int) {
 	if lenTopics := len(logTopics); lenTopics != 2 {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
@@ -34,6 +35,7 @@ func handleTransfer(transactionHash ethereum.Hash, logTopics []ethereum.Hash, da
 	)
 
 	transfer, err := microservice_user_actions.DecodeTransfer(
+		network_,
 		transactionHash,
 		fromAddressPadded,
 		toAddressPadded,
