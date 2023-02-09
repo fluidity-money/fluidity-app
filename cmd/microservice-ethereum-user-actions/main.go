@@ -134,6 +134,7 @@ func main() {
 			)
 
 			handleTransfer(
+				network_,
 				transactionHash,
 				topicRemaining,
 				logData,
