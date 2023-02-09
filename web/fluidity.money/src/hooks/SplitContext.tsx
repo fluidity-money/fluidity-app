@@ -3,8 +3,10 @@ import type {
   IBrowserSDK,
 } from "@splitsoftware/splitio/types/splitio";
 
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { SplitFactory } from "@splitsoftware/splitio";
+
+export const SPLIT_BROWSER_KEY = process.env["NEXT_PUBLIC_FLU_SPLIT_BROWSER_KEY"];
 
 type SplitWindow = Window & {
   split: IBrowserSDK | null;
@@ -33,20 +35,20 @@ const SplitContext = createContext<SplitContextType>(initContext());
 type ISplitContextProvider = React.PropsWithChildren<{
   splitBrowserKey: string;
   splitUser: string;
-  setSplitUser: React.Dispatch<React.SetStateAction<string>>;
 }>;
 
 const SplitContextProvider = ({
   children,
   splitBrowserKey,
   splitUser,
-  setSplitUser,
 }: ISplitContextProvider) => {
+  const [ splitUserKey, setSplitUserKey ] = useState("user");
+
   const [splitTreatment, setSplitTreatment] = useState<SplitContextType>({
     showExperiment: () => false,
     client: null,
-    splitUser,
-    setSplitUser,
+    splitUser: splitUserKey,
+    setSplitUser: setSplitUserKey,
   });
 
   useEffect(() => {
@@ -70,8 +72,8 @@ const SplitContextProvider = ({
         showExperiment: (featName: string) =>
           splitClient.getTreatment(featName) === "on",
         client: splitClient,
-        splitUser,
-        setSplitUser,
+        splitUser: splitUserKey,
+        setSplitUser: setSplitUserKey,
       });
     })();
   }, [splitUser]);
@@ -83,4 +85,7 @@ const SplitContextProvider = ({
   );
 };
 
-export { SplitContextProvider, SplitContext };
+const useSplitContext = () =>
+  useContext(SplitContext);
+
+export { SplitContextProvider, useSplitContext };

@@ -13,6 +13,7 @@ import {
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
+import { useSplitContext } from "hooks/SplitContext";
 
 interface IRewardBoxProps {
   totalTransactions: number;
@@ -34,6 +35,7 @@ const RewardsInfoBox = ({
   loading,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
+  const { showExperiment } = useSplitContext();
 
   const showRewardPool = type === "black";
 
@@ -47,10 +49,18 @@ const RewardsInfoBox = ({
   const { width } = useViewport();
   const mobileBreakpoint = 620;
 
-  const options = Object.keys(SupportedChains).map((chain) => ({
-    name: chain,
-    icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-  }));
+  const chainOptions = showExperiment("enable-arbitrum")
+    ? Object.keys(SupportedChains)
+      .map((chain) => ({
+        name: chain,
+        icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+      }))
+    : Object.keys(SupportedChains)
+      .filter(chain => chain !== "ARB")
+      .map(chain => ({
+        name: chain,
+        icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+      }))
 
   const [prizePool, setPrizePool] = useState<number>(0);
 
@@ -122,7 +132,7 @@ const RewardsInfoBox = ({
               icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
             }}
             className={styles.overlap}
-            options={options}
+            options={chainOptions}
             setOption={setChain}
             mobile={width <= mobileBreakpoint && width > 0}
           />
