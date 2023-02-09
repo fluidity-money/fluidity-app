@@ -1,35 +1,43 @@
 import { ethers } from "ethers";
-import * as hre from "hardhat";
 import { expect } from "chai";
-import { accountSigner, govOperatorSigner, govTokenSigner } from "./setup-common";
-const { PANIC_CODES } = require("@nomicfoundation/hardhat-chai-matchers/panic");
+import { commonBindings, signers } from "./setup-common";
 import { expectEq, expectGt } from "./test-utils";
 
 describe("GovToken", async () => {
-  it("uses the account signer to adjust allowance", async () => {
-    const govOperatorSignerAddress = govOperatorSigner.address;
-    const accountSignerAddress = accountSigner.address;
+  let govOperator: ethers.Contract;
+  let govOperatorSigner: ethers.Signer;
+  let accountSigner: ethers.Signer;
 
-    const oldAccountSignerAllowance = await govTokenSigner.allowance(
+  before(async function() {
+    govOperator = commonBindings.govToken.owner;
+    govOperatorSigner = signers.govToken.owner;
+    accountSigner = signers.userAccount1;
+  });
+
+  it("uses the account signer to adjust allowance", async () => {
+    const govOperatorSignerAddress = await govOperatorSigner.getAddress();
+    const accountSignerAddress = await accountSigner.getAddress();
+
+    const oldAccountSignerAllowance = await govOperator.allowance(
       govOperatorSignerAddress,
       accountSignerAddress
     );
 
     expectEq(oldAccountSignerAllowance, 0);
 
-    await govTokenSigner.increaseAllowance(accountSignerAddress, 1000);
+    await govOperator.increaseAllowance(accountSignerAddress, 1000);
 
-    const newAccountSignerAllowance = await govTokenSigner.allowance(
+    const newAccountSignerAllowance = await govOperator.allowance(
       govOperatorSignerAddress,
       accountSignerAddress
     );
 
     expectEq(newAccountSignerAllowance, 1000);
 
-    await govTokenSigner.decreaseAllowance(accountSignerAddress, 223);
+    await govOperator.decreaseAllowance(accountSignerAddress, 223);
 
     expectEq(
-      await govTokenSigner.allowance(
+      await govOperator.allowance(
         govOperatorSignerAddress,
         accountSignerAddress
       ),
@@ -38,30 +46,26 @@ describe("GovToken", async () => {
   });
 
   it("burn some tokens and make sure they stay burned", async () => {
-    const govOperatorSignerAddress = govOperatorSigner.address;
-    const accountSignerAddress = accountSigner.address;
+    const govOperatorSignerAddress = await govOperatorSigner.getAddress();
 
-    const amountBefore = await govTokenSigner.balanceOf(govOperatorSignerAddress);
+    const amountBefore = await govOperator.balanceOf(govOperatorSignerAddress);
 
     expectGt(amountBefore, 0);
 
-    await govTokenSigner.burn(9999);
-
-    const newAmount = await govTokenSigner.balanceOf(govOperatorSignerAddress);
+    await govOperator.burn(9999);
 
     expectGt(amountBefore, 9999);
   });
 
   it("should fail to drain more than the sender's account", async () => {
-    const govOperatorSignerAddress = govOperatorSigner.address;
-    const accountSignerAddress = accountSigner.address;
+    const govOperatorSignerAddress = await govOperatorSigner.getAddress();
 
-    const amountBefore = await govTokenSigner.balanceOf(govOperatorSignerAddress);
+    const amountBefore = await govOperator.balanceOf(govOperatorSignerAddress);
 
     expectGt(amountBefore, 0);
 
     // assume that the underflow will take place
 
-    await expect(govTokenSigner.burn(amountBefore + 1000)).to.be.revertedWith("");
+    await expect(govOperator.burn(amountBefore + 1000)).to.be.revertedWith("");
   });
 });

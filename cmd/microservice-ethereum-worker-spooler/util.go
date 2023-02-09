@@ -55,7 +55,7 @@ func bigExp10(val int64) *big.Int {
 func sendRewards(queueName string, dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) {
 	transactions := spooler.GetAndRemoveRewardsForToken(dbNetwork, token)
 
-	spooledRewards, err := ethereum.BatchWinningsByUser(transactions, token)
+	firstBlock, lastBlock, spooledRewards, err := ethereum.BatchWinnings(transactions, token)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -64,10 +64,12 @@ func sendRewards(queueName string, dbNetwork network.BlockchainNetwork, token to
 		})
 	}
 
-	rewards := make([]worker.EthereumSpooledRewards, 0)
-
-	for _, reward := range spooledRewards {
-		rewards = append(rewards, reward)
+	rewards := worker.EthereumSpooledRewards{
+		Network:    dbNetwork,
+		Token:      token,
+		FirstBlock: &firstBlock,
+		LastBlock:  &lastBlock,
+		Rewards:    spooledRewards,
 	}
 
 	queue.SendMessage(queueName, rewards)
