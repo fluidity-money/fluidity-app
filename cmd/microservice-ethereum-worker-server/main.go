@@ -39,7 +39,7 @@ const (
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
 	// EnvOperatorAddress to query to get utility info
-	EnvOperatorAddress = `FLU_ETHEREUM_OPERATOR_ADDR`
+	EnvOperatorAddress = `FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`

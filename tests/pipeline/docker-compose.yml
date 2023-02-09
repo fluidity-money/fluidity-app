@@ -1,0 +1,142 @@
+version: '3.4'
+
+x-flu-envs: &flu-envs
+  FLU_ETHEREUM_NETWORK: ethereum
+  FLU_DEBUG: true
+  FLU_DEBUG_DIE_FAST: true
+  FLU_WORKER_ID: spooler
+  FLU_AMQP_QUEUE_ADDR: amqp://rabbit
+  FLU_POSTGRES_URI: postgresql://fluidity:fluidity@postgres:5432?sslmode=disable
+  FLU_TIMESCALE_URI: postgresql://fluidity:fluidity@timescale:5432?sslmode=disable
+  FLU_REDIS_ADDR: redis:6379
+  FLU_ETHEREUM_HTTP_URL: http://contracts:8545
+  FLU_ETHEREUM_WS_URL: ws://contracts:8545
+
+x-util-mining-test-envs: &util-mining-test-envs
+  FLU_ETHEREUM_SEED_PHRASE: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump"
+  FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR: 0xf1721fcf509c975c3ec0f474aeb58efcbf80e4d6
+  FLU_ETHEREUM_UTIL_TOKEN_ADDR: 0x9391202b846ee3f574e59e4ad58ef6140e9ba4f6
+  FLU_ETHEREUM_UTIL_CLIENT_ADDR: 0x737f9dc58538b222a6159efa9cc548ab4b7a3f1e
+
+services:
+  rabbit:
+    image: rabbitmq
+  redis:
+    image: redis
+  postgres:
+    build:
+      context: ../../database
+      dockerfile: Dockerfile.postgres
+    environment:
+      - POSTGRES_USER=fluidity
+      - POSTGRES_PASSWORD=fluidity
+  timescale:
+    build:
+      context: ../../database
+      dockerfile: Dockerfile.timescale
+    environment:
+      - POSTGRES_USER=fluidity
+      - POSTGRES_PASSWORD=fluidity
+
+  spooler:
+    build:
+      context: ../../cmd/microservice-ethereum-worker-spooler/
+    environment:
+      <<: *flu-envs
+      FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler.in
+      FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler.out
+      FLU_ETHEREUM_NETWORK: ethereum
+
+  test-spooler:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - spooler
+    environment:
+      FLU_TEST: TestSpooler
+      <<: *flu-envs
+      FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler.in
+      FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler.out
+      FLU_ETHEREUM_NETWORK: ethereum
+
+  contracts-utilmining:
+    hostname: contracts
+    build:
+      context: ../../contracts/ethereum
+      dockerfile: Dockerfile.foundry
+    environment:
+      <<: *util-mining-test-envs
+      FLU_ETHEREUM_FORKING: true
+      FLU_FORGE_SCRIPT: "foundry-scripts/Test.s.sol:TestScript"
+      FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORK_URL}"
+      FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
+
+  connector-ethereum-block-headers-amqp:
+    build:
+      context: ../../cmd/connector-ethereum-block-headers-amqp/
+    environment:
+      <<: *flu-envs
+    restart: on-failure
+
+  microservice-ethereum-block-fluid-transfers-amqp:
+    build:
+      context: ../../cmd/microservice-ethereum-block-fluid-transfers-amqp/
+    environment:
+      <<: *flu-envs
+      FLU_ETHEREUM_BLOCK_RETRIES: 5
+      FLU_ETHEREUM_BLOCK_RETRY_DELAY: 1
+    restart: on-failure
+
+  microservice-ethereum-application-server-util-mining:
+    build:
+      context: ../../cmd/microservice-ethereum-application-server/
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: apps
+      FLU_ETHEREUM_CONTRACT_ADDR: 0x9391202b846ee3f574e59e4ad58ef6140e9ba4f6
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+      FLU_ETHEREUM_APPLICATION_CONTRACTS: "uniswap_v2:0x0"
+      FLU_ETHEREUM_UTILITY_CONTRACTS: "testClient:0x9391202b846ee3f574e59e4ad58ef6140e9ba4f6"
+      FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out
+    restart: on-failure
+
+  microservice-ethereum-worker-server-util-mining:
+    build:
+      context: ../../cmd/microservice-ethereum-worker-server/
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: worker-server
+      FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR: 0xf1721fcf509c975c3ec0f474aeb58efcbf80e4d6
+      FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+      FLU_ETHEREUM_CONTRACT_ADDR: 0x9391202b846ee3f574e59e4ad58ef6140e9ba4f6
+      FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: USDT
+      FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: util-mining-worker-server-out
+      FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out
+    restart: on-failure
+
+  test-util-mining:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - contracts-utilmining
+      - connector-ethereum-block-headers-amqp
+      - microservice-ethereum-block-fluid-transfers-amqp
+      - microservice-ethereum-application-server-util-mining
+      - microservice-ethereum-worker-server-util-mining
+    environment:
+      FLU_TEST: TestUtilityMining
+      FLU_WORKER_ID: tests
+      <<: *flu-envs
+      <<: *util-mining-test-envs
+    restart: always
