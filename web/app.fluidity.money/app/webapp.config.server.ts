@@ -158,7 +158,5 @@ const getColors = async () => {
   );
 };
 
-
-
 export const colors = getColors();
 export default options;
