@@ -22,7 +22,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const lastWeek = lastWeekDate.getDate() - 7;
   lastWeekDate.setDate(lastWeek);
   const lastWeekIso = lastWeekDate.toISOString();
-  console.log(lastWeekIso);
 
   try {
     const { data: userTransactionCountData, errors: userTransactionCountErr } =
@@ -50,7 +49,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const estimated1MPoolWeight = 0.076;
 
-    console.log(count);
     const projectedWin = count * estimated1MPoolWeight;
 
     return json({
