@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: GPL
+
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "./BaseNativeToken.sol";
 import "./GovToken.sol";
 
-import "@balancer-labs/v2-interfaces/contracts/solidity-utils/helpers/BalancerErrors.sol";
-import { WeightedPoolUserData } from "@balancer-labs/v2-interfaces/contracts/pool-weighted/WeightedPoolUserData.sol";
-import { IVault } from "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
-import { IAsset } from "@balancer-labs/v2-interfaces/contracts/vault/IAsset.sol";
-
-import {_asIAsset } from "@balancer-labs/v2-solidity-utils/contracts/helpers/ERC20Helpers.sol";
+import "./balancer/IVault.sol";
+import "./balancer/IAsset.sol";
+import "./balancer/WeightedPoolUserData.sol";
+import "./balancer/Helpers.sol";
 
 struct Lockup {
 	/// @dev lockTime that the token was locked at
@@ -80,7 +79,7 @@ contract VEGovLockup {
 		require(_fwEthAmount > 0, "fwEth token 0");
 
     	require(
-    		(_govTokenAmount + _fwEthAmount) * 0.2 == _fwEthAmount,
+    		_govTokenAmount + _fwEthAmount == _fwEthAmount * 5,
     		"20% liquidity fweth needed"
     	);
 
@@ -89,7 +88,10 @@ contract VEGovLockup {
     	govToken_.transferFrom(msg.sender, address(this), _govTokenAmount);
     	fwEthToken_.transferFrom(msg.sender, address(this), _fwEthAmount);
 
-    	uint256[] amountsIn = [_govTokenAmount, _fwEthAmount];
+    	uint256[] memory amountsIn = new uint256[](2);
+
+    	amountsIn[0] = _govTokenAmount;
+    	amountsIn[1] = _fwEthAmount;
 
     	uint256 minBptAmountOut = 0;
 

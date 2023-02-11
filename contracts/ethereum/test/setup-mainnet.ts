@@ -18,7 +18,12 @@ export let contracts: typeof commonContracts & {
     deployedToken: ethers.Contract,
     deployedPool: ethers.Contract,
   },
+  weth: {
+    deployedToken: ethers.Contract,
+    deployedPool: ethers.Contract,
+  },
   rewardPools: ethers.Contract,
+  ethConvertor: ethers.Contract
 };
 
 export let bindings: typeof commonBindings & {
@@ -39,9 +44,16 @@ export let bindings: typeof commonBindings & {
     base: ethers.Contract,
     fluid: ethers.Contract,
   },
+  weth: {
+    base: ethers.Contract,
+    fluid: ethers.Contract
+  },
   rewardPools: {
     operator: ethers.Contract,
   },
+  ethConvertor: {
+    operator: ethers.Contract
+  }
 };
 
 before(async function () {
@@ -87,13 +99,25 @@ before(async function () {
     Object.values(tokens).map(e => e.deployedToken),
   );
 
+  const convertorEthToTokenFactory = await hre.ethers.getContractFactory(
+    "ConvertorEthToToken"
+  );
+
+  const ethConvertor = await convertorEthToTokenFactory.deploy(
+    tokens["fwETH"].deployedToken.address,
+    TokenList["weth"].address
+  );
+
   contracts = {
     ...commonContracts,
     usdt: tokens["fUSDt"],
     fei: tokens["fFei"],
     dai: tokens["fDAI"],
+    weth: tokens["fwETH"],
     rewardPools,
+    ethConvertor
   };
+
   bindings = {
     ...commonBindings,
     usdt: {
@@ -112,8 +136,15 @@ before(async function () {
       base: await hre.ethers.getContractAt("IERC20", TokenList["dai"].address, signers.userAccount1),
       fluid: contracts.dai.deployedToken.connect(signers.userAccount1),
     },
+    weth: {
+      base: await hre.ethers.getContractAt("IERC20", TokenList["weth"].address, signers.userAccount1),
+      fluid: contracts.weth.deployedToken.connect(signers.userAccount1),
+    },
     rewardPools: {
       operator: contracts.rewardPools.connect(signers.rewardPools.externalOperator),
     },
+    ethConvertor: {
+      operator: contracts.ethConvertor.connect(signers.fwEthAccount)
+    }
   };
 });

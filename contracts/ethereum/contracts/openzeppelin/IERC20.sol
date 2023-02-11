@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/IERC20.sol)
 
+// extended to include "decimals()(uint8)"
+
 pragma solidity ^0.8.0;
 
 /**
@@ -25,6 +27,11 @@ interface IERC20 {
      * @dev Returns the amount of tokens in existence.
      */
     function totalSupply() external view returns (uint256);
+
+    /**
+     * @dev Returns the number of decimals.
+     */
+    function decimals() external view returns (uint8);
 
     /**
      * @dev Returns the amount of tokens owned by `account`.

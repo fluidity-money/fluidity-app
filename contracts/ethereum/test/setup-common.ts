@@ -1,10 +1,14 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployOperator, deployGovToken } from "../script-utils";
+
+import {
+  deployOperator,
+  deployGovToken } from "../script-utils";
 
 export let signers: {
   userAccount1: ethers.Signer,
   userAccount2: ethers.Signer,
+  fwEthAccount: ethers.Signer,
 
   token: {
     emergencyCouncil: ethers.Signer,
@@ -27,7 +31,6 @@ export let commonContracts: {
   operator: ethers.Contract,
   govToken: ethers.Contract,
 };
-
 
 export let commonBindings: {
   operator: {
@@ -53,7 +56,8 @@ before(async function () {
     operatorCouncilSigner,
     operatorOperatorSigner,
     rewardPoolsOperatorSigner,
-    govTokenOwnerSigner
+    govTokenOwnerSigner,
+    fwEthAccountSigner
   ] = await hre.ethers.getSigners();
 
   let operator = await deployOperator(
@@ -61,11 +65,14 @@ before(async function () {
     operatorOperatorSigner,
     operatorCouncilSigner,
   );
+
   let govToken = await deployGovToken(hre, govTokenOwnerSigner);
 
   signers = {
     userAccount1: account1Signer,
     userAccount2: account2Signer,
+    fwEthAccount: fwEthAccountSigner,
+
     token: {
       emergencyCouncil: tokenCouncilSigner,
       externalOperator: tokenOperatorSigner,
@@ -82,6 +89,7 @@ before(async function () {
       owner: govTokenOwnerSigner,
     },
   };
+
   commonContracts = {
     operator,
     govToken,

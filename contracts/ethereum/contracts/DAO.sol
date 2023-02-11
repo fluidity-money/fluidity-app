@@ -40,7 +40,7 @@ contract DAO {
 
     uint8 version_;
 
-    VEGovLockup governanceLockup_;
+    VEGovLockup lockupSource_;
 
     address emergencyCouncil_;
 
@@ -53,14 +53,14 @@ contract DAO {
     /// @dev _council to use
     function init(
         address _emergencyCouncil,
-        VEGovToken _governanceToken
+        VEGovLockup _lockupSource
     )
         public
     {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
         emergencyCouncil_ = _emergencyCouncil;
-        governanceLockup_ = _governanceLockup;
+        lockupSource_ = _lockupSource;
     }
 
     function getRatificationTs(bytes20 _ipfsHash) public view returns (uint256) {

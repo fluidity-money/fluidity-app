@@ -85,13 +85,13 @@ export const deployGovToken = async (
   const govToken = await factory.deploy();
   await govToken.deployed();
 
-  await govToken.init(
+  await govToken.initialise(
     "Fluidity Money",
     "FLUID",
     18,
-    BigNumber.from("1000000000000000000000000000"),
-    "0x0000000000000000000000000000000000000000"
+    BigNumber.from("1000000000000000000000000000")
   );
+
   return govToken;
 };
 
@@ -237,14 +237,13 @@ export const deployRewardPools = async (
   hre: HardhatRuntimeEnvironment,
   externalOperator: ethers.Signer,
   tokens: ethers.Contract[]
-): Promise<ethers.Contract> => {
-  return deployAndInit(
+): Promise<ethers.Contract> =>
+  deployAndInit(
     hre,
     "RewardPools",
     await externalOperator.getAddress(),
     tokens.map(e => e.address),
   );
-};
 
 export const forknetTakeFunds = async (
   hre: HardhatRuntimeEnvironment,
