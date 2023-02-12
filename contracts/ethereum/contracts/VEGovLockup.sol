@@ -3,29 +3,33 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./BaseNativeToken.sol";
-import "./GovToken.sol";
-
 import "./balancer/IVault.sol";
 import "./balancer/IAsset.sol";
 import "./balancer/WeightedPoolUserData.sol";
 import "./balancer/Helpers.sol";
 
+import "./BaseNativeToken.sol";
+import "./GovToken.sol";
+
+import "./IEmergencyMode.sol";
+
+import { calcGovToVEGov } from "./LibGovernanceCalc.sol";
+
 struct Lockup {
-	/// @dev lockTime that the token was locked at
-	uint256 lockTime;
+    /// @dev lockTime that the token was locked at
+    uint256 lockTime;
 
-	/// @dev maxLockTime to lock the tokens up for (ie, one year)
-	uint256 maxLockTime;
+    /// @dev maxLockTime to lock the tokens up for (ie, one year)
+    uint256 maxLockTime;
 
-	/// @dev fluidAtLock locked up by the user at the time of locking
-	uint256 fluidAtLock;
+    /// @dev fluidAtLock locked up by the user at the time of locking
+    uint256 fluidAtLock;
 
-	/// @dev fwEthAtLock locked up by the user at the time of locking
-	uint256 fwEthAtLock;
+    /// @dev fwEthAtLock locked up by the user at the time of locking
+    uint256 fwEthAtLock;
 }
 
-contract VEGovLockup {
+contract VEGovLockup is IEmergencyMode {
     uint8 version_;
 
     address operator_;
@@ -45,55 +49,121 @@ contract VEGovLockup {
     mapping(address => Lockup) lockups_;
 
     function init(
-    	address _operator,
-    	address _emergencyCouncil,
-    	GovToken _govToken,
-    	IERC20 _fwEthToken
+        address _operator,
+        address _emergencyCouncil,
+        GovToken _govToken,
+        IERC20 _fwEthToken
     )
-    	public
+        public
     {
-    	require(version_ == 0, "contract is already initialised");
+        require(version_ == 0, "contract is already initialised");
 
-    	require(
-    		_govToken.decimals() == _fwEthToken.decimals(),
-    		"inconsistent tokens"
-    	);
+        require(
+            _govToken.decimals() == _fwEthToken.decimals(),
+            "inconsistent tokens"
+        );
 
-    	operator_ = _operator;
-    	emergencyCouncil_ = _emergencyCouncil;
-    	govToken_ = _govToken;
-    	fwEthToken_ = _fwEthToken;
+        operator_ = _operator;
+        emergencyCouncil_ = _emergencyCouncil;
+        govToken_ = _govToken;
+        fwEthToken_ = _fwEthToken;
+    }
+
+    function operator() public view returns (address) {
+        return operator_;
+    }
+
+    function operatorOrEmergencyCouncil() public view returns (bool) {
+        return msg.sender == operator() || msg.sender == emergencyCouncil_;
     }
 
     function noEmergencyMode() public view returns (bool) {
-    	return noEmergencyMode_;
+        return noEmergencyMode_;
     }
 
-    function lockup(uint256 _govTokenAmount, uint256 _fwEthAmount, uint256 _maxLockTime) public {
-    	require(noEmergencyMode(), "emergency mode");
+    function enableEmergencyMode() public {
+        require(operatorOrEmergencyCouncil(), "can't enable emergency mode!");
+        noEmergencyMode_ = false;
+    }
 
-		// 20% of the provided tokens must be in fw eth (assuming
-		// the decimals are the same for gov token and fweth)
+    function disableEmergencyMode() public {
+        require(msg.sender == operator(), "only the operator account can use this");
+        noEmergencyMode_ = true;
+    }
 
-		require(_govTokenAmount > 0, "gov token 0");
-		require(_fwEthAmount > 0, "fwEth token 0");
+    function hasLockedUp(address _user) public view returns (bool) {
+        return lockups_[_user].lockTime > 0;
+    }
 
-    	require(
-    		_govTokenAmount + _fwEthAmount == _fwEthAmount * 5,
-    		"20% liquidity fweth needed"
-    	);
+    function trackAmount(
+        address _spender,
+        uint256 _lockTime,
+        uint256 _maxLockTime,
+        uint256 _fluidAtLock,
+        uint256 _fwEthAtLock
+    )
+        internal
+    {
+        lockups_[_spender].lockTime = _lockTime;
+        lockups_[_spender].maxLockTime = _maxLockTime;
+        lockups_[_spender].fluidAtLock = _fluidAtLock;
+        lockups_[_spender].fwEthAtLock = _fwEthAtLock;
+    }
 
-    	require(_maxLockTime > 0, "max lock time 0");
+    function balanceOf(address _spender) public view returns (uint256) {
+        Lockup storage lockup = lockups_[_spender];
 
-    	govToken_.transferFrom(msg.sender, address(this), _govTokenAmount);
-    	fwEthToken_.transferFrom(msg.sender, address(this), _fwEthAmount);
+        return calcGovToVEGov(
+            lockup.fluidAtLock,
+            lockup.lockTime,
+            lockup.maxLockTime
+        );
+    }
 
-    	uint256[] memory amountsIn = new uint256[](2);
+/**
+ * @notice deposit 80% fluid token, 20% fwETH, locking the amounts up and then
+ *         multiplying the deposited fluid assets amount by the vote escrow
+ *         multiplier. then quote the user the amount of ve tokens they have
+ *
+ * @param _fluidTokenAmount to take as 80% of the deposit to calculate the amounts
+ * @param _fwEthAmount to use as the 20% to deposit the amounts in balancer
+ * @param _maxLockTime to lock up the tokens for the maximum amount of time for
+ *
+ * @returns the amount of ve tokens the user has
+ */
+    function deposit(
+        uint256 _govTokenAmount,
+        uint256 _fwEthAmount,
+        uint256 _maxLockTime
+    )
+        public returns (uint256)
+    {
+        require(noEmergencyMode(), "emergency mode");
 
-    	amountsIn[0] = _govTokenAmount;
-    	amountsIn[1] = _fwEthAmount;
+        // 20% of the provided tokens must be in fw eth (assuming
+        // the decimals are the same for gov token and fweth)
 
-    	uint256 minBptAmountOut = 0;
+        require(_fluidTokenAmount > 0, "gov token 0");
+        require(_fwEthAmount > 0, "fwEth token 0");
+
+        require(!hasLockedUp(msg.sender), "user locked up already");
+
+        require(
+            _fluidTokenAmount + _fwEthAmount == _fwEthAmount * 5,
+            "20% liquidity fweth needed"
+        );
+
+        require(_maxLockTime > 0, "max lock time 0");
+
+        govToken_.transferFrom(msg.sender, address(this), _fluidTokenAmount);
+        fwEthToken_.transferFrom(msg.sender, address(this), _fwEthAmount);
+
+        uint256[] memory amountsIn = new uint256[](2);
+
+        amountsIn[0] = _fluidTokenAmount;
+        amountsIn[1] = _fwEthAmount;
+
+        uint256 minBptAmountOut = 0;
 
         bytes memory userData = abi.encode(
             WeightedPoolUserData.JoinKind.EXACT_TOKENS_IN_FOR_BPT_OUT,
@@ -103,9 +173,7 @@ contract VEGovLockup {
 
         (IERC20[] memory tokens, , ) = vault_.getPoolTokens(vaultPoolId_);
 
-        // knowing that this is reentrant possibly
-
-    	IVault.JoinPoolRequest memory request = IVault.JoinPoolRequest({
+        IVault.JoinPoolRequest memory request = IVault.JoinPoolRequest({
             assets: _asIAsset(tokens),
             maxAmountsIn: amountsIn,
             userData: userData,
@@ -115,38 +183,25 @@ contract VEGovLockup {
         address addressThis = address(this);
 
         vault_.joinPool(vaultPoolId_, addressThis, addressThis, request);
-    }
 
-    function calculateGovToVEGov(
-        uint256 _fluidAmount,
-        uint256 _lockTime,
-        uint256 _maxLockTime
-    )
-        public pure returns (uint256)
-    {
-    	// (FLUID * lock time) / max lock time
-        return (_fluidAmount * _lockTime) / _maxLockTime;
-    }
+        // give the user their amounts and return what they received
 
-    function calculateLinearDecay(
-        uint256 _VEFluidAtLock,
-        uint256 _lockTime,
-        uint256 _timeSinceLockInDays
-    )
-        public pure returns (uint256)
-    {
-    	// ((veFLUID at lock / lock time) * x) + veFLUID at lock
-        return ((_VEFluidAtLock / _lockTime) * _timeSinceLockInDays) + _VEFluidAtLock;
-    }
+        uint256 lockTime = block.timestamp;
 
-	/// @notice calculateMaxLiquidityBackInPercentage to calculate
-	///         the percentage of liquidity to return to the user
-    function calculateMaxLiquidityBackInPercentage(
-        uint256 _timeSinceLockInDays,
-        uint256 _lockTime
-    )
-        public pure returns (uint256)
-    {
-        return _timeSinceLockInDays / _lockTime;
+        uint256 veGovAmount = calcGovToVEGov(
+            _fluidTokenAmount,
+            lockTime,
+            _maxLockTime
+        );
+
+        trackAmount(
+            msg.sender,
+            lockTime,
+            _maxLockTime,
+            _fluidTokenAmount,
+            _fwEthAmount
+        );
+
+        return veGovAmount;
     }
 }

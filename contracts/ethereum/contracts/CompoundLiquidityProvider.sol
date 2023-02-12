@@ -8,10 +8,12 @@ pragma solidity ^0.8.11;
 pragma abicoder v1;
 
 import "./compound/CTokenInterfaces.sol";
-import "./LiquidityProvider.sol";
+
 import "./openzeppelin/SafeERC20.sol";
 
-contract CompoundLiquidityProvider is LiquidityProvider {
+import "./ILiquidityProvider.sol";
+
+contract CompoundLiquidityProvider is ILiquidityProvider {
     using SafeERC20 for IERC20;
 
     /// @dev for migrations
@@ -46,7 +48,7 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         underlying_.safeApprove(address(compoundToken_), type(uint).max);
     }
 
-    /// @inheritdoc LiquidityProvider
+    /// @inheritdoc ILiquidityProvider
     function addToPool(uint amount) external {
         require(msg.sender == owner_, "only the owner can use this");
 
@@ -54,7 +56,7 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         require(mintRes == 0, "compound mint failed");
     }
 
-    /// @inheritdoc LiquidityProvider
+    /// @inheritdoc ILiquidityProvider
     function takeFromPool(uint amount) external {
         require(msg.sender == owner_, "only the owner can use this");
 
@@ -64,7 +66,7 @@ contract CompoundLiquidityProvider is LiquidityProvider {
         underlying_.safeTransfer(msg.sender, amount);
     }
 
-    /// @inheritdoc LiquidityProvider
+    /// @inheritdoc ILiquidityProvider
     function totalPoolAmount() external returns (uint) {
         return compoundToken_.balanceOfUnderlying(address(this));
     }

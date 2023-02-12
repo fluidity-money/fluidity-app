@@ -1,15 +1,27 @@
+// SPDX-License-Identifier: GPL
+
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-import "./VEGovLockup.sol";
+import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
-type VoteIdentifier is uint256;
+import "./openzeppelin/IUpgradeableBeacon.sol";
+
+import "./VEGovLockup.sol";
+import "./Operator.sol";
+
+import "./ILiquidityProvider.sol";
+import "./IToken.sol";
 
 /// @dev default time to wait before a vote is possibly ratified after it's submission
 uint256 constant DEFAULT_VOTE_BLOCK_TIME = 10 days;
 
 /// @dev default vote timelock once a vote has been ratified
 uint256 constant DEFAULT_FROZEN_TIME = 24 hours;
+
+/// @dev selector for the token's init function
+string constant TOKEN_INIT_SELECTOR = "init(address,uint8,string,string,address,address,address)";
 
 enum ProposalStatus {
     UNFINISHED,
@@ -28,6 +40,11 @@ struct Proposal {
     mapping(address => uint256) votes;
 }
 
+/*
+ * DAO supports deploying tokens and liquidity pools, freezing them,
+ * doing contract upgrades, allocating amounts using utility gauges to
+ * different protocols
+ */
 contract DAO {
 
     event VoteCreated(bytes20 indexed ipfsHash);
@@ -42,21 +59,23 @@ contract DAO {
 
     VEGovLockup lockupSource_;
 
+    Operator operator_;
+
     address emergencyCouncil_;
 
     address registry_;
 
     mapping(bytes20 => Proposal) proposals_;
 
+    bool reentrancyGuard_;
+
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
     /// @dev _council to use
-    function init(
+    constructor(
         address _emergencyCouncil,
         VEGovLockup _lockupSource
-    )
-        public
-    {
+    ) {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
         emergencyCouncil_ = _emergencyCouncil;
@@ -72,7 +91,7 @@ contract DAO {
     }
 
     function getAmountAlreadyVoted(bytes20 _ipfsHash, address _spender) public view returns (uint256) {
-      proposals_[_ipfsHash].votes[_spender];
+      return proposals_[_ipfsHash].votes[_spender];
     }
 
     function _voteFor(address _sender, bytes20 _ipfsHash, uint256 _amount) internal {
@@ -189,10 +208,28 @@ contract DAO {
         return getProposalStatus(_ipfsHash) == ProposalStatus.FAILED;
     }
 
-    function getAmountUserCanVote(bytes20 _ipfsHash, address _spender, uint256 _amount) public view returns (uint256) {
+    /// @notice getAmountUserCanVote based on what's been voted so far
+    ///         and the balance the user has based on the decay
+    function getAmountUserCanVote(
+        bytes20 _ipfsHash,
+        address _spender,
+        uint256 _amount
+    )
+        public view returns (uint256)
+    {
         uint256 spent = proposals_[_ipfsHash].votes[_spender];
 
-        return spent > _amount ? spent : _amount;
+        uint256 available = lockupSource_.balanceOf(_spender);
+
+        if (spent > available) {
+            available = 0;
+        } else {
+            available = available - spent;
+        }
+
+        // if the amount available is greater than, use the available number
+
+        return available > _amount ? available : _amount;
     }
 
     /// @notice voteFor the Vote given for the amount given, increasing
@@ -227,38 +264,24 @@ contract DAO {
         _voteAgainst(msg.sender, _ipfsHash, _amount);
     }
 
-    function noReentrancy() internal view returns (bool) {
-        bool status;
-
-        assembly {
-            status := sload(
-                0xd311b4828f49df8265725f4e29310cb16d4290d46c4f51cdb6f0042cedbbeafa
-            )
-        }
-
-        return status;
+    function enableReentrancyGuard() internal {
+        require(!reentrancyGuard_, "already entered");
+        reentrancyGuard_ = true;
     }
 
-    function setReentrancyGuard(bool _enabled) internal {
-        assembly {
-            sstore(
-                // keccak(fluidity.dao.lock) - 1
-                0xd311b4828f49df8265725f4e29310cb16d4290d46c4f51cdb6f0042cedbbeafa,
-                _enabled
-            )
-        }
+    function disableReentrancyGuard() internal {
+        reentrancyGuard_ = false;
     }
 
     /// @notice execute calldata at a contract target, following a Proposal
     ///         that's been proposed and ratified
     /// @dev _vote to execute once it follows the requirement
     function executeProposal(bytes20 _ipfsHash) public {
-        require(noReentrancy(), "reentrant");
         require(getProposalReadyToExecute(_ipfsHash), "proposal can't execute");
 
         Proposal storage proposal = proposals_[_ipfsHash];
 
-        setReentrancyGuard(true);
+        enableReentrancyGuard();
 
         (bool rc, bytes memory returnData) = proposal.targetContract.call(proposal.data);
 
@@ -278,44 +301,74 @@ contract DAO {
             }
         }
 
-        setReentrancyGuard(false);
+        disableReentrancyGuard();
 
         // mark the contract as executed
 
         proposal.targetContract = address(0);
     }
 
-    /*
-     * update the implementations of the contracts (only callable by this contract itself)
-     */
+    function upgradeBeacon(
+        IUpgradeableBeacon _beacon,
+        address _oldImplementation,
+        address _newImplementation
+    )
+        public
+    {
+        require(msg.sender == address(this), "sender not the DAO");
+        require(address(_beacon) != address(0), "zero address");
 
-    function upgradeToken(address _oldImplementation, address _newImplementation) public {
+        require(
+            _beacon.implementation() == _oldImplementation,
+            "old impl not consistent"
+        );
+
+        _beacon.upgradeTo(_newImplementation);
     }
 
-    function upgradeOperator(address _oldImplementation, address _newImplementation) public {
-    }
-
-    function upgradeDAO(address _oldImplementation, address _newImplementation) public {
-    }
-
-    /// @notice deployNewToken and register it with the Registry and Operator
-    /// @dev _fluidTokenName to track in our deployment (should be f + tokenName - ie fUSDT)
-    /// @dev _underlyingTokenName to use (should be tokenName - ie USDT)
-    /// @dev
     function deployNewToken(
         string memory _fluidTokenName,
-        string memory _underlyingTokenName,
-        uint8 _underlyingDecimals,
-        string memory _symbol,
-        address _underlyingToken
+        string memory _fluidSymbol,
+        uint8 _decimals,
+        ILiquidityProvider _liquidityProvider,
+        IBeacon _beacon
     )
         external returns (address)
     {
-        return address(0);
+        require(msg.sender == address(this), "sender not the dao");
+
+        require(address(_beacon) != address(0), "beacon is null");
+        require(address(_liquidityProvider) != address(0), "liquidity provider null");
+
+        BeaconProxy beaconProxy = new BeaconProxy(
+            address(_beacon),
+            abi.encodeWithSignature(
+                TOKEN_INIT_SELECTOR,
+                address(_liquidityProvider),
+                _decimals,
+                _fluidTokenName,
+                _fluidSymbol,
+                emergencyCouncil_,
+                address(this),
+                operator_
+            )
+         );
+
+         IERC20 token = IERC20(address(beaconProxy));
+
+         require(
+             token.decimals() == _decimals,
+             "decimals in deploy not consistent"
+         );
+
+         return address(beaconProxy);
     }
 
-    /// @notice disableToken at the address given
-    /// @dev _tokenAddress to shut down
-    function disableToken(address _tokenAddress) public {
+    /// @notice disableAddresses given using `enableEmergencyMode()`
+    function disableAddresses(IEmergencyMode[] memory _addresses) public {
+        require(msg.sender == address(this), "sender not the dao");
+
+        for (uint256 i = 0; i < _addresses.length; i++)
+            _addresses[i].enableEmergencyMode();
     }
 }

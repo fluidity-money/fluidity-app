@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "./openzeppelin/IERC20.sol";
+import "./IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 
 /// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.

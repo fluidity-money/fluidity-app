@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: GPL
+
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "../openzeppelin/IERC20.sol";
+import "../IERC20.sol";
 
 import "./IAsset.sol";
 

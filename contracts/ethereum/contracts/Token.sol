@@ -7,74 +7,26 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./openzeppelin/IERC20.sol";
+import "./IERC20.sol";
+
 import "./openzeppelin/SafeERC20.sol";
-import "./openzeppelin/Address.sol";
 
 import "./ITransferWithBeneficiary.sol";
 
 import "./IFluidClient.sol";
-import "./LiquidityProvider.sol";
+import "./ILiquidityProvider.sol";
+import "./IEmergencyMode.sol";
+import "./IToken.sol";
 
 /// @title The fluid token ERC20 contract
-contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
+contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode {
     using SafeERC20 for IERC20;
-    using Address for address;
 
     uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
     /// @dev sentinel to indicate a block has been rewarded in the
     /// @dev pastRewards_ and rewardedBlocks_ maps
     uint private constant BLOCK_REWARDED = 1;
-
-    /// @notice emitted when a reward is quarantined for being too large
-    event BlockedReward(
-        address indexed winner,
-        uint amount,
-        uint startBlock,
-        uint endBlock
-    );
-
-    /// @notice emitted when a blocked reward is released
-    event UnblockReward(
-        bytes32 indexed originalRewardTx,
-        address indexed winner,
-        uint amount,
-        uint startBlock,
-        uint endBlock
-    );
-
-    /// @notice emitted when an underlying token is wrapped into a fluid asset
-    event MintFluid(address indexed addr, uint amount);
-
-    /// @notice emitted when a fluid token is unwrapped to its underlying asset
-    event BurnFluid(address indexed addr, uint amount);
-
-    /// @notice emitted when a new operator takes over the contract management
-    event OperatorChanged(address indexed oldOperator, address indexed newOperator);
-
-    /// @notice emitted when the contract enters emergency mode!
-    event Emergency(bool indexed status);
-
-    /// @notice emitted when restrictions
-    event MaxUncheckedRewardLimitChanged(uint amount);
-
-    /// @notice global mint limit changed by setRestrictions
-    /// @notice deprecated, mint limits no longer exist
-    event GlobalMintLimitChanged(uint amount);
-
-    /// @notice user mint limits changed by setRestrictions
-    /// @notice deprecated, mint limits no longer exist
-    event UserMintLimitChanged(uint amount);
-
-    /// @notice updating the reward quarantine before manual signoff
-    /// @notice by the multisig (with updateRewardQuarantineThreshold)
-    event RewardQuarantineThresholdUpdated(uint amount);
-
-    /// @notice emitted when the mint limits are enabled or disabled
-    /// @notice by enableMintLimits
-    /// @notice deprecated, mint limits no longer exist
-    event MintLimitsStateChanged(bool indexed status);
 
     // erc20 props
     mapping(address => uint256) private balances_;
@@ -91,7 +43,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
     // for migrations
     uint private version_;
 
-    LiquidityProvider private pool_;
+    ILiquidityProvider private pool_;
 
     /// @dev deprecated, worker config is now handled externally
     address private __deprecated_7;
@@ -134,20 +86,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
     /// @dev account that can call the reward function, should be the /operator contract/
     address oracle_;
 
-    /**
-     * @notice initialiser function - sets the contract's data
-     * @dev we pass in the metadata explicitly instead of sourcing from the
-     * @dev underlying token because some underlying tokens don't implement
-     * @dev these methods
-     *
-     * @param _liquidityProvider the `LiquidityProvider` contract address. Should have this contract as its owner.
-     * @param _decimals the fluid token's decimals (should be the same as the underlying token's)
-     * @param _name the fluid token's name
-     * @param _symbol the fluid token's symbol
-     * @param _emergencyCouncil address that can activate emergency mode
-     * @param _operator address that can release quarantine payouts and activate emergency mode
-     * @param _oracle address that can call the reward function
-     */
+    /// @inheritdoc IToken
     function init(
         address _liquidityProvider,
         uint8 _decimals,
@@ -169,7 +108,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         emergencyCouncil_ = _emergencyCouncil;
 
         // remember the liquidity provider to deposit tokens into
-        pool_ = LiquidityProvider(_liquidityProvider);
+        pool_ = ILiquidityProvider(_liquidityProvider);
 
         // sanity check
         pool_.underlying_().totalSupply();
@@ -189,10 +128,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return operator_;
     }
 
-    /**
-     * @notice update the operator account to a new address
-     * @param newOperator the address of the new operator to change to
-     */
+    /// @inheritdoc IToken
     function updateOperator(address newOperator) public {
         require(msg.sender == operator_, "only operator can use this function!");
 
@@ -205,19 +141,12 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return noEmergencyMode_;
     }
 
-    /**
-     * @notice getter for the RNG oracle provided by `workerConfig_`
-     * @return the address of the trusted oracle
-     * @dev individual oracles are now recorded in the operator, this now should return the registry contract
-     */
+    /// @inheritdoc IToken
     function oracle() public view returns (address) {
         return oracle_;
     }
 
-    /**
-     * @notice enables emergency mode preventing the swapping in of tokens,
-     * @notice and setting the rng oracle address to null
-     */
+    /// @inheritdoc IEmergencyMode
     function enableEmergencyMode() public {
         require(
             msg.sender == operator_ ||
@@ -231,10 +160,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         emit Emergency(true);
     }
 
-    /**
-     * @notice disables emergency mode, following presumably a contract upgrade
-     * @notice (operator only)
-     */
+    /// @inheritdoc IEmergencyMode
     function disableEmergencyMode() public {
         require(msg.sender == operator_, "only the operator account can use this");
 
@@ -252,14 +178,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /**
-     * @notice wraps `amount` of underlying tokens into fluid tokens
-     * @notice requires you to have called the ERC20 `approve` method
-     * @notice targeting this contract first on the underlying asset
-     *
-     * @param amount the number of tokens to wrap
-     * @return the number of tokens wrapped
-     */
+    /// @inheritdoc IToken
     function erc20In(uint amount) public returns (uint) {
         require(noEmergencyMode(), "emergency mode!");
 
@@ -282,22 +201,13 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return realAmount;
     }
 
-    /**
-     * @notice wraps the `amount` given and transfers the tokens to `receiver`
-     *
-     * @param recipient of the wrapped assets
-     * @param amount to wrap and send to the recipient
-     */
+    /// @inheritdoc IToken
     function erc20InFor(address recipient, uint256 amount) public {
         erc20In(amount);
         transfer(recipient, amount);
     }
 
-    /**
-     * @notice unwraps `amount` of fluid tokens back to underlying
-     *
-     * @param amount the number of fluid tokens to unwrap
-     */
+    /// @inheritdoc IToken
     function erc20Out(uint amount) public {
         // take the user's fluid tokens
         _burn(msg.sender, amount);
@@ -308,11 +218,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         emit BurnFluid(msg.sender, amount);
     }
 
-    /**
-     * @notice calculates the size of the reward pool (the interest we've earned)
-     *
-     * @return the number of tokens in the reward pool
-     */
+    /// @inheritdoc IToken
     function rewardPoolAmount() public returns (uint) {
         uint totalAmount = pool_.totalPoolAmount();
         uint totalFluid = totalSupply();
@@ -352,9 +258,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         _mint(winner, amount);
     }
 
-    /**
-     * @inheritdoc IFluidClient
-     */
+    /// @inheritdoc IFluidClient
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == oracle(), "only the oracle account can use this");
@@ -372,6 +276,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         }
     }
 
+    /// @inheritdoc IFluidClient
     function getUtilityVars() external returns (UtilityVars memory) {
         UtilityVars memory vars = UtilityVars({
             poolSizeNative: rewardPoolAmount(),
@@ -385,16 +290,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return vars;
     }
 
-    /**
-     * @notice admin function, unblocks a reward that was quarantined for being too large
-     * @notice allows for paying out or removing the reward, in case of abuse
-     *
-     * @param user the address of the user who's reward was quarantined
-     * @param amount the amount of tokens to release (in case multiple rewards were quarantined)
-     * @param payout should the reward be paid out or removed?
-     * @param firstBlock the first block the rewards include (should be from the BlockedReward event)
-     * @param lastBlock the last block the rewards include
-     */
+    /// @inheritdoc IToken
     function unblockReward(bytes32 rewardTx, address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == operator_, "only the operator account can use this");
@@ -410,40 +306,22 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         }
     }
 
-    /*
-     * @notice returns whether mint limits are enabled
-     * @notice mint limits no longer exist, this always `false`
-     */
+    /// @inheritdoc IToken
     function mintLimitsEnabled() public pure returns (bool) { return false; }
 
-    /*
-     * @notice returns the mint limit per user
-     * @notice mint limits no longer exist, this always `uint256.max`
-     */
+    /// @inheritdoc IToken
     function userMintLimit() public pure returns (uint) { return type(uint).max; }
 
-    /*
-     * @notice returns the remaining global mint limit
-     * @notice mint limits no longer exist, this always `uint256.max`
-     */
+    /// @inheritdoc IToken
     function remainingGlobalMintLimit() public pure returns (uint) { return type(uint).max; }
 
-    /**
-     * @notice return the max unchecked reward that's currently set
-     */
+    /// @inheritdoc IToken
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
 
-    /*
-     * @notice return the current operator
-     */
+    /// @inheritdoc IToken
     function operator() public view returns (address) { return operator_; }
 
-    /*
-     * @notice returns how much `account` has minted
-     * @notice mint limits no longer exist, this always `0`
-     *
-     * @param the account to check
-     */
+    /// @inheritdoc IToken
     function userAmountMinted(address /* account */) public pure returns (uint) { return 0; }
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
@@ -485,9 +363,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return true;
     }
 
-    /// @notice support for meson's crosschain swap for ERC20
-    /// @notice transfers deposited assets to the 3rd party dapp contract
-    /// @notice for the user - we don't do anything special :)
+    /// @inheritdoc ITransferWithBeneficiary
     function transferWithBeneficiary(
         address token,
         uint256 amount,
@@ -504,8 +380,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return rc;
     }
 
-    /// @notice upgrade the underlying LiquidityProvider to a new source
-    function upgradeLiquidityProvider(LiquidityProvider newPool) public {
+    /// @inheritdoc IToken
+    function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
       require(noEmergencyMode(), "emergency mode");
       require(msg.sender == operator_, "only operator can use this function");
 
@@ -539,8 +415,12 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary {
         return true;
     }
 
-    /// @notice drain the reward pool of the amount given without touching any principal amounts
-    /// @dev this is intended to only be used to retrieve initial liquidity provided by the team OR by the DAO to allocate funds
+    /**
+     * @notice drain the reward pool of the amount given without
+     *         touching any principal amounts
+     * @dev this is intended to only be used to retrieve initial
+     *      liquidity provided by the team OR by the DAO to allocate funds
+     */
     function drainRewardPool(address _recipient, uint256 _amount) public {
         require(noEmergencyMode(), "emergency mode");
         require(msg.sender == operator_, "only operator can use this function");

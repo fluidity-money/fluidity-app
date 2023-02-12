@@ -7,17 +7,15 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./openzeppelin/Address.sol";
 import "./IFluidClient.sol";
+import "./IEmergencyMode.sol";
 
 struct FluidityReward {
     string clientName;
     Winner[] rewards;
 }
 
-contract Operator {
-    using Address for address;
-
+contract Operator is IEmergencyMode {
     /// @dev the utility name of the fluid token
     string constant FLUID_TOKEN = "FLUID";
 
@@ -45,11 +43,8 @@ contract Operator {
     /// @notice emitted when the rng oracles are changed to a new address
     event OracleChanged(address indexed contractAddr, address indexed oldOracle, address indexed newOracle);
 
-    /// @notice emitted when an emergency is declared!
-    event Emergency(bool indexed enabled);
-
     /// @dev if false, emergency mode is active!
-    bool private noGlobalEmergency_;
+    bool private noEmergency_;
 
     /// @dev for migrations
     uint256 private version_;
@@ -81,18 +76,18 @@ contract Operator {
         operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
 
-        noGlobalEmergency_ = true;
+        noEmergency_ = true;
     }
 
-    function noGlobalEmergency() public view returns (bool) {
-        return noGlobalEmergency_;
+    function noEmergencyMode() public view returns (bool) {
+        return noEmergency_;
     }
 
     function enableEmergencyMode() public {
         bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil_;
         require(authorised, "only the operator or emergency council can use this");
 
-        noGlobalEmergency_ = false;
+        noEmergency_ = false;
         emit Emergency(true);
     }
 
@@ -103,7 +98,7 @@ contract Operator {
     function disableEmergencyMode() public {
         require(msg.sender == operator_, "only the operator account can use this");
 
-        noGlobalEmergency_ = true;
+        noEmergency_ = true;
 
         emit Emergency(false);
     }
@@ -157,7 +152,7 @@ contract Operator {
 
     /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory newOracles) public {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == operator_, "only operator account can use this");
 
         for (uint i = 0; i < newOracles.length; i++) {
@@ -170,19 +165,19 @@ contract Operator {
     }
 
     function getWorkerAddress(address contractAddr) public view returns (address) {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(noEmergencyMode(), "emergency mode!");
 
         return oracles_[contractAddr];
     }
 
     function getWorkerAddress() public view returns (address) {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(noEmergencyMode(), "emergency mode!");
 
         return oracles_[msg.sender];
     }
 
     function reward(address token, FluidityReward[] calldata rewards, uint firstBlock, uint lastBlock) public {
-        require(noGlobalEmergency(), "emergency mode!");
+        require(noEmergencyMode(), "emergency mode!");
 
         require(msg.sender == oracles_[token], "only the token's oracle can use this");
 

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/IERC20.sol)
 
-// extended to include "decimals()(uint8)"
-
 pragma solidity ^0.8.0;
 
 /**
@@ -37,6 +35,17 @@ interface IERC20 {
      * @dev Returns the amount of tokens owned by `account`.
      */
     function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Returns the name of the token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
+
 
     /**
      * @dev Moves `amount` tokens from the caller's account to `to`.
