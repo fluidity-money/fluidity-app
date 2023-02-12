@@ -16,9 +16,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const uniswapSwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
+const uniswapV3SwapLogTopic = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
 
-const uniswapV2PairAbiString = `[
+const uniswapV3PairAbiString = `[
     {
       "anonymous": false,
       "inputs": [
@@ -29,41 +29,59 @@ const uniswapV2PairAbiString = `[
           "type": "address"
         },
         {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount0In",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount1In",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount0Out",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount1Out",
-          "type": "uint256"
-        },
-        {
           "indexed": true,
           "internalType": "address",
-          "name": "to",
+          "name": "recipient",
           "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "amount0",
+          "type": "int256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "amount1",
+          "type": "int256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint160",
+          "name": "sqrtPriceX96",
+          "type": "uint160"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint128",
+          "name": "liquidity",
+          "type": "uint128"
+        },
+        {
+          "indexed": false,
+          "internalType": "int24",
+          "name": "tick",
+          "type": "int24"
         }
       ],
       "name": "Swap",
       "type": "event"
     },
-	{
-      "constant": true,
+    {
+      "inputs": [],
+      "name": "fee",
+      "outputs": [
+        {
+          "internalType": "uint24",
+          "name": "",
+          "type": "uint24"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "token0",
       "outputs": [
@@ -73,34 +91,17 @@ const uniswapV2PairAbiString = `[
           "type": "address"
         }
       ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-	  "constant": true,
-      "inputs": [],
-      "name": "token1",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
       "stateMutability": "view",
       "type": "function"
     }
 ]`
 
-// uniswapV2PairAbi set by init.go to generate the ABI code
-var uniswapV2PairAbi ethAbi.ABI
+// uniswapV3PairAbi set by init.go to generate the ABI code
+var uniswapV3PairAbi ethAbi.ABI
 
-// GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
-// If the token swapped from was the fluid token, get the exact amount,
-// otherwise approximate the cost based on the received amount of the fluid token
-func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+// GetUniswapV3Fees returns Uniswap V3's fee of the amount swapped.
+// The fee is dependent on the pool being swapped on
+func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
@@ -113,7 +114,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		return nil, nil
 	}
 
-	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
+	unpacked, err := uniswapV3PairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -122,9 +123,9 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	if len(unpacked) != 4 {
+	if len(unpacked) != 5 {
 		return nil, fmt.Errorf(
-			"Unpacked the wrong number of values! Expected 4, got %v",
+			"Unpacked the wrong number of values! Expected 5, got %v",
 			len(unpacked),
 		)
 	}
@@ -142,7 +143,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	contractAddr := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
 	// figure out which token is which in the pair contract
-	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token0")
+	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "token0")
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -160,63 +161,71 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
+	poolFee_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "fee")
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get pool fee! %v",
+			err,
+		)
+	}
+
+	poolFee, err := ethereum.CoerceBoundContractResultsToRat(poolFee_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce pool fee! %v",
+			err,
+		)
+	}
+
 	var (
 		// swap logs
-		amount0in  = swapAmounts[0]
-		amount1in  = swapAmounts[1]
-		amount0out = swapAmounts[2]
-		amount1out = swapAmounts[3]
+		amount0 = swapAmounts[0]
+		amount1 = swapAmounts[1]
 
 		// the amount of fluid tokens sent or received
 		fluidTransferAmount *big.Rat
 
 		// the multiplier to find the fee
 		feeMultiplier *big.Rat
-
-		// whether the token being swapped from is the fluid token
-		inTokenIsFluid = false
-		zeroRat        = big.NewRat(0, 1)
 	)
 
-	// fluid index 0  0, x, y, 0 = swapping x token for y fluid
-	// fluid index 0  x, 0, 0, y = swapping x fluid for y token
-	// fluid index 1  0, x, y, 0 = swapping x fluid for y token
-	// fluid index 1  x, 0, 0, y = swapping x token for y fluid
-
+	// If amount0 is negative, then amount1 is paid out
 	var (
 		// Whether token0 is the fluid token
-		fluidIndex0 = token0addr == fluidTokenContract
+		token0IsFluid = token0addr == fluidTokenContract
+
+		zeroRat = big.NewRat(0, 1)
 		// Whether amount0 is equal to zero
-		amount0IsZero = amount0in.Cmp(zeroRat) == 0
+		amount0IsNeg = amount0.Cmp(zeroRat) == 0
 	)
 
 	switch true {
-	case fluidIndex0 && amount0IsZero:
-		inTokenIsFluid = false
-		fluidTransferAmount = amount0out
+	case token0IsFluid && amount0IsNeg:
+		fluidTransferAmount = new(big.Rat).Mul(amount0, big.NewRat(-1, 1))
 
-	case fluidIndex0 && !amount0IsZero:
-		inTokenIsFluid = true
-		fluidTransferAmount = amount0in
+	case token0IsFluid && !amount0IsNeg:
+		fluidTransferAmount = amount0
 
-	case !fluidIndex0 && amount0IsZero:
-		inTokenIsFluid = true
-		fluidTransferAmount = amount1in
+	case !token0IsFluid && amount0IsNeg:
+		fluidTransferAmount = amount1
 
-	case !fluidIndex0 && !amount0IsZero:
-		inTokenIsFluid = false
-		fluidTransferAmount = amount1out
+	case !token0IsFluid && !amount0IsNeg:
+		fluidTransferAmount = new(big.Rat).Mul(amount1, big.NewRat(-1, 1))
 	}
 
 	// if trading x fUSDC -> y Token B
 	// the fee is x * 0.003 (100% input -> 99.7%)
 	// if trading y Token B -> x fUSDC
 	// the fee is x * 0.003009027 (99.7% input -> 100%)
-	if inTokenIsFluid {
-		feeMultiplier = big.NewRat(3, 1000)
+	if !amount0IsNeg {
+		feeMultiplier = poolFee
 	} else {
-		feeMultiplier = big.NewRat(3, 997)
+		feeMultiplier = new(big.Rat).Sub(new(big.Rat).Inv(poolFee), big.NewRat(1, 1))
 	}
+
+	feeMultiplier = new(big.Rat).Mul(feeMultiplier, big.NewRat(1, 1000000))
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
 
