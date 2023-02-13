@@ -49,7 +49,7 @@ const integrationTestUniswapV3 = `
     "transfer": {
       "transaction": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6",
       "log": {
-        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGA5EselnlwAAD////////////////////////////////////+WNlDJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQxvh7mCN4sTZSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgi1gZVSHXISPj///////////////////////////////////////vImw",
+        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGA5EselnlwAAD////////////////////////////////////+WNlDJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQxvh7mCN4sTZSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgi1gZVSHXISPj///////////////////////////////////////vImw==",
         "address": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
         "topics": [
           "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
