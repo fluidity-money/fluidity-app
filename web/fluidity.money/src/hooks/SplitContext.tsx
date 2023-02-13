@@ -6,7 +6,8 @@ import type {
 import { createContext, useContext, useEffect, useState } from "react";
 import { SplitFactory } from "@splitsoftware/splitio";
 
-export const SPLIT_BROWSER_KEY = process.env["NEXT_PUBLIC_FLU_SPLIT_BROWSER_KEY"];
+export const SPLIT_BROWSER_KEY =
+  process.env["NEXT_PUBLIC_FLU_SPLIT_BROWSER_KEY"];
 
 type SplitWindow = Window & {
   split: IBrowserSDK | null;
@@ -42,7 +43,7 @@ const SplitContextProvider = ({
   splitBrowserKey,
   splitUser,
 }: ISplitContextProvider) => {
-  const [ splitUserKey, setSplitUserKey ] = useState("user");
+  const [splitUserKey, setSplitUserKey] = useState("user");
 
   const [splitTreatment, setSplitTreatment] = useState<SplitContextType>({
     showExperiment: () => false,
@@ -85,7 +86,6 @@ const SplitContextProvider = ({
   );
 };
 
-const useSplitContext = () =>
-  useContext(SplitContext);
+const useSplitContext = () => useContext(SplitContext);
 
 export { SplitContextProvider, useSplitContext };

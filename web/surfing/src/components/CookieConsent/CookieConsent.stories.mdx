@@ -18,7 +18,8 @@ export const Template = (args) => (
         name="Cookies"
         args={{
             activated: false,
-            url: '/privacy'
+            url: '/privacy',
+            callBack: () => { return }
         }}
     >
         {Template.bind({})}

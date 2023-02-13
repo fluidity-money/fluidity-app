@@ -76,9 +76,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
   }, [width, breakpoint]);
 
-  const splitUser = 
+  const splitUser =
     process.env.NODE_ENV === "development" ||
-    (!!location && location.hostname.includes('staging')) 
+    (!!location && location.hostname.includes("staging"))
       ? "dev"
       : "user";
 
@@ -91,7 +91,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           width="0"
           style={{
             display: "none",
-            visibility: "hidden"
+            visibility: "hidden",
           }}
         ></iframe>
       </noscript>
@@ -100,9 +100,16 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <div id="root">
         <ApolloProvider client={client}>
           <ChainContextProvider>
-            <SplitContextProvider splitBrowserKey={SPLIT_BROWSER_KEY} splitUser={splitUser} >
+            <SplitContextProvider
+              splitBrowserKey={SPLIT_BROWSER_KEY}
+              splitUser={splitUser}
+            >
               <div className="App">
-                {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
+                {width < breakpoint && width > 0 ? (
+                  <MobileNavBar />
+                ) : (
+                  <NavBar />
+                )}
                 <Component {...pageProps} />
               </div>
             </SplitContextProvider>
@@ -113,7 +120,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
-          callBack={() => {
+          callback={() => {
             setCookieConsent(true);
           }}
         />
