@@ -50,16 +50,17 @@ const RewardsInfoBox = ({
   const mobileBreakpoint = 620;
 
   const chainOptions = showExperiment("enable-arbitrum")
-    ? Object.keys(SupportedChains).map((chain) => ({
+    ? Object.keys(SupportedChains)
+      .map((chain) => ({
         name: chain,
         icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
       }))
     : Object.keys(SupportedChains)
-        .filter((chain) => chain !== "ARB")
-        .map((chain) => ({
-          name: chain,
-          icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-        }));
+      .filter(chain => chain !== "ARB")
+      .map(chain => ({
+        name: chain,
+        icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+      }))
 
   const [prizePool, setPrizePool] = useState<number>(0);
 
