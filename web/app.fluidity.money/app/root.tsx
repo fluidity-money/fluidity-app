@@ -17,7 +17,7 @@ import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
-import { SplitContextProvider } from "./util/split";
+import { SplitContextProvider } from "contexts/SplitProvider";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
@@ -318,7 +318,7 @@ function App() {
               width="0"
               style={{
                 display: "none",
-                visibility: "hidden"
+                visibility: "hidden",
               }}
             ></iframe>
           </noscript>

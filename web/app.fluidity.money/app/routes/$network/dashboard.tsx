@@ -20,7 +20,7 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "~/util/split";
+import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
   DashboardIcon,

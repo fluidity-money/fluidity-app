@@ -9,9 +9,11 @@ import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
+import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
+import config, { colors } from "~/webapp.config.server";
 import {
   Display,
   GeneralButton,
@@ -30,8 +32,6 @@ import SwapCompleteModal from "~/components/SwapCompleteModal";
 import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
 import { Chain } from "~/util/chainUtils/chains";
-import config, { colors } from "~/webapp.config.server";
-import { SplitContext } from "~/util/split";
 
 type LoaderData = {
   tokens: Token[];
