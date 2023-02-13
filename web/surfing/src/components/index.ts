@@ -29,3 +29,4 @@ export { default as BurgerMenu } from "./BurgerMenu";
 export { default as UseCase } from "./UseCase";
 export { default as IntroTile } from "./IntroTile";
 export { default as Video } from "./Video";
+export { CookieConsent } from "./CookieConsent";
