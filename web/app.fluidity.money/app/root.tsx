@@ -256,7 +256,7 @@ function App() {
 
     if (!_targetedBannerSeen) {
       setShowTargetedBanner(true);
-    
+
       localStorage.setItem("targetedBanner", "true");
     }
   });
@@ -272,10 +272,11 @@ function App() {
           <p>Hey there...</p>
           <h2>Thank you for using the app!</h2>
           <p>
-            We'd love to sign *YOU* up to our beta program, could you visit
+            We&apos;d love to sign *YOU* up to our beta program, could you visit
             <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">this link?</a>
           </p>
-        </Banner>;
+        </Banner>
+        ;
         <CookieConsent
           activated={cookieConsent}
           url={
@@ -285,7 +286,6 @@ function App() {
             setCookieConsent(true);
           }}
         />
-        
         <CacheProvider sha={gitSha}>
           <ToolProvider>
             <SplitContextProvider
@@ -299,20 +299,20 @@ function App() {
             <ScrollRestoration />
             <Scripts />
             {GTAG_ID && GTM_ID && isProduction && (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              <>
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
                     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
                     })(window,document,'script','dataLayer','${GTM_ID}');`,
-              }}
-            />
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
-            />
+                  }}
+                />
+                <script
+                  async
+                  src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
+                />
                 <script
                   dangerouslySetInnerHTML={{
                     __html: `

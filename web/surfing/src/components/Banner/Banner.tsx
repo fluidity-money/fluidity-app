@@ -7,19 +7,18 @@ export type BannerProps = {
   children: React.ReactNode;
 };
 
-const Banner = ({ activated, positionFixed=false, callBack, children }: BannerProps) => {
-  const containerClass = `${styles.container} ${positionFixed && styles.positionFixed}`;
+const Banner = ({
+  activated,
+  positionFixed = false,
+  callBack,
+  children,
+}: BannerProps) => {
+  const containerClass = `${styles.container} ${
+    positionFixed && styles.positionFixed
+  }`;
 
   return (
-    <>
-      {!activated ? (
-        <div className={containerClass}>
-          { children }
-        </div>
-      ) : (
-        <></>
-      )}
-    </>
+    <>{!activated ? <div className={containerClass}>{children}</div> : <></>}</>
   );
 };
 
