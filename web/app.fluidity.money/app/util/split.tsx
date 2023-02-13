@@ -34,7 +34,6 @@ type ISplitContextProvider = React.PropsWithChildren<{
   splitBrowserKey: string;
   splitUser: string;
   setSplitUser: React.Dispatch<React.SetStateAction<string>>;
-  splitClientFeatures: string[];
 }>;
 
 const SplitContextProvider = ({
@@ -42,7 +41,6 @@ const SplitContextProvider = ({
   splitBrowserKey,
   splitUser,
   setSplitUser,
-  splitClientFeatures = [],
 }: ISplitContextProvider) => {
   const [splitTreatment, setSplitTreatment] = useState<SplitContextType>({
     showExperiment: () => false,
@@ -52,7 +50,7 @@ const SplitContextProvider = ({
   });
 
   useEffect(() => {
-    if (!(splitBrowserKey && splitUser && splitClientFeatures.length)) return;
+    if (!splitBrowserKey || !splitUser) return;
 
     window["split"] = SplitFactory({
       core: {
