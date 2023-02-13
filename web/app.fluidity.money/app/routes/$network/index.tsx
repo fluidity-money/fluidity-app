@@ -216,7 +216,7 @@ const NetworkPage = () => {
                   <LoadingDots />
                 </div>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Loading your last 50 transactions...
+                  Loading your transactions from last week...
                 </Text>
                 <br />
               </>
@@ -232,8 +232,8 @@ const NetworkPage = () => {
                   {numberToMonetaryString(projectedWin)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on your last 50
-                  transactions.
+                  Would have been your winnings, based on your transactions last
+                  week.
                 </Text>
                 <br />
               </>

@@ -167,6 +167,9 @@ module.exports = {
       }
     },
   },
+  etherscan: {
+    apiKey: process.env.FLU_ETHERSCAN_API
+  },
   networks: {
     localhost: {
       url: "http://localhost:8545",
