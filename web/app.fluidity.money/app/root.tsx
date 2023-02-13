@@ -318,7 +318,7 @@ function App() {
               width="0"
               style={{
                 display: "none",
-                visibility: "hidden"
+                visibility: "hidden",
               }}
             ></iframe>
           </noscript>
