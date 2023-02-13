@@ -1,5 +1,7 @@
 import { gql, Queryable, jsonPost } from "~/util";
 import {fetchGqlEndpoint, hasuraDateToUnix} from "~/util/api/graphql";
+import BN from "bn.js";
+import {getUsdFromTokenAmount} from "~/util/chainUtils/tokens";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -110,6 +112,7 @@ const queryByAddress: Queryable = {
       time
       transaction_hash
       amount
+      token_decimals
     }
   }`
 };
@@ -207,6 +210,7 @@ const queryByTxHash: Queryable = {
       time
       transaction_hash
       amount
+      token_decimals
     }
   }`
 };
@@ -311,6 +315,7 @@ const queryAll: Queryable = {
       time
       transaction_hash
       amount
+      token_decimals
     }
   }
 `
@@ -417,7 +422,7 @@ const useUserTransactionsByAddress = async (
     result.data[network].transfers = hasuraTransfers.map(transfer => ({
       sender: { address: transfer.sender_address },
       receiver: { address: transfer.recipient_address },
-      amount: transfer.amount,
+      amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
       currency: { symbol: transfer.token_short_name },
       transaction: { hash: transfer.transaction_hash },
       block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
@@ -464,7 +469,7 @@ const useUserTransactionsByTxHash = async (
     result.data[network].transfers = hasuraTransfers.map(transfer => ({
       sender: { address: transfer.sender_address },
       receiver: { address: transfer.recipient_address },
-      amount: transfer.amount,
+      amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
       currency: { symbol: transfer.token_short_name },
       transaction: { hash: transfer.transaction_hash },
       block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
@@ -513,7 +518,7 @@ const useUserTransactionsAll = async (
         transfers: hasuraTransfers.map(transfer => ({
           sender: {address: transfer.sender_address},
           receiver: {address: transfer.recipient_address},
-          amount: transfer.amount,
+          amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
           currency: {symbol: transfer.token_short_name},
           transaction: {hash: transfer.transaction_hash},
           block: {

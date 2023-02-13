@@ -1,5 +1,7 @@
 import { gql, jsonPost, Queryable } from "~/util";
 import {fetchGqlEndpoint, hasuraDateToUnix} from "~/util/api/graphql";
+import {getUsdFromTokenAmount} from "~/util/chainUtils/tokens";
+import BN from "bn.js";
 
 const queryByAddressTimestamp: Queryable = {
   ethereum: gql`
@@ -39,7 +41,7 @@ const queryByAddressTimestamp: Queryable = {
       $filterHashes: [String!] = [], 
       $timestamp: timestamp!
     ) {
-    arbitrum: user_actions(
+    transfers: user_actions(
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
@@ -51,6 +53,7 @@ const queryByAddressTimestamp: Queryable = {
       sender_address
       recipient_address
       token_short_name
+      token_decimals
       time
       transaction_hash
       amount
@@ -91,7 +94,7 @@ const queryByTimestamp: Queryable = {
       $filterHashes: [String!] = [], 
       $timestamp: timestamp!
     ) {
-    arbitrum: user_actions(
+    transfers: user_actions(
       where: {
         network: { _eq: "arbitrum" },
        _not: { transaction_hash: { _in: $filterHashes } }, 
@@ -102,6 +105,7 @@ const queryByTimestamp: Queryable = {
       sender_address
       recipient_address
       token_short_name
+      token_decimals
       time
       transaction_hash
       amount
@@ -131,7 +135,7 @@ export type VolumeTxsResponse = {
     [network: string]: {
       transfers: 
         {
-          amount: string;
+          amount: string | number;
           currency: {
             symbol: string;
           };
@@ -157,6 +161,7 @@ export type HasuraVolumeTransaction = {
   recipient_address: string,
   amount: number,
   token_short_name: string,
+  token_decimals: number,
   time: number
 };
 
@@ -196,13 +201,17 @@ const useVolumeTxByAddressTimestamp = async (
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as HasuraVolumeTxsResponse).data.transfers || [];
-    result.data[network].transfers = hasuraTransfers.map(transfer => ({
-      sender: { address: transfer.sender_address },
-      receiver: { address: transfer.recipient_address },
-      amount: String(transfer.amount),
-      currency: { symbol: transfer.token_short_name },
-      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
-    }))
+    result.data = {
+      arbitrum: {
+        transfers: hasuraTransfers.map(transfer => ({
+          sender: {address: transfer.sender_address},
+          receiver: {address: transfer.recipient_address},
+          amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
+          currency: {symbol: transfer.token_short_name},
+          block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
+        }))
+      }
+    }
   }
 
   return result;
@@ -238,13 +247,17 @@ const useVolumeTxByTimestamp = async (
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as HasuraVolumeTxsResponse).data.transfers || [];
-    result.data[network].transfers = hasuraTransfers.map(transfer => ({
-      sender: { address: transfer.sender_address },
-      receiver: { address: transfer.recipient_address },
-      amount: String(transfer.amount),
-      currency: { symbol: transfer.token_short_name },
-      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
-    }))
+    result.data = {
+      arbitrum: {
+        transfers: hasuraTransfers.map(transfer => ({
+          sender: {address: transfer.sender_address},
+          receiver: {address: transfer.recipient_address},
+          amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
+          currency: {symbol: transfer.token_short_name},
+          block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
+        }))
+      }
+    }
   }
 
   return result; 

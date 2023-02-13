@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const parsedVolume = volumesRes.data?.[network].transfers.map((transfer) => ({
     symbol: transfer.currency.symbol,
-    amount: parseFloat(transfer.amount) || 0,
+    amount: parseFloat(String(transfer.amount)) || 0,
     timestamp: transfer.block.timestamp.unixtime * 1000,
     sender: transfer.sender.address,
     receiver: transfer.receiver.address,
