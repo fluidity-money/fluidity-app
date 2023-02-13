@@ -172,6 +172,8 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	poolFee, err := ethereum.CoerceBoundContractResultsToRat(poolFee_)
 
+	poolFee = new(big.Rat).Mul(poolFee, big.NewRat(1, 1000000))
+
 	if err != nil {
 		return nil, fmt.Errorf(
 			"Failed to coerce pool fee! %v",
@@ -190,6 +192,8 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		// the multiplier to find the fee
 		feeMultiplier *big.Rat
 	)
+
+	fmt.Println(amount0, amount1)
 
 	// If amount0 is negative, then amount1 is paid out
 	var (
@@ -215,17 +219,22 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		fluidTransferAmount = new(big.Rat).Mul(amount1, big.NewRat(-1, 1))
 	}
 
+	fmt.Println(fluidTransferAmount)
+
 	// if trading x fUSDC -> y Token B
 	// the fee is x * 0.003 (100% input -> 99.7%)
 	// if trading y Token B -> x fUSDC
 	// the fee is x * 0.003009027 (99.7% input -> 100%)
-	if !amount0IsNeg {
+	if token0IsFluid != amount0IsNeg {
 		feeMultiplier = poolFee
 	} else {
-		feeMultiplier = new(big.Rat).Sub(new(big.Rat).Inv(poolFee), big.NewRat(1, 1))
+		poolFeeRem := new(big.Rat).Sub(big.NewRat(1, 1), poolFee)
+		invPoolFee := new(big.Rat).Inv(poolFeeRem)
+		feeMultiplier = new(big.Rat).Sub(invPoolFee, big.NewRat(1, 1))
 	}
 
-	feeMultiplier = new(big.Rat).Mul(feeMultiplier, big.NewRat(1, 1000000))
+	fmt.Println(feeMultiplier)
+	fmt.Println()
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
 
