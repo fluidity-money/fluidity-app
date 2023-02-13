@@ -23,6 +23,8 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { SplitContext } from "~/util/split";
 import config from "~/webapp.config.server";
 import {
+  AssetsIcon,
+  DaoIcon,
   DashboardIcon,
   GeneralButton,
   Trophy,
@@ -32,8 +34,6 @@ import {
   BlockchainModal,
   numberToMonetaryString,
   useViewport,
-  DaoIcon,
-  AssetsIcon,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -167,10 +167,8 @@ export default function Dashboard() {
     { home: { name: "dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "rewards", icon: <Trophy /> } },
 
-    showExperiment("enable-assets") && {
-      assets: { name: "Assets", icon: <AssetsIcon /> },
-    },
-    showExperiment("enable-dao") && { dao: { name: "DAO", icon: <DaoIcon /> } },
+    ...showExperiment("enable-assets") ? [{ assets: { name: "Assets", icon: <AssetsIcon /> }}]: [],
+    ...showExperiment("enable-dao") ? [{ dao: { name: "DAO", icon: <DaoIcon /> } }] : [],
   ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =

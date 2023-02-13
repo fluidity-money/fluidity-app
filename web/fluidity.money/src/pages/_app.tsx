@@ -120,7 +120,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
-          callBack={() => {
+          callback={() => {
             setCookieConsent(true);
           }}
         />
