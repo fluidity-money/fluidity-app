@@ -32,6 +32,8 @@ import {
   BlockchainModal,
   numberToMonetaryString,
   useViewport,
+  DaoIcon,
+  AssetsIcon,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -164,8 +166,11 @@ export default function Dashboard() {
   const navigationMap = [
     { home: { name: "dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "rewards", icon: <Trophy /> } },
-    // {assets: {name: "Assets", icon: <AssetsIcon />}},
-    // {dao: {name:"DAO", icon: <DaoIcon />}},
+
+    showExperiment("enable-assets") && {
+      assets: { name: "Assets", icon: <AssetsIcon /> },
+    },
+    showExperiment("enable-dao") && { dao: { name: "DAO", icon: <DaoIcon /> } },
   ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =

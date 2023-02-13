@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import {
   useLoaderData,
@@ -20,7 +21,8 @@ import { ToolProvider } from "./components/ToolTip";
 import { SplitContextProvider } from "./util/split";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
-import { CookieConsent } from "@fluidity-money/surfing";
+import { CookieConsent, Banner } from "@fluidity-money/surfing";
+import { SplitContext } from "~/util/split";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -236,99 +238,51 @@ function App() {
     }
   }, []);
 
+  const { showExperiment } = useContext(SplitContext);
+
   const [splitUser, setSplitUser] = useState(splitUserKey);
+
+  // show the user a banner if they're on our "bother"
+  // list for being interesting
+
+  const [showTargetedBanner, setShowTargetedBanner] = useState(false);
+
+  useEffect(() => {
+    if (!showExperiment("target-banner")) {
+      return;
+    }
+
+    const _targetedBannerSeen = localStorage.getItem("targetedBanner");
+
+    if (!_targetedBannerSeen) {
+      setShowTargetedBanner(true);
+
+      localStorage.setItem("targetedBanner", "true");
+    }
+  });
 
   return (
     <html lang="en">
       <head>
         <Meta />
         <Links />
-        {GTAG_ID && GTM_ID && isProduction && (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                    })(window,document,'script','dataLayer','${GTM_ID}');`,
-              }}
-            />
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                      window.dataLayer = window.dataLayer || [];
-                      function gtag(){dataLayer.push(arguments);}
-                      gtag('js', new Date());
-                      gtag('config', '${GTAG_ID}');
-                    `,
-              }}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                      (function (h, o, t, j, a, r) {
-                        h.hj =
-                          h.hj ||
-                          function () {
-                            (h.hj.q = h.hj.q || []).push(arguments);
-                          };
-                        h._hjSettings = { hjid: 3278724, hjsv: 6 };
-                        a = o.getElementsByTagName("head")[0];
-                        r = o.createElement("script");
-                        r.async = 1;
-                        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-                        a.appendChild(r);
-                      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
-                    `,
-              }}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(e,t,o,n,p,r,i) {
-                        e.visitorGlobalObjectAlias=n;
-                        e[e.visitorGlobalObjectAlias]=e[e.visitorGlobalObjectAlias]||function(){
-                          (e[e.visitorGlobalObjectAlias].q=e[e.visitorGlobalObjectAlias].q||[]).push(arguments)
-                        };
-                        e[e.visitorGlobalObjectAlias].l=(new Date).getTime();
-                        r=t.createElement("script");
-                        r.src=o;
-                        r.async=true;
-                        i=t.getElementsByTagName("script")[0];
-                        i.parentNode.insertBefore(r,i)
-                      })(window,document,"https://diffuser-cdn.app-us1.com/diffuser/diffuser.js","vgo");
-                      vgo('setAccount', '612285146');
-                      vgo('setTrackByDefault', true);
-                      vgo('process');`,
-              }}
-            />
-          </>
-        )}
       </head>
       <body>
-        {GTM_ID && isProduction && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-              height="0"
-              width="0"
-              style={{
-                display: "none",
-                visibility: "hidden",
-              }}
-            ></iframe>
-          </noscript>
-        )}
+        <Banner activated={showTargetedBanner}>
+          <p>Hey there...</p>
+          <h2>Thank you for using the app!</h2>
+          <p>
+            We&apos;d love to sign *YOU* up to our beta program, could you visit
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">this link?</a>
+          </p>
+        </Banner>
+        ;
         <CookieConsent
           activated={cookieConsent}
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
-          callBack={() => {
+          callback={() => {
             setCookieConsent(true);
           }}
         />
@@ -343,6 +297,61 @@ function App() {
             </SplitContextProvider>
             <ScrollRestoration />
             <Scripts />
+            {GTAG_ID && GTM_ID && isProduction && (
+              <>
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                    })(window,document,'script','dataLayer','${GTM_ID}');`,
+                  }}
+                />
+                <script
+                  async
+                  src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      (function (h, o, t, j, a, r) {
+                        h.hj =
+                          h.hj ||
+                          function () {
+                            (h.hj.q = h.hj.q || []).push(arguments);
+                          };
+                        h._hjSettings = { hjid: 3278724, hjsv: 6 };
+                        a = o.getElementsByTagName("head")[0];
+                        r = o.createElement("script");
+                        r.async = 1;
+                        r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+                        a.appendChild(r);
+                      })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+                    `,
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `(function(e,t,o,n,p,r,i) {
+                        e.visitorGlobalObjectAlias=n;
+                        e[e.visitorGlobalObjectAlias]=e[e.visitorGlobalObjectAlias]||function(){
+                          (e[e.visitorGlobalObjectAlias].q=e[e.visitorGlobalObjectAlias].q||[]).push(arguments)
+                        };
+                        e[e.visitorGlobalObjectAlias].l=(new Date).getTime();
+                        r=t.createElement("script");
+                        r.src=o;
+                        r.async=true;
+                        i=t.getElementsByTagName("script")[0];
+                        i.parentNode.insertBefore(r,i)
+                      })(window,document,"https://diffuser-cdn.app-us1.com/diffuser/diffuser.js","vgo");
+                      vgo('setAccount', '612285146');
+                      vgo('setTrackByDefault', true);
+                      vgo('process');`,
+                  }}
+                />
+              </>
+            )}
             <LiveReload />
           </ToolProvider>
         </CacheProvider>

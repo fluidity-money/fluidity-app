@@ -1,0 +1,26 @@
+import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
+
+import Banner from "./Banner";
+
+<Meta title="Modal/Banner" component={Banner} />
+
+export const Template = (args) => (
+    <Banner {...args}/>
+);
+
+<Title>Banner</Title>
+<Subtitle>Beautiful typography for beautiful things.</Subtitle>
+
+<ArgsTable of={Banner} default />
+
+<Canvas>
+    <Story
+        name="Banner without anything extra"
+        args={{
+            positionFixed: false,
+            children: <h1>This is a message</h1>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>
