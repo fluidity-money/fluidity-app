@@ -166,7 +166,6 @@ export default function Dashboard() {
   const navigationMap = [
     { home: { name: "dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "rewards", icon: <Trophy /> } },
-
     ...showExperiment("enable-assets") ? [{ assets: { name: "Assets", icon: <AssetsIcon /> }}]: [],
     ...showExperiment("enable-dao") ? [{ dao: { name: "DAO", icon: <DaoIcon /> } }] : [],
   ];
