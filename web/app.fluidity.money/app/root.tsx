@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import type { MetaFunction, LoaderFunction } from "@remix-run/node";
 import {
   useLoaderData,
@@ -20,7 +21,8 @@ import { ToolProvider } from "./components/ToolTip";
 import { SplitContextProvider } from "./util/split";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
-import { CookieConsent } from "@fluidity-money/surfing";
+import { CookieConsent, Banner } from "@fluidity-money/surfing";
+import { SplitContext } from "~/util/split";
 
 // Removed LinkFunction as insufficiently typed (missing apple-touch-icon)
 export const links = () => {
@@ -133,7 +135,6 @@ export const loader: LoaderFunction = async ({
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
   const splitBrowserKey = process.env?.FLU_SPLIT_BROWSER_KEY ?? "";
-  const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
 
   const GTAG_ID = process.env["FLU_GTAG_ID"];
@@ -149,7 +150,6 @@ export const loader: LoaderFunction = async ({
     host,
     gitSha,
     splitBrowserKey,
-    splitClientFeatures,
     splitUserKey,
   };
 };
@@ -190,7 +190,6 @@ type LoaderData = {
   gitSha?: string;
   host?: string;
   splitBrowserKey: string;
-  splitClientFeatures: string[];
   splitUserKey: string;
 };
 
@@ -204,7 +203,6 @@ function App() {
     gitSha = "unknown",
     splitBrowserKey,
     splitUserKey,
-    splitClientFeatures,
   } = useLoaderData<LoaderData>();
 
   switch (true) {
@@ -240,36 +238,79 @@ function App() {
     }
   }, []);
 
+  const { showExperiment } = useContext(SplitContext);
+
   const [splitUser, setSplitUser] = useState(splitUserKey);
+
+  // show the user a banner if they're on our "bother"
+  // list for being interesting
+
+  const [showTargetedBanner, setShowTargetedBanner] = useState(false);
+
+  useEffect(() => {
+    if (!showExperiment("target-banner")) {
+      return;
+    }
+
+    const _targetedBannerSeen = localStorage.getItem("targetedBanner");
+
+    if (!_targetedBannerSeen) {
+      setShowTargetedBanner(true);
+
+      localStorage.setItem("targetedBanner", "true");
+    }
+  });
 
   return (
     <html lang="en">
       <head>
         <Meta />
         <Links />
-        {GTAG_ID && GTM_ID && isProduction && (
+      </head>
+      <body>
+        <Banner activated={showTargetedBanner}>
+          <p>Hey there...</p>
+          <h2>Thank you for using the app!</h2>
+          <p>
+            We&apos;d love to sign *YOU* up to our beta program, could you visit
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">this link?</a>
+          </p>
+        </Banner>
+        ;
+        <CookieConsent
+          activated={cookieConsent}
+          url={
+            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+          }
+          callback={() => {
+            setCookieConsent(true);
+          }}
+        />
+        <CacheProvider sha={gitSha}>
+          <ToolProvider>
+            <SplitContextProvider
+              splitBrowserKey={splitBrowserKey}
+              splitUser={splitUser}
+              setSplitUser={setSplitUser}
+            >
+              <Outlet />
+            </SplitContextProvider>
+            <ScrollRestoration />
+            <Scripts />
+            {GTAG_ID && GTM_ID && isProduction && (
               <>
-                <script dangerouslySetInnerHTML={{
-                  __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
                     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
                     })(window,document,'script','dataLayer','${GTM_ID}');`,
-                }} 
+                  }}
                 />
                 <script
                   async
-                  src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`} 
-                /> 
-                <script
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      window.dataLayer = window.dataLayer || [];
-                      function gtag(){dataLayer.push(arguments);}
-                      gtag('js', new Date());
-                      gtag('config', '${GTAG_ID}');
-                    `,
-                  }}
+                  src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
                 />
                 <script
                   dangerouslySetInnerHTML={{
@@ -311,42 +352,6 @@ function App() {
                 />
               </>
             )}
-      </head>
-      <body>
-        {GTM_ID && isProduction && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-              height="0"
-              width="0"
-              style={{
-                display: "none",
-                visibility: "hidden"
-              }}
-            ></iframe>
-          </noscript>
-        )}
-        <CookieConsent
-          activated={cookieConsent}
-          url={
-            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
-          }
-          callBack={() => {
-            setCookieConsent(true);
-          }}
-        />
-        <CacheProvider sha={gitSha}>
-          <ToolProvider>
-            <SplitContextProvider
-              splitBrowserKey={splitBrowserKey}
-              splitUser={splitUser}
-              setSplitUser={setSplitUser}
-              splitClientFeatures={splitClientFeatures}
-            >
-              <Outlet />
-            </SplitContextProvider>
-            <ScrollRestoration />
-            <Scripts />
             <LiveReload />
           </ToolProvider>
         </CacheProvider>

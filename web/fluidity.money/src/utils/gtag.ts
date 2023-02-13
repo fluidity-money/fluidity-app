@@ -1,8 +1,8 @@
-export const GTAG_ID = process.env["FLU_GTAG_ID"];
-export const GTM_ID = process.env["FLU_GTM_ID"];
+export const GTAG_ID = process.env["NEXT_PUBLIC_FLU_GTAG_ID"];
+export const GTM_ID = process.env["NEXT_PUBLIC_FLU_GTM_ID"];
 
 export const pageview = (url: URL) => {
-  if (typeof window.gtag === "undefined") return;
+  if (typeof window?.gtag === "undefined") return;
 
   window.gtag("config", GTAG_ID, {
     page_path: url,
@@ -17,7 +17,7 @@ type GTagEvent = {
 };
 
 export const event = ({ action, category, label, value }: GTagEvent) => {
-  if (typeof window.gtag === "undefined") return;
+  if (typeof window?.gtag === "undefined") return;
 
   window.gtag("event", action, {
     event_category: category,

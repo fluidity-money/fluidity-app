@@ -34,6 +34,8 @@ import {
   BlockchainModal,
   numberToMonetaryString,
   useViewport,
+  DaoIcon,
+  AssetsIcon,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";

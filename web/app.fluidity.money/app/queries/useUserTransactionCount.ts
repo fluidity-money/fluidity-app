@@ -1,20 +1,28 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
 
-const queryByAddress: Queryable = {
+const queryByAddressTimestamp: Queryable = {
   ethereum: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $address: String!
+      $timestamp: ISO8601DateTime!
+    ) {
       ethereum {
         transfers(
           currency: { in: $fluidCurrencies }
           any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
         ) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $address: String!
+      $timestamp: ISO8601DateTime!
+    ) {
       solana {
         transfers(
           currency: { in: $fluidCurrencies }
@@ -23,28 +31,34 @@ const queryByAddress: Queryable = {
             { receiverAddress: { is: $address } }
           ]
         ) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
 };
 
-const queryAll: Queryable = {
+const queryByTimestamp: Queryable = {
   ethereum: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $timestamp: ISO8601DateTime!
+    ) {
       ethereum {
         transfers(currency: { in: $fluidCurrencies }) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $timestamp: ISO8601DateTime!
+    ) {
       solana {
         transfers(currency: { in: $fluidCurrencies }) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
@@ -77,14 +91,19 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionByAddressCount = (network: string, address: string) => {
+const useUserTransactionCountByAddressTimestamp = (
+  network: string,
+  address: string,
+  iso8601Timestamp: string
+) => {
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
+    timestamp: iso8601Timestamp,
   };
 
   const body = {
-    query: queryByAddress[network],
+    query: queryByAddressTimestamp[network],
     variables,
   };
 
@@ -97,13 +116,17 @@ const useUserTransactionByAddressCount = (network: string, address: string) => {
   );
 };
 
-const useUserTransactionAllCount = (network: string) => {
+const useUserTransactionCountByTimestamp = (
+  network: string,
+  iso8601Timestamp: string
+) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
+    timestamp: iso8601Timestamp,
   };
 
   const body = {
-    query: queryAll[network],
+    query: queryByTimestamp[network],
     variables,
   };
 
@@ -116,4 +139,7 @@ const useUserTransactionAllCount = (network: string) => {
   );
 };
 
-export { useUserTransactionAllCount, useUserTransactionByAddressCount };
+export {
+  useUserTransactionCountByTimestamp,
+  useUserTransactionCountByAddressTimestamp,
+};
