@@ -1,16 +1,19 @@
 import styles from "./CookieConsent.module.scss";
 
-import { Banner } from "../Banner";
+import { Banner, BannerProps } from "../Banner";
 
 export type CookieConsentProps = {
-  activated: boolean;
   url: string;
-  callBack: () => void;
-};
+} & Omit<BannerProps, "children">;
 
-const CookieConsent = ({ activated, url, callBack }: CookieConsentProps) => {
+const CookieConsent = (props: CookieConsentProps) => {
+  const {
+    url,
+    callback,
+  } = props;
+
   return (
-    <Banner activated={activated} positionFixed={true} callBack={callBack}>
+    <Banner {...props}>
       <div className={styles.text}>
         <h4>Hi there! 👋</h4>
         Fluidity uses cookies to ensure that we give you the best experience on
@@ -23,7 +26,7 @@ const CookieConsent = ({ activated, url, callBack }: CookieConsentProps) => {
         .<br />
         We're open source, so our data usage is fully transparent.
       </div>
-      <button className={styles.button} onClick={callBack}>
+      <button className={styles.button} onClick={callback}>
         Got it!
       </button>
     </Banner>

@@ -282,7 +282,7 @@ function App() {
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
-          callBack={() => {
+          callback={() => {
             setCookieConsent(true);
           }}
         />
