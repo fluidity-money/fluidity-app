@@ -18,7 +18,7 @@ const integrationTestUniswapV2 = `
           "0x00000000000000000000000020e95253e54490d8d30ea41574b24f741ee70201"
         ]
       },
-      "application": 1
+      "application": 2
     },
     "transaction": {
       "to": "0xd7c09e006a2891880331b0f6224071c1e890a98a",
@@ -57,12 +57,12 @@ const integrationTestUniswapV3 = `
           "0x00000000000000000000000035f09f57fd5c6106da70f4ed8e14312614747efc"
         ]
       },
-      "transaction": {
-        "to": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
-        "from": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
-        "hash": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6"
-      },
-      "application": 2
+      "application": 1
+    },
+    "transaction": {
+    "to": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
+    "from": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
+    "hash": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6"
     },
     "expected_sender": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
     "expected_recipient": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",

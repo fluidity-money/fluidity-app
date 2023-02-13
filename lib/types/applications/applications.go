@@ -15,8 +15,8 @@ type Application int64
 
 var applicationNames = []string{
 	"none",
-	"uniswap_v2",
 	"uniswap_v3",
+	"uniswap_v2",
 	"balancer_v2",
 	"oneinch_v2",
 	"oneinch_v1",
