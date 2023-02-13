@@ -193,8 +193,6 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		feeMultiplier *big.Rat
 	)
 
-	fmt.Println(amount0, amount1)
-
 	// If amount0 is negative, then amount1 is paid out
 	var (
 		// Whether token0 is the fluid token
@@ -219,8 +217,6 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		fluidTransferAmount = new(big.Rat).Mul(amount1, big.NewRat(-1, 1))
 	}
 
-	fmt.Println(fluidTransferAmount)
-
 	// if trading x fUSDC -> y Token B
 	// the fee is x * 0.003 (100% input -> 99.7%)
 	// if trading y Token B -> x fUSDC
@@ -232,9 +228,6 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		invPoolFee := new(big.Rat).Inv(poolFeeRem)
 		feeMultiplier = new(big.Rat).Sub(invPoolFee, big.NewRat(1, 1))
 	}
-
-	fmt.Println(feeMultiplier)
-	fmt.Println()
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
 
