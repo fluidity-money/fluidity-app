@@ -23,6 +23,8 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { SplitContext } from "~/util/split";
 import config from "~/webapp.config.server";
 import {
+  AssetsIcon,
+  DaoIcon,
   DashboardIcon,
   GeneralButton,
   Trophy,
@@ -164,8 +166,9 @@ export default function Dashboard() {
   const navigationMap = [
     { home: { name: "dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "rewards", icon: <Trophy /> } },
-    // {assets: {name: "Assets", icon: <AssetsIcon />}},
-    // {dao: {name:"DAO", icon: <DaoIcon />}},
+
+    ...showExperiment("enable-assets") ? [{ assets: { name: "Assets", icon: <AssetsIcon /> }}]: [],
+    ...showExperiment("enable-dao") ? [{ dao: { name: "DAO", icon: <DaoIcon /> } }] : [],
   ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =

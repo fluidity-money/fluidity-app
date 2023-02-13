@@ -20,7 +20,7 @@ const Demo = () => {
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const weeklyAvailableRewards = onChainData.data?.ethPool/52
+  const weeklyAvailableRewards = onChainData.data?.ethPool / 52;
 
   const handleConnectWallet = () =>
     (window.location.href = "https://app.fluidity.money/wtf");

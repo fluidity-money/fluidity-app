@@ -8,12 +8,8 @@ export type IPropPools = {
   solPool: number;
 };
 
-const handler: NextApiHandler = async(_, res) => {
-  const [
-    totalTransactions,
-    ethPool,
-    solPool,
-  ] = await Promise.all([
+const handler: NextApiHandler = async (_, res) => {
+  const [totalTransactions, ethPool, solPool] = await Promise.all([
     getTotalTransactions(),
     getEthTotalPrizePool(),
     Promise.resolve(() => 0),
