@@ -292,7 +292,6 @@ function App() {
               splitBrowserKey={splitBrowserKey}
               splitUser={splitUser}
               setSplitUser={setSplitUser}
-              splitClientFeatures={splitClientFeatures}
             >
               <Outlet />
             </SplitContextProvider>
