@@ -1,5 +1,5 @@
-export const GTAG_ID = process.env["NEXT_PUBLIC_FLU_GTAG_ID"];
-export const GTM_ID = process.env["NEXT_PUBLIC_FLU_GTM_ID"];
+export const GTAG_ID = "G-MNXGX2P9KJ";
+export const GTM_ID = "GTM-W7QJGR2";
 
 export const pageview = (url: URL) => {
   if (typeof window?.gtag === "undefined") return;
