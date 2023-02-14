@@ -70,8 +70,8 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			blockNumber                 = announcement.BlockNumber
 			fromAddress                 = announcement.FromAddress
 			toAddress                   = announcement.ToAddress
-			sourceRandom                = announcement.SourceRandom
-			sourcePayouts               = announcement.SourcePayouts
+			sourceRandom                = announcement.RandomSource
+			sourcePayouts               = announcement.RandomPayouts
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
 			application                 = announcement.Application
@@ -118,7 +118,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			continue
 		}
 
-		fromWinAmount, toWinAmount := calculatePayouts(sourcePayouts, winningBalls)
+		fromWinAmounts, toWinAmounts := probability.CalculatePayoutsSplit(sourcePayouts, winningBalls)
 
 		log.App(func(k *log.Log) {
 			k.Format(
@@ -127,9 +127,9 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 				fromAddress,
 				toAddress,
 				fromAddress,
-				fromWinAmount.String(),
+				formatPayouts(fromWinAmounts),
 				toAddress,
-				toWinAmount.String(),
+				formatPayouts(toWinAmounts),
 			)
 		})
 
@@ -138,9 +138,9 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			TransactionHash: announcementTransactionHash,
 			BlockNumber:     blockNumber,
 			FromAddress:     fromAddress,
-			FromWinAmount:   fromWinAmount,
+			FromWinAmount:   fromWinAmounts,
 			ToAddress:       toAddress,
-			ToWinAmount:     toWinAmount,
+			ToWinAmount:     toWinAmounts,
 			TokenDetails:    tokenDetails,
 			Application:     application,
 		}
