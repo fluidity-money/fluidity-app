@@ -6,12 +6,9 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
-import "./openzeppelin/IUpgradeableBeacon.sol";
-
 import "./VEGovLockup.sol";
 import "./Operator.sol";
 
-import "./ILiquidityProvider.sol";
 import "./IToken.sol";
 
 /// @dev default time to wait before a vote is possibly ratified after it's submission
@@ -20,24 +17,36 @@ uint256 constant DEFAULT_VOTE_BLOCK_TIME = 10 days;
 /// @dev default vote timelock once a vote has been ratified
 uint256 constant DEFAULT_FROZEN_TIME = 24 hours;
 
-/// @dev selector for the token's init function
-string constant TOKEN_INIT_SELECTOR = "init(address,uint8,string,string,address,address,address)";
-
 enum ProposalStatus {
     UNFINISHED,
     FROZEN,
     SUCCEEDED,
     EXECUTED,
-    FAILED
+    FAILED,
+    KILLED
 }
 
 struct Proposal {
+    /// @notice targetContract to delegateCall to
     address targetContract;
+
+    /// @notice ratificationTs to use as the timestamp of when voting finished
     uint256 ratificationTs;
+
+    /// @notice votesFor that voted in favour of the proposal
     uint256 votesFor;
+
+    /// @notice votesAgainst the proposal
     uint256 votesAgainst;
+
+    /// @notice data to use as calldata in delegatecall
     bytes data;
+
+    /// @notice votes that were made by users
     mapping(address => uint256) votes;
+
+    /// @notice killed by the emergency council?
+    bool killed;
 }
 
 /*
@@ -142,6 +151,10 @@ contract DAO {
             _voteAgainst(msg.sender, _ipfsHash, _againstAmount);
     }
 
+    function getProposalKilled(bytes20 _ipfsHash) public view returns (bool) {
+        return proposals_[_ipfsHash].killed;
+    }
+
     function getProposalVotingOver(bytes20 _ipfsHash) public view returns (bool) {
         return getRatificationTs(_ipfsHash) > block.timestamp;
     }
@@ -166,6 +179,9 @@ contract DAO {
     }
 
     function getProposalStatus(bytes20 _ipfsHash) public view returns (ProposalStatus) {
+        // was the proposal killed?
+        bool proposalKilled = getProposalKilled(_ipfsHash);
+
         // is the period of voting over?
         bool proposalVotingOver = getProposalVotingOver(_ipfsHash);
 
@@ -177,6 +193,8 @@ contract DAO {
 
         // has the proposal already been executed?
         bool proposalExecuted = getProposalExecuted(_ipfsHash);
+
+        if (proposalKilled) return ProposalStatus.KILLED;
 
         // if the vote passed, and it's past the period of freeze, and it's
         // been executed, it's been executed
@@ -288,7 +306,9 @@ contract DAO {
 
         enableReentrancyGuard();
 
-        (bool rc, bytes memory returnData) = proposal.targetContract.call(proposal.data);
+        (bool rc, bytes memory returnData) = proposal.targetContract.delegatecall(
+            proposal.data
+        );
 
         // return data under 68 with a failure reverted silently
 
@@ -311,69 +331,5 @@ contract DAO {
         // mark the contract as executed
 
         proposal.targetContract = address(0);
-    }
-
-    function upgradeBeacon(
-        IUpgradeableBeacon _beacon,
-        address _oldImplementation,
-        address _newImplementation
-    )
-        public
-    {
-        require(msg.sender == address(this), "sender not the DAO");
-        require(address(_beacon) != address(0), "zero address");
-
-        require(
-            _beacon.implementation() == _oldImplementation,
-            "old impl not consistent"
-        );
-
-        _beacon.upgradeTo(_newImplementation);
-    }
-
-    function deployNewToken(
-        string memory _fluidTokenName,
-        string memory _fluidSymbol,
-        uint8 _decimals,
-        ILiquidityProvider _liquidityProvider,
-        IBeacon _beacon
-    )
-        external returns (address)
-    {
-        require(msg.sender == address(this), "sender not the dao");
-
-        require(address(_beacon) != address(0), "beacon is null");
-        require(address(_liquidityProvider) != address(0), "liquidity provider null");
-
-        BeaconProxy beaconProxy = new BeaconProxy(
-            address(_beacon),
-            abi.encodeWithSignature(
-                TOKEN_INIT_SELECTOR,
-                address(_liquidityProvider),
-                _decimals,
-                _fluidTokenName,
-                _fluidSymbol,
-                emergencyCouncil_,
-                address(this),
-                operator_
-            )
-         );
-
-         IERC20 token = IERC20(address(beaconProxy));
-
-         require(
-             token.decimals() == _decimals,
-             "decimals in deploy not consistent"
-         );
-
-         return address(beaconProxy);
-    }
-
-    /// @notice disableAddresses given using `enableEmergencyMode()`
-    function disableAddresses(IEmergencyMode[] memory _addresses) public {
-        require(msg.sender == address(this), "sender not the dao");
-
-        for (uint256 i = 0; i < _addresses.length; i++)
-            _addresses[i].enableEmergencyMode();
     }
 }

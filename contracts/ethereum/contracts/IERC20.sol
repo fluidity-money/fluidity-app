@@ -46,7 +46,6 @@ interface IERC20 {
      */
     function symbol() external view returns (string memory);
 
-
     /**
      * @dev Moves `amount` tokens from the caller's account to `to`.
      *

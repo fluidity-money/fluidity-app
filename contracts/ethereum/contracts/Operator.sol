@@ -39,10 +39,19 @@ contract Operator is IEmergencyMode, IUtilityGauges {
     }
 
     /// @notice emitted when a fluidity client is updated
-    event FluidityClientChanged(address indexed token, string indexed name, address oldClient, address newClient);
+    event FluidityClientChanged(
+        address indexed token,
+        string indexed name,
+        address oldClient,
+        address newClient
+    );
 
     /// @notice emitted when the rng oracles are changed to a new address
-    event OracleChanged(address indexed contractAddr, address indexed oldOracle, address indexed newOracle);
+    event OracleChanged(
+        address indexed contractAddr,
+        address indexed oldOracle,
+        address indexed newOracle
+    );
 
     /// @dev if false, emergency mode is active!
     bool private noEmergency_;
@@ -137,7 +146,12 @@ contract Operator is IEmergencyMode, IUtilityGauges {
      *
      * @return an array of utility vars
      */
-    function getUtilityVars(address token, string[] memory names) public returns (ScannedUtilityVars[] memory) {
+    function getUtilityVars(
+        address token,
+        string[] memory names
+    )
+        public returns (ScannedUtilityVars[] memory)
+    {
         ScannedUtilityVars[] memory vars = new ScannedUtilityVars[](names.length);
         for (uint i = 0; i < names.length; i++) {
             string memory name = names[i];
@@ -159,7 +173,11 @@ contract Operator is IEmergencyMode, IUtilityGauges {
         for (uint i = 0; i < newOracles.length; i++) {
             OracleUpdate memory oracle = newOracles[i];
 
-            emit OracleChanged(oracle.contractAddr, oracles_[oracle.contractAddr], oracle.newOracle);
+            emit OracleChanged(
+                oracle.contractAddr,
+                oracles_[oracle.contractAddr],
+                oracle.newOracle
+            );
 
             oracles_[oracle.contractAddr] = oracle.newOracle;
         }
@@ -177,7 +195,14 @@ contract Operator is IEmergencyMode, IUtilityGauges {
         return oracles_[msg.sender];
     }
 
-    function reward(address token, FluidityReward[] calldata rewards, uint firstBlock, uint lastBlock) public {
+    function reward(
+        address token,
+        FluidityReward[] calldata rewards,
+        uint firstBlock,
+        uint lastBlock
+    )
+        public
+    {
         require(noEmergencyMode(), "emergency mode!");
 
         require(msg.sender == oracles_[token], "only the token's oracle can use this");
