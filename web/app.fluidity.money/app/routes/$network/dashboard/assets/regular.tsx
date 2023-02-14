@@ -13,10 +13,10 @@ export const loader: LoaderFunction = async ({ params }) => {
   const { tokens } =
     serverConfig.config[network as unknown as string] ?? {};
 
-  const fluidTokens = tokens.filter((token) => token.isFluidOf == undefined);
+  const regularTokens = tokens.filter((token) => !token.isFluidOf);
 
   return {
-    tokens: fluidTokens,
+    tokens: regularTokens,
   };
 };
 

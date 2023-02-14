@@ -2,7 +2,7 @@ import BN from "bn.js";
 import { LoaderFunction } from "react-router-dom";
 import { useUserTransactionsByAddress } from "~/queries";
 import useAssetStatistics from "~/queries/useAssetStatistics";
-import { getTokenFromSymbol, Token } from "~/util/chainUtils/tokens";
+import { getTokenFromAddress, getTokenFromSymbol, Token } from "~/util/chainUtils/tokens";
 
 export type ITokenHeader = {
   token: Token
@@ -40,12 +40,20 @@ export const loader: LoaderFunction = async ({ request, params }): Promise<IToke
   if (!address) throw new Error("address is required");
   if (!token) throw new Error("token is required");
 
+  const regularToken = getTokenFromSymbol(network, token)?.isFluidOf
+
+  if (!regularToken) throw new Error("Couldn't find regular token")
+
+  const regularSymbol = getTokenFromAddress(network, regularToken)?.symbol
+
+  if (!regularSymbol) throw new Error("Couldn't find regular token symbol")
+
   const [
     assetStatistics,
     activity
   ] = await Promise.all(
     [
-      useAssetStatistics(network, token, address),
+      useAssetStatistics(network, regularSymbol, address),
       useUserTransactionsByAddress(network, [token], 1, address, [], 12).then(
         (res) => res.data?.[network].transfers?.map((tx) => {
           const desc = tx.sender.address === address ? "Sent" : "Received"

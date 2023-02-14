@@ -1,6 +1,6 @@
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { Suspense, useContext, useEffect, useState } from "react"
-import { CollapsibleCard, TokenCard, TokenDetails } from "@fluidity-money/surfing"
+import { CollapsibleCard, LoadingDots, Spinner, TokenCard, TokenDetails } from "@fluidity-money/surfing"
 import { useLoaderData, useParams } from "@remix-run/react"
 import { Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
@@ -8,15 +8,17 @@ import serverConfig from "~/webapp.config.server";
 import { useCache } from "~/hooks/useCache";
 import BN from "bn.js";
 import { ITokenStatistics } from "../../query/dashboard/assets";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
   const { tokens } =
     serverConfig.config[network as unknown as string] ?? {};
 
+  const fluidTokens = tokens.filter((t) => t.isFluidOf !== undefined)
+    
   return {
-    tokens,
+    tokens: fluidTokens,
   };
 };
 
@@ -24,22 +26,12 @@ type LoaderData = {
   tokens: Token[]
 }
 
-export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) => {
-  return (
-    <div>
-      <h1>Error</h1>
-      <p>{props.error.message}</p>
-      <p>The stack trace is:</p>
-      <pre>{props.error.stack}</pre>
-    </div>
-  );
-}
-
 const allAssetsVariants = {
   hidden: {
   },
   visible: {
     x: 0,
+    height: 'auto',
     opacity: 1,
     transition: {
       duration: 1,
@@ -63,13 +55,11 @@ const FluidAssets = () => {
         animate="visible"
         exit="exit"
       >
-        <Suspense fallback={'loading'}>
-          {
-            tokens.map((t, i) => {
-              return <CardWrapper key={i} token={t}/>
-            })
-          }
-        </Suspense>
+        {
+          tokens.map((t, i) => {
+            return <CardWrapper key={i} token={t}/>
+          })
+        }
       </motion.div>
   )
 }
@@ -143,8 +133,8 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const regularContract = token.isFluidOf
 
-  if (!network) return <div></div>
-  if (!regularContract) return <div></div>
+  if (!network) throw new Error('no network')
+  if (!regularContract) throw new Error(`no regular contract for ${token.symbol}`)
 
   useEffect(() => {
     if (!connected) return
@@ -163,9 +153,11 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   }, [connected])
 
-  const { data } = useCache<ITokenStatistics>(address ? `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}` : '', true)
+  const queryString = `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}`
 
-  if (!data) return <div></div>
+  const { data } = useCache<ITokenStatistics>(address ? queryString : '', true)
+
+  if (!data) return <></>
 
   const { topPrize, avgPrize, topAssetPrize, activity } = data
   const decimals = new BN(10).pow(new BN(token.decimals))
