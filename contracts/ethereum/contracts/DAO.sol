@@ -90,7 +90,12 @@ contract DAO {
         return getRatificationTs(_ipfsHash) == 0;
     }
 
-    function getAmountAlreadyVoted(bytes20 _ipfsHash, address _spender) public view returns (uint256) {
+    function getAmountAlreadyVoted(
+        bytes20 _ipfsHash,
+        address _spender
+    )
+        public view returns (uint256)
+    {
       return proposals_[_ipfsHash].votes[_spender];
     }
 

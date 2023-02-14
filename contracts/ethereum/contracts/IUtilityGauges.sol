@@ -1,8 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL
 
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-interface IAsset {
+interface IUtilityGauges {
     // solhint-disable-previous-line no-empty-blocks
 }

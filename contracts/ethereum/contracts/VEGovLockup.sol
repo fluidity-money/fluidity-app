@@ -3,30 +3,27 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./balancer/IVault.sol";
-import "./balancer/IAsset.sol";
-import "./balancer/WeightedPoolUserData.sol";
-import "./balancer/Helpers.sol";
-
 import "./BaseNativeToken.sol";
 import "./GovToken.sol";
 
+import "./IERC20.sol";
 import "./IEmergencyMode.sol";
 
 import { calcGovToVEGov } from "./LibGovernanceCalc.sol";
 
+/// @dev default maxLockTime to use as the max amount that could be
+///      locked up
+uint256 constant MAX_LOCKUP_TIME = 365 days;
+
 struct Lockup {
-    /// @dev lockTime that the token was locked at
+    /// @dev lockLength is the number of seconds the amount was locked up for
+    uint256 lockLength;
+
+    /// @dev fluid/fweth BPT token we're locking up
+    uint256 bptAtLock;
+
+    /// @dev lockTime is the timestamp the token was locked up for
     uint256 lockTime;
-
-    /// @dev maxLockTime to lock the tokens up for (ie, one year)
-    uint256 maxLockTime;
-
-    /// @dev fluidAtLock locked up by the user at the time of locking
-    uint256 fluidAtLock;
-
-    /// @dev fwEthAtLock locked up by the user at the time of locking
-    uint256 fwEthAtLock;
 }
 
 contract VEGovLockup is IEmergencyMode {
@@ -38,35 +35,22 @@ contract VEGovLockup is IEmergencyMode {
 
     bool noEmergencyMode_;
 
-    GovToken govToken_;
-
-    IERC20 fwEthToken_;
-
-    IVault vault_;
-
-    bytes32 vaultPoolId_;
+    IERC20 balancerPoolToken_;
 
     mapping(address => Lockup) lockups_;
 
     function init(
         address _operator,
         address _emergencyCouncil,
-        GovToken _govToken,
-        IERC20 _fwEthToken
+        IERC20 _balancerPoolToken
     )
         public
     {
         require(version_ == 0, "contract is already initialised");
 
-        require(
-            _govToken.decimals() == _fwEthToken.decimals(),
-            "inconsistent tokens"
-        );
-
         operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
-        govToken_ = _govToken;
-        fwEthToken_ = _fwEthToken;
+        balancerPoolToken_ = _balancerPoolToken;
     }
 
     function operator() public view returns (address) {
@@ -92,116 +76,122 @@ contract VEGovLockup is IEmergencyMode {
     }
 
     function hasLockedUp(address _user) public view returns (bool) {
-        return lockups_[_user].lockTime > 0;
+        return lockups_[_user].lockLength > 0;
     }
 
-    function trackAmount(
+    function trackDeposit(
         address _spender,
-        uint256 _lockTime,
-        uint256 _maxLockTime,
-        uint256 _fluidAtLock,
-        uint256 _fwEthAtLock
+        uint256 _lockLength,
+        uint256 _bptAtLock,
+        uint256 _lockTime
     )
         internal
     {
+        lockups_[_spender].lockLength = _lockLength;
+        lockups_[_spender].bptAtLock = _bptAtLock;
         lockups_[_spender].lockTime = _lockTime;
-        lockups_[_spender].maxLockTime = _maxLockTime;
-        lockups_[_spender].fluidAtLock = _fluidAtLock;
-        lockups_[_spender].fwEthAtLock = _fwEthAtLock;
     }
 
-    function balanceOf(address _spender) public view returns (uint256) {
-        Lockup storage lockup = lockups_[_spender];
+    function daysSinceLocked(
+        uint256 _lockTime,
+        uint256 _currentTime
+    )
+        public pure returns (uint256)
+    {
+        return _lockTime - _currentTime;
+    }
 
-        return calcGovToVEGov(
-            lockup.fluidAtLock,
-            lockup.lockTime,
-            lockup.maxLockTime
+    function currentVEGovAmount(
+        uint256 _lockLength,
+        uint256 _lockTime,
+        uint256 _currentTime,
+        uint256 _tokenAmount
+    )
+        public pure returns (uint256)
+    {
+        uint256 currentLockLength = _lockLength - daysSinceLocked(_lockTime, _currentTime);
+        return calcGovToVEGov(_tokenAmount, currentLockLength, MAX_LOCKUP_TIME);
+    }
+
+    function lockLengthOf(address _spender) public view returns (uint256) {
+        return lockups_[_spender].lockLength;
+    }
+
+    function lockTimeOf(address _spender) public view returns (uint256) {
+        return lockups_[_spender].lockTime;
+    }
+
+    function currentVEGovAmountOfAtWith(
+        address _spender,
+        uint256 _time,
+        uint256 _token
+    )
+        public view returns (uint256)
+    {
+        return currentVEGovAmount(
+            lockLengthOf(_spender),
+            lockTimeOf(_spender),
+            _time,
+            _token
         );
     }
 
-/**
- * @notice deposit 80% fluid token, 20% fwETH, locking the amounts up and then
- *         multiplying the deposited fluid assets amount by the vote escrow
- *         multiplier. then quote the user the amount of ve tokens they have
- *
- * @param _fluidTokenAmount to take as 80% of the deposit to calculate the amounts
- * @param _fwEthAmount to use as the 20% to deposit the amounts in balancer
- * @param _maxLockTime to lock up the tokens for the maximum amount of time for
- *
- * @returns the amount of ve tokens the user has
- */
+    function balanceOfUnderlying(address _spender) public view returns (uint256) {
+        return lockups_[_spender].bptAtLock;
+    }
+
+    function balanceOf(address _spender) public view returns (uint256) {
+        return currentVEGovAmountOfAtWith(
+            _spender,
+            block.timestamp,
+            balanceOfUnderlying(_spender)
+        );
+    }
+
+    function canWithdraw(address _spender)
+        public view returns (bool)
+    {
+        return balanceOf(_spender) == 0;
+    }
+
+    /**
+     * @notice deposit 80% fluid token, 20% fwETH, locking the amounts up and then
+     *         multiplying the deposited fluid assets amount by the vote escrow
+     *         multiplier. then quote the user the amount of ve tokens they have
+     *
+     * @param _bptAmount to take from the user to lock up
+     *
+     * @param _lockLength in seconds to lock the assets up for, used to
+     *         calculate the lock time = lock length + block timestamp
+     */
     function deposit(
-        uint256 _govTokenAmount,
-        uint256 _fwEthAmount,
-        uint256 _maxLockTime
+        uint256 _bptAmount,
+        uint256 _lockLength
     )
         public returns (uint256)
     {
         require(noEmergencyMode(), "emergency mode");
-
-        // 20% of the provided tokens must be in fw eth (assuming
-        // the decimals are the same for gov token and fweth)
-
-        require(_fluidTokenAmount > 0, "gov token 0");
-        require(_fwEthAmount > 0, "fwEth token 0");
-
         require(!hasLockedUp(msg.sender), "user locked up already");
+        require(_bptAmount > 0, "more than 0 token needed for lockup");
+        require(_lockLength > 0, "lock length = 0");
 
-        require(
-            _fluidTokenAmount + _fwEthAmount == _fwEthAmount * 5,
-            "20% liquidity fweth needed"
-        );
+        balancerPoolToken_.transferFrom(msg.sender, address(this), _bptAmount);
 
-        require(_maxLockTime > 0, "max lock time 0");
-
-        govToken_.transferFrom(msg.sender, address(this), _fluidTokenAmount);
-        fwEthToken_.transferFrom(msg.sender, address(this), _fwEthAmount);
-
-        uint256[] memory amountsIn = new uint256[](2);
-
-        amountsIn[0] = _fluidTokenAmount;
-        amountsIn[1] = _fwEthAmount;
-
-        uint256 minBptAmountOut = 0;
-
-        bytes memory userData = abi.encode(
-            WeightedPoolUserData.JoinKind.EXACT_TOKENS_IN_FOR_BPT_OUT,
-            amountsIn,
-            minBptAmountOut
-        );
-
-        (IERC20[] memory tokens, , ) = vault_.getPoolTokens(vaultPoolId_);
-
-        IVault.JoinPoolRequest memory request = IVault.JoinPoolRequest({
-            assets: _asIAsset(tokens),
-            maxAmountsIn: amountsIn,
-            userData: userData,
-            fromInternalBalance: false
-        });
-
-        address addressThis = address(this);
-
-        vault_.joinPool(vaultPoolId_, addressThis, addressThis, request);
-
-        // give the user their amounts and return what they received
-
-        uint256 lockTime = block.timestamp;
-
-        uint256 veGovAmount = calcGovToVEGov(
-            _fluidTokenAmount,
-            lockTime,
-            _maxLockTime
-        );
-
-        trackAmount(
+        trackDeposit(
             msg.sender,
-            lockTime,
-            _maxLockTime,
-            _fluidTokenAmount,
-            _fwEthAmount
+            _lockLength,
+            _bptAmount,
+            block.timestamp
         );
 
-        return veGovAmount;
+        return balanceOf(msg.sender);
+    }
+
+    function withdraw(uint256 _amount) public {
+        require(canWithdraw(msg.sender));
+
+        uint256 sendable = balanceOfUnderlying(msg.sender) - _amount;
+
+        balancerPoolToken_.transfer(msg.sender, sendable);
     }
 }

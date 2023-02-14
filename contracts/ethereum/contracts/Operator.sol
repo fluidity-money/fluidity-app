@@ -9,13 +9,14 @@ pragma abicoder v2;
 
 import "./IFluidClient.sol";
 import "./IEmergencyMode.sol";
+import "./IUtilityGauges.sol";
 
 struct FluidityReward {
     string clientName;
     Winner[] rewards;
 }
 
-contract Operator is IEmergencyMode {
+contract Operator is IEmergencyMode, IUtilityGauges {
     /// @dev the utility name of the fluid token
     string constant FLUID_TOKEN = "FLUID";
 
