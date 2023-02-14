@@ -105,6 +105,15 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
+export type HasuraUserTransactionCountRes = {
+  data: {
+    [network: string]: {
+        count: number;
+      }
+  };
+  errors?: unknown;
+};
+
 const useUserTransactionByAddressCount = async(network: string, address: string) => {
   const variables = {
     address: address,
@@ -130,7 +139,7 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    result.data[network].transfers = [(result as any).data.aggregate];
+    result.data[network].transfers = [(result as unknown as HasuraUserTransactionCountRes).data.aggregate];
   }
 
   return result; 
@@ -160,7 +169,7 @@ const useUserTransactionAllCount = async(network: string) => {
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    result.data[network].transfers = [(result as any).data.aggregate];
+    result.data[network].transfers = [(result as unknown as HasuraUserTransactionCountRes).data.aggregate];
   }
 
   return result; 

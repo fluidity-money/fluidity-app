@@ -2,6 +2,7 @@ import { gql, Queryable, jsonPost } from "~/util";
 import {fetchGqlEndpoint, hasuraDateToUnix} from "~/util/api/graphql";
 import BN from "bn.js";
 import {getUsdFromTokenAmount} from "~/util/chainUtils/tokens";
+import {MintAddress} from "~/types/MintAddress";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -113,6 +114,8 @@ const queryByAddress: Queryable = {
       transaction_hash
       amount
       token_decimals
+      type
+      swap_in
     }
   }`
 };
@@ -211,6 +214,8 @@ const queryByTxHash: Queryable = {
       transaction_hash
       amount
       token_decimals
+      type
+      swap_in
     }
   }`
 };
@@ -316,6 +321,8 @@ const queryAll: Queryable = {
       transaction_hash
       amount
       token_decimals
+      type
+      swap_in
     }
   }
 `
@@ -376,6 +383,8 @@ export type HasuraUserTransaction = {
   token_short_name: string,
   transaction_hash: string,
   time: string, 
+  type: 'swap' | 'send'
+  swap_in: boolean,
 };
 
 export type HasuraUserTransactionRes = {
@@ -419,14 +428,35 @@ const useUserTransactionsByAddress = async (
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
-    result.data[network].transfers = hasuraTransfers.map(transfer => ({
-      sender: { address: transfer.sender_address },
-      receiver: { address: transfer.recipient_address },
-      amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
-      currency: { symbol: transfer.token_short_name },
-      transaction: { hash: transfer.transaction_hash },
-      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
-    }))
+    result.data[network].transfers = hasuraTransfers.map(transfer => {
+      let senderAddress = "";
+      let recipientAddress = "";
+      // only senderAddress is defined by user actions
+      switch (transfer.type) {
+        case 'send':
+          senderAddress = transfer.sender_address;
+          recipientAddress = transfer.recipient_address;
+          break;
+        case 'swap':
+          if (transfer.swap_in) {
+            senderAddress = MintAddress;
+            recipientAddress = transfer.sender_address;
+          } else {
+            senderAddress = transfer.sender_address;
+            recipientAddress = MintAddress;
+          }
+          break;
+      }
+
+      return {
+        sender: {address: senderAddress},
+        receiver: {address: recipientAddress},
+        amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
+        currency: {symbol: 'f' + transfer.token_short_name},
+        transaction: {hash: transfer.transaction_hash},
+        block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
+      }
+    })
   }
 
   return result; 
@@ -466,14 +496,35 @@ const useUserTransactionsByTxHash = async (
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
-    result.data[network].transfers = hasuraTransfers.map(transfer => ({
-      sender: { address: transfer.sender_address },
-      receiver: { address: transfer.recipient_address },
-      amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
-      currency: { symbol: transfer.token_short_name },
-      transaction: { hash: transfer.transaction_hash },
-      block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } }
-    }))
+    result.data[network].transfers = hasuraTransfers.map(transfer => {
+      let senderAddress = "";
+      let recipientAddress = "";
+      // only senderAddress is defined by user actions
+      switch (transfer.type) {
+        case 'send':
+          senderAddress = transfer.sender_address;
+          recipientAddress = transfer.recipient_address;
+          break;
+        case 'swap':
+          if (transfer.swap_in) {
+            senderAddress = MintAddress;
+            recipientAddress = transfer.sender_address;
+          } else {
+            senderAddress = transfer.sender_address;
+            recipientAddress = MintAddress;
+          }
+          break;
+      }
+
+      return {
+        sender: {address: senderAddress},
+        receiver: {address: recipientAddress},
+        amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
+        currency: {symbol: 'f' + transfer.token_short_name},
+        transaction: {hash: transfer.transaction_hash},
+        block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
+      };
+    })
   }
 
   return result; 
@@ -513,18 +564,39 @@ const useUserTransactionsAll = async (
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
+
     result.data = {
       arbitrum: {
-        transfers: hasuraTransfers.map(transfer => ({
-          sender: {address: transfer.sender_address},
-          receiver: {address: transfer.recipient_address},
-          amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
-          currency: {symbol: transfer.token_short_name},
-          transaction: {hash: transfer.transaction_hash},
-          block: {
-            timestamp: {unixtime: hasuraDateToUnix(transfer.time)}
+        transfers: hasuraTransfers.map(transfer => {
+          let senderAddress = "";
+          let recipientAddress = "";
+          // only senderAddress is defined by user actions
+          switch (transfer.type) {
+            case 'send':
+              senderAddress = transfer.sender_address;
+              recipientAddress = transfer.recipient_address;
+              break;
+            case 'swap':
+              if (transfer.swap_in) {
+                senderAddress = MintAddress;
+                recipientAddress = transfer.sender_address;
+              } else {
+                senderAddress = transfer.sender_address;
+                recipientAddress = MintAddress;
+              }
+              break;
           }
-        }))
+          return {
+            sender: {address: senderAddress},
+            receiver: {address: recipientAddress},
+            amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
+            currency: {symbol: 'f' + transfer.token_short_name},
+            transaction: {hash: transfer.transaction_hash},
+            block: {
+              timestamp: {unixtime: hasuraDateToUnix(transfer.time)}
+            }
+          }
+        })
       }
     }
   }

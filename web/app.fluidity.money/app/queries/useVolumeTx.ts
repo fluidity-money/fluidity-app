@@ -206,8 +206,8 @@ const useVolumeTxByAddressTimestamp = async (
         transfers: hasuraTransfers.map(transfer => ({
           sender: {address: transfer.sender_address},
           receiver: {address: transfer.recipient_address},
-          amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
-          currency: {symbol: transfer.token_short_name},
+          amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
+          currency: {symbol: 'f' + transfer.token_short_name},
           block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
         }))
       }
@@ -252,8 +252,8 @@ const useVolumeTxByTimestamp = async (
         transfers: hasuraTransfers.map(transfer => ({
           sender: {address: transfer.sender_address},
           receiver: {address: transfer.recipient_address},
-          amount: getUsdFromTokenAmount(new BN(transfer.amount), transfer.token_decimals),
-          currency: {symbol: transfer.token_short_name},
+          amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
+          currency: {symbol: 'f' + transfer.token_short_name},
           block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
         }))
       }
