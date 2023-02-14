@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     // const decimals = new BN(10).pow(new BN(12));
     // const amount = bn.div(decimals).toNumber();
 
-    return {
+    return network === "arbitrum" ? volume : {
       ...volume,
       amount: volume.amount / 10 ** 12,
     };

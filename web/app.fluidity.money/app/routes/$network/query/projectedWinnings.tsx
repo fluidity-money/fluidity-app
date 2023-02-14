@@ -55,7 +55,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
       // Bitquery stores DAI decimals (6) incorrectly (should be 18)
       const normalisedValue =
-        currency === "DAI" || currency === "fDAI" ? value / 10 ** 12 : value;
+        network !== "arbitrum" && (currency === "DAI" || currency === "fDAI") ?
+          value / 10 ** 12 : 
+          value;
 
       return sum + normalisedValue;
     }, 0);
