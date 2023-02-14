@@ -163,11 +163,11 @@ export default function Dashboard() {
     !closeMobileModal && setOpenMobModal(false);
   }, [closeMobileModal]);
 
-  const navigationMap = [
+  const navigationMap: {
+    [key: string]: { name: string; icon: JSX.Element };
+  }[] = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "Rewards", icon: <Trophy /> } },
-    {assets: {name: "Assets", icon: <AssetsIcon />}},
-    // {dao: {name:"DAO", icon: <DaoIcon />}},
   ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
