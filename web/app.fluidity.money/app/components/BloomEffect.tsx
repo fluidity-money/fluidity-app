@@ -8,16 +8,10 @@ type BloomEffectProps = {
   color?: string;
   type: "static" | "pulsing";
   blendMode?: Property.MixBlendMode;
-  width?: number;
 };
 
 const BloomEffect = (props: BloomEffectProps) => {
-  const {
-    color: colorStr = "#fff",
-    type = "static",
-    blendMode,
-    width = 70,
-  } = props;
+  const { color: colorStr = "#fff", type = "static", blendMode } = props;
 
   const [colorStart, colorEnd] = useMemo(() => {
     const _color = new color(colorStr);
@@ -32,7 +26,7 @@ const BloomEffect = (props: BloomEffectProps) => {
       background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 0%)`,
     },
     static: {
-      background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} min(${width}%, 450px))`,
+      background: `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`,
     },
     pulsing: {
       transition: {
@@ -41,9 +35,9 @@ const BloomEffect = (props: BloomEffectProps) => {
         duration: 2,
       },
       background: [
-        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} ${width}%)`,
-        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} ${width - 10}%)`,
-        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} ${width}%)`,
+        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`,
+        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 60%)`,
+        `radial-gradient(circle, ${colorStart} 0%, ${colorEnd} 70%)`,
       ],
     },
   };

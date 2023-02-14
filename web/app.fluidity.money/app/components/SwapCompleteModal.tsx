@@ -95,7 +95,6 @@ const SwapCompleteModal = ({
           <BloomEffect
             type={"static"}
             color={colorMap[tokenPair.symbol] ?? "#fff"}
-            width={60}
           />
           <motion.img
             variants={variants}
@@ -126,8 +125,7 @@ const SwapCompleteModal = ({
                   className="swapping-video"
                   src={"/videos/LoadingOther.webm"}
                   loop={false}
-                  type="fill"
-                  height={"auto"}
+                  type="none"
                   onEnded={() => {
                     setPlayVideo(false);
                   }}

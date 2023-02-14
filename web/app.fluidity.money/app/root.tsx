@@ -17,7 +17,7 @@ import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
-import { SplitContextProvider } from "contexts/SplitProvider";
+import { SplitContextProvider } from "./util/split";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
@@ -122,6 +122,7 @@ export const loader: LoaderFunction = async ({
 }): Promise<LoaderData> => {
   const nodeEnv = process.env.NODE_ENV;
   const sentryDsn = process.env?.FLU_SENTRY_DSN ?? "";
+  const gaToken = process.env["GA_WEBAPP_ANALYTICS_ID"];
 
   const host = request.headers.get("Host") ?? "unknown-host";
 
@@ -133,21 +134,19 @@ export const loader: LoaderFunction = async ({
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
   const splitBrowserKey = process.env?.FLU_SPLIT_BROWSER_KEY ?? "";
+  const splitClientFeatures = ["Fluidify-Button-Placement"];
   const splitUserKey = "user";
-
-  const GTAG_ID = process.env["FLU_GTAG_ID"];
-  const GTM_ID = process.env["FLU_GTM_ID"];
 
   return {
     nodeEnv,
     sentryDsn,
-    GTAG_ID,
-    GTM_ID,
+    gaToken,
     isProduction,
     isStaging,
     host,
     gitSha,
     splitBrowserKey,
+    splitClientFeatures,
     splitUserKey,
   };
 };
@@ -181,13 +180,13 @@ function ErrorBoundary(err: Error) {
 type LoaderData = {
   nodeEnv: string;
   sentryDsn: string;
-  GTAG_ID?: string;
-  GTM_ID?: string;
+  gaToken?: string;
   isProduction: boolean;
   isStaging: boolean;
   gitSha?: string;
   host?: string;
   splitBrowserKey: string;
+  splitClientFeatures: string[];
   splitUserKey: string;
 };
 
@@ -195,12 +194,12 @@ function App() {
   const {
     nodeEnv,
     sentryDsn,
-    GTAG_ID,
-    GTM_ID,
+    gaToken,
     isProduction,
     gitSha = "unknown",
     splitBrowserKey,
     splitUserKey,
+    splitClientFeatures,
   } = useLoaderData<LoaderData>();
 
   switch (true) {
@@ -221,12 +220,12 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (GTAG_ID && typeof window.gtag !== "undefined") {
-      window.gtag("config", GTAG_ID, {
+    if (gaToken && typeof window.gtag !== "undefined") {
+      window.gtag("config", gaToken, {
         page_path: new URL(window.location.href),
       });
     }
-  }, [location, GTAG_ID]);
+  }, [location, gaToken]);
 
   const [showCookieConsent, setShowCookieConsent] = useState(false);
   useEffect(() => {
@@ -244,34 +243,49 @@ function App() {
       <head>
         <Meta />
         <Links />
-        {GTAG_ID && GTM_ID && isProduction && (
-          <>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                    })(window,document,'script','dataLayer','${GTM_ID}');`,
-              }}
-            />
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
+      </head>
+      <body>
+        <CookieConsent
+          activated={showCookieConsent}
+          url={
+            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
+          }
+          callBack={() => {
+            localStorage.setItem("cookieConsent", "true");
+            setShowCookieConsent(false);
+          }}
+        />
+        <CacheProvider sha={gitSha}>
+          <ToolProvider>
+            <SplitContextProvider
+              splitBrowserKey={splitBrowserKey}
+              splitUser={splitUser}
+              setSplitUser={setSplitUser}
+              splitClientFeatures={splitClientFeatures}
+            >
+              <Outlet />
+            </SplitContextProvider>
+            <ScrollRestoration />
+            <Scripts />
+            {gaToken && isProduction && (
+              <>
+                <script
+                  src={`https://www.googletagmanager.com/gtag/js?id=${gaToken}`}
+                  async
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
                       window.dataLayer = window.dataLayer || [];
                       function gtag(){dataLayer.push(arguments);}
                       gtag('js', new Date());
-                      gtag('config', '${GTAG_ID}');
+                      gtag('config', '${gaToken}');
                     `,
-              }}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
                       (function (h, o, t, j, a, r) {
                         h.hj =
                           h.hj ||
@@ -286,11 +300,11 @@ function App() {
                         a.appendChild(r);
                       })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
                     `,
-              }}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(e,t,o,n,p,r,i) {
+                  }}
+                />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `(function(e,t,o,n,p,r,i) {
                         e.visitorGlobalObjectAlias=n;
                         e[e.visitorGlobalObjectAlias]=e[e.visitorGlobalObjectAlias]||function(){
                           (e[e.visitorGlobalObjectAlias].q=e[e.visitorGlobalObjectAlias].q||[]).push(arguments)
@@ -305,45 +319,10 @@ function App() {
                       vgo('setAccount', '612285146');
                       vgo('setTrackByDefault', true);
                       vgo('process');`,
-              }}
-            />
-          </>
-        )}
-      </head>
-      <body>
-        {GTM_ID && isProduction && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-              height="0"
-              width="0"
-              style={{
-                display: "none",
-                visibility: "hidden",
-              }}
-            ></iframe>
-          </noscript>
-        )}
-        <CookieConsent
-          activated={cookieConsent}
-          url={
-            "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
-          }
-          callback={() => {
-            setCookieConsent(true);
-          }}
-        />
-        <CacheProvider sha={gitSha}>
-          <ToolProvider>
-            <SplitContextProvider
-              splitBrowserKey={splitBrowserKey}
-              splitUser={splitUser}
-              setSplitUser={setSplitUser}
-            >
-              <Outlet />
-            </SplitContextProvider>
-            <ScrollRestoration />
-            <Scripts />
+                  }}
+                />
+              </>
+            )}
             <LiveReload />
           </ToolProvider>
         </CacheProvider>

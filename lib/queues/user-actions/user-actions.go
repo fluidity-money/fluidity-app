@@ -10,7 +10,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
@@ -37,10 +36,10 @@ type (
 	BufferedUserAction = user_actions.BufferedUserAction
 )
 
-func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
-	return user_actions.NewSwapEthereum(
-		network_,
-		senderAddress,
+func NewSwap(network network.BlockchainNetwork, userAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
+	return user_actions.NewSwap(
+		network,
+		userAddress,
 		transactionHash,
 		amount,
 		swapIn,
@@ -49,31 +48,10 @@ func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.
 	)
 }
 
-func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
-	return user_actions.NewSwapSolana(
-		senderAddress,
-		transactionHash,
-		amount,
-		swapIn,
-		tokenShortName,
-		tokenDecimals,
-	)
-}
-
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
-	return user_actions.NewSendEthereum(
-		network_,
-		senderAddress,
-		recipientAddress,
-		transactionHash,
-		amount,
-		tokenShortName,
-		tokenDecimals,
-	)
-}
-
-func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
-	return user_actions.NewSendSolana(
+// NewSend, using the same code as the types equivalent of user actions
+func NewSend(network network.BlockchainNetwork, senderAddress string, recipientAddress string, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+	return user_actions.NewSend(
+		network,
 		senderAddress,
 		recipientAddress,
 		transactionHash,

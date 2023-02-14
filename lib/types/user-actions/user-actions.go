@@ -6,9 +6,9 @@ package user_actions
 
 import (
 	"math/big"
+	"strings"
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -73,64 +73,62 @@ type (
 	}
 )
 
-// NewSwapEthereum made by the user, either swapping in (swapIn) to a
-// Fluid Asset from an underlying asset or swapping out. Sets the time to
-// time.Now().
-func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
+// NewSwap made by the user, either swapping in (swapIn) to a Fluid Asset
+// from an underlying asset or swapping out. Sets the time to time.Now().
+// Solana ATA owner addresses should be set outside of the function.
+func NewSwap(network_ network.BlockchainNetwork, userAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
+	var (
+		transactionHash_ = transactionHash
+		senderAddress    = userAddress
+	)
+
+	// Solana accounts/hashes are case sensitive
+	if network_ != network.NetworkSolana {
+		transactionHash_ = strings.ToLower(transactionHash)
+		senderAddress = strings.ToLower(userAddress)
+	}
+
+	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
+
 	return UserAction{
 		Network:         network_,
-		TransactionHash: transactionHash.String(),
-		Type:            UserActionSwap,
-		SwapIn:          swapIn,
-		SenderAddress:   senderAddress.String(),
-		Amount:          amount,
-		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
-		Time:            time.Now(),
-	}
-}
-
-// NewSwapSolana made by the user, either swapping in (swapIn) to a Fluid
-// Asset from an underlying asset or swapping out. Sets the time to
-// time.Now(). Solana ATA owner addresses should be set outside of the
-// function.
-func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
-	return UserAction{
-		Network:         network.NetworkSolana,
-		TransactionHash: transactionHash,
+		TransactionHash: transactionHash_,
 		Type:            UserActionSwap,
 		SwapIn:          swapIn,
 		SenderAddress:   senderAddress,
 		Amount:          amount,
-		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
+		TokenDetails:    tokenDetails,
 		Time:            time.Now(),
 	}
 }
 
-// NewSendEthereum of a Fluid Asset, from the sender to the recipient
-// with the transaction hash with the amount. The current time is set
-// within the function.
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+// NewSend of a Fluid Asset, from the sender to the recipient with the
+// transaction hash with the amount. The current time is set within the
+// function. Solana ATA owner addresses should be set outside of the function.
+func NewSend(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+	var (
+		transactionHash_  = transactionHash
+		senderAddress_    = senderAddress
+		recipientAddress_ = recipientAddress
+	)
+
+	tokenDetails := token_details.New(tokenShortName, tokenDecimals)
+
+	// Solana accounts/hashes are case sensitive
+	if network_ != network.NetworkSolana {
+		transactionHash_ = strings.ToLower(transactionHash)
+		senderAddress_ = strings.ToLower(senderAddress)
+		recipientAddress_ = strings.ToLower(recipientAddress)
+	}
+
 	return UserAction{
 		Network:          network_,
-		TransactionHash:  transactionHash.String(),
+		TransactionHash:  transactionHash_,
 		Type:             UserActionSend,
-		SenderAddress:    senderAddress.String(),
-		RecipientAddress: recipientAddress.String(),
+		SenderAddress:    senderAddress_,
+		RecipientAddress: recipientAddress_,
 		Amount:           amount,
-		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
-		Time:             time.Now(),
-	}
-}
-
-func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
-	return UserAction{
-		Network:          network.NetworkSolana,
-		TransactionHash:  transactionHash,
-		Type:             UserActionSend,
-		SenderAddress:    senderAddress,
-		RecipientAddress: recipientAddress,
-		Amount:           amount,
-		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
+		TokenDetails:     tokenDetails,
 		Time:             time.Now(),
 	}
 }

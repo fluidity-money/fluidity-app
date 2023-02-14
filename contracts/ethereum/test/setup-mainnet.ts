@@ -3,46 +3,44 @@ import * as hre from "hardhat";
 import { deployTokens, deployRewardPools, forknetTakeFunds } from "../script-utils";
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
-import { commonBindings, commonContracts, signers } from "./setup-common";
+import {
+  configAddr,
+  tokenOracleSigner,
+  tokenOperatorSigner,
+  tokenCouncilSigner,
+  configOperatorSigner,
+  configCouncilSigner,
+  rewardPoolsOperatorSigner,
+  accountSigner,
+  account2Signer } from './setup-common';
 
-export let contracts: typeof commonContracts & {
-  usdt: {
-    deployedToken: ethers.Contract,
-    deployedPool: ethers.Contract,
-  },
-  fei: {
-    deployedToken: ethers.Contract,
-    deployedPool: ethers.Contract,
-  },
-  dai: {
-    deployedToken: ethers.Contract,
-    deployedPool: ethers.Contract,
-  },
-  rewardPools: ethers.Contract,
-};
+export let usdtAddr: string;
+export let fUsdtAddr: string;
 
-export let bindings: typeof commonBindings & {
-  usdt: {
-    baseAccount1: ethers.Contract,
-    fluidAccount1: ethers.Contract,
-    fluidAccount2: ethers.Contract,
-    // this is the operator contract!!
-    oracleBoundOperator: ethers.Contract,
-    externalOperator: ethers.Contract,
-    emergencyCouncil: ethers.Contract,
-  },
-  fei: {
-    base: ethers.Contract,
-    fluid: ethers.Contract,
-  },
-  dai: {
-    base: ethers.Contract,
-    fluid: ethers.Contract,
-  },
-  rewardPools: {
-    operator: ethers.Contract,
-  },
-};
+export let feiAddr: string;
+export let fFeiAddr: string;
+
+export let daiAddr: string;
+export let fDaiAddr: string;
+
+export let usdtAccount: ethers.Contract
+export let fUsdtAccount: ethers.Contract;
+export let fUsdtAccount2: ethers.Contract;
+
+export let feiAccount: ethers.Contract
+export let fFeiAccount: ethers.Contract;
+
+export let daiAccount: ethers.Contract;
+export let fDaiAccount: ethers.Contract;
+
+export let fUsdtOracle: ethers.Contract;
+export let fUsdtOperator: ethers.Contract;
+export let fUsdtCouncil: ethers.Contract;
+
+export let configOperator: ethers.Contract;
+export let configCouncil: ethers.Contract;
+
+export let rewardPoolsOperator: ethers.Contract;
 
 before(async function () {
   if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
@@ -54,61 +52,71 @@ before(async function () {
 
   await forknetTakeFunds(
     hre,
-    [await signers.userAccount1.getAddress()],
+    [accountSigner],
     toDeploy,
   );
 
+  console.log("signer" + tokenOperatorSigner)
+  console.log("addr" + await tokenOperatorSigner.getAddress())
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
-    signers.token.emergencyCouncil,
-    signers.token.externalOperator,
-    commonBindings.operator.externalOperator,
-    signers.token.externalOracle,
+    await tokenCouncilSigner.getAddress(),
+    await tokenOperatorSigner.getAddress(),
+    configAddr,
   );
 
-  const tokenOracleAddress = await signers.token.externalOracle.getAddress();
+  configOperator = await hre.ethers.getContractAt(
+    "WorkerConfig",
+    configAddr,
+    configOperatorSigner,
+  );
+
+  configCouncil = await hre.ethers.getContractAt(
+    "WorkerConfig",
+    configAddr,
+    configCouncilSigner,
+  );
+
+  const tokenOracleAddress = await tokenOracleSigner.getAddress();
 
   const oracles = Object.values(tokens)
     .map(t => [t.deployedToken.address, tokenOracleAddress]);
 
-  await commonBindings.operator.externalOperator.updateOracles(oracles);
+  await configOperator.updateOracles(oracles);
 
-  const rewardPools = await deployRewardPools(
+  usdtAddr = TokenList["usdt"].address;
+  fUsdtAddr = tokens.fUSDt.deployedToken.address;
+
+  feiAddr = TokenList["fei"].address;
+  fFeiAddr = tokens.fFei.deployedToken.address;
+
+  daiAddr = TokenList["dai"].address;
+  fDaiAddr = tokens.fDAI.deployedToken.address;
+
+  usdtAccount = await hre.ethers.getContractAt("IERC20", usdtAddr, accountSigner);
+  fUsdtAccount = await hre.ethers.getContractAt("Token", fUsdtAddr, accountSigner);
+  fUsdtAccount2 = await hre.ethers.getContractAt("Token", fUsdtAddr, account2Signer);
+
+  feiAccount = await hre.ethers.getContractAt("IERC20", feiAddr, accountSigner);
+  fFeiAccount = await hre.ethers.getContractAt("Token", fFeiAddr, accountSigner);
+
+  daiAccount = await hre.ethers.getContractAt("IERC20", daiAddr, accountSigner);
+  fDaiAccount = await hre.ethers.getContractAt("Token", fDaiAddr, accountSigner);
+
+  fUsdtOracle = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOracleSigner);
+  fUsdtOperator = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenOperatorSigner);
+  fUsdtCouncil = await hre.ethers.getContractAt("Token", fUsdtAddr, tokenCouncilSigner);
+
+  rewardPoolsOperator = await deployRewardPools(
     hre,
-    signers.rewardPools.externalOperator,
-    Object.values(tokens).map(e => e.deployedToken),
+    await rewardPoolsOperatorSigner.getAddress(),
+    [
+      fUsdtAddr,
+      fFeiAddr,
+      fDaiAddr
+    ]
   );
-
-  contracts = {
-    ...commonContracts,
-    usdt: tokens["fUSDt"],
-    fei: tokens["fFei"],
-    dai: tokens["fDAI"],
-    rewardPools,
-  };
-  bindings = {
-    ...commonBindings,
-    usdt: {
-      baseAccount1: await hre.ethers.getContractAt("IERC20", TokenList["usdt"].address, signers.userAccount1),
-      fluidAccount1: contracts.usdt.deployedToken.connect(signers.userAccount1),
-      fluidAccount2: contracts.usdt.deployedToken.connect(signers.userAccount2),
-      externalOperator: contracts.usdt.deployedToken.connect(signers.token.externalOperator),
-      emergencyCouncil: contracts.usdt.deployedToken.connect(signers.token.emergencyCouncil),
-      oracleBoundOperator: contracts.operator.connect(signers.token.externalOracle),
-    },
-    fei: {
-      base: await hre.ethers.getContractAt("IERC20", TokenList["fei"].address, signers.userAccount1),
-      fluid: contracts.fei.deployedToken.connect(signers.userAccount1),
-    },
-    dai: {
-      base: await hre.ethers.getContractAt("IERC20", TokenList["dai"].address, signers.userAccount1),
-      fluid: contracts.dai.deployedToken.connect(signers.userAccount1),
-    },
-    rewardPools: {
-      operator: contracts.rewardPools.connect(signers.rewardPools.externalOperator),
-    },
-  };
 });

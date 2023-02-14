@@ -1,27 +1,14 @@
 import * as hre from "hardhat";
-import { bindings } from './setup-mainnet';
+import { usdtAccount, fUsdtAccount } from './setup-mainnet';
 import * as ethers from 'ethers';
 import { expectEq, expectGt } from './test-utils';
-import { signers } from "./setup-common";
+import { accountAddr } from "./setup-common";
 
 describe("token compound integration", async function () {
-  let usdtAccount: ethers.Contract;
-  let fUsdtAccount: ethers.Contract;
-  let accountAddr: string;
-
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();
     }
-
-    ({
-      usdt: {
-        baseAccount1: usdtAccount,
-        fluidAccount1: fUsdtAccount,
-      },
-    } = bindings);
-
-    accountAddr = await signers.userAccount1.getAddress()
   });
 
   it("should allow depositing erc20 tokens", async function () {

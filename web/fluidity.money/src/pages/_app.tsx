@@ -19,9 +19,6 @@ import "styles/app.global.scss";
 import { CookieConsent } from "@fluidity-money/surfing";
 import { useRouter } from "next/router";
 import * as gtag from "utils/gtag";
-import { GTM_ID } from "utils/gtag";
-import { SPLIT_BROWSER_KEY } from "hooks/SplitContext";
-import { SplitContextProvider } from "hooks/SplitContext";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -76,36 +73,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
   }, [width, breakpoint]);
 
-  const splitUser = 
-    process.env.NODE_ENV === "development" ||
-    (!!location && location.hostname.includes('staging')) 
-      ? "dev"
-      : "user";
-
   return (
     <>
-      <noscript>
-        <iframe
-          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-          height="0"
-          width="0"
-          style={{
-            display: "none",
-            visibility: "hidden"
-          }}
-        ></iframe>
-      </noscript>
       <div id={"fluid"} />
       <div id="shade" />
       <div id="root">
         <ApolloProvider client={client}>
           <ChainContextProvider>
-            <SplitContextProvider splitBrowserKey={SPLIT_BROWSER_KEY} splitUser={splitUser} >
-              <div className="App">
-                {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
-                <Component {...pageProps} />
-              </div>
-            </SplitContextProvider>
+            <div className="App">
+              {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
+              <Component {...pageProps} />
+            </div>
           </ChainContextProvider>
         </ApolloProvider>
         <CookieConsent
@@ -113,7 +91,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
-          callback={() => {
+          callBack={() => {
             setCookieConsent(true);
           }}
         />

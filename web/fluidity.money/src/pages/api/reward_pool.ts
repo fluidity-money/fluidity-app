@@ -1,5 +1,3 @@
-import type { NextApiHandler } from "next";
-
 import { getEthTotalPrizePool, getTotalTransactions } from "data/ethereum";
 
 export type IPropPools = {
@@ -8,16 +6,10 @@ export type IPropPools = {
   solPool: number;
 };
 
-const handler: NextApiHandler = async(_, res) => {
-  const [
-    totalTransactions,
-    ethPool,
-    solPool,
-  ] = await Promise.all([
-    getTotalTransactions(),
-    getEthTotalPrizePool(),
-    Promise.resolve(() => 0),
-  ]);
+const handler = async (req, res) => {
+  const totalTransactions = await getTotalTransactions();
+  const ethPool: number = await getEthTotalPrizePool();
+  const solPool: number = 0;
 
   res.status(200).json({ totalTransactions, ethPool, solPool });
 };

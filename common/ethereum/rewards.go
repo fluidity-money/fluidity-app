@@ -6,78 +6,109 @@ package ethereum
 
 import (
 	"fmt"
-	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-// BatchWinningsByUser batches winnings that have the same token, returning
-// the total winnings each user has earned
-func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details.TokenDetails) (misc.BigInt, misc.BigInt, map[applications.UtilityName]map[ethereum.Address]misc.BigInt, error) {
+func foldWinnings(reward worker.EthereumReward, spooledReward worker.EthereumSpooledRewards, exists bool) worker.EthereumSpooledRewards {
+	var (
+		blockNumber = reward.BlockNumber
+		network     = reward.Network
+		token       = reward.TokenDetails
+		amount      = reward.WinAmount
+		winner      = reward.Winner
+		hash        = reward.TransactionHash
+	)
 
-	// utility => address => winnings
-	rewards := make(map[applications.UtilityName]map[ethereum.Address]misc.BigInt)
+	if !exists {
+		spooledReward.Network = network
+		spooledReward.Token = token
+		spooledReward.Winner = winner
+		spooledReward.TransactionHash = hash
+		spooledReward.WinAmount = new(misc.BigInt)
+		spooledReward.FirstBlock = new(misc.BigInt)
+		spooledReward.LastBlock = new(misc.BigInt)
+
+		spooledReward.FirstBlock.Set(&blockNumber.Int)
+		spooledReward.LastBlock.Set(&blockNumber.Int)
+	}
+
+	spooledReward.WinAmount.Add(&spooledReward.WinAmount.Int, &amount.Int)
 
 	var (
-		firstRewardBlock = winnings[0].BlockNumber
-
-		firstBlockInt = new(big.Int).Set(&firstRewardBlock.Int)
-		lastBlockInt = new(big.Int).Set(&firstRewardBlock.Int)
+		blockNumBeforeFirstBlock = blockNumber.Cmp(&spooledReward.FirstBlock.Int) < 0
+		blockNumAfterLastBlock   = spooledReward.LastBlock.Cmp(&blockNumber.Int) < 0
 	)
+
+	if blockNumBeforeFirstBlock {
+		spooledReward.FirstBlock.Set(&blockNumber.Int)
+	}
+
+	if blockNumAfterLastBlock {
+		spooledReward.LastBlock.Set(&blockNumber.Int)
+	}
+
+	return spooledReward
+}
+
+// BatchWinningsByUser batches winnings that have the same token, returning
+// the total winnings each user has earned
+func BatchWinningsByUser(winnings []worker.EthereumReward, expectedToken token_details.TokenDetails) (map[ethereum.Address]worker.EthereumSpooledRewards, error) {
+	spooledWinnings := make(map[ethereum.Address]worker.EthereumSpooledRewards)
 
 	for _, reward := range winnings {
 		var (
-			token       = reward.TokenDetails
-			winner      = reward.Winner
-			winAmount   = &reward.WinAmount.Int
-			utility     = reward.Utilityname
-			blockNumber = &reward.BlockNumber.Int
+			token  = reward.TokenDetails
+			winner = reward.Winner
 		)
 
 		if token != expectedToken {
-			return misc.BigInt{}, misc.BigInt{}, nil, fmt.Errorf(
+			return spooledWinnings, fmt.Errorf(
 				"Token doesn't match when batching winnings! Expected %+v, got %+v!",
 				expectedToken,
 				token,
 			)
 		}
 
-		var (
-			blockNumBeforeFirstBlock = blockNumber.Cmp(firstBlockInt) < 0
-			blockNumAfterLastBlock   = lastBlockInt.Cmp(blockNumber) < 0
-		)
+		spooledReward, exists := spooledWinnings[winner]
 
-		if blockNumBeforeFirstBlock {
-			firstBlockInt.Set(blockNumber)
-		}
-		if blockNumAfterLastBlock {
-			lastBlockInt.Set(blockNumber)
-		}
+		updatedReward := foldWinnings(reward, spooledReward, exists)
 
-		_, exists := rewards[utility]
-		if !exists {
-			rewards[utility] = make(map[ethereum.Address]misc.BigInt)
-		}
-
-		rewardInt, exists := rewards[utility][winner]
-		if !exists {
-			rewardInt = misc.BigIntFromInt64(0)
-		}
-
-		rewardInt.Add(&rewardInt.Int, winAmount)
-
-		rewards[utility][winner] = rewardInt
+		spooledWinnings[winner] = updatedReward
 	}
 
-	var (
-		firstBlock = misc.NewBigIntFromInt(*firstBlockInt)
-		lastBlock = misc.NewBigIntFromInt(*lastBlockInt)
-	)
-
-	return firstBlock, lastBlock, rewards, nil
+	return spooledWinnings, nil
 }
 
+// BatchWinningsByToken batches winnings that have the same winner together, returning the
+// set of tokens and their winnings for each
+func BatchWinningsByToken(winnings []worker.EthereumReward, address ethereum.Address) (map[string]worker.EthereumSpooledRewards, error) {
+	spooledWinnings := make(map[string]worker.EthereumSpooledRewards)
+
+	for _, reward := range winnings {
+		var (
+			token     = reward.TokenDetails
+			tokenName = token.TokenShortName
+			winner    = reward.Winner
+		)
+
+		if winner != address {
+			return spooledWinnings, fmt.Errorf(
+				"Address doesn't match when batching winnings! Expected %s, got %s!",
+				address.String(),
+				winner.String(),
+			)
+		}
+
+		spooledReward, exists := spooledWinnings[tokenName]
+
+		updatedReward := foldWinnings(reward, spooledReward, exists)
+
+		spooledWinnings[tokenName] = updatedReward
+	}
+
+	return spooledWinnings, nil
+}

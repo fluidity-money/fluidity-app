@@ -295,12 +295,6 @@ id = "okxwallet"
 description = "OKX Wallet allows you to connect your wallet to any dApp, and supports a variety of blockchains."
 logo = "/assets/wallets/okx.svg"
 
-[[config.ethereum.wallets]]
-name = "Coin98"
-id = "coin98"
-description = "Store multi-chain Cryptoassets with Coin98 Wallet."
-logo = "/assets/wallets/coin98.svg"
-
 [[contract.solana]]
 name = "Mainnet"
 address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"

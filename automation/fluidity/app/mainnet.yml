@@ -8,12 +8,10 @@ SERVICES:
       DEPLOYMENT_TYPE: CODEDEPLOY
       CODEDEPLOY_WAIT_TIME: 60 #minutes
       LOAD_BALANCER: flu-mainnet-app-fluidity-alb
-      TARGET_GROUP_01: flu-mainnet-app-fluidity-fe-tg
+      TARGET_GROUP_01: flu-mainnet-app-fluidity-fe-tg 
       TARGET_GROUP_02: flu-mainnet-app-fluidity-fe-tg-1
-
-      ENV_FLU_GTAG_ID: G-MNXGX2P9KJ
-      ENV_FLU_GTM_ID: GTM-W7QJGR2
-
+      
+      ENV_GA_WEBAPP_ANALYTICS_ID: G-MNXGX2P9KJ
       SECRET_FLU_BITQUERY_TOKEN: /fluidity/bitquery_token
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
       SECRET_FLU_ETH_RPC_WS: /fluidity/ethereum/websocket_url
@@ -24,7 +22,7 @@ SERVICES:
       SECRET_FLU_HASURA_SECRET: /fluidity/hasura/key
       SECRET_FLU_SPLIT_BROWSER_KEY: /fluidity/split/key
       SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
-
+      
       DOCKER_ARGS:
         SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token

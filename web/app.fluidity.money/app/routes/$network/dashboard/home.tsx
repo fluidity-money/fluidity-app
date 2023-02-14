@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
 import { MintAddress } from "~/types/MintAddress";
-import { SplitContext } from "contexts/SplitProvider";
 import {
   Display,
   LineChart,
@@ -241,8 +240,6 @@ export default function Home() {
   const { network, page, colors } = useLoaderData<LoaderData>();
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
-
-  const { showExperiment } = useContext(SplitContext);
 
   const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
@@ -581,25 +578,15 @@ export default function Home() {
             <div className="totals-column">
               {/* Rewards */}
               <div className="statistics-set">
-                <Text>
-                  {activeTableFilterIndex
-                    ? "My yield"
-                    : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
-                </Text>
+                <Text>{activeTableFilterIndex ? "My" : "Total"} yield</Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
-                    activeTableFilterIndex ||
-                      !showExperiment("weekly-available-rewards")
-                      ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
-                      : totalPrizePool / 52
+                    rewards.find(
+                      ({ network: rewardNetwork }) => rewardNetwork === network
+                    )?.total_reward || 0
                   )}
                 </Display>
                 <Link to={`/${network}/dashboard/rewards`}>
@@ -638,10 +625,7 @@ export default function Home() {
             <div className="totals-column">
               {/* Prize Pool */}
               <div className="statistics-set">
-                <Text>
-                  {showExperiment("weekly-available-rewards") ? "Total " : ""}
-                  Prize Pool
-                </Text>
+                <Text>Prize Pool</Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}

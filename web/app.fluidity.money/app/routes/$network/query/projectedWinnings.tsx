@@ -1,7 +1,7 @@
 import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
 import config from "~/webapp.config.server";
-import { useUserTransactionCountByAddressTimestamp } from "~/queries";
+import { useUserTransactionsByAddress } from "~/queries";
 
 export type ProjectedWinData = {
   projectedWin: number;
@@ -17,22 +17,23 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   if (!address || !tokens) throw new Error("Invalid Request");
 
-  const lastWeekDate = new Date();
-
-  const lastWeek = lastWeekDate.getDate() - 7;
-  lastWeekDate.setDate(lastWeek);
-  const lastWeekIso = lastWeekDate.toISOString();
+  const tokenAddrs = tokens
+    .filter((t) => !t.isFluidOf)
+    .map(({ address }) => address);
 
   try {
-    const { data: userTransactionCountData, errors: userTransactionCountErr } =
-      await useUserTransactionCountByAddressTimestamp(
+    const { data: userTransactionsData, errors: userTransactionsErr } =
+      await useUserTransactionsByAddress(
         network ?? "",
+        tokenAddrs,
+        1,
         address,
-        lastWeekIso
+        [],
+        50
       );
 
-    if (userTransactionCountErr || !userTransactionCountData) {
-      captureException(userTransactionCountErr, {
+    if (userTransactionsErr || !userTransactionsData) {
+      captureException(userTransactionsErr, {
         tags: {
           section: "opportunity",
         },
@@ -42,14 +43,26 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     }
 
     const {
-      [network as string]: {
-        transfers: [{ count }],
-      },
-    } = userTransactionCountData;
+      [network as string]: { transfers: transactions },
+    } = userTransactionsData;
+
+    // Destructure GraphQL data
+    const totalUserTransferValue = transactions.reduce((sum, transaction) => {
+      const {
+        amount: value,
+        currency: { symbol: currency },
+      } = transaction;
+
+      // Bitquery stores DAI decimals (6) incorrectly (should be 18)
+      const normalisedValue =
+        currency === "DAI" || currency === "fDAI" ? value / 10 ** 12 : value;
+
+      return sum + normalisedValue;
+    }, 0);
 
     const estimated1MPoolWeight = 0.076;
 
-    const projectedWin = count * estimated1MPoolWeight;
+    const projectedWin = totalUserTransferValue * estimated1MPoolWeight;
 
     return json({
       projectedWin,

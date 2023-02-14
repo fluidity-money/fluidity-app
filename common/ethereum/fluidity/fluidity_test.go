@@ -5,26 +5,19 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBatchReward(t *testing.T) {
-	testRewardBatch := []abiFluidityReward{
+	testRewardBatch := []RewardArg{
 		{
-			ClientName: string(applications.UtilityFluid),
-			Winners:    []abiWinner{
-				{
-					Winner:     common.HexToAddress("0x6221A9c005F6e47EB398fD867784CacfDcFFF4E7"),
-					WinAmount:  big.NewInt(100),
-				},
-			},
+			Winner:     common.HexToAddress("0x6221A9c005F6e47EB398fD867784CacfDcFFF4E7"),
+			WinAmount:  big.NewInt(100),
 		},
 	}
 
-	_, err := OperatorAbi.Pack(
-		"reward",
-		common.HexToAddress("0xt0k3n"),
+	_, err := FluidityContractAbi.Pack(
+		"batchReward",
 		testRewardBatch,
 		big.NewInt(1),
 		big.NewInt(10),
@@ -33,6 +26,6 @@ func TestBatchReward(t *testing.T) {
 	assert.NoError(
 		t,
 		err,
-		"Failed to pack fluidity reward args!",
+		"Failed to pack fluidity batchReward args!",
 	)
 }

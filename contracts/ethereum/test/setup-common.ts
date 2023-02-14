@@ -1,98 +1,52 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployOperator, deployGovToken } from "../script-utils";
+import { deployTokens, deployWorkerConfig, deployGovToken, forknetTakeFunds } from "../script-utils";
+import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
-export let signers: {
-  userAccount1: ethers.Signer,
-  userAccount2: ethers.Signer,
+export let configAddr: string;
 
-  token: {
-    emergencyCouncil: ethers.Signer,
-    externalOperator: ethers.Signer,
-    externalOracle: ethers.Signer,
-  },
-  operator: {
-    emergencyCouncil: ethers.Signer,
-    externalOperator: ethers.Signer,
-  },
-  rewardPools: {
-    externalOperator: ethers.Signer,
-  },
-  govToken: {
-    owner: ethers.Signer,
-  }
-};
-
-export let commonContracts: {
-  operator: ethers.Contract,
-  govToken: ethers.Contract,
-};
-
-
-export let commonBindings: {
-  operator: {
-    emergencyCouncil: ethers.Contract,
-    externalOperator: ethers.Contract,
-  },
-  govToken: {
-    owner: ethers.Contract,
-  },
-};
+export let accountAddr: string;
+export let accountSigner: ethers.Signer;
+export let account2Signer: ethers.Signer;
+export let deploySigner: ethers.Signer;
+export let tokenOracleSigner: ethers.Signer;
+export let tokenOperatorSigner: ethers.Signer;
+export let tokenCouncilSigner: ethers.Signer;
+export let configOperatorSigner: ethers.Signer;
+export let configCouncilSigner: ethers.Signer;
+export let rewardPoolsOperatorSigner: ethers.Signer;
+export let govOperatorSigner: ethers.Signer;
+export let govTokenSigner: ethers.Signer;
+export let govTokenAddr: string;
 
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
-    throw new Error(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
+    console.log(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
+    this.skip();
   }
 
-  const [
-    account1Signer,
+  [
+    accountSigner,
     account2Signer,
-    externalOracleSigner,
-    tokenCouncilSigner,
+    deploySigner,
+    tokenOracleSigner,
     tokenOperatorSigner,
-    operatorCouncilSigner,
-    operatorOperatorSigner,
+    tokenCouncilSigner,
+    configOperatorSigner,
+    configCouncilSigner,
     rewardPoolsOperatorSigner,
-    govTokenOwnerSigner
+    govOperatorSigner
   ] = await hre.ethers.getSigners();
 
-  let operator = await deployOperator(
-    hre,
-    operatorOperatorSigner,
-    operatorCouncilSigner,
-  );
-  let govToken = await deployGovToken(hre, govTokenOwnerSigner);
+  accountAddr = await accountSigner.getAddress();
 
-  signers = {
-    userAccount1: account1Signer,
-    userAccount2: account2Signer,
-    token: {
-      emergencyCouncil: tokenCouncilSigner,
-      externalOperator: tokenOperatorSigner,
-      externalOracle: externalOracleSigner,
-    },
-    operator: {
-      emergencyCouncil: operatorCouncilSigner,
-      externalOperator: operatorOperatorSigner,
-    },
-    rewardPools: {
-      externalOperator: rewardPoolsOperatorSigner,
-    },
-    govToken: {
-      owner: govTokenOwnerSigner,
-    },
-  };
-  commonContracts = {
-    operator,
-    govToken,
-  };
-  commonBindings = {
-    operator: {
-      emergencyCouncil: operator.connect(operatorCouncilSigner),
-      externalOperator: operator.connect(operatorOperatorSigner),
-    },
-    govToken: {
-      owner: govToken.connect(govTokenOwnerSigner),
-    },
-  };
+  configAddr = await deployWorkerConfig(
+    hre,
+    await configOperatorSigner.getAddress(),
+    await configCouncilSigner.getAddress(),
+  );
+
+  govTokenSigner = await deployGovToken(hre, govOperatorSigner);
+
+  govTokenAddr = govTokenSigner.address;
 });

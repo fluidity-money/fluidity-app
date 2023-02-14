@@ -10,7 +10,7 @@ As mentioned earlier, to mint a Fluid Asset a principal token is required to be 
 
 Fluidity earns yield on the deposited USDC token and distributes it to the reward pool, which is only accessible to people who utilise the respective Fluid asset.&#x20;
 
-The yield is generated from lending the principal asset into Decentralised Finance protocols such as Compound or _Solend_, or utilise in yield generating strategies. When a Fluid Asset is swapped back for the principal, the contract withdraws the tokens from the Defi Protocol.
+The yield is generated from lending the principal asset into Decentralised Finance protocols such as Compound or _Solend_, or utilise in yield generating strategies. When a Fluid Asset is swapped back for the prinicipal, the contract withdraws the tokens from the Defi Protocol.
 
 This way Fluidity does not charge any fees to utilise Fluid assets, and rewards can be sizeable.&#x20;
 

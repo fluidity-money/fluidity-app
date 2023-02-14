@@ -19,105 +19,263 @@ import (
 )
 
 const tokenContractAbiString = `[
-{
-	"inputs": [],
-	"name": "rewardPoolAmount",
-	"outputs": [
-		{ "internalType": "uint256", "name": "", "type": "uint256" }
-	],
-	"stateMutability": "nonpayable",
-	"type": "function"
-},
-{
-	"inputs": [
-		{ "internalType": "address", "name": "to", "type": "address" },
-		{ "internalType": "uint256", "name": "amount", "type": "uint256" }
-	],
-	"name": "transfer",
-	"outputs": [],
-	"stateMutability": "nonpayable",
-	"type": "function"
-},
-{
-	"anonymous": false,
-	"inputs": [
-		{ "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
-		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
-		{ "indexed": false, "internalType": "uint256", "name": "startBlock", "type": "uint256" },
-		{ "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
-	],
-	"name": "Reward",
-	"type": "event"
-},
-{
-	"anonymous": false,
-	"inputs": [
-		{ "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
-		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
-		{ "indexed": false, "internalType": "uint256", "name": "startBlock", "type": "uint256" },
-		{ "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
-	],
-	"name": "BlockedReward",
-	"type": "event"
-},
-{
-	"anonymous": false,
-	"inputs": [
-		{ "indexed": true, "internalType": "bytes32", "name": "originalRewardTx", "type": "bytes32" },
-		{ "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
-		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
-		{ "indexed": false, "internalType": "uint256", "name": "startBlock", "type": "uint256" },
-		{ "indexed": false, "internalType": "uint256", "name": "endBlock", "type": "uint256" }
-	],
-	"name": "UnblockReward",
-	"type": "event"
-},
-{
-	"inputs": [
-		{ "internalType": "bytes32", "name": "rewardTx", "type": "bytes32" },
-		{ "internalType": "address", "name": "user", "type": "address" },
-		{ "internalType": "uint256", "name": "amount", "type": "uint256" },
-		{ "internalType": "bool", "name": "payout", "type": "bool" },
-		{ "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
-		{ "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
-	],
-	"name": "unblockReward",
-	"outputs": [],
-	"stateMutability": "nonpayable",
-	"type": "function"
-},
-{
-	"anonymous": false,
-	"inputs": [
-		{ "indexed": true, "internalType": "address", "name": "addr", "type": "address" },
-		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
-	],
-	"name": "BurnFluid",
-	"type": "event"
-},
-{
-	"anonymous": false,
-	"inputs": [
-		{ "indexed": true, "internalType": "address", "name": "addr", "type": "address" },
-		{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
-	],
-	"name": "MintFluid",
-	"type": "event"
-},
-{
-	"anonymous": false,
-	"inputs": [
-		{ "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-		{ "indexed": true, "internalType": "address", "name": "to", "type": "address" },
-		{ "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
-	],
-	"name": "Transfer",
-	"type": "event"
-}
+  {
+    "inputs": [],
+    "name": "rewardPoolAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "winner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "winAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Winner[]",
+        "name": "rewards",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "firstBlock",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "batchReward",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startBlock",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "Reward",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startBlock",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "BlockedReward",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "originalRewardTx",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startBlock",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "endBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "UnblockReward",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "txHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "balls",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "payouts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "reward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "global",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "user",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateMintLimits",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "rewardTx",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "payout",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "firstBlock",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastBlock",
+        "type": "uint256"
+      }
+    ],
+    "name": "unblockReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ]
 `
 
-const operatorAbiString = `[
+const workerConfigAbiString = `[
   {
       "inputs": [
         {
@@ -134,93 +292,26 @@ const operatorAbiString = `[
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-	  "inputs": [
-		  { "internalType": "address", "name": "token", "type": "address" },
-		  {
-			  "components": [
-				  { "internalType": "string", "name": "clientName", "type": "string" },
-				  {
-				  "components": [
-					  { "internalType": "address", "name": "winner", "type": "address" },
-					  { "internalType": "uint256", "name": "winAmount", "type": "uint256" }
-				  ],
-				  "internalType": "struct Winner[]",
-				  "name": "rewards",
-				  "type": "tuple[]"
-			  }
-			  ],
-			  "internalType": "struct FluidityReward[]",
-			  "name": "rewards",
-			  "type": "tuple[]"
-		  },
-		  { "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
-		  { "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
-	  ],
-	  "name": "reward",
-	  "outputs": [],
-	  "stateMutability": "nonpayable",
-	  "type": "function"
-  },
-  {
-	  "inputs": [
-	  { "internalType": "address", "name": "token", "type": "address" },
-	  { "internalType": "string[]", "name": "names", "type": "string[]" }
-	  ],
-	  "name": "getUtilityVars",
-	  "outputs": [
-	  {
-		  "components": [
-		  {
-			  "components": [
-			  { "internalType": "uint256", "name": "poolSizeNative", "type": "uint256" },
-			  { "internalType": "uint256", "name": "tokenDecimalScale", "type": "uint256" },
-			  { "internalType": "uint256", "name": "exchangeRateNum", "type": "uint256" },
-			  { "internalType": "uint256", "name": "exchangeRateDenom", "type": "uint256" },
-			  { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
-			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
-			  ],
-			  "internalType": "struct UtilityVars",
-			  "name": "vars",
-			  "type": "tuple"
-		  },
-		  { "internalType": "string", "name": "name", "type": "string" }
-		  ],
-		  "internalType": "struct Operator.ScannedUtilityVars[]",
-		  "name": "",
-		  "type": "tuple[]"
-	  }
-	  ],
-	  "stateMutability": "nonpayable",
-	  "type": "function"
   }
 ]`
 
 var (
 	FluidityContractAbi ethAbi.ABI
-	OperatorAbi         ethAbi.ABI
+	WorkerConfigAbi     ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles
-type abiOracleUpdate struct {
+type OracleUpdate struct {
 	ContractAddress ethCommon.Address `abi:"contractAddr"`
 	NewOracle       ethCommon.Address `abi:"newOracle"`
 }
 
-type (
-	// the Winner struct from solidity, to be passed (in the abiFluidityReward struct) to batchReward
-	abiWinner struct {
-		Winner     ethCommon.Address `abi:"winner"`
-		WinAmount  *big.Int          `abi:"winAmount"`
-	}
-	// the FluidityReward struct from solidit, to be passed to batchReward
-	abiFluidityReward struct {
-		ClientName string `abi:"clientName"`
-		Winners []abiWinner `abi:"rewards"`
-	}
-)
+// the Reward struct from solidity, to be passed to batchReward
+type RewardArg struct {
+	Winner     ethCommon.Address `abi:"winner"`
+	WinAmount  *big.Int          `abi:"winAmount"`
+}
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
@@ -264,55 +355,62 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
+func TransactBatchReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement []typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
-		operatorAddress,
-		OperatorAbi,
+		fluidityAddress,
+		FluidityContractAbi,
 		client,
 		client,
 		client,
 	)
 
 	var (
-		firstBlock = &announcement.FirstBlock.Int
-		lastBlock = &announcement.LastBlock.Int
-		batchedRewards = announcement.Rewards
-
-		rewards []abiFluidityReward
+		rewards          = make([]RewardArg, len(announcement))
+		globalFirstBlock = new(big.Int)
+		globalLastBlock  = new(big.Int)
 	)
 
-	for utility, reward := range batchedRewards {
-		winners := make([]abiWinner, len(reward))
-		i := 0
+	// set a default for the min block
+	globalFirstBlock.Set(&announcement[0].FirstBlock.Int)
 
-		for winnerAddress, winAmount := range reward {
-			winner := abiWinner{
-				Winner:    ethereum.ConvertInternalAddress(winnerAddress),
-				WinAmount: &winAmount.Int,
-			}
+	for i, reward := range announcement {
+		var (
+			winner_       = reward.Winner
+			amountInt     = reward.WinAmount
+			firstBlockInt = reward.FirstBlock
+			lastBlockInt  = reward.LastBlock
 
-			winners[i] = winner
-			i++
+			winner     = ethereum.ConvertInternalAddress(winner_)
+			amount     = &amountInt.Int
+			firstBlock = &firstBlockInt.Int
+			lastBlock  = &lastBlockInt.Int
+		)
+
+		if firstBlock.Cmp(globalFirstBlock) < 0 {
+			globalFirstBlock.Set(firstBlock)
 		}
 
-		reward := abiFluidityReward{
-			ClientName: string(utility),
-			Winners:    winners,
+		if lastBlock.Cmp(globalLastBlock) > 0 {
+			globalLastBlock.Set(lastBlock)
 		}
 
-		rewards = append(rewards, reward)
+		rewardArg := RewardArg{
+			Winner:     winner,
+			WinAmount:  amount,
+		}
+
+		rewards[i] = rewardArg
 	}
 
 	gas, err := ethereum.EstimateGas(
 		client,
-		&OperatorAbi,
+		&FluidityContractAbi,
 		transactionOptions,
-		&operatorAddress,
-		"reward",
-		tokenAddress,
+		&fluidityAddress,
+		"batchReward",
 		rewards,
-		firstBlock,
-		lastBlock,
+		globalFirstBlock,
+		globalLastBlock,
 	)
 
 	if err != nil {
@@ -327,11 +425,10 @@ func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,
 		transactionOptions,
-		"reward",
-		tokenAddress,
+		"batchReward",
 		rewards,
-		firstBlock,
-		lastBlock,
+		globalFirstBlock,
+		globalLastBlock,
 	)
 
 	if err != nil {

@@ -7,10 +7,8 @@ package user_actions
 import (
 	"testing"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -24,17 +22,18 @@ type UserActionsTestSuite struct {
 }
 
 func (suite *UserActionsTestSuite) SetupTest() {
-	suite.ethSwap = NewSwapEthereum(
+	suite.ethSwap = NewSwap(
 		network.NetworkEthereum,
-		ethereum.AddressFromString("0xethAdDr"),
-		ethereum.HashFromString("0xethHash"),
+		"0xethAdDr",
+		"0xethHash",
 		misc.BigIntFromInt64(123456789),
 		true,
 		"fTEST",
 		6,
 	)
 
-	suite.solSwap = NewSwapSolana(
+	suite.solSwap = NewSwap(
+		network.NetworkSolana,
 		"0xsOlAddR",
 		"0xsOlHash",
 		misc.BigIntFromInt64(123456789),
@@ -43,17 +42,18 @@ func (suite *UserActionsTestSuite) SetupTest() {
 		6,
 	)
 
-	suite.ethSend = NewSendEthereum(
+	suite.ethSend = NewSend(
 		network.NetworkEthereum,
-		ethereum.AddressFromString("0xethAdDrSender"),
-		ethereum.AddressFromString("0xethAdDrRec"),
-		ethereum.HashFromString("0xethHash"),
+		"0xethAdDrSender",
+		"0xethAdDrRec",
+		"0xethHash",
 		misc.BigIntFromInt64(123456789),
 		"fTEST",
 		6,
 	)
 
-	suite.solSend = NewSendSolana(
+	suite.solSend = NewSend(
+		network.NetworkSolana,
 		"0xsOlAdDrSender",
 		"0xsOlAdDrRec",
 		"0xsOlHash",

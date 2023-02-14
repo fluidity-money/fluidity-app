@@ -4,7 +4,7 @@ import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
 import { useEffect, useMemo, useState, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
+import { SplitContext } from "~/util/split";
 import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";

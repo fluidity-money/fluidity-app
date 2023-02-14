@@ -1,28 +1,20 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
 
-const queryByAddressTimestamp: Queryable = {
+const queryByAddress: Queryable = {
   ethereum: gql`
-    query getTransactionCount(
-      $fluidCurrencies: [String!]
-      $address: String!
-      $timestamp: ISO8601DateTime!
-    ) {
+    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
       ethereum {
         transfers(
           currency: { in: $fluidCurrencies }
           any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
         ) {
-          count(time: { after: $timestamp })
+          count
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount(
-      $fluidCurrencies: [String!]
-      $address: String!
-      $timestamp: ISO8601DateTime!
-    ) {
+    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
       solana {
         transfers(
           currency: { in: $fluidCurrencies }
@@ -31,34 +23,28 @@ const queryByAddressTimestamp: Queryable = {
             { receiverAddress: { is: $address } }
           ]
         ) {
-          count(time: { after: $timestamp })
+          count
         }
       }
     }
   `,
 };
 
-const queryByTimestamp: Queryable = {
+const queryAll: Queryable = {
   ethereum: gql`
-    query getTransactionCount(
-      $fluidCurrencies: [String!]
-      $timestamp: ISO8601DateTime!
-    ) {
+    query getTransactionCount($fluidCurrencies: [String!]) {
       ethereum {
         transfers(currency: { in: $fluidCurrencies }) {
-          count(time: { after: $timestamp })
+          count
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount(
-      $fluidCurrencies: [String!]
-      $timestamp: ISO8601DateTime!
-    ) {
+    query getTransactionCount($fluidCurrencies: [String!]) {
       solana {
         transfers(currency: { in: $fluidCurrencies }) {
-          count(time: { after: $timestamp })
+          count
         }
       }
     }
@@ -91,19 +77,14 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionCountByAddressTimestamp = (
-  network: string,
-  address: string,
-  iso8601Timestamp: string
-) => {
+const useUserTransactionByAddressCount = (network: string, address: string) => {
   const variables = {
     address: address,
     fluidCurrencies: getTokenForNetwork(network),
-    timestamp: iso8601Timestamp,
   };
 
   const body = {
-    query: queryByAddressTimestamp[network],
+    query: queryByAddress[network],
     variables,
   };
 
@@ -116,17 +97,13 @@ const useUserTransactionCountByAddressTimestamp = (
   );
 };
 
-const useUserTransactionCountByTimestamp = (
-  network: string,
-  iso8601Timestamp: string
-) => {
+const useUserTransactionAllCount = (network: string) => {
   const variables = {
     fluidCurrencies: getTokenForNetwork(network),
-    timestamp: iso8601Timestamp,
   };
 
   const body = {
-    query: queryByTimestamp[network],
+    query: queryAll[network],
     variables,
   };
 
@@ -139,7 +116,4 @@ const useUserTransactionCountByTimestamp = (
   );
 };
 
-export {
-  useUserTransactionCountByTimestamp,
-  useUserTransactionCountByAddressTimestamp,
-};
+export { useUserTransactionAllCount, useUserTransactionByAddressCount };

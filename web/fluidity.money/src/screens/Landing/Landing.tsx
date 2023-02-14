@@ -22,13 +22,13 @@ const Landing = () => {
       : ["/assets/videos/FluidityHomeloop.webm"]
   ).map((link) => link);
 
-  const state = {
+  const [state, setState] = useState({
     src: vidSources[0],
     mimeType: type,
     key: "video-0",
     loop: true,
     scale: isFirefox ? 1 : 0.5,
-  };
+  });
 
   const { width } = useViewport();
   const breakpoint = 620;

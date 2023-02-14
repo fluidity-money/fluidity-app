@@ -20,5 +20,4 @@ SECRET_FLU_REDIS_ADDR: /fluidity/ethereum/data/redis/endpoint
 SECRET_FLU_TIMESCALE_URI: /fluidity/timescale/uri
 SECRET_FLU_POSTGRES_URI: /fluidity/ethereum/data/postgres/uri
 SECRET_FLU_AMQP_QUEUE_ADDR: /fluidity/ethereum/data/rabbitmq/uri
-SECRET_FLU_MORALIS_TOKEN: /fluidity/moralis/token
 
