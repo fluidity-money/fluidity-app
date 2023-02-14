@@ -155,21 +155,14 @@ contract VEGovLockup is IEmergencyMode {
     }
 
     /**
-     * @notice deposit 80% fluid token, 20% fwETH, locking the amounts up and then
-     *         multiplying the deposited fluid assets amount by the vote escrow
-     *         multiplier. then quote the user the amount of ve tokens they have
+     * @notice deposit some token for the length given
      *
      * @param _bptAmount to take from the user to lock up
      *
      * @param _lockLength in seconds to lock the assets up for, used to
      *         calculate the lock time = lock length + block timestamp
      */
-    function deposit(
-        uint256 _bptAmount,
-        uint256 _lockLength
-    )
-        public returns (uint256)
-    {
+    function deposit(uint256 _bptAmount, uint256 _lockLength) public returns (uint256) {
         require(noEmergencyMode(), "emergency mode");
         require(!hasLockedUp(msg.sender), "user locked up already");
         require(_bptAmount > 0, "more than 0 token needed for lockup");
