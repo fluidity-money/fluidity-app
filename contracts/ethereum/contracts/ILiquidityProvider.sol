@@ -5,7 +5,7 @@
 // LICENSE.md file.
 
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
 
 import "./IERC20.sol";
 

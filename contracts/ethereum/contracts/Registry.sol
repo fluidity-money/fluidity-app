@@ -11,6 +11,11 @@ import "./IRegistry.sol";
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
 contract Registry is IRegistry {
+
+    // @dev RegistrationType is a uint8 in practice, so it can be updated
+    // with a contract upgrade if the ABI changes
+    event RegistrationMade(RegistrationType type_, address indexed addr);
+
     uint8 version_;
 
     address operator_;
@@ -21,9 +26,7 @@ contract Registry is IRegistry {
     /// @notice liquidityProviderBeacon_ as a helpful guide for the DAO
     IBeacon liquidityProviderBeacon_;
 
-    IToken[] tokens_;
-
-    ILiquidityProvider[] liquidityProviders_;
+    Registration[] registrations_;
 
     function init(
         address _operator,
@@ -45,21 +48,18 @@ contract Registry is IRegistry {
         return operator_ == address(0) || msg.sender == operator_;
     }
 
-    function addToken(IToken _token) public {
+    function register(RegistrationType _type, address _contract) public {
         require(operatorNotRequiredOrIsOperator(), "not allowed");
-        tokens_.push(_token);
+
+        registrations_.push(Registration({
+            type_: _type,
+            addr: _contract
+        }));
+
+        emit RegistrationMade(_type, _contract);
     }
 
-    function getTokens() public view returns (IToken[] memory) {
-        return tokens_;
-    }
-
-    function addLiquidityProvider(ILiquidityProvider _provider) public {
-        require(operatorNotRequiredOrIsOperator(), "not allowed");
-        liquidityProviders_.push(_provider);
-    }
-
-    function getLiquidityProviders() public view returns (ILiquidityProvider[] memory) {
-        return liquidityProviders_;
+    function registrations() public view returns (Registration[] memory) {
+        return registrations_;
     }
 }

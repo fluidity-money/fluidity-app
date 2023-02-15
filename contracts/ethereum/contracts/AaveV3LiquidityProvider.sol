@@ -5,11 +5,15 @@
 // LICENSE.md file.
 
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
+
+import "./aave/IAToken.sol";
 
 import "./aaveV3/ATokenInterfaces.sol";
-import "./ILiquidityProvider.sol";
+
 import "./openzeppelin/SafeERC20.sol";
+
+import "./ILiquidityProvider.sol";
 
 /// @title Liquidity provider using aave V3 pools
 contract AaveV3LiquidityProvider is ILiquidityProvider {
@@ -23,8 +27,10 @@ contract AaveV3LiquidityProvider is ILiquidityProvider {
 
     /// @dev token being invested
     IERC20 public underlying_;
+
     PoolAddressesProviderInterface public poolAddresses_;
-    ATokenInterface public aToken_;
+
+    IAToken public aToken_;
 
     /**
      * @notice initialiser function
@@ -44,7 +50,7 @@ contract AaveV3LiquidityProvider is ILiquidityProvider {
         owner_ = owner;
 
         poolAddresses_ = PoolAddressesProviderInterface(addressProvider);
-        aToken_ = ATokenInterface(aToken);
+        aToken_ = IAToken(aToken);
 
         underlying_ = IERC20(aToken_.UNDERLYING_ASSET_ADDRESS());
     }

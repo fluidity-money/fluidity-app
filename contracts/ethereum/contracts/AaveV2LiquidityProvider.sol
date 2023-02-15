@@ -5,7 +5,9 @@
 // LICENSE.md file.
 
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
+
+import "./aave/IAToken.sol";
 
 import "./aaveV2/ATokenInterfaces.sol";
 
@@ -26,7 +28,7 @@ contract AaveV2LiquidityProvider is ILiquidityProvider {
     /// @dev token being invested
     IERC20 public underlying_;
     LendingPoolAddressesProviderInterface public lendingPoolAddresses_;
-    ATokenInterface public aToken_;
+    IAToken public aToken_;
 
     /**
      * @notice initialiser function
@@ -46,7 +48,7 @@ contract AaveV2LiquidityProvider is ILiquidityProvider {
         owner_ = owner;
 
         lendingPoolAddresses_ = LendingPoolAddressesProviderInterface(addressProvider);
-        aToken_ = ATokenInterface(aToken);
+        aToken_ = IAToken(aToken);
 
         underlying_ = IERC20(aToken_.UNDERLYING_ASSET_ADDRESS());
     }

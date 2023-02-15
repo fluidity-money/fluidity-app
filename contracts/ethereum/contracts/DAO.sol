@@ -71,11 +71,7 @@ contract DAO {
 
     VEGovLockup lockupSource_;
 
-    Operator operator_;
-
     address emergencyCouncil_;
-
-    address registry_;
 
     mapping(bytes20 => Proposal) proposals_;
 

@@ -3,13 +3,17 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-import "./IToken.sol";
-import "./ILiquidityProvider.sol";
+enum RegistrationType {
+    TOKEN,
+    LIQUIDITY_PROVIDER
+}
+
+struct Registration {
+    RegistrationType type_;
+    address addr;
+}
 
 interface IRegistry {
-    function addToken(IToken) external;
-    function getTokens() external view returns (IToken[] memory);
-
-    function addLiquidityProvider(ILiquidityProvider) external;
-    function getLiquidityProviders() external view returns (ILiquidityProvider[] memory);
+    function register(RegistrationType, address) external;
+    function registrations() external view returns (Registration[] memory);
 }
