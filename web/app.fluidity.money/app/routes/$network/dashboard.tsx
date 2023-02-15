@@ -178,7 +178,7 @@ export default function Dashboard() {
     },
     arbitrum: {
       name: "ARB",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
+      icon: <img src="/assets/chains/arbIcon.svg" />,
     },
     solana: {
       name: "SOL",
