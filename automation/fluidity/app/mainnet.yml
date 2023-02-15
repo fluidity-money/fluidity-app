@@ -11,7 +11,8 @@ SERVICES:
       TARGET_GROUP_01: flu-mainnet-app-fluidity-fe-tg
       TARGET_GROUP_02: flu-mainnet-app-fluidity-fe-tg-1
 
-      ENV_GA_WEBAPP_ANALYTICS_ID: GTM-W7QJGR2
+      ENV_FLU_GTAG_ID: G-MNXGX2P9KJ
+      ENV_FLU_GTM_ID: GTM-W7QJGR2
 
       SECRET_FLU_BITQUERY_TOKEN: /fluidity/bitquery_token
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url

@@ -23,6 +23,9 @@ ARG FLU_SENTRY_DSN
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
+ENV NEXT_PUBLIC_FLU_GTAG_ID ${NEXT_PUBLIC_FLU_GTAG_ID}
+ENV NEXT_PUBLIC_FLU_GTM_ID ${NEXT_PUBLIC_FLU_GTM_ID}
+
 RUN make frontend
 
 FROM fluidity/runtime-web-container:latest

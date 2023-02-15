@@ -1,10 +1,10 @@
-export const GA_DEST_ID = 'G-EF68MNJRJ7';
-export const GA_TRACKING_ID = 'GT-NM2HFZW';
+export const GTAG_ID = "G-MNXGX2P9KJ";
+export const GTM_ID = "GTM-W7QJGR2";
 
 export const pageview = (url: URL) => {
-  if (typeof window.gtag === "undefined") return;
+  if (typeof window?.gtag === "undefined") return;
 
-  window.gtag("config", GA_TRACKING_ID, {
+  window.gtag("config", GTAG_ID, {
     page_path: url,
   });
 };
@@ -17,7 +17,7 @@ type GTagEvent = {
 };
 
 export const event = ({ action, category, label, value }: GTagEvent) => {
-  if (typeof window.gtag === "undefined") return;
+  if (typeof window?.gtag === "undefined") return;
 
   window.gtag("event", action, {
     event_category: category,
