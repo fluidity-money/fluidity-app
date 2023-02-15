@@ -1,0 +1,50 @@
+@use 'common' as *;
+
+.TokenCard {
+  img {
+    width: 64px;
+    position: absolute;
+    left: 32px;
+    top: 1.4em;
+  }
+
+  &.hasLabels {
+    img {
+      top: 2em;
+    }
+
+    button {
+      margin-top: -1.2em;
+    }
+  }
+
+  button {
+    margin-right: 2em;
+  }
+
+  span:first-child {
+    justify-self: start;
+  }
+
+  h4 {
+    justify-self: start;
+  }
+
+  h1, h4 {
+    margin: 0;
+  }
+
+  column-gap: 4em;
+  position: relative;
+  padding: 2em;
+  padding-left: 128px;
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 1fr auto auto auto auto;
+  align-items: center;
+  justify-items: end;
+
+  &.isFluid {
+    grid-template-columns: 1fr auto auto auto auto;
+  }
+}
