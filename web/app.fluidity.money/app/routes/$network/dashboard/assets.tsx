@@ -121,9 +121,9 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
-  if (!showExperiment("enable-assets-page")) return <></>
+  // if (!showExperiment("enable-assets-page")) return <></>
 
-  if (!address) return <></>
+  // if (!address) return <></>
 
   return (
     <div className="pad-main">
