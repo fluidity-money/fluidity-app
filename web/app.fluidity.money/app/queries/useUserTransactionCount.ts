@@ -1,21 +1,29 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
 import {fetchGqlEndpoint} from "~/util/api/graphql";
 
-const queryByAddress: Queryable = {
+const queryByAddressTimestamp: Queryable = {
   ethereum: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $address: String!
+      $timestamp: ISO8601DateTime!
+    ) {
       ethereum {
         transfers(
           currency: { in: $fluidCurrencies }
           any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
         ) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $address: String!
+      $timestamp: ISO8601DateTime!
+    ) {
       solana {
         transfers(
           currency: { in: $fluidCurrencies }
@@ -24,17 +32,18 @@ const queryByAddress: Queryable = {
             { receiverAddress: { is: $address } }
           ]
         ) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   arbitrum: gql`
-    query getTransactionCount($address: String!) {
+    query getTransactionCount($address: String!, $timestamp: timestamp!) {
       arbitrum: user_actions_aggregate(
         where: {
           network: { _eq: "arbitrum" },
-          sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
+          sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } },
+          time: { _gt: $timestamp }
         }
       ) {
         aggregate {
@@ -45,30 +54,39 @@ const queryByAddress: Queryable = {
   `,
 };
 
-const queryAll: Queryable = {
+const queryByTimestamp: Queryable = {
   ethereum: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $timestamp: ISO8601DateTime!
+    ) {
       ethereum {
         transfers(currency: { in: $fluidCurrencies }) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $timestamp: ISO8601DateTime!
+    ) {
       solana {
         transfers(currency: { in: $fluidCurrencies }) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   arbitrum: gql`
-    query getTransactionCount {
+    query getTransactionCount(
+      $timestamp: timestamp!
+    ) {
       arbitrum: user_actions_aggregate(
         where: {
           network: { _eq: "arbitrum" },
+          time: { _gt: $timestamp }
         }
       ) {
         aggregate {
@@ -114,14 +132,20 @@ export type HasuraUserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionByAddressCount = async(network: string, address: string) => {
+const useUserTransactionCountByAddressTimestamp = async(
+  network: string,
+  address: string,
+  iso8601Timestamp: string
+) => {
   const variables = {
     address: address,
     ...(network !== "arbitrum" && {fluidCurrencies: getTokenForNetwork(network)}),
+    fluidCurrencies: getTokenForNetwork(network),
+    timestamp: iso8601Timestamp,
   };
 
   const body = {
-    query: queryByAddress[network],
+    query: queryByAddressTimestamp[network],
     variables,
   };
 
@@ -145,13 +169,17 @@ const useUserTransactionByAddressCount = async(network: string, address: string)
   return result; 
 };
 
-const useUserTransactionAllCount = async(network: string) => {
+const useUserTransactionCountByTimestamp = async(
+  network: string,
+  iso8601Timestamp: string
+) => {
   const variables = {
     ...(network !== "arbitrum" && {fluidCurrencies: getTokenForNetwork(network)}),
-  };
+    timestamp: iso8601Timestamp,
+  }
 
   const body = {
-    query: queryAll[network],
+    query: queryByTimestamp[network],
     variables,
   };
 
@@ -175,4 +203,7 @@ const useUserTransactionAllCount = async(network: string) => {
   return result; 
 };
 
-export { useUserTransactionAllCount, useUserTransactionByAddressCount };
+export {
+  useUserTransactionCountByTimestamp,
+  useUserTransactionCountByAddressTimestamp,
+};

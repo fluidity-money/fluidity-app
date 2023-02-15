@@ -20,9 +20,11 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "~/util/split";
+import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
+  AssetsIcon,
+  DaoIcon,
   DashboardIcon,
   GeneralButton,
   Trophy,
@@ -164,8 +166,8 @@ export default function Dashboard() {
   const navigationMap = [
     { home: { name: "dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "rewards", icon: <Trophy /> } },
-    // {assets: {name: "Assets", icon: <AssetsIcon />}},
-    // {dao: {name:"DAO", icon: <DaoIcon />}},
+    ...showExperiment("enable-assets") ? [{ assets: { name: "Assets", icon: <AssetsIcon /> }}]: [],
+    ...showExperiment("enable-dao") ? [{ dao: { name: "DAO", icon: <DaoIcon /> } }] : [],
   ];
 
   const chainNameMap: Record<string, {name: string; icon: JSX.Element}> =
@@ -260,6 +262,14 @@ export default function Dashboard() {
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  const otherModalOpen =
+    openMobModal ||
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
+      ? true
+      : false;
+
   return (
     <>
       <header id="flu-logo" className="hide-on-mobile">
@@ -292,6 +302,23 @@ export default function Dashboard() {
             mobile={isMobile}
           />
         </div>
+      </Modal>
+
+      {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
+      <Modal visible={!otherModalOpen}>
+        <GeneralButton
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
+          version={"primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() => navigate("../fluidify")}
+        >
+          <Heading as="h5">
+            <b>Fluidify Money</b>
+          </Heading>
+        </GeneralButton>
       </Modal>
 
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
@@ -425,7 +452,7 @@ export default function Dashboard() {
             */}
 
             {/* Fluidify button */}
-            {showExperiment("Fluidify-Button-Placement") && (
+            {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
                 className="fluidify-button-dashboard "
                 version={"primary"}
@@ -481,12 +508,9 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-
         <Outlet />
-
         {/* Provide Luquidity*/}
         {!openMobModal && <ProvideLiquidity />}
-
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&
@@ -498,7 +522,7 @@ export default function Dashboard() {
           )}
 
         {/* Default Fluidify button */}
-        {!showExperiment("Fluidify-Button-Placement") && (
+        {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
             version={"primary"}
@@ -531,7 +555,6 @@ export default function Dashboard() {
             unclaimedRewards={unclaimedRewards}
           />
         )}
-
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>

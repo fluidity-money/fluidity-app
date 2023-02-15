@@ -2,6 +2,7 @@ import { ReactNode, useContext } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
+import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
@@ -14,10 +15,8 @@ import {
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 import { EIP1193 } from "@web3-react/eip1193";
-import FluidityFacadeContext from "./FluidityFacade";
-
-import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
-import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
+import { SplitContext } from "contexts/SplitProvider";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   getTotalPrizePool,
   getUserMintLimit,
@@ -30,10 +29,11 @@ import makeContractSwap, {
   getAmountMinted,
   getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
-import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
 import useWindow from "~/hooks/useWindow";
-import { SplitContext } from "~/util/split";
+
+import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 
 type OKXWallet = {
   isOkxWallet: boolean;

@@ -7,6 +7,7 @@ package probability
 import (
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -44,17 +45,34 @@ func probability(m, n, b int64) *big.Rat {
 	return probability
 }
 
+// calculateBpy given a block time, pool, and delta weight returns how much of the token should be distributed
+func calculateBpy(blockTimeRat *big.Rat, pool worker.UtilityVars) *big.Rat {
+	var (
+		rewardPoolNative = pool.PoolSizeNative
+		exchangeRate     = pool.ExchangeRate
+
+		deltaWeight = pool.DeltaWeight
+	)
+
+	rewardPoolUsd := new(big.Rat).Mul(rewardPoolNative, exchangeRate)
+
+	poolBpy := new(big.Rat).Mul(blockTimeRat, rewardPoolUsd)
+
+	poolBpy.Quo(poolBpy, deltaWeight)
+
+	return poolBpy
+}
+
+// calculatePayoutFrac given a token's bpy and the sum of all token's bpy,
+// returning how much of the payout should be given to that token
+func calculatePayoutFrac(tokenBpy, totalBpy *big.Rat) *big.Rat {
+	return new(big.Rat).Quo(tokenBpy, totalBpy)
+}
+
 // A / p(b)
 // Calculates the payouts for the different reward tiers, returns the probabilities and payouts
-func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b int64, blockTime uint64, emission *worker.Emission) (payout *big.Rat, probability_ *big.Rat) {
+func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64, emission *worker.Emission) (payout *big.Rat, probability_ *big.Rat) {
 	m := int64(winningClasses)
-
-	blockTimeRat := new(big.Rat).SetUint64(blockTime)
-
-	// Pay out the reward pool as APY, divide between blocks
-	delta := new(big.Rat).Mul(blockTimeRat, rewardPool)
-
-	delta.Quo(delta, deltaWeight)
 
 	gTimesAtx := new(big.Rat).Mul(g, atx)
 
@@ -91,8 +109,8 @@ func payout(atx, g, rewardPool, deltaWeight *big.Rat, winningClasses int, n, b i
 	emission.Payout.B = b
 	emission.Payout.Delta, _ = delta.Float64()
 	emission.Payout.Atx, _ = atx.Float64()
-	emission.Payout.BlockTime = blockTime
-	emission.Payout.RewardPool, _ = rewardPool.Float64()
+	//emission.Payout.BlockTime = blockTime
+	//emission.Payout.RewardPool, _ = rewardPool.Float64()
 
 	return aDivP, p
 }
@@ -150,13 +168,32 @@ func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.E
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, deltaWeight *big.Rat, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts []*misc.BigInt, probabilities []*big.Rat) {
+func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.UtilityVars, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[applications.UtilityName][]worker.Payout, probabilities []*big.Rat) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 
+	blockTimeRat := new(big.Rat).SetUint64(blockTimeInSeconds)
+
 	n := calculateN(winningClasses, payoutFreq, atx, emission)
 
-	payouts = make([]*misc.BigInt, winningClasses)
+	payouts = make(map[applications.UtilityName][]worker.Payout)
+
+	poolBpys := make([]*big.Rat, len(distributionPools))
+
+	totalBpy := new(big.Rat)
+
+	// sum and record the bpy of each token
+	for i, pool := range distributionPools {
+		name := pool.Name
+
+		payouts[name] = make([]worker.Payout, winningClasses)
+
+		bpy := calculateBpy(blockTimeRat, pool)
+
+		poolBpys[i] = bpy
+
+		totalBpy.Add(totalBpy, bpy)
+	}
 
 	probabilities = make([]*big.Rat, winningClasses)
 
@@ -167,12 +204,11 @@ func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, delta
 		payout, probability := payout(
 			averageTransfersInBlock_,
 			gasFee,
-			rewardPool,
-			deltaWeight,
+			blockTimeRat,
+			totalBpy,
 			winningClasses,
 			n,
 			winningClass,
-			blockTimeInSeconds,
 			emission,
 		)
 
@@ -187,17 +223,44 @@ func WinningChances(gasFee, atx, rewardPool, decimalPlacesRat, payoutFreq, delta
 		case 4: emission.WinningChances.Payout5, _ = payout.Float64()
 		}
 
-		// this is the payout that a user would receive! due to the way that
-		// eth works!
-
-		payout.Mul(payout, decimalPlacesRat)
-
-		leftSide := new(big.Int).Quo(payout.Num(), payout.Denom())
-
-		payoutBigInt := misc.NewBigIntFromInt(*leftSide)
-
-		payouts[i] = &payoutBigInt
 		probabilities[i] = probability
+
+		// figure out the payout for each token we're distributing
+		for poolIdx, pool := range distributionPools {
+			var (
+				poolName = pool.Name
+				tokenDecimals = pool.TokenDecimalsScale
+				exchangeRate = pool.ExchangeRate
+				bpy = poolBpys[poolIdx]
+
+			)
+			frac := calculatePayoutFrac(bpy, totalBpy)
+
+			// clone tokenPayout so we don't mutate
+			tokenPayout := new(big.Rat).Set(payout)
+
+			// amount of the total payout (in usd) that the token gets
+			tokenPayout.Mul(tokenPayout, frac)
+
+			// store the usd value
+			usdPayout, _ := tokenPayout.Float64();
+
+			// amount of the total payout in amount of the token
+			tokenPayout.Quo(tokenPayout, exchangeRate)
+
+			// payout scaled by decimals to pass to ethereum
+			tokenPayout.Mul(tokenPayout, tokenDecimals)
+
+			// strip off any remaining decimals
+			leftSide := new(big.Int).Quo(tokenPayout.Num(), tokenPayout.Denom())
+
+			payoutBigInt := misc.NewBigIntFromInt(*leftSide)
+
+			payouts[poolName][i] = worker.Payout{
+				Native: payoutBigInt,
+				Usd: usdPayout,
+			}
+		}
 	}
 
 	// set the emissions data for logging after the fact
