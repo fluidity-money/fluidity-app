@@ -30,8 +30,8 @@ export const links = () => {
 import serverConfig from "~/webapp.config.server";
 import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import BN from "bn.js";
-import { SplitContext } from "~/util/split";
 import React from "react";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
