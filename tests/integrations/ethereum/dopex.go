@@ -8,108 +8,87 @@ const integrationTestDopex = `
 [
   {
     "transfer": {
-      "transaction": "0x645dc6e15a69196d3c74ea63487009d2fab1d0df6ff6437e1785e07aaafa63ee",
+      "transaction": "0xee8b737c8ada56c3eb3e8fab9d8be1db02c799a15666bc38e6e90701ad1c4573",
       "log": {
-        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiscjBInoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtkdyLvYJU=",
-        "address": "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f",
+        "data": "AAAAAAAAAAAAAAAAIVtbJad3sgnCG67jpoAzt0Y36ukAAAAAAAAAAAAAAACguGmRxiGLNsHRnUounrDONgbrSAAAAAAAAAAAAAAAANrBf5WNLuUjoiBiBplFl8E9gx7HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9OnQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2o8",
+        "address": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
         "topics": [
-          "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
-          "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
-          "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"
+          "0xd6d34547c69c5ee3d2667625c188acf1006abb93e0ee7cf03925c67cf7760413"
         ]
       },
       "application": 12
     },
     "transaction": {
-      "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
-      "from": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-      "hash": "0x645dc6e15a69196d3c74ea63487009d2fab1d0df6ff6437e1785e07aaafa63ee"
+      "to": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+      "from": "0x215b5b25A777b209C21baEE3a68033B74637EAE9",
+      "hash": "0xee8b737c8ada56c3eb3e8fab9d8be1db02c799a15666bc38e6e90701ad1c4573"
     },
-    "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-    "expected_recipient": "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f",
-    "expected_fees": "2/100",
-	"expected_emission": {
-		"apeswap": 0.02
-	},
-	"rpc_methods": {
-		"eth_getCode": "0x0"
-	},
-	"call_methods": {
-		"token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
-		"token1()": "0x000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-	},
-    "token_decimals": 18,
-    "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
-  },
-  {
-    "transfer": {
-      "transaction": "0x59cd90de6da2f47603d6718d0d091eec181f8edfb339f26b895a257c754a52fd",
-      "log": {
-        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJiWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIp3lRZiNBiFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-        "address": "0xaaf5110db6e744ff70fb339de037b990a20bdace",
-        "topics": [
-          "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
-          "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
-          "0xD4CF8e47BeAC55b42Ae58991785Fa326d9384Bd1"
-        ]
-      },
-      "application": 12
+    "expected_sender": "0x215b5b25A777b209C21baEE3a68033B74637EAE9",
+    "expected_recipient": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+    "expected_fees": "1767913/250000000",
+    "expected_emission": {
+      "dopex": 0.007071652
     },
-    "transaction": {
-      "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
-      "from": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-      "hash": "0x59cd90de6da2f47603d6718d0d091eec181f8edfb339f26b895a257c754a52fd"
-    },
-    "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-    "expected_recipient": "0xaaf5110db6e744ff70fb339de037b990a20bdace",
-    "expected_fees": "9977607422832023685/500000000000000000000",
-	"expected_emission": {
-		"apeswap": 0.019955214845664048
-	},
-	"rpc_methods": {
-		"eth_getCode": "0x0"
-	},
-	"call_methods": {
-		"token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
-		"token1()": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-	},
-    "token_decimals": 18,
-    "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
-  },
-  {
-    "transfer": {
-      "transaction": "0x399f63f0832af79554118119990c01a549ab004a39ebea99a295db3047497c29",
-      "log": {
-        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG4tRfmsLPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmJaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-        "address": "0x6b0cc136f7babd971b5decd21690be65718990e2",
-        "topics": [
-          "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
-          "0x5f509a3C3F16dF2Fba7bF84dEE1eFbce6BB85587",
-          "0xD4CF8e47BeAC55b42Ae58991785Fa326d9384Bd1"
-        ]
-      },
-      "application": 12
-    },
-    "transaction": {
-      "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
-      "from": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-      "hash": "0x399f63f0832af79554118119990c01a549ab004a39ebea99a295db3047497c29"
-    },
-    "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
-    "expected_recipient": "0x6b0cc136f7babd971b5decd21690be65718990e2",
-    "expected_fees": "2/100",
-	"expected_emission": {
-		"apeswap": 0.02
-	},
-	"rpc_methods": {
-		"eth_getCode": "0x0"
-	},
-	"call_methods": {
-		"token0()": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-		"token1()": "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-	},
+    "rpc_methods": {},
+    "call_methods": {},
     "token_decimals": 6,
-    "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    "contract_address": "0xdac17f958d2ee523a2206206994597c13d831ec7"
+  },
+  {
+    "transfer": {
+      "transaction": "0x9dae8fa7960745b4daf3add1293430ee9f1badab638ceb6eb5369096cb6f511d",
+      "log": {
+        "data": "AAAAAAAAAAAAAAAAIVtbJad3sgnCG67jpoAzt0Y36ukAAAAAAAAAAAAAAABrF1R06JCUxE2pi5VO7erElScdDwAAAAAAAAAAAAAAANrBf5WNLuUjoiBiBplFl8E9gx7HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG8FtZ07IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB5QlwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHodM",
+        "address": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+        "topics": [
+          "0xd6d34547c69c5ee3d2667625c188acf1006abb93e0ee7cf03925c67cf7760413"
+        ]
+      },
+      "application": 12
+    },
+    "transaction": {
+      "to": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+      "from": "0x215b5b25A777b209C21baEE3a68033B74637EAE9",
+      "hash": "0x9dae8fa7960745b4daf3add1293430ee9f1badab638ceb6eb5369096cb6f511d"
+    },
+    "expected_sender": "0x215b5b25A777b209C21baEE3a68033B74637EAE9",
+    "expected_recipient": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+    "expected_fees": "14000000000000000000/1000000000000000000000",
+    "expected_emission": {
+      "dopex": 0.014
+    },
+    "rpc_methods": {},
+    "call_methods": {},
+    "token_decimals": 18,
+    "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
+  },
+  {
+    "transfer": {
+      "transaction": "0x00c8e84e01c89e54e20badd8ab979bd92257aae0952de2b0335a4f80a71e9498",
+      "log": {
+        "data": "AAAAAAAAAAAAAAAAIVtbJad3sgnCG67jpoAzt0Y36ukAAAAAAAAAAAAAAACguGmRxiGLNsHRnUounrDONgbrSAAAAAAAAAAAAAAAAGsXVHTokJTETamLlU7t6sSVJx0PAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAehH8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAb8KKqa5Mk2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwjDosjX9jN",
+        "address": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+        "topics": [
+          "0xd6d34547c69c5ee3d2667625c188acf1006abb93e0ee7cf03925c67cf7760413"
+        ]
+      },
+      "application": 12
+    },
+    "transaction": {
+      "to": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+      "from": "0x215b5b25A777b209C21baEE3a68033B74637EAE9",
+      "hash": "0x00c8e84e01c89e54e20badd8ab979bd92257aae0952de2b0335a4f80a71e9498"
+    },
+    "expected_sender": "0x215b5b25A777b209C21baEE3a68033B74637EAE9",
+    "expected_recipient": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
+    "expected_fees": "14192361736025075099/1000000000000000000000",
+    "expected_emission": {
+      "dopex": 0.01419236173602507509
+    },
+    "rpc_methods": {},
+    "call_methods": {},
+    "token_decimals": 18,
+    "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
   }
 ]
 `

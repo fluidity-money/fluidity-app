@@ -71,8 +71,11 @@ var dopexSwapAbi ethAbi.ABI
 func GetDopexFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
-	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+	if len(transfer.Log.Topics) != 1 {
+		return nil, fmt.Errorf(
+			"Unexpected number of topics! (Expected 1, got %v)",
+			len(transfer.Log.Topics),
+		)
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
