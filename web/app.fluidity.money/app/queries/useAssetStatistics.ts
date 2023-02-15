@@ -1,6 +1,5 @@
 import { gql, jsonPost, Queryable } from "~/util";
 
-
 const query: Queryable = {
   ethereum: gql`
     query GetAssetStatistics($token_name: String!, $address: String!) {
@@ -49,25 +48,29 @@ type AssetStatisticsResponse = {
         max: {
           winning_amount: number;
           transaction_hash: string;
-        }
+        };
         avg: {
           winning_amount: number;
-        }
-      }
-    }
+        };
+      };
+    };
     global: {
       aggregate: {
         max: {
           winning_amount: number;
           transaction_hash: string;
-        }
-      }
-    }
+        };
+      };
+    };
   };
   error?: string;
 };
 
-const useAssetStatistics = async (network: string, tokenName: string, userAddress: string) => {
+const useAssetStatistics = async (
+  network: string,
+  tokenName: string,
+  userAddress: string
+) => {
   if (network !== "ethereum") {
     throw Error(`network ${network} not supported`);
   }
@@ -92,6 +95,5 @@ const useAssetStatistics = async (network: string, tokenName: string, userAddres
       : {}
   );
 };
-
 
 export default useAssetStatistics;

@@ -30,7 +30,7 @@ export const links = () => {
 import serverConfig from "~/webapp.config.server";
 import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import BN from "bn.js";
-import { SplitContext } from "~/util/split";
+import { SplitContext } from "contexts/SplitProvider";
 import React from "react";
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -121,9 +121,9 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
-  if (!showExperiment("enable-assets-page")) return <></>
+  // if (!showExperiment("enable-assets-page")) return <></>
 
-  if (!address) return <></>
+  // if (!address) return <></>
 
   return (
     <div className="pad-main">

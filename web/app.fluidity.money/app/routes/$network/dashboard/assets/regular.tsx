@@ -10,8 +10,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
-  const { tokens } =
-    serverConfig.config[network as unknown as string] ?? {};
+  const { tokens } = serverConfig.config[network as unknown as string] ?? {};
 
   const regularTokens = tokens.filter((token) => !token.isFluidOf);
 
@@ -21,10 +20,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 type LoaderData = {
-  tokens: Token[]
-}
+  tokens: Token[];
+};
 
-export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) => {
+export const ErrorBoundary: React.FC<{ error: Error }> = (props: {
+  error: Error;
+}) => {
   return (
     <div>
       <h1>Error</h1>
@@ -33,18 +34,17 @@ export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) =
       <pre>{props.error.stack}</pre>
     </div>
   );
-}
+};
 
 const allAssetsVariants = {
-  hidden: {
-  },
+  hidden: {},
   visible: {
     left: 0,
     transition: {
       duration: 1,
       staggerChildren: 0.1,
       staggerDirection: 1,
-    }
+    },
   },
   exit: {
     left: -100,
@@ -52,10 +52,10 @@ const allAssetsVariants = {
     transition: {
       duration: 5,
       staggerChildren: 0.1,
-      staggerDirection: -1
-    }
-  }
-}
+      staggerDirection: -1,
+    },
+  },
+};
 
 const RegularAssets = () => {
   const { tokens } = useLoaderData<LoaderData>();
@@ -67,65 +67,59 @@ const RegularAssets = () => {
       animate="visible"
       exit="exit"
     >
-      <Suspense fallback={'loading'}>
-        {
-          tokens.map((t, i) => {
-            return <CardWrapper key={i} token={t}/>
-          })
-        }
+      <Suspense fallback={"loading"}>
+        {tokens.map((t, i) => {
+          return <CardWrapper key={i} token={t} />;
+        })}
       </Suspense>
     </motion.div>
-  )
-}
+  );
+};
 
 const assetVariants = {
   hidden: {
     opacity: 0,
-    y: 100
+    y: 100,
   },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.5,
-      ease: 'easeInOut'
-    }
+      ease: "easeInOut",
+    },
   },
   exit: {
     opacity: 0,
-    y: 20
-  }
-}
+    y: 20,
+  },
+};
 
 const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
   const { token } = props;
-  const navigate = useNavigate()
-  const { network } = useParams()
+  const navigate = useNavigate();
+  const { network } = useParams();
 
-  const {connected, balance} = useContext(FluidityFacadeContext)
+  const { connected, balance } = useContext(FluidityFacadeContext);
 
-  const [amount, setAmount] = useState<BN>(new BN(0))
+  const [amount, setAmount] = useState<BN>(new BN(0));
 
   useEffect(() => {
-    if (!connected) return
+    if (!connected) return;
 
     (async () => {
-      const amt = await balance?.(token.address) ?? new BN(0)
-      setAmount(amt)
-    })()
+      const amt = (await balance?.(token.address)) ?? new BN(0);
+      setAmount(amt);
+    })();
+  }, [connected]);
 
-  }, [connected])
-
-  const decimals = new BN(10).pow(new BN(token.decimals))
+  const decimals = new BN(10).pow(new BN(token.decimals));
 
   return (
-    <motion.div variants={assetVariants} style={{marginBottom: '1em'}}>
-      <CollapsibleCard
-        expanded={false}
-        type='box'
-      >
+    <motion.div variants={assetVariants} style={{ marginBottom: "1em" }}>
+      <CollapsibleCard expanded={false} type="box">
         <CollapsibleCard.Summary>
-          <TokenCard 
+          <TokenCard
             showLabels
             token={token}
             regAmt={amount.div(decimals).toNumber() || 0}
@@ -135,7 +129,7 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
         </CollapsibleCard.Summary>
       </CollapsibleCard>
     </motion.div>
-  )
-}
+  );
+};
 
-export default RegularAssets
+export default RegularAssets;
