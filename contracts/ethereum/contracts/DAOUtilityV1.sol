@@ -31,13 +31,25 @@ contract DAOUtilityV1 {
         _beacon.upgradeTo(_newImplementation);
     }
 
+    /**
+     * @notice deployNewToken and register it with Registry
+     * @param _fluidTokenName to use as the name of the Fluid Asset
+     * @param _fluidSymbol to use as the symbol for the Fluid Asset
+     * @param _decimals to use for the underlying asset (and to set for this!)
+     * @param _liquidityProvider to use to get the underlying yield for
+     * @param _beacon to use to source the implementation address
+     * @param _oracle that is permitted to call the trusted methods on the Token
+     * @param _emergencyCouncil that is permitted to trigger the emergency features
+     *
+     * @dev uses the sender address as the operator/emergency council!
+     */
     function deployNewToken(
         string memory _fluidTokenName,
         string memory _fluidSymbol,
         uint8 _decimals,
         ILiquidityProvider _liquidityProvider,
         IBeacon _beacon,
-        address _operator,
+        address _oracle,
         address _emergencyCouncil
     )
         external returns (address)
@@ -55,7 +67,7 @@ contract DAOUtilityV1 {
                 _fluidSymbol,
                 _emergencyCouncil,
                 address(this),
-                _operator
+                _oracle
             )
          );
 

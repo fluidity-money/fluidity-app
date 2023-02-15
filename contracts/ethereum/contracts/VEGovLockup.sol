@@ -9,7 +9,7 @@ import "./GovToken.sol";
 import "./IERC20.sol";
 import "./IEmergencyMode.sol";
 
-import { calcGovToVEGov } from "./LibGovernanceCalc.sol";
+import "./LibGovernanceCalc.sol";
 
 /// @dev default maxLockTime to use as the max amount that could be
 ///      locked up
@@ -22,7 +22,7 @@ struct Lockup {
     /// @dev fluid/fweth BPT token we're locking up
     uint256 bptAtLock;
 
-    /// @dev lockTime is the timestamp the token was locked up for
+    /// @dev lockTime is the timestamp the token was locked up at
     uint256 lockTime;
 }
 
@@ -37,7 +37,7 @@ contract VEGovLockup is IEmergencyMode {
 
     IERC20 balancerPoolToken_;
 
-    mapping(address => Lockup) lockups_;
+    mapping(address => Lockup[]) lockups_;
 
     function init(
         address _operator,
@@ -75,11 +75,7 @@ contract VEGovLockup is IEmergencyMode {
         noEmergencyMode_ = true;
     }
 
-    function hasLockedUp(address _user) public view returns (bool) {
-        return lockups_[_user].lockLength > 0;
-    }
-
-    function trackDeposit(
+    function trackNewDeposit(
         address _spender,
         uint256 _lockLength,
         uint256 _bptAtLock,
@@ -87,9 +83,13 @@ contract VEGovLockup is IEmergencyMode {
     )
         internal
     {
-        lockups_[_spender].lockLength = _lockLength;
-        lockups_[_spender].bptAtLock = _bptAtLock;
-        lockups_[_spender].lockTime = _lockTime;
+        Lockup memory lockup;
+
+        lockup.lockLength = _lockLength;
+        lockup.bptAtLock = _bptAtLock;
+        lockup.lockTime = _lockTime;
+
+        lockups_[_spender].push(lockup);
     }
 
     function daysSinceLocked(
@@ -113,45 +113,29 @@ contract VEGovLockup is IEmergencyMode {
         return calcGovToVEGov(_tokenAmount, currentLockLength, MAX_LOCKUP_TIME);
     }
 
-    function lockLengthOf(address _spender) public view returns (uint256) {
-        return lockups_[_spender].lockLength;
-    }
+    function balanceOfUnderlying(address _spender) public view returns (uint256 amount) {
+        for (uint256 i = 0; i < lockups_[_spender].length; i++)
+            amount += lockups_[_spender][i].bptAtLock;
 
-    function lockTimeOf(address _spender) public view returns (uint256) {
-        return lockups_[_spender].lockTime;
-    }
-
-    function currentVEGovAmountOfAtWith(
-        address _spender,
-        uint256 _time,
-        uint256 _token
-    )
-        public view returns (uint256)
-    {
-        return currentVEGovAmount(
-            lockLengthOf(_spender),
-            lockTimeOf(_spender),
-            _time,
-            _token
-        );
-    }
-
-    function balanceOfUnderlying(address _spender) public view returns (uint256) {
-        return lockups_[_spender].bptAtLock;
+        return amount;
     }
 
     function balanceOf(address _spender) public view returns (uint256) {
-        return currentVEGovAmountOfAtWith(
-            _spender,
-            block.timestamp,
-            balanceOfUnderlying(_spender)
-        );
+        uint256 amounts;
+
+        for (uint256 i = 0; i < lockups_[_spender].length; i++)
+            amounts +=     currentVEGovAmount(
+                lockups_[_spender][i].lockLength,
+                lockups_[_spender][i].lockTime,
+                block.timestamp,
+                lockups_[_spender][i].bptAtLock
+            );
+
+        return amounts;
     }
 
-    function canWithdraw(address _spender)
-        public view returns (bool)
-    {
-        return balanceOf(_spender) == 0;
+    function numberOfVotingPowers(address _spender) public view returns (uint256) {
+        return lockups_[_spender].length;
     }
 
     /**
@@ -162,29 +146,54 @@ contract VEGovLockup is IEmergencyMode {
      * @param _lockLength in seconds to lock the assets up for, used to
      *         calculate the lock time = lock length + block timestamp
      */
-    function deposit(uint256 _bptAmount, uint256 _lockLength) public returns (uint256) {
+    function deposit(
+        uint256 _bptAmount,
+        uint256 _lockLength
+    )
+        public returns (uint256 newVEGov, uint256 powerNumber)
+    {
         require(noEmergencyMode(), "emergency mode");
-        require(!hasLockedUp(msg.sender), "user locked up already");
+
         require(_bptAmount > 0, "more than 0 token needed for lockup");
         require(_lockLength > 0, "lock length = 0");
 
         balancerPoolToken_.transferFrom(msg.sender, address(this), _bptAmount);
 
-        trackDeposit(
+        trackNewDeposit(
             msg.sender,
             _lockLength,
             _bptAmount,
             block.timestamp
         );
 
-        return balanceOf(msg.sender);
+        newVEGov = balanceOf(msg.sender);
+
+        powerNumber = numberOfVotingPowers(msg.sender);
+
+        return (newVEGov, powerNumber);
     }
 
-    function withdraw(uint256 _amount) public {
-        require(canWithdraw(msg.sender));
+    function isPowerEmpty(uint256 _powerNumber) public view returns (bool) {
+        return lockups_[msg.sender][_powerNumber].lockLength != 0;
+    }
 
-        uint256 sendable = balanceOfUnderlying(msg.sender) - _amount;
+    function increaseAmount(uint256 _powerNumber, uint256 _bptAmount) public {
+        require(noEmergencyMode(), "emergency mode");
 
-        balancerPoolToken_.transfer(msg.sender, sendable);
+        require(!isPowerEmpty(_powerNumber), "power doesn't exist");
+
+        require(_bptAmount > 0, "more than 0 token needed for lockup");
+
+        balancerPoolToken_.transferFrom(msg.sender, address(this), _bptAmount);
+
+        lockups_[msg.sender][_powerNumber].bptAtLock += _bptAmount;
+    }
+
+    function increaseLockTime(uint256 _powerNumber, uint256 _extraTime) public {
+        require(noEmergencyMode(), "emergency mode");
+
+        require(!isPowerEmpty(_powerNumber), "power doesn't exist");
+
+        lockups_[msg.sender][_powerNumber].lockLength += _extraTime;
     }
 }

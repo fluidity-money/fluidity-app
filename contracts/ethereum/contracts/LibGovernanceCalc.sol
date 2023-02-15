@@ -16,5 +16,17 @@ function calcGovToVEGov(
 {
     // ie, 1000, 365 days, 365 days = 1000
     // (FLUID * lock time) / max lock time
+
     return (_tokenAmount * _lockLength) / _maxLockLength;
+}
+
+function redeemableGov(
+    uint256 _lockTime,
+    uint256 _tokenAmount
+)
+    pure returns (uint256)
+{
+    // bpt back per day = (1 / lock time) * bpt locked
+
+    return (1 / _lockTime) * _tokenAmount;
 }

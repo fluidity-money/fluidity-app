@@ -47,6 +47,9 @@ struct Proposal {
 
     /// @notice killed by the emergency council?
     bool killed;
+
+    /// @notice isDelegateCall instead of ordinary call
+    bool isDelegateCall;
 }
 
 /*
@@ -75,8 +78,6 @@ contract DAO {
     address registry_;
 
     mapping(bytes20 => Proposal) proposals_;
-
-    bool reentrancyGuard_;
 
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
@@ -130,6 +131,7 @@ contract DAO {
         address _target,
         uint256 _forAmount,
         uint256 _againstAmount,
+        bool _isDelegateCall,
         bytes calldata _calldata
     )
         public
@@ -142,6 +144,7 @@ contract DAO {
 
         proposal.ratificationTs = block.timestamp + DEFAULT_VOTE_BLOCK_TIME;
         proposal.targetContract = _target;
+        proposal.isDelegateCall = _isDelegateCall;
         proposal.data = _calldata;
 
         if (_forAmount > 0)
@@ -255,6 +258,15 @@ contract DAO {
         return available > _amount ? available : _amount;
     }
 
+    function killProposal(bytes20 _ipfsHash) public {
+        require(
+            msg.sender == emergencyCouncil_,
+            "only emergency council can use this"
+        );
+
+        proposals_[_ipfsHash].killed = true;
+    }
+
     /// @notice voteFor the Vote given for the amount given, increasing
     ///         the amount for stored in the contract
     /// @dev _vote to vote for
@@ -287,15 +299,6 @@ contract DAO {
         _voteAgainst(msg.sender, _ipfsHash, _amount);
     }
 
-    function enableReentrancyGuard() internal {
-        require(!reentrancyGuard_, "already entered");
-        reentrancyGuard_ = true;
-    }
-
-    function disableReentrancyGuard() internal {
-        reentrancyGuard_ = false;
-    }
-
     /// @notice execute calldata at a contract target, following a Proposal
     ///         that's been proposed and ratified
     /// @dev _vote to execute once it follows the requirement
@@ -304,32 +307,44 @@ contract DAO {
 
         Proposal storage proposal = proposals_[_ipfsHash];
 
-        enableReentrancyGuard();
+        bool rc;
+        bytes memory returnData;
 
-        (bool rc, bytes memory returnData) = proposal.targetContract.delegatecall(
-            proposal.data
-        );
+        // if the proposal is a delegate call, use that instead, or just make a
+        // call
+
+        if (proposal.isDelegateCall)
+            (rc, returnData) = proposal.targetContract.delegatecall(
+                proposal.data
+            );
+
+        else
+           (rc, returnData) = proposal.targetContract.call(
+                proposal.data
+            );
 
         // return data under 68 with a failure reverted silently
 
         uint256 returnDataSize = returnData.length;
 
         // if the return success was false, and the return size is below
-        // 68 (size for a revert statement), then error out
+        // 68 (size for a revert string), then error out
 
         require(rc && returnDataSize >= 68, "call failed");
 
-        if (!rc) {
+        if (!rc)
             // an error happened, so we revert with the revert data from before
             assembly {
                 revert(returnData, returnDataSize)
             }
-        }
-
-        disableReentrancyGuard();
 
         // mark the contract as executed
 
         proposal.targetContract = address(0);
+    }
+
+    function disableEmergencyCouncil() public {
+        require(msg.sender == address(this), "only dao can use this");
+        emergencyCouncil_ = address(0);
     }
 }
