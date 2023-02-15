@@ -14,18 +14,19 @@ import "fmt"
 type Application int64
 
 var applicationNames = []string{
-    "none",
-    "uniswap_v2",
-    "balancer_v2",
-    "oneinch_v2",
-    "oneinch_v1",
-    "mooniswap",
-    "oneinch_fixedrate",
-    "dodo_v2",
-    "curve",
-    "multichain",
-    "xy_finance",
-    "apeswap",
+	"none",
+	"uniswap_v2",
+	"balancer_v2",
+	"oneinch_v2",
+	"oneinch_v1",
+	"mooniswap",
+	"oneinch_fixedrate",
+	"dodo_v2",
+	"curve",
+	"multichain",
+	"xy_finance",
+	"apeswap",
+	"dopex",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
@@ -39,14 +40,14 @@ func (app Application) String() string {
 }
 
 func ParseApplicationName(name string) (Application, error) {
-    for i, app := range applicationNames {
-        if app == name {
-            return Application(i), nil
-        }
-    }
+	for i, app := range applicationNames {
+		if app == name {
+			return Application(i), nil
+		}
+	}
 
-    return 0, fmt.Errorf(
-        "unknown app name %s",
-        name,
-    )
+	return 0, fmt.Errorf(
+		"unknown app name %s",
+		name,
+	)
 }
