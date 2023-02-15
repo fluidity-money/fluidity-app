@@ -11,19 +11,21 @@ import "./IFluidClient.sol";
 import "./IEmergencyMode.sol";
 import "./IUtilityGauges.sol";
 
+import "./TrfVariables.sol";
+
 struct FluidityReward {
     string clientName;
     Winner[] rewards;
 }
 
+struct OracleUpdate {
+    address contractAddr;
+    address newOracle;
+}
+
 contract Operator is IEmergencyMode, IUtilityGauges {
     /// @dev the utility name of the fluid token
     string constant FLUID_TOKEN = "FLUID";
-
-    struct OracleUpdate {
-        address contractAddr;
-        address newOracle;
-    }
 
     struct FluidityClientChange {
         string name;
@@ -70,6 +72,8 @@ contract Operator is IEmergencyMode, IUtilityGauges {
 
     /// @dev token => utility name => fluid client
     mapping(address => mapping(string => IFluidClient)) private fluidityClients_;
+
+    mapping(address => TrfVariables) trfVariables_;
 
     /**
      * @notice intialise the worker config for each of the tokens in the map
@@ -155,7 +159,9 @@ contract Operator is IEmergencyMode, IUtilityGauges {
         ScannedUtilityVars[] memory vars = new ScannedUtilityVars[](names.length);
         for (uint i = 0; i < names.length; i++) {
             string memory name = names[i];
+
             vars[i].name = name;
+
             IFluidClient utility = fluidityClients_[token][name];
 
             // reverts if utility == 0 !
@@ -165,22 +171,46 @@ contract Operator is IEmergencyMode, IUtilityGauges {
         return vars;
     }
 
+    function _updateOracle(address contractAddr, address newOracle) internal {
+        emit OracleChanged(
+            contractAddr,
+            oracles_[contractAddr],
+            newOracle
+        );
+
+        oracles_[contractAddr] = newOracle;
+    }
+
+    function updateOracle(address contractAddr, address newOracle) public {
+        require(noEmergencyMode(), "emergency mode!");
+        require(msg.sender == operator_, "only operator account can use this");
+
+        _updateOracle(contractAddr, newOracle);
+    }
+
     /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory newOracles) public {
         require(noEmergencyMode(), "emergency mode!");
         require(msg.sender == operator_, "only operator account can use this");
 
         for (uint i = 0; i < newOracles.length; i++) {
-            OracleUpdate memory oracle = newOracles[i];
-
-            emit OracleChanged(
-                oracle.contractAddr,
-                oracles_[oracle.contractAddr],
-                oracle.newOracle
+            _updateOracle(
+                newOracles[i].contractAddr,
+                newOracles[i].newOracle
             );
-
-            oracles_[oracle.contractAddr] = oracle.newOracle;
         }
+    }
+
+    /// @notice update the trf variables for a specific token
+    function updateTrfVariables(address token, TrfVariables calldata trf) public {
+        require(noEmergencyMode(), "emergency mode!");
+        require(msg.sender == operator_, "only operator account can use this");
+
+        trfVariables_[token] = trf;
+    }
+
+    function getTrfVariables(address token) public view returns (TrfVariables memory) {
+        return trfVariables_[token];
     }
 
     function getWorkerAddress(address contractAddr) public view returns (address) {

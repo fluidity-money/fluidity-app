@@ -24,6 +24,9 @@ import "./IEmergencyMode.sol";
 
 import "./IRegistry.sol";
 
+import "./TrfVariables.sol";
+import "./Operator.sol";
+
 /// @dev selector for the token's init function
 bytes4 constant TOKEN_INIT_SELECTOR =
   bytes4(keccak256("init(address,uint8,string,string,address,address,address)"));
@@ -41,7 +44,31 @@ bytes4 constant LIQUIDITY_PROVIDER_AAVEV2_INIT_SELECTOR =
 /// @dev keccak(init(address,address,address))
 bytes4 constant LIQUIDITY_PROVIDER_AAVEV3_INIT_SELECTOR = bytes4(keccak256("init(address,address,address)"));
 
+
 contract DAOUtilityV1 {
+
+    function defaultEthereumTrfVariables() public pure returns (TrfVariables memory) {
+        return TrfVariables({
+            currentAtxTransactionMargin: 0,
+            defaultTransfersInBlock: 0,
+            spoolerInstantRewardThreshold: 1,
+            spoolerBatchedRewardThreshold: 1,
+            defaultSecondsSinceLastBlock: 13,
+            atxBufferSize: 10
+        });
+    }
+
+    function defaultArbitrumTrfVariables() public pure returns (TrfVariables memory) {
+        return TrfVariables({
+            currentAtxTransactionMargin: 0,
+            defaultTransfersInBlock: 0,
+            spoolerInstantRewardThreshold: 1,
+            spoolerBatchedRewardThreshold: 1,
+            defaultSecondsSinceLastBlock: 1,
+            atxBufferSize: 10
+        });
+    }
+
     function upgradeBeacon(
         IUpgradeableBeacon _beacon,
         address _oldImplementation,
@@ -69,6 +96,8 @@ contract DAOUtilityV1 {
      * @param _emergencyCouncil that is permitted to trigger the emergency features
      * @param _oracle that is permitted to call the trusted methods on the Token
      * @param _decimals to use for the underlying asset (and to set for this!)
+     * @param _trfVariables to use for the trf variables
+     * @param _operator to use to configure the token configuration for the deployed asset
      *
      * @dev uses the sender address as the operator/emergency council!
      */
@@ -80,7 +109,9 @@ contract DAOUtilityV1 {
         string memory _fluidSymbol,
         address _emergencyCouncil,
         address _oracle,
-        uint8 _decimals
+        uint8 _decimals,
+        TrfVariables memory _trfVariables,
+        Operator _operator
     )
         public returns (address)
     {
@@ -91,13 +122,13 @@ contract DAOUtilityV1 {
             address(_beacon),
             abi.encodeWithSelector(
                 TOKEN_INIT_SELECTOR,
-                address(_liquidityProvider),
-                _decimals,
-                _fluidTokenName,
-                _fluidSymbol,
-                _emergencyCouncil,
-                address(this),
-                _oracle
+                address(_liquidityProvider), // _liquidityProvider
+                _decimals,                   // _decimals
+                _fluidTokenName,             // _name
+                _fluidSymbol,                // _symbol
+                _emergencyCouncil,           // _emergencyCouncil
+                address(this),               // _operator
+                address(_operator)           // _oracle
             )
          );
 
@@ -114,7 +145,95 @@ contract DAOUtilityV1 {
 
          _registry.register(RegistrationType.TOKEN, address(beaconProxy));
 
+         // start to set up the operator for the token deployed
+
+         _operator.updateOracle(address(beaconProxy), address(_oracle));
+
+         _operator.updateTrfVariables(address(beaconProxy), _trfVariables);
+
          return address(beaconProxy);
+    }
+
+    /**
+     * @notice deployNewTokenWithDefaultEthTrfVars and register it with Registry
+     * @param _beacon to use to source the implementation address
+     * @param _registry to use to register the token deployment
+     * @param _liquidityProvider to use to get the underlying yield for
+     * @param _fluidTokenName to use as the name of the Fluid Asset
+     * @param _fluidSymbol to use as the symbol for the Fluid Asset
+     * @param _emergencyCouncil that is permitted to trigger the emergency features
+     * @param _oracle that is permitted to call the trusted methods on the Token
+     * @param _decimals to use for the underlying asset (and to set for this!)
+     * @param _operator to use to configure the token configuration for the deployed asset
+     *
+     * @dev uses the sender address as the operator/emergency council!
+     */
+    function deployNewTokenWithDefaultEthTrfVars(
+        IBeacon _beacon,
+        IRegistry _registry,
+        ILiquidityProvider _liquidityProvider,
+        string memory _fluidTokenName,
+        string memory _fluidSymbol,
+        address _emergencyCouncil,
+        address _oracle,
+        uint8 _decimals,
+        Operator _operator
+    )
+        public returns (address)
+    {
+        return deployNewToken(
+            _beacon,
+            _registry,
+            _liquidityProvider,
+            _fluidTokenName,
+            _fluidSymbol,
+            _emergencyCouncil,
+            _oracle,
+            _decimals,
+            defaultEthereumTrfVariables(),
+            _operator
+        );
+    }
+
+    /**
+     * @notice deployNewTokenWithDefaultArbTrfVars and register it with Registry
+     * @param _beacon to use to source the implementation address
+     * @param _registry to use to register the token deployment
+     * @param _liquidityProvider to use to get the underlying yield for
+     * @param _fluidTokenName to use as the name of the Fluid Asset
+     * @param _fluidSymbol to use as the symbol for the Fluid Asset
+     * @param _emergencyCouncil that is permitted to trigger the emergency features
+     * @param _oracle that is permitted to call the trusted methods on the Token
+     * @param _decimals to use for the underlying asset (and to set for this!)
+     * @param _operator to use to configure the token configuration for the deployed asset
+     *
+     * @dev uses the sender address as the operator/emergency council!
+     */
+    function deployNewTokenWithDefaultArbTrfVars(
+        IBeacon _beacon,
+        IRegistry _registry,
+        ILiquidityProvider _liquidityProvider,
+        string memory _fluidTokenName,
+        string memory _fluidSymbol,
+        address _emergencyCouncil,
+        address _oracle,
+        uint8 _decimals,
+        Operator _operator
+    )
+        public returns (address)
+    {
+        return deployNewToken(
+            _beacon,
+            _registry,
+            _liquidityProvider,
+            _fluidTokenName,
+            _fluidSymbol,
+            _emergencyCouncil,
+            _oracle,
+            _decimals,
+            defaultArbitrumTrfVariables(),
+            _operator
+        );
     }
 
     /**
