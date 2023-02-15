@@ -162,7 +162,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const { topPrize, avgPrize, topAssetPrize, activity } = data
   const decimals = new BN(10).pow(new BN(token.decimals))
 
-  const augmentedActivity = getAugmentedWalletActivity(activity, quantities.fluidAmt?.toNumber() || 0)
+  const augmentedActivity = getAugmentedWalletActivity(activity, quantities.fluidAmt?.div(decimals).toNumber() || 0)
 
   return (
     <motion.div style={{marginBottom: '1em'}} 
