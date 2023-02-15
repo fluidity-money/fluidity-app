@@ -1,0 +1,23 @@
+{
+    "name": "@fluidity-money/fanfare",
+    "version": "0.0.1",
+    "author": "Fluidity Money",
+    "license": "GPLv3",
+    "private": true,
+    "description": "A notification server for listening to events and sending notifications to users",
+    "main": "src/main.ts",
+    "type": "module",
+    "devDependencies": {
+        "rxjs": "^7.8.0",
+        "socket.io": "^4.6.0",
+        "typescript": "^4.9.3",
+        "vite": "^4.1.0",
+        "vite-node": "^0.28.4"
+    },
+    "scripts": {
+        "dev": "vite-node -w src/main.ts",
+        "build": "vite build",
+        "start": "node dist/fanfare.js"
+    },
+    "dependencies": {}
+}

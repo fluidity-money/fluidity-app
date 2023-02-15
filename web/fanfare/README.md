@@ -1,0 +1,3 @@
+# Fanfare 🥳
+
+Speedy notification service.
