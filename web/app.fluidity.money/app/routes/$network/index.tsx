@@ -54,7 +54,6 @@ type LoaderData = {
 };
 
 const NetworkPage = () => {
-  console.log("networkplagegae");
   const { network } = useLoaderData<LoaderData>();
 
   const { connected, address, rawAddress, disconnect } = useContext(
