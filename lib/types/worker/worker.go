@@ -104,8 +104,8 @@ type (
 		MaxPriorityFeePerGas       misc.BigInt `json:"max_priority_fee_per_gas"`
 		MaxPriorityFeePerGasNormal float64     `json:"max_priority_fee_per_gas_normal"`
 
-		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
-		MaxFeePerGasNormal float64 `json:"max_fee_per_gas_normal"`
+		MaxFeePerGas       misc.BigInt `json:"max_fee_per_gas"`
+		MaxFeePerGasNormal float64     `json:"max_fee_per_gas_normal"`
 
 		EffectiveGasPriceNormal float64 `json:"effective_gas_price_normal"`
 
@@ -210,6 +210,7 @@ type (
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
+		Dopex            float64 `json:"dopex"`
 	}
 )
 

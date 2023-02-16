@@ -165,6 +165,7 @@ func InsertEmissions(emission Emission) {
 			multichain_fee,
 			xyfinance_fee,
 			apeswap_fee,
+			dopex_fee,
 
 			saber_fee,
 			orca_fee,
@@ -275,30 +276,31 @@ func InsertEmissions(emission Emission) {
 			$66,
 			$67,
 			$68,
-
 			$69,
+
 			$70,
 			$71,
 			$72,
 			$73,
 			$74,
-
 			$75,
+
 			$76,
 			$77,
 			$78,
 			$79,
-
 			$80,
+
 			$81,
 			$82,
 			$83,
-
 			$84,
+
 			$85,
 			$86,
 			$87,
-			$88
+			$88,
+			$89
 		);`,
 
 		TableEmissions,
@@ -390,6 +392,7 @@ func InsertEmissions(emission Emission) {
 		ethAppFees.Multichain,
 		ethAppFees.XyFinance,
 		ethAppFees.Apeswap,
+		ethAppFees.Dopex,
 
 		solAppFees.Saber,
 		solAppFees.Orca,

@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dopex"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
@@ -41,6 +42,7 @@ const (
 	ApplicationMultichain
 	ApplicationXyFinance
 	ApplicationApeswap
+	ApplicationDopex
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -157,6 +159,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Apeswap += util.MaybeRatToFloat(fee)
+	case ApplicationDopex:
+		fee, err = dopex.GetDopexFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Dopex += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -174,8 +185,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
 func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
-		logAddress  = transfer.Log.Address
-		nilAddress  libEthereum.Address
+		logAddress = transfer.Log.Address
+		nilAddress libEthereum.Address
 	)
 
 	switch transfer.Application {
@@ -211,6 +222,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		return transaction.From, logAddress, nil
 	case ApplicationApeswap:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationDopex:
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 

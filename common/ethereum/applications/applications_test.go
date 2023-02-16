@@ -127,4 +127,3 @@ func TestGetApplicationTransferParties(t *testing.T) {
 	assert.Equal(t, transactionSender, sender)
 	assert.Equal(t, logAddress, receiver)
 }
-
