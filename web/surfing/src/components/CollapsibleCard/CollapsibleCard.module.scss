@@ -1,0 +1,24 @@
+@use "common" as *;
+
+.CollapsibleCard {
+  width: 100%;
+
+  .Summary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &.pointer {
+      cursor: pointer;
+    } 
+
+    .content {
+      flex-grow: 1;
+    }
+
+    svg {
+      margin-right: 3em;
+      margin-left: 1em;
+    }
+  }
+}
