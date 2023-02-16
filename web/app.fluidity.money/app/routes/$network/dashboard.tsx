@@ -169,21 +169,32 @@ export default function Dashboard() {
     { rewards: { name: "Rewards", icon: <Trophy /> } },
   ];
 
-  const chainNameMap: Record<string, {name: string; icon: JSX.Element}> =
-  {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    arbitrum: {
-      name: "ARB",
-      icon: <img src="/assets/chains/arbIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  }
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
+    showExperiment("enable-arbitrum") || true
+    ? {
+      ethereum: {
+        name: "ETH",
+        icon: <img src="/assets/chains/ethIcon.svg" />,
+      },
+      arbitrum: {
+        name: "ARB",
+        icon: <img src="/assets/chains/arbIcon.svg" />,
+      },
+      solana: {
+        name: "SOL",
+        icon: <img src="/assets/chains/solanaIcon.svg" />,
+      },
+    }
+  : {
+      ethereum: {
+        name: "ETH",
+        icon: <img src="/assets/chains/ethIcon.svg" />,
+      },
+      solana: {
+        name: "SOL",
+        icon: <img src="/assets/chains/solanaIcon.svg" />,
+      },
+    };
 
   const matches = useMatches();
   console.log(matches);
