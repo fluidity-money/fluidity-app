@@ -127,7 +127,7 @@ const integrationTestBalancerV2 = `
           "0xbd72ae3bb5da3cb770c75d217b83f4d838306565"
         ]
       },
-      "application": 2
+      "application": 3
     },
     "transaction": {
       "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",

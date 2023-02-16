@@ -31,8 +31,8 @@ import (
 const (
 	// ApplicationNone is the nil value representing a transfer.
 	ApplicationNone libApps.Application = iota
-	ApplicationUniswapV2
 	ApplicationUniswapV3
+	ApplicationUniswapV2
 	ApplicationBalancerV2
 	ApplicationOneInchLPV2
 	ApplicationOneInchLPV1
@@ -59,15 +59,6 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	)
 
 	switch transfer.Application {
-	case ApplicationUniswapV2:
-		fee, err = uniswap.GetUniswapV2Fees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-
-		emission.UniswapV2 += util.MaybeRatToFloat(fee)
 	case ApplicationUniswapV3:
 		fee, err = uniswap.GetUniswapV3Fees(
 			transfer,
@@ -77,6 +68,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.UniswapV3 += util.MaybeRatToFloat(fee)
+	case ApplicationUniswapV2:
+		fee, err = uniswap.GetUniswapV2Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.UniswapV2 += util.MaybeRatToFloat(fee)
 	case ApplicationBalancerV2:
 		fee, err = balancer.GetBalancerFees(
 			transfer,

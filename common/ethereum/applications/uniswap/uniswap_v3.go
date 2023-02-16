@@ -110,8 +110,12 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	logTopic := transfer.Log.Topics[0].String()
 
-	if logTopic != uniswapSwapLogTopic {
-		return nil, nil
+	if logTopic != uniswapV3SwapLogTopic {
+		return nil, fmt.Errorf(
+			"Incorrect Log Topic (%v, expected %v)",
+			logTopic,
+			uniswapV3SwapLogTopic,
+		)
 	}
 
 	unpacked, err := uniswapV3PairAbi.Unpack("Swap", transfer.Log.Data)

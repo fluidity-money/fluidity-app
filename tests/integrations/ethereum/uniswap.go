@@ -60,15 +60,15 @@ const integrationTestUniswapV3 = `
       "application": 1
     },
     "transaction": {
-    "to": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
-    "from": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
-    "hash": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6"
+      "to": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
+      "from": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
+      "hash": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6"
     },
     "expected_sender": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
-    "expected_recipient": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
-    "expected_fees": "7099301083/999000000",
+    "expected_recipient": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
+    "expected_fees": "7099301084/9999000000",
     "expected_emission": {
-      "uniswap_v3": 7.1064076
+      "uniswap_v3": 0.7100011085108511
     },
     "rpc_methods": {
       "eth_getCode": "0x0"

@@ -16,7 +16,7 @@ const integrationTestDopex = `
           "0xd6d34547c69c5ee3d2667625c188acf1006abb93e0ee7cf03925c67cf7760413"
         ]
       },
-      "application": 12
+      "application": 13
     },
     "transaction": {
       "to": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
@@ -44,7 +44,7 @@ const integrationTestDopex = `
           "0xd6d34547c69c5ee3d2667625c188acf1006abb93e0ee7cf03925c67cf7760413"
         ]
       },
-      "application": 12
+      "application": 13
     },
     "transaction": {
       "to": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",
@@ -72,7 +72,7 @@ const integrationTestDopex = `
           "0xd6d34547c69c5ee3d2667625c188acf1006abb93e0ee7cf03925c67cf7760413"
         ]
       },
-      "application": 12
+      "application": 13
     },
     "transaction": {
       "to": "0xD62707f513F4B472d0BaDd922D74c49e06d9e7c7",

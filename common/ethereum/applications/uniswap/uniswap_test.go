@@ -50,7 +50,7 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	// fails without proper rpc responses
 	transfer.Log.Data = *dataBlob
 	transfer.Log.Topics = []ethereum.Hash{
-		ethereum.HashFromString(uniswapSwapLogTopic),
+		ethereum.HashFromString(uniswapV2SwapLogTopic),
 	}
 	fees, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
@@ -137,7 +137,7 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	// fails without proper rpc responses
 	transfer.Log.Data = *dataBlob
 	transfer.Log.Topics = []ethereum.Hash{
-		ethereum.HashFromString(uniswapSwapLogTopic),
+		ethereum.HashFromString(uniswapV3SwapLogTopic),
 	}
 	fees, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
