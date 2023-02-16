@@ -71,7 +71,7 @@ const useAssetStatistics = async (
   tokenName: string,
   userAddress: string
 ) => {
-  if (network !== "ethereum") {
+  if (network !== "ethereum" && network !== "arbitrum") {
     throw Error(`network ${network} not supported`);
   }
 

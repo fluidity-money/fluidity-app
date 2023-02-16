@@ -28,14 +28,16 @@ const networkMapper = (network: string) => {
       return "ethereum";
     case "SOL":
       return "solana";
-    case "ethereum":
-      return "ETH";
     case "ARB":
       return "arbitrum";
+    case "ethereum":
+      return "ETH";
+    case "solana":
+      return "SOL";
     case "arbitrum":
       return "ARB";
     default:
-      return "SOL";
+      return "ETH";
   }
 };
 

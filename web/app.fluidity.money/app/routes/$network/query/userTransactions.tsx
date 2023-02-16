@@ -250,7 +250,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         timestamp: tx.timestamp,
         logo: tokenLogoMap[tx.currency] || defaultLogo,
         provider:
-          (network === "ethereum"
+          (network === "ethereum" || network === "arbitrum"
             ? !isFromPendingWin
               ? (winner as Winner)?.ethereum_application
               : (winner as Winner)?.solana_application
