@@ -1,8 +1,8 @@
-import { getTokenFromSymbol, Token } from "~/util/chainUtils/tokens";
+import { Token } from "~/util/chainUtils/tokens";
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
-import { useLoaderData, Link, useParams, useSearchParams } from "@remix-run/react";
+import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
 import BN from "bn.js";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import { debounce, DebouncedFunc } from "lodash";
