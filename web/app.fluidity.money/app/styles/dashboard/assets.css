@@ -1,3 +1,37 @@
+.assets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3em;
+}
+
+.assets-active-filter {
+  font-weight: 700;
+}
+
+.assets-active-filter-underline {
+  height: 2px;
+  width: 100%;
+  background-color: white;
+  margin-top: 0.5em;
+}
+
+.assets-navigation {
+  display: flex;
+  gap: 1em;
+}
+
+.assets-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.assets-balance > h1 {
+  margin: 0;
+  margin-bottom: -0.2em;
+}
+
 #user-rewards {
   width: auto;
   padding: 2em;

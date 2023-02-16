@@ -228,11 +228,12 @@ function App() {
     }
   }, [location, GTAG_ID]);
 
-  const [cookieConsent, setCookieConsent] = useState(true);
+  const [activatedCookieConsent, setActivatedCookieConsent] = useState(true);
   useEffect(() => {
     const _cookieConsent = localStorage.getItem("cookieConsent");
+
     if (!_cookieConsent) {
-      setCookieConsent(false);
+      setActivatedCookieConsent(false);
     }
   }, []);
 
@@ -324,12 +325,13 @@ function App() {
           </noscript>
         )}
         <CookieConsent
-          activated={cookieConsent}
+          activated={activatedCookieConsent}
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
           callback={() => {
-            setCookieConsent(true);
+            localStorage.setItem("cookieConsent", "true");
+            setActivatedCookieConsent(true);
           }}
         />
         <CacheProvider sha={gitSha}>

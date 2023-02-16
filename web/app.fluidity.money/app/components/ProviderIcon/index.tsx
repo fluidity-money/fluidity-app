@@ -1,6 +1,5 @@
-import { useLoaderData } from "@remix-run/react";
+import { useCache } from "~/hooks/useCache";
 import { Application } from "~/queries/useApplicationRewardStatistics";
-import config from "~/webapp.config.server";
 
 export type Providers =
   | "Aave"
@@ -61,13 +60,13 @@ type IProviderIcon = {
   provider: Providers;
 };
 
-type LoaderData = {
-  icons: typeof config.provider_icons;
-};
+type Icons = { [K in Providers]: string };
 
 const ProviderIcon = ({ provider }: IProviderIcon) => {
-  const { icons } = useLoaderData<LoaderData>();
-  return <img className="provider-img" src={icons[provider]} alt="" />;
+  const { data: icons } = useCache<Icons>("/query/providermeta");
+  const icon = (icons && icons[provider]) || "/images/logoMetallic.png";
+
+  return <img className="provider-img" src={icon} alt={provider} />;
 };
 
 export default ProviderIcon;

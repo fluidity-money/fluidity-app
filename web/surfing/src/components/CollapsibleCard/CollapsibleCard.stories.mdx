@@ -1,0 +1,110 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+import CollapsibleCard from "./";
+import { TokenDetails, TokenCard } from "../";
+
+<Meta title="Container/CollapsibleCard" component={CollapsibleCard} />
+
+export const FluidTemplate = () => {
+  return (
+    <>
+      <CollapsibleCard
+        expanded
+        type="gray"
+      >
+        <CollapsibleCard.Summary>
+          <TokenCard 
+            isFluid
+            showLabels
+            token={{
+              symbol: 'fUSDC',
+              name: 'Fluid USD Coin',
+              logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04068DA6C83AFCFA0e13ba15A6696662335D5B75/logo.png',
+              address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75',
+              decimals: 6,
+              colour: '#fff'
+            }}
+            fluidAmt={2100}
+            regAmt={234}
+            value={1.00}
+          />
+        </CollapsibleCard.Summary>
+        <CollapsibleCard.Details>
+          <TokenDetails 
+              topPrize={{
+                winning_amount: 0.69,
+                transaction_hash: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f'
+              }}
+              avgPrize={0.42}
+              topAssetPrize={{
+                winning_amount: 5.12,
+                transaction_hash: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f'
+              }}
+              activity={[{
+                desc: 'Sent',
+                value: 420,
+                reward: 0.53,
+                transaction: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f',
+                totalWalletValue: 0,
+              },
+              {
+                desc: 'Received',
+                value: 220,
+                reward: 16.18,
+                transaction: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f',
+                totalWalletValue: 5,
+              },
+              {
+                desc: 'Sent',
+                value: 820,
+                reward: 0.00,
+                transaction: '0x5a6ba27d838915d141f5c685284233445f258139e57e6345e2780dacfef5d94f',
+                totalWalletValue: 15,
+              }]}
+            />
+        </CollapsibleCard.Details>
+      </CollapsibleCard>
+    </>
+  )
+}
+
+export const RegularTemplate = () => {
+  return (
+    <>
+      <CollapsibleCard
+        type="box"
+      >
+        <CollapsibleCard.Summary>
+          <TokenCard 
+            showLabels
+            token={{
+              symbol: 'USDC',
+              name: 'USD Coin',
+              logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04068DA6C83AFCFA0e13ba15A6696662335D5B75/logo.png',
+              address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75',
+              decimals: 6,
+              colour: '#fff'
+            }}
+            fluidAmt={2100}
+            regAmt={234}
+            value={1.00}
+          />
+        </CollapsibleCard.Summary>
+      </CollapsibleCard>
+    </>
+    )
+}
+
+<Canvas columns={1}  withSource="open" withToolbar>
+  <Title>Data Table</Title>
+  <Subtitle>Table to show logs</Subtitle>
+  <Story
+    name="Fluid Asset"
+  >
+    {FluidTemplate.bind({})}
+  </Story>
+  <Story
+    name="Regular Asset"
+  >
+    {RegularTemplate.bind({})}
+  </Story>
+</Canvas>
