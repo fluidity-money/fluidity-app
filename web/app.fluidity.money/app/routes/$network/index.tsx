@@ -89,6 +89,10 @@ const NetworkPage = () => {
       name: "ETH",
       icon: <img src="/assets/chains/ethIcon.svg" />,
     },
+    arbitrum: {
+      name: "ARB",
+      icon: <img src="/assets/chains/arbIcon.svg" />,
+    },
     solana: {
       name: "SOL",
       icon: <img src="/assets/chains/solanaIcon.svg" />,

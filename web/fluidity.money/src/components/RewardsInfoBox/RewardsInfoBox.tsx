@@ -42,25 +42,19 @@ const RewardsInfoBox = ({
   const imgLink = (opt: string) =>
     opt === "ETH"
       ? "/assets/images/chainIcons/ethIcon.svg"
-      : "/assets/images/chainIcons/solanaIcon.svg";
+    : opt === "SOL"
+    ? "/assets/images/chainIcons/solanaIcon.svg"
+    : "/assets/images/chainIcons/arbIcon.svg";
 
   const [showModal, setShowModal] = useState(false);
 
   const { width } = useViewport();
   const mobileBreakpoint = 620;
 
-  const chainOptions = showExperiment("enable-arbitrum")
-    ? Object.keys(SupportedChains)
-      .map((chain) => ({
-        name: chain,
-        icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-      }))
-    : Object.keys(SupportedChains)
-      .filter(chain => chain !== "ARB")
-      .map(chain => ({
-        name: chain,
-        icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-      }))
+  const chainOptions = Object.keys(SupportedChains).map((chain) => ({
+    name: chain,
+    icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+  }))
 
   const [prizePool, setPrizePool] = useState<number>(0);
 

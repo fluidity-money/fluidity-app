@@ -9,6 +9,8 @@
 | `FLU_ETH_RPC_WS`        | URI to subscribe to ETH transactions                      |
 | `FLU_SOL_RPC_HTTP`      | URI to fetch SOL transactions                             |
 | `FLU_SOL_RPC_WS`        | URI to subscribe to SOL transactions                      |
+| `FLU_ARB_RPC_HTTP`      | URI to fetch ARB transactions                             |
+| `FLU_ARB_RPC_WS`        | URI to subscribe to ARB transactions                      |
 | `FLU_HASURA_RPC_HTTP`   | URI to fetch winners data from db (hasura interface)      |
 | `FLU_HASURA_RPC_WS`     | URI to subscribe to winners data on db (hasura interface) |
 | `FLU_HASURA_SECRET`     | Hasura admin secret used in client headers for RPC calls  |
