@@ -23,7 +23,8 @@ export let contracts: typeof commonContracts & {
     deployedPool: ethers.Contract,
   },
   rewardPools: ethers.Contract,
-  ethConvertor: ethers.Contract
+  ethConvertor: ethers.Contract,
+  registry: ethers.Contract
 };
 
 export let bindings: typeof commonBindings & {
@@ -52,6 +53,9 @@ export let bindings: typeof commonBindings & {
     operator: ethers.Contract,
   },
   ethConvertor: {
+    operator: ethers.Contract
+  },
+  registry: {
     operator: ethers.Contract
   }
 };

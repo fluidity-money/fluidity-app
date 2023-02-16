@@ -27,7 +27,8 @@ enum ProposalStatus {
 }
 
 struct Proposal {
-    /// @notice targetContract to delegateCall to
+    /// @notice targetContract to delegateCall to, if it's set to address(0)
+    ///         it's been executed
     address targetContract;
 
     /// @notice ratificationTs to use as the timestamp of when voting finished
@@ -59,21 +60,32 @@ struct Proposal {
  */
 contract DAO {
 
-    event VoteCreated(bytes20 indexed ipfsHash);
+    event VoteCreated(bytes32 indexed proposalId);
 
-    event VoteExecuted(bytes20 indexed ipfsHash);
+    event VoteExecuted(bytes32 indexed proposalId);
 
-    event VotedFor(bytes20 indexed ipfsHash, address sender, uint256 amount);
+    event VotedFor(
+        bytes32 indexed proposalId,
+        address sender,
+        uint256 amount
+    );
 
-    event VotedAgainst(bytes20 indexed ipfsHash, address sender, uint256 amount);
+    event VotedAgainst(
+        bytes32 indexed proposalId,
+        address sender,
+        uint256 amount
+    );
 
-    uint8 version_;
+    event ProposalCreated(bytes ipfsHash, bytes32 proposalId);
 
     VEGovLockup lockupSource_;
 
     address emergencyCouncil_;
 
-    mapping(bytes20 => Proposal) proposals_;
+    mapping(bytes32 => Proposal) proposals_;
+
+    /// @dev nonces_ of user submissions per sender
+    mapping(address => uint256) nonces_;
 
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
@@ -82,61 +94,112 @@ contract DAO {
         address _emergencyCouncil,
         VEGovLockup _lockupSource
     ) {
-        require(version_ == 0, "contract is already initialised");
-        version_ = 1;
         emergencyCouncil_ = _emergencyCouncil;
         lockupSource_ = _lockupSource;
     }
 
-    function getRatificationTs(bytes20 _ipfsHash) public view returns (uint256) {
-        return proposals_[_ipfsHash].ratificationTs;
+    function getRatificationTs(bytes32 _proposalId) public view returns (uint256) {
+        return proposals_[_proposalId].ratificationTs;
     }
 
-    function getProposalExists(bytes20 _ipfsHash) public view returns (bool) {
-        return getRatificationTs(_ipfsHash) == 0;
+    function getProposalExists(bytes32 _proposalId) public view returns (bool) {
+        return getRatificationTs(_proposalId) == 0;
     }
 
     function getAmountAlreadyVoted(
-        bytes20 _ipfsHash,
+        bytes32 _proposalId,
         address _spender
     )
         public view returns (uint256)
     {
-      return proposals_[_ipfsHash].votes[_spender];
+      return proposals_[_proposalId].votes[_spender];
     }
 
-    function _voteFor(address _sender, bytes20 _ipfsHash, uint256 _amount) internal {
-        proposals_[_ipfsHash].votesFor += _amount;
-        emit VotedFor(_ipfsHash, _sender, _amount);
+    /**
+     * @notice _voteFor a proposal, recording the votes the user voted
+     *         and the votes for
+     *
+     * @param _sender that voted for the proposal
+     * @param _proposalId to address the proposal with
+     * @param _amount to record for the votes and to add that the user voted
+     */
+    function _voteFor(address _sender, bytes32 _proposalId, uint256 _amount) internal {
+        proposals_[_proposalId].votesFor += _amount;
+        proposals_[_proposalId].votes[_sender] += _amount;
+        emit VotedFor(_proposalId, _sender, _amount);
     }
 
-    function _voteAgainst(address _sender, bytes20 _ipfsHash, uint256 _amount) internal {
-        proposals_[_ipfsHash].votesAgainst += _amount;
-        emit VotedAgainst(_ipfsHash, _sender, _amount);
+    /**
+     * @notice _voteAgainst r a proposal, recording the votes the user voted
+     *         and the votes for
+     *
+     * @param _sender that voted for the proposal
+     * @param _proposalId to address the proposal with
+     * @param _amount to record for the votes and to add that the user voted
+     */
+     function _voteAgainst(
+         address _sender,
+         bytes32 _proposalId,
+         uint256 _amount
+     ) internal {
+         proposals_[_proposalId].votesAgainst += _amount;
+         proposals_[_proposalId].votes[_sender] += _amount;
+         emit VotedAgainst(_proposalId, _sender, _amount);
     }
 
-    /// @notice createProposal for the epoch of 100 blocks,
-    /// @dev _target contract address to execute the calldata on
-    /// @dev _calldata to execute once the period has passed and the
-    ///      vote has succeeded
-    ///
-    /// the null address is used more than once to check for prior
-    /// execution, and should not be used to create a contract
+    function incrementSenderNonce(address _sender) internal {
+        nonces_[_sender]++;
+    }
+
+    /**
+     * @notice newProposalId is a concatenation of the inputs to the
+     *         proposal
+     */
+    function newProposalId(
+        bytes memory _ipfsHash,
+        address _target,
+        bool _isDelegateCall,
+        bytes calldata _calldata
+    ) internal pure returns (bytes32) {
+        return keccak256(bytes.concat(abi.encode(
+            _ipfsHash,
+            _target,
+            _isDelegateCall,
+            _calldata
+        )));
+    }
+
+    /**
+     * @notice createProposal with the inputs given
+     * @param _target contract address to execute the calldata on
+     * @param _calldata to execute once the period has passed and the vote
+     *        has succeeded
+     *
+     * @dev the null address is used more than once to check for prior
+            execution, and should not be used to create a contract
+     */
     function createProposal(
-        bytes20 _ipfsHash,
+        bytes calldata _ipfsHash,
         address _target,
         uint256 _forAmount,
         uint256 _againstAmount,
         bool _isDelegateCall,
         bytes calldata _calldata
-    )
-        public
-    {
+    ) public {
         require(_target != address(0), "null address");
 
-        Proposal storage proposal = proposals_[_ipfsHash];
+        bytes32 proposalId = newProposalId(
+            _ipfsHash,
+            _target,
+            _isDelegateCall,
+            _calldata
+        );
 
-        require(!getProposalExists(_ipfsHash), "proposal already exists");
+        Proposal storage proposal = proposals_[proposalId];
+
+        emit ProposalCreated(_ipfsHash, proposalId);
+
+        require(!getProposalExists(proposalId), "proposal already exists");
 
         proposal.ratificationTs = block.timestamp + DEFAULT_VOTE_BLOCK_TIME;
         proposal.targetContract = _target;
@@ -144,54 +207,67 @@ contract DAO {
         proposal.data = _calldata;
 
         if (_forAmount > 0)
-            _voteFor(msg.sender, _ipfsHash, _forAmount);
+            voteFor(proposalId, _forAmount);
 
         if (_againstAmount > 0)
-            _voteAgainst(msg.sender, _ipfsHash, _againstAmount);
+            voteAgainst(proposalId, _againstAmount);
     }
 
-    function getProposalKilled(bytes20 _ipfsHash) public view returns (bool) {
-        return proposals_[_ipfsHash].killed;
+    function getProposalKilled(bytes32 _proposalId) public view returns (bool) {
+        return proposals_[_proposalId].killed;
     }
 
-    function getProposalVotingOver(bytes20 _ipfsHash) public view returns (bool) {
-        return getRatificationTs(_ipfsHash) > block.timestamp;
+    function getProposalVotingOver(bytes32 _proposalId) public view returns (bool) {
+        return getRatificationTs(_proposalId) < block.timestamp;
     }
 
-    function getProposalVoteable(bytes20 _ipfsHash) public view returns (bool) {
-        return !getProposalVotingOver(_ipfsHash);
+    function getProposalVoteable(bytes32 _proposalId) public view returns (bool) {
+        return !getProposalVotingOver(_proposalId);
     }
 
-    function getProposalFrozenPeriodOver(bytes20 _ipfsHash) public view returns (bool) {
-        uint256 ts = getRatificationTs(_ipfsHash);
+    /**
+     * @notice getProposalFrozenPeriodOver if the time that the
+     *         proposal was set to expire + the frozen period exceeds the current
+     *         timestamp
+     *
+     * @param _proposalId to check the condition for
+     */
+    function getProposalFrozenPeriodOver(bytes32 _proposalId) public view returns (bool) {
+        // getRatificationTs returns the timestamp that the proposal was
+        // submitted for + the voting period
+        uint256 ts = getRatificationTs(_proposalId);
+
+        // if the ratification period + the time for the voting has passed + the
+        // frozen period, this would return true
+
         return ts > block.timestamp + DEFAULT_FROZEN_TIME;
     }
 
-    function getProposalExecuted(bytes20 _ipfsHash) public view returns (bool) {
-        return proposals_[_ipfsHash].targetContract == address(0);
+    function getProposalExecuted(bytes32 _proposalId) public view returns (bool) {
+        return proposals_[_proposalId].targetContract == address(0);
     }
 
     /// @notice getProposalPassing check if the proposal has enough votes
     ///         to pass
-    function getProposalPassing(bytes20 _ipfsHash) public view returns (bool) {
-        return proposals_[_ipfsHash].votesFor > proposals_[_ipfsHash].votesAgainst;
+    function getProposalPassing(bytes32 _proposalId) public view returns (bool) {
+        return proposals_[_proposalId].votesFor > proposals_[_proposalId].votesAgainst;
     }
 
-    function getProposalStatus(bytes20 _ipfsHash) public view returns (ProposalStatus) {
+    function getProposalStatus(bytes32 _proposalId) public view returns (ProposalStatus) {
         // was the proposal killed?
-        bool proposalKilled = getProposalKilled(_ipfsHash);
+        bool proposalKilled = getProposalKilled(_proposalId);
 
         // is the period of voting over?
-        bool proposalVotingOver = getProposalVotingOver(_ipfsHash);
+        bool proposalVotingOver = getProposalVotingOver(_proposalId);
 
         // is the period where the proposal is frozen over?
-        bool proposalFrozenPeriodOver = getProposalFrozenPeriodOver(_ipfsHash);
+        bool proposalFrozenPeriodOver = getProposalFrozenPeriodOver(_proposalId);
 
         // is the proposal passing?
-        bool proposalPassing = getProposalPassing(_ipfsHash);
+        bool proposalPassing = getProposalPassing(_proposalId);
 
         // has the proposal already been executed?
-        bool proposalExecuted = getProposalExecuted(_ipfsHash);
+        bool proposalExecuted = getProposalExecuted(_proposalId);
 
         if (proposalKilled) return ProposalStatus.KILLED;
 
@@ -222,24 +298,24 @@ contract DAO {
         return ProposalStatus.UNFINISHED;
     }
 
-    function getProposalReadyToExecute(bytes20 _ipfsHash) public view returns (bool) {
-        return getProposalStatus(_ipfsHash) == ProposalStatus.SUCCEEDED;
+    function getProposalReadyToExecute(bytes32 _proposalId) public view returns (bool) {
+        return getProposalStatus(_proposalId) == ProposalStatus.SUCCEEDED;
     }
 
-    function getProposalFailed(bytes20 _ipfsHash) public view returns (bool) {
-        return getProposalStatus(_ipfsHash) == ProposalStatus.FAILED;
+    function getProposalFailed(bytes32 _proposalId) public view returns (bool) {
+        return getProposalStatus(_proposalId) == ProposalStatus.FAILED;
     }
 
     /// @notice getAmountUserCanVote based on what's been voted so far
     ///         and the balance the user has based on the decay
     function getAmountUserCanVote(
-        bytes20 _ipfsHash,
+        bytes32 _proposalId,
         address _spender,
         uint256 _amount
     )
         public view returns (uint256)
     {
-        uint256 spent = proposals_[_ipfsHash].votes[_spender];
+        uint256 spent = proposals_[_proposalId].votes[_spender];
 
         uint256 available = lockupSource_.balanceOf(_spender);
 
@@ -254,13 +330,15 @@ contract DAO {
         return available > _amount ? available : _amount;
     }
 
-    function killProposal(bytes20 _ipfsHash) public {
+    function killProposal(bytes32 _proposalId) public {
         require(
             msg.sender == emergencyCouncil_,
             "only emergency council can use this"
         );
 
-        proposals_[_ipfsHash].killed = true;
+        require(!getProposalExecuted(_proposalId), "already executed");
+
+        proposals_[_proposalId].killed = true;
     }
 
     /// @notice voteFor the Vote given for the amount given, increasing
@@ -268,40 +346,40 @@ contract DAO {
     /// @dev _vote to vote for
     /// @dev _amount to use of the governance token that should be
     ///      locked up for the vote
-    function voteFor(bytes20 _ipfsHash, uint256 _amount) public {
-        require(getProposalExists(_ipfsHash), "proposal does not exist");
-        require(getProposalVoteable(_ipfsHash), "proposal frozen");
+    function voteFor(bytes32 _proposalId, uint256 _amount) public {
+        require(getProposalExists(_proposalId), "proposal does not exist");
+        require(getProposalVoteable(_proposalId), "proposal frozen");
 
         require(
-          getAmountUserCanVote(_ipfsHash, msg.sender, _amount) <= _amount,
+          getAmountUserCanVote(_proposalId, msg.sender, _amount) <= _amount,
           "user trying to vote more they can"
         );
 
-        _voteFor(msg.sender, _ipfsHash, _amount);
+        _voteFor(msg.sender, _proposalId, _amount);
     }
 
     /// @notice voteAgainst the Vote given for the amount, reducing the
     ///         amount for it stored in the contract
     /// @dev _vote to provide the vote for
-    function voteAgainst(bytes20 _ipfsHash, uint256 _amount) public {
-        require(getProposalExists(_ipfsHash), "proposal does not exist");
-        require(getProposalVoteable(_ipfsHash), "proposal frozen");
+    function voteAgainst(bytes32 _proposalId, uint256 _amount) public {
+        require(getProposalExists(_proposalId), "proposal does not exist");
+        require(getProposalVoteable(_proposalId), "proposal frozen");
 
         require(
-          getAmountUserCanVote(_ipfsHash, msg.sender, _amount) <= _amount,
+          getAmountUserCanVote(_proposalId, msg.sender, _amount) <= _amount,
           "user trying to vote more they can"
         );
 
-        _voteAgainst(msg.sender, _ipfsHash, _amount);
+        _voteAgainst(msg.sender, _proposalId, _amount);
     }
 
     /// @notice execute calldata at a contract target, following a Proposal
     ///         that's been proposed and ratified
     /// @dev _vote to execute once it follows the requirement
-    function executeProposal(bytes20 _ipfsHash) public {
-        require(getProposalReadyToExecute(_ipfsHash), "proposal can't execute");
+    function executeProposal(bytes32 _proposalId) public {
+        require(getProposalReadyToExecute(_proposalId), "proposal can't execute");
 
-        Proposal storage proposal = proposals_[_ipfsHash];
+        Proposal storage proposal = proposals_[_proposalId];
 
         bool rc;
         bytes memory returnData;

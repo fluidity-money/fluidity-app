@@ -15,13 +15,11 @@ import "./Token.sol";
  * given address
  */
 contract ConvertorEthToToken {
-    Token tokenAddress_;
+    Token public tokenAddress_;
 
-    address payable wethAddress_;
+    address payable public wethAddress_;
 
     constructor(Token _tokenAddress, IWETH _wethAddress) {
-        require(wethAddress_ == address(0), "already initialised");
-
         tokenAddress_ = _tokenAddress;
         wethAddress_ = payable(address(_wethAddress));
     }
@@ -33,9 +31,9 @@ contract ConvertorEthToToken {
     }
 
     function unwrapEth(uint256 _amount) public {
-    	tokenAddress_.transferFrom(msg.sender, address(this), _amount);
-    	tokenAddress_.erc20Out(_amount);
-    	IWETH(wethAddress_).withdraw(_amount);
-    	payable(msg.sender).transfer(_amount);
+        tokenAddress_.transferFrom(msg.sender, address(this), _amount);
+        tokenAddress_.erc20Out(_amount);
+        IWETH(wethAddress_).withdraw(_amount);
+        payable(msg.sender).transfer(_amount);
     }
 }

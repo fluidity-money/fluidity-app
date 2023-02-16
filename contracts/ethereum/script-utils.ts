@@ -66,12 +66,14 @@ export const deployOperator = async (
   hre: HardhatRuntimeEnvironment,
   externalOperator: ethers.Signer,
   council: ethers.Signer,
+  registry: ethers.Signer
 ): Promise<ethers.Contract> => {
   return deployAndInit(
     hre,
     "Operator",
     await externalOperator.getAddress(),
     await council.getAddress(),
+    await registry.getAddress()
   )
 };
 
@@ -83,9 +85,10 @@ export const deployGovToken = async (
     .connect(govOperatorSigner);
 
   const govToken = await factory.deploy();
+
   await govToken.deployed();
 
-  await govToken.initialise(
+  await govToken["init(string,string,uint8,uint256)"](
     "Fluidity Money",
     "FLUID",
     18,

@@ -27,17 +27,17 @@ struct Lockup {
 }
 
 contract VEGovLockup is IEmergencyMode {
-    uint8 version_;
+    uint8 private version_;
 
-    address operator_;
+    address private operator_;
 
-    address emergencyCouncil_;
+    address private emergencyCouncil_;
 
-    bool noEmergencyMode_;
+    bool private noEmergencyMode_;
 
-    IERC20 balancerPoolToken_;
+    IERC20 private balancerPoolToken_;
 
-    mapping(address => Lockup[]) lockups_;
+    mapping(address => Lockup[]) private lockups_;
 
     function init(
         address _operator,
@@ -51,10 +51,18 @@ contract VEGovLockup is IEmergencyMode {
         operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
         balancerPoolToken_ = _balancerPoolToken;
+
+        noEmergencyMode_ = true;
+
+        version_ = 1;
     }
 
     function operator() public view returns (address) {
         return operator_;
+    }
+
+    function balancerPoolToken() public view returns (IERC20) {
+        return balancerPoolToken_;
     }
 
     function operatorOrEmergencyCouncil() public view returns (bool) {
@@ -92,15 +100,6 @@ contract VEGovLockup is IEmergencyMode {
         lockups_[_spender].push(lockup);
     }
 
-    function daysSinceLocked(
-        uint256 _lockTime,
-        uint256 _currentTime
-    )
-        public pure returns (uint256)
-    {
-        return _lockTime - _currentTime;
-    }
-
     function currentVEGovAmount(
         uint256 _lockLength,
         uint256 _lockTime,
@@ -109,7 +108,7 @@ contract VEGovLockup is IEmergencyMode {
     )
         public pure returns (uint256)
     {
-        uint256 currentLockLength = _lockLength - daysSinceLocked(_lockTime, _currentTime);
+        uint256 currentLockLength = _lockLength - _lockTime -_currentTime;
         return calcGovToVEGov(_tokenAmount, currentLockLength, MAX_LOCKUP_TIME);
     }
 

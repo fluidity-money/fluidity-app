@@ -9,14 +9,20 @@ import "./BaseNativeToken.sol";
 // init here
 
 contract GovToken is BaseNativeToken {
-    function initialise(
+    uint8 private version_;
+
+    function init(
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _totalSupply
     ) public {
+        require(version_ == 0, "already initialised");
+
         super.init(_name, _symbol, _decimals);
         _mint(msg.sender, _totalSupply);
+
+        version_ = 1;
     }
 
     function burn(uint256 _amount) public {

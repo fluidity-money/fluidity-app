@@ -3,38 +3,68 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
+import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+
 import "./IToken.sol";
 import "./ILiquidityProvider.sol";
 import "./IToken.sol";
 import "./IRegistry.sol";
 
-import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import "./TrfVariables.sol";
+
+struct FluidityClientChange {
+    string name;
+    bool overwrite;
+    address token;
+    IFluidClient client;
+}
+
+/// @dev return type from getUtilityVars
+struct ScannedUtilityVars {
+    UtilityVars vars;
+    string name;
+}
 
 contract Registry is IRegistry {
 
-    // @dev RegistrationType is a uint8 in practice, so it can be updated
-    // with a contract upgrade if the ABI changes
-    event RegistrationMade(RegistrationType type_, address indexed addr);
+    /// @dev RegistrationType is a uint8 in practice, so it can be updated
+    /// with a contract upgrade if the ABI changes
+    event RegistrationMade(uint8 type_, address indexed addr);
 
-    uint8 version_;
+    /// @notice emitted when a fluidity client is updated
+    event FluidityClientChanged(
+        address indexed token,
+        string indexed name,
+        address oldClient,
+        address newClient
+    );
 
-    address operator_;
+    uint8 private version_;
+
+    /**
+    * @dev operator_ able to access the permissioned functions on this
+    * Registry (note: not Operator)
+    */
+    address private operator_;
 
     /// @notice tokenBeacon_ to be used as a helpful guide for the DAO
-    IBeacon tokenBeacon_;
+    IBeacon public tokenBeacon_;
 
     /// @notice liquidityProviderBeacon_ as a helpful guide for the DAO
-    IBeacon liquidityProviderBeacon_;
+    IBeacon public liquidityProviderBeacon_;
 
-    Registration[] registrations_;
+    Registration[] private registrations_;
+
+    /// @dev token => utility name => fluid client
+    mapping(address => mapping(string => IFluidClient)) private fluidityClients_;
+
+    mapping(address => TrfVariables) private trfVariables_;
 
     function init(
         address _operator,
         IBeacon _tokenBeacon,
         IBeacon _liquidityProviderBeacon
-    )
-        public
-    {
+    ) public {
         require(version_ == 0, "already initialised");
 
         operator_ = _operator;
@@ -48,7 +78,7 @@ contract Registry is IRegistry {
         return operator_ == address(0) || msg.sender == operator_;
     }
 
-    function register(RegistrationType _type, address _contract) public {
+    function register(uint8 _type, address _contract) public {
         require(operatorNotRequiredOrIsOperator(), "not allowed");
 
         registrations_.push(Registration({
@@ -61,5 +91,101 @@ contract Registry is IRegistry {
 
     function registrations() public view returns (Registration[] memory) {
         return registrations_;
+    }
+
+    /// @inheritdoc IRegistry
+    function getRewardPools() public returns (RewardPool[] memory rewardPool) {
+
+        // set the length to half the registrations, since presumably they're
+        // all "Token" then "Registration" for each (push if we run out...
+        // for... gas - if someone uses this who's not the frontend)
+        rewardPool = new RewardPool[](registrations_.length / 2);
+
+        for (uint i = 0; i < registrations_.length; i++) {
+            Registration storage registration = registrations_[i];
+
+            if (registration.type_ != RegistrationTypeToken) continue;
+
+            IToken token = IToken(registration.addr);
+
+            RewardPool memory pool;
+
+            pool.amount = token.rewardPoolAmount();
+            pool.decimals = token.decimals();
+
+            rewardPool[i] = pool;
+        }
+    }
+
+    function getFluidityClient(
+        address _token,
+        string memory _clientName
+    ) public view returns (IFluidClient) {
+        return fluidityClients_[_token][_clientName];
+    }
+
+    function updateUtilityClients(FluidityClientChange[] memory _clients) public {
+        require(msg.sender == operator_, "only the operator account can use this");
+
+        for (uint i = 0; i < _clients.length; i++) {
+            FluidityClientChange memory change = _clients[i];
+
+            address oldClient = address(getFluidityClient(change.token, change.name));
+
+            // either the old client must be unset (setting a completely new client)
+            // or the overwrite option must be set
+
+            require(
+                oldClient == address(0) || change.overwrite,
+                "trying to overwrite a client without the overwrite option set!"
+            );
+
+            fluidityClients_[change.token][change.name] = change.client;
+
+            emit FluidityClientChanged(
+                change.token,
+                change.name,
+                oldClient,
+                address(change.client)
+            );
+        }
+    }
+
+    /// @notice update the trf variables for a specific token
+    function updateTrfVariables(address _token, TrfVariables calldata _trf) public {
+        require(msg.sender == operator_, "only operator account can use this");
+
+        trfVariables_[_token] = _trf;
+    }
+
+    function getTrfVariables(address _token) public view returns (TrfVariables memory) {
+        return trfVariables_[_token];
+    }
+
+    /**
+     * @notice fetches utility vars for several contracts by name
+     * @param _token the token for which to fetch utilities
+     * @param _names the list of names of utilities to fetch for
+     *
+     * @return an array of utility vars
+     */
+    function getUtilityVars(
+        address _token,
+        string[] memory _names
+    ) public returns (ScannedUtilityVars[] memory) {
+        ScannedUtilityVars[] memory vars = new ScannedUtilityVars[](_names.length);
+
+        for (uint i = 0; i < _names.length; i++) {
+            string memory name = _names[i];
+
+            vars[i].name = name;
+
+            IFluidClient utility = fluidityClients_[_token][name];
+
+            // reverts if utility == 0 !
+            vars[i].vars = utility.getUtilityVars();
+        }
+
+        return vars;
     }
 }

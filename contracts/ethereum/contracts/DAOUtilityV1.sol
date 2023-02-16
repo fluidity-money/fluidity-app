@@ -24,26 +24,61 @@ import "./IEmergencyMode.sol";
 
 import "./IRegistry.sol";
 
-import "./TrfVariables.sol";
+import { Token } from "./Token.sol";
+
+import "./IToken.sol";
+
+import { TrfVariables } from "./TrfVariables.sol";
+
 import "./Operator.sol";
 
+import "./CompoundLiquidityProvider.sol";
+
+import "./AaveV2LiquidityProvider.sol";
+
+import "./AaveV3LiquidityProvider.sol";
+
 /// @dev selector for the token's init function
-bytes4 constant TOKEN_INIT_SELECTOR =
-  bytes4(keccak256("init(address,uint8,string,string,address,address,address)"));
+bytes4 constant TOKEN_INIT_SELECTOR = Token.init.selector;
 
 /// @dev selector for compound's liquidity provider init function
 bytes4 constant LIQUIDITY_PROVIDER_COMPOUND_INIT_SELECTOR =
-  bytes4(keccak256("init(address,address)"));
+    CompoundLiquidityProvider.init.selector;
 
 /// @dev selector for aave v2's liquidity provider init function
 /// @dev
 bytes4 constant LIQUIDITY_PROVIDER_AAVEV2_INIT_SELECTOR =
-  bytes4(keccak256("init(address,address,address)"));
+    AaveV2LiquidityProvider.init.selector;
 
 /// @dev selector for aave v3's liquidity provider init function
 /// @dev keccak(init(address,address,address))
-bytes4 constant LIQUIDITY_PROVIDER_AAVEV3_INIT_SELECTOR = bytes4(keccak256("init(address,address,address)"));
+bytes4 constant LIQUIDITY_PROVIDER_AAVEV3_INIT_SELECTOR =
+    AaveV3LiquidityProvider.init.selector;
 
+/// @dev TokenCreationArguments for when running out of stack space
+struct TokenCreationArguments {
+    ILiquidityProvider liquidityProvider;
+    string fluidTokenName;
+    string fluidSymbol;
+    address emergencyCouncil;
+    address oracle;
+    uint8 decimals;
+}
+
+struct CompoundLiquidityProviderCreationArguments {
+    CErc20Interface cToken;
+    IRegistry registry;
+}
+
+struct AaveV2LiquidityProviderCreationArguments {
+    AaveV2LendingPoolAddressesProviderInterface addressProvider;
+    IAToken aToken;
+}
+
+struct AaveV3LiquidityProviderCreationArguments {
+    AaveV3PoolAddressesProviderInterface addressProvider;
+    IAToken aToken;
+}
 
 contract DAOUtilityV1 {
 
@@ -88,174 +123,71 @@ contract DAOUtilityV1 {
 
     /**
      * @notice deployNewToken and register it with Registry
-     * @param _beacon to use to source the implementation address
-     * @param _registry to use to register the token deployment
-     * @param _liquidityProvider to use to get the underlying yield for
-     * @param _fluidTokenName to use as the name of the Fluid Asset
-     * @param _fluidSymbol to use as the symbol for the Fluid Asset
-     * @param _emergencyCouncil that is permitted to trigger the emergency features
-     * @param _oracle that is permitted to call the trusted methods on the Token
-     * @param _decimals to use for the underlying asset (and to set for this!)
+     * @param _args to get the arguments to create the token with
      * @param _trfVariables to use for the trf variables
      * @param _operator to use to configure the token configuration for the deployed asset
      *
      * @dev uses the sender address as the operator/emergency council!
      */
     function deployNewToken(
+        TokenCreationArguments memory _args,
         IBeacon _beacon,
-        IRegistry _registry,
-        ILiquidityProvider _liquidityProvider,
-        string memory _fluidTokenName,
-        string memory _fluidSymbol,
-        address _emergencyCouncil,
-        address _oracle,
-        uint8 _decimals,
         TrfVariables memory _trfVariables,
+        IRegistry _registry,
         Operator _operator
-    )
-        public returns (address)
-    {
-        require(address(_beacon) != address(0), "beacon is null");
-        require(address(_liquidityProvider) != address(0), "liquidity provider null");
-
+    ) public returns (IToken) {
         BeaconProxy beaconProxy = new BeaconProxy(
             address(_beacon),
             abi.encodeWithSelector(
                 TOKEN_INIT_SELECTOR,
-                address(_liquidityProvider), // _liquidityProvider
-                _decimals,                   // _decimals
-                _fluidTokenName,             // _name
-                _fluidSymbol,                // _symbol
-                _emergencyCouncil,           // _emergencyCouncil
-                address(this),               // _operator
-                address(_operator)           // _oracle
+                address(_args.liquidityProvider), // _liquidityProvider
+                _args.decimals,                   // _decimals
+                _args.fluidTokenName,             // _name
+                _args.fluidSymbol,                // _symbol
+                _args.emergencyCouncil,           // _emergencyCouncil
+                address(this),                    // _operator
+                address(_operator)                // _oracle
             )
          );
 
          // check that the setup went okay
 
-         IERC20 token = IERC20(address(beaconProxy));
+         IToken token = IToken(address(beaconProxy));
 
          require(
-             token.decimals() == _decimals,
+             token.decimals() == _args.decimals,
              "decimals in deploy not consistent"
          );
 
          // register the token
 
-         _registry.register(RegistrationType.TOKEN, address(beaconProxy));
+         _registry.register(RegistrationTypeToken, address(beaconProxy));
 
          // start to set up the operator for the token deployed
 
-         _operator.updateOracle(address(beaconProxy), address(_oracle));
+         _operator.updateOracle(address(beaconProxy), address(_args.oracle));
 
-         _operator.updateTrfVariables(address(beaconProxy), _trfVariables);
+         _registry.updateTrfVariables(address(beaconProxy), _trfVariables);
 
-         return address(beaconProxy);
-    }
-
-    /**
-     * @notice deployNewTokenWithDefaultEthTrfVars and register it with Registry
-     * @param _beacon to use to source the implementation address
-     * @param _registry to use to register the token deployment
-     * @param _liquidityProvider to use to get the underlying yield for
-     * @param _fluidTokenName to use as the name of the Fluid Asset
-     * @param _fluidSymbol to use as the symbol for the Fluid Asset
-     * @param _emergencyCouncil that is permitted to trigger the emergency features
-     * @param _oracle that is permitted to call the trusted methods on the Token
-     * @param _decimals to use for the underlying asset (and to set for this!)
-     * @param _operator to use to configure the token configuration for the deployed asset
-     *
-     * @dev uses the sender address as the operator/emergency council!
-     */
-    function deployNewTokenWithDefaultEthTrfVars(
-        IBeacon _beacon,
-        IRegistry _registry,
-        ILiquidityProvider _liquidityProvider,
-        string memory _fluidTokenName,
-        string memory _fluidSymbol,
-        address _emergencyCouncil,
-        address _oracle,
-        uint8 _decimals,
-        Operator _operator
-    )
-        public returns (address)
-    {
-        return deployNewToken(
-            _beacon,
-            _registry,
-            _liquidityProvider,
-            _fluidTokenName,
-            _fluidSymbol,
-            _emergencyCouncil,
-            _oracle,
-            _decimals,
-            defaultEthereumTrfVariables(),
-            _operator
-        );
-    }
-
-    /**
-     * @notice deployNewTokenWithDefaultArbTrfVars and register it with Registry
-     * @param _beacon to use to source the implementation address
-     * @param _registry to use to register the token deployment
-     * @param _liquidityProvider to use to get the underlying yield for
-     * @param _fluidTokenName to use as the name of the Fluid Asset
-     * @param _fluidSymbol to use as the symbol for the Fluid Asset
-     * @param _emergencyCouncil that is permitted to trigger the emergency features
-     * @param _oracle that is permitted to call the trusted methods on the Token
-     * @param _decimals to use for the underlying asset (and to set for this!)
-     * @param _operator to use to configure the token configuration for the deployed asset
-     *
-     * @dev uses the sender address as the operator/emergency council!
-     */
-    function deployNewTokenWithDefaultArbTrfVars(
-        IBeacon _beacon,
-        IRegistry _registry,
-        ILiquidityProvider _liquidityProvider,
-        string memory _fluidTokenName,
-        string memory _fluidSymbol,
-        address _emergencyCouncil,
-        address _oracle,
-        uint8 _decimals,
-        Operator _operator
-    )
-        public returns (address)
-    {
-        return deployNewToken(
-            _beacon,
-            _registry,
-            _liquidityProvider,
-            _fluidTokenName,
-            _fluidSymbol,
-            _emergencyCouncil,
-            _oracle,
-            _decimals,
-            defaultArbitrumTrfVariables(),
-            _operator
-        );
+         return token;
     }
 
     /**
      * @notice deployNewCompoundLiquidityProvider and register it with Registry
-     * @param _cToken to use as the underlying for the pool
+     * @param _args to destructure to use in the creation of the CompoundLiquidityProvider
      * @param _beacon to use to source the implementation address
      * @param _registry to use to register the token deployment
      */
     function deployNewCompoundLiquidityProvider(
-        CErc20Interface _cToken,
+        CompoundLiquidityProviderCreationArguments memory _args,
         IBeacon _beacon,
         IRegistry _registry
-    )
-        public returns (address)
-    {
-        require(address(_beacon) != address(0), "beacon is null");
-
+    ) public returns (ILiquidityProvider) {
         BeaconProxy beaconProxy = new BeaconProxy(
             address(_beacon),
             abi.encodeWithSelector(
                 LIQUIDITY_PROVIDER_COMPOUND_INIT_SELECTOR,
-                address(_cToken),
+                address(_args.cToken),
                 address(this)
             )
          );
@@ -268,33 +200,31 @@ contract DAOUtilityV1 {
 
          // register the liquidity provider
 
-         _registry.register(RegistrationType.TOKEN, address(beaconProxy));
+         _registry.register(
+             RegistrationTypeLiquidityProvider,
+             address(beaconProxy)
+         );
 
-         return address(beaconProxy);
+         return ILiquidityProvider(address(beaconProxy));
     }
 
     /**
      * @notice deployNewAaveV2LiquidityProvider and register it with Registry
-     * @param _addressProvider to get the lending pool with
+     * @param _args to use in the creation of the liquidity provider for AAVE v2
      * @param _beacon to use to source the implementation address
      * @param _registry to use to register the token deployment
      */
     function deployNewAaveV2LiquidityProvider(
-        AaveV2LendingPoolAddressesProviderInterface _addressProvider,
-        IAToken _aToken,
+        AaveV2LiquidityProviderCreationArguments memory _args,
         IBeacon _beacon,
         IRegistry _registry
-    )
-        public returns (address)
-    {
-        require(address(_beacon) != address(0), "beacon is null");
-
+    ) public returns (ILiquidityProvider) {
         BeaconProxy beaconProxy = new BeaconProxy(
             address(_beacon),
             abi.encodeWithSelector(
                 LIQUIDITY_PROVIDER_AAVEV2_INIT_SELECTOR,
-                address(_addressProvider),
-                address(_aToken),
+                address(_args.addressProvider),
+                address(_args.aToken),
                 address(this)
             )
          );
@@ -307,33 +237,31 @@ contract DAOUtilityV1 {
 
          // register the liquidity provider
 
-         _registry.register(RegistrationType.TOKEN, address(beaconProxy));
+         _registry.register(
+             RegistrationTypeLiquidityProvider,
+             address(beaconProxy)
+         );
 
-         return address(beaconProxy);
+         return ILiquidityProvider(address(beaconProxy));
     }
 
     /**
      * @notice deployNewAaveV3LiquidityProvider and register it with Registry
-     * @param _addressProvider to get the lending pool with
+     * @param _args to destructure in the creation of the AAVE v3 LiquidityProvider
      * @param _beacon to use to source the implementation address
      * @param _registry to use to register the token deployment
      */
     function deployNewAaveV3LiquidityProvider(
-        AaveV3PoolAddressesProviderInterface _addressProvider,
-        IAToken _aToken,
+        AaveV3LiquidityProviderCreationArguments memory _args,
         IBeacon _beacon,
         IRegistry _registry
-    )
-        public returns (address)
-    {
-        require(address(_beacon) != address(0), "beacon is null");
-
+    ) public returns (ILiquidityProvider) {
         BeaconProxy beaconProxy = new BeaconProxy(
             address(_beacon),
             abi.encodeWithSelector(
                 LIQUIDITY_PROVIDER_AAVEV3_INIT_SELECTOR,
-                address(_addressProvider),
-                address(_aToken),
+                address(_args.addressProvider),
+                address(_args.aToken),
                 address(this)
             )
          );
@@ -346,9 +274,284 @@ contract DAOUtilityV1 {
 
          // register the liquidity provider
 
-         _registry.register(RegistrationType.TOKEN, address(beaconProxy));
+         _registry.register(
+             RegistrationTypeLiquidityProvider,
+             address(beaconProxy)
+         );
 
-         return address(beaconProxy);
+         return lp;
+    }
+
+    function deployNewCompoundToken(
+        IBeacon _tokenBeacon,
+        IBeacon _compoundBeacon,
+        IRegistry _registry,
+
+        // compound liquidity provider arguments
+        CompoundLiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        TrfVariables memory _trfVariables,
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        ILiquidityProvider lp = deployNewCompoundLiquidityProvider(
+            _lpArgs,
+            _compoundBeacon,
+            _registry
+        );
+
+        _tokenArgs.liquidityProvider = lp;
+
+        IToken token = deployNewToken(
+            _tokenArgs,
+            _tokenBeacon,
+            _trfVariables,
+            _registry,
+            _operator
+        );
+
+        return (lp, token);
+    }
+
+    function deployNewAaveV2Token(
+        IBeacon _tokenBeacon,
+        IBeacon _aaveV2LiquidityProviderBeacon,
+        IRegistry _registry,
+
+        // aave v2 liquidity provider arguments
+        AaveV2LiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        TrfVariables memory _trfVariables,
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        ILiquidityProvider lp = deployNewAaveV2LiquidityProvider(
+            _lpArgs,
+            _aaveV2LiquidityProviderBeacon,
+            _registry
+        );
+
+        IToken token = deployNewToken(
+            _tokenArgs,
+            _tokenBeacon,
+            _trfVariables,
+            _registry,
+            _operator
+        );
+
+        return (lp, token);
+    }
+
+    function deployNewAaveV3Token(
+        IBeacon _tokenBeacon,
+        IBeacon _aaveV3LiquidityProviderBeacon,
+        IRegistry _registry,
+
+        // aave v3 liquidity provider arguments
+        AaveV3LiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        TrfVariables memory _trfVariables,
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        ILiquidityProvider lp = deployNewAaveV3LiquidityProvider(
+            _lpArgs,
+            _aaveV3LiquidityProviderBeacon,
+            _registry
+        );
+
+        _tokenArgs.liquidityProvider = lp;
+
+        IToken token = deployNewToken(
+            _tokenArgs,
+            _tokenBeacon,
+            _trfVariables,
+            _registry,
+            _operator
+        );
+
+        return (lp, token);
+    }
+
+    function deployNewCompoundTokenWithDefaultEthTrfVars(
+        IBeacon _tokenBeacon,
+        IBeacon _compoundBeacon,
+        IRegistry _registry,
+
+        // compound liquidity provider arguments
+        CompoundLiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        return deployNewCompoundToken(
+            _tokenBeacon,
+            _compoundBeacon,
+            _registry,
+            _lpArgs,
+            _tokenArgs,
+            defaultEthereumTrfVariables(),
+            _operator
+        );
+    }
+
+    function deployNewAaveV2TokenWithDefaultEthTrfVars(
+        IBeacon _tokenBeacon,
+        IBeacon _aaveV2LiquidityProviderBeacon,
+        IRegistry _registry,
+
+        // aave v2 liquidity provider arguments
+        AaveV2LiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        return deployNewAaveV2Token(
+            _tokenBeacon,
+            _aaveV2LiquidityProviderBeacon,
+            _registry,
+            _lpArgs,
+            _tokenArgs,
+            defaultEthereumTrfVariables(),
+            _operator
+        );
+    }
+
+    function deployNewAaveV3TokenWithDefaultEthTrfVars(
+        IBeacon _tokenBeacon,
+        IBeacon _aaveV3LiquidityProviderBeacon,
+        IRegistry _registry,
+
+        // aave v3 liquidity provider arguments
+        AaveV3LiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        return deployNewAaveV3Token(
+            _tokenBeacon,
+            _aaveV3LiquidityProviderBeacon,
+            _registry,
+            _lpArgs,
+            _tokenArgs,
+            defaultEthereumTrfVariables(),
+            _operator
+        );
+    }
+
+    function deployNewCompoundTokenWithDefaultArbTrfVars(
+        IBeacon _tokenBeacon,
+        IBeacon _compoundBeacon,
+        IRegistry _registry,
+
+        // compound liquidity provider arguments
+        CompoundLiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        return deployNewCompoundToken(
+            _tokenBeacon,
+            _compoundBeacon,
+            _registry,
+            _lpArgs,
+            _tokenArgs,
+            defaultArbitrumTrfVariables(),
+            _operator
+        );
+    }
+
+    function deployNewAaveV2TokenWithDefaultArbTrfVars(
+        IBeacon _tokenBeacon,
+        IBeacon _aaveV2LiquidityProviderBeacon,
+        IRegistry _registry,
+
+        // aave v2 liquidity provider arguments
+        AaveV2LiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        return deployNewAaveV2Token(
+            _tokenBeacon,
+            _aaveV2LiquidityProviderBeacon,
+            _registry,
+            _lpArgs,
+            _tokenArgs,
+            defaultArbitrumTrfVariables(),
+            _operator
+        );
+    }
+
+    function deployNewAaveV3TokenWithDefaultArbTrfVars(
+        IBeacon _tokenBeacon,
+        IBeacon _aaveV3LiquidityProviderBeacon,
+        IRegistry _registry,
+
+        // aave v3 liquidity provider arguments
+        AaveV3LiquidityProviderCreationArguments memory _lpArgs,
+
+        // token arguments
+        TokenCreationArguments memory _tokenArgs,
+
+        // registry arguments
+        Operator _operator
+    ) public returns (ILiquidityProvider, IToken) {
+        return deployNewAaveV3Token(
+            _tokenBeacon,
+            _aaveV3LiquidityProviderBeacon,
+            _registry,
+            _lpArgs,
+            _tokenArgs,
+            defaultArbitrumTrfVariables(),
+            _operator
+        );
+    }
+
+    function updateTrfVariables(
+        IRegistry _registry,
+        address _token,
+        uint256 _currentAtxTransactionMargin,
+        uint256 _defaultTransfersInBlock,
+        uint256 _spoolerInstantRewardThreshold,
+        uint256 _spoolerBatchedRewardThreshold,
+        uint8 _defaultSecondsSinceLastBlock,
+        uint8 _atxBufferSize
+    ) public {
+        TrfVariables memory variables = TrfVariables({
+            currentAtxTransactionMargin: _currentAtxTransactionMargin,
+            defaultTransfersInBlock: _defaultTransfersInBlock,
+            spoolerInstantRewardThreshold: _spoolerInstantRewardThreshold,
+            spoolerBatchedRewardThreshold: _spoolerBatchedRewardThreshold,
+            defaultSecondsSinceLastBlock: _defaultSecondsSinceLastBlock,
+            atxBufferSize: _atxBufferSize
+        });
+
+        _registry.updateTrfVariables(_token, variables);
     }
 
     /// @notice disableAddresses given using `enableEmergencyMode()`

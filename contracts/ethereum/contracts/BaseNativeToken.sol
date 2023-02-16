@@ -4,19 +4,25 @@ pragma solidity >=0.8.0;
 import "./IERC20.sol";
 import "./openzeppelin/SafeERC20.sol";
 
-/// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
-/// @author Fluidity Money
-/// @author Modified from Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol)
-/// @notice Modified to support proxy initialisation and to support some extra functions, as well as mint from the initial amount
-/// @dev Do not manually set balances without updating totalSupply, as the sum of all user balances must not exceed it.
+/**
+* @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
+* @author Fluidity Money
+*
+* @author Modified from Solmate
+* (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol)
+*
+* @notice Modified to support proxy initialisation and to support some
+* extra functions, as well as mint from the initial amount
+*
+* @dev Do not manually set balances without updating totalSupply, as
+* the sum of all user balances must not exceed it.
+*/
 abstract contract BaseNativeToken is IERC20 {
     using SafeERC20 for IERC20;
 
     /*//////////////////////////////////////////////////////////////
                             METADATA STORAGE
     //////////////////////////////////////////////////////////////*/
-
-    uint8 private version_;
 
     string private name_;
 
@@ -52,11 +58,7 @@ abstract contract BaseNativeToken is IERC20 {
         string memory _name,
         string memory _symbol,
         uint8 _decimals
-    ) virtual public {
-        require(version_ == 0, "already initialised");
-
-        version_ = 1;
-
+    ) virtual internal {
         name_ = _name;
         symbol_ = _symbol;
         decimals_ = _decimals;
@@ -109,7 +111,7 @@ abstract contract BaseNativeToken is IERC20 {
         if (allowed != type(uint256).max)
             allowance_[_from][msg.sender] = allowed - _amount;
 
-        require(balanceOf(_from) >= _amount, "not enough balance");
+        // the user's balance will underflow, causing a revert here
 
         balanceOf_[_from] -= _amount;
 
@@ -127,9 +129,7 @@ abstract contract BaseNativeToken is IERC20 {
     function increaseAllowance(
         address _spender,
         uint256 _amount
-    )
-        public returns (bool)
-    {
+    ) public returns (bool) {
         approve(_spender, allowance_[msg.sender][_spender] + _amount);
         return true;
     }
@@ -137,9 +137,7 @@ abstract contract BaseNativeToken is IERC20 {
     function decreaseAllowance(
         address _spender,
         uint256 _amount
-    )
-        public returns (bool)
-    {
+    ) public returns (bool) {
         // no check cause solidity reverts when it goes under 0
         uint256 newAmount = allowance_[msg.sender][_spender] - _amount;
 
@@ -149,17 +147,13 @@ abstract contract BaseNativeToken is IERC20 {
     function allowance(
         address _owner,
         address _spender
-    )
-        public view returns (uint256)
-    {
+    ) public view returns (uint256) {
         return allowance_[_owner][_spender];
     }
 
     function balanceOf(
         address _spender
-    )
-        public virtual view returns (uint256)
-    {
+    ) public virtual view returns (uint256) {
         return balanceOf_[_spender];
     }
 

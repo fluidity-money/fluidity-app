@@ -30,10 +30,15 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     // erc20 props
     mapping(address => uint256) private balances_;
+
     mapping(address => mapping(address => uint256)) private allowances_;
+
     uint8 private decimals_;
+
     uint256 private totalSupply_;
+
     string private name_;
+
     string private symbol_;
 
     /// @dev if false, emergency mode is active - can be called by either the
@@ -86,8 +91,23 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @dev account that can call the reward function, should be the /operator contract/
     address oracle_;
 
-    /// @inheritdoc IToken
-    function init(
+    /**
+     * @notice initialiser function - sets the contract's data
+     * @dev we pass in the metadata explicitly instead of sourcing from the
+     * @dev underlying token because some underlying tokens don't implement
+     * @dev these methods
+     *
+     * @param _liquidityProvider the `LiquidityProvider` contract
+     *        address. Should have this contract as its owner.
+     *
+     * @param _decimals the fluid token's decimals (should be the same as the underlying token's)
+     * @param _name the fluid token's name
+     * @param _symbol the fluid token's symbol
+     * @param _emergencyCouncil address that can activate emergency mode
+     * @param _operator address that can release quarantine payouts and activate emergency mode
+     * @param _oracle address that can call the reward function
+     */
+     function init(
         address _liquidityProvider,
         uint8 _decimals,
         string memory _name,
@@ -318,10 +338,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IToken
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
 
-    /// @inheritdoc IToken
     function operator() public view returns (address) { return operator_; }
 
-    /// @inheritdoc IToken
     function userAmountMinted(address /* account */) public pure returns (uint) { return 0; }
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
@@ -365,17 +383,17 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @inheritdoc ITransferWithBeneficiary
     function transferWithBeneficiary(
-        address token,
-        uint256 amount,
-        address beneficiary,
+        address _token,
+        uint256 _amount,
+        address _beneficiary,
         uint64 /* data */
     ) external override returns (bool) {
         bool rc;
 
-        rc = Token(token).transferFrom(msg.sender, address(this), amount);
+        rc = Token(_token).transferFrom(msg.sender, address(this), _amount);
         if (!rc) return false;
 
-        rc = Token(token).transfer(beneficiary, amount);
+        rc = Token(_token).transfer(_beneficiary, _amount);
 
         return rc;
     }
@@ -415,12 +433,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         return true;
     }
 
-    /**
-     * @notice drain the reward pool of the amount given without
-     *         touching any principal amounts
-     * @dev this is intended to only be used to retrieve initial
-     *      liquidity provided by the team OR by the DAO to allocate funds
-     */
+    /// @inheritdoc IToken
     function drainRewardPool(address _recipient, uint256 _amount) public {
         require(noEmergencyMode(), "emergency mode");
         require(msg.sender == operator_, "only operator can use this function");

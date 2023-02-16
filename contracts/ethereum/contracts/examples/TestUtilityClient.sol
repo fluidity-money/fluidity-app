@@ -19,7 +19,8 @@ contract TestClient is IFluidClient {
         govToken_.init(
             "Test utility token!",
             "UTILCLIENT",
-            8
+            8,
+            1
         );
     }
 

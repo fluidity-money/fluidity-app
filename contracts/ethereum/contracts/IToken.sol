@@ -10,7 +10,9 @@ pragma abicoder v2;
 import "./IFluidClient.sol";
 import "./ILiquidityProvider.sol";
 
-interface IToken {
+import "./IERC20.sol";
+
+interface IToken is IERC20 {
     /// @notice emitted when a reward is quarantined for being too large
     event BlockedReward(
         address indexed winner,
@@ -57,38 +59,13 @@ interface IToken {
     /// @notice deprecated, mint limits no longer exist
     event MintLimitsStateChanged(bool indexed status);
 
-    /**
-     * @notice initialiser function - sets the contract's data
-     * @dev we pass in the metadata explicitly instead of sourcing from the
-     * @dev underlying token because some underlying tokens don't implement
-     * @dev these methods
-     *
-     * @param _liquidityProvider the `LiquidityProvider` contract address. Should have this contract as its owner.
-     * @param _decimals the fluid token's decimals (should be the same as the underlying token's)
-     * @param _name the fluid token's name
-     * @param _symbol the fluid token's symbol
-     * @param _emergencyCouncil address that can activate emergency mode
-     * @param _operator address that can release quarantine payouts and activate emergency mode
-     * @param _oracle address that can call the reward function
-     */
-    function init(
-        address _liquidityProvider,
-        uint8 _decimals,
-        string memory _name,
-        string memory _symbol,
-        address _emergencyCouncil,
-        address _operator,
-        address _oracle
-    )
-        external;
-
     function op() external view returns (address);
 
     /**
      * @notice update the operator account to a new address
-     * @param newOperator the address of the new operator to change to
+     * @param _newOperator the address of the new operator to change to
      */
-    function updateOperator(address newOperator) external;
+    function updateOperator(address _newOperator) external;
 
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
@@ -98,32 +75,32 @@ interface IToken {
     function oracle() external view returns (address);
 
     /// @notice updates the reward quarantine threshold if called by the operator
-    function updateRewardQuarantineThreshold(uint _maxUncheckedReward) external;
+    function updateRewardQuarantineThreshold(uint) external;
 
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
      * @notice requires you to have called the ERC20 `approve` method
      * @notice targeting this contract first on the underlying asset
      *
-     * @param amount the number of tokens to wrap
+     * @param _amount the number of tokens to wrap
      * @return the number of tokens wrapped
      */
-    function erc20In(uint amount) external returns (uint);
+    function erc20In(uint _amount) external returns (uint);
 
     /**
      * @notice wraps the `amount` given and transfers the tokens to `receiver`
      *
-     * @param recipient of the wrapped assets
-     * @param amount to wrap and send to the recipient
+     * @param _recipient of the wrapped assets
+     * @param _amount to wrap and send to the recipient
      */
-    function erc20InFor(address recipient, uint256 amount) external;
+    function erc20InFor(address _recipient, uint256 _amount) external;
 
     /**
      * @notice unwraps `amount` of fluid tokens back to underlying
      *
-     * @param amount the number of fluid tokens to unwrap
+     * @param _amount the number of fluid tokens to unwrap
      */
-    function erc20Out(uint amount) external;
+    function erc20Out(uint _amount) external;
 
     /**
      * @notice calculates the size of the reward pool (the interest we've earned)
@@ -136,19 +113,19 @@ interface IToken {
      * @notice admin function, unblocks a reward that was quarantined for being too large
      * @notice allows for paying out or removing the reward, in case of abuse
      *
-     * @param user the address of the user who's reward was quarantined
-     * @param amount the amount of tokens to release (in case multiple rewards were quarantined)
-     * @param payout should the reward be paid out or removed?
-     * @param firstBlock the first block the rewards include (should be from the BlockedReward event)
-     * @param lastBlock the last block the rewards include
+     * @param _user the address of the user who's reward was quarantined
+     * @param _amount the amount of tokens to release (in case multiple rewards were quarantined)
+     * @param _payout should the reward be paid out or removed?
+     * @param _firstBlock the first block the rewards include (should be from the BlockedReward event)
+     * @param _lastBlock the last block the rewards include
      */
     function unblockReward(
-        bytes32 rewardTx,
-        address user,
-        uint amount,
-        bool payout,
-        uint firstBlock,
-        uint lastBlock
+        bytes32 _rewardTx,
+        address _user,
+        uint _amount,
+        bool _payout,
+        uint _firstBlock,
+        uint _lastBlock
     )
         external;
 
@@ -179,14 +156,6 @@ interface IToken {
      * @notice return the current operator
      */
     function operator() external view returns (address);
-
-    /*
-     * @notice returns how much `account` has minted
-     * @notice mint limits no longer exist, this always `0`
-     *
-     * @param the account to check
-     */
-    function userAmountMinted(address /* account */) external pure returns (uint);
 
     /// @notice upgrade the underlying ILiquidityProvider to a new source
     function upgradeLiquidityProvider(ILiquidityProvider newPool) external;
