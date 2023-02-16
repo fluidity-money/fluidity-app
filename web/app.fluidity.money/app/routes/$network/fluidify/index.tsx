@@ -207,11 +207,16 @@ export default function FluidifyToken() {
     if (address && !swapping) {
       (async () => {
         switch (network) {
-          case "ethereum": {
+          case "ethereum": 
+          case "arbitrum": {
             const [tokensMinted, userTokenBalance, mintLimit] =
               await Promise.all([
                 Promise.all(
                   tokens.map(async (token) => {
+                    // no mint limits on arbitrum
+                    if (network === "arbitrum")
+                      return undefined;
+
                     if (token.isFluidOf) return undefined;
 
                     const fluidToken = tokens.find(
