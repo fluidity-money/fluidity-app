@@ -19,5 +19,7 @@
         "build": "vite build",
         "start": "node dist/fanfare.js"
     },
-    "dependencies": {}
+    "dependencies": {
+        "uuid": "^9.0.0"
+    }
 }

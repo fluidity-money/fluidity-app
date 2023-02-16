@@ -1,8 +1,8 @@
 import { Server } from "socket.io";
-import { randomUUID } from "crypto";
+import { v4 as uuidv4 } from 'uuid';
 
 const port = process.env.PORT as unknown as number || 3111;
-const uid = randomUUID();
+const uid = uuidv4();
 
 const io = new Server(port, {
   cors: {
