@@ -170,7 +170,7 @@ export default function Dashboard() {
   ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
-    showExperiment("enable-arbitrum") || true
+    showExperiment("enable-arbitrum")
     ? {
       ethereum: {
         name: "ETH",
