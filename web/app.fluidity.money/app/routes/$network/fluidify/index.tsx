@@ -1,8 +1,8 @@
-import type { Token } from "~/util/chainUtils/tokens";
+import { Token } from "~/util/chainUtils/tokens";
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
 import BN from "bn.js";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import { debounce, DebouncedFunc } from "lodash";
@@ -121,8 +121,31 @@ export default function FluidifyToken() {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
+ const [searchParams, setSearchParams] = useSearchParams()
+ const token = searchParams.get("token")
+
+  const deeplinkAssetToken = tokens.find(
+    (t) => t.symbol.toLowerCase() === token?.toLowerCase()
+  )
+
   // Currently selected token
-  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
+  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>(deeplinkAssetToken);
+
+  // TODO: Remove this entirely. Use search params exclusively as the source of truth w/o side effects.
+  useEffect(() => {
+    if (!assetToken) {
+      return setSearchParams((prev) => {
+        const searchParams = prev
+        searchParams.delete("token");
+        return searchParams;
+      })
+    }
+    setSearchParams((prev) => {
+      const searchParams = prev
+      searchParams.set("token", assetToken.symbol);
+      return searchParams;
+    })
+  }, [assetToken])
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
