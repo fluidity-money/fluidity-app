@@ -144,7 +144,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           timestamp: timestamp * 1000,
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
-            currency === "DAI" || currency === "fDAI"
+            network !== "arbitrum" && (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,

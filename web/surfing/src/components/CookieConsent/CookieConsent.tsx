@@ -32,7 +32,7 @@ const CookieConsent = ({ activated, url, callback }: CookieConsentProps) => {
         <></>
       )}
     </>
-  );
+  )
 };
 
 export default CookieConsent;

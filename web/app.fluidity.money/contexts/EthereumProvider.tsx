@@ -52,7 +52,8 @@ const EthereumFacade = ({
   tokens: Token[];
   connectors: [Connector, Web3ReactHooks][];
 }) => {
-  const { isActive, provider, account, connector } = useWeb3React();
+  const { isActive, provider, account, connector, isActivating } =
+    useWeb3React();
   const okxWallet = useWindow("okxwallet");
   const browserWallet = useWindow("ethereum") as Coin98Wallet;
 
@@ -365,6 +366,7 @@ const EthereumFacade = ({
         getDegenScore,
         addToken,
         connected: isActive,
+        connecting: isActivating,
       }}
     >
       {children}
