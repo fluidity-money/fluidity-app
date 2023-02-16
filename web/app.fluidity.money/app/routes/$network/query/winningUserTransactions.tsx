@@ -203,7 +203,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           timestamp: new Date(winner.awarded_time).getTime(),
           logo: tokenLogoMap[tx.currency] || defaultLogo,
           provider:
-            (network === "ethereum"
+            (network === "ethereum" || network === "arbitrum"
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
