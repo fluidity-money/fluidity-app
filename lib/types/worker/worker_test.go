@@ -80,6 +80,7 @@ func TestString(t *testing.T) {
 		"lifinity":0
 	},
 	"ethereum_fees":{
+		"uniswap_v3":0,
 		"uniswap_v2":0,
 		"balancer_v2":0,
 		"oneinch_v2":0,

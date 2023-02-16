@@ -18,7 +18,7 @@ const integrationTestUniswapV2 = `
           "0x00000000000000000000000020e95253e54490d8d30ea41574b24f741ee70201"
         ]
       },
-      "application": 1
+      "application": 2
     },
     "transaction": {
       "to": "0xd7c09e006a2891880331b0f6224071c1e890a98a",
@@ -29,13 +29,53 @@ const integrationTestUniswapV2 = `
     "expected_recipient": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
     "expected_fees": "9934320933/997000000",
     "expected_emission": {
-	"uniswap_v2": 9.964213573721164
+      "uniswap_v2": 9.964213573721164
     },
     "rpc_methods": {
-	"eth_getCode": "0x0"
+      "eth_getCode": "0x0"
     },
     "call_methods": {
-    	"token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+      "token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+    },
+    "token_decimals": 6,
+    "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  }
+]
+`
+
+const integrationTestUniswapV3 = `
+[
+  {
+    "transfer": {
+      "transaction": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6",
+      "log": {
+        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGA5EselnlwAAD////////////////////////////////////+WNlDJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQxvh7mCN4sTZSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgi1gZVSHXISPj///////////////////////////////////////vImw==",
+        "address": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
+        "topics": [
+          "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+          "0x000000000000000000000000ef1c6e67703c7bd7107eed8303fbe6ec2554bf6b",
+          "0x00000000000000000000000035f09f57fd5c6106da70f4ed8e14312614747efc"
+        ]
+      },
+      "application": 1
+    },
+    "transaction": {
+      "to": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
+      "from": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
+      "hash": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6"
+    },
+    "expected_sender": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
+    "expected_recipient": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
+    "expected_fees": "7099301084/9999000000",
+    "expected_emission": {
+      "uniswap_v3": 0.7100011085108511
+    },
+    "rpc_methods": {
+      "eth_getCode": "0x0"
+    },
+    "call_methods": {
+      "token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
+      "fee()": "0x0000000000000000000000000000000000000000000000000000000000000064"
     },
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
