@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import { motion } from "framer-motion";
-import { LabelledValue, Text, LinkButton, LineChart, DataTable } from "~/components";
+import { Text, LinkButton, LineChart } from "~/components";
 import { numberToMonetaryString, trimAddress } from "~/util";
 import styles from "./TokenDetails.module.scss";
 
@@ -51,7 +51,7 @@ const TokenDetails = ({
           <Text>Your avg. prize</Text>
         </div>
         <div className={styles.prize}>
-          <Text size="lg" prominent>{numberToMonetaryString(topAssetPrize.winning_amount)}</Text>
+          <Text holo size="lg" prominent>{numberToMonetaryString(topAssetPrize.winning_amount)}</Text>
           <Text >Top asset prize</Text>
         </div>
       </div>
