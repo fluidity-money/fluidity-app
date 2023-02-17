@@ -20,6 +20,8 @@
         "start": "node dist/fanfare.js"
     },
     "dependencies": {
+        "ethers": "^6.0.3",
+        "express": "^4.18.2",
         "uuid": "^9.0.0"
     }
 }

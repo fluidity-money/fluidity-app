@@ -2,6 +2,8 @@
 
 Speedy notification service.
 
+Currently geared towards ERC20-ish notifications but is pretty easy to rekit.
+
 ## Getting setup
 Environment variables required largely depend on what services are active.
 You'll need a websocket RPC for each service you attach to and possibly a secret for your GraphQL service.
