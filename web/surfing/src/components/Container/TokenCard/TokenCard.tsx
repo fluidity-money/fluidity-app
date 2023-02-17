@@ -56,7 +56,7 @@ const TokenCard = ({
         )}
         
 
-        <Display size="xxs" className={styles.top}>
+        <Display size="xxs" className={isMobile ? styles.top : styles.bottom}>
           {token.symbol}
         </Display>
         { !isMobile && (
@@ -66,12 +66,12 @@ const TokenCard = ({
             <Text className={styles.stat} size="md">{numberToMonetaryString(value)}</Text>
           </>
         )}
-        <Display size="xxs" className={styles.top}>{numberToMonetaryString(isFluid ? fluidAmt*value : regAmt*value)}</Display>
+        <Display size="xxs" className={isMobile ? styles.top : styles.bottom}>{numberToMonetaryString(isFluid ? fluidAmt*value : regAmt*value)}</Display>
         {
           isMobile && (
             <>
               {
-                isFluid ? <Text size="sm" className={styles.bottom}>{token.name}</Text> : <LinkButton className={styles.bottom} type="internal" size="small" handleClick={onButtonPress}>FLUIDIFY</LinkButton>
+                isFluid ? <Text size="sm" className={`${styles.bottom} ${styles.left}`}>{token.name}</Text> : <LinkButton className={styles.bottom} type="internal" size="small" handleClick={onButtonPress}>FLUIDIFY</LinkButton>
               }
               <Text className={styles.bottom} size="sm">{numberToCommaSeparated(isFluid ? fluidAmt : regAmt)} at {numberToMonetaryString(value)}</Text>
             </>
