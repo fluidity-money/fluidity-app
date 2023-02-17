@@ -163,11 +163,13 @@ contract DAOUtilityV1 {
 
          _registry.register(RegistrationTypeToken, address(beaconProxy));
 
+         // set up the variables for the TRF
+
+         _registry.updateTrfVariables(address(beaconProxy), _trfVariables);
+
          // start to set up the operator for the token deployed
 
          _operator.updateOracle(address(beaconProxy), address(_args.oracle));
-
-         _registry.updateTrfVariables(address(beaconProxy), _trfVariables);
 
          return token;
     }
