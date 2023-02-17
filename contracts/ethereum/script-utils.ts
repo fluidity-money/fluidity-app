@@ -66,15 +66,57 @@ export const deployOperator = async (
   hre: HardhatRuntimeEnvironment,
   externalOperator: ethers.Signer,
   council: ethers.Signer,
-  registry: ethers.Signer
-): Promise<ethers.Contract> => {
-  return deployAndInit(
+  registry: ethers.Contract
+): Promise<ethers.Contract> =>
+  deployAndInit(
     hre,
     "Operator",
     await externalOperator.getAddress(),
     await council.getAddress(),
-    await registry.getAddress()
-  )
+    registry.address
+  );
+
+export const deployVEGovLockup = async(
+  hre: HardhatRuntimeEnvironment,
+  council: ethers.Signer,
+  lockToken: string
+): Promise<ethers.Contract> =>
+  deployAndInit(
+    hre,
+    "VEGovLockup",
+    await council.getAddress(),
+    lockToken
+  );
+
+export const deployRegistry = async(
+  hre: HardhatRuntimeEnvironment,
+  operator: ethers.Contract,
+  tokenBeacon: ethers.Contract,
+  compoundLpBeacon: ethers.Contract,
+  aaveV2LpBeacon: ethers.Contract,
+  aaveV3LpBeacon: ethers.Contract
+): Promise<ethers.Contract> =>
+  deployAndInit(
+    hre,
+    "Registry",
+    operator.address,
+    tokenBeacon.address,
+    compoundLpBeacon.address,
+    aaveV2LpBeacon.address,
+    aaveV3LpBeacon.address
+  );
+
+export const deployDAO = async (
+  hre: HardhatRuntimeEnvironment,
+  council: ethers.Signer,
+  veGovLockupSource: ethers.Contract
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("DAO");
+
+  return factory.deploy(
+    await council.getAddress(),
+    veGovLockupSource.address
+  );
 };
 
 export const deployGovToken = async (
@@ -97,6 +139,35 @@ export const deployGovToken = async (
 
   return govToken;
 };
+
+export const deployFactories = async(
+  hre: HardhatRuntimeEnvironment
+): Promise<[
+  ethers.ContractFactory,
+  ethers.ContractFactory,
+  ethers.ContractFactory,
+  ethers.ContractFactory
+]> =>
+  Promise.all([
+    hre.ethers.getContractFactory("Token"),
+    hre.ethers.getContractFactory("CompoundLiquidityProvider"),
+    hre.ethers.getContractFactory("AaveV2LiquidityProvider"),
+    hre.ethers.getContractFactory("AaveV3LiquidityProvider")
+  ]);
+
+export const deployBeacons = async (
+  hre: HardhatRuntimeEnvironment,
+  tokenFactory: ethers.ContractFactory,
+  compoundFactory: ethers.ContractFactory,
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV3Factory: ethers.ContractFactory
+): Promise<[ethers.Contract, ethers.Contract, ethers.Contract, ethers.Contract]> =>
+  Promise.all([
+    hre.upgrades.deployBeacon(tokenFactory),
+    hre.upgrades.deployBeacon(compoundFactory),
+    hre.upgrades.deployBeacon(aaveV2Factory),
+    hre.upgrades.deployBeacon(aaveV3Factory)
+  ]);
 
 export const deployTestUtility = async (
   hre: HardhatRuntimeEnvironment,
@@ -133,22 +204,21 @@ export const deployTokens = async (
   externalOperator: ethers.Signer,
   boundOperatorOperator: ethers.Contract,
   externalOracle: ethers.Signer,
-): Promise<{
+
+  tokenFactory: ethers.ContractFactory,
   tokenBeacon: ethers.Contract,
-  aaveV2Beacon: ethers.Contract,
+
+  compoundFactory: ethers.ContractFactory,
   compoundBeacon: ethers.Contract,
+
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV2Beacon: ethers.Contract,
+
+  aaveV3Factory: ethers.ContractFactory,
+  aaveV3Beacon: ethers.Contract
+): Promise<{
   tokens: TokenAddresses,
 }> => {
-  const tokenFactory = await hre.ethers.getContractFactory("Token");
-  const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
-  const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
-  const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");
-
-  const tokenBeacon = await hre.upgrades.deployBeacon(tokenFactory);
-  const compoundBeacon = await hre.upgrades.deployBeacon(compoundFactory);
-  const aaveV2Beacon = await hre.upgrades.deployBeacon(aaveV2Factory);
-  const aaveV3Beacon = await hre.upgrades.deployBeacon(aaveV3Factory);
-
   const tokenAddresses: TokenAddresses = {};
 
   for (const token of tokens) {
@@ -229,10 +299,7 @@ export const deployTokens = async (
   }
 
   return {
-    tokenBeacon,
-    aaveV2Beacon,
-    compoundBeacon,
-    tokens: tokenAddresses,
+    tokens: tokenAddresses
   };
 };
 

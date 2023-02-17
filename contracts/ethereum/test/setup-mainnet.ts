@@ -3,7 +3,12 @@ import * as hre from "hardhat";
 import { deployTokens, deployRewardPools, forknetTakeFunds } from "../script-utils";
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
-import { commonBindings, commonContracts, signers } from "./setup-common";
+import {
+  commonBindings,
+  commonContracts,
+  commonBeacons,
+  commonFactories,
+  signers } from "./setup-common";
 
 export let contracts: typeof commonContracts & {
   usdt: {
@@ -23,8 +28,7 @@ export let contracts: typeof commonContracts & {
     deployedPool: ethers.Contract,
   },
   rewardPools: ethers.Contract,
-  ethConvertor: ethers.Contract,
-  registry: ethers.Contract
+  ethConvertor: ethers.Contract
 };
 
 export let bindings: typeof commonBindings & {
@@ -54,9 +58,6 @@ export let bindings: typeof commonBindings & {
   },
   ethConvertor: {
     operator: ethers.Contract
-  },
-  registry: {
-    operator: ethers.Contract
   }
 };
 
@@ -79,6 +80,12 @@ before(async function () {
     toDeploy,
   );
 
+  const { tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory } =
+    commonFactories;
+
+  const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
+    commonBeacons;
+
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
@@ -88,6 +95,15 @@ before(async function () {
     signers.token.externalOperator,
     commonBindings.operator.externalOperator,
     signers.token.externalOracle,
+
+    tokenFactory,
+    tokenBeacon,
+    compoundFactory,
+    compoundBeacon,
+    aaveV2Factory,
+    aaveV2Beacon,
+    aaveV3Factory,
+    aaveV3Beacon
   );
 
   const tokenOracleAddress = await signers.token.externalOracle.getAddress();

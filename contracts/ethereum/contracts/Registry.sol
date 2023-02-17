@@ -50,8 +50,14 @@ contract Registry is IRegistry {
     /// @notice tokenBeacon_ to be used as a helpful guide for the DAO
     IBeacon public tokenBeacon_;
 
-    /// @notice liquidityProviderBeacon_ as a helpful guide for the DAO
-    IBeacon public liquidityProviderBeacon_;
+    /// @notice compoundLiquidityProviderBeacon_ as a helpful guide for the DAO
+    IBeacon public compoundLiquidityProviderBeacon_;
+
+    /// @notice aaveV2LiquidityProviderBeacon_ as a helpful guide for the DAO
+    IBeacon public aaveV2LiquidityProviderBeacon_;
+
+    /// @notice aaveV3LiquidityProviderBeacon_ as a helpful guide for the DAO
+    IBeacon public aaveV3LiquidityProviderBeacon_;
 
     Registration[] private registrations_;
 
@@ -63,13 +69,19 @@ contract Registry is IRegistry {
     function init(
         address _operator,
         IBeacon _tokenBeacon,
-        IBeacon _liquidityProviderBeacon
+
+        IBeacon _compoundLiquidityProviderBeacon,
+        IBeacon _aaveV2LiquidityProviderBeacon,
+        IBeacon _aaveV3LiquidityProviderBeacon
     ) public {
         require(version_ == 0, "already initialised");
 
         operator_ = _operator;
         tokenBeacon_ = _tokenBeacon;
-        liquidityProviderBeacon_ = _liquidityProviderBeacon;
+
+        compoundLiquidityProviderBeacon_ = _compoundLiquidityProviderBeacon;
+        aaveV2LiquidityProviderBeacon_ = _aaveV2LiquidityProviderBeacon;
+        aaveV3LiquidityProviderBeacon_ = _aaveV3LiquidityProviderBeacon;
 
         version_ = 1;
     }

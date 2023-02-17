@@ -35,38 +35,23 @@ contract VEGovLockup is IEmergencyMode {
 
     bool private noEmergencyMode_;
 
-    IERC20 private balancerPoolToken_;
+    IERC20 private voteToken_;
 
     mapping(address => Lockup[]) private lockups_;
 
-    function init(
-        address _operator,
-        address _emergencyCouncil,
-        IERC20 _balancerPoolToken
-    )
-        public
-    {
+    function init(address _emergencyCouncil, IERC20 _voteToken) public {
         require(version_ == 0, "contract is already initialised");
 
-        operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
-        balancerPoolToken_ = _balancerPoolToken;
+        voteToken_ = _voteToken;
 
         noEmergencyMode_ = true;
 
         version_ = 1;
     }
 
-    function operator() public view returns (address) {
-        return operator_;
-    }
-
-    function balancerPoolToken() public view returns (IERC20) {
-        return balancerPoolToken_;
-    }
-
-    function operatorOrEmergencyCouncil() public view returns (bool) {
-        return msg.sender == operator() || msg.sender == emergencyCouncil_;
+    function voteToken() public view returns (IERC20) {
+        return voteToken_;
     }
 
     function noEmergencyMode() public view returns (bool) {
@@ -74,12 +59,12 @@ contract VEGovLockup is IEmergencyMode {
     }
 
     function enableEmergencyMode() public {
-        require(operatorOrEmergencyCouncil(), "can't enable emergency mode!");
+        require(msg.sender == emergencyCouncil_, "only council");
         noEmergencyMode_ = false;
     }
 
     function disableEmergencyMode() public {
-        require(msg.sender == operator(), "only the operator account can use this");
+        require(msg.sender == emergencyCouncil_, "only council");
         noEmergencyMode_ = true;
     }
 
@@ -88,9 +73,7 @@ contract VEGovLockup is IEmergencyMode {
         uint256 _lockLength,
         uint256 _bptAtLock,
         uint256 _lockTime
-    )
-        internal
-    {
+    ) internal {
         Lockup memory lockup;
 
         lockup.lockLength = _lockLength;
@@ -156,7 +139,7 @@ contract VEGovLockup is IEmergencyMode {
         require(_bptAmount > 0, "more than 0 token needed for lockup");
         require(_lockLength > 0, "lock length = 0");
 
-        balancerPoolToken_.transferFrom(msg.sender, address(this), _bptAmount);
+        voteToken_.transferFrom(msg.sender, address(this), _bptAmount);
 
         trackNewDeposit(
             msg.sender,
@@ -183,7 +166,7 @@ contract VEGovLockup is IEmergencyMode {
 
         require(_bptAmount > 0, "more than 0 token needed for lockup");
 
-        balancerPoolToken_.transferFrom(msg.sender, address(this), _bptAmount);
+        voteToken_.transferFrom(msg.sender, address(this), _bptAmount);
 
         lockups_[msg.sender][_powerNumber].bptAtLock += _bptAmount;
     }

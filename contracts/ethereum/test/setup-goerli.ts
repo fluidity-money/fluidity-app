@@ -1,8 +1,13 @@
-import * as hre from "hardhat";
 import { ethers } from "ethers";
-import { deployTokens, forknetTakeFunds, Token } from "../script-utils";
+import * as hre from "hardhat";
+import { deployTokens, forknetTakeFunds } from "../script-utils";
 import { AAVE_V3_GOERLI_POOL_PROVIDER_ADDR, GoerliTokenList } from "../test-constants";
-import { commonBindings, commonContracts, signers } from "./setup-common";
+import {
+    commonBeacons, commonBindings,
+    commonContracts,
+    commonFactories, signers
+} from "./setup-common";
+
 
 export let contracts: typeof commonContracts & {
   usdc: {
@@ -29,6 +34,12 @@ before(async function() {
   // deploy fUsdc
   await forknetTakeFunds(hre, [await signers.userAccount1.getAddress()], [GoerliTokenList["usdc"]]);
 
+  const { tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory } =
+    commonFactories;
+
+  const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
+    commonBeacons;
+
   const {tokens} = await deployTokens(
     hre,
     toDeploy,
@@ -38,6 +49,15 @@ before(async function() {
     signers.token.externalOperator,
     commonBindings.operator.externalOperator,
     signers.token.externalOracle,
+
+    tokenFactory,
+    tokenBeacon,
+    compoundFactory,
+    compoundBeacon,
+    aaveV2Factory,
+    aaveV2Beacon,
+    aaveV3Factory,
+    aaveV3Beacon
   );
 
   contracts = {

@@ -3,7 +3,13 @@ import * as hre from "hardhat";
 
 import {
   deployOperator,
-  deployGovToken } from "../script-utils";
+  deployDAO,
+  deployGovToken,
+  deployRegistry,
+  deployVEGovLockup,
+  deployBeacons,
+  deployFactories
+  } from "../script-utils";
 
 export let signers: {
   userAccount1: ethers.Signer,
@@ -42,6 +48,20 @@ export let commonBindings: {
   },
 };
 
+export let commonFactories: {
+  tokenFactory: ethers.ContractFactory,
+  compoundFactory: ethers.ContractFactory,
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV3Factory: ethers.ContractFactory
+};
+
+export let commonBeacons: {
+  tokenBeacon: ethers.Contract,
+  compoundBeacon: ethers.Contract,
+  aaveV2Beacon: ethers.Contract,
+  aaveV3Beacon: ethers.Contract
+};
+
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
     throw new Error(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
@@ -60,13 +80,44 @@ before(async function () {
     fwEthAccountSigner
   ] = await hre.ethers.getSigners();
 
+  let govToken = await deployGovToken(hre, govTokenOwnerSigner);
+
+  let veGov = await deployVEGovLockup(hre, operatorCouncilSigner, govToken.address);
+
+  let dao = await deployDAO(hre, operatorCouncilSigner, veGov);
+
+  const [tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory] =
+    await deployFactories(hre);
+
+  console.log("factories");
+
+  let [tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon] = await deployBeacons(
+    hre,
+    tokenFactory,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory
+  );
+
+  console.log("beacons");
+
+  let registry = await deployRegistry(
+    hre,
+    dao,
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon
+  );
+
+  console.log("registry");
+
   let operator = await deployOperator(
     hre,
     operatorOperatorSigner,
     operatorCouncilSigner,
+    registry
   );
-
-  let govToken = await deployGovToken(hre, govTokenOwnerSigner);
 
   signers = {
     userAccount1: account1Signer,
@@ -102,5 +153,19 @@ before(async function () {
     govToken: {
       owner: govToken.connect(govTokenOwnerSigner),
     },
+  };
+
+  commonFactories = {
+    tokenFactory,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory
+  };
+
+  commonBeacons = {
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon
   };
 });
