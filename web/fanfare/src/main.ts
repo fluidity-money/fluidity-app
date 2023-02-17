@@ -22,9 +22,14 @@ const io = new Server(httpServer, {
 
 // Prepare for commands
 io.on("connection", (socket) => {
+  const {
+    remoteAddress,
+    request: { socket: { remotePort } },
+  } = socket.conn;
+
   socket.on("ping", () => {
-    console.log(`Received command: ping`);
-    socket.emit(`pong [${uuid}]`);
+    console.log(`[ping] ${remoteAddress}:${remotePort}`);
+    socket.emit("pong", `pong [${uuid}]`);
   });
 });
 
