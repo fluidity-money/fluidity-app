@@ -28,7 +28,7 @@ const TokenCard = ({
   isFluid = false,
   onButtonPress = () => {}
 }: ITokenCard) => {
-  const mobileBreakpoint = 768
+  const mobileBreakpoint = 1200
   const { width } = useViewport()
   const isMobile = width < mobileBreakpoint
 

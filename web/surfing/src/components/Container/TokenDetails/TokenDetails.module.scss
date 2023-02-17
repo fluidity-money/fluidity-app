@@ -8,6 +8,45 @@
   flex-direction: row;
   justify-content: left;
   position: relative;
+  gap: 2em;
+
+  &.isMobile {
+    flex-direction: column;
+    padding-left: 2em;
+
+    .details {
+      margin-right: 0;
+      align-items: center;
+
+      .prizes {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 5px;
+        padding: 1rem;
+        width: 100%;
+        justify-content: center;
+
+        .prize {
+          align-items: center;
+        }
+      }
+
+      .activity{
+        width: 100%;
+
+        th:last-child, td:last-child {
+          text-align: right;
+        }
+
+        th:first-child, td:first-child {
+          text-align: left;
+        }
+      }
+    }
+
+    .graph {
+      height: 100px;
+    }
+  }
 
   a {
     color: $textGrey;
@@ -20,7 +59,6 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    margin-right: 2em;
 
     .prizes {
       display: flex;
@@ -91,6 +129,8 @@
     
   .graph {
     flex-basis: 30%;
+    flex-shrink: 1;
+
     mix-blend-mode: screen;
   }
 }
