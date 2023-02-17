@@ -19,6 +19,7 @@
 
   .content {
     flex-grow: 1;
+    flex-shrink: 1;
 
     .top {
       align-self: end;
@@ -48,6 +49,7 @@
     }
 
     column-gap: 4rem;
+
     position: relative;
     display: grid;
     grid-template-rows: auto auto;
@@ -58,11 +60,15 @@
     margin-left: 2rem;
     margin-right: 2rem;
 
+    @media (max-width: 900px) {
+      column-gap: 2rem;
+    }
+
     &.isFluid {
       grid-template-columns: 1fr auto auto auto auto;
+      margin-right: 0;
     }
   }
-
 
   &.isMobile {
     padding: 1rem;
@@ -72,7 +78,11 @@
       column-gap: 1rem;
 
       margin-left: 1rem;
-      margin-right: 0;
+      margin-right: 1rem;
+
+      @media (max-width: 400px) {
+        margin-right: 0;
+      }
 
       button {
         margin-top: -0.1rem;
@@ -80,7 +90,7 @@
       }
 
       h1 {
-        font-size: 2rem;
+       font-size: 1.5rem;
       }
     }
   }
