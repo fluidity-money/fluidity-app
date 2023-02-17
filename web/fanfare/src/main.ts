@@ -32,4 +32,6 @@ app.get("/", (req, res) => {
   res.send(`OK {${uuid}}`);
 });
 
-console.log(`Fanfare instance {${uuid}}: :${port}`);
+httpServer.listen(port, () => {
+  console.log(`Fanfare instance {${uuid}} - Listening on :${port}`);
+});
