@@ -18,7 +18,7 @@ import { useCache } from "~/hooks/useCache";
 import { Rewarders } from "~/util/rewardAggregates";
 
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { Suspense, useContext, useEffect, useState } from "react";
 import { LoaderFunction } from "@remix-run/node";
