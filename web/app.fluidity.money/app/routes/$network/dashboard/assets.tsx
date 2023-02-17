@@ -145,30 +145,28 @@ const AssetsRoot = () => {
               <Display size="sm"> {numberToMonetaryString(totalWalletValue || 0)} </Display>
             
           </div>
-          <AnimateSharedLayout>
-            <div className="assets-navigation">
-              {navigationMap.map((l, i) => {
-                const selected = currentPage === l.link;
-                return (
-                  <Link key={i} to={l.link}>
-                    <Text
-                      size="lg"
-                      prominent={selected}
-                      className={selected ? "assets-active-filter" : ""}
-                    >
-                      {l.name}
-                    </Text>
-                    {selected && (
-                      <motion.div
-                        className="assets-active-filter-underline"
-                        layoutId="underline"
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </AnimateSharedLayout>
+          <div className="assets-navigation">
+            {navigationMap.map((l, i) => {
+              const selected = currentPage === l.link;
+              return (
+                <Link key={i} to={l.link}>
+                  <Text
+                    size="lg"
+                    prominent={selected}
+                    className={selected ? "assets-active-filter" : ""}
+                  >
+                    {l.name}
+                  </Text>
+                  {selected && (
+                    <motion.div
+                      className="assets-active-filter-underline"
+                      layoutId="underline"
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </div>
         <AnimatePresence>
             <Outlet />
