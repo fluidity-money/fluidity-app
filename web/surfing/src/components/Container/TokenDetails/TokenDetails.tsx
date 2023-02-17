@@ -86,7 +86,7 @@ const TokenDetails = ({
             <tbody>
             { activity.length ? (
                 activity.slice(0,3).map(({desc, value, reward, transaction}) => (
-                  <tr>
+                  <tr key={`tx-${transaction}`}>
                     <td>
                       <Text>
                       {isMobile ? (<a href={getTxExplorerLink('ethereum', transaction)}>{`${desc} ${numberToMonetaryString(value)}`}</a>) : (<>{desc}</>) }
