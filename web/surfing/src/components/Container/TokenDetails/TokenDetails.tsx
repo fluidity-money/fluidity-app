@@ -24,6 +24,7 @@ export type ITokenDetails = {
     transaction: string
     totalWalletValue: number
   }[]
+  onClickFullHistory: () => void
 }
 
 const getTxExplorerLink = (chain: 'ethereum' | 'solana', address: string) =>
@@ -36,6 +37,7 @@ const TokenDetails = ({
   avgPrize,
   topAssetPrize,
   activity,
+  onClickFullHistory,
 }: ITokenDetails) => {
   const mobileBreakpoint = 1200
   const { width } = useViewport()
@@ -104,7 +106,7 @@ const TokenDetails = ({
           </table>
         </div>
 
-        <LinkButton type="internal" size="small" handleClick={() => 1} >Full History</LinkButton>
+        <LinkButton type="internal" size="small" handleClick={onClickFullHistory} >Full History</LinkButton>
       </div>
       <motion.div 
         className={styles.graph}
