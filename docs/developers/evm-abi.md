@@ -8,7 +8,7 @@ The following ABIs can be compiled in the [repository](https://github.com/fluidi
 Source code
 {% endembed %}
 
-The Token is an ERC20-compatible contract featuring swap-in (`swapIn`) and swap-out (`swapOut`) features. Tokens include fUSDT, fUSDC and fDAI.
+The Token is an ERC20-compatible contract featuring swap-in (`erc20In`) and swap-out (`erc20Out`) .
 
 ### LiquidityProvider
 
