@@ -1,6 +1,7 @@
 import * as ethers from 'ethers';
 import { assert } from 'chai';
 import { bindings } from './setup-mainnet';
+import { BigNumber } from 'ethers';
 
 describe("registry reward pools", async function () {
   let registryOperator: ethers.Contract;
@@ -25,30 +26,29 @@ describe("registry reward pools", async function () {
   });
 
   it("registry consistent reward pools", async function () {
-    const manualAmount_ = tokens.map(v =>
+    const manualAmounts_ = tokens.map(v =>
       Promise.all([v.callStatic.rewardPoolAmount(), v.decimals()]) as Promise<[number, number]>);
 
-    let manualAmounts = await Promise.all(manualAmount_);
+    const manualAmounts = await Promise.all(manualAmounts_);
 
-    let manualAmount = manualAmounts
+    const manualAmount_ = manualAmounts
       .map(([pool, decimals]) => pool / (10 ** decimals))
       .reduce((acc, v) => acc + v);
 
-    // explicitly convert to integers from bignumbers here, hoping that
-    // it's consistent in practice, since BigNumber seems to have issues
-    // with the number 1e18
+    const manualAmount = BigNumber.from(manualAmount_);
 
-    const pools: { amount: ethers.BigNumber, decimals: number}[]
-      = await registryOperator.callStatic.getRewardPools();
+    const rewardPoolsAmount_ =
+      await registryOperator.callStatic.getRewardPools();
 
-    let rewardPoolsAmount = pools.reduce(
-      (acc, { amount, decimals }) => acc + (amount.toNumber() / (10 ** decimals)),
-      0,
-    );
+    const rewardPoolsAmount = BigNumber.from(rewardPoolsAmount_ / 1e18);
+
+    const similar =
+      manualAmount.add(1).gt(rewardPoolsAmount) ||
+      manualAmount.lt(rewardPoolsAmount.add(1));
 
     assert(
-      manualAmount == rewardPoolsAmount,
-      `manual amount (${manualAmount}) not the same as reward pools amount ${rewardPoolsAmount}`
+      similar,
+      `manual amount (${manualAmount}) not similar as reward pools amount ${rewardPoolsAmount}`
     );
   });
 });

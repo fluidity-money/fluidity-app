@@ -64,13 +64,8 @@ contract DAO {
 
     event VoteExecuted(bytes32 indexed proposalId);
 
-    event VotedFor(
-        bytes32 indexed proposalId,
-        address sender,
-        uint256 amount
-    );
-
-    event VotedAgainst(
+    event Voted(
+        bool direction,
         bytes32 indexed proposalId,
         address sender,
         uint256 amount
@@ -83,9 +78,6 @@ contract DAO {
     address emergencyCouncil_;
 
     mapping(bytes32 => Proposal) proposals_;
-
-    /// @dev nonces_ of user submissions per sender
-    mapping(address => uint256) nonces_;
 
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
@@ -126,12 +118,12 @@ contract DAO {
     function _voteFor(address _sender, bytes32 _proposalId, uint256 _amount) internal {
         proposals_[_proposalId].votesFor += _amount;
         proposals_[_proposalId].votes[_sender] += _amount;
-        emit VotedFor(_proposalId, _sender, _amount);
+        emit Voted(true, _proposalId, _sender, _amount);
     }
 
     /**
-     * @notice _voteAgainst r a proposal, recording the votes the user voted
-     *         and the votes for
+     * @notice _voteAgainst a proposal, recording the votes the user voted
+     *         and the votes against
      *
      * @param _sender that voted for the proposal
      * @param _proposalId to address the proposal with
@@ -144,11 +136,7 @@ contract DAO {
      ) internal {
          proposals_[_proposalId].votesAgainst += _amount;
          proposals_[_proposalId].votes[_sender] += _amount;
-         emit VotedAgainst(_proposalId, _sender, _amount);
-    }
-
-    function incrementSenderNonce(address _sender) internal {
-        nonces_[_sender]++;
+         emit Voted(false, _proposalId, _sender, _amount);
     }
 
     /**

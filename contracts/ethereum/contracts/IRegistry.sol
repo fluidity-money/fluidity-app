@@ -23,11 +23,6 @@ struct Registration {
     address addr;
 }
 
-struct RewardPool {
-    uint256 amount;
-    uint8 decimals;
-}
-
 interface IRegistry {
     function register(uint8, address) external;
     function registerMany(Registration[] calldata) external;
@@ -48,5 +43,5 @@ interface IRegistry {
      *         each token
     * @dev should (really) only be used by the UI since this is pretty expensive
     */
-    function getRewardPools() external returns (RewardPool[] memory);
+    function getRewardPools() external returns (uint256);
 }

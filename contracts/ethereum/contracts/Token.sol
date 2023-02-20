@@ -144,10 +144,6 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
     }
 
-    function op() public view returns (address) {
-        return operator_;
-    }
-
     /// @inheritdoc IToken
     function updateOperator(address newOperator) public {
         require(msg.sender == operator_, "only operator can use this function!");
@@ -331,9 +327,6 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @inheritdoc IToken
     function userMintLimit() public pure returns (uint) { return type(uint).max; }
-
-    /// @inheritdoc IToken
-    function remainingGlobalMintLimit() public pure returns (uint) { return type(uint).max; }
 
     /// @inheritdoc IToken
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }

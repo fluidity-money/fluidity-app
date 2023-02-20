@@ -59,8 +59,6 @@ interface IToken is IERC20 {
     /// @notice deprecated, mint limits no longer exist
     event MintLimitsStateChanged(bool indexed status);
 
-    function op() external view returns (address);
-
     /**
      * @notice update the operator account to a new address
      * @param _newOperator the address of the new operator to change to
@@ -140,12 +138,6 @@ interface IToken is IERC20 {
      * @notice mint limits no longer exist, this always `uint256.max`
      */
     function userMintLimit() external pure returns (uint);
-
-    /*
-     * @notice returns the remaining global mint limit
-     * @notice mint limits no longer exist, this always `uint256.max`
-     */
-    function remainingGlobalMintLimit() external pure returns (uint);
 
     /**
      * @notice return the max unchecked reward that's currently set

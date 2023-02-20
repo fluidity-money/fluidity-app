@@ -13,7 +13,7 @@ import "./LibGovernanceCalc.sol";
 
 /// @dev default maxLockTime to use as the max amount that could be
 ///      locked up
-uint256 constant MAX_LOCKUP_TIME = 365 days;
+uint256 constant MAX_LOCK_TIME = 365 days;
 
 struct Lockup {
     /// @dev lockLength is the number of seconds the amount was locked up for
@@ -92,7 +92,7 @@ contract VEGovLockup is IEmergencyMode {
         public pure returns (uint256)
     {
         uint256 currentLockLength = _lockLength - _lockTime -_currentTime;
-        return calcGovToVEGov(_tokenAmount, currentLockLength, MAX_LOCKUP_TIME);
+        return calcGovToVEGov(_tokenAmount, currentLockLength, MAX_LOCK_TIME);
     }
 
     function balanceOfUnderlying(address _spender) public view returns (uint256 amount) {
@@ -138,6 +138,8 @@ contract VEGovLockup is IEmergencyMode {
 
         require(_bptAmount > 0, "more than 0 token needed for lockup");
         require(_lockLength > 0, "lock length = 0");
+
+        require(_lockLength <= MAX_LOCK_TIME, "greater than max time");
 
         voteToken_.transferFrom(msg.sender, address(this), _bptAmount);
 
