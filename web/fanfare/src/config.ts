@@ -7,7 +7,7 @@ import {
  } from './observers';
 
 
-export const FanfareConfig = mergeSettings({
+export default mergeSettings({
     unhealthyThreshold: 5,
     services: [
         // GraphQLObserver(
