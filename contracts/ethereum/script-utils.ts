@@ -90,7 +90,7 @@ export const deployVEGovLockup = async(
 
 export const deployRegistry = async(
   hre: HardhatRuntimeEnvironment,
-  operator: ethers.Contract,
+  operator: ethers.Signer,
   tokenBeacon: ethers.Contract,
   compoundLpBeacon: ethers.Contract,
   aaveV2LpBeacon: ethers.Contract,
@@ -99,7 +99,7 @@ export const deployRegistry = async(
   deployAndInit(
     hre,
     "Registry",
-    operator.address,
+    await operator.getAddress(),
     tokenBeacon.address,
     compoundLpBeacon.address,
     aaveV2LpBeacon.address,
@@ -176,6 +176,7 @@ export const deployTestUtility = async (
 ) => {
   const factory = await hre.ethers.getContractFactory("TestClient");
   const client = await factory.deploy(boundOperatorOperator.address);
+
   await client.deployed();
 
   await boundOperatorOperator.updateUtilityClients([{
@@ -203,6 +204,7 @@ export const deployTokens = async (
   council: ethers.Signer,
   externalOperator: ethers.Signer,
   boundOperatorOperator: ethers.Contract,
+  boundRegistryOperator: ethers.Contract,
   externalOracle: ethers.Signer,
 
   tokenFactory: ethers.ContractFactory,
@@ -281,7 +283,7 @@ export const deployTokens = async (
       boundOperatorOperator.address,
     );
 
-    await boundOperatorOperator.updateUtilityClients([{
+    await boundRegistryOperator.updateUtilityClients([{
       name: "FLUID",
       overwrite: false,
       token: deployedToken.address,
@@ -302,18 +304,6 @@ export const deployTokens = async (
     tokens: tokenAddresses
   };
 };
-
-export const deployRewardPools = async (
-  hre: HardhatRuntimeEnvironment,
-  externalOperator: ethers.Signer,
-  tokens: ethers.Contract[]
-): Promise<ethers.Contract> =>
-  deployAndInit(
-    hre,
-    "RewardPools",
-    await externalOperator.getAddress(),
-    tokens.map(e => e.address),
-  );
 
 export const forknetTakeFunds = async (
   hre: HardhatRuntimeEnvironment,

@@ -78,7 +78,13 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     operator,
   );
 
-  const testClient = await deployTestUtility(hre, operator, externalOperatorAddress, tokens["fUSDt"].deployedToken.address);
+  const testClient = await deployTestUtility(
+    hre,
+    operator,
+    externalOperatorAddress,
+    tokens["fUSDt"].deployedToken.address
+  );
+
   console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDt"].deployedToken.address}`);
 
   console.log(`deployment complete`);

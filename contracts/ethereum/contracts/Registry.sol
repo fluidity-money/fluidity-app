@@ -90,15 +90,26 @@ contract Registry is IRegistry {
         return operator_ == address(0) || msg.sender == operator_;
     }
 
-    function register(uint8 _type, address _contract) public {
-        require(operatorNotRequiredOrIsOperator(), "not allowed");
-
+    function _register(uint8 _type, address _contract) internal {
         registrations_.push(Registration({
             type_: _type,
             addr: _contract
         }));
 
         emit RegistrationMade(_type, _contract);
+    }
+
+    function register(uint8 _type, address _contract) public {
+        require(operatorNotRequiredOrIsOperator(), "not allowed");
+
+        _register(_type, _contract);
+    }
+
+    function registerMany(Registration[] calldata _registrations) public {
+        require(operatorNotRequiredOrIsOperator(), "not allowed");
+
+        for (uint i = 0; i < _registrations.length; i++)
+          _register(_registrations[i].type_, _registrations[i].addr);
     }
 
     function registrations() public view returns (Registration[] memory) {

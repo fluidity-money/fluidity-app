@@ -48,6 +48,7 @@ before(async function() {
     signers.token.emergencyCouncil,
     signers.token.externalOperator,
     commonBindings.operator.externalOperator,
+    commonBindings.registry.externalOperator,
     signers.token.externalOracle,
 
     tokenFactory,

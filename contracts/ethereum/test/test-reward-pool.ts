@@ -1,30 +1,31 @@
-import * as hre from 'hardhat';
 import * as ethers from 'ethers';
 import { assert } from 'chai';
 import { bindings } from './setup-mainnet';
 
-describe("reward pools", async function () {
-  let fUsdt: ethers.Contract;
-  let fDai: ethers.Contract;
-  let fFei: ethers.Contract;
-  let rewardPoolsOperator: ethers.Contract;
+describe("registry reward pools", async function () {
+  let registryOperator: ethers.Contract;
+
+  let tokens: ethers.Contract[];
 
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();
     }
 
+    tokens = [
+      bindings.usdt.fluidAccount1,
+      bindings.dai.fluid,
+      bindings.fei.fluid
+    ];
+
     ({
-      usdt: { fluidAccount1: fUsdt },
-      dai: { fluid: fDai },
-      fei: { fluid: fFei },
-      rewardPools: { operator: rewardPoolsOperator },
+      registry: { externalOperator: registryOperator },
     } = bindings);
   });
 
-  it("consistent reward pools", async function () {
-    const manualAmount_ = [ fUsdt, fDai, fFei ]
-      .map(v => Promise.all([v.callStatic.rewardPoolAmount(), v.decimals()]) as Promise<[number, number]>);
+  it("registry consistent reward pools", async function () {
+    const manualAmount_ = tokens.map(v =>
+      Promise.all([v.callStatic.rewardPoolAmount(), v.decimals()]) as Promise<[number, number]>);
 
     let manualAmounts = await Promise.all(manualAmount_);
 
@@ -37,7 +38,7 @@ describe("reward pools", async function () {
     // with the number 1e18
 
     const pools: { amount: ethers.BigNumber, decimals: number}[]
-      = await rewardPoolsOperator.callStatic.getPools();
+      = await registryOperator.callStatic.getPools();
 
     let rewardPoolsAmount = pools.reduce(
       (acc, { amount, decimals }) => acc + (amount.toNumber() / (10 ** decimals)),

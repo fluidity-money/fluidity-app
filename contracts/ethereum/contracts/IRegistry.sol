@@ -30,6 +30,8 @@ struct RewardPool {
 
 interface IRegistry {
     function register(uint8, address) external;
+    function registerMany(Registration[] calldata) external;
+
     function registrations() external view returns (Registration[] memory);
 
     function getFluidityClient(

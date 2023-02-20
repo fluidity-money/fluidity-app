@@ -1,7 +1,11 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, deployRewardPools, forknetTakeFunds } from "../script-utils";
-import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
+import { deployTokens, forknetTakeFunds } from "../script-utils";
+
+import {
+  AAVE_V2_POOL_PROVIDER_ADDR,
+  REGISTRATION_TYPE_TOKEN,
+  TokenList } from "../test-constants";
 
 import {
   commonBindings,
@@ -27,7 +31,6 @@ export let contracts: typeof commonContracts & {
     deployedToken: ethers.Contract,
     deployedPool: ethers.Contract,
   },
-  rewardPools: ethers.Contract,
   ethConvertor: ethers.Contract
 };
 
@@ -52,9 +55,6 @@ export let bindings: typeof commonBindings & {
   weth: {
     base: ethers.Contract,
     fluid: ethers.Contract
-  },
-  rewardPools: {
-    operator: ethers.Contract,
   },
   ethConvertor: {
     operator: ethers.Contract
@@ -94,6 +94,7 @@ before(async function () {
     signers.token.emergencyCouncil,
     signers.token.externalOperator,
     commonBindings.operator.externalOperator,
+    commonBindings.registry.externalOperator,
     signers.token.externalOracle,
 
     tokenFactory,
@@ -113,12 +114,6 @@ before(async function () {
 
   await commonBindings.operator.externalOperator.updateOracles(oracles);
 
-  const rewardPools = await deployRewardPools(
-    hre,
-    signers.rewardPools.externalOperator,
-    Object.values(tokens).map(e => e.deployedToken),
-  );
-
   const convertorEthToTokenFactory = await hre.ethers.getContractFactory(
     "ConvertorEthToToken"
   );
@@ -128,13 +123,22 @@ before(async function () {
     TokenList["weth"].address
   );
 
+  const deployedTokens = Object.values(tokens).map(({ deployedToken }) => deployedToken);
+
+  await commonBindings.registry.externalOperator.registerMany(deployedTokens.map((token) => {
+    console.log(token.address);
+    return {
+      type_: REGISTRATION_TYPE_TOKEN,
+      addr: token.address
+    }
+  }));
+
   contracts = {
     ...commonContracts,
     usdt: tokens["fUSDt"],
     fei: tokens["fFei"],
     dai: tokens["fDAI"],
     weth: tokens["fwETH"],
-    rewardPools,
     ethConvertor
   };
 
@@ -159,9 +163,6 @@ before(async function () {
     weth: {
       base: await hre.ethers.getContractAt("IERC20", TokenList["weth"].address, signers.userAccount1),
       fluid: contracts.weth.deployedToken.connect(signers.userAccount1),
-    },
-    rewardPools: {
-      operator: contracts.rewardPools.connect(signers.rewardPools.externalOperator),
     },
     ethConvertor: {
       operator: contracts.ethConvertor.connect(signers.fwEthAccount)

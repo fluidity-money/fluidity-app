@@ -25,8 +25,8 @@ export let signers: {
     emergencyCouncil: ethers.Signer,
     externalOperator: ethers.Signer,
   },
-  rewardPools: {
-    externalOperator: ethers.Signer,
+  registry: {
+    externalOperator: ethers.Signer
   },
   govToken: {
     owner: ethers.Signer,
@@ -36,12 +36,17 @@ export let signers: {
 export let commonContracts: {
   operator: ethers.Contract,
   govToken: ethers.Contract,
+  registry: ethers.Contract,
+  dao: ethers.Contract
 };
 
 export let commonBindings: {
   operator: {
     emergencyCouncil: ethers.Contract,
     externalOperator: ethers.Contract,
+  },
+  registry: {
+    externalOperator: ethers.Contract
   },
   govToken: {
     owner: ethers.Contract,
@@ -75,7 +80,6 @@ before(async function () {
     tokenOperatorSigner,
     operatorCouncilSigner,
     operatorOperatorSigner,
-    rewardPoolsOperatorSigner,
     govTokenOwnerSigner,
     fwEthAccountSigner
   ] = await hre.ethers.getSigners();
@@ -89,8 +93,6 @@ before(async function () {
   const [tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory] =
     await deployFactories(hre);
 
-  console.log("factories");
-
   let [tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon] = await deployBeacons(
     hre,
     tokenFactory,
@@ -99,18 +101,14 @@ before(async function () {
     aaveV3Factory
   );
 
-  console.log("beacons");
-
   let registry = await deployRegistry(
     hre,
-    dao,
+    operatorOperatorSigner,
     tokenBeacon,
     compoundBeacon,
     aaveV2Beacon,
     aaveV3Beacon
   );
-
-  console.log("registry");
 
   let operator = await deployOperator(
     hre,
@@ -133,8 +131,8 @@ before(async function () {
       emergencyCouncil: operatorCouncilSigner,
       externalOperator: operatorOperatorSigner,
     },
-    rewardPools: {
-      externalOperator: rewardPoolsOperatorSigner,
+    registry: {
+      externalOperator: operatorOperatorSigner
     },
     govToken: {
       owner: govTokenOwnerSigner,
@@ -144,15 +142,21 @@ before(async function () {
   commonContracts = {
     operator,
     govToken,
+    registry,
+    dao
   };
+
   commonBindings = {
     operator: {
       emergencyCouncil: operator.connect(operatorCouncilSigner),
       externalOperator: operator.connect(operatorOperatorSigner),
     },
+    registry: {
+      externalOperator: registry.connect(operatorOperatorSigner)
+    },
     govToken: {
       owner: govToken.connect(govTokenOwnerSigner),
-    },
+    }
   };
 
   commonFactories = {
