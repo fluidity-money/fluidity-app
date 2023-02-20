@@ -15,7 +15,8 @@ describe("registry reward pools", async function () {
     tokens = [
       bindings.usdt.fluidAccount1,
       bindings.dai.fluid,
-      bindings.fei.fluid
+      bindings.fei.fluid,
+      bindings.weth.fluid
     ];
 
     ({

@@ -111,10 +111,13 @@ contract Registry is IRegistry {
     }
 
     /// @inheritdoc IRegistry
-    function getRewardPools() public returns (RewardPool[] memory rewardPool) {
-        rewardPool = new RewardPool[](registrations_.length);
+    function getRewardPools() public returns (RewardPool[] memory) {
 
-        uint pos = 0;
+        // Create 13 items for the RewardPool, assuming that the values
+        // will be (1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12, 1e13, 1e14, 1e15, 1e16,
+        // 1e17, 1e18)
+
+        RewardPool[] memory rewardPools = new RewardPool[](13);
 
         for (uint i = 0; i < registrations_.length; i++) {
             Registration storage registration = registrations_[i];
@@ -123,14 +126,30 @@ contract Registry is IRegistry {
 
             IToken token = IToken(registration.addr);
 
-            RewardPool memory pool;
+            uint8 decimals = token.decimals();
 
-            pool.amount = token.rewardPoolAmount();
-            pool.decimals = token.decimals();
+            uint pos;
 
-            rewardPool[pos] = pool;
-            pos++;
+            if (decimals == 6) pos = 0;
+            else if (decimals == 7) pos = 1;
+            else if (decimals == 8) pos = 2;
+            else if (decimals == 9) pos = 3;
+            else if (decimals == 10) pos = 4;
+            else if (decimals == 11) pos = 5;
+            else if (decimals == 12) pos = 6;
+            else if (decimals == 13) pos = 7;
+            else if (decimals == 14) pos = 8;
+            else if (decimals == 15) pos = 9;
+            else if (decimals == 16) pos = 10;
+            else if (decimals == 17) pos = 11;
+            else if (decimals == 18) pos = 12;
+            else revert("registry upgrade");
+
+            rewardPools[pos].decimals = decimals;
+            rewardPools[pos].amount += token.rewardPoolAmount();
         }
+
+        return rewardPools;
     }
 
     function getFluidityClient(
