@@ -296,10 +296,9 @@ contract DAO {
 
     /// @notice getAmountUserCanVote based on what's been voted so far
     ///         and the balance the user has based on the decay
-    function getAmountUserCanVote(
+    function getAmountAvailable(
         bytes32 _proposalId,
-        address _spender,
-        uint256 _amount
+        address _spender
     )
         public view returns (uint256)
     {
@@ -313,9 +312,7 @@ contract DAO {
             available = available - spent;
         }
 
-        // if the amount available is greater than, use the available number
-
-        return available > _amount ? available : _amount;
+        return available;
     }
 
     function killProposal(bytes32 _proposalId) public {
@@ -339,7 +336,7 @@ contract DAO {
         require(getProposalVoteable(_proposalId), "proposal frozen");
 
         require(
-          getAmountUserCanVote(_proposalId, msg.sender, _amount) <= _amount,
+          getAmountAvailable(_proposalId, msg.sender) == _amount,
           "user trying to vote more they can"
         );
 
@@ -354,7 +351,7 @@ contract DAO {
         require(getProposalVoteable(_proposalId), "proposal frozen");
 
         require(
-          getAmountUserCanVote(_proposalId, msg.sender, _amount) <= _amount,
+          getAmountAvailable(_proposalId, msg.sender) <= _amount,
           "user trying to vote more they can"
         );
 
