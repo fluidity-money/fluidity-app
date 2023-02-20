@@ -22,9 +22,6 @@ const getChainId = (network: Chain): number => {
     case "solana":
       return 1;
   }
-}
-
-export {
-  chainType,
-  getChainId,
 };
+
+export { chainType, getChainId };

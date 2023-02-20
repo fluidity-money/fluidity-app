@@ -62,22 +62,26 @@ const EthereumFacade = ({
 
   const chain = chainType(network);
 
-  if (!chain || chain !== "evm")
-    console.warn("Unsupported connector", network);
+  if (!chain || chain !== "evm") console.warn("Unsupported connector", network);
 
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
     connectors.every(([connector]) => {
-      connector?.connectEagerly?.()?.then(() => {
-        // switch if connected eagerly to the wrong network
-        // Provider type is missing chainId but it can exist
-        const connectedChainId = (connector.provider as unknown as {chainId?: string})?.chainId;
-        const desiredChainId = `0x${getChainId(network).toString(16)}`
-        if (connectedChainId && desiredChainId !== connectedChainId) {
-          connector.activate(getChainId(network))
-        }
-      }).catch(() => true)
+      connector
+        ?.connectEagerly?.()
+        ?.then(() => {
+          // switch if connected eagerly to the wrong network
+          // Provider type is missing chainId but it can exist
+          const connectedChainId = (
+            connector.provider as unknown as { chainId?: string }
+          )?.chainId;
+          const desiredChainId = `0x${getChainId(network).toString(16)}`;
+          if (connectedChainId && desiredChainId !== connectedChainId) {
+            connector.activate(getChainId(network));
+          }
+        })
+        .catch(() => true);
     });
   }, []);
 
@@ -386,9 +390,12 @@ const EthereumFacade = ({
   );
 };
 
-export const EthereumProvider = (rpcUrl: string, tokens: Token[], network?: string) => {
-  if (!network)
-    throw new Error("No network provided to EthereumProvider!");
+export const EthereumProvider = (
+  rpcUrl: string,
+  tokens: Token[],
+  network?: string
+) => {
+  if (!network) throw new Error("No network provided to EthereumProvider!");
 
   const Provider = ({ children }: { children: React.ReactNode }) => {
     // Custom key logic
@@ -443,7 +450,11 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[], network?: stri
     return (
       <>
         <Web3ReactProvider connectors={connectors} key={key}>
-          <EthereumFacade tokens={tokens} connectors={connectors} network={network as Chain}>
+          <EthereumFacade
+            tokens={tokens}
+            connectors={connectors}
+            network={network as Chain}
+          >
             {children}
           </EthereumFacade>
         </Web3ReactProvider>
