@@ -39,8 +39,6 @@ contract Registry is IRegistry {
         address newClient
     );
 
-    uint8 private version_;
-
     /**
     * @dev operator_ able to access the permissioned functions on this
     * Registry (note: not Operator)
@@ -66,24 +64,20 @@ contract Registry is IRegistry {
 
     mapping(address => TrfVariables) private trfVariables_;
 
-    function init(
+    constructor(
         address _operator,
         IBeacon _tokenBeacon,
 
         IBeacon _compoundLiquidityProviderBeacon,
         IBeacon _aaveV2LiquidityProviderBeacon,
         IBeacon _aaveV3LiquidityProviderBeacon
-    ) public {
-        require(version_ == 0, "already initialised");
-
+    ) {
         operator_ = _operator;
         tokenBeacon_ = _tokenBeacon;
 
         compoundLiquidityProviderBeacon_ = _compoundLiquidityProviderBeacon;
         aaveV2LiquidityProviderBeacon_ = _aaveV2LiquidityProviderBeacon;
         aaveV3LiquidityProviderBeacon_ = _aaveV3LiquidityProviderBeacon;
-
-        version_ = 1;
     }
 
     function operatorNotRequiredOrIsOperator() public view returns (bool) {
@@ -118,11 +112,9 @@ contract Registry is IRegistry {
 
     /// @inheritdoc IRegistry
     function getRewardPools() public returns (RewardPool[] memory rewardPool) {
+        rewardPool = new RewardPool[](registrations_.length);
 
-        // set the length to half the registrations, since presumably they're
-        // all "Token" then "Registration" for each (push if we run out...
-        // for... gas - if someone uses this who's not the frontend)
-        rewardPool = new RewardPool[](registrations_.length / 2);
+        uint pos = 0;
 
         for (uint i = 0; i < registrations_.length; i++) {
             Registration storage registration = registrations_[i];
@@ -136,7 +128,8 @@ contract Registry is IRegistry {
             pool.amount = token.rewardPoolAmount();
             pool.decimals = token.decimals();
 
-            rewardPool[i] = pool;
+            rewardPool[pos] = pool;
+            pos++;
         }
     }
 

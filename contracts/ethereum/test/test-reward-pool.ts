@@ -38,7 +38,7 @@ describe("registry reward pools", async function () {
     // with the number 1e18
 
     const pools: { amount: ethers.BigNumber, decimals: number}[]
-      = await registryOperator.callStatic.getPools();
+      = await registryOperator.callStatic.getRewardPools();
 
     let rewardPoolsAmount = pools.reduce(
       (acc, { amount, decimals }) => acc + (amount.toNumber() / (10 ** decimals)),

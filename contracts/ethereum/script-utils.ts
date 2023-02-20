@@ -95,16 +95,17 @@ export const deployRegistry = async(
   compoundLpBeacon: ethers.Contract,
   aaveV2LpBeacon: ethers.Contract,
   aaveV3LpBeacon: ethers.Contract
-): Promise<ethers.Contract> =>
-  deployAndInit(
-    hre,
-    "Registry",
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("Registry");
+
+  return factory.deploy(
     await operator.getAddress(),
     tokenBeacon.address,
     compoundLpBeacon.address,
     aaveV2LpBeacon.address,
     aaveV3LpBeacon.address
   );
+};
 
 export const deployDAO = async (
   hre: HardhatRuntimeEnvironment,
