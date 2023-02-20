@@ -67,7 +67,10 @@ const fluidAssetOf = (tokens: Token[], assetToken: Token): Token | undefined =>
     : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address);
 
 const getUsdFromTokenAmount = (amount: BN, decimalsOrToken: number | Token) => {
-  const decimals = typeof decimalsOrToken === 'number' ? decimalsOrToken : decimalsOrToken.decimals;
+  const decimals =
+    typeof decimalsOrToken === "number"
+      ? decimalsOrToken
+      : decimalsOrToken.decimals;
   return amount.div(new BN(10).pow(new BN(decimals - 2))).toNumber() / 100;
 };
 

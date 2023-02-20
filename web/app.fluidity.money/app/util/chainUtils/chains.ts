@@ -5,14 +5,12 @@ const chainType = (network: string): ChainType | undefined => {
   switch (network) {
     case "ethereum":
     case "arbitrum":
-      return "evm"
+      return "evm";
     case "solana":
-      return "solana"
+      return "solana";
     default:
-      return undefined
+      return undefined;
   }
 };
 
-export {
-  chainType,
-};
+export { chainType };

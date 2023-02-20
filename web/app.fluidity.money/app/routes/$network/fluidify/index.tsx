@@ -121,31 +121,33 @@ export default function FluidifyToken() {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
- const [searchParams, setSearchParams] = useSearchParams()
- const token = searchParams.get("token")
+  const [searchParams, setSearchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
   const deeplinkAssetToken = tokens.find(
     (t) => t.symbol.toLowerCase() === token?.toLowerCase()
-  )
+  );
 
   // Currently selected token
-  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>(deeplinkAssetToken);
+  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>(
+    deeplinkAssetToken
+  );
 
   // TODO: Remove this entirely. Use search params exclusively as the source of truth w/o side effects.
   useEffect(() => {
     if (!assetToken) {
       return setSearchParams((prev) => {
-        const searchParams = prev
+        const searchParams = prev;
         searchParams.delete("token");
         return searchParams;
-      })
+      });
     }
     setSearchParams((prev) => {
-      const searchParams = prev
+      const searchParams = prev;
       searchParams.set("token", assetToken.symbol);
       return searchParams;
-    })
-  }, [assetToken])
+    });
+  }, [assetToken]);
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
@@ -207,15 +209,14 @@ export default function FluidifyToken() {
     if (address && !swapping) {
       (async () => {
         switch (network) {
-          case "ethereum": 
+          case "ethereum":
           case "arbitrum": {
             const [tokensMinted, userTokenBalance, mintLimit] =
               await Promise.all([
                 Promise.all(
                   tokens.map(async (token) => {
                     // no mint limits on arbitrum
-                    if (network === "arbitrum")
-                      return undefined;
+                    if (network === "arbitrum") return undefined;
 
                     if (token.isFluidOf) return undefined;
 
