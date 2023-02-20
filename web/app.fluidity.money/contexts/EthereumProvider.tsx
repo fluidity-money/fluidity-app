@@ -71,8 +71,8 @@ const EthereumFacade = ({
     connectors.every(([connector]) => {
       connector?.connectEagerly?.()?.then(() => {
         // switch if connected eagerly to the wrong network
-        // @ts-ignore
-        const connectedChainId = connector.provider?.chainId;
+        // Provider type is missing chainId but it can exist
+        const connectedChainId = (connector.provider as unknown as {chainId?: string})?.chainId;
         const desiredChainId = `0x${getChainId(network).toString(16)}`
         if (connectedChainId && desiredChainId !== connectedChainId) {
           connector.activate(getChainId(network))
