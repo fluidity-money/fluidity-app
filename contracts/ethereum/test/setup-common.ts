@@ -101,9 +101,13 @@ before(async function () {
     aaveV3Factory
   );
 
+  const operatorAddress = await operatorOperatorSigner.getAddress();
+
+  const councilAddress = await operatorCouncilSigner.getAddress();
+
   let registry = await deployRegistry(
     hre,
-    operatorOperatorSigner,
+    operatorAddress,
     tokenBeacon,
     compoundBeacon,
     aaveV2Beacon,
@@ -112,8 +116,8 @@ before(async function () {
 
   let operator = await deployOperator(
     hre,
-    operatorOperatorSigner,
-    operatorCouncilSigner,
+    operatorAddress,
+    councilAddress,
     registry
   );
 

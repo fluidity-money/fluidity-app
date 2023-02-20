@@ -40,16 +40,22 @@ before(async function() {
   const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
     commonBeacons;
 
+  const emergencyCouncilAddress = await signers.token.emergencyCouncil.getAddress();
+
+  const operatorAddress = await  signers.token.externalOperator.getAddress();
+
+  const oracleAddress = await signers.token.externalOracle.getAddress();
+
   const {tokens} = await deployTokens(
     hre,
     toDeploy,
     "no v2 tokens here",
     AAVE_V3_GOERLI_POOL_PROVIDER_ADDR,
-    signers.token.emergencyCouncil,
-    signers.token.externalOperator,
+    emergencyCouncilAddress,
+    operatorAddress,
     commonBindings.operator.externalOperator,
     commonBindings.registry.externalOperator,
-    signers.token.externalOracle,
+    oracleAddress,
 
     tokenFactory,
     tokenBeacon,

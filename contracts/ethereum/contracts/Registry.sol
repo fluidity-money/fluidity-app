@@ -9,6 +9,7 @@ import "./IToken.sol";
 import "./ILiquidityProvider.sol";
 import "./IToken.sol";
 import "./IRegistry.sol";
+import "./ITotalRewardPool.sol";
 
 import "./TrfVariables.sol";
 
@@ -25,7 +26,7 @@ struct ScannedUtilityVars {
     string name;
 }
 
-contract Registry is IRegistry {
+contract Registry is IRegistry, ITotalRewardPool {
 
     /// @dev RegistrationType is a uint8 in practice, so it can be updated
     /// with a contract upgrade if the ABI changes
@@ -110,8 +111,8 @@ contract Registry is IRegistry {
         return registrations_;
     }
 
-    /// @inheritdoc IRegistry
-    function getRewardPools() public returns (uint256 cumulative) {
+    /// @inheritdoc ITotalRewardPool
+    function getTotalRewardPool() public returns (uint256 cumulative) {
         for (uint i = 0; i < registrations_.length; i++) {
             Registration storage registration = registrations_[i];
 

@@ -31,20 +31,18 @@ describe("registry reward pools", async function () {
 
     const manualAmounts = await Promise.all(manualAmounts_);
 
-    const manualAmount_ = manualAmounts
+    const manualAmount = manualAmounts
       .map(([pool, decimals]) => pool / (10 ** decimals))
       .reduce((acc, v) => acc + v);
 
-    const manualAmount = BigNumber.from(manualAmount_);
-
     const rewardPoolsAmount_ =
-      await registryOperator.callStatic.getRewardPools();
+      await registryOperator.callStatic.getTotalRewardPool();
 
-    const rewardPoolsAmount = BigNumber.from(rewardPoolsAmount_ / 1e18);
+    const rewardPoolsAmount = rewardPoolsAmount_ / 1e18;
 
     const similar =
-      manualAmount.add(1).gt(rewardPoolsAmount) ||
-      manualAmount.lt(rewardPoolsAmount.add(1));
+      manualAmount + 1 > rewardPoolsAmount ||
+      manualAmount < rewardPoolsAmount + 1;
 
     assert(
       similar,

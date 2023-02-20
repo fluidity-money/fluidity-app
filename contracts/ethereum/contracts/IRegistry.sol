@@ -37,11 +37,4 @@ interface IRegistry {
     function updateTrfVariables(address, TrfVariables calldata) external;
 
     function getTrfVariables(address) external returns (TrfVariables memory);
-
-    /**
-     * @notice getRewardPools, returning the decimals and addresses of
-     *         each token
-    * @dev should (really) only be used by the UI since this is pretty expensive
-    */
-    function getRewardPools() external returns (uint256);
 }

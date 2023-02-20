@@ -4,7 +4,17 @@ import "hardhat-docgen";
 import { task, subtask } from "hardhat/config";
 import type { HardhatUserConfig } from "hardhat/types";
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-import { deployTokens, deployOperator, setOracles, forknetTakeFunds, mustEnv, deployTestUtility } from './script-utils';
+
+import {
+  deployTokens,
+  deployOperator,
+  setOracles,
+  forknetTakeFunds,
+  mustEnv,
+  deployTestUtility,
+  deployRegistry,
+  deployBeacons,
+  deployFactories } from './script-utils';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -54,10 +64,31 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   }
   await hre.run("forknet:take-usdt");
 
+  const [tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory] =
+    await deployFactories(hre);
+
+  const [tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon] = await deployBeacons(
+    hre,
+    tokenFactory,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory
+  );
+
+  const registry = await deployRegistry(
+    hre,
+    externalOperatorAddress,
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon
+  );
+
   const operator = await deployOperator(
     hre,
     externalOperatorAddress,
-    emergencyCouncilAddress,
+    emergencyCouncilKey,
+    registry
   );
 
   const { tokens } = await deployTokens(
@@ -66,8 +97,19 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
     emergencyCouncilAddress,
-    operator.address,
     externalOperatorAddress,
+    operator,
+    registry,
+    externalOperatorAddress,
+
+    tokenFactory,
+    tokenBeacon,
+    compoundFactory,
+    compoundBeacon,
+    aaveV2Factory,
+    aaveV2Beacon,
+    aaveV3Factory,
+    aaveV3Beacon
   );
 
   await setOracles(
@@ -81,7 +123,6 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   const testClient = await deployTestUtility(
     hre,
     operator,
-    externalOperatorAddress,
     tokens["fUSDt"].deployedToken.address
   );
 

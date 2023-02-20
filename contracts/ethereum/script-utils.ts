@@ -64,15 +64,15 @@ const deployAndInit = async (
 
 export const deployOperator = async (
   hre: HardhatRuntimeEnvironment,
-  externalOperator: ethers.Signer,
-  council: ethers.Signer,
+  externalOperatorAddress: string,
+  councilAddress: string,
   registry: ethers.Contract
 ): Promise<ethers.Contract> =>
   deployAndInit(
     hre,
     "Operator",
-    await externalOperator.getAddress(),
-    await council.getAddress(),
+    externalOperatorAddress,
+    councilAddress,
     registry.address
   );
 
@@ -90,7 +90,7 @@ export const deployVEGovLockup = async(
 
 export const deployRegistry = async(
   hre: HardhatRuntimeEnvironment,
-  operator: ethers.Signer,
+  operatorAddress: string,
   tokenBeacon: ethers.Contract,
   compoundLpBeacon: ethers.Contract,
   aaveV2LpBeacon: ethers.Contract,
@@ -99,7 +99,7 @@ export const deployRegistry = async(
   const factory = await hre.ethers.getContractFactory("Registry");
 
   return factory.deploy(
-    await operator.getAddress(),
+    operatorAddress,
     tokenBeacon.address,
     compoundLpBeacon.address,
     aaveV2LpBeacon.address,
@@ -202,11 +202,11 @@ export const deployTokens = async (
   tokens: Token[],
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
-  council: ethers.Signer,
-  externalOperator: ethers.Signer,
+  councilAddress: string,
+  externalOperatorAddress: string,
   boundOperatorOperator: ethers.Contract,
   boundRegistryOperator: ethers.Contract,
-  externalOracle: ethers.Signer,
+  externalOracleAddress: string,
 
   tokenFactory: ethers.ContractFactory,
   tokenBeacon: ethers.Contract,
@@ -279,8 +279,8 @@ export const deployTokens = async (
       token.decimals,
       token.name,
       token.symbol,
-      await council.getAddress(),
-      await externalOperator.getAddress(),
+      councilAddress,
+      externalOperatorAddress,
       boundOperatorOperator.address,
     );
 
@@ -293,7 +293,7 @@ export const deployTokens = async (
 
     await boundOperatorOperator.updateOracles([{
       contractAddr: deployedToken.address,
-      newOracle: externalOracle.getAddress(),
+      newOracle: externalOracleAddress,
     }]);
 
     tokenAddresses[token.symbol] = {deployedToken, deployedPool};
