@@ -1,3 +1,5 @@
+import { useSync } from "./sync";
+
 export type { Queryable } from "./api/graphql";
 
 export { gql } from "./api/graphql";
@@ -17,3 +19,6 @@ export {
   transactionActivityLabel,
   transactionTimeLabel,
 } from "./converters";
+export {
+  useSync
+} from "./sync";
