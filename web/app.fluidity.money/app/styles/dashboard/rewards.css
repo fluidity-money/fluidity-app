@@ -175,6 +175,7 @@
   outline: unset;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
   gap: 2em;
 }
 

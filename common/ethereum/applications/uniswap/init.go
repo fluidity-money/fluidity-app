@@ -18,4 +18,10 @@ func init() {
 	if uniswapV2PairAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(uniswapV3PairAbiString)
+
+	if uniswapV3PairAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }

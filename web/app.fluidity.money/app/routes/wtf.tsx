@@ -1,7 +1,7 @@
 import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   json,
   LinksFunction,
@@ -32,6 +32,7 @@ import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
 import { generateMeta } from "~/util/tweeter";
+import {SplitContext} from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -148,20 +149,37 @@ export default function IndexPage() {
   const navigate = useNavigate();
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
+  const {showExperiment} = useContext(SplitContext);
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chains = [
-    {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  ];
+  const chains =
+    showExperiment("enable-arbitrum")
+      ? [
+        {
+          name: "ETH",
+          icon: <img src="/assets/chains/ethIcon.svg" />,
+        },
+        {
+          name: "ARB",
+          icon: <img src="/assets/chains/ethIcon.svg" />,
+        },
+        {
+          name: "SOL",
+          icon: <img src="/assets/chains/solanaIcon.svg" />,
+        },
+      ]
+      : [
+        {
+          name: "ETH",
+          icon: <img src="/assets/chains/ethIcon.svg" />,
+        },
+        {
+          name: "SOL",
+          icon: <img src="/assets/chains/solanaIcon.svg" />,
+        },
+      ];
 
   return (
     <>

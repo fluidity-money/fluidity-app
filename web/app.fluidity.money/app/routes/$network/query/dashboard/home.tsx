@@ -50,7 +50,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
               address,
             }
           )
-        : jsonGet<Record<string, string>, { volume: Volume[] }>(
+        : jsonGet<Record<string, never>, { volume: Volume[] }>(
             `${url.origin}/${network}/query/volumeStats`
           ),
       address

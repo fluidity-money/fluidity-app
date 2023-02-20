@@ -3,10 +3,10 @@ import styles from "./CookieConsent.module.scss";
 export type CookieConsentProps = {
   activated: boolean;
   url: string;
-  callBack: () => void;
+  callback: () => void;
 };
 
-const CookieConsent = ({ activated, url, callBack }: CookieConsentProps) => {
+const CookieConsent = ({ activated, url, callback }: CookieConsentProps) => {
   return (
     <>
       {!activated ? (
@@ -24,7 +24,7 @@ const CookieConsent = ({ activated, url, callBack }: CookieConsentProps) => {
             .<br />
             We're open source, so our data usage is fully transparent.
           </div>
-          <button className={styles.button} onClick={callBack}>
+          <button className={styles.button} onClick={callback}>
             Got it!
           </button>
         </div>
@@ -32,7 +32,7 @@ const CookieConsent = ({ activated, url, callBack }: CookieConsentProps) => {
         <></>
       )}
     </>
-  );
+  )
 };
 
 export default CookieConsent;

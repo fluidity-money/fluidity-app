@@ -4,7 +4,7 @@ import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
 import { useEffect, useMemo, useState, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "~/util/split";
+import { SplitContext } from "contexts/SplitProvider";
 import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";
@@ -25,17 +25,20 @@ const Provider = ({
   tokens,
   solRpc,
   ethRpc,
+  arbRpc,
   children,
 }: {
   network?: string;
   tokens: Token[];
   solRpc: string;
   ethRpc: string;
+  arbRpc: string;
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
     ethereum: EthereumProvider(ethRpc, tokens),
     solana: SolanaProvider(solRpc, tokens),
+    arbitrum: EthereumProvider(arbRpc, tokens),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
@@ -62,6 +65,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
   const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
+  const arbitrumRpcUrl = process.env.FLU_ARB_RPC_HTTP;
 
   const redirectTarget = redirect("/");
 
@@ -76,6 +80,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     rpcUrls: {
       solana: solanaRpcUrl,
       ethereum: ethereumRpcUrl,
+      arbitrum: arbitrumRpcUrl,
     },
     colors: (await colors)[network as string],
   };
@@ -114,6 +119,7 @@ type LoaderData = {
   rpcUrls: {
     solana: string;
     ethereum: string;
+    arbitrum: string;
   };
   colors: {
     [symbol: string]: string;
@@ -144,6 +150,7 @@ export default function Network() {
       tokens={tokens}
       solRpc={rpcUrls.solana}
       ethRpc={rpcUrls.ethereum}
+      arbRpc={rpcUrls.arbitrum}
     >
       <NotificationSubscription
         network={network}

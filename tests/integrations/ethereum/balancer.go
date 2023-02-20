@@ -19,7 +19,7 @@ const integrationTestBalancerV2 = `
           "0x6b175474e89094c44da98b954eedeac495271d0f"
         ]
       },
-      "application": 2
+      "application": 3
     },
     "transaction": {
       "to": "0x00000000ae347930bd1e7b0f35588b92280f9e75",
@@ -55,7 +55,7 @@ const integrationTestBalancerV2 = `
           "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
         ]
       },
-      "application": 2
+      "application": 3
     },
     "transaction": {
       "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -91,7 +91,7 @@ const integrationTestBalancerV2 = `
           "0x676495371d5107f870e0e7d5afb6fed91f236f21"
         ]
       },
-      "application": 2
+      "application": 3
     },
     "transaction": {
       "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -127,7 +127,7 @@ const integrationTestBalancerV2 = `
           "0xbd72ae3bb5da3cb770c75d217b83f4d838306565"
         ]
       },
-      "application": 2
+      "application": 3
     },
     "transaction": {
       "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -163,7 +163,7 @@ const integrationTestBalancerV2 = `
           "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
         ]
       },
-      "application": 2
+      "application": 3
     },
     "transaction": {
       "to": "0xba12222222228d8ba445958a75a0704d566bf2c8",

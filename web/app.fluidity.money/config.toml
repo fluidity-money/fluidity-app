@@ -11,6 +11,11 @@ server = "https://api.ethereum.fluidity.money"
 # rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
 # server = "https://api.solana.fluidity.money"
 
+[[drivers.arbitrum]]
+label = "Arbitrum"
+testnet = false
+rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -154,6 +159,65 @@ colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 decimals = 6
 
+[config.arbitrum]
+explorer = "https://etherscan.io"
+fluidAssets = [
+    "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
+    "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62",
+    "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b",
+]
+
+[[config.arbitrum.tokens]]
+symbol = "USDC"
+name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
+address = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+colour = "#2775ca"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+colour = "#2775ca"
+isFluidOf = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "USDT"
+name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
+address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+colour = "#12946c"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDT"
+name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
+address = "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62"
+colour = "#12946c"
+isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "DAI"
+name = "Dai Stablecoin"
+logo = "/assets/tokens/dai.svg"
+address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+colour = "#825902"
+decimals = 18
+
+[[config.arbitrum.tokens]]
+symbol = "fDAI"
+name = "Fluid DAI"
+logo = "/assets/tokens/fDAI.svg"
+address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
+colour = "#825902"
+isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+decimals = 18
+
 # liquidity_providers Configurations 
 # eth providers
 [liquidity_providers.ethereum]
@@ -247,6 +311,17 @@ img= "/images/providers/Jupiter.svg"
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.jup.ag/"
 fUSDT = "https://www.jup.ag/"
+
+[liquidity_providers.arbitrum]
+
+[[liquidity_providers.arbitrum.providers]]
+name= "aave"
+img= "/images/providers/aave-aave-logo.png"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
+fUSDT = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
+fDAI = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
 
 # provider icons
 [provider_icons]

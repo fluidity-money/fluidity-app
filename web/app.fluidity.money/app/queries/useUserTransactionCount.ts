@@ -1,20 +1,29 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
+import {fetchGqlEndpoint} from "~/util/api/graphql";
 
-const queryByAddress: Queryable = {
+const queryByAddressTimestamp: Queryable = {
   ethereum: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $address: String!
+      $timestamp: ISO8601DateTime!
+    ) {
       ethereum {
         transfers(
           currency: { in: $fluidCurrencies }
           any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
         ) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount($fluidCurrencies: [String!], $address: String!) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $address: String!
+      $timestamp: ISO8601DateTime!
+    ) {
       solana {
         transfers(
           currency: { in: $fluidCurrencies }
@@ -23,6 +32,21 @@ const queryByAddress: Queryable = {
             { receiverAddress: { is: $address } }
           ]
         ) {
+          count(time: { after: $timestamp })
+        }
+      }
+    }
+  `,
+  arbitrum: gql`
+    query getTransactionCount($address: String!, $timestamp: timestamp!) {
+      arbitrum: user_actions_aggregate(
+        where: {
+          network: { _eq: "arbitrum" },
+          sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } },
+          time: { _gt: $timestamp }
+        }
+      ) {
+        aggregate {
           count
         }
       }
@@ -30,20 +54,42 @@ const queryByAddress: Queryable = {
   `,
 };
 
-const queryAll: Queryable = {
+const queryByTimestamp: Queryable = {
   ethereum: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $timestamp: ISO8601DateTime!
+    ) {
       ethereum {
         transfers(currency: { in: $fluidCurrencies }) {
-          count
+          count(time: { after: $timestamp })
         }
       }
     }
   `,
   solana: gql`
-    query getTransactionCount($fluidCurrencies: [String!]) {
+    query getTransactionCount(
+      $fluidCurrencies: [String!]
+      $timestamp: ISO8601DateTime!
+    ) {
       solana {
         transfers(currency: { in: $fluidCurrencies }) {
+          count(time: { after: $timestamp })
+        }
+      }
+    }
+  `,
+  arbitrum: gql`
+    query getTransactionCount(
+      $timestamp: timestamp!
+    ) {
+      arbitrum: user_actions_aggregate(
+        where: {
+          network: { _eq: "arbitrum" },
+          time: { _gt: $timestamp }
+        }
+      ) {
+        aggregate {
           count
         }
       }
@@ -55,14 +101,14 @@ type UserTransactionCountByAddressBody = {
   query: string;
   variables: {
     address: string;
-    fluidCurrencies: string[];
+    fluidCurrencies?: string[];
   };
 };
 
 type UserTransactionCountAllBody = {
   query: string;
   variables: {
-    fluidCurrencies: string[];
+    fluidCurrencies?: string[];
   };
 };
 
@@ -77,43 +123,87 @@ export type UserTransactionCountRes = {
   errors?: unknown;
 };
 
-const useUserTransactionByAddressCount = (network: string, address: string) => {
+export type HasuraUserTransactionCountRes = {
+  data: {
+    [network: string]: {
+        count: number;
+      }
+  };
+  errors?: unknown;
+};
+
+const useUserTransactionCountByAddressTimestamp = async(
+  network: string,
+  address: string,
+  iso8601Timestamp: string
+) => {
   const variables = {
     address: address,
+    ...(network !== "arbitrum" && {fluidCurrencies: getTokenForNetwork(network)}),
     fluidCurrencies: getTokenForNetwork(network),
+    timestamp: iso8601Timestamp,
   };
 
   const body = {
-    query: queryByAddress[network],
+    query: queryByAddressTimestamp[network],
     variables,
   };
 
-  return jsonPost<UserTransactionCountByAddressBody, UserTransactionCountRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionCountByAddressBody, UserTransactionCountRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers,
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = [(result as unknown as HasuraUserTransactionCountRes).data.aggregate];
+  }
+
+  return result; 
 };
 
-const useUserTransactionAllCount = (network: string) => {
+const useUserTransactionCountByTimestamp = async(
+  network: string,
+  iso8601Timestamp: string
+) => {
   const variables = {
-    fluidCurrencies: getTokenForNetwork(network),
-  };
+    ...(network !== "arbitrum" && {fluidCurrencies: getTokenForNetwork(network)}),
+    timestamp: iso8601Timestamp,
+  }
 
   const body = {
-    query: queryAll[network],
+    query: queryByTimestamp[network],
     variables,
   };
 
-  return jsonPost<UserTransactionCountAllBody, UserTransactionCountRes>(
-    "https://graphql.bitquery.io",
+  const {url, headers} = fetchGqlEndpoint(network) || {};
+
+  if (!url || !headers)
+    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+
+  const result = await jsonPost<UserTransactionCountAllBody, UserTransactionCountRes>(
+    url,
     body,
-    {
-      "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "",
-    }
+    headers,
   );
+
+  // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
+  // https://github.com/graphql/graphql-js/issues/297
+  if (network === "arbitrum" && result.data) {
+    result.data[network].transfers = [(result as unknown as HasuraUserTransactionCountRes).data.aggregate];
+  }
+
+  return result; 
 };
 
-export { useUserTransactionAllCount, useUserTransactionByAddressCount };
+export {
+  useUserTransactionCountByTimestamp,
+  useUserTransactionCountByAddressTimestamp,
+};
