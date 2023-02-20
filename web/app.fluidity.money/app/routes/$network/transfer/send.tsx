@@ -2,7 +2,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { debounce } from "lodash";
 import { useState } from "react";
-import { useEnsResolver } from "wagmi";
+import TokenSelect from "~/components/TokenSelect";
 
 import { Asset, useTokens } from "~/queries/useTokens";
 import { useSync } from "~/util";
@@ -32,14 +32,14 @@ const Send  = () => {
         (contact) => contact.name.toLowerCase().includes(search.toLowerCase())
     ) || [];
 
-    const [match, setMatch] = useState<Contact | undefined>();
+    const [, setMatch] = useState<Contact | undefined>();
 
     return (
         <div>
             <h1>Send</h1>
             <div className="sendform">
                 <input type="text" placeholder="Enter amount" />
-                <TokenSelect assets={tokens} />
+                <TokenSelect assets={tokens} onChange={() => { return; }} />
                 <div className="inputrow">
                     <input
                         type="text"
