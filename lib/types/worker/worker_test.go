@@ -91,8 +91,7 @@ func TestString(t *testing.T) {
 		"curve":0,
 		"multichain":0,
 		"xyfinance":0,
-		"apeswap":0,
-		"dopex":0
+		"apeswap":0
 	},
 	"calculate_n":{
 		"probability_m":0,

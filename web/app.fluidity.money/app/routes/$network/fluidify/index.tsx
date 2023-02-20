@@ -104,18 +104,6 @@ export default function FluidifyToken() {
     addToken,
   } = useContext(FluidityFacadeContext);
 
-  const { width } = useViewport();
-
-  const isTablet = width < 1250;
-
-  // Switch over to Form, on Mobile
-  const [openMobModal, setOpenMobModal] = useState(false);
-
-  // If screen is Desktop, restore normal view
-  useEffect(() => {
-    if (!isTablet) return setOpenMobModal(false);
-  }, [width]);
-
   // Tokens return from loader
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
@@ -130,6 +118,18 @@ export default function FluidifyToken() {
 
   // Currently selected token
   const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>(deeplinkAssetToken);
+
+  const { width } = useViewport();
+
+  const isTablet = width < 1250;
+
+  // Switch over to Form, on Mobile
+  const [openMobModal, setOpenMobModal] = useState(assetToken ? true : false);
+
+  // If screen is Desktop, restore normal view
+  useEffect(() => {
+    if (!isTablet) return setOpenMobModal(false);
+  }, [width]);
 
   // TODO: Remove this entirely. Use search params exclusively as the source of truth w/o side effects.
   useEffect(() => {

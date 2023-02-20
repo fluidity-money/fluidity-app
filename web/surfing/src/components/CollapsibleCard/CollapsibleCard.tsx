@@ -5,7 +5,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useState } from "react";
 
-import { Card, TokenCard, ArrowUp, TokenDetails } from "~/components";
+import { Card, TokenCard, ArrowUp, TokenDetails, TriangleDown } from "~/components";
 
 import styles from "./CollapsibleCard.module.scss";
 
@@ -64,7 +64,7 @@ const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive })
   return (
     <div className={`${styles.Summary} ${canExpand ? styles.pointer : ''}`} onClick={onClick}>
       <div className={styles.content}>{children}</div>
-      {canExpand && <ArrowUp fill={"white"} style={{transform: `rotate(${isActive ? "180deg" : "0"})`}}/>}
+      {canExpand && <TriangleDown className={styles.caret} style={{transform: `rotate(${isActive ? "180deg" : "0"})`}}/>}
     </div>
   )
 }
