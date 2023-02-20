@@ -17,7 +17,7 @@ const integrationTestDodoV2 = `
         ],
 	"log_index": "89"
       },
-      "application": 7
+      "application": 8
     },
     "transaction": {
       "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
@@ -53,7 +53,7 @@ const integrationTestDodoV2 = `
         ],
 	"log_index": "112"
       },
-      "application": 7
+      "application": 8
     },
     "transaction": {
       "to": "0x617dee16b86534a5d792a4d7a62fb491b544111e",
@@ -89,7 +89,7 @@ const integrationTestDodoV2 = `
           ],
 	  "log_index": "100"
       },
-      "application": 7
+      "application": 8
     },
     "transaction": {
       "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",
@@ -126,7 +126,7 @@ const integrationTestDodoV2 = `
           ],
 	  "log_index": "463"
       },
-      "application": 7
+      "application": 8
     },
     "transaction": {
       "to": "0xf42ecdc112365ff79a745b4cf7d4c266bd6e4b25",

@@ -23,7 +23,7 @@ const integrationTestMooniswap = `
 				"from": "0xc04e9356b6cc9d164ad1733e165f7aa6fffc474c",
 				"hash": "0xb9828b517292fad4a2991978b2a6a424dc6d319bbfd7fe166e3dd8f5be2ffe3b"
 			},
-			"application": 2
+			"application": 6
 		},
 	},
 	"expected_sender": "0xc04e9356b6cc9d164ad1733e165f7aa6fffc474c",

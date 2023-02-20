@@ -68,7 +68,9 @@ const ProvideLiquidity = () => {
   const providers =
     network === "ethereum"
       ? provider["ethereum"].providers
-      : provider["solana"].providers;
+      : network === "solana"
+      ? provider["solana"].providers
+      : provider["arbitrum"].providers;
 
   const liqidityProviders = (
     <div className="liquidity-providers">

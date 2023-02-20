@@ -1,8 +1,8 @@
-import type { Token } from "~/util/chainUtils/tokens";
+import { Token } from "~/util/chainUtils/tokens";
 import type AugmentedToken from "~/types/AugmentedToken";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useSearchParams } from "@remix-run/react";
 import BN from "bn.js";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import { debounce, DebouncedFunc } from "lodash";
@@ -104,25 +104,50 @@ export default function FluidifyToken() {
     addToken,
   } = useContext(FluidityFacadeContext);
 
+  // Tokens return from loader
+  const [tokens, setTokens] = useState<AugmentedToken[]>(
+    defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
+  );
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const token = searchParams.get("token");
+
+  const deeplinkAssetToken = tokens.find(
+    (t) => t.symbol.toLowerCase() === token?.toLowerCase()
+  );
+
+  // Currently selected token
+  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>(
+    deeplinkAssetToken
+  );
+
   const { width } = useViewport();
 
   const isTablet = width < 1250;
 
   // Switch over to Form, on Mobile
-  const [openMobModal, setOpenMobModal] = useState(false);
+  const [openMobModal, setOpenMobModal] = useState(assetToken ? true : false);
 
   // If screen is Desktop, restore normal view
   useEffect(() => {
     if (!isTablet) return setOpenMobModal(false);
   }, [width]);
 
-  // Tokens return from loader
-  const [tokens, setTokens] = useState<AugmentedToken[]>(
-    defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
-  );
-
-  // Currently selected token
-  const [assetToken, setAssetToken] = useState<AugmentedToken | undefined>();
+  // TODO: Remove this entirely. Use search params exclusively as the source of truth w/o side effects.
+  useEffect(() => {
+    if (!assetToken) {
+      return setSearchParams((prev) => {
+        const searchParams = prev;
+        searchParams.delete("token");
+        return searchParams;
+      });
+    }
+    setSearchParams((prev) => {
+      const searchParams = prev;
+      searchParams.set("token", assetToken.symbol);
+      return searchParams;
+    });
+  }, [assetToken]);
 
   const tokenIsFluid = !!assetToken?.isFluidOf;
 
@@ -184,11 +209,15 @@ export default function FluidifyToken() {
     if (address && !swapping) {
       (async () => {
         switch (network) {
-          case "ethereum": {
+          case "ethereum":
+          case "arbitrum": {
             const [tokensMinted, userTokenBalance, mintLimit] =
               await Promise.all([
                 Promise.all(
                   tokens.map(async (token) => {
+                    // no mint limits on arbitrum
+                    if (network === "arbitrum") return undefined;
+
                     if (token.isFluidOf) return undefined;
 
                     const fluidToken = tokens.find(

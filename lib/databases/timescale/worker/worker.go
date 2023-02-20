@@ -154,6 +154,7 @@ func InsertEmissions(emission Emission) {
 			transfers_past,
 			seconds_since_last_block,
 
+			uniswap_v3_fee,
 			uniswap_v2_fee,
 			balancer_v_fee,
 			oneinch_v2_fee,
@@ -381,6 +382,7 @@ func InsertEmissions(emission Emission) {
 		transfersPast,
 		secondsSinceLastBlock,
 
+		ethAppFees.UniswapV3,
 		ethAppFees.UniswapV2,
 		ethAppFees.BalancerV2,
 		ethAppFees.OneInchV2,

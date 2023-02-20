@@ -18,7 +18,7 @@ const integrationTestApeSwap = `
           "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"
         ]
       },
-      "application": 11
+      "application": 12
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -57,7 +57,7 @@ const integrationTestApeSwap = `
           "0xD4CF8e47BeAC55b42Ae58991785Fa326d9384Bd1"
         ]
       },
-      "application": 11
+      "application": 12
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -96,7 +96,7 @@ const integrationTestApeSwap = `
           "0xD4CF8e47BeAC55b42Ae58991785Fa326d9384Bd1"
         ]
       },
-      "application": 11
+      "application": 12
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",

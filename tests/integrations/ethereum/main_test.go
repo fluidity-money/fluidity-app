@@ -39,7 +39,7 @@ type integrationTest struct {
 
 	ExpectedEmission worker.EthereumAppFees `json:"expected_emission"`
 
-	FluidTokenDecimals   int            `json:"token_decimals"`
+	FluidTokenDecimals   int               `json:"token_decimals"`
 	FluidContractAddress ethCommon.Address `json:"contract_address"`
 
 	RpcMethods  map[string]interface{} `json:"rpc_methods"`
@@ -66,11 +66,11 @@ func unmarshalJsonTestOrFatal(jsonStr string) []integrationTest {
 	// initialise mocked client with responses
 	for i, test := range tests {
 		var (
-			rpcMethods = test.RpcMethods
+			rpcMethods  = test.RpcMethods
 			callMethods = test.CallMethods
 		)
 
-		client, err  := test_utils.MockRpcClient(rpcMethods, callMethods)
+		client, err := test_utils.MockRpcClient(rpcMethods, callMethods)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -92,8 +92,11 @@ func init() {
 	balancerTests := unmarshalJsonTestOrFatal(integrationTestBalancerV2)
 	tests = append(tests, balancerTests...)
 
-	uniswapTests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
-	tests = append(tests, uniswapTests...)
+	uniswapV2Tests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
+	tests = append(tests, uniswapV2Tests...)
+
+	uniswapV3Tests := unmarshalJsonTestOrFatal(integrationTestUniswapV3)
+	tests = append(tests, uniswapV3Tests...)
 
 	dodoTests := unmarshalJsonTestOrFatal(integrationTestDodoV2)
 	tests = append(tests, dodoTests...)

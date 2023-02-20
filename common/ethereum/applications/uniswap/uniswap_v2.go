@@ -16,7 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const uniswapSwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
+const uniswapV2SwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 
 const uniswapV2PairAbiString = `[
     {
@@ -100,7 +100,7 @@ var uniswapV2PairAbi ethAbi.ABI
 // GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
@@ -109,8 +109,12 @@ func GetUniswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 
 	logTopic := transfer.Log.Topics[0].String()
 
-	if logTopic != uniswapSwapLogTopic {
-		return nil, nil
+	if logTopic != uniswapV2SwapLogTopic {
+		return nil, fmt.Errorf(
+			"Incorrect Log Topic! (%v, expected %v)",
+			logTopic,
+			uniswapV2SwapLogTopic,
+		)
 	}
 
 	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
