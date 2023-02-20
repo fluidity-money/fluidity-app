@@ -197,9 +197,7 @@ export default function Dashboard() {
     };
 
   const matches = useMatches();
-  console.log(matches);
   const transitionPath = useTransition().location?.pathname;
-  console.log(transitionPath);
   const currentPath = transitionPath || matches[matches.length - 1].pathname;
   const resolvedPaths = navigationMap.map((obj) =>
     useResolvedPath(Object.keys(obj)[0])

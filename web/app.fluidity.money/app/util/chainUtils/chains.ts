@@ -13,6 +13,18 @@ const chainType = (network: string): ChainType | undefined => {
   }
 };
 
+const getChainId = (network: Chain): number => {
+  switch (network) {
+    case "ethereum":
+      return 1;
+    case "arbitrum":
+      return 42161;
+    case "solana":
+      return 1;
+  }
+}
+
 export {
   chainType,
+  getChainId,
 };
