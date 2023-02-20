@@ -17,7 +17,7 @@ const integrationTestSaddle = `
           "0x000000000000000000000000737b7865f84bdc86b5c8ca718a5b7a6d905776f6"
         ]
       },
-      "application": 12
+      "application": 13
     },
     "transaction": {
 	    "to": "0x13cc34aa8037f722405285ad2c82fe570bfa2bdc",
@@ -59,7 +59,7 @@ const integrationTestSaddle = `
           "0x000000000000000000000000737b7865f84bdc86b5c8ca718a5b7a6d905776f6"
         ]
       },
-      "application": 12
+      "application": 13
     },
     "transaction": {
 	    "to": "0x13cc34aa8037f722405285ad2c82fe570bfa2bdc",
