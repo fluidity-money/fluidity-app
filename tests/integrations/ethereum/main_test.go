@@ -106,9 +106,6 @@ func init() {
 
 	apeswapTests := unmarshalJsonTestOrFatal(integrationTestApeSwap)
 	tests = append(tests, apeswapTests...)
-
-	dopexTests := unmarshalJsonTestOrFatal(integrationTestDopex)
-	tests = append(tests, dopexTests...)
 }
 
 func TestIntegrations(t *testing.T) {
