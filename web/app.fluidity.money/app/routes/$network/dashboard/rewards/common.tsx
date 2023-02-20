@@ -11,7 +11,7 @@ import {
   Spinner,
 } from "@fluidity-money/surfing";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import {networkMapper} from "~/util";
+import { networkMapper } from "~/util";
 
 type IUserRewards = {
   claimNow: boolean;
@@ -158,7 +158,7 @@ const UserRewards = ({
             <section className="fees">
               <Text size="xs">Network fee</Text>
               <Text size="xs">
-                {networkFee} {networkMapper(network)} 
+                {networkFee} {networkMapper(network)}
               </Text>
             </section>
             <hr className="line" />

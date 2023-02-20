@@ -16,7 +16,7 @@ import {
 
 import claimStyles from "~/styles/dashboard/rewards/claim.css";
 import { generateTweet } from "~/util/tweeter";
-import {networkMapper} from "~/util";
+import { networkMapper } from "~/util";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: claimStyles }];

@@ -124,7 +124,9 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
             token={token}
             regAmt={amount.div(decimals).toNumber() || 0}
             value={1}
-            onButtonPress={() => navigate(`/${network}/fluidify?token=${token.symbol}`)}
+            onButtonPress={() =>
+              navigate(`/${network}/fluidify?token=${token.symbol}`)
+            }
           />
         </CollapsibleCard.Summary>
       </CollapsibleCard>
