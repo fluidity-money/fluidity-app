@@ -27,7 +27,6 @@ var applicationNames = []string{
 	"multichain",
 	"xy_finance",
 	"apeswap",
-	"dopex",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
