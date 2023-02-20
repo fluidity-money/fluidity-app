@@ -35,7 +35,7 @@ const integrationTestUniswapV2 = `
       "eth_getCode": "0x0"
     },
     "call_methods": {
-    	"token0()": {
+		"token0()": {
 		"": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
 	}
     },
