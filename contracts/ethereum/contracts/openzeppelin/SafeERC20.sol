@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)
 
+// Adjusted to use our local IERC20 interface instead of OpenZeppelin's
+
 pragma solidity ^0.8.0;
 
-import "./IERC20.sol";
-import "./Address.sol";
+import "../IERC20.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 /**
  * @title SafeERC20
@@ -16,7 +19,7 @@ import "./Address.sol";
  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
  */
 library SafeERC20 {
-    using Address for address;
+    using AddressUpgradeable for address;
 
     function safeTransfer(
         IERC20 token,
