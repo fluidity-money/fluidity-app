@@ -165,7 +165,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		// fromToken is the address of tokenA
 		fromToken = addresses[0]
 
-		// fromToken is the address of tokenA
+		// toToken is the address of tokenB
 		toToken = addresses[1]
 
 		// fromAmount is the amount of tokenA swapped
