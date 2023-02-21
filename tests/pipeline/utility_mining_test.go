@@ -107,7 +107,6 @@ func TestUtilityMining(t *testing.T) {
         tokenAddressString = util.GetEnvOrFatal(EnvFluidTokenAddress)
     )
 
-    appsOut := libtest.LogMessages("util-mining-apps-server-out")
     workerOut := libtest.LogMessages("util-mining-worker-server-out")
 
     time.Sleep(5 * time.Second) // dont look at this
@@ -175,26 +174,6 @@ func TestUtilityMining(t *testing.T) {
             tx.Hash().String(),
         )
     })
-
-    var block worker.EthereumHintedBlock
-    err = appsOut.GetMessage(&block)
-
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "No message on queue!"
-            k.Payload = err
-        })
-    }
-
-    log.Debug(func(k *log.Log) {
-        k.Format(
-            "apps server out %+v",
-            block,
-        )
-    })
-
-
-
 
     var announcements []worker.EthereumAnnouncement
     err = workerOut.GetMessage(&announcements)

@@ -104,8 +104,6 @@ func main() {
 		})
 	}
 
-	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
-
 	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
 
 	gethClient, err := ethclient.Dial(ethereumUrl)
@@ -264,25 +262,12 @@ func main() {
 
 		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
 
-		sizeOfThePool, err := fluidity.GetRewardPool(
-			gethClient,
-			contractAddress,
-		)
-
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get the prize pool in the Fluidity contract! Address %#v!",
-					contractAddress.String(),
-				)
-
+				k.Message = "Failed to get the price of eth from chainlink!"
 				k.Payload = err
 			})
 		}
-
-		// normalise the size of the pool to a normal number!
-
-		sizeOfThePool.Quo(sizeOfThePool, underlyingTokenDecimalsRat)
 
 		var blockAnnouncements []worker.EthereumAnnouncement
 
@@ -400,7 +385,9 @@ func main() {
 
 					application = transfer.Decorator.Application
 
-					transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+					if applicationFeeUsd != nil {
+						transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+					}
 
 					if utility != "" {
 						fluidClients = append(fluidClients, utility)
