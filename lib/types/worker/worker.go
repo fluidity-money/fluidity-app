@@ -212,6 +212,7 @@ type (
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
 		Saddle           float64 `json:"saddle"`
+		GTradeV6_1       float64 `json:"gtrade_v6_1"`
 	}
 )
 
