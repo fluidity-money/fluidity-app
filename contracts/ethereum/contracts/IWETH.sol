@@ -11,4 +11,5 @@ interface IWETH {
     function deposit() external payable;
     function withdraw(uint) external payable;
     function approve(address, uint256) external returns (bool);
+    function balanceOf(address) external view returns (uint256);
 }

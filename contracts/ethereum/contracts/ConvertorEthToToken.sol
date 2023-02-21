@@ -10,6 +10,8 @@ pragma abicoder v2;
 import "./IWETH.sol";
 import "./Token.sol";
 
+import "hardhat/console.sol";
+
 /*
  * Take some Eth, wrap it into wEth, then use it to wrap a Token at the
  * given address
@@ -29,6 +31,8 @@ contract ConvertorEthToToken {
         IWETH(wethAddress_).approve(address(tokenAddress_), msg.value);
         tokenAddress_.erc20InFor(msg.sender, msg.value);
     }
+
+    receive() external payable {}
 
     function unwrapEth(uint256 _amount) public {
         tokenAddress_.transferFrom(msg.sender, address(this), _amount);

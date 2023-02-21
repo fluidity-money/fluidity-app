@@ -1,7 +1,6 @@
 import * as ethers from 'ethers';
 import { assert } from 'chai';
 import { bindings } from './setup-mainnet';
-import { BigNumber } from 'ethers';
 
 describe("registry reward pools", async function () {
   let registryOperator: ethers.Contract;
