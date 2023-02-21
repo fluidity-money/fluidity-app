@@ -15,9 +15,11 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/tests/pipeline/libtest"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -185,10 +187,15 @@ func TestUtilityMining(t *testing.T) {
         })
     }
 
-    log.Debug(func(k *log.Log) {
-        k.Format(
-            "worker server out %+v",
-            announcements,
-        )
-    })
+    assert.Equal(t, 1, len(announcements), "wrong number of announcements!")
+
+    // set randomSource so we always have 1 ball winning
+    randomN := len(announcements[0].RandomSource)
+    for i := range announcements[0].RandomSource {
+        announcements[0].RandomSource[i] = uint32(randomN + 1)
+    }
+
+    announcements[0].RandomSource[0] = 0
+
+    queue.SendMessage("worker-client-in", announcements)
 }

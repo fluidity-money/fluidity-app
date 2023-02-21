@@ -120,6 +120,16 @@ services:
       FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out
     restart: on-failure
 
+  microservice-ethereum-worker-client-util-mining:
+    build:
+      context: ../../cmd/microservice-ethereum-worker-client/
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: worker-client
+      FLU_ETHEREUMM_AMQP_QUEUE_NAME: worker-client-in
+      FLU_ETHEREUM_AMQP_PUBLISH_NAME: worker-client-out
+    restart: on-failure
+
   test-util-mining:
     build:
       context: .
