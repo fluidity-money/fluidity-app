@@ -11,11 +11,17 @@ import (
 )
 
 func init() {
-	reader := strings.NewReader(gtradeV6_1PairAbiString)
+	reader := strings.NewReader(gtradeV6_1AbiString)
 
 	var err error
 
 	if gtradeV6_1PairAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
+
+	reader = strings.NewReader(erc20AbiString)
+
+	if erc20Abi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }

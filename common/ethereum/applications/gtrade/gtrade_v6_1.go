@@ -8,25 +8,120 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"sort"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const gtradeV6_1SwapLogTopic = ""
+const gtradeV6_1FeesChargedLogTopic = "0x3a484d35e7358ad950e494938ebbac2c1319c2b76d162112f51d66752244dde3"
 
-const gtradeV6_1PairAbiString = `[
+const gtradeV6_1AbiString = `[
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "pairIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "long",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "collateral",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "leverage",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "percentProfit",
+          "type": "int256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "rolloverFees",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "fundingFees",
+          "type": "int256"
+        }
+      ],
+      "name": "FeesCharged",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "storageT",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "storage",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+]`
+
+const erc20AbiString = `[
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    }
 ]`
 
 // gtradeV6_1PairAbi set by init.go to generate the ABI code
 var gtradeV6_1PairAbi ethAbi.ABI
 
+// erc20Abi set by init.go to generate the ERC20 Transfer struct
+var erc20Abi ethAbi.ABI
+
 // GetgtradeV6_1Fees returns gtrade V6_1's fee of the amount swapped.
 // The fee is dependent on the pool being swapped on
-func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
@@ -35,15 +130,15 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 
 	logTopic := transfer.Log.Topics[0].String()
 
-	if logTopic != gtradeV6_1SwapLogTopic {
+	if logTopic != gtradeV6_1FeesChargedLogTopic {
 		return nil, fmt.Errorf(
 			"Incorrect Log Topic (%v, expected %v)",
 			logTopic,
-			gtradeV6_1SwapLogTopic,
+			gtradeV6_1FeesChargedLogTopic,
 		)
 	}
 
-	unpacked, err := gtradeV6_1PairAbi.Unpack("Swap", transfer.Log.Data)
+	unpacked, err := gtradeV6_1PairAbi.Unpack("FeesCharged", transfer.Log.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -52,113 +147,170 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 	}
 
-	if len(unpacked) != 5 {
+	expectedUnpackedLen := 7
+	if len(unpacked) != expectedUnpackedLen {
 		return nil, fmt.Errorf(
-			"Unpacked the wrong number of values! Expected 5, got %v",
+			"Unpacked the wrong number of values! Expected %v, got %v",
+			expectedUnpackedLen,
 			len(unpacked),
-		)
-	}
-
-	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Failed to coerce swap log data to rats! %v",
-			err,
 		)
 	}
 
 	// convert the pair contract's address to the go ethereum address type
 	contractAddr := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
-	// figure out which token is which in the pair contract
-	token0addr_, err := ethereum.StaticCall(client, contractAddr, gtradeV6_1PairAbi, "token0")
+	// storageT is the contract that stores deposited tokens
+	storageT_, err := ethereum.StaticCall(client, contractAddr, gtradeV6_1PairAbi, "storageT")
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to get token0 address! %v",
+			"Failed to get storageT address! %v",
 			err,
 		)
 	}
 
-	token0addr, err := ethereum.CoerceBoundContractResultsToAddress(token0addr_)
+	storageT, err := ethereum.CoerceBoundContractResultsToAddress(storageT_)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to coerce token0 address! %v",
+			"Failed to coerce storageT address! %v",
 			err,
 		)
 	}
 
-	poolFee_, err := ethereum.StaticCall(client, contractAddr, gtradeV6_1PairAbi, "fee")
+	// Get all logs in transaction
+	txHash := ethereum.ConvertInternalHash(transfer.TransactionHash)
 
-	if err != nil {
+	txLogs := txReceipt.Logs
+
+	// Binary search through logs until we find matching log
+	feesChargedLogBlockIndex := uint(transfer.Log.Index.Uint64())
+
+	feesChargedLogTxIndex := sort.Search(len(txLogs), func(i int) bool {
+		// txLogs.Index sorted in ascending order, so use >= op
+		return feesChargedLogBlockIndex >= uint(txLogs[i].Index.Uint64())
+	})
+
+	// firstFeeSwap log should occur right after FeesCharged log
+	firstFeeTransferLogTxIndex := feesChargedLogTxIndex + 1
+
+	// secondFeeSwap log should occur 6 logs after FeesCharged log
+	secondFeeTransferLogTxIndex := feesChargedLogTxIndex + 6
+
+	// assert corresponding last fee swap exists
+	if secondFeeTransferLogTxIndex >= len(txLogs) {
 		return nil, fmt.Errorf(
-			"Failed to get pool fee! %v",
+			"failed to find enough transfer logs from txHash (%v) for feesCharged (%v)! %v",
+			txHash.String(),
+			transfer.TransactionHash,
 			err,
 		)
 	}
 
-	poolFee, err := ethereum.CoerceBoundContractResultsToRat(poolFee_)
+	// Get first fee transfer amount
+	firstFeeTransferLog := txLogs[firstFeeTransferLogTxIndex]
 
-	poolFee = new(big.Rat).Mul(poolFee, big.NewRat(1, 1000000))
+	unpacked, err = erc20Abi.Unpack("Transfer", firstFeeTransferLog.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to coerce pool fee! %v",
+			"Failed to unpack Transfer log data! %v",
 			err,
 		)
 	}
 
-	var (
-		// swap logs
-		amount0 = swapAmounts[0]
-		amount1 = swapAmounts[1]
-
-		// the amount of fluid tokens sent or received
-		fluidTransferAmount *big.Rat
-
-		// the multiplier to find the fee
-		feeMultiplier *big.Rat
-	)
-
-	// If amount0 is negative, then amount1 is paid out
-	var (
-		// Whether token0 is the fluid token
-		token0IsFluid = token0addr == fluidTokenContract
-
-		zeroRat = big.NewRat(0, 1)
-		// Whether amount0 is equal to zero
-		amount0IsNeg = amount0.Cmp(zeroRat) == 0
-	)
-
-	switch true {
-	case token0IsFluid && amount0IsNeg:
-		fluidTransferAmount = new(big.Rat).Mul(amount0, big.NewRat(-1, 1))
-
-	case token0IsFluid && !amount0IsNeg:
-		fluidTransferAmount = amount0
-
-	case !token0IsFluid && amount0IsNeg:
-		fluidTransferAmount = amount1
-
-	case !token0IsFluid && !amount0IsNeg:
-		fluidTransferAmount = new(big.Rat).Mul(amount1, big.NewRat(-1, 1))
+	expectedUnpackedLen = 1
+	if len(unpacked) != expectedUnpackedLen {
+		return nil, fmt.Errorf(
+			"Unpacked the wrong number of values! Expected %v, got %v",
+			expectedUnpackedLen,
+			len(unpacked),
+		)
 	}
 
-	// if trading x fUSDC -> y Token B
-	// the fee is x * 0.003 (100% input -> 99.7%)
-	// if trading y Token B -> x fUSDC
-	// the fee is x * 0.003009027 (99.7% input -> 100%)
-	if token0IsFluid != amount0IsNeg {
-		feeMultiplier = poolFee
-	} else {
-		poolFeeRem := new(big.Rat).Sub(big.NewRat(1, 1), poolFee)
-		invPoolFee := new(big.Rat).Inv(poolFeeRem)
-		feeMultiplier = new(big.Rat).Sub(invPoolFee, big.NewRat(1, 1))
+	// Check token is fluid, otherwise err
+	contractAddr = ethereum.ConvertInternalAddress(transfer.Log.Address)
+	if contractAddr != fluidTokenContract {
+		return nil, fmt.Errorf(
+			"First GTrade Fee Transfer in transaction %#v does not involve fluid token - skipping!",
+			transfer.TransactionHash.String(),
+		)
 	}
 
-	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
+	// Check Sender is GTrade Storage
+	sender := firstFeeTransferLog.Topics[1]
+	if sender.String() != storageT.String() {
+		return nil, fmt.Errorf(
+			"Unexpected Sender (%v) in GTrade Fee Transfer (Expected %v)",
+			sender.String(),
+			storageT.String(),
+		)
+	}
+
+	// firstFee is the amount of the first fee transfer
+	feeBuffer := []interface{}{unpacked[1]}
+	firstFee, err := ethereum.CoerceBoundContractResultsToRat(feeBuffer)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce firstFee to rat! %v",
+			err,
+		)
+	}
+
+	// Get second fee transfer amount
+	secondFeeTransferLog := txLogs[secondFeeTransferLogTxIndex]
+
+	unpacked, err = erc20Abi.Unpack("Transfer", secondFeeTransferLog.Data)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to unpack SourceChainSwap log data! %v",
+			err,
+		)
+	}
+
+	expectedUnpackedLen = 1
+
+	if len(unpacked) != expectedUnpackedLen {
+		return nil, fmt.Errorf(
+			"Unpacked the wrong number of values! Expected %v, got %v",
+			expectedUnpackedLen,
+			len(unpacked),
+		)
+	}
+
+	// Check token is fluid, otherwise err
+	contractAddr = ethereum.ConvertInternalAddress(transfer.Log.Address)
+	if contractAddr != fluidTokenContract {
+		return nil, fmt.Errorf(
+			"First GTrade Fee Transfer in transaction %#v does not involve fluid token - skipping!",
+			transfer.TransactionHash.String(),
+		)
+	}
+
+	// Check Sender is GTrade Storage
+	sender = firstFeeTransferLog.Topics[1]
+	if sender.String() != storageT.String() {
+		return nil, fmt.Errorf(
+			"Unexpected Sender (%v) in GTrade Fee Transfer (Expected %v)",
+			sender.String(),
+			storageT.String(),
+		)
+	}
+
+	// secondFee is the amount of the second fee transfer
+	feeBuffer[0] = unpacked[1]
+	secondFee, err := ethereum.CoerceBoundContractResultsToRat(feeBuffer)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce secondFee to rat! %v",
+			err,
+		)
+	}
+
+	fee := new(big.Rat).Add(firstFee, secondFee)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)

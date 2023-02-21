@@ -175,6 +175,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			client,
 			fluidTokenContract,
 			tokenDecimals,
+			txReceipt,
 		)
 
 		emission.GTradeV6_1 += util.MaybeRatToFloat(fee)
