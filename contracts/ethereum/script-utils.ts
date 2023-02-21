@@ -64,15 +64,60 @@ const deployAndInit = async (
 
 export const deployOperator = async (
   hre: HardhatRuntimeEnvironment,
-  externalOperator: ethers.Signer,
-  council: ethers.Signer,
-): Promise<ethers.Contract> => {
-  return deployAndInit(
+  externalOperatorAddress: string,
+  councilAddress: string,
+  registry: ethers.Contract
+): Promise<ethers.Contract> =>
+  deployAndInit(
     hre,
     "Operator",
-    await externalOperator.getAddress(),
+    externalOperatorAddress,
+    councilAddress,
+    registry.address
+  );
+
+export const deployVEGovLockup = async(
+  hre: HardhatRuntimeEnvironment,
+  council: ethers.Signer,
+  lockToken: string
+): Promise<ethers.Contract> =>
+  deployAndInit(
+    hre,
+    "VEGovLockup",
     await council.getAddress(),
-  )
+    lockToken
+  );
+
+export const deployRegistry = async(
+  hre: HardhatRuntimeEnvironment,
+  operatorAddress: string,
+  tokenBeacon: ethers.Contract,
+  compoundLpBeacon: ethers.Contract,
+  aaveV2LpBeacon: ethers.Contract,
+  aaveV3LpBeacon: ethers.Contract
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("Registry");
+
+  return factory.deploy(
+    operatorAddress,
+    tokenBeacon.address,
+    compoundLpBeacon.address,
+    aaveV2LpBeacon.address,
+    aaveV3LpBeacon.address
+  );
+};
+
+export const deployDAO = async (
+  hre: HardhatRuntimeEnvironment,
+  council: ethers.Signer,
+  veGovLockupSource: ethers.Contract
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("DAO");
+
+  return factory.deploy(
+    await council.getAddress(),
+    veGovLockupSource.address
+  );
 };
 
 export const deployGovToken = async (
@@ -83,16 +128,47 @@ export const deployGovToken = async (
     .connect(govOperatorSigner);
 
   const govToken = await factory.deploy();
+
   await govToken.deployed();
 
-  await govToken.init(
+  await govToken["init(string,string,uint8,uint256)"](
     "Fluidity Money",
     "FLUID",
     18,
     BigNumber.from("1000000000000000000000000000")
   );
+
   return govToken;
 };
+
+export const deployFactories = async(
+  hre: HardhatRuntimeEnvironment
+): Promise<[
+  ethers.ContractFactory,
+  ethers.ContractFactory,
+  ethers.ContractFactory,
+  ethers.ContractFactory
+]> =>
+  Promise.all([
+    hre.ethers.getContractFactory("Token"),
+    hre.ethers.getContractFactory("CompoundLiquidityProvider"),
+    hre.ethers.getContractFactory("AaveV2LiquidityProvider"),
+    hre.ethers.getContractFactory("AaveV3LiquidityProvider")
+  ]);
+
+export const deployBeacons = async (
+  hre: HardhatRuntimeEnvironment,
+  tokenFactory: ethers.ContractFactory,
+  compoundFactory: ethers.ContractFactory,
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV3Factory: ethers.ContractFactory
+): Promise<[ethers.Contract, ethers.Contract, ethers.Contract, ethers.Contract]> =>
+  Promise.all([
+    hre.upgrades.deployBeacon(tokenFactory),
+    hre.upgrades.deployBeacon(compoundFactory),
+    hre.upgrades.deployBeacon(aaveV2Factory),
+    hre.upgrades.deployBeacon(aaveV3Factory)
+  ]);
 
 export const deployTestUtility = async (
   hre: HardhatRuntimeEnvironment,
@@ -101,6 +177,7 @@ export const deployTestUtility = async (
 ) => {
   const factory = await hre.ethers.getContractFactory("TestClient");
   const client = await factory.deploy(boundOperatorOperator.address);
+
   await client.deployed();
 
   await boundOperatorOperator.updateUtilityClients([{
@@ -125,26 +202,26 @@ export const deployTokens = async (
   tokens: Token[],
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
-  council: ethers.Signer,
-  externalOperator: ethers.Signer,
+  councilAddress: string,
+  externalOperatorAddress: string,
   boundOperatorOperator: ethers.Contract,
-  externalOracle: ethers.Signer,
-): Promise<{
+  boundRegistryOperator: ethers.Contract,
+  externalOracleAddress: string,
+
+  tokenFactory: ethers.ContractFactory,
   tokenBeacon: ethers.Contract,
-  aaveV2Beacon: ethers.Contract,
+
+  compoundFactory: ethers.ContractFactory,
   compoundBeacon: ethers.Contract,
+
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV2Beacon: ethers.Contract,
+
+  aaveV3Factory: ethers.ContractFactory,
+  aaveV3Beacon: ethers.Contract
+): Promise<{
   tokens: TokenAddresses,
 }> => {
-  const tokenFactory = await hre.ethers.getContractFactory("Token");
-  const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
-  const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
-  const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");
-
-  const tokenBeacon = await hre.upgrades.deployBeacon(tokenFactory);
-  const compoundBeacon = await hre.upgrades.deployBeacon(compoundFactory);
-  const aaveV2Beacon = await hre.upgrades.deployBeacon(aaveV2Factory);
-  const aaveV3Beacon = await hre.upgrades.deployBeacon(aaveV3Factory);
-
   const tokenAddresses: TokenAddresses = {};
 
   for (const token of tokens) {
@@ -202,12 +279,12 @@ export const deployTokens = async (
       token.decimals,
       token.name,
       token.symbol,
-      await council.getAddress(),
-      await externalOperator.getAddress(),
+      councilAddress,
+      externalOperatorAddress,
       boundOperatorOperator.address,
     );
 
-    await boundOperatorOperator.updateUtilityClients([{
+    await boundRegistryOperator.updateUtilityClients([{
       name: "FLUID",
       overwrite: false,
       token: deployedToken.address,
@@ -216,7 +293,7 @@ export const deployTokens = async (
 
     await boundOperatorOperator.updateOracles([{
       contractAddr: deployedToken.address,
-      newOracle: externalOracle.getAddress(),
+      newOracle: externalOracleAddress,
     }]);
 
     tokenAddresses[token.symbol] = {deployedToken, deployedPool};
@@ -225,24 +302,8 @@ export const deployTokens = async (
   }
 
   return {
-    tokenBeacon,
-    aaveV2Beacon,
-    compoundBeacon,
-    tokens: tokenAddresses,
+    tokens: tokenAddresses
   };
-};
-
-export const deployRewardPools = async (
-  hre: HardhatRuntimeEnvironment,
-  externalOperator: ethers.Signer,
-  tokens: ethers.Contract[]
-): Promise<ethers.Contract> => {
-  return deployAndInit(
-    hre,
-    "RewardPools",
-    await externalOperator.getAddress(),
-    tokens.map(e => e.address),
-  );
 };
 
 export const forknetTakeFunds = async (

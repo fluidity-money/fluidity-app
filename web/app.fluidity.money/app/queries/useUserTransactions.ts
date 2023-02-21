@@ -1,8 +1,8 @@
 import { gql, Queryable, jsonPost } from "~/util";
-import {fetchGqlEndpoint, hasuraDateToUnix} from "~/util/api/graphql";
+import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
 import BN from "bn.js";
-import {getUsdFromTokenAmount} from "~/util/chainUtils/tokens";
-import {MintAddress} from "~/types/MintAddress";
+import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
+import { MintAddress } from "~/types/MintAddress";
 
 const queryByAddress: Queryable = {
   ethereum: gql`
@@ -92,32 +92,34 @@ const queryByAddress: Queryable = {
 
   arbitrum: gql`
     query getTransactionsByAddress(
-      $address: String!, 
-      $offset: Int = 0, 
-      $filterHashes: [String!] = [], 
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-    transfers: user_actions(
-      where: {
-        network: { _eq: "arbitrum" },
-       _not: { transaction_hash: { _in: $filterHashes } }, 
-       sender_address: { _eq: $address }, _or: { recipient_address: { _eq: $address } }
-      }, 
-      order_by: {time: desc},
-      limit: $limit, 
-      offset: $offset
-    ) {
-      sender_address
-      recipient_address
-      token_short_name
-      time
-      transaction_hash
-      amount
-      token_decimals
-      type
-      swap_in
+      transfers: user_actions(
+        where: {
+          network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          sender_address: { _eq: $address }
+          _or: { recipient_address: { _eq: $address } }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+      }
     }
-  }`
+  `,
 };
 
 const queryByTxHash: Queryable = {
@@ -193,31 +195,32 @@ const queryByTxHash: Queryable = {
 
   arbitrum: gql`
     query getTransactionsByTxHash(
-      $transactions: [String!],
-      $filterHashes: [String!] = [], 
+      $transactions: [String!]
+      $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-    transfers: user_actions(
-      where: {
-        network: { _eq: "arbitrum" },
-       _not: { transaction_hash: {_in: $filterHashes } },
-       transaction_hash: { in: $transactions }
-      }, 
-      order_by: {time: desc},
-      limit: $limit, 
-      offset: $offset
-    ) {
-      sender_address
-      recipient_address
-      token_short_name
-      time
-      transaction_hash
-      amount
-      token_decimals
-      type
-      swap_in
+      transfers: user_actions(
+        where: {
+          network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+      }
     }
-  }`
+  `,
 };
 
 const queryAll: Queryable = {
@@ -301,31 +304,31 @@ const queryAll: Queryable = {
 
   arbitrum: gql`
     query getTransactions(
-      $offset: Int = 0, 
-      $filterHashes: [String!] = [], 
+      $offset: Int = 0
+      $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-    transfers: user_actions(
-      where: {
-        network: { _eq: "arbitrum" },
-       _not: { transaction_hash: { _in: $filterHashes } }, 
-      }, 
-      order_by: { time: desc },
-      limit: $limit, 
-      offset: $offset
-    ) {
-      sender_address
-      recipient_address
-      token_short_name
-      time
-      transaction_hash
-      amount
-      token_decimals
-      type
-      swap_in
+      transfers: user_actions(
+        where: {
+          network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+      }
     }
-  }
-`
+  `,
 };
 
 type UserTransactionsByAddressBody = {
@@ -376,21 +379,20 @@ export type UserTransaction = {
 };
 
 export type HasuraUserTransaction = {
-  sender_address: string,
-  recipient_address: string,
-  amount: number,
-  token_decimals: number,
-  token_short_name: string,
-  transaction_hash: string,
-  time: string, 
-  type: 'swap' | 'send'
-  swap_in: boolean,
+  sender_address: string;
+  recipient_address: string;
+  amount: number;
+  token_decimals: number;
+  token_short_name: string;
+  transaction_hash: string;
+  time: string;
+  type: "swap" | "send";
+  swap_in: boolean;
 };
 
 export type HasuraUserTransactionRes = {
-  data: { transfers: HasuraUserTransaction[] }
+  data: { transfers: HasuraUserTransaction[] };
 };
-
 
 const useUserTransactionsByAddress = async (
   network: string,
@@ -405,7 +407,7 @@ const useUserTransactionsByAddress = async (
     offset: (page - 1) * 12,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && {tokens}),
+    ...(network !== "arbitrum" && { tokens }),
   };
 
   const body = {
@@ -413,31 +415,33 @@ const useUserTransactionsByAddress = async (
     variables,
   };
 
-  const {url, headers} = fetchGqlEndpoint(network) || {};
+  const { url, headers } = fetchGqlEndpoint(network) || {};
 
   if (!url || !headers)
-    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+    return {
+      errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
+    };
 
-  const result = await jsonPost<UserTransactionsByAddressBody, UserTransactionsRes>(
-    url,
-    body,
-    headers, 
-  );
+  const result = await jsonPost<
+    UserTransactionsByAddressBody,
+    UserTransactionsRes
+  >(url, body, headers);
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
-    result.data[network].transfers = hasuraTransfers.map(transfer => {
+    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data
+      .transfers;
+    result.data[network].transfers = hasuraTransfers.map((transfer) => {
       let senderAddress = "";
       let recipientAddress = "";
       // only senderAddress is defined by user actions
       switch (transfer.type) {
-        case 'send':
+        case "send":
           senderAddress = transfer.sender_address;
           recipientAddress = transfer.recipient_address;
           break;
-        case 'swap':
+        case "swap":
           if (transfer.swap_in) {
             senderAddress = MintAddress;
             recipientAddress = transfer.sender_address;
@@ -449,17 +453,20 @@ const useUserTransactionsByAddress = async (
       }
 
       return {
-        sender: {address: senderAddress},
-        receiver: {address: recipientAddress},
-        amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
-        currency: {symbol: 'f' + transfer.token_short_name},
-        transaction: {hash: transfer.transaction_hash},
-        block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
-      }
-    })
+        sender: { address: senderAddress },
+        receiver: { address: recipientAddress },
+        amount: getUsdFromTokenAmount(
+          new BN(String(transfer.amount)),
+          transfer.token_decimals
+        ),
+        currency: { symbol: "f" + transfer.token_short_name },
+        transaction: { hash: transfer.transaction_hash },
+        block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
+      };
+    });
   }
 
-  return result; 
+  return result;
 };
 
 const useUserTransactionsByTxHash = async (
@@ -473,7 +480,7 @@ const useUserTransactionsByTxHash = async (
     transactions,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && {tokens}),
+    ...(network !== "arbitrum" && { tokens }),
   };
 
   const body = {
@@ -481,31 +488,33 @@ const useUserTransactionsByTxHash = async (
     variables,
   };
 
-  const {url, headers} = fetchGqlEndpoint(network) || {};
+  const { url, headers } = fetchGqlEndpoint(network) || {};
 
   if (!url || !headers)
-    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+    return {
+      errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
+    };
 
-  const result = await jsonPost<UserTransactionsByTxHashBody, UserTransactionsRes>(
-    url,
-    body,
-    headers,
-  );
+  const result = await jsonPost<
+    UserTransactionsByTxHashBody,
+    UserTransactionsRes
+  >(url, body, headers);
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
-    result.data[network].transfers = hasuraTransfers.map(transfer => {
+    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data
+      .transfers;
+    result.data[network].transfers = hasuraTransfers.map((transfer) => {
       let senderAddress = "";
       let recipientAddress = "";
       // only senderAddress is defined by user actions
       switch (transfer.type) {
-        case 'send':
+        case "send":
           senderAddress = transfer.sender_address;
           recipientAddress = transfer.recipient_address;
           break;
-        case 'swap':
+        case "swap":
           if (transfer.swap_in) {
             senderAddress = MintAddress;
             recipientAddress = transfer.sender_address;
@@ -517,17 +526,20 @@ const useUserTransactionsByTxHash = async (
       }
 
       return {
-        sender: {address: senderAddress},
-        receiver: {address: recipientAddress},
-        amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
-        currency: {symbol: 'f' + transfer.token_short_name},
-        transaction: {hash: transfer.transaction_hash},
-        block: {timestamp: {unixtime: hasuraDateToUnix(transfer.time)}}
+        sender: { address: senderAddress },
+        receiver: { address: recipientAddress },
+        amount: getUsdFromTokenAmount(
+          new BN(String(transfer.amount)),
+          transfer.token_decimals
+        ),
+        currency: { symbol: "f" + transfer.token_short_name },
+        transaction: { hash: transfer.transaction_hash },
+        block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
       };
-    })
+    });
   }
 
-  return result; 
+  return result;
 };
 
 const useUserTransactionsAll = async (
@@ -541,7 +553,7 @@ const useUserTransactionsAll = async (
     offset: (page - 1) * 12,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && {tokens}),
+    ...(network !== "arbitrum" && { tokens }),
   };
 
   const body = {
@@ -549,34 +561,37 @@ const useUserTransactionsAll = async (
     variables,
   };
 
-  const {url, headers} = fetchGqlEndpoint(network) || {};
+  const { url, headers } = fetchGqlEndpoint(network) || {};
 
   if (!url || !headers)
-    return {errors: `Failed to fetch GraphQL URL and headers for network ${network}`}
+    return {
+      errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
+    };
 
   const result = await jsonPost<UserTransactionsAllBody, UserTransactionsRes>(
     url,
     body,
-    headers,
+    headers
   );
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
   if (network === "arbitrum" && result.data) {
-    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data.transfers;
+    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data
+      .transfers;
 
     result.data = {
       arbitrum: {
-        transfers: hasuraTransfers.map(transfer => {
+        transfers: hasuraTransfers.map((transfer) => {
           let senderAddress = "";
           let recipientAddress = "";
           // only senderAddress is defined by user actions
           switch (transfer.type) {
-            case 'send':
+            case "send":
               senderAddress = transfer.sender_address;
               recipientAddress = transfer.recipient_address;
               break;
-            case 'swap':
+            case "swap":
               if (transfer.swap_in) {
                 senderAddress = MintAddress;
                 recipientAddress = transfer.sender_address;
@@ -587,21 +602,24 @@ const useUserTransactionsAll = async (
               break;
           }
           return {
-            sender: {address: senderAddress},
-            receiver: {address: recipientAddress},
-            amount: getUsdFromTokenAmount(new BN(String(transfer.amount)), transfer.token_decimals),
-            currency: {symbol: 'f' + transfer.token_short_name},
-            transaction: {hash: transfer.transaction_hash},
+            sender: { address: senderAddress },
+            receiver: { address: recipientAddress },
+            amount: getUsdFromTokenAmount(
+              new BN(String(transfer.amount)),
+              transfer.token_decimals
+            ),
+            currency: { symbol: "f" + transfer.token_short_name },
+            transaction: { hash: transfer.transaction_hash },
             block: {
-              timestamp: {unixtime: hasuraDateToUnix(transfer.time)}
-            }
-          }
-        })
-      }
-    }
+              timestamp: { unixtime: hasuraDateToUnix(transfer.time) },
+            },
+          };
+        }),
+      },
+    };
   }
 
-  return result; 
+  return result;
 };
 
 export {

@@ -36,9 +36,9 @@ const Provider = ({
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    ethereum: EthereumProvider(ethRpc, tokens),
+    ethereum: EthereumProvider(ethRpc, tokens, network),
     solana: SolanaProvider(solRpc, tokens),
-    arbitrum: EthereumProvider(arbRpc, tokens),
+    arbitrum: EthereumProvider(arbRpc, tokens, network),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");

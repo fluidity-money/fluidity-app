@@ -35,7 +35,9 @@ const integrationTestUniswapV2 = `
       "eth_getCode": "0x0"
     },
     "call_methods": {
-      "token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+		"token0()": {
+		"": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+	}
     },
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -74,8 +76,12 @@ const integrationTestUniswapV3 = `
       "eth_getCode": "0x0"
     },
     "call_methods": {
-      "token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
-      "fee()": "0x0000000000000000000000000000000000000000000000000000000000000064"
+      "token0()": {
+		"": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+	  },
+      "fee()": {
+		"": "0x0000000000000000000000000000000000000000000000000000000000000064"
+	  }
     },
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"

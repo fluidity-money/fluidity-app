@@ -18,7 +18,7 @@ import { useCache } from "~/hooks/useCache";
 import { Rewarders } from "~/util/rewardAggregates";
 
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { Suspense, useContext, useEffect, useState } from "react";
 import { LoaderFunction } from "@remix-run/node";
@@ -62,7 +62,9 @@ const getTotalValueOfAssetType = async (
   return totalBalance;
 };
 
-export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) => {
+export const ErrorBoundary: React.FC<{ error: Error }> = (props: {
+  error: Error;
+}) => {
   return (
     <div>
       <h1>Error</h1>
@@ -72,7 +74,7 @@ export const ErrorBoundary: React.FC<{error: Error}> = (props: {error: Error}) =
       <pre>{props.error.stack}</pre>
     </div>
   );
-}
+};
 
 const AssetsRoot = () => {
   const { showExperiment } = useContext(SplitContext);
@@ -121,57 +123,68 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
-  if (!showExperiment("enable-assets-page")) return <></>
+  if (!showExperiment("enable-assets-page")) return <></>;
 
-  if (!address) return <></>
+  if (!address) return <></>;
 
   return (
     <div className="pad-main">
-      <Suspense fallback={<div
-        style={{display: "flex", flexDirection: "column", gap: '2em', justifyContent: "center", alignItems: "center", height: '500px'}}
+      <Suspense
+        fallback={
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "2em",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "500px",
+            }}
+          >
+            <LoadingDots />
+            <Text>Loading assets...</Text>
+          </div>
+        }
       >
-        <LoadingDots />
-        <Text>Loading assets...</Text>
-      </div>}>
         <div className="assets-header">
           <div className="assets-balance">
             <Text>
               Total balance of {isFluidAssets ? "Fluid" : "Regular"} Assets
             </Text>
-            
-              {/* <Suspense>
+
+            {/* <Suspense>
                 <AnimatedNumber animateToNumber={totalWalletValue ?? 0}/>
               </Suspense> */}
-              <Display size="sm"> {numberToMonetaryString(totalWalletValue || 0)} </Display>
-            
+            <Display size="sm">
+              {" "}
+              {numberToMonetaryString(totalWalletValue || 0)}{" "}
+            </Display>
           </div>
-          <AnimateSharedLayout>
-            <div className="assets-navigation">
-              {navigationMap.map((l, i) => {
-                const selected = currentPage === l.link;
-                return (
-                  <Link key={i} to={l.link}>
-                    <Text
-                      size="lg"
-                      prominent={selected}
-                      className={selected ? "assets-active-filter" : ""}
-                    >
-                      {l.name}
-                    </Text>
-                    {selected && (
-                      <motion.div
-                        className="assets-active-filter-underline"
-                        layoutId="underline"
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </AnimateSharedLayout>
+          <div className="assets-navigation">
+            {navigationMap.map((l, i) => {
+              const selected = currentPage === l.link;
+              return (
+                <Link key={i} to={l.link}>
+                  <Text
+                    size="lg"
+                    prominent={selected}
+                    className={selected ? "assets-active-filter" : ""}
+                  >
+                    {l.name}
+                  </Text>
+                  {selected && (
+                    <motion.div
+                      className="assets-active-filter-underline"
+                      layoutId="underline"
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </div>
         <AnimatePresence>
-            <Outlet />
+          <Outlet />
         </AnimatePresence>
         <section id="rewarders">
           <Heading className="highest-rewarders" as={"h2"}>

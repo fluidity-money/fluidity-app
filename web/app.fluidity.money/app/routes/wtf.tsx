@@ -32,7 +32,7 @@ import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
 import { generateMeta } from "~/util/tweeter";
-import {SplitContext} from "contexts/SplitProvider";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -149,14 +149,13 @@ export default function IndexPage() {
   const navigate = useNavigate();
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
-  const {showExperiment} = useContext(SplitContext);
+  const { showExperiment } = useContext(SplitContext);
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chains =
-    showExperiment("enable-arbitrum")
-      ? [
+  const chains = showExperiment("enable-arbitrum")
+    ? [
         {
           name: "ETH",
           icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -170,7 +169,7 @@ export default function IndexPage() {
           icon: <img src="/assets/chains/solanaIcon.svg" />,
         },
       ]
-      : [
+    : [
         {
           name: "ETH",
           icon: <img src="/assets/chains/ethIcon.svg" />,

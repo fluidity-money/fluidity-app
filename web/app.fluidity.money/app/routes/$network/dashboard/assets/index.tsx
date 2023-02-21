@@ -5,7 +5,7 @@ import {
   TokenCard,
   TokenDetails,
 } from "@fluidity-money/surfing";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
 import { Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
@@ -174,6 +174,8 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     quantities.fluidAmt?.div(decimals).toNumber() || 0
   );
 
+  const navigate = useNavigate();
+
   return (
     <motion.div style={{ marginBottom: "1em" }} variants={assetVariants}>
       <CollapsibleCard expanded={false}>
@@ -200,6 +202,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
               transaction_hash: topAssetPrize.transaction_hash,
             }}
             activity={augmentedActivity}
+            onClickFullHistory={() => navigate(`/${network}/dashboard/rewards`)}
           />
         </CollapsibleCard.Details>
       </CollapsibleCard>

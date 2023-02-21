@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL
+
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
@@ -13,7 +15,13 @@ contract TestClient is IFluidClient {
     constructor(address o) {
         oracle_ = o;
         govToken_ = new GovToken();
-        govToken_.init("Test utility token!", "UTILCLIENT", 8, 2 * (10 ** 8));
+
+        govToken_.init(
+            "Test utility token!",
+            "UTILCLIENT",
+            8,
+            1
+        );
     }
 
     function transferFrom(GovToken token, uint amount) external {
@@ -30,7 +38,7 @@ contract TestClient is IFluidClient {
         }
     }
 
-    function getUtilityVars() external returns (UtilityVars memory) {
+    function getUtilityVars() external view returns (UtilityVars memory) {
         return UtilityVars({
             poolSizeNative: govToken_.balanceOf(address(this)),
             tokenDecimalScale: 10 ** govToken_.decimals(),

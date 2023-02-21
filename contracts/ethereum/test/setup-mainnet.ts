@@ -1,9 +1,18 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, deployRewardPools, forknetTakeFunds } from "../script-utils";
-import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
+import { deployTokens, forknetTakeFunds } from "../script-utils";
 
-import { commonBindings, commonContracts, signers } from "./setup-common";
+import {
+  AAVE_V2_POOL_PROVIDER_ADDR,
+  REGISTRATION_TYPE_TOKEN,
+  TokenList } from "../test-constants";
+
+import {
+  commonBindings,
+  commonContracts,
+  commonBeacons,
+  commonFactories,
+  signers } from "./setup-common";
 
 export let contracts: typeof commonContracts & {
   usdt: {
@@ -18,7 +27,11 @@ export let contracts: typeof commonContracts & {
     deployedToken: ethers.Contract,
     deployedPool: ethers.Contract,
   },
-  rewardPools: ethers.Contract,
+  weth: {
+    deployedToken: ethers.Contract,
+    deployedPool: ethers.Contract,
+  },
+  ethConvertor: ethers.Contract
 };
 
 export let bindings: typeof commonBindings & {
@@ -39,9 +52,13 @@ export let bindings: typeof commonBindings & {
     base: ethers.Contract,
     fluid: ethers.Contract,
   },
-  rewardPools: {
-    operator: ethers.Contract,
+  weth: {
+    base: ethers.Contract,
+    fluid: ethers.Contract
   },
+  ethConvertor: {
+    operator: ethers.Contract
+  }
 };
 
 before(async function () {
@@ -50,7 +67,12 @@ before(async function () {
     return;
   }
 
-  const toDeploy = [TokenList["usdt"], TokenList["fei"], TokenList["dai"]];
+  const toDeploy = [
+    TokenList["usdt"],
+    TokenList["fei"],
+    TokenList["dai"],
+    TokenList["weth"]
+  ];
 
   await forknetTakeFunds(
     hre,
@@ -58,15 +80,37 @@ before(async function () {
     toDeploy,
   );
 
+  const { tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory } =
+    commonFactories;
+
+  const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
+    commonBeacons;
+
+  const emergencyCouncilAddress = await signers.token.emergencyCouncil.getAddress();
+
+  const operatorAddress = await signers.token.externalOperator.getAddress();
+
+  const oracleAddress = await signers.token.externalOracle.getAddress();
+
   const { tokens } = await deployTokens(
     hre,
     toDeploy,
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
-    signers.token.emergencyCouncil,
-    signers.token.externalOperator,
+    emergencyCouncilAddress,
+    operatorAddress,
     commonBindings.operator.externalOperator,
-    signers.token.externalOracle,
+    commonBindings.registry.externalOperator,
+    oracleAddress,
+
+    tokenFactory,
+    tokenBeacon,
+    compoundFactory,
+    compoundBeacon,
+    aaveV2Factory,
+    aaveV2Beacon,
+    aaveV3Factory,
+    aaveV3Beacon
   );
 
   const tokenOracleAddress = await signers.token.externalOracle.getAddress();
@@ -76,19 +120,34 @@ before(async function () {
 
   await commonBindings.operator.externalOperator.updateOracles(oracles);
 
-  const rewardPools = await deployRewardPools(
-    hre,
-    signers.rewardPools.externalOperator,
-    Object.values(tokens).map(e => e.deployedToken),
+  const convertorEthToTokenFactory = await hre.ethers.getContractFactory(
+    "ConvertorEthToToken"
   );
+
+  const ethConvertor = await convertorEthToTokenFactory.deploy(
+    tokens["fwETH"].deployedToken.address,
+    TokenList["weth"].address
+  );
+
+  const deployedTokens = Object.values(tokens).map(({ deployedToken }) => deployedToken);
+
+  await commonBindings.registry.externalOperator.registerMany(deployedTokens.map((token) => {
+    console.log(token.address);
+    return {
+      type_: REGISTRATION_TYPE_TOKEN,
+      addr: token.address
+    }
+  }));
 
   contracts = {
     ...commonContracts,
     usdt: tokens["fUSDt"],
     fei: tokens["fFei"],
     dai: tokens["fDAI"],
-    rewardPools,
+    weth: tokens["fwETH"],
+    ethConvertor
   };
+
   bindings = {
     ...commonBindings,
     usdt: {
@@ -107,8 +166,12 @@ before(async function () {
       base: await hre.ethers.getContractAt("IERC20", TokenList["dai"].address, signers.userAccount1),
       fluid: contracts.dai.deployedToken.connect(signers.userAccount1),
     },
-    rewardPools: {
-      operator: contracts.rewardPools.connect(signers.rewardPools.externalOperator),
+    weth: {
+      base: await hre.ethers.getContractAt("IERC20", TokenList["weth"].address, signers.userAccount1),
+      fluid: contracts.weth.deployedToken.connect(signers.userAccount1),
     },
+    ethConvertor: {
+      operator: contracts.ethConvertor.connect(signers.fwEthAccount)
+    }
   };
 });

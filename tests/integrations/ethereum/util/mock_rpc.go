@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -60,20 +61,29 @@ func marshalError(response serverResponse, rw http.ResponseWriter, err interface
 // MockRpcClient to return an eth client connected to an endpoint that mocks the given methods.
 // rpcMethods [methodName]response to provide a list of Ethereum RPC methods and how they should be mocked.
 // callMethods[methodName]response to provide a list of eth_call contract methods and how they should respond.
-func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]interface{}) (*ethclient.Client, error) {
+func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]map[string]interface{}) (*ethclient.Client, error) {
 	var (
 		// generate a random endpoint for the client
 		endpoint = "/" + fmt.Sprint(rand.Uint64())
 
 		// store methods internally - don't modify the ones passed
-		callMethods = make(map[string]interface{})
+		// method => calldata => response
+		// or method => "" => response for defaults
+		callMethods = make(map[string]map[string]interface{})
 		rpcMethods  = make(map[string]interface{})
 	)
 
-	for methodName, response := range callMethods_ {
+	for methodName, responses := range callMethods_ {
 		// hash method signatures
 		hashedMethod := methodSigHash(methodName)
-		callMethods[hashedMethod] = response
+
+		method := make(map[string]interface{})
+
+		for methodArgs, response := range responses {
+			method[methodArgs] = response
+		}
+
+		callMethods[hashedMethod] = method
 	}
 
 	for methodName, response := range rpcMethods_ {
@@ -92,6 +102,7 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 			marshalError(response, rw, err)
 			return
 		}
+		log.Printf("req %+v", string(*request.Params))
 
 		response.Id = request.Id
 
@@ -133,9 +144,23 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]i
 
 		// return the mocked result, if it's valid
 		if len(data) >= 10 {
-			expectedResult := callMethods[data[:10]]
-			if expectedResult != nil {
-				response.Result = expectedResult
+			method := callMethods[data[:10]]
+			if method != nil {
+				fullCalldata := method[data]
+				methodName := method[""]
+
+				log.Printf("fetching %s", data[:10])
+				if fullCalldata != nil {
+					response.Result = fullCalldata
+					log.Printf(fmt.Sprintf("returning exact %s", fullCalldata))
+				} else if methodName != nil {
+					response.Result = methodName
+					log.Printf(fmt.Sprintf("returning default %s", methodName))
+				} else {
+					log.Printf(fmt.Sprintf("no callmethod for calldata %s", data))
+				}
+			} else {
+				log.Printf(fmt.Sprintf("no method for id %s, calldata %s", data[:10], data))
 			}
 		}
 
