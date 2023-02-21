@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -167,13 +168,23 @@ func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*B
 
 		defer resp.Body.Close()
 
+		bodyBuf, err := io.ReadAll(resp.Body)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to read the reponse body!"
+				k.Payload = err
+			})
+		}
+
 		var blocksResponse BlocksResponse
 
-		err = json.NewDecoder(resp.Body).Decode(&blocksResponse)
+		err = json.Unmarshal(bodyBuf, &blocksResponse)
 
 		if err != nil {
 			return nil, fmt.Errorf(
-				"could not unmarshal response body: %v",
+				"could not unmarshal response body '%s': %v",
+				bodyBuf,
 				err,
 			)
 		}
