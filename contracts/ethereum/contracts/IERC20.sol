@@ -27,9 +27,24 @@ interface IERC20 {
     function totalSupply() external view returns (uint256);
 
     /**
+     * @dev Returns the number of decimals.
+     */
+    function decimals() external view returns (uint8);
+
+    /**
      * @dev Returns the amount of tokens owned by `account`.
      */
     function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * @dev Returns the name of the token.
+     */
+    function name() external view returns (string memory);
+
+    /**
+     * @dev Returns the symbol of the token.
+     */
+    function symbol() external view returns (string memory);
 
     /**
      * @dev Moves `amount` tokens from the caller's account to `to`.

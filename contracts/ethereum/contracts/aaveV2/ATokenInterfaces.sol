@@ -1,16 +1,10 @@
-pragma solidity 0.8.11;
-pragma abicoder v1;
+// SPDX-License-Identifier: GPL
 
-import "../openzeppelin/IERC20Metadata.sol";
+pragma solidity 0.8.11;
+pragma abicoder v2;
 
 interface LendingPoolAddressesProviderInterface {
     function getLendingPool() external view returns (address);
-}
-
-interface ATokenInterface is IERC20Metadata {
-    function UNDERLYING_ASSET_ADDRESS() external view returns (address);
-
-    function balanceOf(address _user) external view returns (uint256);
 }
 
 address constant aaveEthMock = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;

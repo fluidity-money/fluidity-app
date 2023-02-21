@@ -5,12 +5,12 @@
 // LICENSE.md file.
 
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
 
-import "./openzeppelin/IERC20.sol";
+import "./IERC20.sol";
 
 /// @title generic interface around an interest source
-interface LiquidityProvider {
+interface ILiquidityProvider {
     /**
      * @notice getter for the owner of the pool (account that can deposit and remove from it)
      * @return address of the owning account
