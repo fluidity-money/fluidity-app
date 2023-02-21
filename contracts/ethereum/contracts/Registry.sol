@@ -84,10 +84,6 @@ contract Registry is IRegistry, ITotalRewardPool {
         aaveV3LiquidityProviderBeacon_ = _aaveV3LiquidityProviderBeacon;
     }
 
-    function operatorNotRequiredOrIsOperator() public view returns (bool) {
-        return operator_ == address(0) || msg.sender == operator_;
-    }
-
     function _register(uint8 _type, address _contract) internal {
         registrations_.push(Registration({
             type_: _type,
@@ -98,13 +94,13 @@ contract Registry is IRegistry, ITotalRewardPool {
     }
 
     function register(uint8 _type, address _contract) public {
-        require(operatorNotRequiredOrIsOperator(), "not allowed");
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
         _register(_type, _contract);
     }
 
     function registerMany(Registration[] calldata _registrations) public {
-        require(operatorNotRequiredOrIsOperator(), "not allowed");
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
         for (uint i = 0; i < _registrations.length; i++)
           _register(_registrations[i].type_, _registrations[i].addr);

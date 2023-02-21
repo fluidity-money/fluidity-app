@@ -30,7 +30,9 @@ contract ConvertorEthToToken {
         tokenAddress_.erc20InFor(msg.sender, msg.value);
     }
 
-    receive() external payable {}
+    receive() external payable {
+        require(msg.sender == address(wethAddress_), "sender not weth");
+    }
 
     function unwrapEth(uint256 _amount) public {
         tokenAddress_.transferFrom(msg.sender, address(this), _amount);
