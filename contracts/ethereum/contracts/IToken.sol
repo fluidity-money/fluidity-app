@@ -127,18 +127,6 @@ interface IToken is IERC20 {
     )
         external;
 
-    /*
-     * @notice returns whether mint limits are enabled
-     * @notice mint limits no longer exist, this always `false`
-     */
-    function mintLimitsEnabled() external pure returns (bool);
-
-    /*
-     * @notice returns the mint limit per user
-     * @notice mint limits no longer exist, this always `uint256.max`
-     */
-    function userMintLimit() external pure returns (uint);
-
     /**
      * @notice return the max unchecked reward that's currently set
      */

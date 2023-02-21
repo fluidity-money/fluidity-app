@@ -10,8 +10,6 @@ pragma abicoder v2;
 import "./IWETH.sol";
 import "./Token.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Take some Eth, wrap it into wEth, then use it to wrap a Token at the
  * given address

@@ -323,12 +323,6 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     }
 
     /// @inheritdoc IToken
-    function mintLimitsEnabled() public pure returns (bool) { return false; }
-
-    /// @inheritdoc IToken
-    function userMintLimit() public pure returns (uint) { return type(uint).max; }
-
-    /// @inheritdoc IToken
     function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
 
     function operator() public view returns (address) { return operator_; }

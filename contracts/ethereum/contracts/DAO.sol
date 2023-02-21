@@ -336,7 +336,7 @@ contract DAO {
         require(getProposalVoteable(_proposalId), "proposal frozen");
 
         require(
-          getAmountAvailable(_proposalId, msg.sender) == _amount,
+          getAmountAvailable(_proposalId, msg.sender) >= _amount,
           "user trying to vote more they can"
         );
 

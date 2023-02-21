@@ -9,7 +9,7 @@ pragma abicoder v2;
 
 interface IWETH {
     function deposit() external payable;
-    function withdraw(uint) external payable;
+    function withdraw(uint) external;
     function approve(address, uint256) external returns (bool);
     function balanceOf(address) external view returns (uint256);
 }

@@ -40,6 +40,9 @@ contract Registry is IRegistry, ITotalRewardPool {
         address newClient
     );
 
+    /// @dev TrfVariablesUpdated in the code
+    event TrfVariablesUpdated(TrfVariables old, TrfVariables new_);
+
     /**
     * @dev operator_ able to access the permissioned functions on this
     * Registry (note: not Operator)
@@ -120,9 +123,11 @@ contract Registry is IRegistry, ITotalRewardPool {
 
             IToken token = IToken(registration.addr);
 
-			uint256 amount = token.rewardPoolAmount();
+            uint256 amount = token.rewardPoolAmount();
 
             uint8 decimals = token.decimals();
+
+            require(18 >= decimals, "decimals too high");
 
             cumulative += amount * (10 ** (18 - decimals));
         }
@@ -167,6 +172,8 @@ contract Registry is IRegistry, ITotalRewardPool {
     /// @notice update the trf variables for a specific token
     function updateTrfVariables(address _token, TrfVariables calldata _trf) public {
         require(msg.sender == operator_, "only operator account can use this");
+
+        emit TrfVariablesUpdated(trfVariables_[_token], _trf);
 
         trfVariables_[_token] = _trf;
     }
