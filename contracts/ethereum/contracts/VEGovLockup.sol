@@ -3,11 +3,11 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
+import "../interfaces/IERC20.sol";
+import "../interfaces/IEmergencyMode.sol";
+
 import "./BaseNativeToken.sol";
 import "./GovToken.sol";
-
-import "./IERC20.sol";
-import "./IEmergencyMode.sol";
 
 import "./LibGovernanceCalc.sol";
 

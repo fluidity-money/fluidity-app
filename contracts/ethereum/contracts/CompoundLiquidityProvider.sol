@@ -7,11 +7,10 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-import "./compound/CTokenInterfaces.sol";
+import "../interfaces/compound/CTokenInterfaces.sol";
+import "../interfaces/ILiquidityProvider.sol";
 
 import "./openzeppelin/SafeERC20.sol";
-
-import "./ILiquidityProvider.sol";
 
 contract CompoundLiquidityProvider is ILiquidityProvider {
     using SafeERC20 for IERC20;

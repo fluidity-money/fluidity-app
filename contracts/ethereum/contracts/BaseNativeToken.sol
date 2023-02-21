@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import "./IERC20.sol";
+import "../interfaces/IERC20.sol";
+
 import "./openzeppelin/SafeERC20.sol";
 
 /**

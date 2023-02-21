@@ -7,16 +7,14 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./IERC20.sol";
+import "../interfaces/IEmergencyMode.sol";
+import "../interfaces/IERC20.sol";
+import "../interfaces/IFluidClient.sol";
+import "../interfaces/ILiquidityProvider.sol";
+import "../interfaces/IToken.sol";
+import "../interfaces/ITransferWithBeneficiary.sol";
 
 import "./openzeppelin/SafeERC20.sol";
-
-import "./ITransferWithBeneficiary.sol";
-
-import "./IFluidClient.sol";
-import "./ILiquidityProvider.sol";
-import "./IEmergencyMode.sol";
-import "./IToken.sol";
 
 /// @title The fluid token ERC20 contract
 contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode {

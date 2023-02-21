@@ -7,13 +7,11 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-import "./aave/IAToken.sol";
-
-import "./aaveV2/ATokenInterfaces.sol";
+import "../interfaces/aave/IAToken.sol";
+import "../interfaces/aaveV2/ATokenInterfaces.sol";
+import "../interfaces/ILiquidityProvider.sol";
 
 import "./openzeppelin/SafeERC20.sol";
-
-import "./ILiquidityProvider.sol";
 
 /// @title Liquidity provider using aave V2 pools
 contract AaveV2LiquidityProvider is ILiquidityProvider {

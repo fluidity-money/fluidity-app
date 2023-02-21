@@ -5,13 +5,12 @@ pragma abicoder v2;
 
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
-import "./IToken.sol";
-import "./ILiquidityProvider.sol";
-import "./IToken.sol";
-import "./IRegistry.sol";
-import "./ITotalRewardPool.sol";
-
-import "./TrfVariables.sol";
+import "../interfaces/ILiquidityProvider.sol";
+import "../interfaces/IRegistry.sol";
+import "../interfaces/IToken.sol";
+import "../interfaces/IToken.sol";
+import "../interfaces/ITotalRewardPool.sol";
+import "../interfaces/ITrfVariables.sol";
 
 struct FluidityClientChange {
     string name;

@@ -4,8 +4,7 @@ pragma solidity ^0.8.11;
 pragma abicoder v2;
 
 import "./IFluidClient.sol";
-
-import "./TrfVariables.sol";
+import "./ITrfVariables.sol";
 
 /**
  * @dev RegistrationTypeToken denoting implementations of "IToken.sol"

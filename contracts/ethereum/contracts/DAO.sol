@@ -6,10 +6,10 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
+import "../interfaces/IToken.sol";
+
 import "./VEGovLockup.sol";
 import "./Operator.sol";
-
-import "./IToken.sol";
 
 /// @dev default time to wait before a vote is possibly ratified after it's submission
 uint256 constant DEFAULT_VOTE_BLOCK_TIME = 10 days;

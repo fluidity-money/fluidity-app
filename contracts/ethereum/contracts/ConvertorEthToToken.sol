@@ -7,19 +7,19 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./IWETH.sol";
-import "./Token.sol";
+import "../interfaces/IWETH.sol";
+import "../interfaces/IToken.sol";
 
 /*
  * Take some Eth, wrap it into wEth, then use it to wrap a Token at the
  * given address
  */
 contract ConvertorEthToToken {
-    Token public tokenAddress_;
+    IToken public tokenAddress_;
 
     address payable public wethAddress_;
 
-    constructor(Token _tokenAddress, IWETH _wethAddress) {
+    constructor(IToken _tokenAddress, IWETH _wethAddress) {
         tokenAddress_ = _tokenAddress;
         wethAddress_ = payable(address(_wethAddress));
     }

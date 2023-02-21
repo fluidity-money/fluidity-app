@@ -5,30 +5,24 @@ pragma abicoder v2;
 
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
-import "../openzeppelin/IUpgradeableBeacon.sol";
-
-import "../compound/CTokenInterfaces.sol";
-
-import "../aave/IAToken.sol";
+import "../../interfaces/aave/IAToken.sol";
+import "../../interfaces/compound/CTokenInterfaces.sol";
+import "../../interfaces/IEmergencyMode.sol";
+import "../../interfaces/ILiquidityProvider.sol";
+import "../../interfaces/IRegistry.sol";
+import "../../interfaces/IToken.sol";
+import "../../interfaces/ITrfVariables.sol";
+import "../../interfaces/openzeppelin/IUpgradeableBeacon.sol";
 
 import {
     LendingPoolAddressesProviderInterface as AaveV2LendingPoolAddressesProviderInterface
-} from "../aaveV2/ATokenInterfaces.sol";
+} from "../../interfaces/aaveV2/ATokenInterfaces.sol";
 
 import {
     PoolAddressesProviderInterface as AaveV3PoolAddressesProviderInterface
-} from "../aaveV3/ATokenInterfaces.sol";
-
-import "../ILiquidityProvider.sol";
-import "../IEmergencyMode.sol";
-
-import "../IRegistry.sol";
+} from "../../interfaces/aaveV3/ATokenInterfaces.sol";
 
 import { Token } from "../Token.sol";
-
-import "../IToken.sol";
-
-import { TrfVariables } from "../TrfVariables.sol";
 
 import "../Operator.sol";
 

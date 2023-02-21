@@ -7,12 +7,11 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "./IFluidClient.sol";
-import "./IEmergencyMode.sol";
-import "./IUtilityGauges.sol";
-import "./IRegistry.sol";
-
-import "./TrfVariables.sol";
+import "../interfaces/IEmergencyMode.sol";
+import "../interfaces/IFluidClient.sol";
+import "../interfaces/IRegistry.sol";
+import "../interfaces/IUtilityGauges.sol";
+import "../interfaces/ITrfVariables.sol";
 
 struct FluidityReward {
     string clientName;

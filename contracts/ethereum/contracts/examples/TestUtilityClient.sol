@@ -3,7 +3,8 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "../IFluidClient.sol";
+import "../../interfaces/IFluidClient.sol";
+
 import "../GovToken.sol";
 
 contract TestClient is IFluidClient {
