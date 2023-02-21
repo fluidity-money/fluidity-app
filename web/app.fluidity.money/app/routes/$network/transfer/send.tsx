@@ -29,7 +29,7 @@ const Send = () => {
   const [addressInput, setAddressInput] = useState("");
   const [search, setSearch] = useState("");
   const [contacts] = useSync<Contact[]>("address", []);
-  const filteredContacts =
+  const filteredContacts = [] as Contact[];
     (contacts &&
       contacts.filter((contact) =>
         contact.name.toLowerCase().includes(search.toLowerCase())

@@ -37,18 +37,13 @@ export const ViewRewardModal = ({
   balance,
   forSending,
 }: IPropsConnectedWalletModal) => {
-  const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const { width } = useViewport();
   const isMobile = width < 500 && width > 0;
 
-  useEffect(() => {
-    setModal(
-      createPortal(
+  return visible ? createPortal(
         <>
           <div
-            className={`view-reward-modal-container ${
-              visible === true ? "show-modal" : "hide-modal"
-            }`}
+            className={`view-reward-modal-container show-modal`}
           >
             <span className="view-reward-modal-cancel" onClick={close}>
               <LinkButton
@@ -144,9 +139,5 @@ export const ViewRewardModal = ({
           </div>
         </>,
         document.body
-      )
-    );
-  }, [visible]);
-
-  return modal;
+      ): null;
 };

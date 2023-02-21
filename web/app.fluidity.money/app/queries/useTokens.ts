@@ -24,15 +24,17 @@ export type Asset = {
 
 export const useTokens = async () => {
   const {
-    data: { asset },
+    data: {
+        asset
+    }
   } = await jsonPost(
     "https://fluidity.hasura.app/v1/graphql",
-    tokenQuery,
+    {query: tokenQuery},
     process.env.FLU_HASURA_SECRET
       ? {
           "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
         }
       : {}
   );
-  return asset as Asset[];
+  return asset || [] as Asset[];
 };
