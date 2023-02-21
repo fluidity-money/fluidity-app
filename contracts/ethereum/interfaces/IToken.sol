@@ -42,22 +42,9 @@ interface IToken is IERC20 {
     /// @notice emitted when restrictions
     event MaxUncheckedRewardLimitChanged(uint amount);
 
-    /// @notice global mint limit changed by setRestrictions
-    /// @notice deprecated, mint limits no longer exist
-    event GlobalMintLimitChanged(uint amount);
-
-    /// @notice user mint limits changed by setRestrictions
-    /// @notice deprecated, mint limits no longer exist
-    event UserMintLimitChanged(uint amount);
-
     /// @notice updating the reward quarantine before manual signoff
     /// @notice by the multisig (with updateRewardQuarantineThreshold)
     event RewardQuarantineThresholdUpdated(uint amount);
-
-    /// @notice emitted when the mint limits are enabled or disabled
-    /// @notice by enableMintLimits
-    /// @notice deprecated, mint limits no longer exist
-    event MintLimitsStateChanged(bool indexed status);
 
     /**
      * @notice update the operator account to a new address
@@ -71,6 +58,11 @@ interface IToken is IERC20 {
      * @dev individual oracles are now recorded in the operator, this now should return the registry contract
      */
     function oracle() external view returns (address);
+
+    /**
+     * @notice underlyingToken that this IToken wraps
+     */
+    function underlyingToken() external view returns (IERC20);
 
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint) external;

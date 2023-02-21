@@ -82,10 +82,7 @@ contract AaveV2LiquidityProvider is ILiquidityProvider {
             address(this)
         );
 
-        require(
-            _amount == realAmount,
-            "amount aave withdrew was different to requested"
-        );
+        require(_amount == realAmount, "weird aave withdraw");
 
         underlying_.safeTransfer(msg.sender, realAmount);
     }

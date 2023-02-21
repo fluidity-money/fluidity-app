@@ -224,6 +224,7 @@ abstract contract BaseNativeToken is IERC20 {
         emit Approval(_owner, _spender, _value);
     }
 
+    // solhint-disable-next-line func-name-mixedcase
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
         return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
     }
