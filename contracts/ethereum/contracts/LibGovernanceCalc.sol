@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.11.0;
 pragma abicoder v2;
 
 /// @notice calcGovToVEGov
 /// @param _tokenAmount to lock up
 /// @param _lockLength is the amount of time the user is locking the token for (ie, 10 days)
 /// @param _maxLockLength in example, is 1 year that we can lock it up for
+// solhint-disable-next-line func-visibility
 function calcGovToVEGov(
     uint256 _tokenAmount,
     uint256 _lockLength,
@@ -18,6 +19,7 @@ function calcGovToVEGov(
     return (_tokenAmount * _lockLength) / _maxLockLength;
 }
 
+// solhint-disable-next-line func-visibility
 function redeemableGov(
     uint256 _lockTime,
     uint256 _tokenAmount

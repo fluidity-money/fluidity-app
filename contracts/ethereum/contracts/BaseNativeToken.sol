@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity >=0.8.0;
+
+pragma solidity ^0.8.11.0;
 
 import "../interfaces/IERC20.sol";
 
@@ -187,6 +188,7 @@ abstract contract BaseNativeToken is IERC20 {
         bytes32 _r,
         bytes32 _s
     ) public virtual {
+        // solhint-disable-next-line not-rely-on-time
         require(_deadline >= block.timestamp, "PERMIT_DEADLINE_EXPIRED");
 
         // Unchecked because the only math done is incrementing

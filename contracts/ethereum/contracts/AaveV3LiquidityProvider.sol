@@ -4,7 +4,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.11.0;
 pragma abicoder v2;
 
 import "../interfaces/ILiquidityProvider.sol";
@@ -76,10 +76,7 @@ contract AaveV3LiquidityProvider is ILiquidityProvider {
 
         uint realAmount = pool.withdraw(address(underlying_), _amount, address(this));
 
-        require(
-            _amount == realAmount,
-            "amount aave withdrew was different to requested"
-        );
+        require(_amount == realAmount, "aave withdraw weird");
 
         underlying_.safeTransfer(msg.sender, realAmount);
     }

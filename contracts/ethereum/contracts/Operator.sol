@@ -4,7 +4,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.11.0;
 pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
@@ -25,7 +25,7 @@ struct OracleUpdate {
 
 contract Operator is IEmergencyMode, IUtilityGauges {
     /// @dev the utility name of the fluid token
-    string constant FLUID_TOKEN = "FLUID";
+    string constant private FLUID_TOKEN = "FLUID";
 
     /// @notice emitted when the rng oracles are changed to a new address
     event OracleChanged(
@@ -78,7 +78,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
 
     function enableEmergencyMode() public {
         bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil_;
-        require(authorised, "only the operator or emergency council can use this");
+        require(authorised, "emergency only");
 
         noEmergency_ = false;
         emit Emergency(true);
@@ -89,7 +89,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
      * @notice (operator only)
      */
     function disableEmergencyMode() public {
-        require(msg.sender == operator_, "only the operator account can use this");
+        require(msg.sender == operator_, "operator only");
 
         noEmergency_ = true;
 
@@ -108,7 +108,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
 
     function updateOracle(address _contractAddr, address _newOracle) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator_, "only operator account can use this");
+        require(msg.sender == operator_, "only operator");
 
         _updateOracle(_contractAddr, _newOracle);
     }
@@ -116,7 +116,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
     /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory _newOracles) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator_, "only operator account can use this");
+        require(msg.sender == operator_, "only operator");
 
         for (uint i = 0; i < _newOracles.length; i++) {
             _updateOracle(
@@ -148,7 +148,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
     {
         require(noEmergencyMode(), "emergency mode!");
 
-        require(msg.sender == oracles_[_token], "only the token's oracle can use this");
+        require(msg.sender == oracles_[_token], "only oracle");
 
         for (uint i = 0; i < _rewards.length; i++) {
             FluidityReward memory fluidReward = _rewards[i];

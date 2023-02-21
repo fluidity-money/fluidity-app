@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.11.0;
 pragma abicoder v2;
 
 import "../interfaces/IERC20.sol";
@@ -106,10 +106,10 @@ contract VEGovLockup is IEmergencyMode {
         uint256 amounts;
 
         for (uint256 i = 0; i < lockups_[_spender].length; i++)
-            amounts +=     currentVEGovAmount(
+            amounts += currentVEGovAmount(
                 lockups_[_spender][i].lockLength,
                 lockups_[_spender][i].lockTime,
-                block.timestamp,
+                block.timestamp, // solhint-disable-line not-rely-on-time
                 lockups_[_spender][i].bptAtLock
             );
 
@@ -136,7 +136,7 @@ contract VEGovLockup is IEmergencyMode {
     {
         require(noEmergencyMode(), "emergency mode");
 
-        require(_bptAmount > 0, "more than 0 token needed for lockup");
+        require(_bptAmount > 0, "need bpt > 0");
         require(_lockLength > 0, "lock length = 0");
 
         require(_lockLength <= MAX_LOCK_TIME, "greater than max time");
@@ -147,7 +147,7 @@ contract VEGovLockup is IEmergencyMode {
             msg.sender,
             _lockLength,
             _bptAmount,
-            block.timestamp
+            block.timestamp // solhint-disable-line not-rely-on-time
         );
 
         newVEGov = balanceOf(msg.sender);
@@ -166,7 +166,7 @@ contract VEGovLockup is IEmergencyMode {
 
         require(!isPowerEmpty(_powerNumber), "power doesn't exist");
 
-        require(_bptAmount > 0, "more than 0 token needed for lockup");
+        require(_bptAmount > 0, "need < 0");
 
         voteToken_.transferFrom(msg.sender, address(this), _bptAmount);
 

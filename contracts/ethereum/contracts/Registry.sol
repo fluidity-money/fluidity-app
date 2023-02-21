@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.11.0;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
@@ -138,7 +138,7 @@ contract Registry is IRegistry, ITotalRewardPool {
     }
 
     function updateUtilityClients(FluidityClientChange[] memory _clients) public {
-        require(msg.sender == operator_, "only the operator account can use this");
+        require(msg.sender == operator_, "only operator");
 
         for (uint i = 0; i < _clients.length; i++) {
             FluidityClientChange memory change = _clients[i];
@@ -148,10 +148,7 @@ contract Registry is IRegistry, ITotalRewardPool {
             // either the old client must be unset (setting a completely new client)
             // or the overwrite option must be set
 
-            require(
-                oldClient == address(0) || change.overwrite,
-                "trying to overwrite a client without the overwrite option set!"
-            );
+            require(oldClient == address(0) || change.overwrite, "no override");
 
             fluidityClients_[change.token][change.name] = change.client;
 
@@ -166,7 +163,7 @@ contract Registry is IRegistry, ITotalRewardPool {
 
     /// @notice update the trf variables for a specific token
     function updateTrfVariables(address _token, TrfVariables calldata _trf) public {
-        require(msg.sender == operator_, "only operator account can use this");
+        require(msg.sender == operator_, "only operator");
 
         emit TrfVariablesUpdated(trfVariables_[_token], _trf);
 

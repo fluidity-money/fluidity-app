@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.11.0;
 pragma abicoder v2;
-
-import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
 import "../interfaces/IToken.sol";
 
@@ -73,11 +70,11 @@ contract DAO {
 
     event ProposalCreated(bytes ipfsHash, bytes32 proposalId);
 
-    VEGovLockup lockupSource_;
+    VEGovLockup private lockupSource_;
 
-    address emergencyCouncil_;
+    address private emergencyCouncil_;
 
-    mapping(bytes32 => Proposal) proposals_;
+    mapping(bytes32 => Proposal) private proposals_;
 
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
@@ -189,7 +186,9 @@ contract DAO {
 
         require(!getProposalExists(proposalId), "proposal already exists");
 
+        // solhint-disable-next-line not-rely-on-time
         proposal.ratificationTs = block.timestamp + DEFAULT_VOTE_BLOCK_TIME;
+
         proposal.targetContract = _target;
         proposal.isDelegateCall = _isDelegateCall;
         proposal.data = _calldata;
@@ -206,6 +205,7 @@ contract DAO {
     }
 
     function getProposalVotingOver(bytes32 _proposalId) public view returns (bool) {
+        // solhint-disable-next-line not-rely-on-time
         return getRatificationTs(_proposalId) < block.timestamp;
     }
 
@@ -228,6 +228,7 @@ contract DAO {
         // if the ratification period + the time for the voting has passed + the
         // frozen period, this would return true
 
+        // solhint-disable-next-line not-rely-on-time
         return ts > block.timestamp + DEFAULT_FROZEN_TIME;
     }
 
@@ -316,10 +317,7 @@ contract DAO {
     }
 
     function killProposal(bytes32 _proposalId) public {
-        require(
-            msg.sender == emergencyCouncil_,
-            "only emergency council can use this"
-        );
+        require(msg.sender == emergencyCouncil_, "emergency only");
 
         require(!getProposalExecuted(_proposalId), "already executed");
 
@@ -337,7 +335,7 @@ contract DAO {
 
         require(
           getAmountAvailable(_proposalId, msg.sender) >= _amount,
-          "user trying to vote more they can"
+          "too much vote"
         );
 
         _voteFor(msg.sender, _proposalId, _amount);
@@ -352,7 +350,7 @@ contract DAO {
 
         require(
           getAmountAvailable(_proposalId, msg.sender) <= _amount,
-          "user trying to vote more they can"
+          "too much vote"
         );
 
         _voteAgainst(msg.sender, _proposalId, _amount);
@@ -372,15 +370,17 @@ contract DAO {
         // if the proposal is a delegate call, use that instead, or just make a
         // call
 
-        if (proposal.isDelegateCall)
+        if (proposal.isDelegateCall) {
+            // solhint-disable-next-line avoid-low-level-calls
             (rc, returnData) = proposal.targetContract.delegatecall(
                 proposal.data
             );
-
-        else
+        } else {
+            // solhint-disable-next-line avoid-low-level-calls
            (rc, returnData) = proposal.targetContract.call(
                 proposal.data
             );
+        }
 
         // return data under 68 with a failure reverted silently
 
@@ -393,6 +393,7 @@ contract DAO {
 
         if (!rc)
             // an error happened, so we revert with the revert data from before
+            // solhint-disable-next-line no-inline-assembly
             assembly {
                 revert(returnData, returnDataSize)
             }
