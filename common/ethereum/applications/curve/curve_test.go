@@ -31,12 +31,16 @@ func TestGetCurveSwapFee(t *testing.T) {
 
 	var (
 		rpcMethods  = make(map[string]interface{})
-		callMethods = make(map[string]interface{})
+		callMethods = make(map[string]map[string]interface{})
 	)
 
 	rpcMethods["eth_getCode"] = "0x0"
-	callMethods["fee()"] = feeRpcResponse
-	callMethods["coins(uint256)"] = ethCoinsRpcResponse
+	callMethods["fee()"] = map[string]interface{}{
+		"": feeRpcResponse,
+	}
+	callMethods["coins(uint256)"] = map[string]interface{}{
+		"": ethCoinsRpcResponse,
+	}
 
 	// get the mocked client
 	client, err := testUtils.MockRpcClient(rpcMethods, callMethods)
@@ -88,7 +92,9 @@ func TestGetCurveSwapFee(t *testing.T) {
 	// bad RPC responses
 	// bad swap fee response
 	fluidTokenAddr = common.HexToAddress("0x0000000000000000000000000000000000000000")
-	callMethods["fee()"] = "t"
+	callMethods["fee()"] = map[string]interface{}{
+		"": "t",
+	}
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
@@ -97,8 +103,12 @@ func TestGetCurveSwapFee(t *testing.T) {
 	assert.Error(t, err)
 
 	// bad coins response
-	callMethods["fee()"] = feeRpcResponse
-	callMethods["coins(uint256)"] = "0x00"
+	callMethods["fee()"] = map[string]interface{}{
+		"": feeRpcResponse,
+	}
+	callMethods["coins(uint256)"] = map[string]interface{}{
+		"": "0x00",
+	}
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 

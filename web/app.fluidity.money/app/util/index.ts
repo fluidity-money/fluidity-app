@@ -17,3 +17,4 @@ export {
   transactionActivityLabel,
   transactionTimeLabel,
 } from "./converters";
+export { useSync } from "./sync";

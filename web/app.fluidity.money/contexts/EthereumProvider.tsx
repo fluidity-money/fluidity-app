@@ -2,6 +2,7 @@ import { ReactNode, useContext } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
+import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
@@ -14,10 +15,8 @@ import {
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect";
 import { EIP1193 } from "@web3-react/eip1193";
-import FluidityFacadeContext from "./FluidityFacade";
-
-import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
-import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
+import { SplitContext } from "contexts/SplitProvider";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   getTotalPrizePool,
   getUserMintLimit,
@@ -30,10 +29,12 @@ import makeContractSwap, {
   getAmountMinted,
   getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
-import { Token } from "~/util/chainUtils/tokens";
 import { Buffer } from "buffer";
 import useWindow from "~/hooks/useWindow";
-import { SplitContext } from "~/util/split";
+import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
+
+import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -47,24 +48,40 @@ const EthereumFacade = ({
   children,
   tokens,
   connectors,
+  network,
 }: {
   children: ReactNode;
   tokens: Token[];
   connectors: [Connector, Web3ReactHooks][];
+  network: Chain;
 }) => {
-  const { isActive, provider, account, connector } = useWeb3React();
+  const { isActive, provider, account, connector, isActivating } =
+    useWeb3React();
   const okxWallet = useWindow("okxwallet");
   const browserWallet = useWindow("ethereum") as Coin98Wallet;
+
+  const chain = chainType(network);
+
+  if (!chain || chain !== "evm") console.warn("Unsupported connector", network);
 
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
     connectors.every(([connector]) => {
-      connector?.connectEagerly?.()?.catch(() => {
-        return true;
-      });
-
-      return false;
+      connector
+        ?.connectEagerly?.()
+        ?.then(() => {
+          // switch if connected eagerly to the wrong network
+          // Provider type is missing chainId but it can exist
+          const connectedChainId = (
+            connector.provider as unknown as { chainId?: string }
+          )?.chainId;
+          const desiredChainId = `0x${getChainId(network).toString(16)}`;
+          if (connectedChainId && desiredChainId !== connectedChainId) {
+            connector.activate(getChainId(network));
+          }
+        })
+        .catch(() => true);
     });
   }, []);
 
@@ -134,7 +151,7 @@ const EthereumFacade = ({
         break;
     }
 
-    connector?.activate();
+    connector?.activate(getChainId(network));
   };
 
   const deactivate = async (): Promise<void> => {
@@ -365,6 +382,7 @@ const EthereumFacade = ({
         getDegenScore,
         addToken,
         connected: isActive,
+        connecting: isActivating,
       }}
     >
       {children}
@@ -372,7 +390,13 @@ const EthereumFacade = ({
   );
 };
 
-export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
+export const EthereumProvider = (
+  rpcUrl: string,
+  tokens: Token[],
+  network?: string
+) => {
+  if (!network) throw new Error("No network provided to EthereumProvider!");
+
   const Provider = ({ children }: { children: React.ReactNode }) => {
     // Custom key logic
     const okxWallet = useWindow("okxwallet");
@@ -426,7 +450,11 @@ export const EthereumProvider = (rpcUrl: string, tokens: Token[]) => {
     return (
       <>
         <Web3ReactProvider connectors={connectors} key={key}>
-          <EthereumFacade tokens={tokens} connectors={connectors}>
+          <EthereumFacade
+            tokens={tokens}
+            connectors={connectors}
+            network={network as Chain}
+          >
             {children}
           </EthereumFacade>
         </Web3ReactProvider>

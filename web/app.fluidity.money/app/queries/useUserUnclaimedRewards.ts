@@ -1,10 +1,15 @@
 import { gql, Queryable, jsonPost } from "~/util";
+import { chainType } from "~/util/chainUtils/chains";
 
 const query: Queryable = {
   ethereum: gql`
     query getPendingRewards($address: String!) {
       ethereum_pending_winners(
-        where: { reward_sent: { _eq: false }, address: { _eq: $address } }
+        where: {
+          reward_sent: { _eq: false }
+          address: { _eq: $address }
+          network: { _eq: "ethereum" }
+        }
         order_by: { block_number: desc }
       ) {
         address
@@ -19,6 +24,27 @@ const query: Queryable = {
   `,
 
   solana: gql``,
+
+  arbitrum: gql`
+    query getPendingRewards($address: String!) {
+      ethereum_pending_winners(
+        where: {
+          reward_sent: { _eq: false }
+          address: { _eq: $address }
+          network: { _eq: "arbitrum" }
+        }
+        order_by: { block_number: desc }
+      ) {
+        address
+        reward_sent
+        token_decimals
+        token_short_name
+        transaction_hash
+        win_amount
+        block_number
+      }
+    }
+  `,
 };
 
 type UnclaimedRewardsReq = {
@@ -45,7 +71,7 @@ type UnclaimedRewardsRes = {
 };
 
 const useUserUnclaimedRewards = async (network: string, address: string) => {
-  if (network !== "ethereum") {
+  if (chainType(network) !== "evm") {
     throw Error(`network ${network} not supported`);
   }
 

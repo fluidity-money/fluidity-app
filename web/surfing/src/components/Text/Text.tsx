@@ -6,6 +6,7 @@ type TextProps = {
   prominent?: boolean;
   className?: string;
   bold?: boolean;
+  holo?: boolean;
   as?: "span" | "p";
 };
 
@@ -16,6 +17,7 @@ const Text = ({
   prominent = false,
   bold = false,
   className,
+  holo = false,
   ...props
 }: TextProps) => {
   const classNameProps = className || "";
@@ -23,7 +25,8 @@ const Text = ({
   const sizeProps = `${styles[size]}`;
   const prominentProps = `${prominent ? styles.prominent : ""}`;
   const boldProps = `${bold ? styles.bold : ""}`;
-  const classProps = `${styles.text} ${sizeProps} ${prominentProps} ${boldProps} ${classNameProps}`;
+  const holoProps = `${holo ? styles.holo : ""}`;
+  const classProps = `${styles.text} ${sizeProps} ${prominentProps} ${boldProps} ${classNameProps} ${holoProps}`;
 
   const Component = as || "span";
   return (

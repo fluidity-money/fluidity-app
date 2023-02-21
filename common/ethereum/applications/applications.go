@@ -12,8 +12,10 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/gtrade"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -30,6 +32,7 @@ import (
 const (
 	// ApplicationNone is the nil value representing a transfer.
 	ApplicationNone libApps.Application = iota
+	ApplicationUniswapV3
 	ApplicationUniswapV2
 	ApplicationBalancerV2
 	ApplicationOneInchLPV2
@@ -41,6 +44,8 @@ const (
 	ApplicationMultichain
 	ApplicationXyFinance
 	ApplicationApeswap
+	ApplicationSaddle
+	ApplicationGTradeV6_1
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -56,8 +61,17 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	)
 
 	switch transfer.Application {
+	case ApplicationUniswapV3:
+		fee, err = uniswap.GetUniswapV3Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.UniswapV3 += util.MaybeRatToFloat(fee)
 	case ApplicationUniswapV2:
-		fee, err = uniswap.GetUniswapFees(
+		fee, err = uniswap.GetUniswapV2Fees(
 			transfer,
 			client,
 			fluidTokenContract,
@@ -157,6 +171,26 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Apeswap += util.MaybeRatToFloat(fee)
+	case ApplicationSaddle:
+		fee, err = saddle.GetSaddleFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+			txReceipt,
+		)
+
+		emission.Saddle += util.MaybeRatToFloat(fee)
+	case ApplicationGTradeV6_1:
+		fee, err = gtrade.GetGtradeV6_1Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+			txReceipt,
+		)
+
+		emission.GTradeV6_1 += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -174,12 +208,13 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
 func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
-		logAddress  = transfer.Log.Address
-		nilAddress  libEthereum.Address
+		logAddress = transfer.Log.Address
+		nilAddress libEthereum.Address
 	)
 
 	switch transfer.Application {
-	case ApplicationUniswapV2:
+	case ApplicationUniswapV2,
+		ApplicationUniswapV3:
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and the rest to the Uniswap contract
 		return transaction.From, logAddress, nil
@@ -210,6 +245,14 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationApeswap:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationSaddle:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationGTradeV6_1:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil

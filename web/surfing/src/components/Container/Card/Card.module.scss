@@ -24,7 +24,6 @@ button {
 
   &.transparent {
     background-color: $white-a5;
-    background-filter: blur(10px);
   }
 
   &.box {
@@ -39,6 +38,15 @@ button {
 
   &.rounded {
     border-radius: 12px;
+  }
+
+  &.frosted {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.102);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur( 10px );
   }
   
   &.disabled {

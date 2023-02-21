@@ -20,7 +20,7 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "~/util/split";
+import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
   DashboardIcon,
@@ -32,8 +32,6 @@ import {
   BlockchainModal,
   numberToMonetaryString,
   useViewport,
-  DaoIcon,
-  AssetsIcon,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
@@ -93,15 +91,17 @@ export const meta: MetaFunction = () => ({
 
 const routeMapper = (route: string) => {
   switch (route.toLowerCase()) {
-    case "home":
+    case "/":
+    case "/home":
       return "DASHBOARD";
-    case "rewards":
+    case "/rewards":
       return "REWARDS";
-    case "unclaimed":
+    case "/unclaimed":
       return "CLAIM";
-    case "assets":
+    case "/assets":
+    case "/assets/regular":
       return "ASSETS";
-    case "dao":
+    case "/dao":
       return "DAO";
     default:
       return "DASHBOARD";
@@ -109,7 +109,6 @@ const routeMapper = (route: string) => {
 };
 
 type LoaderData = {
-  appName: string;
   fromRedirect: boolean;
   network: string;
   provider: typeof config.liquidity_providers;
@@ -126,10 +125,11 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
+  const showArbitrum = showExperiment("enable-arbitrum");
 
   const url = useLocation();
-  const urlPaths = url.pathname.split("/");
-  const pathname = urlPaths.pop() ?? "";
+  const urlPaths = url.pathname.split("dashboard");
+  const pathname = urlPaths[1] ?? "";
   const appName = routeMapper(pathname);
 
   {
@@ -163,42 +163,28 @@ export default function Dashboard() {
     !closeMobileModal && setOpenMobModal(false);
   }, [closeMobileModal]);
 
-  const navigationMap = [
-    { home: { name: "dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "rewards", icon: <Trophy /> } },
-
-    showExperiment("enable-assets") && {
-      assets: { name: "Assets", icon: <AssetsIcon /> },
-    },
-    showExperiment("enable-dao") && { dao: { name: "DAO", icon: <DaoIcon /> } },
+  const navigationMap: {
+    [key: string]: { name: string; icon: JSX.Element };
+  }[] = [
+    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "Rewards", icon: <Trophy /> } },
   ];
 
-  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
-    showExperiment("enable-arbitrum")
-      ? {
-          ethereum: {
-            name: "ETH",
-            icon: <img src="/assets/chains/ethIcon.svg" />,
-          },
-          arbitrum: {
-            name: "ARB",
-            icon: <img src="/assets/chains/ethIcon.svg" />,
-          },
-          solana: {
-            name: "SOL",
-            icon: <img src="/assets/chains/solanaIcon.svg" />,
-          },
-        }
-      : {
-          ethereum: {
-            name: "ETH",
-            icon: <img src="/assets/chains/ethIcon.svg" />,
-          },
-          solana: {
-            name: "SOL",
-            icon: <img src="/assets/chains/solanaIcon.svg" />,
-          },
-        };
+  const chainNameMap: Record<string, {name: string; icon: JSX.Element}> =
+  {
+    ethereum: {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    arbitrum: {
+      name: "ARB",
+      icon: <img src="/assets/chains/arbIcon.svg" />,
+    },
+    solana: {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  };
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
@@ -206,10 +192,8 @@ export default function Dashboard() {
   const resolvedPaths = navigationMap.map((obj) =>
     useResolvedPath(Object.keys(obj)[0])
   );
-  const activeIndex = resolvedPaths.findIndex(
-    (path) =>
-      path.pathname === currentPath ||
-      path.pathname === currentPath.slice(0, -1)
+  const activeIndex = resolvedPaths.findIndex((path) =>
+    currentPath.includes(path.pathname)
   );
 
   const handleSetChain = (network: string) => {
@@ -311,7 +295,7 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap)}
+            options={Object.values(chainNameMap).filter(({name}) => showArbitrum ? true : name !== "ARB")}
             setOption={handleSetChain}
             mobile={isMobile}
           />

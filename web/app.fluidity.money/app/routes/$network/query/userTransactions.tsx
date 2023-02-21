@@ -196,7 +196,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           timestamp: timestamp * 1000,
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
-            currency === "DAI" || currency === "fDAI"
+            network !== "arbitrum" &&
+            (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -250,7 +251,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         timestamp: tx.timestamp,
         logo: tokenLogoMap[tx.currency] || defaultLogo,
         provider:
-          (network === "ethereum"
+          (network === "ethereum" || network === "arbitrum"
             ? !isFromPendingWin
               ? (winner as Winner)?.ethereum_application
               : (winner as Winner)?.solana_application
