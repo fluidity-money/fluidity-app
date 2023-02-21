@@ -27,6 +27,7 @@ var applicationNames = []string{
 	"multichain",
 	"xy_finance",
 	"apeswap",
+	"saddle",
 	"gtrade_v6_1",
 }
 
