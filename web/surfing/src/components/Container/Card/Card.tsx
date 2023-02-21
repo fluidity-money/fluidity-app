@@ -8,7 +8,7 @@ interface ICard {
   component?: "div" | "button" | "tr";
   rounded?: boolean;
   disabled?: boolean;
-  type?: "gray" | "box" | "holobox" | "transparent";
+  type?: "gray" | "box" | "holobox" | "transparent" | "frosted";
   [_: string]: any;
 }
 
