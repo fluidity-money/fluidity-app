@@ -229,11 +229,13 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
         // take underlying tokens from the user
 
-        uint originalBalance = underlyingToken().balanceOf(address(this));
+        IERC20 underlying = underlyingToken();
 
-        underlyingToken().safeTransferFrom(msg.sender, address(this), amount);
+        uint originalBalance = underlying.balanceOf(address(this));
 
-        uint finalBalance = underlyingToken().balanceOf(address(this));
+        underlying.safeTransferFrom(msg.sender, address(this), amount);
+
+        uint finalBalance = underlying.balanceOf(address(this));
 
         // ensure the token is behaving
 
@@ -243,7 +245,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
         // add the tokens to our compound pool
 
-        underlyingToken().safeTransfer(address(pool_), realAmount);
+        underlying.safeTransfer(address(pool_), realAmount);
 
         pool_.addToPool(realAmount);
 

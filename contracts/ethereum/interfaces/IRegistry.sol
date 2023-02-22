@@ -5,28 +5,16 @@ pragma abicoder v2;
 
 import "./IFluidClient.sol";
 import "./ITrfVariables.sol";
-
-/**
- * @dev RegistrationTypeToken denoting implementations of "IToken.sol"
- */
-uint8 constant RegistrationTypeToken = 1;
-
-/**
- * @dev RegistrationTypeLiquidityProvider denoting implementations of
- *      "ILiquidityProvider.sol"
- */
-uint8 constant RegistrationTypeLiquidityProvider = 2;
-
-struct Registration {
-    uint8 type_;
-    address addr;
-}
+import "./ITokenOperatorOwned.sol";
 
 interface IRegistry {
-    function register(uint8, address) external;
-    function registerMany(Registration[] calldata) external;
+    function registerToken(ITokenOperatorOwned) external;
+    function registerManyTokens(ITokenOperatorOwned[] calldata) external;
 
-    function registrations() external view returns (Registration[] memory);
+    function registerLiquidityProvider(ILiquidityProvider) external;
+    function registerManyLiquidityProviders(ILiquidityProvider[] calldata) external;
+
+    function tokens() external view returns (ITokenOperatorOwned[] memory);
 
     function getFluidityClient(
         address,

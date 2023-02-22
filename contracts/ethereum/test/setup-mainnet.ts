@@ -131,13 +131,8 @@ before(async function () {
 
   const deployedTokens = Object.values(tokens).map(({ deployedToken }) => deployedToken);
 
-  await commonBindings.registry.externalOperator.registerMany(deployedTokens.map((token) => {
-    console.log(token.address);
-    return {
-      type_: REGISTRATION_TYPE_TOKEN,
-      addr: token.address
-    }
-  }));
+  await commonBindings.registry.externalOperator.registerManyTokens(deployedTokens.map((token) =>
+    token.address));
 
   contracts = {
     ...commonContracts,

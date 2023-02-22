@@ -8,7 +8,8 @@ import {
   deployRegistry,
   deployVEGovLockup,
   deployBeacons,
-  deployFactories
+  deployFactories,
+  deployFluidityV1
   } from "../script-utils";
 
 export let signers: {
@@ -105,13 +106,18 @@ before(async function () {
 
   const councilAddress = await operatorCouncilSigner.getAddress();
 
+  let fluidityV1 = await deployFluidityV1(
+    hre,
+    councilAddress,
+    "Fluidity Money",
+    "FLUID",
+    18,
+    100000
+  );
+
   let registry = await deployRegistry(
     hre,
-    operatorAddress,
-    tokenBeacon,
-    compoundBeacon,
-    aaveV2Beacon,
-    aaveV3Beacon
+    operatorAddress
   );
 
   let operator = await deployOperator(

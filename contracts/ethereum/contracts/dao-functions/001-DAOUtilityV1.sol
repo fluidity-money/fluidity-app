@@ -4,15 +4,20 @@ pragma solidity ^0.8.11;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import "../../interfaces/aave/IAToken.sol";
+
 import "../../interfaces/compound/CTokenInterfaces.sol";
+
 import "../../interfaces/IEmergencyMode.sol";
 import "../../interfaces/ILiquidityProvider.sol";
 import "../../interfaces/IRegistry.sol";
 import "../../interfaces/IToken.sol";
+import "../../interfaces/ITokenOperatorOwned.sol";
 import "../../interfaces/ITrfVariables.sol";
-import "../../interfaces/openzeppelin/IUpgradeableBeacon.sol";
+
+import "../../interfaces/openzeppelin/IProxyAdmin.sol";
 
 import {
     LendingPoolAddressesProviderInterface as AaveV2LendingPoolAddressesProviderInterface
@@ -98,21 +103,20 @@ contract DAOUtilityV1 {
         });
     }
 
-    function upgradeBeacon(
+    function upgradeBeaconWithProxyAdmin(
+        IProxyAdmin _admin,
         IUpgradeableBeacon _beacon,
-        address _oldImplementation,
         address _newImplementation
-    )
-        public
-    {
-        require(address(_beacon) != address(0), "zero address");
+    ) public {
+        _admin.upgrade(_beacon, _newImplementation);
+    }
 
-        require(
-            _beacon.implementation() == _oldImplementation,
-            "old impl not consistent"
-        );
-
-        _beacon.upgradeTo(_newImplementation);
+    function deployAdminPointBeaconToIt(
+        IUpgradeableBeacon _beacon
+    ) public returns (IProxyAdmin) {
+        IProxyAdmin admin = IProxyAdmin(address(new ProxyAdmin()));
+        _beacon.changeAdmin(admin);
+        return admin;
     }
 
     /**
@@ -146,7 +150,7 @@ contract DAOUtilityV1 {
 
          // check that the setup went okay
 
-         IToken token = IToken(address(beaconProxy));
+         ITokenOperatorOwned token = ITokenOperatorOwned(address(beaconProxy));
 
          require(
              token.decimals() == _args.decimals,
@@ -155,7 +159,7 @@ contract DAOUtilityV1 {
 
          // register the token
 
-         _registry.register(RegistrationTypeToken, address(beaconProxy));
+         _registry.registerToken(token);
 
          // set up the variables for the TRF
 
@@ -196,12 +200,9 @@ contract DAOUtilityV1 {
 
          // register the liquidity provider
 
-         _registry.register(
-             RegistrationTypeLiquidityProvider,
-             address(beaconProxy)
-         );
+         _registry.registerLiquidityProvider(lp);
 
-         return ILiquidityProvider(address(beaconProxy));
+         return lp;
     }
 
     /**
@@ -233,12 +234,9 @@ contract DAOUtilityV1 {
 
          // register the liquidity provider
 
-         _registry.register(
-             RegistrationTypeLiquidityProvider,
-             address(beaconProxy)
-         );
+         _registry.registerLiquidityProvider(lp);
 
-         return ILiquidityProvider(address(beaconProxy));
+         return lp;
     }
 
     /**
@@ -270,10 +268,7 @@ contract DAOUtilityV1 {
 
          // register the liquidity provider
 
-         _registry.register(
-             RegistrationTypeLiquidityProvider,
-             address(beaconProxy)
-         );
+         _registry.registerLiquidityProvider(lp);
 
          return lp;
     }

@@ -3,13 +3,13 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-function safeCallOptionalReturn(
+function safeStaticCallOptionalReturn(
     address _target,
     bytes memory _calldata
-) returns (bytes memory returndata) {
+) view returns (bytes memory returndata) {
     bool rc;
 
-    (rc, returndata) = _target.call(_calldata);
+    (rc, returndata) = _target.staticcall(_calldata);
 
     if (!rc) {
         assembly {

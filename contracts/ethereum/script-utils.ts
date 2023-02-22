@@ -2,7 +2,9 @@
 import { promisify } from 'util';
 import { readFile as readFileCb } from 'fs';
 import { ethers, BigNumber } from 'ethers';
+
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
+
 export const readFile = promisify(readFileCb);
 
 export type Token = {
@@ -90,29 +92,20 @@ export const deployVEGovLockup = async(
 
 export const deployRegistry = async(
   hre: HardhatRuntimeEnvironment,
-  operatorAddress: string,
-  tokenBeacon: ethers.Contract,
-  compoundLpBeacon: ethers.Contract,
-  aaveV2LpBeacon: ethers.Contract,
-  aaveV3LpBeacon: ethers.Contract
-): Promise<ethers.Contract> => {
-  const factory = await hre.ethers.getContractFactory("Registry");
-
-  return factory.deploy(
-    operatorAddress,
-    tokenBeacon.address,
-    compoundLpBeacon.address,
-    aaveV2LpBeacon.address,
-    aaveV3LpBeacon.address
+  operatorAddress: string
+): Promise<ethers.Contract> =>
+  deployAndInit(
+    hre,
+    "Registry",
+    operatorAddress
   );
-};
 
 export const deployDAO = async (
   hre: HardhatRuntimeEnvironment,
   council: ethers.Signer,
   veGovLockupSource: ethers.Contract
 ): Promise<ethers.Contract> => {
-  const factory = await hre.ethers.getContractFactory("DAO");
+  const factory = await hre.ethers.getContractFactory("DAOV1");
 
   return factory.deploy(
     await council.getAddress(),
@@ -140,6 +133,26 @@ export const deployGovToken = async (
 
   return govToken;
 };
+
+export const deployFluidityV1 = async(
+  hre: HardhatRuntimeEnvironment,
+  emergencyCouncilAddress: string,
+  govTokenName: string,
+  govTokenSymbol: string,
+  govTokenDecimals: number,
+  govTokenTotalSupply: number
+): Promise<ethers.Contract> => {
+  const creator = await hre.ethers.getContractFactory("FluidityV1");
+
+  return creator.deploy(
+    emergencyCouncilAddress,
+    govTokenName,
+    govTokenSymbol,
+    govTokenDecimals,
+    govTokenTotalSupply
+  );
+};
+
 
 export const deployFactories = async(
   hre: HardhatRuntimeEnvironment
@@ -197,6 +210,8 @@ export type TokenAddresses = {
   }
 };
 
+// deployTokens, registering the utility clients against the registry
+// (not listing the tokens here though)
 export const deployTokens = async (
   hre: HardhatRuntimeEnvironment,
   tokens: Token[],

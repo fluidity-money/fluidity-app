@@ -3,13 +3,11 @@
 pragma solidity ^0.8.11;
 pragma abicoder v2;
 
-import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-
 import "../interfaces/ILiquidityProvider.sol";
 import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IRegistry.sol";
 import "../interfaces/IToken.sol";
-import "../interfaces/IToken.sol";
+import "../interfaces/ITokenOperatorOwned.sol";
 import "../interfaces/ITotalRewardPool.sol";
 import "../interfaces/ITrfVariables.sol";
 
@@ -28,10 +26,6 @@ struct ScannedUtilityVars {
 
 contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
 
-    /// @dev RegistrationType is a uint8 in practice, so it can be updated
-    /// with a contract upgrade if the ABI changes
-    event RegistrationMade(uint8 type_, address indexed addr);
-
     /// @notice emitted when a fluidity client is updated
     event FluidityClientChanged(
         address indexed token,
@@ -43,81 +37,71 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     /// @dev TrfVariablesUpdated in the code
     event TrfVariablesUpdated(TrfVariables old, TrfVariables new_);
 
+    uint8 private version_;
+
     /**
     * @dev operator_ able to access the permissioned functions on this
     * Registry (note: not Operator)
     */
     address private operator_;
 
-    /// @notice tokenBeacon_ to be used as a helpful guide for the DAO
-    IBeacon public tokenBeacon_;
+    ITokenOperatorOwned[] private tokens_;
 
-    /// @notice compoundLiquidityProviderBeacon_ as a helpful guide for the DAO
-    IBeacon public compoundLiquidityProviderBeacon_;
-
-    /// @notice aaveV2LiquidityProviderBeacon_ as a helpful guide for the DAO
-    IBeacon public aaveV2LiquidityProviderBeacon_;
-
-    /// @notice aaveV3LiquidityProviderBeacon_ as a helpful guide for the DAO
-    IBeacon public aaveV3LiquidityProviderBeacon_;
-
-    Registration[] private registrations_;
+    ILiquidityProvider[] private liquidityProviders_;
 
     /// @dev token => utility name => fluid client
     mapping(address => mapping(string => IFluidClient)) private fluidityClients_;
 
     mapping(address => TrfVariables) private trfVariables_;
 
-    constructor(
-        address _operator,
-        IBeacon _tokenBeacon,
+    function init(address _operator) public {
+        require(version_ == 0, "already deployed");
 
-        IBeacon _compoundLiquidityProviderBeacon,
-        IBeacon _aaveV2LiquidityProviderBeacon,
-        IBeacon _aaveV3LiquidityProviderBeacon
-    ) {
         operator_ = _operator;
-        tokenBeacon_ = _tokenBeacon;
 
-        compoundLiquidityProviderBeacon_ = _compoundLiquidityProviderBeacon;
-        aaveV2LiquidityProviderBeacon_ = _aaveV2LiquidityProviderBeacon;
-        aaveV3LiquidityProviderBeacon_ = _aaveV3LiquidityProviderBeacon;
+        version_ = 1;
     }
 
-    function _register(uint8 _type, address _contract) internal {
-        registrations_.push(Registration({
-            type_: _type,
-            addr: _contract
-        }));
-
-        emit RegistrationMade(_type, _contract);
+    function _registerToken(ITokenOperatorOwned _token) internal {
+        tokens_.push(_token);
     }
 
-    function register(uint8 _type, address _contract) public {
+    function registerToken(ITokenOperatorOwned _token) public {
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
+        _registerToken(_token);
+    }
+
+    function registerManyTokens(ITokenOperatorOwned[] calldata _tokens) public {
         require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
-        _register(_type, _contract);
+        for (uint i = 0; i < _tokens.length; i++)
+          _registerToken(_tokens[i]);
     }
 
-    function registerMany(Registration[] calldata _registrations) public {
+    function _registerLiquidityProvider(ILiquidityProvider _lp) internal {
+        liquidityProviders_.push(_lp);
+    }
+
+    function registerLiquidityProvider(ILiquidityProvider _lp) public {
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
+        _registerLiquidityProvider(_lp);
+    }
+
+    function registerManyLiquidityProviders(ILiquidityProvider[] calldata _lps) public {
         require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
-        for (uint i = 0; i < _registrations.length; i++)
-          _register(_registrations[i].type_, _registrations[i].addr);
+        for (uint i = 0; i < _lps.length; i++)
+          _registerLiquidityProvider(_lps[i]);
     }
 
-    function registrations() public view returns (Registration[] memory) {
-        return registrations_;
+    function tokens() public view returns (ITokenOperatorOwned[] memory) {
+        return tokens_;
     }
 
     /// @inheritdoc ITotalRewardPool
     function getTotalRewardPool() public returns (uint256 cumulative) {
-        for (uint i = 0; i < registrations_.length; i++) {
-            Registration storage registration = registrations_[i];
-
-            if (registration.type_ != RegistrationTypeToken) continue;
-
-            IToken token = IToken(registration.addr);
+        for (uint i = 0; i < tokens_.length; i++) {
+            IToken token = tokens_[i];
 
             uint256 amount = token.rewardPoolAmount();
 

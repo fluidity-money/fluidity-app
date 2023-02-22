@@ -75,14 +75,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     aaveV3Factory
   );
 
-  const registry = await deployRegistry(
-    hre,
-    externalOperatorAddress,
-    tokenBeacon,
-    compoundBeacon,
-    aaveV2Beacon,
-    aaveV3Beacon
-  );
+  const registry = await deployRegistry(hre, externalOperatorAddress);
 
   const operator = await deployOperator(
     hre,
