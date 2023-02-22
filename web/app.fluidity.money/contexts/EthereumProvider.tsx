@@ -84,7 +84,7 @@ const EthereumFacade = ({
           const desiredChainId = `0x${getChainId(network).toString(16)}`;
           if (connectedChainId && desiredChainId !== connectedChainId) {
             connector.activate(getChainId(network))?.catch((error: unknown | MetamaskError) => {
-              if (error && error.hasOwnProperty("code")) {
+              if (error && Object.prototype.hasOwnProperty.call(error, "code")) {
                 const {code} = error as MetamaskError;
                 if (code === 4001) {
                   deactivate();
