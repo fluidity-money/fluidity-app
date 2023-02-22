@@ -18,6 +18,7 @@ import {
   trimAddress,
   numberToMonetaryString,
   useViewport,
+  Tooltip
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -724,7 +725,7 @@ export default function Home() {
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100%", height: "400px" }}>
+        <div className="graph" style={{ width: "100%", height: "400px", mixBlendMode: 'screen' }}>
           <div className="statistics-row pad-main">
             {graphTransformers.map((filter, i) => (
               <button
@@ -756,28 +757,29 @@ export default function Home() {
             }}
             renderTooltip={({ datum }: { datum: Volume }) => {
               return datum.amount > 0 ? (
-                <div className={"graph-tooltip-container"}>
-                  <div className={"graph-tooltip"}>
-                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(datum.timestamp, "dd/MM/yy")}
-                    </span>
-                    <br />
-                    <br />
-                    <span>
+                <Tooltip
+                  style={{
+                    minWidth: 160,
+                    gap: '0.4em',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text>{format(datum.timestamp, "dd/MM/yy")}</Text>
+                  <div>
+                    <Text prominent>
                       {datum.sender === MintAddress
                         ? "Mint Address"
                         : trimAddress(datum.sender)}
-                    </span>
-                    <br />
-                    <br />
-                    <span>
-                      <span>{numberToMonetaryString(datum.amount)} </span>
-                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                        swapped
-                      </span>
-                    </span>
+                    </Text>
                   </div>
-                </div>
+                  <div>
+                    <Text prominent>{numberToMonetaryString(datum.amount)}</Text>
+                    <Text>
+                      {' '}swapped
+                    </Text>
+                  </div>
+                </Tooltip>
               ) : (
                 <></>
               );
