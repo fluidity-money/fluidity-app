@@ -35,7 +35,7 @@ import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
-import {ToolTipContent, useToolTip} from "~/components";
+import {useToolTip} from "~/components";
 import {Text} from "@fluidity-money/surfing";
 
 type OKXWallet = {
