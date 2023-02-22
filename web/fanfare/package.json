@@ -16,8 +16,7 @@
     },
     "scripts": {
         "dev": "vite-node -w src/main.ts",
-        "build": "vite build",
-        "start": "node dist/fanfare.js"
+        "start": "vite-node src/main.ts"
     },
     "dependencies": {
         "ethers": "^6.0.3",

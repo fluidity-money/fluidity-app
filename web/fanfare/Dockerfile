@@ -8,8 +8,6 @@ COPY . ./
 
 RUN yarn
 
-RUN make build
-
 FROM fluidity/runtime-web-container:latest
 
 WORKDIR /usr/local/src/fluidity/web/
