@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import "../interfaces/openzeppelin/IProxyAdmin.sol";
 
+import "hardhat/console.sol";
+
 import "./AaveV2LiquidityProvider.sol";
 import "./AaveV3LiquidityProvider.sol";
 import "./CompoundLiquidityProvider.sol";
@@ -128,6 +130,14 @@ contract FluidityV1 {
         uint256 _govTokenTotalSupply,
         Implementations memory _impls
     ) {
+        console.log("gov token", address(_impls.govToken));
+        console.log("gov lockup", address(_impls.veGovLockup));
+        console.log("registry", address(_impls.registry));
+        console.log("operator", address(_impls.operator));
+        console.log("token", address(_impls.token));
+        console.log("compound lp", address(_impls.compoundLp));
+        console.log("aave v2 lp", address(_impls.aaveV2));
+        console.log("aave v3 lp", address(_impls.aaveV3));
 
         setBeacons(_impls);
 

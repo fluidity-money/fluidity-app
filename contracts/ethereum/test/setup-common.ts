@@ -115,6 +115,8 @@ before(async function () {
     aaveV3LiquidityProvider: await commonFactories.aaveV3LiquidityProvider.deploy()
   };
 
+  console.log(commonImpls.registry.address);
+
   const fluidity = await commonFactories.fluidityV1.deploy(
     councilAddress,
     "Fluidity Money",
