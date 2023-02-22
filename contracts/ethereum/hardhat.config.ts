@@ -11,10 +11,7 @@ import {
   setOracles,
   forknetTakeFunds,
   mustEnv,
-  deployTestUtility,
-  deployRegistry,
-  deployBeacons,
-  deployFactories } from './script-utils';
+  deployTestUtility } from './script-utils';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -66,14 +63,6 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
   const [tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory] =
     await deployFactories(hre);
-
-  const [tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon] = await deployBeacons(
-    hre,
-    tokenFactory,
-    compoundFactory,
-    aaveV2Factory,
-    aaveV3Factory
-  );
 
   const registry = await deployRegistry(hre, externalOperatorAddress);
 

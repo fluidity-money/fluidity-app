@@ -26,7 +26,6 @@ struct Implementations {
     CompoundLiquidityProvider compoundLp;
     AaveV2LiquidityProvider aaveV2;
     AaveV3LiquidityProvider aaveV3;
-
 }
 
 contract FluidityV1 {

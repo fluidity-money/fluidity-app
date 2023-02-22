@@ -4,13 +4,11 @@ import { deployTokens, forknetTakeFunds } from "../script-utils";
 
 import {
   AAVE_V2_POOL_PROVIDER_ADDR,
-  REGISTRATION_TYPE_TOKEN,
   TokenList } from "../test-constants";
 
 import {
   commonBindings,
   commonContracts,
-  commonBeacons,
   commonFactories,
   signers } from "./setup-common";
 
@@ -67,6 +65,20 @@ before(async function () {
     return;
   }
 
+  const {
+    token: tokenFactory,
+    compoundLiquidityProvider: compoundFactory,
+    aaveV2LiquidityProvider: aaveV2Factory,
+    aaveV3LiquidityProvider: aaveV3Factory
+  } = commonFactories;
+
+  const {
+    tokenBeacon,
+    compoundLiquidityProviderBeacon: compoundBeacon,
+    aaveV2LiquidityProviderBeacon: aaveV2Beacon,
+    aaveV3LiquidityProviderBeacon: aaveV3Beacon,
+  } = commonContracts;
+
   const toDeploy = [
     TokenList["usdt"],
     TokenList["fei"],
@@ -79,12 +91,6 @@ before(async function () {
     [await signers.userAccount1.getAddress()],
     toDeploy,
   );
-
-  const { tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory } =
-    commonFactories;
-
-  const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
-    commonBeacons;
 
   const emergencyCouncilAddress = await signers.token.emergencyCouncil.getAddress();
 

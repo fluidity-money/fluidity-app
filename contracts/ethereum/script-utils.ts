@@ -1,7 +1,7 @@
 
 import { promisify } from 'util';
 import { readFile as readFileCb } from 'fs';
-import { ethers, BigNumber } from 'ethers';
+import { ethers } from 'ethers';
 
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 
@@ -43,118 +43,7 @@ export const optionalEnv = (env: string, fallback: string): string => {
   return e;
 };
 
-const deploy = async (
-  hre: HardhatRuntimeEnvironment,
-  contract: string,
-) => {
-  const factory = await hre.ethers.getContractFactory(contract);
-  if (!factory) throw new Error(`Contract '${contract}' not found!`);
-  const c = await factory.deploy();
-  await c.deployed();
-  return c;
-}
-
-const deployAndInit = async (
-  hre: HardhatRuntimeEnvironment,
-  contract: string,
-  ...args: any[]
-) => {
-  let c = await deploy(hre, contract);
-  await c.init(...args);
-  return c;
-}
-
-export const deployOperator = async (
-  hre: HardhatRuntimeEnvironment,
-  externalOperatorAddress: string,
-  councilAddress: string,
-  registry: ethers.Contract
-): Promise<ethers.Contract> =>
-  deployAndInit(
-    hre,
-    "Operator",
-    externalOperatorAddress,
-    councilAddress,
-    registry.address
-  );
-
-export const deployVEGovLockup = async(
-  hre: HardhatRuntimeEnvironment,
-  council: ethers.Signer,
-  lockToken: string
-): Promise<ethers.Contract> =>
-  deployAndInit(
-    hre,
-    "VEGovLockup",
-    await council.getAddress(),
-    lockToken
-  );
-
-export const deployRegistry = async(
-  hre: HardhatRuntimeEnvironment,
-  operatorAddress: string
-): Promise<ethers.Contract> =>
-  deployAndInit(
-    hre,
-    "Registry",
-    operatorAddress
-  );
-
-export const deployDAO = async (
-  hre: HardhatRuntimeEnvironment,
-  council: ethers.Signer,
-  veGovLockupSource: ethers.Contract
-): Promise<ethers.Contract> => {
-  const factory = await hre.ethers.getContractFactory("DAOV1");
-
-  return factory.deploy(
-    await council.getAddress(),
-    veGovLockupSource.address
-  );
-};
-
-export const deployGovToken = async (
-  hre: HardhatRuntimeEnvironment,
-  govOperatorSigner: ethers.Signer
-): Promise<ethers.Contract> => {
-  const factory = (await hre.ethers.getContractFactory("GovToken"))
-    .connect(govOperatorSigner);
-
-  const govToken = await factory.deploy();
-
-  await govToken.deployed();
-
-  await govToken["init(string,string,uint8,uint256)"](
-    "Fluidity Money",
-    "FLUID",
-    18,
-    BigNumber.from("1000000000000000000000000000")
-  );
-
-  return govToken;
-};
-
-export const deployFluidityV1 = async(
-  hre: HardhatRuntimeEnvironment,
-  emergencyCouncilAddress: string,
-  govTokenName: string,
-  govTokenSymbol: string,
-  govTokenDecimals: number,
-  govTokenTotalSupply: number
-): Promise<ethers.Contract> => {
-  const creator = await hre.ethers.getContractFactory("FluidityV1");
-
-  return creator.deploy(
-    emergencyCouncilAddress,
-    govTokenName,
-    govTokenSymbol,
-    govTokenDecimals,
-    govTokenTotalSupply
-  );
-};
-
-
-export const deployFactories = async(
+export const getFactories = async(
   hre: HardhatRuntimeEnvironment
 ): Promise<[
   ethers.ContractFactory,
