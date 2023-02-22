@@ -1,6 +1,6 @@
 import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
 
-import Tooltip from "./Tooltip";
+import Tooltip from "./";
 import { Text, NavBar } from '../'
 
 <Meta title="Container/Tooltip" component={Tooltip} />
@@ -8,6 +8,7 @@ import { Text, NavBar } from '../'
 export const Template = (args) => <div style={{position:'relative'}}>
   <Tooltip {...args}>
     <Text size="sm">Unclaimed rewards</Text>
+    <div><Text>Hello</Text></div>
   </Tooltip>
   <NavBar
     logo="./src/assets/images/logos/logoOutline.svg"

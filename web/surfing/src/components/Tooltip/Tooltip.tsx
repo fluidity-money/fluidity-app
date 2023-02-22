@@ -1,6 +1,7 @@
 interface ITooltip {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 import { Card } from '../Container';
@@ -9,15 +10,12 @@ import styles from './Tooltip.module.scss'
 const Tooltip = ({
   children,
   className,
+  style = {},
   ...props
 }: ITooltip) => {
   return (
-    <Card type="frosted" rounded>
-      <div
-        style={{padding: '1em'}}
-      >
+    <Card style={{...style, padding: '1em'}} type="frosted" rounded>
       {children}
-      </div>
     </Card>
   );
 };
