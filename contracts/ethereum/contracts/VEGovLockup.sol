@@ -3,8 +3,9 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "../interfaces/IERC20.sol";
 import "../interfaces/IEmergencyMode.sol";
+import "../interfaces/IERC20.sol";
+import "../interfaces/IOperatorOwned.sol";
 
 import "./BaseNativeToken.sol";
 import "./GovToken.sol";
@@ -26,7 +27,7 @@ struct Lockup {
     uint256 lockTime;
 }
 
-contract VEGovLockup is IEmergencyMode {
+contract VEGovLockup is IEmergencyMode, IOperatorOwned {
     uint8 private version_;
 
     address private operator_;
@@ -54,17 +55,30 @@ contract VEGovLockup is IEmergencyMode {
         return voteToken_;
     }
 
+    function operator() public view returns (address) {
+        return operator_;
+    }
+
+    function updateOperator(address _newOperator) public {
+        require(msg.sender == operator(), "only operator");
+        operator_ = _newOperator;
+    }
+
     function noEmergencyMode() public view returns (bool) {
         return noEmergencyMode_;
     }
 
+    function emergencyCouncil() public view returns (address) {
+        return emergencyCouncil_;
+    }
+
     function enableEmergencyMode() public {
-        require(msg.sender == emergencyCouncil_, "only council");
+        require(msg.sender == emergencyCouncil(), "only council");
         noEmergencyMode_ = false;
     }
 
     function disableEmergencyMode() public {
-        require(msg.sender == emergencyCouncil_, "only council");
+        require(msg.sender == emergencyCouncil(), "only council");
         noEmergencyMode_ = true;
     }
 

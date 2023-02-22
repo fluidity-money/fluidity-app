@@ -171,11 +171,15 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @inheritdoc IOperatorOwned
     function updateOperator(address newOperator) public {
-        require(msg.sender == operator_, "operator only");
+        require(msg.sender == operator(), "operator only");
 
         operator_ = newOperator;
 
         emit OperatorChanged(operator_, newOperator);
+    }
+
+    function emergencyCouncil() public view returns (address) {
+        return emergencyCouncil_;
     }
 
     function noEmergencyMode() public view returns (bool) {
@@ -190,8 +194,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IEmergencyMode
     function enableEmergencyMode() public {
         require(
-            msg.sender == operator_ ||
-            msg.sender == emergencyCouncil_ ||
+            msg.sender == operator() ||
+            msg.sender == emergencyCouncil() ||
             msg.sender == oracle(),
             "can't enable emergency mode!"
         );
@@ -203,7 +207,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @inheritdoc IEmergencyMode
     function disableEmergencyMode() public {
-        require(msg.sender == operator_, "operator only");
+        require(msg.sender == operator(), "operator only");
 
         noEmergencyMode_ = true;
 
@@ -212,7 +216,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
-        require(msg.sender == operator_, "operator only");
+        require(msg.sender == operator(), "operator only");
 
         maxUncheckedReward_ = _maxUncheckedReward;
 
@@ -283,7 +287,19 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @inheritdoc IToken
     function underlyingToken() public view returns (IERC20) {
-        return pool_.underlying_();
+        (bool rc, bytes memory returndata) = address(pool_).staticcall(
+            abi.encodeWithSignature("underlying_()")
+        );
+
+        if (!rc) {
+            assembly {
+                revert(add(returndata, 32), mload(returndata))
+            }
+        }
+
+        (address token) = abi.decode(returndata, (address));
+
+        return IERC20(token);
     }
 
     /**
@@ -360,7 +376,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         uint lastBlock
     ) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator_, "operator only");
+        require(msg.sender == operator(), "operator only");
 
         require(blockedRewards_[user] >= amount, "too much unblock");
 
@@ -390,7 +406,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     }
 
     function setDecimals(uint8 _decimals) public {
-      require(msg.sender == operator_, "operator only");
+      require(msg.sender == operator(), "operator only");
       decimals_ = _decimals;
     }
 
@@ -438,7 +454,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IToken
     function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
       require(noEmergencyMode(), "emergency mode");
-      require(msg.sender == operator_, "operator only");
+      require(msg.sender == operator(), "operator only");
 
       uint oldPoolAmount = pool_.totalPoolAmount();
 
@@ -476,7 +492,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IToken
     function drainRewardPool(address _recipient, uint256 _amount) public {
         require(noEmergencyMode(), "emergency mode");
-        require(msg.sender == operator_, "operator only");
+        require(msg.sender == operator(), "operator only");
 
         uint256 rewardPool = this.rewardPoolAmount();
 

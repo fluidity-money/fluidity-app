@@ -6,6 +6,7 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
 import "../interfaces/ILiquidityProvider.sol";
+import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IRegistry.sol";
 import "../interfaces/IToken.sol";
 import "../interfaces/IToken.sol";
@@ -25,7 +26,7 @@ struct ScannedUtilityVars {
     string name;
 }
 
-contract Registry is IRegistry, ITotalRewardPool {
+contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
 
     /// @dev RegistrationType is a uint8 in practice, so it can be updated
     /// with a contract upgrade if the ABI changes
@@ -128,6 +129,15 @@ contract Registry is IRegistry, ITotalRewardPool {
         }
 
         return cumulative;
+    }
+
+    function operator() public view returns (address) {
+        return operator_;
+    }
+
+    function updateOperator(address _newOperator) public {
+        require(msg.sender == operator(), "only operator");
+        operator_ = _newOperator;
     }
 
     function getFluidityClient(

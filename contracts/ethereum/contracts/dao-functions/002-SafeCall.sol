@@ -13,8 +13,7 @@ function safeCallOptionalReturn(
 
     if (!rc) {
         assembly {
-            let size := mload(returndata)
-            revert(add(32, returndata), size)
+            revert(add(32, returndata), mload(returndata))
         }
     }
 
@@ -24,7 +23,7 @@ function safeCallOptionalReturn(
 function safeCallIgnoreRevert(
     address _target,
     bytes memory _calldata
-) public returns (bytes memory returndata) {
+) returns (bytes memory returndata) {
     (, returndata) = _target.call(_calldata);
     return returndata;
 }

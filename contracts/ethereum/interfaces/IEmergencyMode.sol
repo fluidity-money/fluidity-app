@@ -23,4 +23,9 @@ interface IEmergencyMode {
      * @notice emergency mode status (true if everything is okay)
      */
     function noEmergencyMode() external view returns (bool);
+
+    /**
+     * @notice emergencyCouncil address that can trigger emergency functions
+     */
+    function emergencyCouncil() external view returns (address);
 }

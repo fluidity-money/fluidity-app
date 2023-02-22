@@ -7,7 +7,7 @@ import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IToken.sol";
 import "../interfaces/IStaking.sol";
 
-contract Staking is IStaking, IEmergencyMode {
+contract Staking {
     uint8 private version_;
 
     function init() public {

@@ -9,9 +9,10 @@ pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IFluidClient.sol";
+import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IRegistry.sol";
-import "../interfaces/IUtilityGauges.sol";
 import "../interfaces/ITrfVariables.sol";
+import "../interfaces/IUtilityGauges.sol";
 
 struct FluidityReward {
     string clientName;
@@ -23,7 +24,7 @@ struct OracleUpdate {
     address newOracle;
 }
 
-contract Operator is IEmergencyMode, IUtilityGauges {
+contract Operator is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     /// @dev the utility name of the fluid token
     string constant private FLUID_TOKEN = "FLUID";
 
@@ -44,7 +45,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
     address private emergencyCouncil_;
 
     /// @dev can update contract props and oracles
-    address public operator_;
+    address private operator_;
 
     /// @dev registry to get configuration details from
     IRegistry public registry_;
@@ -72,12 +73,25 @@ contract Operator is IEmergencyMode, IUtilityGauges {
         noEmergency_ = true;
     }
 
+    function operator() public view returns (address) {
+        return operator_;
+    }
+
+    function emergencyCouncil() public view returns (address) {
+        return emergencyCouncil_;
+    }
+
+    function updateOperator(address _newOperator) public {
+        require(operator() == msg.sender, "only operator");
+        operator_ = _newOperator;
+    }
+
     function noEmergencyMode() public view returns (bool) {
         return noEmergency_;
     }
 
     function enableEmergencyMode() public {
-        bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil_;
+        bool authorised = msg.sender == operator() || msg.sender == emergencyCouncil();
         require(authorised, "emergency only");
 
         noEmergency_ = false;
@@ -89,7 +103,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
      * @notice (operator only)
      */
     function disableEmergencyMode() public {
-        require(msg.sender == operator_, "operator only");
+        require(msg.sender == operator(), "operator only");
 
         noEmergency_ = true;
 
@@ -108,7 +122,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
 
     function updateOracle(address _contractAddr, address _newOracle) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator_, "only operator");
+        require(msg.sender == operator(), "only operator");
 
         _updateOracle(_contractAddr, _newOracle);
     }
@@ -116,7 +130,7 @@ contract Operator is IEmergencyMode, IUtilityGauges {
     /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory _newOracles) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator_, "only operator");
+        require(msg.sender == operator(), "only operator");
 
         for (uint i = 0; i < _newOracles.length; i++) {
             _updateOracle(
