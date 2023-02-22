@@ -17,6 +17,18 @@ import "./Registry.sol";
 import "./Token.sol";
 import "./VEGovLockup.sol";
 
+struct Implementations {
+    GovToken govToken;
+    VEGovLockup veGovLockup;
+    Registry registry;
+    Operator operator;
+    Token token;
+    CompoundLiquidityProvider compoundLp;
+    AaveV2LiquidityProvider aaveV2;
+    AaveV3LiquidityProvider aaveV3;
+
+}
+
 contract FluidityV1 {
     /* ~~~~~~ BEACONS ~~~~~~ */
 
@@ -54,53 +66,37 @@ contract FluidityV1 {
 
     DAOV1 public dao;
 
-    function setBeacons() internal {
-        GovToken govTokenImpl = new GovToken();
-
-        VEGovLockup veGovLockupImpl = new VEGovLockup();
-
-        Registry registryImpl = new Registry();
-
-        Operator operatorImpl = new Operator();
-
-        Token tokenImpl = new Token();
-
-        CompoundLiquidityProvider compoundLpImpl = new CompoundLiquidityProvider();
-
-        AaveV2LiquidityProvider aaveV2Impl = new AaveV2LiquidityProvider();
-
-        AaveV3LiquidityProvider aaveV3Impl = new AaveV3LiquidityProvider();
-
+    function setBeacons(Implementations memory _impls) internal {
         govTokenBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(govTokenImpl))
+            new UpgradeableBeacon(address(_impls.govToken))
         ));
 
         veGovLockupBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(veGovLockupImpl))
+            new UpgradeableBeacon(address(_impls.veGovLockup))
         ));
 
         registryBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(registryImpl))
+            new UpgradeableBeacon(address(_impls.registry))
         ));
 
         operatorBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(operatorImpl))
+            new UpgradeableBeacon(address(_impls.operator))
         ));
 
         tokenBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(tokenImpl))
+            new UpgradeableBeacon(address(_impls.token))
         ));
 
         compoundLiquidityProviderBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(compoundLpImpl))
+            new UpgradeableBeacon(address(_impls.compoundLp))
         ));
 
         aaveV2LiquidityProviderBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(aaveV2Impl))
+            new UpgradeableBeacon(address(_impls.aaveV2))
         ));
 
         aaveV3LiquidityProviderBeacon = IUpgradeableBeacon(address(
-            new UpgradeableBeacon(address(aaveV3Impl))
+            new UpgradeableBeacon(address(_impls.aaveV3))
         ));
     }
 
@@ -129,10 +125,11 @@ contract FluidityV1 {
     	string memory _govTokenName,
     	string memory _govTokenSymbol,
     	uint8 _govTokenDecimals,
-    	uint256 _govTokenTotalSupply
+    	uint256 _govTokenTotalSupply,
+    	Implementations memory _impls
     ) {
 
-        setBeacons();
+        setBeacons(_impls);
 
         setBeaconAdmins();
 
