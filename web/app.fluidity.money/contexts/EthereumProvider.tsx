@@ -35,6 +35,8 @@ import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
+import {ToolTipContent, useToolTip} from "~/components";
+import {Text} from "@fluidity-money/surfing";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -43,6 +45,8 @@ type OKXWallet = {
 type Coin98Wallet = {
   isCoin98?: boolean;
 } & Provider;
+
+type MetamaskError = {code: number, message: string}
 
 const EthereumFacade = ({
   children,
@@ -61,6 +65,7 @@ const EthereumFacade = ({
   const browserWallet = useWindow("ethereum") as Coin98Wallet;
 
   const chain = chainType(network);
+  const toolTip = useToolTip();
 
   if (!chain || chain !== "evm") console.warn("Unsupported connector", network);
 
@@ -74,11 +79,26 @@ const EthereumFacade = ({
           // switch if connected eagerly to the wrong network
           // Provider type is missing chainId but it can exist
           const connectedChainId = (
-            connector.provider as unknown as { chainId?: string }
+            connector.provider as unknown as {chainId?: string}
           )?.chainId;
           const desiredChainId = `0x${getChainId(network).toString(16)}`;
           if (connectedChainId && desiredChainId !== connectedChainId) {
-            connector.activate(getChainId(network));
+            connector.activate(getChainId(network))?.catch((e: unknown | MetamaskError) => {
+              if (e && e.hasOwnProperty("code")) {
+                const {code} = e as MetamaskError;
+                if (code === 4001) {
+                  deactivate();
+                  toolTip.open(
+                    "#010A16",
+                    <div>
+                      <Text prominent={true} bold={true} size="lg">Failed to switch network</Text>
+                      <br/>
+                      <Text size="md">User declined network change</Text>
+                    </div>
+                  );
+                }
+              }
+            })
           }
         })
         .catch(() => true);
@@ -393,7 +413,7 @@ const EthereumFacade = ({
 export const EthereumProvider = (
   rpcUrl: string,
   tokens: Token[],
-  network?: string
+  network?: string,
 ) => {
   if (!network) throw new Error("No network provided to EthereumProvider!");
 
