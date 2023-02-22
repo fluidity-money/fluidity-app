@@ -30,6 +30,7 @@ struct Implementations {
 }
 
 contract FluidityV1 {
+
     /* ~~~~~~ BEACONS ~~~~~~ */
 
     IUpgradeableBeacon public govTokenBeacon;
@@ -121,20 +122,20 @@ contract FluidityV1 {
     }
 
     constructor(
-    	address _emergencyCouncil,
-    	string memory _govTokenName,
-    	string memory _govTokenSymbol,
-    	uint8 _govTokenDecimals,
-    	uint256 _govTokenTotalSupply,
-    	Implementations memory _impls
+        address _emergencyCouncil,
+        string memory _govTokenName,
+        string memory _govTokenSymbol,
+        uint8 _govTokenDecimals,
+        uint256 _govTokenTotalSupply,
+        Implementations memory _impls
     ) {
 
         setBeacons(_impls);
 
         setBeaconAdmins();
 
-    	// now that we have some deployments of the beacons, we can
-    	// create the DAO, the Registry, the GovToken and the Operator
+        // now that we have some deployments of the beacons, we can
+        // create the DAO, the Registry, the GovToken and the Operator
 
         BeaconProxy govTokenProxy = new BeaconProxy(
             address(govTokenBeacon),

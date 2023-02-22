@@ -294,6 +294,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         );
 
         if (!rc) {
+            // solhint-disable-next-line no-inline-assembly
             assembly {
                 revert(add(returndata, 32), mload(returndata))
             }
