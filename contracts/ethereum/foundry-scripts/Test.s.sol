@@ -5,6 +5,7 @@ import "forge-std/Script.sol";
 
 import "../contracts/IFluidClient.sol";
 import "../contracts/Operator.sol";
+import "../contracts/Registry.sol";
 
 contract FakeFluidToken is IFluidClient {
     UtilityVars vars;
@@ -53,9 +54,18 @@ contract TestScript is Script {
 
         vm.startBroadcast(deployerKey);
 
+        Registry r = new Registry(
+            externalOperator,
+            IBeacon(address(0)), // tokenBeacon
+            IBeacon(address(0)), // compoundBeacon
+            IBeacon(address(0)), // aaveV1Beacon
+            IBeacon(address(0)) // aaveV2Beacon
+        );
+        require(address(r) == vm.envAddress("FLU_ETHEREUM_REGISTRY_CONTRACT_ADDR"), "registry address env is set incorrectly!");
+
         Operator o = new Operator();
         require(address(o) == vm.envAddress("FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR"), "operator address env is set incorrectly!");
-        o.init(externalOperator, council);
+        o.init(externalOperator, council, r);
 
         IFluidClient fluidToken = new FakeFluidToken(UtilityVars({
             poolSizeNative: 10_000_000 * 10**6,
@@ -65,7 +75,7 @@ contract TestScript is Script {
             deltaWeightNum: 1,
             deltaWeightDenom: 31536000
         }));
-        require(address(fluidToken) == vm.envAddress("FLU_ETHEREUM_UTIL_TOKEN_ADDR"), "util token address env is set incorrectly!");
+        require(address(fluidToken) == vm.envAddress("FLU_ETHEREUM_FLUID_TOKEN_ADDR"), "fluid token address env is set incorrectly!");
 
         IFluidClient utilityClient1 = new FakeFluidToken(UtilityVars({
             poolSizeNative: 500_000 * 10**18,
@@ -81,8 +91,8 @@ contract TestScript is Script {
         // now become the operator so we can set utility clients and oracles
         vm.startBroadcast(externalOperatorKey);
 
-        Operator.FluidityClientChange[] memory fluidClientChanges = new Operator.FluidityClientChange[](2);
-        Operator.FluidityClientChange memory fluidChange1 = Operator.FluidityClientChange({
+        FluidityClientChange[] memory fluidClientChanges = new FluidityClientChange[](2);
+        FluidityClientChange memory fluidChange1 = FluidityClientChange({
             name: "FLUID",
             overwrite: false,
             token: address(fluidToken),
@@ -90,7 +100,7 @@ contract TestScript is Script {
         });
         fluidClientChanges[0] = fluidChange1;
 
-        Operator.FluidityClientChange memory fluidChange2 = Operator.FluidityClientChange({
+        FluidityClientChange memory fluidChange2 = FluidityClientChange({
             name: "testClient",
             overwrite: false,
             token: address(fluidToken),
@@ -98,15 +108,26 @@ contract TestScript is Script {
         });
         fluidClientChanges[1] = fluidChange2;
 
-        o.updateUtilityClients(fluidClientChanges);
+        r.updateUtilityClients(fluidClientChanges);
 
-        Operator.OracleUpdate[] memory oracleChanges = new Operator.OracleUpdate[](1);
-        Operator.OracleUpdate memory oracleChange = Operator.OracleUpdate({
+        OracleUpdate[] memory oracleChanges = new OracleUpdate[](1);
+        OracleUpdate memory oracleChange = OracleUpdate({
             contractAddr: address(fluidToken),
             newOracle: oracle
         });
         oracleChanges[0] = oracleChange;
         o.updateOracles(oracleChanges);
+
+        // set the spooler thresholds to 0
+        TrfVariables memory trfVars = TrfVariables({
+            currentAtxTransactionMargin: 0,
+            defaultTransfersInBlock: 0,
+            spoolerInstantRewardThreshold: 0,
+            spoolerBatchedRewardThreshold: 0,
+            defaultSecondsSinceLastBlock: 13,
+            atxBufferSize: 10
+        });
+        r.updateTrfVariables(address(fluidToken), trfVars);
 
         vm.stopBroadcast();
     }

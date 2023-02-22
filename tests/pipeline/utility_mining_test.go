@@ -29,7 +29,7 @@ const (
     EnvEthereumSeedPhrase = `FLU_ETHEREUM_SEED_PHRASE`
 
     EnvOperatorContractAddress = `FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR`
-    EnvFluidTokenAddress       = `FLU_ETHEREUM_UTIL_TOKEN_ADDR`
+    EnvFluidTokenAddress       = `FLU_ETHEREUM_FLUID_TOKEN_ADDR`
     EnvUtilityClientAddress    = `FLU_ETHEREUM_UTIL_CLIENT_ADDR`
 )
 
