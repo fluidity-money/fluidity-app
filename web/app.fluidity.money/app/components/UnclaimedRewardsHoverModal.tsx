@@ -20,17 +20,24 @@ const UnclaimedRewardsHoverModal = ({
   return (
     <Tooltip
       style={{
-        position: 'absolute',
+        position: "absolute",
         right: 64,
         top: 80,
-        flexDirection: 'row',
-        gap: '1em',
-        alignItems: 'center',
-        cursor: 'default',
+        flexDirection: "row",
+        gap: "1em",
+        alignItems: "center",
+        cursor: "default",
       }}
-      onMouseEnter={() => setShowModal(true)}
-      onMouseLeave={() => setTimeout(() => setShowModal(false), 500)}
     >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+        onMouseEnter={() => setShowModal(true)}
+        onMouseLeave={() => setTimeout(() => setShowModal(false), 500)}
+      >
         <img
           id="card-logo"
           src="/images/fluidTokensMetallicCropped.svg"
@@ -39,9 +46,9 @@ const UnclaimedRewardsHoverModal = ({
         />
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           <Text size="sm">Unclaimed rewards</Text>
@@ -61,6 +68,7 @@ const UnclaimedRewardsHoverModal = ({
             DETAILS
           </LinkButton>
         </div>
+      </div>
     </Tooltip>
   );
 };
