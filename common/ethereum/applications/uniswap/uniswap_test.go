@@ -31,7 +31,7 @@ func TestGetUniswapV2Fees(t *testing.T) {
 		tokenDecimals   = 18
 
 		rpcMethods  = make(map[string]interface{})
-		callMethods = make(map[string]interface{})
+		callMethods = make(map[string]map[string]interface{})
 	)
 
 	// unmarshall the first data blob
@@ -57,7 +57,9 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	assert.Nil(t, fees)
 
 	// add the "token0" call to the client
-	callMethods["token0()"] = "0x0000000000000000000000000000000000000000000000000000000000000000"
+	callMethods["token0()"] = map[string]interface{}{
+		"": "0x0000000000000000000000000000000000000000000000000000000000000000",
+	}
 	rpcMethods["eth_getCode"] = "0x0"
 
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
@@ -118,7 +120,7 @@ func TestGetUniswapV3Fees(t *testing.T) {
 		tokenDecimals   = 18
 
 		rpcMethods  = make(map[string]interface{})
-		callMethods = make(map[string]interface{})
+		callMethods = make(map[string]map[string]interface{})
 	)
 
 	// unmarshall the first data blob
@@ -144,8 +146,12 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	assert.Nil(t, fees)
 
 	// add the "token0" call to the client
-	callMethods["token0()"] = "0x0000000000000000000000000000000000000000000000000000000000000000"
-	callMethods["fee()"] = "0x0000000000000000000000000000000000000000000000000000000000000064"
+	callMethods["token0()"] = map[string]interface{}{
+		"": "0x0000000000000000000000000000000000000000000000000000000000000000",
+	}
+	callMethods["fee()"] = map[string]interface{}{
+		"": "0x0000000000000000000000000000000000000000000000000000000000000064",
+	}
 	rpcMethods["eth_getCode"] = "0x0"
 
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)

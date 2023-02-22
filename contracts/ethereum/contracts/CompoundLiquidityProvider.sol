@@ -5,13 +5,15 @@
 // LICENSE.md file.
 
 pragma solidity ^0.8.11;
-pragma abicoder v1;
+pragma abicoder v2;
 
 import "./compound/CTokenInterfaces.sol";
-import "./LiquidityProvider.sol";
+
 import "./openzeppelin/SafeERC20.sol";
 
-contract CompoundLiquidityProvider is LiquidityProvider {
+import "./ILiquidityProvider.sol";
+
+contract CompoundLiquidityProvider is ILiquidityProvider {
     using SafeERC20 for IERC20;
 
     /// @dev for migrations
@@ -28,43 +30,47 @@ contract CompoundLiquidityProvider is LiquidityProvider {
     /**
      * @notice initialiser function
      *
-     * @param compoundToken address of the compound cToken
-     * @param owner address of the account that owns this pool
+     * @param _compoundToken address of the compound cToken
+     * @param _owner address of the account that owns this pool
      */
     function init(
-        address compoundToken,
-        address owner
+        address _compoundToken,
+        address _owner
     ) external {
-        require(version_ == 0, "contract is already initialized");
+        require(version_ == 0, "contract is already initialised");
+
         version_ = 1;
 
-        owner_ = owner;
+        owner_ = _owner;
 
-        compoundToken_ = CErc20Interface(compoundToken);
+        compoundToken_ = CErc20Interface(_compoundToken);
 
         underlying_ = IERC20(compoundToken_.underlying());
+
         underlying_.safeApprove(address(compoundToken_), type(uint).max);
     }
 
-    /// @inheritdoc LiquidityProvider
-    function addToPool(uint amount) external {
+    /// @inheritdoc ILiquidityProvider
+    function addToPool(uint _amount) external {
         require(msg.sender == owner_, "only the owner can use this");
 
-        uint mintRes = compoundToken_.mint(amount);
+        uint mintRes = compoundToken_.mint(_amount);
+
         require(mintRes == 0, "compound mint failed");
     }
 
-    /// @inheritdoc LiquidityProvider
-    function takeFromPool(uint amount) external {
+    /// @inheritdoc ILiquidityProvider
+    function takeFromPool(uint _amount) external {
         require(msg.sender == owner_, "only the owner can use this");
 
-        uint redeemRes = compoundToken_.redeemUnderlying(amount);
+        uint redeemRes = compoundToken_.redeemUnderlying(_amount);
+
         require(redeemRes == 0, "compound redeem failed");
 
-        underlying_.safeTransfer(msg.sender, amount);
+        underlying_.safeTransfer(msg.sender, _amount);
     }
 
-    /// @inheritdoc LiquidityProvider
+    /// @inheritdoc ILiquidityProvider
     function totalPoolAmount() external returns (uint) {
         return compoundToken_.balanceOfUnderlying(address(this));
     }

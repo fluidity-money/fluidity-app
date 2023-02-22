@@ -1,11 +1,15 @@
 import { gql, Queryable, jsonPost } from "~/util";
-import {chainType} from "~/util/chainUtils/chains";
+import { chainType } from "~/util/chainUtils/chains";
 
 const query: Queryable = {
   ethereum: gql`
     query getPendingRewards($address: String!) {
       ethereum_pending_winners(
-        where: { reward_sent: { _eq: false }, address: { _eq: $address }, network: { _eq: "ethereum"} }
+        where: {
+          reward_sent: { _eq: false }
+          address: { _eq: $address }
+          network: { _eq: "ethereum" }
+        }
         order_by: { block_number: desc }
       ) {
         address
@@ -24,7 +28,11 @@ const query: Queryable = {
   arbitrum: gql`
     query getPendingRewards($address: String!) {
       ethereum_pending_winners(
-        where: { reward_sent: { _eq: false }, address: { _eq: $address }, network: { _eq: "arbitrum"} }
+        where: {
+          reward_sent: { _eq: false }
+          address: { _eq: $address }
+          network: { _eq: "arbitrum" }
+        }
         order_by: { block_number: desc }
       ) {
         address

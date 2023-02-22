@@ -125,6 +125,7 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
+  const showArbitrum = showExperiment("enable-arbitrum");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -169,37 +170,24 @@ export default function Dashboard() {
     { rewards: { name: "Rewards", icon: <Trophy /> } },
   ];
 
-  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
-    showExperiment("enable-arbitrum")
-    ? {
-      ethereum: {
-        name: "ETH",
-        icon: <img src="/assets/chains/ethIcon.svg" />,
-      },
-      arbitrum: {
-        name: "ARB",
-        icon: <img src="/assets/chains/arbIcon.svg" />,
-      },
-      solana: {
-        name: "SOL",
-        icon: <img src="/assets/chains/solanaIcon.svg" />,
-      },
-    }
-  : {
-      ethereum: {
-        name: "ETH",
-        icon: <img src="/assets/chains/ethIcon.svg" />,
-      },
-      solana: {
-        name: "SOL",
-        icon: <img src="/assets/chains/solanaIcon.svg" />,
-      },
-    };
+  const chainNameMap: Record<string, {name: string; icon: JSX.Element}> =
+  {
+    ethereum: {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    arbitrum: {
+      name: "ARB",
+      icon: <img src="/assets/chains/arbIcon.svg" />,
+    },
+    solana: {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  };
 
   const matches = useMatches();
-  console.log(matches);
   const transitionPath = useTransition().location?.pathname;
-  console.log(transitionPath);
   const currentPath = transitionPath || matches[matches.length - 1].pathname;
   const resolvedPaths = navigationMap.map((obj) =>
     useResolvedPath(Object.keys(obj)[0])
@@ -307,7 +295,7 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap)}
+            options={Object.values(chainNameMap).filter(({name}) => showArbitrum ? true : name !== "ARB")}
             setOption={handleSetChain}
             mobile={isMobile}
           />

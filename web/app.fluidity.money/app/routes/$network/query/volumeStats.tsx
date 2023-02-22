@@ -16,8 +16,7 @@ export type Volume = {
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
-  if (!network)
-    return;
+  if (!network) return;
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
@@ -28,10 +27,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     // const decimals = new BN(10).pow(new BN(12));
     // const amount = bn.div(decimals).toNumber();
 
-    return network === "arbitrum" ? volume : {
-      ...volume,
-      amount: volume.amount / 10 ** 12,
-    };
+    return network === "arbitrum"
+      ? volume
+      : {
+          ...volume,
+          amount: volume.amount / 10 ** 12,
+        };
   };
 
   const { fluidAssets } = config.config[network ?? ""];
@@ -47,7 +48,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const prevYearIso = prevYearDate.toISOString();
 
   const volumesRes = address
-    ? await useVolumeTxByAddressTimestamp(network, fluidAssets, address, prevYearIso)
+    ? await useVolumeTxByAddressTimestamp(
+        network,
+        fluidAssets,
+        address,
+        prevYearIso
+      )
     : await useVolumeTxByTimestamp(network, fluidAssets, prevYearIso);
 
   const parsedVolume = volumesRes.data?.[network].transfers.map((transfer) => ({
