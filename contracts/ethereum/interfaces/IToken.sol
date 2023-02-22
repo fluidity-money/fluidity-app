@@ -47,15 +47,11 @@ interface IToken is IERC20 {
     event RewardQuarantineThresholdUpdated(uint amount);
 
     /**
-     * @notice update the operator account to a new address
-     * @param _newOperator the address of the new operator to change to
-     */
-    function updateOperator(address _newOperator) external;
-
-    /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
-     * @dev individual oracles are now recorded in the operator, this now should return the registry contract
+     *
+     * @dev individual oracles are now recorded in the operator, this
+     *      now should return the registry contract
      */
     function oracle() external view returns (address);
 
@@ -104,9 +100,15 @@ interface IToken is IERC20 {
      * @notice allows for paying out or removing the reward, in case of abuse
      *
      * @param _user the address of the user who's reward was quarantined
-     * @param _amount the amount of tokens to release (in case multiple rewards were quarantined)
+     *
+     * @param _amount the amount of tokens to release (in case
+     *        multiple rewards were quarantined)
+     *
      * @param _payout should the reward be paid out or removed?
-     * @param _firstBlock the first block the rewards include (should be from the BlockedReward event)
+     *
+     * @param _firstBlock the first block the rewards include (should
+     *        be from the BlockedReward event)
+     *
      * @param _lastBlock the last block the rewards include
      */
     function unblockReward(
@@ -124,16 +126,15 @@ interface IToken is IERC20 {
      */
     function maxUncheckedReward() external view returns (uint);
 
-    /*
-     * @notice return the current operator
-     */
-    function operator() external view returns (address);
-
     /// @notice upgrade the underlying ILiquidityProvider to a new source
     function upgradeLiquidityProvider(ILiquidityProvider newPool) external;
 
-    /// @notice drain the reward pool of the amount given without touching any principal amounts
-    /// @dev this is intended to only be used to retrieve initial
-    ///      liquidity provided by the team OR by the DAO to allocate funds
+    /**
+     * @notice drain the reward pool of the amount given without
+     *         touching any principal amounts
+     *
+     * @dev this is intended to only be used to retrieve initial
+     *       liquidity provided by the team OR by the DAO to allocate funds
+     */
     function drainRewardPool(address _recipient, uint256 _amount) external;
 }

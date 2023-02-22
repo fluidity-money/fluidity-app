@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity ^0.8.11.0;
+pragma solidity ^0.8.11;
 pragma abicoder v2;
 
 import "../interfaces/IToken.sol";
@@ -55,7 +55,7 @@ struct Proposal {
  * doing contract upgrades, allocating amounts using utility gauges to
  * different protocols
  */
-contract DAO {
+contract DAOV1 {
 
     event VoteCreated(bytes32 indexed proposalId);
 

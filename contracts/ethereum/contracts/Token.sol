@@ -4,13 +4,14 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity 0.8.11.0;
+pragma solidity 0.8.11;
 pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/IFluidClient.sol";
 import "../interfaces/ILiquidityProvider.sol";
+import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IToken.sol";
 import "../interfaces/ITransferWithBeneficiary.sol";
 
@@ -24,7 +25,7 @@ uint constant BLOCK_REWARDED = 1;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
-contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode {
+contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
     using SafeERC20 for IERC20;
 
     // erc20 props
@@ -168,7 +169,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
     }
 
-    /// @inheritdoc IToken
+    /// @inheritdoc IOperatorOwned
     function updateOperator(address newOperator) public {
         require(msg.sender == operator_, "operator only");
 
