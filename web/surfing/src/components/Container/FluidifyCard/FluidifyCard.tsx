@@ -1,27 +1,18 @@
-type Props = {
+interface IFluidifyCard {
   fluid: boolean;
-
   symbol: string;
   name?: string;
-
   logo: string;
-
   stable?: true;
-
   mintCapPercentage?: number;
-
   amount: number;
-
   currentPrice?: string;
-
   address: string;
-
   color?: string;
-
   addToken?: (symbol: string) => void;
 };
 
-const FluidifyCard = (props: Props) => {
+const FluidifyCard = (props: IFluidifyCard) => {
   const {
     fluid,
     logo,
