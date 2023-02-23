@@ -15,6 +15,7 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -162,7 +163,10 @@ const operatorAbiString = `[
 	  "outputs": [],
 	  "stateMutability": "nonpayable",
 	  "type": "function"
-  },
+  }
+]`
+
+const registryAbiString = `[
   {
 	  "inputs": [
 	  { "internalType": "address", "name": "token", "type": "address" },
@@ -200,6 +204,7 @@ const operatorAbiString = `[
 var (
 	FluidityContractAbi ethAbi.ABI
 	OperatorAbi         ethAbi.ABI
+	RegistryAbi         ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
 )
 
@@ -374,72 +379,3 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 	return transaction, nil
 }
 
-// TransactUpdateMintLimits as the worker, releasing restrictions on
-// the amount that can be minted at the time
-func TransactUpdateMintLimits(client *ethclient.Client, fluidityContractAddress ethCommon.Address, global, user *big.Int, transactionOptions *ethAbiBind.TransactOpts) (*ethTypes.Transaction, error) {
-
-	boundContract := ethAbiBind.NewBoundContract(
-		fluidityContractAddress,
-		FluidityContractAbi,
-		client,
-		client,
-		client,
-	)
-
-	transaction, err := ethereum.MakeTransaction(
-		boundContract,
-		transactionOptions,
-		"updateMintLimits",
-		global,
-		user,
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to transact the updateMintLimits function on Fluidity's contract! %v",
-			err,
-		)
-	}
-
-	return transaction, nil
-}
-
-// TransactLegacyReawrd using the deprecated single reward function
-func TransactLegacyReward(client *ethclient.Client, fluidityAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, hash []byte, addressString string, amount *big.Int) (*ethTypes.Transaction, error) {
-	boundContract := ethAbiBind.NewBoundContract(
-		fluidityAddress,
-		FluidityContractAbi,
-		client,
-		client,
-		client,
-	)
-
-	var (
-		address = ethCommon.HexToAddress(addressString)
-		balls   = []*big.Int{big.NewInt(1)}
-		payouts = []*big.Int{amount}
-	)
-
-	var hashBytes [32]byte
-	copy(hashBytes[:], hash)
-
-	transaction, err := ethereum.MakeTransaction(
-		boundContract,
-		transactionOptions,
-		"reward",
-		hashBytes,
-		address,
-		address,
-		balls,
-		payouts,
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"failed to transact the legacy reward function on Fluidity's contract! %v",
-			err,
-		)
-	}
-
-	return transaction, nil
-}

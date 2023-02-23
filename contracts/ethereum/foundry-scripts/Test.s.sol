@@ -61,15 +61,16 @@ contract TestScript is Script {
             IBeacon(address(0)), // aaveV1Beacon
             IBeacon(address(0)) // aaveV2Beacon
         );
-        require(address(r) == vm.envAddress("FLU_ETHEREUM_REGISTRY_CONTRACT_ADDR"), "registry address env is set incorrectly!");
+        require(address(r) == vm.envAddress("FLU_ETHEREUM_REGISTRY_ADDR"), "registry address env is set incorrectly!");
 
         Operator o = new Operator();
         require(address(o) == vm.envAddress("FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR"), "operator address env is set incorrectly!");
         o.init(externalOperator, council, r);
 
+        uint8 decimals = uint8(vm.envUint("FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS"));
         IFluidClient fluidToken = new FakeFluidToken(UtilityVars({
-            poolSizeNative: 10_000_000 * 10**6,
-            tokenDecimalScale: 10**6,
+            poolSizeNative: 10_000_000 * 10**decimals,
+            tokenDecimalScale: 10**decimals,
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
             deltaWeightNum: 1,

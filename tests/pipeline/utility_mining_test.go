@@ -1,7 +1,9 @@
 package main_test
 
 import (
+	"context"
 	"crypto/ecdsa"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -16,6 +18,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/tests/pipeline/libtest"
@@ -110,6 +114,8 @@ func TestUtilityMining(t *testing.T) {
     )
 
     workerOut := libtest.LogMessages("util-mining-worker-server-out")
+    spoolerOut := libtest.LogMessages("spooler-out")
+    winnersOut := libtest.LogMessages("winners.ethereum")
 
     time.Sleep(5 * time.Second) // dont look at this
 
@@ -118,28 +124,16 @@ func TestUtilityMining(t *testing.T) {
     var (
         tokenAddress = common.HexToAddress(tokenAddressString)
         fromAddress = libtest.RandomGethAddress()
+        fromAddressString = ethereum.ConvertGethAddress(fromAddress).String()
         toAddress   = libtest.RandomGethAddress()
+        toAddressString = ethereum.ConvertGethAddress(toAddress).String()
 
-        _ /* deployer */ = wallet.Next()
-        council          = wallet.Next()
-        oracle           = wallet.Next()
-        externalOperator = wallet.Next()
-        user             = wallet.Next()
-
-        _ = council
-        _ = oracle
-        _ = externalOperator
+        _    /* deployer */         = wallet.Next()
+        _    /* council */          = wallet.Next()
+        _    /* oracle */           = wallet.Next()
+        _    /* externalOperator */ = wallet.Next()
+        user                        = wallet.Next()
     )
-
-    log.Debug(func(k *log.Log) {
-        k.Format(
-            "council %s oracle %s externalop %s user %s",
-            council.Address.String(),
-            oracle.Address.String(),
-            externalOperator.Address.String(),
-            user.Address.String(),
-        )
-    })
 
     userPrikey, err := wallet.PrivateKey(user)
 
@@ -159,7 +153,7 @@ func TestUtilityMining(t *testing.T) {
         })
     }
 
-    tx, err := callTransferFunction(client, userPrikey, tokenAddress, fromAddress, toAddress, big.NewInt(2e6))
+    transferTxn, err := callTransferFunction(client, userPrikey, tokenAddress, fromAddress, toAddress, big.NewInt(2e6))
 
     if err != nil {
         log.Fatal(func(k *log.Log) {
@@ -173,7 +167,7 @@ func TestUtilityMining(t *testing.T) {
             "Called the fake transfer function from %s to %s with hash %s!",
             fromAddress.String(),
             toAddress.String(),
-            tx.Hash().String(),
+            transferTxn.Hash().String(),
         )
     })
 
@@ -182,7 +176,7 @@ func TestUtilityMining(t *testing.T) {
 
     if err != nil {
         log.Fatal(func(k *log.Log) {
-            k.Message = "No message on queue!"
+            k.Message = "No message on worker server queue!"
             k.Payload = err
         })
     }
@@ -198,4 +192,96 @@ func TestUtilityMining(t *testing.T) {
     announcements[0].RandomSource[0] = 0
 
     queue.SendMessage("worker-client-in", announcements)
+
+    var spooledRewards worker.EthereumSpooledRewards
+    err = spoolerOut.GetMessage(&spooledRewards)
+
+    if err != nil {
+        log.Fatal(func(k *log.Log) {
+            k.Message = "No message on spooler queue!"
+            k.Payload = err
+        })
+    }
+
+    transferReceipt, err := bind.WaitMined(context.Background(), client, transferTxn)
+
+    assert.Equal(t, transferReceipt.BlockNumber, &spooledRewards.FirstBlock.Int)
+    assert.Equal(t, transferReceipt.BlockNumber, &spooledRewards.LastBlock.Int)
+
+    fluidRewards, exists := spooledRewards.Rewards[applications.UtilityFluid]
+    assert.Equal(t, true, exists)
+    testClientRewards, exists := spooledRewards.Rewards["testClient"]
+    assert.Equal(t, true, exists)
+
+    assert.Equal(t, 2, len(fluidRewards))
+    assert.Equal(t, 2, len(testClientRewards))
+
+    fluidRewardSender, exists := fluidRewards[ethereum.ConvertGethAddress(fromAddress)]
+    assert.Equal(t, true, exists)
+    libtest.AssertNotZero(t, fluidRewardSender, "fluid reward sender")
+
+    fluidRewardRecipient, exists := fluidRewards[ethereum.ConvertGethAddress(toAddress)]
+    assert.Equal(t, true, exists)
+    libtest.AssertNotZero(t, fluidRewardRecipient, "fluid reward recipient")
+
+    utilRewardSender, exists := testClientRewards[ethereum.ConvertGethAddress(fromAddress)]
+    assert.Equal(t, true, exists)
+    libtest.AssertNotZero(t, utilRewardSender, "utility reward sender")
+
+    utilRewardRecipient, exists := testClientRewards[ethereum.ConvertGethAddress(toAddress)]
+    assert.Equal(t, true, exists)
+    libtest.AssertNotZero(t, utilRewardRecipient, "utility reward recipient")
+
+    var winner winners.Winner
+    var allWinners []winners.Winner
+    for {
+        err = winnersOut.GetMessage(&winner)
+
+        if errors.Is(err, libtest.ErrNoMessages) {
+            break
+        }
+
+        assert.Equal(t, err, nil)
+
+        allWinners = append(allWinners, winner)
+    }
+
+    assert.Equal(t, len(allWinners), 4)
+
+    type rewardsFound struct {
+        fluid bool
+        utility bool
+    }
+    var (
+        senderFound    rewardsFound
+        recipientFound rewardsFound
+    )
+
+    for _, winner := range allWinners {
+        var userRewards *rewardsFound
+
+        switch winner.WinnerAddress {
+        case fromAddressString:
+            userRewards = &senderFound
+        case toAddressString:
+            userRewards = &recipientFound
+        default:
+            t.Errorf("Unexpected address in win log! %s", winner.WinnerAddress)
+            continue
+        }
+
+        switch winner.Utility {
+        case applications.UtilityFluid:
+            userRewards.fluid = true
+        case "testClient":
+            userRewards.utility = true
+        default:
+            t.Errorf("Unexpected utility in win log! %s", winner.Utility)
+        }
+    }
+
+    assert.Equal(t, true, senderFound.fluid, "Fluid reward to sender not found")
+    assert.Equal(t, true, senderFound.utility, "Utility reward to sender not found")
+    assert.Equal(t, true, recipientFound.fluid, "Fluid reward to recipient not found")
+    assert.Equal(t, true, recipientFound.utility, "Utility reward to recipient not found")
 }
