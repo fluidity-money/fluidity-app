@@ -24,7 +24,7 @@ const HoverButton = ({
   hoverComp,
   ...props
 }: IHoverButtonProps) => {
-  const [isFocussed, setIsFocussed] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
   const classProps = className || "";
@@ -43,14 +43,14 @@ const HoverButton = ({
       className={buttonClassProps}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onFocus={() => setIsFocussed(true)}
-      onBlur={() => setIsFocussed(true)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(true)}
       {...props}
     >
       <div className={textClassProps}>{children}</div>
       <InfoCircle className={`${styles.icon} ${classProps}`} />
     </button>
-    {(isHovered || isFocussed) && (
+    {(isHovered || isFocused) && (
       <Card rounded className={styles.hoverContainer}>
         {hoverComp}
       </Card>
