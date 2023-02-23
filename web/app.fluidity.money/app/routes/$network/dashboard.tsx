@@ -32,15 +32,15 @@ import {
   BlockchainModal,
   numberToMonetaryString,
   useViewport,
+  ConnectedWalletModal,
+  ConnectedWallet
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import ConnectedWallet from "~/components/ConnectedWallet";
 import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
-import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 

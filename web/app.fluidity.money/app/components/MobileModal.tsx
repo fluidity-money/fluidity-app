@@ -12,11 +12,11 @@ import {
   BlockchainModal,
   Trophy,
   numberToMonetaryString,
+  ConnectedWalletModal,
+  ConnectedWallet
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import BurgerButton from "./BurgerButton";
-import ConnectedWallet from "./ConnectedWallet";
-import { ConnectedWalletModal } from "./ConnectedWalletModal";
 
 type IMobileModal = {
   navigationMap: Array<{ name: string; icon: JSX.Element }>;

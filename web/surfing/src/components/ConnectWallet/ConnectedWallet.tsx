@@ -1,5 +1,6 @@
-import { Text, trimAddressShort, trimAddress } from "@fluidity-money/surfing";
+import { Text } from '../'
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
+import { trimAddress, trimAddressShort } from '~/util';
 
 type IConnectedWallet = {
   address: string;

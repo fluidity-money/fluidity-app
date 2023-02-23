@@ -30,3 +30,4 @@ export { default as IntroTile } from "./IntroTile";
 export { default as Video } from "./Video";
 export { default as CollapsibleCard } from './CollapsibleCard'
 export { default as Tooltip } from './Tooltip'
+export { ConnectedWallet, ConnectedWalletModal } from './ConnectWallet'
