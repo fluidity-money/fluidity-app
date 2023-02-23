@@ -17,7 +17,7 @@ export { FilterCriteria } from "./Filter";
 export { Tab, TabBar } from "./Tab";
 export * from "./Container";
 export * from "./Button";
-export { BlockchainModal } from "./Modal";
+export { BlockchainModal, Modal } from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
 export { LabelledValue } from "./LabelledValue";
