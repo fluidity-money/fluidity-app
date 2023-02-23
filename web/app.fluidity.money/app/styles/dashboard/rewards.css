@@ -185,7 +185,8 @@
 }
 
 .unclaimed-inner {
-  grid-template-columns: 1.5fr 1fr;
+  display: flex;
+  align-items: center;
 }
 
 .card-section {
