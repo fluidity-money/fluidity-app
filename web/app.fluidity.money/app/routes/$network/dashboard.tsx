@@ -33,12 +33,12 @@ import {
   numberToMonetaryString,
   useViewport,
   ConnectedWalletModal,
-  ConnectedWallet
+  ConnectedWallet,
+  Modal
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ProvideLiquidity from "~/components/ProvideLiquidity";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";

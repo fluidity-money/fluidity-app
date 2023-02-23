@@ -19,11 +19,10 @@ import {
   LoadingDots,
   useViewport,
   Video,
-  ConnecctedWallet,
-  ConnectedWalletModal
+  ConnectedWalletModal,
+  Modal
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import Modal from "~/components/Modal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
 import { SplitContext } from "contexts/SplitProvider";

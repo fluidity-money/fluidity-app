@@ -21,10 +21,10 @@ import {
   Text,
   useViewport,
   ConnectedWallet,
-  ConnectedWalletModal
+  ConnectedWalletModal,
+  FluidifyCard
 } from "@fluidity-money/surfing";
 import Draggable from "~/components/Draggable";
-import FluidifyCard from "~/components/FluidifyCard";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
