@@ -7,7 +7,7 @@ import type { SupportedChainsList } from "~/util/chainProviders/chains";
 
 import { useRef } from "react";
 import { SupportedChains } from "~/util";
-import { useClickOutside } from "../Modal";
+import { useClickOutside } from "~/util/hooks/useClickOutside";
 import { ReactComponent as Checkmark } from "~/assets/images/buttonIcons/Checkmark.svg";
 import { Card, Heading, Text } from "~/components";
 import styles from "./BlockchainModal.module.scss";
