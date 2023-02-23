@@ -124,3 +124,9 @@
     display: none;
   }
 }
+
+.network_tooltip {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
