@@ -288,11 +288,6 @@ const UnclaimedWinnings = () => {
             unclaimedRewards={userUnclaimedRewards}
             claimedRewards={userClaimedRewards}
             network={network}
-            networkFee={networkFee}
-            gasFee={gasFee}
-            tokenAddrs={unclaimedTokens.map(
-              ({ symbol }) => fluidTokenMap[symbol]
-            )}
           />
         )}
 

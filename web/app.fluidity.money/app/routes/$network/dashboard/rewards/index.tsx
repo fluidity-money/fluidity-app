@@ -30,9 +30,7 @@ import {
   useViewport,
   Token,
   HoverButton,
-  Card,
   ProviderIcon,
-  Display,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
@@ -484,9 +482,6 @@ export default function Rewards() {
           unclaimedRewards={userUnclaimedRewards}
           claimedRewards={activeYield}
           network={network}
-          networkFee={networkFee}
-          gasFee={gasFee}
-          tokenAddrs={unclaimedTokenAddrs}
         />
       ) : (
         <div>
@@ -574,7 +569,7 @@ export default function Rewards() {
               <>
                 <ProviderIcon provider={rewarders[0]?.name} />
                 <section>
-                  <Heading as="h5" style={{margin: "1em 0px 1em 0px"}}>
+                  <Heading as="h5">
                     {rewarders[0]?.name === "Fluidity"
                       ? "Transacting ƒAssets"
                       : rewarders[0]?.name}
