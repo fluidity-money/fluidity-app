@@ -36,7 +36,7 @@ import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import {useToolTip} from "~/components";
-import {Text} from "@fluidity-money/surfing";
+import {NetworkTooltip} from "~/components/ToolTip";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -90,12 +90,8 @@ const EthereumFacade = ({
                   deactivate();
                   toolTip.open(
                     "#010A16",
-                    <div>
-                      <Text prominent={true} bold={true} size="lg">Failed to switch network</Text>
-                      <br/>
-                      <Text size="md">User declined network change</Text>
-                    </div>
-                  );
+                    <NetworkTooltip />
+                  )
                 }
               }
             })
