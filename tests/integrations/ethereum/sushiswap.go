@@ -18,7 +18,7 @@ const integrationTestSushiswap = `
           "0x000000000000000000000000d4cf8e47beac55b42ae58991785fa326d9384bd1"
         ]
       },
-     "application": 1
+     "application": 2
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -35,7 +35,9 @@ const integrationTestSushiswap = `
 	"eth_getCode": "0x0"
     },
     "call_methods": {
-    	"token0()": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+    	"token0()": {
+		"": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+	}
     },
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"

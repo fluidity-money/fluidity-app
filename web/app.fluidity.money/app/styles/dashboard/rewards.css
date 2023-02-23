@@ -85,11 +85,6 @@
   margin: 0;
 }
 
-.unclaimed-total {
-  margin: 0;
-  font-size: 3em;
-}
-
 .claims-title {
   margin: 0 0 5px 0;
 }
@@ -185,6 +180,7 @@
   outline: unset;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
   gap: 2em;
 }
 

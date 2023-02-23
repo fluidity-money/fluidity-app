@@ -11,6 +11,7 @@ import {
   useViewport,
 } from "@fluidity-money/surfing";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { networkMapper } from "~/util";
 
 type IUserRewards = {
   claimNow: boolean;
@@ -98,14 +99,14 @@ const UserRewards = ({
             <section className="fees">
               <Text size="xs">Network fee</Text>
               <Text size="xs">
-                {networkFee} {network === "ethereum" ? "ETH" : "SOL"}
+                {networkFee} {networkMapper(network)}
               </Text>
             </section>
             <hr className="line" />
             <section className="fees">
               <Text size="xs">Gas fee</Text>
               <Text size="xs">
-                {gasFee} {network === "ethereum" ? "ETH" : "SOL"}
+                {gasFee} {networkMapper(network)}
               </Text>
             </section>
             <hr className="line" />

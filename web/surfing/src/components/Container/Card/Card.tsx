@@ -6,14 +6,16 @@ import styles from "./Card.module.scss";
 
 interface ICard {
   component?: "div" | "button" | "tr";
+  style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
-  type?: "gray" | "box" | "holobox" | "transparent";
+  type?: "gray" | "box" | "holobox" | "transparent" | "frosted";
   [_: string]: any;
 }
 
 const Card = ({
   component,
+  style = {},
   rounded,
   className,
   disabled,
@@ -31,7 +33,7 @@ const Card = ({
   } ${disabled && styles.disabled} ${classProps}`;
 
   return (
-    <Component className={allClasses} disabled={disabled} {...props}>
+    <Component style={style} className={allClasses} disabled={disabled} {...props}>
       {children}
     </Component>
   );

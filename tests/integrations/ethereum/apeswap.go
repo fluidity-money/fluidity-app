@@ -18,7 +18,7 @@ const integrationTestApeSwap = `
           "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"
         ]
       },
-      "application": 11
+      "application": 12
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -35,8 +35,12 @@ const integrationTestApeSwap = `
 		"eth_getCode": "0x0"
 	},
 	"call_methods": {
-		"token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
-		"token1()": "0x000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+		"token0()": {
+			"": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+		},
+		"token1()": {
+			"": "0x000000000000000000000000C02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+		}
 	},
     "token_decimals": 18,
     "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
@@ -53,7 +57,7 @@ const integrationTestApeSwap = `
           "0xD4CF8e47BeAC55b42Ae58991785Fa326d9384Bd1"
         ]
       },
-      "application": 11
+      "application": 12
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -70,8 +74,12 @@ const integrationTestApeSwap = `
 		"eth_getCode": "0x0"
 	},
 	"call_methods": {
-		"token0()": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
-		"token1()": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+		"token0()": {
+			"": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+		},
+		"token1()": {
+			"": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+		}
 	},
     "token_decimals": 18,
     "contract_address": "0x6b175474e89094c44da98b954eedeac495271d0f"
@@ -88,7 +96,7 @@ const integrationTestApeSwap = `
           "0xD4CF8e47BeAC55b42Ae58991785Fa326d9384Bd1"
         ]
       },
-      "application": 11
+      "application": 12
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -105,8 +113,12 @@ const integrationTestApeSwap = `
 		"eth_getCode": "0x0"
 	},
 	"call_methods": {
-		"token0()": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-		"token1()": "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+		"token0()": {
+			"": "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+		},
+		"token1()": {
+			"": "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+		}
 	},
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"

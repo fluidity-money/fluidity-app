@@ -1,0 +1,97 @@
+@use 'common' as *;
+
+.TokenCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1rem 2rem;
+
+  .tokenImg {
+    flex-basis: 64px;
+    flex-grow: 0;
+    flex-shrink: 1;
+
+    img {
+      width: 100%;
+      min-width: 32px;
+    }
+  }
+
+  .content {
+    flex-grow: 1;
+    flex-shrink: 1;
+
+    .top {
+      align-self: end;
+    }
+
+    .bottom {
+      align-self: start;
+    }
+  
+    .left {
+      justify-self: start;
+    }
+
+    span:first-child {
+      justify-self: start;
+    }
+  
+    h1:first-of-type {
+      justify-self: start;
+      font-weight: 500;
+
+      font-size: 1.75rem;
+    }
+  
+    h1, h4 {
+      margin: 0;
+    }
+
+    column-gap: 4rem;
+
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    justify-items: end;
+
+    margin-left: 2rem;
+    margin-right: 2rem;
+
+    @media (max-width: 1300px) {
+      column-gap: 2rem;
+    }
+
+    &.isFluid {
+      grid-template-columns: 1fr auto auto auto auto;
+      margin-right: 0;
+    }
+  }
+
+  &.isMobile {
+    padding: 1rem;
+
+    .content {
+      grid-template-columns: auto auto;
+      column-gap: 1rem;
+
+      margin-left: 1rem;
+      margin-right: 1rem;
+
+      @media (max-width: 400px) {
+        margin-right: 0;
+      }
+
+      button {
+        margin-top: -0.1rem;
+        justify-self: start;
+      }
+
+      h1 {
+       font-size: 1.5rem;
+      }
+    }
+  }
+}

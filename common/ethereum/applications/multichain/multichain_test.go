@@ -28,11 +28,13 @@ func TestGetMultichainAnySwapFee(t *testing.T) {
 
 	var (
 		rpcMethods  = make(map[string]interface{})
-		callMethods = make(map[string]interface{})
+		callMethods = make(map[string]map[string]interface{})
 	)
 
 	rpcMethods["eth_getCode"] = "0x0"
-	callMethods["underlying()"] = ethTokenRpcResponse
+	callMethods["underlying()"] = map[string]interface{}{
+		"": ethTokenRpcResponse,
+	}
 
 	// get the mocked client
 	client, err := testUtils.MockRpcClient(rpcMethods, callMethods)
@@ -80,7 +82,9 @@ func TestGetMultichainAnySwapFee(t *testing.T) {
 
 	// bad RPC responses
 	// bad underlying response
-	callMethods["underlying()"] = "0x00"
+	callMethods["underlying()"] = map[string]interface{}{
+		"": "0x00",
+	}
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 

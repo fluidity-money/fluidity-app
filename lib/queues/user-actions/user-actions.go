@@ -38,7 +38,7 @@ type (
 )
 
 func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
-	return NewSwapEthereum(
+	return user_actions.NewSwapEthereum(
 		network_,
 		senderAddress,
 		transactionHash,
@@ -50,7 +50,7 @@ func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.
 }
 
 func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
-	return NewSwapSolana(
+	return user_actions.NewSwapSolana(
 		senderAddress,
 		transactionHash,
 		amount,
@@ -61,7 +61,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 }
 
 func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
-	return NewSendEthereum(
+	return user_actions.NewSendEthereum(
 		network_,
 		senderAddress,
 		recipientAddress,
@@ -73,7 +73,7 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 }
 
 func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
-	return NewSendSolana(
+	return user_actions.NewSendSolana(
 		senderAddress,
 		recipientAddress,
 		transactionHash,

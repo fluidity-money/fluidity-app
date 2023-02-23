@@ -6,14 +6,45 @@ package worker
 
 import (
 	"encoding/json"
+	"math/big"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
 type (
+	// UtilityVars to store the amount of token and its distribution rate, for payout calculations
+	UtilityVars struct {
+		// Name is the unique onchain id for this utility
+		Name applications.UtilityName `json:"utility_name"`
+
+		// PoolSizeNative is the amount of token to distribute in native tokens
+		PoolSizeNative *big.Rat `json:"pool_size"`
+
+		// TokenDecimalsScale is 1e(decimals)
+		TokenDecimalsScale *big.Rat `json:"token_decimals"`
+
+		// ExchangeRate is the number for which (usd value)*(exchange rate) = (native amount)
+		ExchangeRate *big.Rat `json:"exchange_rate"`
+
+		// DeltaWeight is the frequency with which to distribute tokens
+		// For normal tokens, this is the number of seconds in a year (31536000)
+		DeltaWeight *big.Rat `json:"delta_weight"`
+	}
+
+	// Payout to store details on payouts in different token units
+	Payout struct {
+		// amount in native tokens, can be passed to chain
+		Native misc.BigInt
+
+		// amount normalised to usd (native/1e(decimals)*exchangeRate) for the spooler
+		// this is a float and might be imprecise!
+		Usd float64
+	}
+
 	// WorkerConfigEthereum to be used with any EVM chains to store config
 	// that was previously hardcoded
 	WorkerConfigEthereum struct {
@@ -73,8 +104,8 @@ type (
 		MaxPriorityFeePerGas       misc.BigInt `json:"max_priority_fee_per_gas"`
 		MaxPriorityFeePerGasNormal float64     `json:"max_priority_fee_per_gas_normal"`
 
-		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
-		MaxFeePerGasNormal float64 `json:"max_fee_per_gas_normal"`
+		MaxFeePerGas       misc.BigInt `json:"max_fee_per_gas"`
+		MaxFeePerGasNormal float64     `json:"max_fee_per_gas_normal"`
 
 		EffectiveGasPriceNormal float64 `json:"effective_gas_price_normal"`
 
@@ -168,6 +199,7 @@ type (
 
 	// app fees for ethereum transactions
 	EthereumAppFees struct {
+		UniswapV3        float64 `json:"uniswap_v3"`
 		UniswapV2        float64 `json:"uniswap_v2"`
 		BalancerV2       float64 `json:"balancer_v2"`
 		OneInchV2        float64 `json:"oneinch_v2"`
@@ -179,6 +211,8 @@ type (
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
+		Saddle           float64 `json:"saddle"`
+		GTradeV6_1       float64 `json:"gtrade_v6_1"`
 	}
 )
 

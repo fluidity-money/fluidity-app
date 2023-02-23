@@ -41,34 +41,97 @@ export const optionalEnv = (env: string, fallback: string): string => {
   return e;
 };
 
-export const deployWorkerConfig = async (
+const deploy = async (
   hre: HardhatRuntimeEnvironment,
-  operator: string,
-  emergencyCouncil: string,
-): Promise<string> => {
-  const factory = await hre.ethers.getContractFactory("WorkerConfig");
+  contract: string,
+) => {
+  const factory = await hre.ethers.getContractFactory(contract);
+  if (!factory) throw new Error(`Contract '${contract}' not found!`);
+  const c = await factory.deploy();
+  await c.deployed();
+  return c;
+}
 
-  const workerConfig = await factory.deploy();
+const deployAndInit = async (
+  hre: HardhatRuntimeEnvironment,
+  contract: string,
+  ...args: any[]
+) => {
+  let c = await deploy(hre, contract);
+  await c.init(...args);
+  return c;
+}
 
-  await workerConfig.deployed();
+export const deployOperator = async (
+  hre: HardhatRuntimeEnvironment,
+  externalOperatorAddress: string,
+  councilAddress: string,
+  registry: ethers.Contract
+): Promise<ethers.Contract> =>
+  deployAndInit(
+    hre,
+    "Operator",
+    externalOperatorAddress,
+    councilAddress,
+    registry.address
+  );
 
-  await workerConfig.init(operator, emergencyCouncil);
+export const deployVEGovLockup = async(
+  hre: HardhatRuntimeEnvironment,
+  council: ethers.Signer,
+  lockToken: string
+): Promise<ethers.Contract> =>
+  deployAndInit(
+    hre,
+    "VEGovLockup",
+    await council.getAddress(),
+    lockToken
+  );
 
-  return workerConfig.address;
+export const deployRegistry = async(
+  hre: HardhatRuntimeEnvironment,
+  operatorAddress: string,
+  tokenBeacon: ethers.Contract,
+  compoundLpBeacon: ethers.Contract,
+  aaveV2LpBeacon: ethers.Contract,
+  aaveV3LpBeacon: ethers.Contract
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("Registry");
+
+  return factory.deploy(
+    operatorAddress,
+    tokenBeacon.address,
+    compoundLpBeacon.address,
+    aaveV2LpBeacon.address,
+    aaveV3LpBeacon.address
+  );
+};
+
+export const deployDAO = async (
+  hre: HardhatRuntimeEnvironment,
+  council: ethers.Signer,
+  veGovLockupSource: ethers.Contract
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("DAO");
+
+  return factory.deploy(
+    await council.getAddress(),
+    veGovLockupSource.address
+  );
 };
 
 export const deployGovToken = async (
   hre: HardhatRuntimeEnvironment,
   govOperatorSigner: ethers.Signer
-): Promise<string> => {
-  const factory = await (await hre.ethers.getContractFactory("GovToken"))
+): Promise<ethers.Contract> => {
+  const factory = (await hre.ethers.getContractFactory("GovToken"))
     .connect(govOperatorSigner);
 
   const govToken = await factory.deploy();
 
   await govToken.deployed();
 
-  await govToken.init(
+  await govToken["init(string,string,uint8,uint256)"](
     "Fluidity Money",
     "FLUID",
     18,
@@ -76,6 +139,55 @@ export const deployGovToken = async (
   );
 
   return govToken;
+};
+
+export const deployFactories = async(
+  hre: HardhatRuntimeEnvironment
+): Promise<[
+  ethers.ContractFactory,
+  ethers.ContractFactory,
+  ethers.ContractFactory,
+  ethers.ContractFactory
+]> =>
+  Promise.all([
+    hre.ethers.getContractFactory("Token"),
+    hre.ethers.getContractFactory("CompoundLiquidityProvider"),
+    hre.ethers.getContractFactory("AaveV2LiquidityProvider"),
+    hre.ethers.getContractFactory("AaveV3LiquidityProvider")
+  ]);
+
+export const deployBeacons = async (
+  hre: HardhatRuntimeEnvironment,
+  tokenFactory: ethers.ContractFactory,
+  compoundFactory: ethers.ContractFactory,
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV3Factory: ethers.ContractFactory
+): Promise<[ethers.Contract, ethers.Contract, ethers.Contract, ethers.Contract]> =>
+  Promise.all([
+    hre.upgrades.deployBeacon(tokenFactory),
+    hre.upgrades.deployBeacon(compoundFactory),
+    hre.upgrades.deployBeacon(aaveV2Factory),
+    hre.upgrades.deployBeacon(aaveV3Factory)
+  ]);
+
+export const deployTestUtility = async (
+  hre: HardhatRuntimeEnvironment,
+  boundOperatorOperator: ethers.Contract,
+  token: string,
+) => {
+  const factory = await hre.ethers.getContractFactory("TestClient");
+  const client = await factory.deploy(boundOperatorOperator.address);
+
+  await client.deployed();
+
+  await boundOperatorOperator.updateUtilityClients([{
+    name: "test",
+    overwrite: false,
+    token,
+    client,
+  }]);
+
+  return client;
 };
 
 export type TokenAddresses = {
@@ -90,25 +202,26 @@ export const deployTokens = async (
   tokens: Token[],
   aaveV2PoolProvider: string,
   aaveV3PoolProvider: string,
-  emergencyCouncilAddress: string,
-  operatorAddress: string,
-  workerConfigAddress: string
-): Promise<{
+  councilAddress: string,
+  externalOperatorAddress: string,
+  boundOperatorOperator: ethers.Contract,
+  boundRegistryOperator: ethers.Contract,
+  externalOracleAddress: string,
+
+  tokenFactory: ethers.ContractFactory,
   tokenBeacon: ethers.Contract,
-  aaveV2Beacon: ethers.Contract,
+
+  compoundFactory: ethers.ContractFactory,
   compoundBeacon: ethers.Contract,
+
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV2Beacon: ethers.Contract,
+
+  aaveV3Factory: ethers.ContractFactory,
+  aaveV3Beacon: ethers.Contract
+): Promise<{
   tokens: TokenAddresses,
 }> => {
-  const tokenFactory = await hre.ethers.getContractFactory("Token");
-  const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
-  const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
-  const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");
-
-  const tokenBeacon = await hre.upgrades.deployBeacon(tokenFactory);
-  const compoundBeacon = await hre.upgrades.deployBeacon(compoundFactory);
-  const aaveV2Beacon = await hre.upgrades.deployBeacon(aaveV2Factory);
-  const aaveV3Beacon = await hre.upgrades.deployBeacon(aaveV3Factory);
-
   const tokenAddresses: TokenAddresses = {};
 
   for (const token of tokens) {
@@ -161,16 +274,27 @@ export const deployTokens = async (
 
     await deployedToken.deployed();
 
-    console.log(`init ${operatorAddress}`)
     await deployedToken.functions.init(
       deployedPool.address,
       token.decimals,
       token.name,
       token.symbol,
-      emergencyCouncilAddress,
-      operatorAddress,
-      workerConfigAddress,
+      councilAddress,
+      externalOperatorAddress,
+      boundOperatorOperator.address,
     );
+
+    await boundRegistryOperator.updateUtilityClients([{
+      name: "FLUID",
+      overwrite: false,
+      token: deployedToken.address,
+      client: deployedToken.address,
+    }]);
+
+    await boundOperatorOperator.updateOracles([{
+      contractAddr: deployedToken.address,
+      newOracle: externalOracleAddress,
+    }]);
 
     tokenAddresses[token.symbol] = {deployedToken, deployedPool};
 
@@ -178,28 +302,13 @@ export const deployTokens = async (
   }
 
   return {
-    tokenBeacon,
-    aaveV2Beacon,
-    compoundBeacon,
-    tokens: tokenAddresses,
+    tokens: tokenAddresses
   };
-};
-
-export const deployRewardPools = async (
-  hre: HardhatRuntimeEnvironment,
-  operatorAddress: string,
-  tokens: Token[]
-): Promise<ethers.Contract> => {
-  const factory = await hre.ethers.getContractFactory("RewardPools");
-  const beacon = await hre.upgrades.deployProxy(factory);
-  await beacon.deployed();
-  await beacon.init(operatorAddress, tokens);
-  return beacon;
 };
 
 export const forknetTakeFunds = async (
   hre: HardhatRuntimeEnvironment,
-  accounts: ethers.Signer[],
+  accounts: string[],
   tokens: {name: string, owner: string, address: string}[],
 ) => {
   for (const token of tokens) {
@@ -212,7 +321,7 @@ export const forknetTakeFunds = async (
     });
 
     const impersonatedToken = await hre.ethers.getContractAt(
-      "IERC20",
+      "Token",
       token.address,
       await hre.ethers.getSigner(token.owner),
     );
@@ -228,9 +337,9 @@ export const forknetTakeFunds = async (
     const amount = initialUsdtBalance.div(accounts.length);
 
     const promises = accounts.map(async address => {
-      await impersonatedToken.transfer(await address.getAddress(), amount);
+      await impersonatedToken.transfer(address, amount);
 
-      if (!(await impersonatedToken.balanceOf(await address.getAddress())).eq(amount))
+      if (!(await impersonatedToken.balanceOf(address)).eq(amount))
         throw new Error(`failed to take token ${token.name} ${token.address}`);
     });
 
@@ -243,6 +352,39 @@ export const forknetTakeFunds = async (
 
     console.log(`finished taking ${token.name}`);
   }
+};
+
+export const setOracles = async (
+  hre: HardhatRuntimeEnvironment,
+  tokenAddresses: string[],
+  externalOperator: string,
+  oracle: string,
+  operator: ethers.Contract,
+) => {
+  await hre.network.provider.request({
+    method: "hardhat_impersonateAccount",
+    params: [externalOperator],
+  });
+
+  let impersonatedOperator = operator.connect(await hre.ethers.getSigner(externalOperator));
+
+  let oracles = tokenAddresses.map(token => {
+    return {contractAddr: token, newOracle: oracle};
+  });
+
+  await impersonatedOperator.updateOracles(oracles);
+
+  await hre.network.provider.request({
+    method: "hardhat_stopImpersonatingAccount",
+    params: [externalOperator],
+  });
+}
+
+export type FluidityClientChange = {
+  name: string,
+  overwrite: boolean,
+  token: string,
+  client: string,
 };
 
 // statically ensure an object can't exist (ie, all enum varients are handled)

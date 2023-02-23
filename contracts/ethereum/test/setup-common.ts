@@ -1,52 +1,179 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, deployWorkerConfig, deployGovToken, forknetTakeFunds } from "../script-utils";
-import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from "../test-constants";
 
-export let configAddr: string;
+import {
+  deployOperator,
+  deployDAO,
+  deployGovToken,
+  deployRegistry,
+  deployVEGovLockup,
+  deployBeacons,
+  deployFactories
+  } from "../script-utils";
 
-export let accountAddr: string;
-export let accountSigner: ethers.Signer;
-export let account2Signer: ethers.Signer;
-export let deploySigner: ethers.Signer;
-export let tokenOracleSigner: ethers.Signer;
-export let tokenOperatorSigner: ethers.Signer;
-export let tokenCouncilSigner: ethers.Signer;
-export let configOperatorSigner: ethers.Signer;
-export let configCouncilSigner: ethers.Signer;
-export let rewardPoolsOperatorSigner: ethers.Signer;
-export let govOperatorSigner: ethers.Signer;
-export let govTokenSigner: ethers.Signer;
-export let govTokenAddr: string;
+export let signers: {
+  userAccount1: ethers.Signer,
+  userAccount2: ethers.Signer,
+  fwEthAccount: ethers.Signer,
+
+  token: {
+    emergencyCouncil: ethers.Signer,
+    externalOperator: ethers.Signer,
+    externalOracle: ethers.Signer,
+  },
+  operator: {
+    emergencyCouncil: ethers.Signer,
+    externalOperator: ethers.Signer,
+  },
+  registry: {
+    externalOperator: ethers.Signer
+  },
+  govToken: {
+    owner: ethers.Signer,
+  }
+};
+
+export let commonContracts: {
+  operator: ethers.Contract,
+  govToken: ethers.Contract,
+  registry: ethers.Contract,
+  dao: ethers.Contract
+};
+
+export let commonBindings: {
+  operator: {
+    emergencyCouncil: ethers.Contract,
+    externalOperator: ethers.Contract,
+  },
+  registry: {
+    externalOperator: ethers.Contract
+  },
+  govToken: {
+    owner: ethers.Contract,
+  },
+};
+
+export let commonFactories: {
+  tokenFactory: ethers.ContractFactory,
+  compoundFactory: ethers.ContractFactory,
+  aaveV2Factory: ethers.ContractFactory,
+  aaveV3Factory: ethers.ContractFactory
+};
+
+export let commonBeacons: {
+  tokenBeacon: ethers.Contract,
+  compoundBeacon: ethers.Contract,
+  aaveV2Beacon: ethers.Contract,
+  aaveV3Beacon: ethers.Contract
+};
 
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
-    console.log(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
-    this.skip();
+    throw new Error(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
   }
 
-  [
-    accountSigner,
+  const [
+    account1Signer,
     account2Signer,
-    deploySigner,
-    tokenOracleSigner,
-    tokenOperatorSigner,
+    externalOracleSigner,
     tokenCouncilSigner,
-    configOperatorSigner,
-    configCouncilSigner,
-    rewardPoolsOperatorSigner,
-    govOperatorSigner
+    tokenOperatorSigner,
+    operatorCouncilSigner,
+    operatorOperatorSigner,
+    govTokenOwnerSigner,
+    fwEthAccountSigner
   ] = await hre.ethers.getSigners();
 
-  accountAddr = await accountSigner.getAddress();
+  let govToken = await deployGovToken(hre, govTokenOwnerSigner);
 
-  configAddr = await deployWorkerConfig(
+  let veGov = await deployVEGovLockup(hre, operatorCouncilSigner, govToken.address);
+
+  let dao = await deployDAO(hre, operatorCouncilSigner, veGov);
+
+  const [tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory] =
+    await deployFactories(hre);
+
+  let [tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon] = await deployBeacons(
     hre,
-    await configOperatorSigner.getAddress(),
-    await configCouncilSigner.getAddress(),
+    tokenFactory,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory
   );
 
-  govTokenSigner = await deployGovToken(hre, govOperatorSigner);
+  const operatorAddress = await operatorOperatorSigner.getAddress();
 
-  govTokenAddr = govTokenSigner.address;
+  const councilAddress = await operatorCouncilSigner.getAddress();
+
+  let registry = await deployRegistry(
+    hre,
+    operatorAddress,
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon
+  );
+
+  let operator = await deployOperator(
+    hre,
+    operatorAddress,
+    councilAddress,
+    registry
+  );
+
+  signers = {
+    userAccount1: account1Signer,
+    userAccount2: account2Signer,
+    fwEthAccount: fwEthAccountSigner,
+
+    token: {
+      emergencyCouncil: tokenCouncilSigner,
+      externalOperator: tokenOperatorSigner,
+      externalOracle: externalOracleSigner,
+    },
+    operator: {
+      emergencyCouncil: operatorCouncilSigner,
+      externalOperator: operatorOperatorSigner,
+    },
+    registry: {
+      externalOperator: operatorOperatorSigner
+    },
+    govToken: {
+      owner: govTokenOwnerSigner,
+    },
+  };
+
+  commonContracts = {
+    operator,
+    govToken,
+    registry,
+    dao
+  };
+
+  commonBindings = {
+    operator: {
+      emergencyCouncil: operator.connect(operatorCouncilSigner),
+      externalOperator: operator.connect(operatorOperatorSigner),
+    },
+    registry: {
+      externalOperator: registry.connect(operatorOperatorSigner)
+    },
+    govToken: {
+      owner: govToken.connect(govTokenOwnerSigner),
+    }
+  };
+
+  commonFactories = {
+    tokenFactory,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory
+  };
+
+  commonBeacons = {
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon
+  };
 });
