@@ -18,9 +18,6 @@ type IUserRewards = {
   unclaimedRewards: number;
   claimedRewards: number;
   network: string;
-  networkFee: number;
-  gasFee: number;
-  tokenAddrs?: string[];
 };
 
 const UserRewards = ({
@@ -28,9 +25,6 @@ const UserRewards = ({
   unclaimedRewards,
   claimedRewards,
   network,
-  networkFee,
-  gasFee,
-  tokenAddrs = [],
 }: IUserRewards) => {
   const navigate = useNavigate();
 
@@ -46,37 +40,35 @@ const UserRewards = ({
         className="card-outer"
         component="div"
         rounded={true}
-        type={"box"}
+        type="box"
       >
         <div className="card-inner unclaimed-inner">
-          <section id="unclaimed-left">
-            {/* Icon */}
-            <img
-              id="card-logo"
-              src="/images/fluidTokensMetallicCropped.svg"
-              alt="tokens"
-              style={{ width: 200 }}
-            />
+          {/* Icon */}
+          <img
+            id="card-logo"
+            src="/images/fluidTokensMetallicCropped.svg"
+            alt="tokens"
+            style={{ width: 200 }}
+          />
 
-            {/* Unclaimed fluid rewards */}
-            <section id="unclaimed">
-              <Text size="md">Unclaimed fluid rewards</Text>
-              <Display className="unclaimed-total" size={"sm"}>
-                {numberToMonetaryString(unclaimedRewards)}
-              </Display>
-              {!claimNow && (
-                <GeneralButton
-                  size={"large"}
-                  version={"primary"}
-                  buttontype="text"
-                  handleClick={onClick}
-                  className="view-breakdown-button"
-                >
-                  View Breakdown
-                </GeneralButton>
-              )
-            }
-            </section>
+          {/* Unclaimed fluid rewards */}
+          <section id="unclaimed">
+            <Text size="md">Unclaimed fluid rewards</Text>
+            <Display className="unclaimed-total" size={"sm"}>
+              {numberToMonetaryString(unclaimedRewards)}
+            </Display>
+            {!claimNow && (
+              <GeneralButton
+                size={"large"}
+                version={"primary"}
+                buttontype="text"
+                handleClick={onClick}
+                className="view-breakdown-button"
+              >
+                View Breakdown
+              </GeneralButton>
+            )
+          }
           </section>
 
           {/* Auto-claims infobox */}
@@ -91,25 +83,6 @@ const UserRewards = ({
               instant-claim fees stated below.
               <br />
             </Text>
-
-            <hr className="gradient-line" />
-            <Heading className="claims-title" as="h5">
-              Instant-claim fees
-            </Heading>
-            <section className="fees">
-              <Text size="xs">Network fee</Text>
-              <Text size="xs">
-                {networkFee} {networkMapper(network)}
-              </Text>
-            </section>
-            <hr className="line" />
-            <section className="fees">
-              <Text size="xs">Gas fee</Text>
-              <Text size="xs">
-                {gasFee} {networkMapper(network)}
-              </Text>
-            </section>
-            <hr className="line" />
           </section>
         </div>
       </Card>
