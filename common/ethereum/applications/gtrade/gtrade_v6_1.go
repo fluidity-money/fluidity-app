@@ -125,6 +125,8 @@ var erc20Abi ethAbi.ABI
 // These fees are transferred to the Pool 'Manager', as well as the token
 // We find and add these transfers to calculate the fees
 func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+	// decode the amount of each token in the log
+	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
 		return nil, fmt.Errorf("No log topics passed!")
 	}

@@ -1,0 +1,14 @@
+.Tooltip {
+  cursor: default;
+  position: absolute;
+  box-sizing: border-box;
+  padding: 1em;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur( 10px );
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.102);
+}

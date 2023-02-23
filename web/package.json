@@ -5,7 +5,8 @@
   "workspaces": [
     "app.fluidity.money",
     "fluidity.money",
-    "surfing"
+    "surfing",
+    "fanfare"
   ],
   "dependencies": {
     "prettier": "^2.8.1",
