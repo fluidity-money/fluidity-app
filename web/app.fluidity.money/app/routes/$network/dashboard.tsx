@@ -34,10 +34,10 @@ import {
   useViewport,
   ConnectedWalletModal,
   ConnectedWallet,
-  Modal
+  Modal,
+  ProvideLiquidity
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
-import ProvideLiquidity from "~/components/ProvideLiquidity";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
@@ -116,7 +116,7 @@ type LoaderData = {
 };
 
 export default function Dashboard() {
-  const { network } = useLoaderData<LoaderData>();
+  const { network, provider, tokensConfig } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -508,7 +508,7 @@ export default function Dashboard() {
         />
         <Outlet />
         {/* Provide Luquidity*/}
-        {!openMobModal && <ProvideLiquidity />}
+        {!openMobModal && <ProvideLiquidity provider={provider} network={network} tokensConfig={tokensConfig} />}
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&

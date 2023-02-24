@@ -1,11 +1,19 @@
-import type { Token } from "~/util/chainUtils/tokens";
-
-import { Card, Heading, Text } from "@fluidity-money/surfing";
-import config from "~/webapp.config.server";
+import { Card, Heading, Text, BloomEffect } from "../";
 import { motion } from "framer-motion";
-import { useLoaderData } from "@remix-run/react";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
-import BloomEffect from "../BloomEffect";
+import { useRef, useState } from "react";
+import { useClickOutside } from "~/util";
+
+type Token = {
+  symbol: string;
+  name: string;
+  logo: string;
+  address: string;
+  isFluidOf?: string;
+  obligationAccount?: string;
+  dataAccount?: string;
+  decimals: number;
+  colour: string;
+};
 
 const parent = {
   variantA: { scale: 1 },
@@ -17,43 +25,49 @@ const child = {
   variantB: { scale: 1.05 },
 };
 
-type LoaderData = {
-  provider: typeof config.liquidity_providers;
-  network: string;
-  tokensConfig: typeof config.config;
-};
-
-const useClickOutside = (
-  ref: MutableRefObject<HTMLElement | null>,
-  handleClick: VoidFunction
-) => {
-  useEffect(() => {
-    /**
-     * Run callback if clicked on outside of element
-     */
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        handleClick();
-      }
-    };
-
-    // Bind the event listener
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      // Unbind the event listener on clean up
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [ref]);
-};
-
 type Provider = {
   name: string;
   link: { [symbol: string]: string };
   img: string;
 };
 
-const ProvideLiquidity = () => {
-  const { provider, network, tokensConfig } = useLoaderData<LoaderData>();
+interface IProvideLiquidity {
+  provider: {
+    [x: string]: {
+        providers: {
+            link: {
+                fUSDC: string;
+                fUSDT: string;
+                fTUSD: string;
+                fFRAX: string;
+                fDAI: string;
+            };
+            img: string;
+            name: string;
+        }[];
+    };
+}
+  network: string;
+  tokensConfig: {
+    [x: string]: {
+        tokens: {
+            symbol: string;
+            address: string;
+            name: string;
+            logo: string;
+            colour: string;
+            isFluidOf?: string;
+            obligationAccount?: string;
+            dataAccount?: string;
+            decimals: number;
+            userMintLimit?: number;
+        }[];
+    };
+}
+}
+
+const ProvideLiquidity = (props: IProvideLiquidity) => {
+  const { provider, network, tokensConfig } = props
 
   // type for TOML type
   type FluidTokens = "fUSDC" | "fUSDT" | "fTUSD" | "fFRAX" | "fDAI";
@@ -125,13 +139,16 @@ const ProvideLiquidity = () => {
 
   return (
     <Card
-      id="provide-liquidity"
-      className="card-outer"
-      component="div"
-      rounded={true}
-      type={"box"}
+      rounded
+      type={"holobox"}
+      style={{
+        padding: '2em',
+        display: 'grid',
+        gridTemplateColumns: '2.5fr 1fr',
+        alignItems: 'top',
+        gap: '2em',
+      }}
     >
-      <div className="card-inner">
         <section className="provide-liquidity-left">
           <div>
             {liqidityProviders}
@@ -145,7 +162,7 @@ const ProvideLiquidity = () => {
                 }}
               >
                 <Heading as="h1" className="fluid-liquidity-token">
-                  {`ƒ${poolToken.symbol.slice(1)}`}
+                  {`ƒ${poolToken.symbol?.slice(1)}`}
                 </Heading>
                 <img
                   src="/images/icons/triangleDown.svg"
@@ -175,7 +192,6 @@ const ProvideLiquidity = () => {
             />
           </div>
         </section>
-      </div>
     </Card>
   );
 };

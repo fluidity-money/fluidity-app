@@ -26,10 +26,10 @@ import {
   trimAddress,
   LinkButton,
   useViewport,
+  LabelledValue
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
-  LabelledValue,
   ProviderCard,
   ProviderIcon,
   ToolTipContent,
