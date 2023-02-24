@@ -13,6 +13,7 @@ button {
   flex-direction: column;
   width: fit-content;
   height: fit-content;
+  padding: 1em;
   
   &.heading {
     > * {
@@ -33,9 +34,29 @@ button {
   }
 
   &.holobox {
-    border: 2px solid;
-    border-image-slice: 1;
-    border-image-source: $holo;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 2px;
+      background: $holo;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    &.rounded {
+      &::before {
+        border-radius: 12px;
+      }
+    }
   }
 
   &.rounded {
