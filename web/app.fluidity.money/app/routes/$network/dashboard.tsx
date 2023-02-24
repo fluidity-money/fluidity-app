@@ -507,7 +507,7 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-        {/* Provide Luquidity*/}
+        {/* Provide Liquidity*/}
         {!openMobModal && <ProvideLiquidity provider={provider} network={network} tokensConfig={tokensConfig} />}
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&

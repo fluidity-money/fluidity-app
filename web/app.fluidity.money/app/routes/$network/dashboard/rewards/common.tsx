@@ -99,7 +99,7 @@ const UserRewards = ({
         rounded={true}
         type={"box"}
       >
-        <div className="card-inner unclaimed-inner">
+        <div className="unclaimed-inner">
           <section id="unclaimed-left">
             {/* Icon */}
             <img

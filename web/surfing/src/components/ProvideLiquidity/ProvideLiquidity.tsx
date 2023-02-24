@@ -5,6 +5,8 @@ import { useClickOutside } from "~/util";
 import { Tokens } from "../Images/Token/Token";
 import { Providers } from "../Images/ProviderIcon/ProviderIcon";
 
+import styles from './ProvideLiquidity.module.scss'
+
 type TokenType = {
   symbol: Tokens;
   name: string;
@@ -89,7 +91,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
       : provider["arbitrum"].providers;
 
   const liqidityProviders = (
-    <div className="liquidity-providers">
+    <div className={styles["liquidity-providers"]}>
       {providers.map((provider: Provider) => (
         <motion.a
           key={provider.name}
@@ -119,12 +121,12 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   );
 
   const dropdownOptions = (
-    <div className="dropdown-options">
+    <div className={styles["dropdown-options"]}>
       <ul>
         {fluidTokens.map((option: TokenType) => (
           <li key={`${option.name} ${option.logo}`}>
             <button
-              className="token-option"
+              className={styles["token-option"]}
               onClick={() => {
                 setPoolToken(() => option);
               }}
@@ -132,7 +134,14 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
               <Text size="xl" prominent={true}>
                 {option.symbol}
               </Text>
-              <Token token={option.symbol}/>
+              <div
+                style={{
+                height: 32,
+                width: 32,
+              }}
+              >
+                <Token token={option.symbol}/>
+              </div>
             </button>
           </li>
         ))}
@@ -142,45 +151,38 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
 
   return (
     <Card
+      className={styles.ProvideLiquidity}
       rounded
       type={"holobox"}
-      style={{
-        padding: '2em',
-        display: 'grid',
-        gridTemplateColumns: '2.5fr 1fr',
-        alignItems: 'top',
-        gap: '2em',
-      }}
     >
-        <section className="provide-liquidity-left">
-          <div>
-            {liqidityProviders}
-            <Heading as="h2" className="provide-heading">
-              Provide Liquidity for{" "}
-              <button
-                ref={dropdownRef}
-                className="open-provider-dropdown"
-                onClick={() => {
-                  setOpenDropdown(!openDropdown);
-                }}
-              >
-                <Heading as="h1" className="fluid-liquidity-token">
-                  {`ƒ${poolToken.symbol?.slice(1)}`}
-                </Heading>
-                <ArrowDown width={18} fill={'white'}/>
-                {openDropdown && dropdownOptions}
-              </button>
-            </Heading>
-          </div>
+        <section className={styles['provide-liquidity-left']}>
+          <Heading as="h2" className={styles["provide-heading"]}>
+            Provide Liquidity for{" "}
+            <button
+              ref={dropdownRef}
+              className={styles["open-provider-dropdown"]}
+              onClick={() => {
+                setOpenDropdown(!openDropdown);
+              }}
+            >
+              <Heading as="h1" className={styles["fluid-liquidity-token"]}>
+                {`ƒ${poolToken.symbol?.slice(1)}`}
+              </Heading>
+              <ArrowDown width={18} fill={'white'}/>
+              {openDropdown && dropdownOptions}
+            </button>
+          </Heading>
+          
+          {liqidityProviders}
 
           <Text size="lg">
             Make your assets work harder for your rewards. Get involved.
           </Text>
         </section>
-        <section className="provide-liquidity-right">
-          <div className="provide-liquidity-right-images">
+        <section className={styles["provide-liquidity-right"]}>
+          <div className={styles["provide-liquidity-right-images"]}>
             <BloomEffect color={poolToken.colour} type={"static"} />
-            <span className="dashed-circle"></span>
+            <span className={styles["dashed-circle"]}></span>
             <div
               style={{
                 height: 110,
