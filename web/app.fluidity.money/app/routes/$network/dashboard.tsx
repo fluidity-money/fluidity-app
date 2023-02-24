@@ -4,7 +4,6 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 
-import { json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -57,12 +56,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const tokensConfig = config.config;
 
-  return json({
+  return {
     network,
     provider,
     tokensConfig,
     ethereumWallets,
-  });
+  };
 };
 
 function ErrorBoundary() {
@@ -559,10 +558,6 @@ export default function Dashboard() {
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
-            {/* Version */}
-            <a href={"/"}>
-              <Text>Fluidity Money</Text>
-            </a>
             {/* Terms */}
             <a
               href={
@@ -578,7 +573,7 @@ export default function Dashboard() {
                 "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
               }
             >
-              <Text>Privacy policy</Text>
+              <Text>Privacy Policy</Text>
             </a>
 
             {/* Audits Completed */}
@@ -598,7 +593,7 @@ export default function Dashboard() {
             {/* Source code */}
             {showExperiment("enable-source-code") && (
               <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                <Text>Source code</Text>
+                <Text>Source Code</Text>
               </a>
             )}
           </section>
