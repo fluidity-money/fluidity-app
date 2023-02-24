@@ -1,10 +1,12 @@
-import { Card, Heading, Text, BloomEffect } from "../";
+import { Card, Heading, Text, BloomEffect, Token, ArrowDown, ProviderIcon } from "../";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useClickOutside } from "~/util";
+import { Tokens } from "../Images/Token/Token";
+import { Providers } from "../Images/ProviderIcon/ProviderIcon";
 
-type Token = {
-  symbol: string;
+type TokenType = {
+  symbol: Tokens;
   name: string;
   logo: string;
   address: string;
@@ -26,7 +28,7 @@ const child = {
 };
 
 type Provider = {
-  name: string;
+  name: Providers;
   link: { [symbol: string]: string };
   img: string;
 };
@@ -43,7 +45,7 @@ interface IProvideLiquidity {
                 fDAI: string;
             };
             img: string;
-            name: string;
+            name: Providers;
         }[];
     };
 }
@@ -51,7 +53,7 @@ interface IProvideLiquidity {
   tokensConfig: {
     [x: string]: {
         tokens: {
-            symbol: string;
+            symbol: Tokens;
             address: string;
             name: string;
             logo: string;
@@ -73,7 +75,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   type FluidTokens = "fUSDC" | "fUSDT" | "fTUSD" | "fFRAX" | "fDAI";
 
   const fluidTokens = tokensConfig[network].tokens.filter(
-    (token: Token) => token.isFluidOf
+    (token: TokenType) => token.isFluidOf
   );
 
   // token for liquidity provider pools
@@ -98,11 +100,12 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
           initial="variantA"
           whileHover="variantB"
         >
-          <motion.img
-            src={provider.img}
+          <motion.div
             variants={child}
             style={{ width: 72, height: 72 }}
-          />
+          >
+            <ProviderIcon provider={provider.name}/>
+          </motion.div>
         </motion.a>
       ))}
     </div>
@@ -118,7 +121,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   const dropdownOptions = (
     <div className="dropdown-options">
       <ul>
-        {fluidTokens.map((option: Token) => (
+        {fluidTokens.map((option: TokenType) => (
           <li key={`${option.name} ${option.logo}`}>
             <button
               className="token-option"
@@ -129,7 +132,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
               <Text size="xl" prominent={true}>
                 {option.symbol}
               </Text>
-              <img style={{ width: 30, height: 30 }} src={option.logo} />
+              <Token token={option.symbol}/>
             </button>
           </li>
         ))}
@@ -164,10 +167,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
                 <Heading as="h1" className="fluid-liquidity-token">
                   {`ƒ${poolToken.symbol?.slice(1)}`}
                 </Heading>
-                <img
-                  src="/images/icons/triangleDown.svg"
-                  style={{ width: 18, height: 8 }}
-                />
+                <ArrowDown width={18} fill={'white'}/>
                 {openDropdown && dropdownOptions}
               </button>
             </Heading>
@@ -181,15 +181,16 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
           <div className="provide-liquidity-right-images">
             <BloomEffect color={poolToken.colour} type={"static"} />
             <span className="dashed-circle"></span>
-            <img
-              src={poolToken.logo}
+            <div
               style={{
                 height: 110,
                 width: 110,
                 position: "absolute",
                 transform: "translate(41%, 41%)",
               }}
-            />
+            >
+              <Token token={poolToken.symbol} />
+            </div>
           </div>
         </section>
     </Card>
