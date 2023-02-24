@@ -509,7 +509,9 @@ export default function Dashboard() {
         />
         <Outlet />
         {/* Provide Liquidity*/}
-        {!openMobModal && <ProvideLiquidity provider={provider} network={network} tokensConfig={tokensConfig} />}
+        <div className="pad-main" style={{marginBottom: '2em'}}>
+          {!openMobModal && <ProvideLiquidity provider={provider} network={network} tokensConfig={tokensConfig}/>}
+        </div>
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&
