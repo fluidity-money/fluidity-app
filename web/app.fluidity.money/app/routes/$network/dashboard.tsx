@@ -170,8 +170,7 @@ export default function Dashboard() {
     { rewards: { name: "Rewards", icon: <Trophy /> } },
   ];
 
-  const chainNameMap: Record<string, {name: string; icon: JSX.Element}> =
-  {
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
       name: "ETH",
       icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -295,7 +294,9 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({name}) => showArbitrum ? true : name !== "ARB")}
+            options={Object.values(chainNameMap).filter(({ name }) =>
+              showArbitrum ? true : name !== "ARB"
+            )}
             setOption={handleSetChain}
             mobile={isMobile}
           />

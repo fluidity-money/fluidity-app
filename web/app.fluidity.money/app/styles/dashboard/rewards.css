@@ -122,6 +122,10 @@
   box-sizing: border-box;
 }
 
+.unclaimed-inner {
+  grid-template-columns: 1.5fr 1fr;
+}
+
 .card-section {
   display: flex;
   flex-direction: column;

@@ -35,8 +35,8 @@ import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
 
 import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
-import {useToolTip} from "~/components";
-import {NetworkTooltip} from "~/components/ToolTip";
+import { useToolTip } from "~/components";
+import { NetworkTooltip } from "~/components/ToolTip";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -46,7 +46,7 @@ type Coin98Wallet = {
   isCoin98?: boolean;
 } & Provider;
 
-type MetamaskError = {code: number, message: string}
+type MetamaskError = { code: number; message: string };
 
 const EthereumFacade = ({
   children,
@@ -79,22 +79,24 @@ const EthereumFacade = ({
           // switch if connected eagerly to the wrong network
           // Provider type is missing chainId but it can exist
           const connectedChainId = (
-            connector.provider as unknown as {chainId?: string}
+            connector.provider as unknown as { chainId?: string }
           )?.chainId;
           const desiredChainId = `0x${getChainId(network).toString(16)}`;
           if (connectedChainId && desiredChainId !== connectedChainId) {
-            connector.activate(getChainId(network))?.catch((error: unknown | MetamaskError) => {
-              if (error && Object.prototype.hasOwnProperty.call(error, "code")) {
-                const {code} = error as MetamaskError;
-                if (code === 4001) {
-                  deactivate();
-                  toolTip.open(
-                    "#010A16",
-                    <NetworkTooltip />
-                  )
+            connector
+              .activate(getChainId(network))
+              ?.catch((error: unknown | MetamaskError) => {
+                if (
+                  error &&
+                  Object.prototype.hasOwnProperty.call(error, "code")
+                ) {
+                  const { code } = error as MetamaskError;
+                  if (code === 4001) {
+                    deactivate();
+                    toolTip.open("#010A16", <NetworkTooltip />);
+                  }
                 }
-              }
-            })
+              });
           }
         })
         .catch(() => true);
@@ -409,7 +411,7 @@ const EthereumFacade = ({
 export const EthereumProvider = (
   rpcUrl: string,
   tokens: Token[],
-  network?: string,
+  network?: string
 ) => {
   if (!network) throw new Error("No network provided to EthereumProvider!");
 
