@@ -43,8 +43,7 @@ const SplitContextProvider = ({
   setSplitUser,
 }: ISplitContextProvider) => {
   const [splitTreatment, setSplitTreatment] = useState<SplitContextType>({
-    showExperiment: () => false,
-    client: null,
+    ...initContext(),
     splitUser,
     setSplitUser,
   });
@@ -68,6 +67,7 @@ const SplitContextProvider = ({
 
       setSplitTreatment({
         showExperiment: (featName: string) =>
+          process.env.NODE_ENV === "development" ||
           splitClient.getTreatment(featName) === "on",
         client: splitClient,
         splitUser,

@@ -39,11 +39,10 @@ export const ViewRewardModal = ({
   const { width } = useViewport();
   const isMobile = width < 500 && width > 0;
 
-  return visible ? createPortal(
+  return visible
+    ? createPortal(
         <>
-          <div
-            className={`view-reward-modal-container show-modal`}
-          >
+          <div className={`view-reward-modal-container show-modal`}>
             <span className="view-reward-modal-cancel" onClick={close}>
               <LinkButton
                 handleClick={() => close()}
@@ -138,5 +137,6 @@ export const ViewRewardModal = ({
           </div>
         </>,
         document.body
-      ): null;
+      )
+    : null;
 };
