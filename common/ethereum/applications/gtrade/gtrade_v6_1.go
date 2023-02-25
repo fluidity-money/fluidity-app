@@ -14,6 +14,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -134,11 +135,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != gtradeV6_1FeesChargedLogTopic {
-		return nil, fmt.Errorf(
-			"Incorrect Log Topic (%v, expected %v)",
-			logTopic,
-			gtradeV6_1FeesChargedLogTopic,
-		)
+		return nil, nil
 	}
 
 	unpacked, err := gtradeV6_1PairAbi.Unpack("FeesCharged", transfer.Log.Data)
@@ -234,10 +231,14 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	// Check token is fluid, otherwise err
 	contractAddr = ethereum.ConvertInternalAddress(transfer.Log.Address)
 	if contractAddr != fluidTokenContract {
-		return nil, fmt.Errorf(
-			"First GTrade Fee Transfer in transaction %#v does not involve fluid token - skipping!",
-			transfer.TransactionHash.String(),
-		)
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a GTrade swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
 	}
 
 	// Check Sender is GTrade Storage
@@ -286,10 +287,14 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	// Check token is fluid, otherwise err
 	contractAddr = ethereum.ConvertInternalAddress(transfer.Log.Address)
 	if contractAddr != fluidTokenContract {
-		return nil, fmt.Errorf(
-			"First GTrade Fee Transfer in transaction %#v does not involve fluid token - skipping!",
-			transfer.TransactionHash.String(),
-		)
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a GTrade swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
 	}
 
 	// Check Sender is GTrade Storage

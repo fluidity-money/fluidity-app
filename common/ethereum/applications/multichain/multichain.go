@@ -87,7 +87,7 @@ var anyswapERC20Abi ethAbi.ABI
 // track the receiving pool
 // Fees are calculated as 0.1% for stablecoin swaps, clamped between $40 and $1000 USD
 func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
-	if len(transfer.Log.Topics) < 2 {
+	if len(transfer.Log.Topics) < 1 {
 		return nil, fmt.Errorf("No log topics passed!")
 	}
 
@@ -131,7 +131,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 
 		// log topics
 		// anyToken address
-		any_token = transfer.Log.Topics[0]
+		any_token = transfer.Log.Topics[1]
 	)
 
 	anyTokenAddress := ethCommon.HexToAddress(any_token.String())
