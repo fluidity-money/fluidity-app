@@ -1,52 +1,32 @@
-import { ethers } from "ethers";
+
 import * as hre from "hardhat";
 
-import {
+import type {
   FluidityFactories,
-  FluidityContracts } from "../script-utils";
+  FluidityContracts,
+  FluidityBeaconAddresses,
+  FluiditySigners,
+  FluidityBindings } from "../types";
 
-export let commonFactories: FluidityContracts;
+import {
+  deployFluidity,
+  deployBeacons } from "../deployment";
 
-export let commonContracts: FluidityFactories;
+export let commonFactories: FluidityFactories;
 
-export let signers: {
-  userAccount1: ethers.Signer,
-  userAccount2: ethers.Signer,
-  fwEthAccount: ethers.Signer,
+export let commonContracts: FluidityContracts;
 
-  token: {
-    emergencyCouncil: ethers.Signer,
-    externalOperator: ethers.Signer,
-    externalOracle: ethers.Signer,
-  },
-  operator: {
-    emergencyCouncil: ethers.Signer,
-    externalOperator: ethers.Signer,
-  },
-  registry: {
-    externalOperator: ethers.Signer
-  },
-  govToken: {
-    owner: ethers.Signer,
-  }
-};
+export let commonBeaconAddresses: FluidityBeaconAddresses;
 
-export let commonBindings: {
-  operator: {
-    emergencyCouncil: ethers.Contract,
-    externalOperator: ethers.Contract,
-  },
-  registry: {
-    externalOperator: ethers.Contract
-  },
-  govToken: {
-    owner: ethers.Contract,
-  },
-};
+export let signers: FluiditySigners;
+
+export let commonBindings: FluidityBindings;
 
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
-    throw new Error(`no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`);
+    throw new Error(
+      `no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`
+    );
   }
 
   const [
@@ -63,17 +43,91 @@ before(async function () {
 
   const councilAddress = await operatorCouncilSigner.getAddress();
 
+  const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
+
+  const veGovLockupFactory = await hre.ethers.getContractFactory("VEGovLockup");
+
+  const registryFactory = await hre.ethers.getContractFactory("Registry");
+
+  const operatorFactory = await hre.ethers.getContractFactory("Operator");
+
+  const tokenFactory = await hre.ethers.getContractFactory("Token");
+
+  const compoundLiquidityProviderFactory = await hre.ethers.getContractFactory(
+    "CompoundLiquidityProvider"
+  );
+
+  const aaveV2LiquidityProviderFactory = await hre.ethers.getContractFactory(
+    "AaveV2LiquidityProvider"
+  );
+
+  const aaveV3LiquidityProviderFactory = await hre.ethers.getContractFactory(
+    "AaveV3LiquidityProvider"
+  );
+
+  const daoFactory = await hre.ethers.getContractFactory("DAOV1");
+
   commonFactories = {
-    govToken: await hre.ethers.getContractFactory("GovToken"),
-    veGovLockup: await hre.ethers.getContractFactory("VEGovLockup"),
-    registry: await hre.ethers.getContractFactory("Registry"),
-    operator: await hre.ethers.getContractFactory("Operator"),
-    token: await hre.ethers.getContractFactory("Token"),
-    compoundLiquidityProvider: await hre.ethers.getContractFactory("CompoundLiquidityProvider"),
-    aaveV2LiquidityProvider: await hre.ethers.getContractFactory("AaveV2LiquidityProvider"),
-    aaveV3LiquidityProvider: await hre.ethers.getContractFactory("AaveV3LiquidityProvider"),
-    dao: await hre.ethers.getContractFactory("DAOV1")
+    token: tokenFactory,
+    govToken: govTokenFactory,
+    veGovLockup: veGovLockupFactory,
+    registry: registryFactory,
+    operator: operatorFactory,
+    compoundLiquidityProvider: compoundLiquidityProviderFactory,
+    aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
+    aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
+    dao: daoFactory,
   };
+
+  const [
+    tokenBeacon,
+    compoundLiquidityProviderBeacon,
+    aaveV2LiquidityProviderBeacon,
+    aaveV3LiquidityProviderBeacon,
+    registryBeacon,
+    operatorBeacon
+  ] = await deployBeacons(
+    hre,
+    tokenFactory,
+    compoundLiquidityProviderFactory,
+    aaveV2LiquidityProviderFactory,
+    aaveV3LiquidityProviderFactory,
+    registryFactory,
+    operatorFactory
+  );
+
+  commonBeaconAddresses = {
+    token: tokenBeacon.address,
+    compoundLiquidityProvider: compoundLiquidityProviderBeacon.address,
+    aaveV2LiquidityProvider: aaveV2LiquidityProviderBeacon.address,
+    aaveV3LiquidityProvider: aaveV3LiquidityProviderBeacon.address,
+    registry: registryBeacon.address,
+    operator: operatorBeacon.address
+  };
+
+  const {
+    operator,
+    govToken,
+    registry,
+    dao,
+    veGovLockup
+  } = await deployFluidity(
+    hre,
+    councilAddress,
+    "Fluidity Money Token",
+    "FLUID",
+    18,
+    1,
+
+    registryFactory,
+    operatorFactory,
+    govTokenFactory,
+    veGovLockupFactory,
+    daoFactory,
+
+    registryBeacon.address,
+    operatorBeacon.address
+  );
 
   signers = {
     userAccount1: account1Signer,

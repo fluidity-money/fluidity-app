@@ -15,9 +15,7 @@ contract TestClient is IFluidClient {
 
     constructor(address o) {
         oracle_ = o;
-        govToken_ = new GovToken();
-
-        govToken_.init(
+        govToken_ = new GovToken(
             "Test utility token!",
             "UTILCLIENT",
             8,

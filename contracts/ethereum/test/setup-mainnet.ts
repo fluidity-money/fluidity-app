@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, forknetTakeFunds } from "../script-utils";
+
+import { forknetTakeFunds } from "../script-utils";
+import { deployTokens } from "../deployment";
 
 import {
   AAVE_V2_POOL_PROVIDER_ADDR,
@@ -9,6 +11,7 @@ import {
 import {
   commonBindings,
   commonContracts,
+  commonBeaconAddresses,
   commonFactories,
   signers } from "./setup-common";
 
@@ -66,18 +69,18 @@ before(async function () {
   }
 
   const {
+    token: tokenBeacon,
+    compoundLiquidityProvider: compoundBeacon,
+    aaveV2LiquidityProvider: aaveV2Beacon,
+    aaveV3LiquidityProvider: aaveV3Beacon,
+  } = commonBeaconAddresses;
+
+  const {
     token: tokenFactory,
     compoundLiquidityProvider: compoundFactory,
     aaveV2LiquidityProvider: aaveV2Factory,
     aaveV3LiquidityProvider: aaveV3Factory
   } = commonFactories;
-
-  const {
-    tokenBeacon,
-    compoundLiquidityProviderBeacon: compoundBeacon,
-    aaveV2LiquidityProviderBeacon: aaveV2Beacon,
-    aaveV3LiquidityProviderBeacon: aaveV3Beacon,
-  } = commonContracts;
 
   const toDeploy = [
     TokenList["usdt"],

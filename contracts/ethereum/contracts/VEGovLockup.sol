@@ -39,6 +39,7 @@ contract VEGovLockup is IEmergencyMode, IOperatorOwned {
     mapping(address => Lockup[]) private lockups_;
 
     constructor(address _emergencyCouncil, IERC20 _voteToken) {
+        operator_ = msg.sender;
         emergencyCouncil_ = _emergencyCouncil;
         voteToken_ = _voteToken;
 
