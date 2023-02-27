@@ -14,6 +14,7 @@ export interface IFluidityFacade {
   disconnect: () => Promise<void>;
   prizePool: () => Promise<number>;
   tokens: () => Promise<string[]>;
+  signBuffer?: (buffer: string) => Promise<string | undefined>;
 
   connected: boolean;
   connecting: boolean;
