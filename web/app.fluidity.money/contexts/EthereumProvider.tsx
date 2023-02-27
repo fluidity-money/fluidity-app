@@ -37,8 +37,6 @@ import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
-import { ethers } from "ethers";
-import { hashMessage } from "@ethersproject/hash";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -155,6 +153,7 @@ const EthereumFacade = ({
         break;
       case "okxwallet":
         !okxWallet && window?.open("https://www.okx.com/web3", "_blank");
+
         connector = connectors.find((connector) => {
           const _connector = (connector[0].provider as OKXWallet)?.isOkxWallet
             ? connector[0]
@@ -165,6 +164,7 @@ const EthereumFacade = ({
       case "coin98":
         (!browserWallet || !browserWallet.isCoin98) &&
           window?.open("https://wallet.coin98.com/", "_blank");
+
         connector = connectors.find((connector) => {
           const _connector = (connector[0].provider as Coin98Wallet)?.isCoin98
             ? connector[0]
@@ -273,9 +273,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 

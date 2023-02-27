@@ -21,47 +21,47 @@ const multichainLogAnySwapOut = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543
 
 const multichainAbiString = `[
 {
-	"anonymous": false,
-	"inputs": [
-		{
-			"indexed": true,
-			"internalType": "bytes32",
-			"name": "txhash",
-			"type": "bytes32"
-		},
-		{
-			"indexed": true,
-			"internalType": "address",
-			"name": "token",
-			"type": "address"
-		},
-		{
-			"indexed": true,
-			"internalType": "address",
-			"name": "to",
-			"type": "address"
-		},
-		{
-			"indexed": false,
-			"internalType": "uint256",
-			"name": "amount",
-			"type": "uint256"
-		},
-		{
-			"indexed": false,
-			"internalType": "uint256",
-			"name": "fromChainID",
-			"type": "uint256"
-		},
-		{
-			"indexed": false,
-			"internalType": "uint256",
-			"name": "toChainID",
-			"type": "uint256"
-		}
-	],
-	"name": "LogAnySwap",
-	"type": "event"
+  "anonymous": false,
+  "inputs": [
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "token",
+      "type": "address"
+    },
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "from",
+      "type": "address"
+    },
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "to",
+      "type": "address"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "amount",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "fromChainID",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "toChainID",
+      "type": "uint256"
+    }
+  ],
+  "name": "LogAnySwapOut",
+  "type": "event"
 }]`
 
 const anyswapERC20AbiString = `[
@@ -97,11 +97,11 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 		return nil, nil
 	}
 
-	unpacked, err := multichainAbi.Unpack("LogAnySwap", transfer.Log.Data)
+	unpacked, err := multichainAbi.Unpack("LogAnySwapOut", transfer.Log.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to unpack LogAnySwap log data! %v",
+			"Failed to unpack LogAnySwapOut log data! %v",
 			err,
 		)
 	}
@@ -131,7 +131,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 
 		// log topics
 		// anyToken address
-		any_token = transfer.Log.Topics[1]
+		any_token = transfer.Log.Topics[0]
 	)
 
 	anyTokenAddress := ethCommon.HexToAddress(any_token.String())

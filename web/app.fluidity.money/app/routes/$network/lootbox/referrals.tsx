@@ -3,7 +3,7 @@ import type { ReferralCountData } from "../query/referrals";
 
 import { json } from "@remix-run/node";
 import { useCache } from "~/hooks/useCache";
-import { useLoaderData, useLocation } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useState } from "react";
 import { Text, Heading } from "@fluidity-money/surfing";
