@@ -1,6 +1,14 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
 
+import {
+  FluidityFactories,
+  FluidityContracts } from "../script-utils";
+
+export let commonFactories: FluidityContracts;
+
+export let commonContracts: FluidityFactories;
+
 export let signers: {
   userAccount1: ethers.Signer,
   userAccount2: ethers.Signer,
@@ -21,42 +29,6 @@ export let signers: {
   govToken: {
     owner: ethers.Signer,
   }
-};
-
-export let commonFactories: {
-  govToken: ethers.ContractFactory,
-  veGovLockup: ethers.ContractFactory,
-  registry: ethers.ContractFactory,
-  operator: ethers.ContractFactory,
-  token: ethers.ContractFactory,
-  compoundLiquidityProvider: ethers.ContractFactory,
-  aaveV2LiquidityProvider: ethers.ContractFactory,
-  aaveV3LiquidityProvider: ethers.ContractFactory,
-  dao: ethers.ContractFactory,
-  fluidityV1: ethers.ContractFactory
-};
-
-export let commonImpls: {
-  govToken: ethers.Contract,
-  veGovLockup: ethers.Contract,
-  registry: ethers.Contract,
-  operator: ethers.Contract,
-  token: ethers.Contract,
-  compoundLiquidityProvider: ethers.Contract,
-  aaveV2LiquidityProvider: ethers.Contract,
-  aaveV3LiquidityProvider: ethers.Contract
-};
-
-export let commonContracts: {
-  operator: ethers.Contract,
-  govToken: ethers.Contract,
-  registry: ethers.Contract,
-  dao: ethers.Contract,
-  veGovLockup: ethers.Contract,
-  tokenBeacon: ethers.Contract,
-  compoundLiquidityProviderBeacon: ethers.Contract,
-  aaveV2LiquidityProviderBeacon: ethers.Contract,
-  aaveV3LiquidityProviderBeacon: ethers.Contract
 };
 
 export let commonBindings: {
@@ -100,57 +72,8 @@ before(async function () {
     compoundLiquidityProvider: await hre.ethers.getContractFactory("CompoundLiquidityProvider"),
     aaveV2LiquidityProvider: await hre.ethers.getContractFactory("AaveV2LiquidityProvider"),
     aaveV3LiquidityProvider: await hre.ethers.getContractFactory("AaveV3LiquidityProvider"),
-    dao: await hre.ethers.getContractFactory("DAOV1"),
-    fluidityV1: await hre.ethers.getContractFactory("FluidityV1")
+    dao: await hre.ethers.getContractFactory("DAOV1")
   };
-
-  commonImpls = {
-    govToken: await commonFactories.govToken.deploy(),
-    veGovLockup: await commonFactories.veGovLockup.deploy(),
-    registry: await commonFactories.registry.deploy(),
-    operator: await commonFactories.operator.deploy(),
-    token: await commonFactories.token.deploy(),
-    compoundLiquidityProvider: await commonFactories.compoundLiquidityProvider.deploy(),
-    aaveV2LiquidityProvider: await commonFactories.aaveV2LiquidityProvider.deploy(),
-    aaveV3LiquidityProvider: await commonFactories.aaveV3LiquidityProvider.deploy()
-  };
-
-  console.log(commonImpls.registry.address);
-
-  const fluidity = await commonFactories.fluidityV1.deploy(
-    councilAddress,
-    "Fluidity Money",
-    "FLUID",
-    18,
-    1000000,
-    {
-      govToken: commonImpls.govToken.address,
-      veGovLockup: commonImpls.veGovLockup.address,
-      registry: commonImpls.registry.address,
-      operator: commonImpls.operator.address,
-      token: commonImpls.token.address,
-      aaveV2LiquidityProvider: commonImpls.aaveV2LiquidityProvider.address,
-      aaveV3LiquidityProvider: commonImpls.aaveV3LiquidityProvider.address
-    }
-  );
-
-  console.log("yolo");
-
-  const govToken = commonFactories.govToken.attach(
-    await fluidity.govToken()
-  );
-
-  const veGovLockup = commonFactories.veGovLockup.attach(
-    await fluidity.veGovLockup()
-  );
-
-  const registry = commonFactories.registry.attach(await fluidity.registry());
-
-  const operator = commonFactories.operator.attach(await fluidity.operator());
-
-  const dao = commonFactories.dao.attach(await fluidity.dao());
-
-  const tokenBeacon = await fluidity.tokenBeacon();
 
   signers = {
     userAccount1: account1Signer,
@@ -182,11 +105,7 @@ before(async function () {
     govToken,
     registry,
     dao,
-    veGovLockup,
-    tokenBeacon,
-    compoundLiquidityProviderBeacon,
-    aaveV2LiquidityProviderBeacon,
-    aaveV3LiquidityProviderBeacon
+    veGovLockup
   };
 
   commonBindings = {

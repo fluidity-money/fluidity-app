@@ -28,8 +28,6 @@ struct Lockup {
 }
 
 contract VEGovLockup is IEmergencyMode, IOperatorOwned {
-    uint8 private version_;
-
     address private operator_;
 
     address private emergencyCouncil_;
@@ -40,15 +38,11 @@ contract VEGovLockup is IEmergencyMode, IOperatorOwned {
 
     mapping(address => Lockup[]) private lockups_;
 
-    function init(address _emergencyCouncil, IERC20 _voteToken) public {
-        require(version_ == 0, "contract is already initialised");
-
+    constructor(address _emergencyCouncil, IERC20 _voteToken) {
         emergencyCouncil_ = _emergencyCouncil;
         voteToken_ = _voteToken;
 
         noEmergencyMode_ = true;
-
-        version_ = 1;
     }
 
     function voteToken() public view returns (IERC20) {

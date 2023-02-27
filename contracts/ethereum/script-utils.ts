@@ -2,7 +2,6 @@
 import { promisify } from 'util';
 import { readFile as readFileCb } from 'fs';
 import { ethers } from 'ethers';
-
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 export const readFile = promisify(readFileCb);
@@ -26,6 +25,27 @@ export type Token = {
     }
 );
 
+export type FluidityFactories = {
+  govToken: ethers.ContractFactory,
+  veGovLockup: ethers.ContractFactory,
+  registry: ethers.ContractFactory,
+  operator: ethers.ContractFactory,
+  token: ethers.ContractFactory,
+  compoundLiquidityProvider: ethers.ContractFactory,
+  aaveV2LiquidityProvider: ethers.ContractFactory,
+  aaveV3LiquidityProvider: ethers.ContractFactory,
+  dao: ethers.ContractFactory
+};
+
+export type FluidityContracts = {
+  operator: ethers.Contract,
+  govToken: ethers.Contract,
+  registry: ethers.Contract,
+  dao: ethers.Contract,
+  veGovLockup: ethers.Contract,
+  tokenBeacon: ethers.Contract
+};
+
 export const mustEnv = (env: string): string => {
   const e = process.env[env];
   if (e === undefined) {
@@ -42,21 +62,6 @@ export const optionalEnv = (env: string, fallback: string): string => {
   }
   return e;
 };
-
-export const getFactories = async(
-  hre: HardhatRuntimeEnvironment
-): Promise<[
-  ethers.ContractFactory,
-  ethers.ContractFactory,
-  ethers.ContractFactory,
-  ethers.ContractFactory
-]> =>
-  Promise.all([
-    hre.ethers.getContractFactory("Token"),
-    hre.ethers.getContractFactory("CompoundLiquidityProvider"),
-    hre.ethers.getContractFactory("AaveV2LiquidityProvider"),
-    hre.ethers.getContractFactory("AaveV3LiquidityProvider")
-  ]);
 
 export const deployBeacons = async (
   hre: HardhatRuntimeEnvironment,
