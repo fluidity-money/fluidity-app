@@ -3,16 +3,18 @@ import type { ReferralCountData } from "../query/referrals";
 
 import { json } from "@remix-run/node";
 import { useCache } from "~/hooks/useCache";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Text, Heading } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
+
 import { jsonPost } from "~/util";
 
 type LoaderData = {
   network: string;
   referral: string;
+  referralMsg: string;
 };
 
 export const loader: LoaderFunction = ({ request, params }) => {
@@ -20,10 +22,12 @@ export const loader: LoaderFunction = ({ request, params }) => {
 
   const url = new URL(request.url);
   const referral = url.searchParams.get("referral") ?? "";
+  const referralMsg = url.searchParams.get("referralMsg") ?? "";
 
   return json({
     network,
     referral,
+    referralMsg,
   } as LoaderData);
 };
 
@@ -35,13 +39,17 @@ const SAFE_DEFAULT: ReferralCountData = {
 const Referral = () => {
   const { showExperiment } = useContext(SplitContext);
 
-  const { network, referral } = useLoaderData<LoaderData>();
+  const { network, referral, referralMsg } = useLoaderData<LoaderData>();
 
-  const { address, connected } = useContext(FluidityFacadeContext);
+  const { address, connected, signBuffer } = useContext(FluidityFacadeContext);
 
-  const referralsData_ = connected
-    ? useCache(`/${network}/query/referrals?address=${address}`).data
-    : SAFE_DEFAULT;
+  const [referralCode, setReferralCode] = useState("");
+
+  const referralData = useCache(
+    `/${network}/query/referrals?address=${address}`
+  ).data;
+
+  const referralsData_ = connected ? referralData : SAFE_DEFAULT;
 
   const referralsData = {
     ...SAFE_DEFAULT,
@@ -64,19 +72,38 @@ const Referral = () => {
 
       {/* Referral Section */}
       <form>
-        <input
-          readOnly
-          value={`/${network}/dashboard/home?referral=${address}`}
-        />
+        <input readOnly value={referralCode} />
+
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            (async () => {
+              try {
+                const signedReferrer = await signBuffer?.("Referrer");
+                setReferralCode(
+                  `/${network}/lootbox/referrals?referral=${address}&referralMsg=${signedReferrer}`
+                );
+              } catch {
+                return;
+              }
+            })();
+          }}
+        >
+          Reveal Referral Link
+        </button>
       </form>
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          jsonPost(`/${network}/query/addReferral`, {
-            referrer: referral,
-            referee: address,
-          });
+          (async () => {
+            await jsonPost(`/${network}/query/addReferral`, {
+              referrer: referral,
+              referee: address,
+              referrer_msg: referralMsg,
+              referee_msg: (await signBuffer?.("Referee")) ?? "",
+            });
+          })();
         }}
       >
         <label htmlFor="referrer" />

@@ -2,7 +2,7 @@ import { gql, jsonPost } from "~/util";
 
 const queryByAddress = gql`
   query getReferralCount($address: String!) {
-    lootbox_referrals(where: { address_1: { _eq: $address } }) {
+    lootbox_referrals_aggregate(where: { referrer: { _eq: $address } }) {
       aggregate {
         count
       }
@@ -19,7 +19,7 @@ type ReferralCountByAddressBody = {
 
 type ReferralCountRes = {
   data?: {
-    lootbox_referrals: {
+    lootbox_referrals_aggregate: {
       aggregate: {
         count: number;
       };
@@ -43,8 +43,8 @@ const useReferralCountByAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
