@@ -83,7 +83,7 @@ const getProviderImg = (provider: string) => {
       return "Sushiswap.svg"
     case "Fluidity":
     case "fluidity":
-      return "/images/logoMetallic.png"
+      return "logoMetallic.png"
     case "Oneinch":
     case "oneinch":
     case "1inch":
@@ -114,7 +114,7 @@ const getProviderImg = (provider: string) => {
     case "mercurial":
       return "mercurial.png"
     default:
-      return "fluidity.png"
+      return "logoMetallic.png"
   }
 }
 
