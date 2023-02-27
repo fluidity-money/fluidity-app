@@ -1,11 +1,40 @@
+import { numberToMonetaryString } from "~/util";
 import {
   Card,
-  numberToMonetaryString,
   Text,
   Heading,
   ProviderIcon,
-} from "@fluidity-money/surfing";
-import { Providers } from "~/types/Provider";
+} from "../";
+
+import styles from './ProviderCard.module.scss'
+
+type Providers =
+  | "Aave"
+  | "Aldrin"
+  | "Circle"
+  | "Compound"
+  | "Dodo"
+  | "Jupiter"
+  | "Lemniscap"
+  | "Maker"
+  | "Multicoin"
+  | "Orca"
+  | "Polygon"
+  | "Saber"
+  | "Solana"
+  | "Solend"
+  | "Uniswap"
+  | "Sushiswap"
+  | "Fluidity"
+  | "Balancer"
+  | "Oneinch"
+  | "Mooniswap"
+  | "Curve"
+  | "Multichain"
+  | "XY Finance"
+  | "Raydium"
+  | "Lifinity"
+  | "Mercurial";
 
 interface IProviderCard {
   name: Providers;
@@ -22,17 +51,17 @@ export type Provider = {
 
 const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
   const cardProps =
-    size === "lg" ? "provider-card-large" : "provider-card-medium";
+    size === "lg" ? styles["provider-card-large"] : styles["provider-card-medium"];
 
   return (
     <Card className={cardProps}>
-      <section className="card-left">
+      <section className={styles['card-left']}>
         {/* Icon */}
         <ProviderIcon provider={name} />
 
         {/* Provider Name */}
-        <section className="card-section">
-          <Heading className="card-token-name" as={"h5"}>
+        <section className={styles['card-section']}>
+          <Heading className={styles['card-token-name']} as={"h5"}>
             {name === "Fluidity" ? "Transacting ƒAssets" : name}
           </Heading>
           <Text>{numberToMonetaryString(avgPrize)} Avg prize/tx</Text>
@@ -40,7 +69,7 @@ const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
       </section>
 
       {/* Provider Prize */}
-      <section className="card-section">
+      <section className={styles['card-section']}>
         <Text prominent={true}>{numberToMonetaryString(prize)}</Text>
         <Text>Top prize</Text>
       </section>

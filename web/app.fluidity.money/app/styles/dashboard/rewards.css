@@ -101,48 +101,8 @@
   background: linear-gradient(to right, black, white, white, black);
 }
 
-.provider-card-large {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-top: 10px;
-  width: 444px;
-  height: 72px;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
-
-.provider-card-medium {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  width: 360px;
-  height: 96px;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
-
 .unclaimed-inner {
   grid-template-columns: 1.5fr 1fr;
-}
-
-.card-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-token-name {
-  margin: 0;
-}
-
-.card-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
-.card-left > img {
-  width: 2.5em;
 }
 
 .rewards-carousel {
@@ -217,11 +177,6 @@
 
   .no-user-rewards > section > span {
     text-align: center;
-  }
-
-  .provider-card-large {
-    width: 88vw;
-    min-width: 300px;
   }
 
   #infobox {

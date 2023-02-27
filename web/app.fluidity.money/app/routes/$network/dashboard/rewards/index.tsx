@@ -27,11 +27,11 @@ import {
   LinkButton,
   useViewport,
   LabelledValue,
-  ProviderIcon
+  ProviderIcon,
+  ProviderCard
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import {
-  ProviderCard,
   ToolTipContent,
   useToolTip,
 } from "~/components";
