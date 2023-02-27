@@ -122,6 +122,14 @@ const EthereumFacade = ({
     return await getBalanceOfERC20(signer, contractAddress, tokenAbi);
   };
 
+  const signBuffer = async (buffer: string): Promise<string | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) return;
+
+    return signer.signMessage(buffer);
+  };
+
   // find and activate corresponding connector
   const useConnectorType = (
     type: "metamask" | "walletconnect" | "coin98" | "okxwallet" | string
@@ -145,7 +153,7 @@ const EthereumFacade = ({
         break;
       case "okxwallet":
         !okxWallet && window?.open("https://www.okx.com/web3", "_blank");
-        console.log(connectors);
+
         connector = connectors.find((connector) => {
           const _connector = (connector[0].provider as OKXWallet)?.isOkxWallet
             ? connector[0]
@@ -156,7 +164,7 @@ const EthereumFacade = ({
       case "coin98":
         (!browserWallet || !browserWallet.isCoin98) &&
           window?.open("https://wallet.coin98.com/", "_blank");
-        console.log(connectors);
+
         connector = connectors.find((connector) => {
           const _connector = (connector[0].provider as Coin98Wallet)?.isCoin98
             ? connector[0]
@@ -401,6 +409,7 @@ const EthereumFacade = ({
         addToken,
         connected: isActive,
         connecting: isActivating,
+        signBuffer,
       }}
     >
       {children}
