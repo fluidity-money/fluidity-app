@@ -1,5 +1,6 @@
 import { Provider } from "~/components/ProviderCard";
-import { Providers, providerToDisplayName } from "~/components/ProviderIcon";
+import { providerToDisplayName } from "~/util/provider";
+import { Providers } from "~/types/Provider";
 import {
   ApplicationReward,
   ApplicationRewardResponse,

@@ -1,12 +1,11 @@
-import type { Providers } from "~/components/ProviderIcon";
-
 import {
   Card,
   numberToMonetaryString,
   Text,
   Heading,
+  ProviderIcon,
 } from "@fluidity-money/surfing";
-import { ProviderIcon } from "~/components";
+import { Providers } from "~/types/Provider";
 
 interface IProviderCard {
   name: Providers;
