@@ -164,7 +164,7 @@ services:
       <<: *util-mining-test-envs
     restart: on-failure
 
-  test-util-mining:
+  test-utility-mining:
     build:
       context: .
       dockerfile: Dockerfile.tests

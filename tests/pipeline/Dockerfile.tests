@@ -6,8 +6,5 @@ WORKDIR /usr/local/src/fluidity/tests/pipeline
 COPY . .
 
 ENTRYPOINT [ \
-	"wait-for-amqp", \
-	"wait-for-database.sh", \
-	"./wait-for-geth.sh", \
 	"./run-specific-test.sh" \
 ]

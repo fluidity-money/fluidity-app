@@ -1,7 +1,15 @@
+TESTS := spooler utility-mining
+TARGETS := $(addprefix test-, $(TESTS))
 
-REPO := tests-pipeline
+DOCKER_COMPOSE := docker compose
 
-include ../../golang.mk
+.PHONY: \
+	tests-all \
+	$(TARGETS)
 
-build-tests: ${GO_FILES}
-	${GO_TEST} -c -o ${REPO}.tests
+tests-all: $(TARGETS)
+
+$(TARGETS):
+	${DOCKER_COMPOSE} up --build $@
+	${DOCKER_COMPOSE} down --volumes --timeout 1
+
