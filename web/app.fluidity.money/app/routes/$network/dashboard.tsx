@@ -165,8 +165,8 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { home: { name: "dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "rewards", icon: <Trophy /> } },
   ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
