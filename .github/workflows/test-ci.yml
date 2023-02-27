@@ -108,6 +108,7 @@ jobs:
 
   test-pipeline:
     runs-on: ubuntu-latest
+    environment: mainnet
     steps:
       - uses: actions/checkout@v3
         with:
