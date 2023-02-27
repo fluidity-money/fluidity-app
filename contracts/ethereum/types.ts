@@ -8,16 +8,16 @@ export type Token = {
   address: string,
   owner: string
 } & (
-    {
-      backend: 'compound',
-      compoundAddress: string,
-    } | {
-      backend: 'aaveV2',
-      aaveAddress: string,
-    } | {
-      backend: 'aaveV3',
-      aaveAddress: string,
-    }
+  {
+    backend: 'compound',
+    compoundAddress: string,
+  } | {
+    backend: 'aaveV2',
+    aaveAddress: string,
+  } | {
+    backend: 'aaveV3',
+    aaveAddress: string,
+  }
 );
 
 export type FluidityContracts = {
