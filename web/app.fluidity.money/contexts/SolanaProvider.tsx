@@ -31,7 +31,8 @@ const SolanaFacade = ({
   children: React.ReactNode;
   tokens: Token[];
 }) => {
-  const { connected, publicKey, disconnect, connecting } = useWallet();
+  const { connected, publicKey, disconnect, connecting, signMessage } =
+    useWallet();
 
   const swap = async (amount: string, tokenAddr: string) => {
     const fromToken = tokens.find((t) => t.address === tokenAddr);
@@ -67,6 +68,12 @@ const SolanaFacade = ({
     return getBalance(token);
   };
 
+  const signBuffer = async (buffer: string): Promise<string | undefined> => {
+    const enc = new TextEncoder();
+
+    return signMessage?.(enc.encode(buffer))?.then((val) => String(val));
+  };
+
   const getFluidTokens = async (): Promise<string[]> => {
     const fluidTokens = tokens.filter((t) => t.isFluidOf);
 
@@ -90,6 +97,7 @@ const SolanaFacade = ({
         amountMinted,
         rawAddress: publicKey?.toString() ?? "",
         address: publicKey?.toString().toLowerCase() ?? "",
+        signBuffer,
       }}
     >
       {children}

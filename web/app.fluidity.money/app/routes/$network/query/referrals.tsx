@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const {
-    lootbox_referrals: {
+    lootbox_referrals_aggregate: {
       aggregate: { count: numReferrals },
     },
   } = referralData;
