@@ -1,6 +1,6 @@
 name: Run Tests (develop)
 
-on: 
+on:
   pull_request:
     branches:
       - develop
@@ -39,7 +39,7 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
@@ -79,7 +79,7 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
@@ -102,6 +102,24 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
+          command: |
+            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
+
+  test-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - name: make test-pipeline
+        run: |
+          make test-pipeline
+      - name: Discord
+        uses: ./scripts/actions
+        if: always()
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}

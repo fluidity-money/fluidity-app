@@ -80,7 +80,7 @@ services:
       <<: *util-mining-test-envs
       FLU_ETHEREUM_FORKING: true
       FLU_FORGE_SCRIPT: "foundry-scripts/Test.s.sol:TestScript"
-      FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORK_URL}"
+      FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORKNET_URL_MAINNET}"
       FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
 
   connector-ethereum-block-headers-amqp:
