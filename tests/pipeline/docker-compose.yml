@@ -50,6 +50,7 @@ services:
       context: ../../cmd/microservice-ethereum-worker-spooler/
     environment:
       <<: *flu-envs
+      FLU_WORKER_ID: microservice-ethereum-worker-spooler
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler-in
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out
       FLU_ETHEREUM_NETWORK: ethereum
@@ -67,6 +68,7 @@ services:
     environment:
       FLU_TEST: TestPipelineSpooler
       <<: *flu-envs
+      FLU_WORKER_ID: test-spooler
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler-in
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out
       FLU_ETHEREUM_NETWORK: ethereum
@@ -89,6 +91,7 @@ services:
     environment:
       <<: *flu-envs
       <<: *util-mining-test-envs
+      FLU_WORKER_ID: connector-ethereum-block-headers-amqp
     restart: on-failure
 
   microservice-ethereum-block-fluid-transfers-amqp:
@@ -97,6 +100,7 @@ services:
     environment:
       <<: *flu-envs
       <<: *util-mining-test-envs
+      FLU_WORKER_ID: microservice-ethereum-block-fluid-transfers-amqp
       FLU_ETHEREUM_BLOCK_RETRIES: 5
       FLU_ETHEREUM_BLOCK_RETRY_DELAY: 1
     restart: on-failure
@@ -107,7 +111,7 @@ services:
     environment:
       <<: *flu-envs
       <<: *util-mining-test-envs
-      FLU_WORKER_ID: apps
+      FLU_WORKER_ID: microservice-ethereum-application-server
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
       FLU_ETHEREUM_APPLICATION_CONTRACTS: "uniswap_v2:0x0"
       FLU_ETHEREUM_UTILITY_CONTRACTS: "testClient:0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e"
@@ -152,6 +156,7 @@ services:
     environment:
       <<: *flu-envs
       <<: *util-mining-test-envs
+      FLU_WORKER_ID: connector-ethereum-reward-logs-amqp
       FLU_ETHEREUM_START_BLOCK: latest
       FLU_ETHEREUM_TOKENS_LIST: "0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e:fUSDT:6,0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab:testClient:18"
     restart: on-failure
@@ -162,6 +167,7 @@ services:
     environment:
       <<: *flu-envs
       <<: *util-mining-test-envs
+      FLU_WORKER_ID: microservice-etheruem-track-winners
     restart: on-failure
 
   test-utility-mining:

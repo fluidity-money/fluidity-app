@@ -1,14 +1,6 @@
-FROM debian:latest
+FROM ghcr.io/foundry-rs/foundry:latest
 
-RUN apt-get update && apt-get -y install curl git socat npm
-
-RUN curl -L https://foundry.paradigm.xyz | bash
-
-ENV PATH="$PATH:/root/.foundry/bin"
-
-RUN foundryup
-
-RUN ls /root/.foundry/bin
+RUN apk add curl git socat npm
 
 WORKDIR /app
 
