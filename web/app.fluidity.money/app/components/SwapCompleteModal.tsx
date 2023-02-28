@@ -56,7 +56,7 @@ const SwapCompleteModal = ({
   const [playVideo, setPlayVideo] = useState(true);
 
   useEffect(() => {
-    if (network === "ethereum") {
+    if (network === "ethereum" || network === "arbitrum") {
       balance?.(assetToken.address).then(setWalletBalance);
     }
   }, [confirmed]);
