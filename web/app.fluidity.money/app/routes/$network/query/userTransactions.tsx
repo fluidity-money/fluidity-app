@@ -39,6 +39,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
+  const token = url.searchParams.get("token");
   const page_ = url.searchParams.get("page");
 
   if (!network || !page_) return new Error("Invalid Request");
@@ -130,7 +131,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsByAddress(
                 network,
-                getTokenForNetwork(network),
+                token ? [token] : getTokenForNetwork(network),
                 page,
                 address as string,
                 JointPayoutAddrs.slice(i, i + 99),
@@ -141,7 +142,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsAll(
                 network,
-                getTokenForNetwork(network),
+                token ? [token] : getTokenForNetwork(network),
                 page,
                 JointPayoutAddrs.slice(i, i + 99),
                 limit === Infinity ? 12 : limit

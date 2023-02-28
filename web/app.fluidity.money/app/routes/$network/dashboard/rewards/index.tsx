@@ -45,7 +45,6 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
-
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
