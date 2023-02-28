@@ -3,4 +3,6 @@
 // LICENSE.md file.
 
 import useViewport from "./useViewport";
-export { useViewport };
+import { useClickOutside } from "./useClickOutside";
+
+export { useViewport, useClickOutside };

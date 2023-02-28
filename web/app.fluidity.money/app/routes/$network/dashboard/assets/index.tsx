@@ -13,6 +13,7 @@ import { useCache } from "~/hooks/useCache";
 import BN from "bn.js";
 import { ITokenStatistics } from "../../query/dashboard/assets";
 import { motion } from "framer-motion";
+import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -167,11 +168,10 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   if (!data) return <></>;
 
   const { topPrize, avgPrize, topAssetPrize, activity } = data;
-  const decimals = new BN(10).pow(new BN(token.decimals));
 
   const augmentedActivity = getAugmentedWalletActivity(
     activity,
-    quantities.fluidAmt?.div(decimals).toNumber() || 0
+    getUsdFromTokenAmount(quantities.fluidAmt || new BN(0), token.decimals)
   );
 
   const navigate = useNavigate();
@@ -184,8 +184,14 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
             isFluid
             showLabels
             token={token}
-            fluidAmt={quantities.fluidAmt?.div(decimals).toNumber() || 0}
-            regAmt={quantities.regAmt?.div(decimals).toNumber() || 0}
+            fluidAmt={getUsdFromTokenAmount(
+              quantities.fluidAmt || new BN(0),
+              token.decimals
+            )}
+            regAmt={getUsdFromTokenAmount(
+              quantities.regAmt || new BN(0),
+              token.decimals
+            )}
             value={1}
           />
         </CollapsibleCard.Summary>

@@ -13,6 +13,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -138,6 +139,10 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 
 	token0addr := ethCommon.HexToAddress(token0addr_.String())
 
+	token1addr_ := transfer.Log.Topics[3]
+
+	token1addr := ethCommon.HexToAddress(token1addr_.String())
+
 	var (
 		// swap logs
 		// amount is the amount of in tokens
@@ -153,7 +158,20 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 
 		// whether the token being swapped from is the fluid token
 		inTokenIsFluid = token0addr == fluidTokenContract
+
+		txContainsFluid = inTokenIsFluid || (token1addr == fluidTokenContract)
 	)
+
+	if !txContainsFluid {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a Mooniswap swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
+	}
 
 	// if trading x fUSDC -> y Token B
 	// the fee is x * 0.003 (100% input -> 99.7%)
