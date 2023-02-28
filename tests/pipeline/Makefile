@@ -17,6 +17,8 @@ docker-pull:
 	@${ECR_LOGIN}
 	docker pull $(AWS_ACCOUNT_ID).dkr.ecr.ap-southeast-2.amazonaws.com/build-container
 	docker tag $(AWS_ACCOUNT_ID).dkr.ecr.ap-southeast-2.amazonaws.com/build-container fluidity/build-container
+	docker pull $(AWS_ACCOUNT_ID).dkr.ecr.ap-southeast-2.amazonaws.com/runtime-container
+	docker tag $(AWS_ACCOUNT_ID).dkr.ecr.ap-southeast-2.amazonaws.com/runtime-container fluidity/runtime-container
 
 $(TARGETS): docker-pull
 	${DOCKER_COMPOSE} up --build $@
