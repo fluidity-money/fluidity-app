@@ -1,3 +1,20 @@
+import { useCache } from "~/hooks/useCache";
+import { LoaderFunction } from "@remix-run/node";
+import { Rewarders } from "~/util/rewardAggregates";
+import {
+  Link,
+  Outlet,
+  useLoaderData,
+  useLocation,
+  useParams,
+} from "@remix-run/react";
+import { Suspense, useContext, useEffect, useState } from "react";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "contexts/SplitProvider";
+import BN from "bn.js";
+import { AnimatePresence, motion } from "framer-motion";
+import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
+import serverConfig from "~/webapp.config.server";
 import {
   Text,
   Display,
@@ -8,32 +25,12 @@ import {
   ProviderCard,
   GeneralButton,
 } from "@fluidity-money/surfing";
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useLocation,
-  useParams,
-} from "@remix-run/react";
-import { useCache } from "~/hooks/useCache";
-import { Rewarders } from "~/util/rewardAggregates";
-
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
-import { AnimatePresence, motion } from "framer-motion";
-import FluidityFacadeContext from "contexts/FluidityFacade";
-import { Suspense, useContext, useEffect, useState } from "react";
-import { LoaderFunction } from "@remix-run/node";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: dashboardAssetsStyle }];
 };
-
-import serverConfig from "~/webapp.config.server";
-import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
-import BN from "bn.js";
-import { SplitContext } from "contexts/SplitProvider";
-import React from "react";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -131,7 +128,7 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
-  // if (!showExperiment("enable-assets-page")) return <></>;
+  if (!showExperiment("enable-assets-page")) return <></>;
 
   if (!address && !connecting)
     return (

@@ -2,7 +2,6 @@ import type { TransactionsLoaderData } from "../../userTransactions";
 
 import BN from "bn.js";
 import { LoaderFunction } from "react-router-dom";
-import { useUserTransactionsByAddress } from "~/queries";
 import useAssetStatistics from "~/queries/useAssetStatistics";
 import { jsonGet } from "~/util";
 import {
