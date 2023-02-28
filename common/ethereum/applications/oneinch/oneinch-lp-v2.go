@@ -13,6 +13,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -129,7 +130,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		return nil, nil
 	}
 
-	if logTopic != oneInchLPV2SwapLogTopic && logTopic != oneInchLPV1SwapLogTopic {
+	if logTopic != oneInchLPV2SwapLogTopic {
 		return nil, nil
 	}
 
@@ -140,7 +141,6 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			transfer.TransactionHash,
 		)
 	}
-
 
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
@@ -180,6 +180,9 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token0addr_ := transfer.Log.Topics[3]
 	token0addr := ethCommon.HexToAddress(token0addr_.String())
 
+	token1addr_ := transfer.Log.Topics[4]
+	token1addr := ethCommon.HexToAddress(token1addr_.String())
+
 	var (
 		// swap logs
 		// amount is the initial number of Token0
@@ -194,7 +197,20 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 		// whether the token being swapped from is the fluid token
 		srcTokenIsFluid = token0addr == fluidTokenContract
+
+		swapContainsFluid = srcTokenIsFluid || (token1addr == fluidTokenContract)
 	)
+
+	if !swapContainsFluid {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a 1InchV2 swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
+	}
 
 	staticFeeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "fee")
 
