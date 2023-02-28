@@ -4,7 +4,6 @@ x-flu-envs: &flu-envs
   FLU_ETHEREUM_NETWORK: ethereum
   FLU_DEBUG: true
   FLU_DEBUG_DIE_FAST: true
-  FLU_WORKER_ID: spooler
   FLU_AMQP_QUEUE_ADDR: amqp://rabbit
   FLU_POSTGRES_URI: postgresql://fluidity:fluidity@postgres:5432?sslmode=disable
   FLU_TIMESCALE_URI: postgresql://fluidity:fluidity@timescale:5432?sslmode=disable

@@ -106,7 +106,11 @@ func main() {
 
 		if filterAddress != logAddressString {
 			logging.Debug(func(k *logging.Log) {
-				k.Message = "Address doesn't match, skipping!"
+				k.Format(
+					"Address %s doesn't match %s, skipping!",
+					logAddress,
+					filterAddress,
+				)
 			})
 
 			return

@@ -117,7 +117,8 @@ func TestUtilityMining(t *testing.T) {
     spoolerOut := libtest.LogMessages("spooler-out")
     winnersOut := libtest.LogMessages("winners.ethereum")
 
-    time.Sleep(5 * time.Second) // dont look at this
+    // wait until the other microservices have been brought up
+    time.Sleep(5 * time.Second)
 
     wallet := libtest.NewWalletFromSeed(seedPhrase)
 

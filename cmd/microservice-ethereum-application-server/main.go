@@ -278,10 +278,10 @@ func main() {
 
 				normalisedAddress := ethereum.AddressFromString(transfer.Log.Address.String())
 
-				utility, exists := utilities[normalisedAddress]
+				utility, utilityFound := utilities[normalisedAddress]
 
-				// nil, nil for a skipped event
-				if fee == nil && !exists {
+				// we set the decorator if there's an app fee or a utility
+				if fee == nil && !utilityFound {
 					log.App(func(k *log.Log) {
 						k.Format(
 							"Skipping an application transfer for transaction %#v and application %#v!",

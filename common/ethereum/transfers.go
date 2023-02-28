@@ -110,16 +110,10 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		utility, exists := utilities[ethereum.AddressFromString(transferContractAddress)]
 
-		log.Debugf("comparing %s, exists %v", ethereum.AddressFromString(transferContractAddress), exists)
-		for k, v := range utilities {
-			log.Debugf("against %s %s", k, v)
-		}
-
 		if exists {
 			decorator = &worker.EthereumWorkerDecorator{
 				UtilityName:    utility,
 			}
-			log.Debugf("setting decorator to %s %+v", utility, decorator)
 		}
 
 		transfer := worker.EthereumDecoratedTransfer{

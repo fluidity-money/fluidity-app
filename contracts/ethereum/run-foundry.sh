@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # we start the server on port 8544 initially, and then create a redirect from 8545 once our contracts are set up
+# this should probably only be run in docker unless you really know what you're doing
 
 if [ "$FLU_ETHEREUM_FORKING" = "true" ]; then
 	anvil \
