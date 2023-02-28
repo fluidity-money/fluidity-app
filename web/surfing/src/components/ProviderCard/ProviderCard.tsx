@@ -1,3 +1,4 @@
+import { Provider } from "~/types";
 import { numberToMonetaryString } from "~/util";
 import {
   Card,
@@ -8,46 +9,12 @@ import {
 
 import styles from './ProviderCard.module.scss'
 
-type Providers =
-  | "Aave"
-  | "Aldrin"
-  | "Circle"
-  | "Compound"
-  | "Dodo"
-  | "Jupiter"
-  | "Lemniscap"
-  | "Maker"
-  | "Multicoin"
-  | "Orca"
-  | "Polygon"
-  | "Saber"
-  | "Solana"
-  | "Solend"
-  | "Uniswap"
-  | "Sushiswap"
-  | "Fluidity"
-  | "Balancer"
-  | "Oneinch"
-  | "Mooniswap"
-  | "Curve"
-  | "Multichain"
-  | "XY Finance"
-  | "Raydium"
-  | "Lifinity"
-  | "Mercurial";
-
 interface IProviderCard {
-  name: Providers;
+  name: Provider;
   prize: number;
   avgPrize: number;
   size: "md" | "lg";
 }
-
-export type Provider = {
-  name: Providers;
-  prize: number;
-  avgPrize: number;
-};
 
 const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
   const cardProps =
