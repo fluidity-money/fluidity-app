@@ -13,87 +13,101 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 const uniswapV3SwapLogTopic = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67"
 
 const uniswapV3PairAbiString = `[
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "recipient",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "int256",
-          "name": "amount0",
-          "type": "int256"
-        },
-        {
-          "indexed": false,
-          "internalType": "int256",
-          "name": "amount1",
-          "type": "int256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint160",
-          "name": "sqrtPriceX96",
-          "type": "uint160"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint128",
-          "name": "liquidity",
-          "type": "uint128"
-        },
-        {
-          "indexed": false,
-          "internalType": "int24",
-          "name": "tick",
-          "type": "int24"
-        }
-      ],
-      "name": "Swap",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "fee",
-      "outputs": [
-        {
-          "internalType": "uint24",
-          "name": "",
-          "type": "uint24"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "token0",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    }
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "amount0",
+        "type": "int256"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "amount1",
+        "type": "int256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint160",
+        "name": "sqrtPriceX96",
+        "type": "uint160"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint128",
+        "name": "liquidity",
+        "type": "uint128"
+      },
+      {
+        "indexed": false,
+        "internalType": "int24",
+        "name": "tick",
+        "type": "int24"
+      }
+    ],
+    "name": "Swap",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "fee",
+    "outputs": [
+      {
+        "internalType": "uint24",
+        "name": "",
+        "type": "uint24"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "token0",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "token1",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
 ]`
 
 // uniswapV3PairAbi set by init.go to generate the ABI code
@@ -111,11 +125,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != uniswapV3SwapLogTopic {
-		return nil, fmt.Errorf(
-			"Incorrect Log Topic (%v, expected %v)",
-			logTopic,
-			uniswapV3SwapLogTopic,
-		)
+		return nil, nil
 	}
 
 	unpacked, err := uniswapV3PairAbi.Unpack("Swap", transfer.Log.Data)
@@ -165,6 +175,24 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
+	token1addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "token1")
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get token1 address! %v",
+			err,
+		)
+	}
+
+	token1addr, err := ethereum.CoerceBoundContractResultsToAddress(token1addr_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce token1 address! %v",
+			err,
+		)
+	}
+
 	poolFee_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "fee")
 
 	if err != nil {
@@ -202,12 +230,25 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		// Whether token0 is the fluid token
 		token0IsFluid = token0addr == fluidTokenContract
 
+		// Whether swap contains any fluid tokens
+		swapContainsFluid = token0IsFluid || (token1addr == fluidTokenContract)
+
 		zeroRat = big.NewRat(0, 1)
 		// Whether amount0 is equal to zero
 		amount0IsNeg = amount0.Cmp(zeroRat) == 0
 	)
 
 	switch true {
+	case !swapContainsFluid:
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a UniswapV3 swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
+
 	case token0IsFluid && amount0IsNeg:
 		fluidTransferAmount = new(big.Rat).Mul(amount0, big.NewRat(-1, 1))
 
