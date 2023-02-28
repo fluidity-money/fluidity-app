@@ -1,4 +1,5 @@
-import type {
+import {
+  json,
   LinksFunction,
   LoaderFunction,
   MetaFunction,
@@ -34,7 +35,9 @@ import {
   ConnectedWalletModal,
   ConnectedWallet,
   Modal,
-  ProvideLiquidity
+  ProvideLiquidity,
+  Provider,
+  ChainName,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -42,6 +45,8 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
+import { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -54,14 +59,21 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const provider = config.liquidity_providers;
 
+  // Sanitize names from config with Provider names
+  Object.keys(provider).forEach((chain) => {
+    provider[chain].providers.forEach((provider) => {
+      provider.name = getProviderDisplayName(provider.name);
+    });
+  });
+
   const tokensConfig = config.config;
 
-  return {
+  return json({
     network,
     provider,
     tokensConfig,
     ethereumWallets,
-  };
+  });
 };
 
 function ErrorBoundary() {
@@ -109,9 +121,37 @@ const routeMapper = (route: string) => {
 
 type LoaderData = {
   fromRedirect: boolean;
-  network: string;
-  provider: typeof config.liquidity_providers;
-  tokensConfig: typeof config.config;
+  network: ChainName;
+  provider: {
+    [x: string]: {
+      providers: {
+        name: Provider;
+        link: {
+          fUSDC: string;
+          fUSDT: string;
+          fTUSD?: string;
+          fFRAX?: string;
+          fDAI?: string;
+        };
+      }[];
+    };
+  };
+  tokensConfig: {
+    [x: string]: {
+      tokens: {
+        symbol: Tokens;
+        address: string;
+        name: string;
+        logo: string;
+        colour: string;
+        isFluidOf?: string;
+        obligationAccount?: string;
+        dataAccount?: string;
+        decimals: number;
+        userMintLimit?: number;
+      }[];
+    };
+  };
 };
 
 export default function Dashboard() {
@@ -508,8 +548,14 @@ export default function Dashboard() {
         />
         <Outlet />
         {/* Provide Liquidity*/}
-        <div className="pad-main" style={{marginBottom: '2em'}}>
-          {!openMobModal && <ProvideLiquidity provider={provider} network={network} tokensConfig={tokensConfig}/>}
+        <div className="pad-main" style={{ marginBottom: "2em" }}>
+          {!openMobModal && (
+            <ProvideLiquidity
+              provider={provider}
+              network={network}
+              tokensConfig={tokensConfig}
+            />
+          )}
         </div>
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&

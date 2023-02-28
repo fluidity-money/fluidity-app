@@ -1,17 +1,22 @@
-import { Provider } from "~/components/ProviderCard";
-import { providerToDisplayName } from "~/util/provider";
-import { Providers } from "~/types/Provider";
+import { getProviderDisplayName } from "~/util/provider";
+import { Provider } from "@fluidity-money/surfing";
 import {
   ApplicationReward,
   ApplicationRewardResponse,
 } from "~/queries/useApplicationRewardStatistics";
 import { Chain } from "./chainUtils/chains";
 
+type ProviderWithRewards = {
+  name: Provider;
+  prize: number;
+  avgPrize: number;
+};
+
 export type Rewarders = {
-  week: Provider[];
-  month: Provider[];
-  year: Provider[];
-  all: Provider[];
+  week: ProviderWithRewards[];
+  month: ProviderWithRewards[];
+  year: ProviderWithRewards[];
+  all: ProviderWithRewards[];
 };
 
 // aggregateRewards to transform reward data into the
@@ -42,7 +47,7 @@ const aggregateRewards = (
 const aggregateRewardInterval = (rewards?: ApplicationReward<Chain>[]) =>
   rewards
     ?.map((reward) => ({
-      name: providerToDisplayName(reward.application),
+      name: getProviderDisplayName(reward.application),
       avgPrize: reward.average_reward,
       prize: reward.highest_reward,
     }))
@@ -65,6 +70,6 @@ const aggregateRewardInterval = (rewards?: ApplicationReward<Chain>[]) =>
         };
       }
       return previous;
-    }, {} as { [K in Providers]: Provider });
+    }, {} as { [K in Provider]: ProviderWithRewards });
 
 export { aggregateRewards };

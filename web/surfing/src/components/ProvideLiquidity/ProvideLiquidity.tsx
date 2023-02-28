@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useClickOutside } from "~/util";
 import { Tokens } from "../Images/Token/Token";
-import { Providers } from "../Images/ProviderIcon/ProviderIcon";
+import { Provider } from "~/types";
 
 import styles from './ProvideLiquidity.module.scss'
 
@@ -29,26 +29,21 @@ const child = {
   variantB: { scale: 1.05 },
 };
 
-type Provider = {
-  name: Providers;
-  link: { [symbol: string]: string };
-  img: string;
+type AugmentedProvider = {
+  name: Provider;
+  link: {
+    fUSDC: string;
+    fUSDT: string;
+    fTUSD?: string;
+    fFRAX?: string;
+    fDAI?: string;
+  };
 };
 
 interface IProvideLiquidity {
   provider: {
     [x: string]: {
-        providers: {
-            link: {
-                fUSDC: string;
-                fUSDT: string;
-                fTUSD: string;
-                fFRAX: string;
-                fDAI: string;
-            };
-            img: string;
-            name: Providers;
-        }[];
+        providers: AugmentedProvider[];
     };
 }
   network: string;
@@ -92,7 +87,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
 
   const liqidityProviders = (
     <div className={styles["liquidity-providers"]}>
-      {providers.map((provider: Provider) => (
+      {providers.map((provider: AugmentedProvider) => (
         <motion.a
           key={provider.name}
           href={provider.link[poolToken.symbol as FluidTokens]}

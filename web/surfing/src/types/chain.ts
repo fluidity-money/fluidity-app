@@ -1,6 +1,8 @@
+export type ChainName = 'ethereum' | 'solana' | 'arbitrum' | 'compound' | 'polygon'
+
 interface Chain {
   short: SupportedChainsList;
-  name: string;
+  name: ChainName;
 }
 
 interface ISupportedChains {
@@ -24,13 +26,4 @@ export const SupportedChains: ISupportedChains = {
     name: "arbitrum",
     short: "ARB",
   },
-  // Unused
-  // CMPD = {
-  //   name: "compound",
-  //   short: "CMPD"
-  // },
-  // POL = {
-  //   name: "polygon",
-  //   short: "POL"
-  // },
 };

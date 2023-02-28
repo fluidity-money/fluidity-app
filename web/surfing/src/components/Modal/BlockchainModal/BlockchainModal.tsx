@@ -3,10 +3,9 @@
 // LICENSE.md file.
 
 import type { ReactComponentElement } from "react";
-import type { SupportedChainsList } from "~/util/chainProviders/chains";
+import { SupportedChainsList, SupportedChains } from "~/types"
 
 import { useRef } from "react";
-import { SupportedChains } from "~/util";
 import { useClickOutside } from "~/util/hooks/useClickOutside";
 import { ReactComponent as Checkmark } from "~/assets/images/buttonIcons/Checkmark.svg";
 import { Card, Heading, Text } from "~/components";

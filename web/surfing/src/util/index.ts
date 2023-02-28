@@ -2,12 +2,8 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-// export { default as Web3Provider, useWallet } from "./hooks/useWeb3State";
-// export { fluRelayEnvironment, useWinningTransactions } from './api';
 export { useViewport, useClickOutside } from "./hooks";
-export type { SupportedChainsList } from "./chainProviders";
 
-export { SupportedChains } from "./chainProviders";
 export {
   toSignificantDecimals,
   numberToMonetaryString,
@@ -23,3 +19,5 @@ export {
   decimalTrim,
   shorthandAmountFormatter,
 } from "./formatters";
+
+export { getProviderImgPath } from "./liquidityProviders/providers";

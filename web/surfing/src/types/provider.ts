@@ -1,4 +1,4 @@
-export type ProviderName =
+export type Provider =
   | "Aave"
   | "Aldrin"
   | "Circle"
