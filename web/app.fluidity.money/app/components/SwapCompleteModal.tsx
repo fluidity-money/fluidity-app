@@ -1,6 +1,5 @@
 import { Chain, chainType } from "~/util/chainUtils/chains";
 
-import Modal from "./Modal";
 import BN from "bn.js";
 import { ColorMap } from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
@@ -17,8 +16,9 @@ import {
   numberToMonetaryString,
   stringifiedNumberToMonetaryString,
   Video,
+  Modal,
+  BloomEffect,
 } from "@fluidity-money/surfing";
-import BloomEffect from "~/components/BloomEffect";
 import {
   addDecimalToBn,
   getUsdFromTokenAmount,

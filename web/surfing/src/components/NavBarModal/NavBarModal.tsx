@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { useClickOutside } from "../Modal/Modal";
+import { useClickOutside } from "~/util/hooks/useClickOutside";
 import { LinkButton } from "~/components/Button";
 import styles from "./NavBarModal.module.scss";
 

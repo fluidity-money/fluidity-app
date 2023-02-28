@@ -5,6 +5,7 @@ import {
   ManualCarousel,
   numberToMonetaryString,
   LoadingDots,
+  ProviderCard,
 } from "@fluidity-money/surfing";
 import {
   Link,
@@ -13,7 +14,6 @@ import {
   useLocation,
   useParams,
 } from "@remix-run/react";
-import ProviderCard from "~/components/ProviderCard";
 import { useCache } from "~/hooks/useCache";
 import { Rewarders } from "~/util/rewardAggregates";
 

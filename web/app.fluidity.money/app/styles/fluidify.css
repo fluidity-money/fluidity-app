@@ -354,41 +354,6 @@ main {
   outline: none;
 }
 
-.card-outer {
-  position: relative;
-  border-radius: 30px;
-}
-
-.card-outer::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2px;
-  border-radius: 12px;
-  background: conic-gradient(
-    from 209.59deg at 50% 50%,
-    #f3b8d8 0deg,
-    #b793e9 50.06deg,
-    #9fd4f3 85.94deg,
-    #ffd2c4 134.97deg,
-    #fbf3f3 172.05deg,
-    #d9abdf 200.75deg,
-    #af9ce3 224.67deg,
-    #aae4e1 259.36deg,
-    #c6ead0 298.82deg,
-    #ffffff 328.72deg,
-    #fdb5e4 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
 .cover {
   position: fixed;
   top: 0;
@@ -963,11 +928,6 @@ main {
     gap: 0.6em;
   }
 
-  #provide-liquidity {
-    padding: 1em;
-    margin: 0 0 2em 0;
-  }
-
   .connect-wallet-modal-container {
     min-width: 300px;
     top: 45%;
@@ -1050,16 +1010,6 @@ main {
     justify-content: center;
     align-items: center;
     gap: 2em;
-  }
-}
-
-@media (max-width: 1200px) {
-  .card-inner {
-    grid-template-columns: 1fr;
-  }
-
-  #provide-liquidity {
-    padding-top: 0;
   }
 }
 
