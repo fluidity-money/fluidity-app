@@ -13,6 +13,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -43,6 +44,32 @@ const fixedRateSwapAbiString = `[
 	],
 	"name": "Swap",
 	"type": "event"
+},
+{
+  "inputs": [],
+  "name": "token0",
+  "outputs": [
+    {
+      "internalType": "contract IERC20",
+      "name": "",
+      "type": "address"
+    }
+  ],
+  "stateMutability": "view",
+  "type": "function"
+},
+{
+  "inputs": [],
+  "name": "token1",
+  "outputs": [
+    {
+      "internalType": "contract IERC20",
+      "name": "",
+      "type": "address"
+    }
+  ],
+  "stateMutability": "view",
+  "type": "function"
 }]`
 
 var fixedRateSwapAbi ethAbi.ABI
@@ -84,6 +111,60 @@ func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
+	}
+
+	swapContract_ := transfer.Log.Address.String()
+	swapContract := ethCommon.HexToAddress(swapContract_)
+
+	// now get the pair's token0
+	token0_, err := ethereum.StaticCall(client, swapContract, fixedRateSwapAbi, "token0")
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get token0! %v",
+			err,
+		)
+	}
+
+	token0, err := ethereum.CoerceBoundContractResultsToAddress(token0_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce token0 %v! %v",
+			token0_,
+			err,
+		)
+	}
+
+	// now get the pair's token1
+	token1_, err := ethereum.StaticCall(client, swapContract, fixedRateSwapAbi, "token1")
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get token1! %v",
+			err,
+		)
+	}
+
+	token1, err := ethereum.CoerceBoundContractResultsToAddress(token1_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce token1 %v! %v",
+			token1_,
+			err,
+		)
+	}
+
+	if (token0 != fluidTokenContract) && (token1 != fluidTokenContract) {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a 1Inch Fixed Rate Swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
 	}
 
 	var (
