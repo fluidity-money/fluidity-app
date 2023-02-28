@@ -93,7 +93,7 @@ const UserRewards = ({
     <>
       {/* Info card*/}
       <Card rounded type="holobox" style={{ padding: "2em" }}>
-        <div className="card-inner unclaimed-inner">
+        <div className="unclaimed-inner">
           <section id="unclaimed-left">
             {/* Icon */}
             <img

@@ -1,11 +1,6 @@
-import {
-  Text,
-  Display,
-  Heading,
-  ManualCarousel,
-  numberToMonetaryString,
-  LoadingDots,
-} from "@fluidity-money/surfing";
+import { useCache } from "~/hooks/useCache";
+import { LoaderFunction } from "@remix-run/node";
+import { Rewarders } from "~/util/rewardAggregates";
 import {
   Link,
   Outlet,
@@ -13,25 +8,29 @@ import {
   useLocation,
   useParams,
 } from "@remix-run/react";
-import ProviderCard from "~/components/ProviderCard";
-import { useCache } from "~/hooks/useCache";
-import { Rewarders } from "~/util/rewardAggregates";
-
-import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
-import { AnimatePresence, motion } from "framer-motion";
-import FluidityFacadeContext from "contexts/FluidityFacade";
 import { Suspense, useContext, useEffect, useState } from "react";
-import { LoaderFunction } from "@remix-run/node";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "contexts/SplitProvider";
+import BN from "bn.js";
+import { AnimatePresence, motion } from "framer-motion";
+import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
+import serverConfig from "~/webapp.config.server";
+import {
+  Text,
+  Display,
+  Heading,
+  ManualCarousel,
+  numberToMonetaryString,
+  LoadingDots,
+  ProviderCard,
+  GeneralButton,
+} from "@fluidity-money/surfing";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
+import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: dashboardAssetsStyle }];
 };
-
-import serverConfig from "~/webapp.config.server";
-import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
-import BN from "bn.js";
-import { SplitContext } from "contexts/SplitProvider";
-import React from "react";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -104,11 +103,17 @@ const AssetsRoot = () => {
     },
   ];
 
-  const { connected, balance, address } = useContext(FluidityFacadeContext);
+  const { connected, balance, address, connecting } = useContext(
+    FluidityFacadeContext
+  );
 
   const [totalWalletValue, setTotalWalletValue] = useState<number | undefined>(
     undefined
   );
+
+  // Toggle Select Chain Modal
+  const [walletModalVisibility, setWalletModalVisibility] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (!connected || !balance) return;
@@ -125,7 +130,27 @@ const AssetsRoot = () => {
 
   if (!showExperiment("enable-assets-page")) return <></>;
 
-  if (!address) return <></>;
+  if (!address && !connecting)
+    return (
+      <div className="pad-main">
+        <Heading>Connect Your Wallet to see your Assets!</Heading>
+        <GeneralButton
+          version={connected || connecting ? "transparent" : "primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() =>
+            connecting ? null : setWalletModalVisibility(true)
+          }
+          className="connect-wallet-btn"
+        >
+          {connecting ? `Connecting...` : `Connect Wallet`}
+        </GeneralButton>
+        <ConnectWalletModal
+          visible={walletModalVisibility}
+          close={() => setWalletModalVisibility(false)}
+        />
+      </div>
+    );
 
   return (
     <div className="pad-main">

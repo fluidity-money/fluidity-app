@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { Text, Card, GeneralButton } from "@fluidity-money/surfing";
+import { Text, Card, GeneralButton } from '../'
 import ConnectedWallet from "./ConnectedWallet";
 
 interface IPropsConnectedWalletModal {
@@ -80,10 +80,9 @@ export const ConnectedWalletModal = ({
               </span>
               <div className="connected-wallet-modal-body">
                 <Card
-                  className="card-outer address-copy-box"
-                  component="div"
-                  rounded={false}
-                  type={"box"}
+                  className="address-copy-box"
+                  type={"holobox"}
+                  rounded
                 >
                   <span
                     className={"address-copy-box"}

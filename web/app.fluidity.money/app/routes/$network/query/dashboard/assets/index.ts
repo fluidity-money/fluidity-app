@@ -1,7 +1,9 @@
+import type { TransactionsLoaderData } from "../../userTransactions";
+
 import BN from "bn.js";
 import { LoaderFunction } from "react-router-dom";
-import { useUserTransactionsByAddress } from "~/queries";
 import useAssetStatistics from "~/queries/useAssetStatistics";
+import { jsonGet } from "~/util";
 import {
   getTokenFromAddress,
   getTokenFromSymbol,
@@ -49,26 +51,39 @@ export const loader: LoaderFunction = async ({
   if (!address) throw new Error("address is required");
   if (!token) throw new Error("token is required");
 
-  const regularToken = getTokenFromSymbol(network, token)?.isFluidOf;
+  const fluidToken = getTokenFromSymbol(network, token);
 
-  if (!regularToken) throw new Error("Couldn't find regular token");
+  if (!fluidToken) throw new Error("Couldn't find token");
 
-  const regularSymbol = getTokenFromAddress(network, regularToken)?.symbol;
+  const fluidTokenAddr = fluidToken.address;
+
+  const regularTokenAddr = fluidToken?.isFluidOf;
+
+  if (!regularTokenAddr) throw new Error("Couldn't find token");
+
+  const regularSymbol = getTokenFromAddress(network, regularTokenAddr)?.symbol;
 
   if (!regularSymbol) throw new Error("Couldn't find regular token symbol");
 
   const [assetStatistics, activity] = await Promise.all([
     useAssetStatistics(network, regularSymbol, address),
-    useUserTransactionsByAddress(network, [token], 1, address, [], 12).then(
-      (res) =>
-        res.data?.[network].transfers?.map((tx) => {
-          const desc = tx.sender.address === address ? "Sent" : "Received";
-          const value = tx.amount;
-          const reward = 1000;
-          const transaction = tx.transaction.hash;
-          const time = tx.block.timestamp.unixtime;
-          return { desc, value, reward, transaction, time };
-        })
+    jsonGet<
+      { page: number; address: string; token: string },
+      TransactionsLoaderData
+    >(`${url.origin}/${network}/query/userTransactions`, {
+      page: 1,
+      address,
+      token: fluidTokenAddr,
+    }).then((res) =>
+      res.transactions?.map((tx) => {
+        const desc = tx.sender === address ? "Sent" : "Received";
+        const value = tx.value;
+        const reward = tx.reward;
+        const transaction = tx.hash;
+        const time = tx.timestamp;
+
+        return { desc, value, reward, transaction, time };
+      })
     ),
   ]);
 

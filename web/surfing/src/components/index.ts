@@ -17,7 +17,7 @@ export { FilterCriteria } from "./Filter";
 export { Tab, TabBar } from "./Tab";
 export * from "./Container";
 export * from "./Button";
-export { BlockchainModal } from "./Modal";
+export { BlockchainModal, Modal } from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
 export { LabelledValue } from "./LabelledValue";
@@ -30,3 +30,7 @@ export { default as IntroTile } from "./IntroTile";
 export { default as Video } from "./Video";
 export { default as CollapsibleCard } from './CollapsibleCard'
 export { default as Tooltip } from './Tooltip'
+export { ConnectedWallet, ConnectedWalletModal } from './ConnectWallet'
+export { BloomEffect } from './BloomEffect'
+export { ProvideLiquidity } from './ProvideLiquidity'
+export { ProviderCard } from './ProviderCard'
