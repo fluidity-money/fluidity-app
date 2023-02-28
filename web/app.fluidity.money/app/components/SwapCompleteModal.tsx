@@ -1,4 +1,4 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 
 import Modal from "./Modal";
 import BN from "bn.js";
@@ -56,7 +56,7 @@ const SwapCompleteModal = ({
   const [playVideo, setPlayVideo] = useState(true);
 
   useEffect(() => {
-    if (network === "ethereum") {
+    if (chainType(network) === "evm") {
       balance?.(assetToken.address).then(setWalletBalance);
     }
   }, [confirmed]);
