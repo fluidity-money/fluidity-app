@@ -26,6 +26,7 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
+  AssetsIcon,
   Text,
   Heading,
   ChainSelectorButton,
@@ -165,6 +166,7 @@ export default function Dashboard() {
 
   const { showExperiment, client } = useContext(SplitContext);
   const showArbitrum = showExperiment("enable-arbitrum");
+  const showAssets = showExperiment("enable-assets-page");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -205,9 +207,10 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "rewards", icon: <Trophy /> } },
-  ];
+      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+      { rewards: { name: "Rewards", icon: <Trophy /> } },
+      { assets: { name: "Assets", icon: <AssetsIcon /> } },
+    ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -300,9 +303,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
@@ -345,9 +348,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           version={"primary"}
           buttontype="text"
           size={"medium"}
@@ -362,33 +364,37 @@ export default function Dashboard() {
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
         {/* Nav Bar */}
         <ul>
-          {navigationMap.map((obj, index) => {
-            const key = Object.keys(obj)[0];
-            const { name, icon } = Object.values(obj)[0];
-            const active = index === activeIndex;
+          {navigationMap
+            .filter((obj) =>
+              showAssets ? true : Object.keys(obj)[0] !== "assets"
+            )
+            .map((obj, index) => {
+              const key = Object.keys(obj)[0];
+              const { name, icon } = Object.values(obj)[0];
+              const active = index === activeIndex;
 
-            return (
-              <li key={key}>
-                {index === activeIndex ? (
-                  <motion.div className={"active"} layoutId="active" />
-                ) : (
-                  <div />
-                )}
-                <Link to={key}>
-                  <Text
-                    prominent={active}
-                    className={
-                      active
-                        ? "dashboard-navbar-active"
-                        : "dashboard-navbar-default"
-                    }
-                  >
-                    {icon} {name}
-                  </Text>
-                </Link>
-              </li>
-            );
-          })}
+              return (
+                <li key={key}>
+                  {index === activeIndex ? (
+                    <motion.div className={"active"} layoutId="active" />
+                  ) : (
+                    <div />
+                  )}
+                  <Link to={key}>
+                    <Text
+                      prominent={active}
+                      className={
+                        active
+                          ? "dashboard-navbar-active"
+                          : "dashboard-navbar-default"
+                      }
+                    >
+                      {icon} {name}
+                    </Text>
+                  </Link>
+                </li>
+              );
+            })}
         </ul>
 
         {/* Connect Wallet Button */}

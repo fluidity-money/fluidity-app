@@ -6,6 +6,7 @@ import {
   numberToMonetaryString,
   LoadingDots,
   ProviderCard,
+  GeneralButton,
 } from "@fluidity-money/surfing";
 import {
   Link,
@@ -17,6 +18,7 @@ import {
 import { useCache } from "~/hooks/useCache";
 import { Rewarders } from "~/util/rewardAggregates";
 
+import ConnectWalletModal from "~/components/ConnectWalletModal";
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
 import { AnimatePresence, motion } from "framer-motion";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -104,11 +106,17 @@ const AssetsRoot = () => {
     },
   ];
 
-  const { connected, balance, address } = useContext(FluidityFacadeContext);
+  const { connected, balance, address, connecting } = useContext(
+    FluidityFacadeContext
+  );
 
   const [totalWalletValue, setTotalWalletValue] = useState<number | undefined>(
     undefined
   );
+
+  // Toggle Select Chain Modal
+  const [walletModalVisibility, setWalletModalVisibility] =
+    useState<boolean>(false);
 
   useEffect(() => {
     if (!connected || !balance) return;
@@ -123,9 +131,29 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
-  if (!showExperiment("enable-assets-page")) return <></>;
+  // if (!showExperiment("enable-assets-page")) return <></>;
 
-  if (!address) return <></>;
+  if (!address && !connecting)
+    return (
+      <div className="pad-main">
+        <Heading>Connect Your Wallet to see your Assets!</Heading>
+        <GeneralButton
+          version={connected || connecting ? "transparent" : "primary"}
+          buttontype="text"
+          size={"medium"}
+          handleClick={() =>
+            connecting ? null : setWalletModalVisibility(true)
+          }
+          className="connect-wallet-btn"
+        >
+          {connecting ? `Connecting...` : `Connect Wallet`}
+        </GeneralButton>
+        <ConnectWalletModal
+          visible={walletModalVisibility}
+          close={() => setWalletModalVisibility(false)}
+        />
+      </div>
+    );
 
   return (
     <div className="pad-main">
