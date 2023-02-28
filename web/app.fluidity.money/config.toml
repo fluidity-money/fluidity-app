@@ -36,6 +36,7 @@ fluidAssets = [
 [[config.ethereum.tokens]]
 symbol = "USDC"
 name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
 address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 colour = "#2775ca"
 decimals = 6
@@ -43,6 +44,7 @@ decimals = 6
 [[config.ethereum.tokens]]
 symbol = "fUSDC"
 name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
 address = "0x9d1089802eE608BA84C5c98211afE5f37F96B36C"
 colour = "#2775ca"
 isFluidOf = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -51,6 +53,7 @@ decimals = 6
 [[config.ethereum.tokens]]
 symbol = "USDT"
 name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
 address = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 colour = "#12946c"
 decimals = 6
@@ -58,6 +61,7 @@ decimals = 6
 [[config.ethereum.tokens]]
 symbol = "fUSDT"
 name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
 address = "0xADc234a4e90E2045f353F5d4fCdE66144d23b458"
 colour = "#12946c"
 isFluidOf = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
@@ -66,6 +70,7 @@ decimals = 6
 [[config.ethereum.tokens]]
 symbol = "TUSD"
 name = "TrueUSD"
+logo = "/assets/tokens/tusd.svg"
 address = "0x0000000000085d4780B73119b644AE5ecd22b376"
 colour = "#1da1f2"
 decimals = 18
@@ -73,6 +78,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "fTUSD"
 name = "Fluid TUSD"
+logo = "/assets/tokens/fTUSD.svg"
 address = "0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F"
 colour = "#1da1f2"
 isFluidOf = "0x0000000000085d4780B73119b644AE5ecd22b376"
@@ -81,6 +87,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "FRAX"
 name = "Frax"
+logo = "/assets/tokens/frax.svg"
 address = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
 colour = "#e84142"
 decimals = 18
@@ -88,6 +95,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "fFRAX"
 name = "Fluid FRAX"
+logo = "/assets/tokens/fFRAX.svg"
 address = "0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C"
 colour = "#e84142"
 isFluidOf = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
@@ -96,6 +104,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "DAI"
 name = "Dai Stablecoin"
+logo = "/assets/tokens/dai.svg"
 address = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 colour = "#825902"
 decimals = 18
@@ -103,6 +112,7 @@ decimals = 18
 [[config.ethereum.tokens]]
 symbol = "fDAI"
 name = "Fluid DAI"
+logo = "/assets/tokens/fDAI.svg"
 address = "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
 colour = "#825902"
 isFluidOf = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
@@ -118,6 +128,7 @@ fluidAssets = [
 [[config.solana.tokens]]
 symbol = "USDC"
 name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
 address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 colour = "#2775ca"
 decimals = 6
@@ -125,6 +136,7 @@ decimals = 6
 [[config.solana.tokens]]
 symbol = "fUSDC"
 name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
 address = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
 colour = "#2775ca"
 isFluidOf = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
@@ -133,6 +145,7 @@ decimals = 6
 [[config.solana.tokens]]
 symbol = "USDT"
 name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
 address = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 colour = "#12946c"
 decimals = 6
@@ -140,6 +153,7 @@ decimals = 6
 [[config.solana.tokens]]
 symbol = "fUSDT"
 name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
 address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
@@ -156,6 +170,7 @@ fluidAssets = [
 [[config.arbitrum.tokens]]
 symbol = "USDC"
 name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
 address = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
 colour = "#2775ca"
 decimals = 6
@@ -163,6 +178,7 @@ decimals = 6
 [[config.arbitrum.tokens]]
 symbol = "fUSDC"
 name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
 address = "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 colour = "#2775ca"
 isFluidOf = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
@@ -171,6 +187,7 @@ decimals = 6
 [[config.arbitrum.tokens]]
 symbol = "USDT"
 name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
 address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
 colour = "#12946c"
 decimals = 6
@@ -178,6 +195,7 @@ decimals = 6
 [[config.arbitrum.tokens]]
 symbol = "fUSDT"
 name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
 address = "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62"
 colour = "#12946c"
 isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
@@ -186,6 +204,7 @@ decimals = 6
 [[config.arbitrum.tokens]]
 symbol = "DAI"
 name = "Dai Stablecoin"
+logo = "/assets/tokens/dai.svg"
 address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
 colour = "#825902"
 decimals = 18
@@ -193,6 +212,7 @@ decimals = 18
 [[config.arbitrum.tokens]]
 symbol = "fDAI"
 name = "Fluid DAI"
+logo = "/assets/tokens/fDAI.svg"
 address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
 colour = "#825902"
 isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
