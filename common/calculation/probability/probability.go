@@ -99,9 +99,9 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 	p := probability(m, n, b)
 
 	// a / p
-	aDivP := new(big.Rat).Mul(
+	aDivP := new(big.Rat).Quo(
 		a,
-		new(big.Rat).Inv(p),
+		p,
 	)
 
 	emission.Payout.Winnings, _ = aDivP.Float64()
@@ -235,8 +235,8 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 				tokenDecimals = pool.TokenDecimalsScale
 				exchangeRate = pool.ExchangeRate
 				bpy = poolBpys[poolIdx]
-
 			)
+
 			frac := calculatePayoutFrac(bpy, totalBpy)
 
 			// clone tokenPayout so we don't mutate
