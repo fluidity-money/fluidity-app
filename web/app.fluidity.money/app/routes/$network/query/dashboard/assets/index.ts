@@ -51,11 +51,17 @@ export const loader: LoaderFunction = async ({
   if (!address) throw new Error("address is required");
   if (!token) throw new Error("token is required");
 
-  const regularToken = getTokenFromSymbol(network, token)?.isFluidOf;
+  const fluidToken = getTokenFromSymbol(network, token);
 
-  if (!regularToken) throw new Error("Couldn't find regular token");
+  if (!fluidToken) throw new Error("Couldn't find token");
 
-  const regularSymbol = getTokenFromAddress(network, regularToken)?.symbol;
+  const fluidTokenAddr = fluidToken.address;
+
+  const regularTokenAddr = fluidToken?.isFluidOf;
+
+  if (!regularTokenAddr) throw new Error("Couldn't find token");
+
+  const regularSymbol = getTokenFromAddress(network, regularTokenAddr)?.symbol;
 
   if (!regularSymbol) throw new Error("Couldn't find regular token symbol");
 
@@ -67,7 +73,7 @@ export const loader: LoaderFunction = async ({
     >(`${url.origin}/${network}/query/userTransactions`, {
       page: 1,
       address,
-      token: regularToken,
+      token: fluidTokenAddr,
     }).then((res) =>
       res.transactions?.map((tx) => {
         const desc = tx.sender === address ? "Sent" : "Received";
