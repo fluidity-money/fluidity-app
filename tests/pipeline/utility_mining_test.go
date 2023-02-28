@@ -105,7 +105,7 @@ func callTransferFunction(ethClient *ethclient.Client, prikey *ecdsa.PrivateKey,
 }
 
 
-func TestUtilityMining(t *testing.T) {
+func TestPipelineUtilityMining(t *testing.T) {
 
     var (
         gethUrl            = util.GetEnvOrFatal(EnvEthereumHttpUrl)

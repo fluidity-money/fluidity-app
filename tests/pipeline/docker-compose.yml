@@ -64,7 +64,7 @@ services:
       - timescale
       - spooler
     environment:
-      FLU_TEST: TestSpooler
+      FLU_TEST: TestPipelineSpooler
       <<: *flu-envs
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler-in
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out
@@ -183,7 +183,7 @@ services:
       - connector-ethereum-reward-logs-amqp-util-mining
       - microservice-ethereum-track-winners-util-mining
     environment:
-      FLU_TEST: TestUtilityMining
+      FLU_TEST: TestPipelineUtilityMining
       FLU_WORKER_ID: tests
       <<: *flu-envs
       <<: *util-mining-test-envs

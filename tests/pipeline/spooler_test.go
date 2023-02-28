@@ -81,7 +81,7 @@ func generateWinnings(token token_details.TokenDetails, usd float64, exchangeRat
     return payout, payoutMap
 }
 
-func TestSpooler(t *testing.T) {
+func TestPipelineSpooler(t *testing.T) {
     var (
         spoolerInputQueue   = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
         spoolerPublishQueue = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
