@@ -13,6 +13,3 @@ func TestMain(m *testing.M) {
     }
 }
 
-func main() {
-
-}
