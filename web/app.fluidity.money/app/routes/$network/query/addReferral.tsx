@@ -63,12 +63,15 @@ export const action: ActionFunction = async ({ request, params }) => {
         case "evm": {
           const referrerVerified =
             ethers.utils
-              .recoverAddress(hashMessage("Referrer"), referrerMsg)
+              .recoverAddress(
+                hashMessage(`Hi! From ${referrer} with ❤️`),
+                Buffer.from(referrerMsg, "base64url").toString("hex")
+              )
               .toLocaleLowerCase() === referrer;
 
           const refereeVerified =
             recoverAddress(
-              hashMessage("Referee"),
+              hashMessage(`🌊 - ${referee}`),
               refereeMsg
             ).toLocaleLowerCase() === referee;
 
@@ -82,7 +85,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
           const referrerVerified = nacl.sign.detached.verify(
             enc.encode("Referrer"),
-            enc.encode(referrerMsg),
+            enc.encode(Buffer.from(referrerMsg, "base64url").toString("hex")),
             referrerPubkey.toBytes()
           );
 

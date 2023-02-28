@@ -8,6 +8,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useState } from "react";
 import { Text, Heading } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
+import { Buffer } from "buffer";
 
 import { jsonPost } from "~/util";
 
@@ -79,11 +80,22 @@ const Referral = () => {
             e.preventDefault();
             (async () => {
               try {
-                const signedReferrer = await signBuffer?.("Referrer");
-                setReferralCode(
-                  `/${network}/lootbox/referrals?referral=${address}&referralMsg=${signedReferrer}`
+                const signedReferrer = await signBuffer?.(
+                  `Hi! From ${address} with ❤️`
                 );
-              } catch {
+
+                if (!signedReferrer) return;
+
+                const urlSafeB64 = Buffer.from(
+                  signedReferrer.slice(2),
+                  "hex"
+                ).toString("base64url");
+
+                setReferralCode(
+                  `/${network}/lootbox/referrals?referral=${address}&referralMsg=${urlSafeB64}`
+                );
+              } catch (e) {
+                console.log(e);
                 return;
               }
             })();
@@ -101,7 +113,7 @@ const Referral = () => {
               referrer: referral,
               referee: address,
               referrer_msg: referralMsg,
-              referee_msg: (await signBuffer?.("Referee")) ?? "",
+              referee_msg: (await signBuffer?.(`🌊 - ${address}`)) ?? "",
             });
           })();
         }}
