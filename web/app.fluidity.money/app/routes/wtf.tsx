@@ -25,7 +25,7 @@ import {
   appendLeading0x,
   Video,
   useViewport,
-  Modal
+  Modal,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import { captureException } from "@sentry/react";

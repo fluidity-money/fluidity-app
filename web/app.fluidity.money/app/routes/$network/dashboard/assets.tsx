@@ -5,7 +5,7 @@ import {
   ManualCarousel,
   numberToMonetaryString,
   LoadingDots,
-  ProviderCard
+  ProviderCard,
 } from "@fluidity-money/surfing";
 import {
   Link,

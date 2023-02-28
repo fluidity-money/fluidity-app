@@ -22,7 +22,7 @@ import {
   useViewport,
   ConnectedWallet,
   ConnectedWalletModal,
-  FluidifyCard
+  FluidifyCard,
 } from "@fluidity-money/surfing";
 import Draggable from "~/components/Draggable";
 import ConnectWalletModal from "~/components/ConnectWalletModal";

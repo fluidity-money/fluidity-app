@@ -7,7 +7,7 @@ import {
   LinkButton,
   Twitter,
   useViewport,
-  BloomEffect
+  BloomEffect,
 } from "@fluidity-money/surfing";
 import { generateTweet } from "~/util/tweeter";
 

@@ -20,7 +20,8 @@ import {
   useViewport,
   Video,
   ConnectedWalletModal,
-  Modal
+  ConnectedWallet,
+  Modal,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";

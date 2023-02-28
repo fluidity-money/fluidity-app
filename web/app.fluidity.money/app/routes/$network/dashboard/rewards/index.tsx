@@ -28,17 +28,14 @@ import {
   useViewport,
   LabelledValue,
   ProviderIcon,
-  ProviderCard
+  ProviderCard,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
-import {
-  ToolTipContent,
-  useToolTip,
-} from "~/components";
+import { ToolTipContent, useToolTip } from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
-import config, { colors } from "~/webapp.config.server";
+import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
 
 export const links: LinksFunction = () => {
@@ -48,7 +45,6 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
-  const icons = config.provider_icons;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
@@ -57,7 +53,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   return json({
     network,
-    icons,
     page: txTablePage,
     colors: (await colors)[network as string],
   });

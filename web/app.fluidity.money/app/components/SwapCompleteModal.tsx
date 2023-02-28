@@ -17,7 +17,7 @@ import {
   stringifiedNumberToMonetaryString,
   Video,
   Modal,
-  BloomEffect
+  BloomEffect,
 } from "@fluidity-money/surfing";
 import {
   addDecimalToBn,
