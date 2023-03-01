@@ -4,8 +4,8 @@ pragma solidity ^0.8.11;
 pragma abicoder v2;
 
 import "../interfaces/IToken.sol";
+import "../interfaces/IVEGovLockup.sol";
 
-import "./VEGovLockup.sol";
 import "./Operator.sol";
 
 /// @dev default time to wait before a vote is possibly ratified after it's submission
@@ -70,7 +70,7 @@ contract DAOV1 {
 
     event ProposalCreated(bytes ipfsHash, bytes32 proposalId);
 
-    VEGovLockup private lockupSource_;
+    IVEGovLockup private lockupSource_;
 
     address private emergencyCouncil_;
 
@@ -81,7 +81,7 @@ contract DAOV1 {
     /// @dev _council to use
     constructor(
         address _emergencyCouncil,
-        VEGovLockup _lockupSource
+        IVEGovLockup _lockupSource
     ) {
         emergencyCouncil_ = _emergencyCouncil;
         lockupSource_ = _lockupSource;

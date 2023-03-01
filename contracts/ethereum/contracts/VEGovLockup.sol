@@ -3,190 +3,142 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
-import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
-import "../interfaces/IOperatorOwned.sol";
 
-import "./BaseNativeToken.sol";
-import "./GovToken.sol";
+/// @dev default maxLockTime to use as the max amount of time that could be locked up
+uint256 constant MAX_LOCK_TIME = 100;
 
-import "./LibGovernanceCalc.sol";
-
-/// @dev default maxLockTime to use as the max amount that could be
-///      locked up
-uint256 constant MAX_LOCK_TIME = 365 days;
+/// @dev FP_COEFFICIENT to use as the floating point coefficient
+uint256 constant FP_COEFFICIENT = 1e6;
 
 struct Lockup {
-    /// @dev lockLength is the number of seconds the amount was locked up for
-    uint256 lockLength;
-
-    /// @dev fluid/fweth BPT token we're locking up
-    uint256 bptAtLock;
-
-    /// @dev lockTime is the timestamp the token was locked up at
-    uint256 lockTime;
+	uint256 lockTime;
+	uint256 bptLocked;
+	uint256 lockTimestamp;
 }
 
-contract VEGovLockup is IEmergencyMode, IOperatorOwned {
-    address private operator_;
+contract VEGovLockup {
+	IERC20 private token_;
 
-    address private emergencyCouncil_;
+	mapping (address => Lockup) lockups_;
 
-    bool private noEmergencyMode_;
+	function swag(IERC20 _token) public {
+		token_ = _token;
+	}
 
-    IERC20 private voteToken_;
+	function getLockTime(address _spender) public view returns (uint256) {
+		return lockups_[_spender].lockTime;
+	}
 
-    mapping(address => Lockup[]) private lockups_;
+	function getBPTLocked(address _spender) public view returns (uint256) {
+		return lockups_[_spender].bptLocked;
+	}
 
-    constructor(address _emergencyCouncil, IERC20 _voteToken) {
-        operator_ = msg.sender;
-        emergencyCouncil_ = _emergencyCouncil;
-        voteToken_ = _voteToken;
+	function getLockTimestamp(address _spender) public view returns (uint256) {
+		return lockups_[_spender].lockTimestamp;
+	}
 
-        noEmergencyMode_ = true;
-    }
+	function getVEFluidBalance(uint256 _bptLocked, uint256 _lockTime) public pure returns (uint256) {
+		return FP_COEFFICIENT * (_bptLocked * _lockTime) / MAX_LOCK_TIME;
+	}
 
-    function voteToken() public view returns (IERC20) {
-        return voteToken_;
-    }
+	/// @notice veFluidBalanceAtLock for the VE gov that the user receives at lock
+	function getVEFluidBalanceAtLock(address _spender) public view returns (uint256) {
+		return getVEFluidBalance(getBPTLocked(_spender), getLockTime(_spender));
+	}
 
-    function operator() public view returns (address) {
-        return operator_;
-    }
+	/// @notice bptDecay to calculate how much bpt you get back per second
+	function getBPTDecay(address _spender) public view returns (uint256) {
+		return FP_COEFFICIENT * getBPTLocked(_spender) / getLockTime(_spender);
+	}
 
-    function updateOperator(address _newOperator) public {
-        require(msg.sender == operator(), "only operator");
-        operator_ = _newOperator;
-    }
+	/// @notice veFluidDecayPerSecond to calculate how much VE Fluid you burn per second
+	function getVEFluidDecayPerSecond(address _spender) public view returns (uint256) {
+		return  FP_COEFFICIENT * getBPTLocked(_spender) / MAX_LOCK_TIME;
+	}
 
-    function noEmergencyMode() public view returns (bool) {
-        return noEmergencyMode_;
-    }
+	function getSecondsSinceLock(address _spender) public view returns (uint256) {
+		return block.timestamp - getLockTimestamp(_spender);
+	}
 
-    function emergencyCouncil() public view returns (address) {
-        return emergencyCouncil_;
-    }
+	/// @notice balanceOf the user's balance (the current VEFluid)
+	function balanceOf(address _spender) public view returns (uint256) {
+		uint256 veFluidBalanceAtLock = getVEFluidBalanceAtLock(_spender);
+		uint256 veFluidDecayPerSecond = getVEFluidDecayPerSecond(_spender);
+		uint256 secondsSinceLock = getSecondsSinceLock(_spender);
 
-    function enableEmergencyMode() public {
-        require(msg.sender == emergencyCouncil(), "only council");
-        noEmergencyMode_ = false;
-    }
+		return veFluidBalanceAtLock - (veFluidDecayPerSecond * secondsSinceLock);
+	}
 
-    function disableEmergencyMode() public {
-        require(msg.sender == emergencyCouncil(), "only council");
-        noEmergencyMode_ = true;
-    }
+	function timestamp() public view returns (uint256) {
+		return block.timestamp;
+	}
 
-    function trackNewDeposit(
-        address _spender,
-        uint256 _lockLength,
-        uint256 _bptAtLock,
-        uint256 _lockTime
-    ) internal {
-        Lockup memory lockup;
+	/// @notice createLock for the user with the amount given (only one position!)
+	function createLock(uint256 _amount, uint256 _lockTime) public returns (uint256) {
+		require(_amount > 0, "amount = 0");
+		require(_lockTime > 0, "lock time = 0");
+		require(_lockTime < MAX_LOCK_TIME, "lock time too great");
 
-        lockup.lockLength = _lockLength;
-        lockup.bptAtLock = _bptAtLock;
-        lockup.lockTime = _lockTime;
+		bool rc = token_.transferFrom(msg.sender, address(this), _amount);
 
-        lockups_[_spender].push(lockup);
-    }
+		require(rc, "failed to transfer");
 
-    function currentVEGovAmount(
-        uint256 _lockLength,
-        uint256 _lockTime,
-        uint256 _currentTime,
-        uint256 _tokenAmount
-    )
-        public pure returns (uint256)
-    {
-        uint256 currentLockLength = _lockLength - _lockTime -_currentTime;
-        return calcGovToVEGov(_tokenAmount, currentLockLength, MAX_LOCK_TIME);
-    }
+		require(lockups_[msg.sender].bptLocked == 0, "already locked");
 
-    function balanceOfUnderlying(address _spender) public view returns (uint256 amount) {
-        for (uint256 i = 0; i < lockups_[_spender].length; i++)
-            amount += lockups_[_spender][i].bptAtLock;
+		lockups_[msg.sender].lockTime = _lockTime;
+		lockups_[msg.sender].bptLocked = _amount;
+		lockups_[msg.sender].lockTimestamp = block.timestamp;
 
-        return amount;
-    }
+		return block.timestamp;
+	}
 
-    function balanceOf(address _spender) public view returns (uint256) {
-        uint256 amounts;
+	function getLockExists(address _spender) public view returns (bool) {
+		return lockups_[_spender].lockTime > 0;
+	}
 
-        for (uint256 i = 0; i < lockups_[_spender].length; i++)
-            amounts += currentVEGovAmount(
-                lockups_[_spender][i].lockLength,
-                lockups_[_spender][i].lockTime,
-                block.timestamp, // solhint-disable-line not-rely-on-time
-                lockups_[_spender][i].bptAtLock
-            );
+	function increaseBptAmount(uint256 _amount) public returns (uint256) {
+		require(_amount > 0, "amount = 0");
+		require(getLockExists(msg.sender), "lock doesn't exist");
 
-        return amounts;
-    }
+		uint256 newLockTimestamp = block.timestamp;
 
-    function numberOfVotingPowers(address _spender) public view returns (uint256) {
-        return lockups_[_spender].length;
-    }
+		// subtracts the previous time that it was locked up from the locked up time
 
-    /**
-     * @notice deposit some token for the length given
-     *
-     * @param _bptAmount to take from the user to lock up
-     *
-     * @param _lockLength in seconds to lock the assets up for, used to
-     *         calculate the lock time = lock length + block timestamp
-     */
-    function deposit(
-        uint256 _bptAmount,
-        uint256 _lockLength
-    )
-        public returns (uint256 newVEGov, uint256 powerNumber)
-    {
-        require(noEmergencyMode(), "emergency mode");
+		uint256 newLockTime =
+			getLockTimestamp(msg.sender) + getLockTime(msg.sender) - newLockTimestamp;
 
-        require(_bptAmount > 0, "need bpt > 0");
-        require(_lockLength > 0, "lock length = 0");
+		require(newLockTime <= MAX_LOCK_TIME, "too long");
 
-        require(_lockLength <= MAX_LOCK_TIME, "greater than max time");
+		bool rc = token_.transferFrom(msg.sender, address(this), _amount);
 
-        voteToken_.transferFrom(msg.sender, address(this), _bptAmount);
+		require(rc, "failed to transfer tokens");
 
-        trackNewDeposit(
-            msg.sender,
-            _lockLength,
-            _bptAmount,
-            block.timestamp // solhint-disable-line not-rely-on-time
-        );
+		uint256 newBptLocked = getBPTLocked(msg.sender) + _amount;
 
-        newVEGov = balanceOf(msg.sender);
+		lockups_[msg.sender] = Lockup({
+			lockTime: newLockTime,
+			bptLocked: newBptLocked,
+			lockTimestamp: newLockTimestamp
+		});
 
-        powerNumber = numberOfVotingPowers(msg.sender);
+		return block.timestamp;
+	}
 
-        return (newVEGov, powerNumber);
-    }
+	function increaseLockTime(uint256 _extraLockTime) public {
+		require(_extraLockTime > 0, "extra lock time = 0");
+		require(getLockExists(msg.sender), "lock doesn't exist");
 
-    function isPowerEmpty(uint256 _powerNumber) public view returns (bool) {
-        return lockups_[msg.sender][_powerNumber].lockLength != 0;
-    }
+		uint256 newLockTimestamp = block.timestamp;
 
-    function increaseAmount(uint256 _powerNumber, uint256 _bptAmount) public {
-        require(noEmergencyMode(), "emergency mode");
+		uint256 newLockTime =
+			getLockTimestamp(msg.sender) +
+			getLockTime(msg.sender) -
+			newLockTimestamp +
+			_extraLockTime;
 
-        require(!isPowerEmpty(_powerNumber), "power doesn't exist");
+		require(newLockTime <= MAX_LOCK_TIME, "too long");
 
-        require(_bptAmount > 0, "need < 0");
-
-        voteToken_.transferFrom(msg.sender, address(this), _bptAmount);
-
-        lockups_[msg.sender][_powerNumber].bptAtLock += _bptAmount;
-    }
-
-    function increaseLockTime(uint256 _powerNumber, uint256 _extraTime) public {
-        require(noEmergencyMode(), "emergency mode");
-
-        require(!isPowerEmpty(_powerNumber), "power doesn't exist");
-
-        lockups_[msg.sender][_powerNumber].lockLength += _extraTime;
-    }
+		lockups_[msg.sender].lockTime = newLockTime;
+	}
 }

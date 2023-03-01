@@ -196,6 +196,9 @@ module.exports = {
       }
     },
   },
+  vyper: {
+    compilers: [{ version: "0.3.7" }],
+  },
   etherscan: {
     apiKey: process.env.FLU_ETHERSCAN_API
   },
