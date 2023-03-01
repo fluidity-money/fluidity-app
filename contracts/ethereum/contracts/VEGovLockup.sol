@@ -132,9 +132,9 @@ contract VEGovLockup {
 		uint256 newLockTimestamp = block.timestamp;
 
 		uint256 newLockTime =
-			getLockTimestamp(msg.sender) +
-			getLockTime(msg.sender) -
-			newLockTimestamp +
+			newLockTimestamp -
+			getLockTimestamp(msg.sender) -
+			getLockTime(msg.sender) +
 			_extraLockTime;
 
 		require(newLockTime <= MAX_LOCK_TIME, "too long");
