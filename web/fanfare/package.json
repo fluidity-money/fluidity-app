@@ -19,6 +19,7 @@
         "start": "vite-node src/main.ts"
     },
     "dependencies": {
+        "@openzeppelin/contracts": "^4.8.1",
         "ethers": "^6.0.3",
         "express": "^4.18.2",
         "uuid": "^9.0.0"
