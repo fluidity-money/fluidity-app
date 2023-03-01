@@ -102,6 +102,8 @@
 }
 
 .unclaimed-inner {
+  display: grid;
+  gap: 4em;
   grid-template-columns: 1.5fr 1fr;
 }
 
@@ -126,9 +128,16 @@
     gap: 2em;
   }
 
+  .unclaimed-inner {
+    display: flex;
+    flex-direction: column;
+  }
+
   #unclaimed-left {
+    display: flex;
     justify-content: center;
   }
+  
   #infobox {
     margin-left: 0;
     max-width: 450px;
