@@ -97,18 +97,27 @@ contract VEGovLockup {
 		return lockups_[_spender].lockTime > 0;
 	}
 
+	function extendLockTime(address _spender, uint256 _amount) internal view returns (uint256) {
+		uint256 newLockTimestamp = block.timestamp;
+
+		uint256 lockTimestamp = getLockTimestamp(_spender);
+
+		uint256 lockTime = getLockTime(_spender);
+
+		bool lockPeriodPassed = newLockTimestamp + lockTimestamp > lockTime;
+
+		if (lockPeriodPassed) {
+			return _amount;
+		} else {
+			// extend the lock time by taking the amount of time remaining in the
+			// lock and adding the new time that we want to it too
+			return lockTime - newLockTimestamp - lockTimestamp + _amount;
+		}
+	}
+
 	function increaseBptAmount(uint256 _amount) public returns (uint256) {
 		require(_amount > 0, "amount = 0");
 		require(getLockExists(msg.sender), "lock doesn't exist");
-
-		uint256 newLockTimestamp = block.timestamp;
-
-		// subtracts the previous time that it was locked up from the locked up time
-
-		uint256 newLockTime =
-			getLockTimestamp(msg.sender) + getLockTime(msg.sender) - newLockTimestamp;
-
-		require(newLockTime <= MAX_LOCK_TIME, "too long");
 
 		bool rc = token_.transferFrom(msg.sender, address(this), _amount);
 
@@ -116,11 +125,15 @@ contract VEGovLockup {
 
 		uint256 newBptLocked = getBPTLocked(msg.sender) + _amount;
 
+		uint256 newLockTime = extendLockTime(msg.sender, 0);
+
 		lockups_[msg.sender] = Lockup({
 			lockTime: newLockTime,
 			bptLocked: newBptLocked,
-			lockTimestamp: newLockTimestamp
+			lockTimestamp: block.timestamp
 		});
+
+		require(newLockTime <= MAX_LOCK_TIME, "too long");
 
 		return block.timestamp;
 	}
@@ -129,16 +142,11 @@ contract VEGovLockup {
 		require(_extraLockTime > 0, "extra lock time = 0");
 		require(getLockExists(msg.sender), "lock doesn't exist");
 
-		uint256 newLockTimestamp = block.timestamp;
-
-		uint256 newLockTime =
-			newLockTimestamp -
-			getLockTimestamp(msg.sender) -
-			getLockTime(msg.sender) +
-			_extraLockTime;
+		uint256 newLockTime = extendLockTime(msg.sender, _extraLockTime);
 
 		require(newLockTime <= MAX_LOCK_TIME, "too long");
 
 		lockups_[msg.sender].lockTime = newLockTime;
+		lockups_[msg.sender].lockTimestamp = block.timestamp;
 	}
 }
