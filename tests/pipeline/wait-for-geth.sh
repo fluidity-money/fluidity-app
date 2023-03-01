@@ -2,6 +2,11 @@
 
 arguments="$@"
 
+err() {
+	echo "error: $@" 2>&1
+	exit 1
+}
+
 test_geth() {
 	url="$1"
 	counter=0
