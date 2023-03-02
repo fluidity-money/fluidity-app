@@ -14,14 +14,14 @@ import (
 )
 
 const (
-	// EnvPublishAmqpQueueName is the queue to post batched winners down
-	EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
+    // EnvPublishAmqpQueueName is the queue to post batched winners down
+    EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
     // EnvTokens to list which tokens to send winnings for
     EnvTokens = `FLU_ETHEREUM_TOKENS_LIST`
 
-	// EnvNetwork to differentiate between eth, arbitrum, etc
-	EnvNetwork = `FLU_ETHEREUM_NETWORK`
+    // EnvNetwork to differentiate between eth, arbitrum, etc
+    EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
 func main() {
