@@ -3,7 +3,35 @@ import { ethers } from 'ethers';
 
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-const ELEVEN_DAYS_PLUS_1 = 950400 + 1;
+const TEN_DAYS_PLUS_1 = 864000 + 1;
+
+const ELEVEN_DAYS_PLUS_1 = TEN_DAYS_PLUS_1 + 950400;
+
+export const PROPOSAL_STATE_UNFINISHED = 0;
+
+export const PROPOSAL_STATE_FROZEN = 1;
+
+export const PROPOSAL_STATE_SUCCEEDED = 2;
+
+export const PROPOSAL_STATE_EXECUTED = 3;
+
+export const PROPOSAL_STATE_FAILED = 4;
+
+export const advanceTimeToFrozen = async (
+  hre: HardhatRuntimeEnvironment
+) =>
+  await hre.network.provider.send(
+    "evm_increaseTime",
+    [ TEN_DAYS_PLUS_1 ]
+  );
+
+export const advanceTimePastProposalFinished = async (
+  hre: HardhatRuntimeEnvironment
+) =>
+  await hre.network.provider.send(
+    "evm_increaseTime",
+    [ ELEVEN_DAYS_PLUS_1 ]
+  );
 
 export const executeCalldataOnDAOVoteAllAndAdvanceTime = async(
   hre: HardhatRuntimeEnvironment,
@@ -24,10 +52,7 @@ export const executeCalldataOnDAOVoteAllAndAdvanceTime = async(
     calldata
   );
 
-  await hre.network.provider.send(
-    "evm_increaseTime",
-    [ ELEVEN_DAYS_PLUS_1 ]
-  );
+  await advanceTimePastProposalFinished(hre);
 
   await dao.executeProposal(proposalId);
 };

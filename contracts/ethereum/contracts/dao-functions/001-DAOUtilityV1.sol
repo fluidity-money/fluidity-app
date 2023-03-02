@@ -550,4 +550,10 @@ contract DAOUtilityV1 {
         for (uint256 i = 0; i < _addresses.length; i++)
             _addresses[i].enableEmergencyMode();
     }
+
+    /// @notice enableAddresses given using `enableEmergencyMode()`
+    function enableAddresses(IEmergencyMode[] memory _addresses) public {
+        for (uint256 i = 0; i < _addresses.length; i++)
+            _addresses[i].disableEmergencyMode();
+    }
 }

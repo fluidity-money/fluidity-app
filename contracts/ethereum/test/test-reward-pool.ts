@@ -1,5 +1,8 @@
+
 import * as ethers from 'ethers';
+
 import { assert } from 'chai';
+
 import { bindings } from './setup-mainnet';
 
 describe("registry reward pools", async function () {

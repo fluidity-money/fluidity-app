@@ -59,15 +59,24 @@ export type FluiditySigners = {
     externalOperator: ethers.Signer,
     externalOracle: ethers.Signer,
   },
+
   operator: {
     emergencyCouncil: ethers.Signer,
     externalOperator: ethers.Signer,
   },
+
   registry: {
     externalOperator: ethers.Signer
   },
+
   govToken: {
     owner: ethers.Signer,
+    extraSigner1: ethers.Signer,
+    extraSigner2: ethers.Signer
+  },
+
+  veGovLockup: {
+    owner: ethers.Signer
   }
 };
 
@@ -76,11 +85,17 @@ export type FluidityBindings = {
     emergencyCouncil: ethers.Contract,
     externalOperator: ethers.Contract,
   },
+
   registry: {
     externalOperator: ethers.Contract
   },
+
   govToken: {
     owner: ethers.Contract,
+  },
+
+  veGovLockup: {
+    spender: ethers.Contract
   }
 };
 

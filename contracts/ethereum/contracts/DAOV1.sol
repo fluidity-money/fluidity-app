@@ -92,7 +92,7 @@ contract DAOV1 {
     }
 
     function getProposalExists(bytes32 _proposalId) public view returns (bool) {
-        return getRatificationTs(_proposalId) == 0;
+        return getRatificationTs(_proposalId) != 0;
     }
 
     function getAmountAlreadyVoted(
@@ -164,7 +164,7 @@ contract DAOV1 {
             execution, and should not be used to create a contract
      */
     function createProposal(
-        bytes calldata _ipfsHash,
+        bytes memory _ipfsHash,
         address _target,
         uint256 _forAmount,
         uint256 _againstAmount,
@@ -231,16 +231,26 @@ contract DAOV1 {
         // frozen period, this would return true
 
         // solhint-disable-next-line not-rely-on-time
-        return ts > block.timestamp + DEFAULT_FROZEN_TIME;
+        return block.timestamp > ts + DEFAULT_FROZEN_TIME;
+    }
+
+    function timestamp() public view returns (uint256) {
+        return block.timestamp;
+    }
+
+    function getProposalTimeUntilVotingOver(
+        bytes32 _proposalId
+    ) public view returns (uint256) {
+        uint256 ratificationTs = getRatificationTs(_proposalId);
+        uint256 currentTs = block.timestamp;
+
+        if (currentTs > ratificationTs) return 0;
+
+        return ratificationTs - currentTs;
     }
 
     function getProposalExecuted(bytes32 _proposalId) public view returns (bool) {
         return proposals_[_proposalId].targetContract == address(0);
-    }
-
-    function isVEGovTotalSupply3Percent(uint256 _x) public view returns (bool) {
-        uint256 totalSupply = lockupSource_.totalSupply();
-        return _x * 1e18 >= 1e18 * totalSupply * 3 / 100;
     }
 
     /// @notice getProposalPassing check if the proposal has enough votes
@@ -248,11 +258,9 @@ contract DAOV1 {
     function getProposalPassing(bytes32 _proposalId) public view returns (bool) {
         uint256 votesFor = proposals_[_proposalId].votesFor;
 
-        bool hasMinimumVotes = isVEGovTotalSupply3Percent(votesFor);
-
         bool hasMoreVotes = votesFor > proposals_[_proposalId].votesAgainst;
 
-        return hasMinimumVotes && hasMoreVotes;
+        return hasMoreVotes;
     }
 
     function getProposalStatus(bytes32 _proposalId) public view returns (ProposalStatus) {
@@ -329,6 +337,10 @@ contract DAOV1 {
         return available;
     }
 
+    function getAmountAvailableSender(bytes32 _proposalId) public view returns (uint256) {
+        return getAmountAvailable(_proposalId, msg.sender);
+    }
+
     function killProposal(bytes32 _proposalId) public {
         require(msg.sender == emergencyCouncil_, "emergency only");
 
@@ -348,7 +360,7 @@ contract DAOV1 {
 
         require(
           getAmountAvailable(_proposalId, msg.sender) >= _amount,
-          "too much vote"
+          "not enough available"
         );
 
         _voteFor(msg.sender, _proposalId, _amount);
@@ -362,8 +374,8 @@ contract DAOV1 {
         require(getProposalVoteable(_proposalId), "proposal frozen");
 
         require(
-          getAmountAvailable(_proposalId, msg.sender) <= _amount,
-          "too much vote"
+          getAmountAvailable(_proposalId, msg.sender) >= _amount,
+          "not enough available"
         );
 
         _voteAgainst(msg.sender, _proposalId, _amount);
@@ -402,14 +414,15 @@ contract DAOV1 {
         // if the return success was false, and the return size is below
         // 68 (size for a revert string), then error out
 
-        require(rc && returnDataSize >= 68, "call failed");
-
-        if (!rc)
+        if (!rc && returnDataSize > 68) {
             // an error happened, so we revert with the revert data from before
             // solhint-disable-next-line no-inline-assembly
             assembly {
                 revert(returnData, returnDataSize)
             }
+        } else if (!rc) {
+            revert("call failed");
+        }
 
         // mark the contract as executed
 

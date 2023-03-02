@@ -39,6 +39,8 @@ before(async function () {
     operatorCouncilSigner,
     operatorOperatorSigner,
     govTokenOwnerSigner,
+    govTokenExtraSigner1,
+    govTokenExtraSigner2,
     fwEthAccountSigner,
     veGovSigner,
     registrySigner
@@ -141,7 +143,13 @@ before(async function () {
 
     govToken: {
       owner: govTokenOwnerSigner,
+      extraSigner1: govTokenExtraSigner1,
+      extraSigner2: govTokenExtraSigner2
     },
+
+    veGovLockup: {
+      owner: veGovSigner
+    }
   };
 
   commonContracts = {
@@ -162,6 +170,9 @@ before(async function () {
     },
     govToken: {
       owner: govToken.connect(govTokenOwnerSigner),
+    },
+    veGovLockup: {
+      spender: veGovLockup.connect(veGovSigner)
     }
   };
 });

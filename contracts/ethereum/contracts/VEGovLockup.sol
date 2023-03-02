@@ -74,28 +74,80 @@ contract VEGovLockup is IVEGovLockup {
         return getVEFluidBalance(getBPTLocked(_spender), getLockTime(_spender));
     }
 
-    /// @notice veFluidDecayPerSecond to calculate how much VE Fluid you burn per second
-    function getVEFluidDecayPerSecond(address _spender) public view returns (uint256) {
-        return  FP_COEFFICIENT * getBPTLocked(_spender) / MAX_LOCK_TIME;
+    function calcVEFluidDecayPerSecond(uint256 _bptLocked) public pure returns (uint256) {
+        return FP_COEFFICIENT * _bptLocked / MAX_LOCK_TIME;
     }
 
-    function getSecondsSinceLock(address _spender) public view returns (uint256) {
+    /// @notice veFluidDecayPerSecond to calculate how much VE Fluid you burn per second
+    function getVEFluidDecayPerSecond(address _spender) public view returns (uint256) {
+        return calcVEFluidDecayPerSecond(getBPTLocked(_spender));
+    }
+
+    function getSecondsSinceLock(
+        address _spender
+    ) public view returns (uint256) {
         return block.timestamp - getLockTimestamp(_spender);
+    }
+
+    /**
+     * @notice balanceOfCalc to use once the values have been
+     *         discovered (for simulation)
+     *
+     * @param _veFluidBalanceAtLock available
+     * @param _veFluidDecayPerSecond that VE Fluid is going down by
+     * @param _lockTime that the lockup was created for
+     * @param _secondsSinceLock as the time since the lockup was created
+     *
+     * @return VE Gov balance
+     */
+    function balanceOfCalc(
+        uint256 _veFluidBalanceAtLock,
+        uint256 _veFluidDecayPerSecond,
+        uint256 _lockTime,
+        uint256 _secondsSinceLock
+    ) public pure returns (uint256) {
+
+        if (_secondsSinceLock >= _lockTime) return 0;
+
+        return _veFluidBalanceAtLock - (_veFluidDecayPerSecond * _secondsSinceLock);
+    }
+
+    /**
+     * @notice balanceOfWith to determine balance of with the given inputs
+     *
+     * @param _bptLocked locked up
+     * @param _lockTime that the amount was locked up for
+     * @param _lockTimestamp that the lock was created at
+     * @param _currentTimestamp as the current timestamp
+     *
+     * @return VE Gov balance
+     */
+     function balanceOfWith(
+        uint256 _bptLocked,
+        uint256 _lockTime,
+        uint256 _lockTimestamp,
+        uint256 _currentTimestamp
+    ) public pure returns (uint256) {
+        uint256 veFluidBalanceAtLock = getVEFluidBalance(_bptLocked, _lockTime);
+        uint256 veFluidDecayPerSecond = calcVEFluidDecayPerSecond(_bptLocked);
+        uint256 secondsSinceLock = _currentTimestamp - _lockTimestamp;
+
+        return balanceOfCalc(
+            veFluidBalanceAtLock,
+            veFluidDecayPerSecond,
+            _lockTime,
+            secondsSinceLock
+        );
     }
 
     /// @notice balanceOf the user's balance (the current VEFluid)
     function balanceOf(address _spender) public view returns (uint256) {
-        uint256 veFluidBalanceAtLock = getVEFluidBalanceAtLock(_spender);
-        uint256 veFluidDecayPerSecond = getVEFluidDecayPerSecond(_spender);
-        uint256 secondsSinceLock = getSecondsSinceLock(_spender);
-
-        if (secondsSinceLock >= getLockTime(_spender)) return 0;
-
-        return veFluidBalanceAtLock - (veFluidDecayPerSecond * secondsSinceLock);
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return tokenAmountDeposited_;
+        return balanceOfWith(
+            getBPTLocked(_spender),
+            getLockTime(_spender),
+            getLockTimestamp(_spender),
+            block.timestamp
+        );
     }
 
     function getLockExists(address _spender) public view returns (bool) {
@@ -145,6 +197,11 @@ contract VEGovLockup is IVEGovLockup {
         }
     }
 
+    /**
+     * @notice increaseBPTAmount deposited in the current lockup
+     *
+     * @param _amount of BPT to increase the amount with
+     */
     function increaseBPTAmount(uint256 _amount) public {
         require(_amount > 0, "amount = 0");
         require(getLockExists(msg.sender), "lock doesn't exist");
@@ -168,7 +225,12 @@ contract VEGovLockup is IVEGovLockup {
         });
     }
 
-    function increaseLockTime(uint256 _extraLockTime) public {
+    /**
+     * @notice increaseLockTime of the current lockup
+     *
+     * @param _extraLockTime to increase the lock by
+     */
+     function increaseLockTime(uint256 _extraLockTime) public {
         require(_extraLockTime > 0, "extra lock time = 0");
         require(getLockExists(msg.sender), "lock doesn't exist");
 
@@ -194,6 +256,10 @@ contract VEGovLockup is IVEGovLockup {
         });
     }
 
+    /**
+     * @notice withdraw the entire amount locked up once the lock has
+     *         expired
+     */
     function withdraw() public {
         require(getLockExists(msg.sender), "lock doesn't exist");
         require(hasLockExpired(msg.sender), "lock hasn't expired");
