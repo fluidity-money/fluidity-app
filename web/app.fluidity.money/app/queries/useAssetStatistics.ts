@@ -98,8 +98,8 @@ const useAssetStatistics = (
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-      }
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
       : {}
   );
 };
