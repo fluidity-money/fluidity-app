@@ -8,7 +8,7 @@ CREATE TABLE winning_transaction_attributes (
     transaction_hash VARCHAR NOT NULL,
     volume BIGINT NOT NULL,
     reward_tier INT NOT NULL
-    application ethereum_application -- 'none' is a regular send
+    application ethereum_application NOT NULL -- 'none' is a regular send
 );
 
 -- migrate:down
