@@ -53,10 +53,10 @@ type (
 	}
 
 	EthereumSpooledRewards struct {
-		Network    network.BlockchainNetwork                                 `json:"network"`
-		Token      token_details.TokenDetails                                `json:"token_details"`
-		FirstBlock *misc.BigInt                                              `json:"first_block"`
-		LastBlock  *misc.BigInt                                              `json:"last_block"`
+		Network    network.BlockchainNetwork                                     `json:"network"`
+		Token      token_details.TokenDetails                                    `json:"token_details"`
+		FirstBlock *misc.BigInt                                                  `json:"first_block"`
+		LastBlock  *misc.BigInt                                                  `json:"last_block"`
 		Rewards    map[applications.UtilityName]map[ethereum.Address]misc.BigInt `json:"rewards"`
 	}
 
@@ -84,9 +84,9 @@ type (
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any
 	// associated transfers
 	EthereumDecoratedTransaction struct {
-		Transaction ethereum.Transaction `json:"transaction"`
-		Receipt ethereum.Receipt `json:"receipt"`
-		Transfers []EthereumDecoratedTransfer `json:"transfers"`
+		Transaction ethereum.Transaction        `json:"transaction"`
+		Receipt     ethereum.Receipt            `json:"receipt"`
+		Transfers   []EthereumDecoratedTransfer `json:"transfers"`
 	}
 	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {

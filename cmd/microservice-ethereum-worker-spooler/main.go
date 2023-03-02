@@ -37,7 +37,7 @@ func main() {
 	dbNetwork, err := network.ParseEthereumNetwork(network_)
 
 	if err != nil {
-		log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to read the network from env!"
 			k.Payload = err
 		})
@@ -73,7 +73,7 @@ func main() {
 				application      = announcement.Application
 				rewardTier       = announcement.RewardTier
 
-				blockNumber    = uint64(blockNumberInt.Int64())
+				blockNumber = uint64(blockNumberInt.Int64())
 			)
 
 			// write the sender and receiver to be stored once the win is paid out

@@ -24,7 +24,6 @@ const (
 
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
-
 )
 
 var (
@@ -43,7 +42,7 @@ func main() {
 	network_, err := network.ParseEthereumNetwork(net_)
 
 	if err != nil {
-		log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to read an ethereum network from env!"
 			k.Payload = err
 		})

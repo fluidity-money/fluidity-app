@@ -12,49 +12,48 @@ import (
 )
 
 func main() {
-    queue.WinnersEthereum(func(winner queue.Winner) {
-        var (
-            network               = winner.Network
-            transactionHash       = winner.SendTransactionHash
-            winnerAddress         = winner.WinnerAddress
-            amount                = winner.WinningAmount
-            tokenDetails          = winner.TokenDetails
-            rewardTier            = winner.RewardTier
-            applicationString     = winner.Application
-        )
+	queue.WinnersEthereum(func(winner queue.Winner) {
+		var (
+			network           = winner.Network
+			transactionHash   = winner.SendTransactionHash
+			winnerAddress     = winner.WinnerAddress
+			amount            = winner.WinningAmount
+			tokenDetails      = winner.TokenDetails
+			rewardTier        = winner.RewardTier
+			applicationString = winner.Application
+		)
 
-        // don't track fluidification
-        if winner.RewardType != "send" {
-            log.Debug(func(k *log.Log) {
-                k.Format(
-                    "Winner %s in transaction %s is a recipient, skipping!",
-                    winnerAddress,
-                    transactionHash,
-                )
-            })
-        }
+		// don't track fluidification
+		if winner.RewardType != "send" {
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Winner %s in transaction %s is a recipient, skipping!",
+					winnerAddress,
+					transactionHash,
+				)
+			})
+		}
 
-        // all applications qualify, including a regular send (ApplicationNone)
-        application, err := applications.ParseApplicationName(applicationString)
+		// all applications qualify, including a regular send (ApplicationNone)
+		application, err := applications.ParseApplicationName(applicationString)
 
-        if err != nil {
-            log.Fatal(func(k *log.Log) {
-                k.Message = "Failed to parse application name!"   
-                k.Payload = err
-            })
-        }
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to parse application name!"
+				k.Payload = err
+			})
+		}
 
-        transactionAttributes := winners.TransactionAttributes{
-            Network: network,
-            Application: application,
-            TransactionHash: transactionHash,
-            Address: winnerAddress,
-            Amount: amount,
-            TokenDetails: tokenDetails,
-            RewardTier: rewardTier,
-        }
+		transactionAttributes := winners.TransactionAttributes{
+			Network:         network,
+			Application:     application,
+			TransactionHash: transactionHash,
+			Address:         winnerAddress,
+			Amount:          amount,
+			TokenDetails:    tokenDetails,
+			RewardTier:      rewardTier,
+		}
 
-        winners.InsertTransactionAttributes(transactionAttributes)
-    })
+		winners.InsertTransactionAttributes(transactionAttributes)
+	})
 }
-

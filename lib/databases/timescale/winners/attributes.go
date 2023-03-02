@@ -12,33 +12,33 @@ import (
 )
 
 const (
-	// TableWinningTransactionAttributes to use when recording 
+	// TableWinningTransactionAttributes to use when recording
 	// winning transaction attributes to timescale
 	TableWinningTransactionAttributes = `winning_transaction_attributes`
 )
 
 type TransactionAttributes struct {
-    // Network that this event took place on
-    Network network.BlockchainNetwork `json:"network"`
+	// Network that this event took place on
+	Network network.BlockchainNetwork `json:"network"`
 
-    // Application used in the event
-    Application applications.Application `json:"application"`
+	// Application used in the event
+	Application applications.Application `json:"application"`
 
-    // TransactionHash to find the corresponding transaction for the event
-    TransactionHash string `json:"transaction_hash"`
+	// TransactionHash to find the corresponding transaction for the event
+	TransactionHash string `json:"transaction_hash"`
 
-    // Sender of the event transaction
-    Address string `json:"address"`
+	// Sender of the event transaction
+	Address string `json:"address"`
 
-    // Amount that was swapped or sent
-    Amount misc.BigInt `json:"amount"`
+	// Amount that was swapped or sent
+	Amount misc.BigInt `json:"amount"`
 
-    // TokenDetails to include information on the token's name and the number
-    // of decimal places contained within it
-    TokenDetails token_details.TokenDetails `json:"token_details"`
+	// TokenDetails to include information on the token's name and the number
+	// of decimal places contained within it
+	TokenDetails token_details.TokenDetails `json:"token_details"`
 
-    // RewardTier to indicate the tier of the payout [1-5]
-    RewardTier int `json:"reward_tier"`
+	// RewardTier to indicate the tier of the payout [1-5]
+	RewardTier int `json:"reward_tier"`
 }
 
 // InsertTransactionAttributes to store the attributes of a winning transaction

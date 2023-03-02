@@ -35,7 +35,7 @@ const (
 )
 
 type (
-	Winner		= winners.Winner
+	Winner      = winners.Winner
 	Application = winners.Application
 )
 
@@ -261,8 +261,8 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 
 	var (
 		shortName = token.TokenShortName
-		first = firstBlock.Int64()
-		last = lastBlock.Int64()
+		first     = firstBlock.Int64()
+		last      = lastBlock.Int64()
 	)
 
 	statementText := fmt.Sprintf(
@@ -307,7 +307,6 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 	}
 
 	defer rows.Close()
-
 
 	var rewards []PendingRewardData
 
@@ -545,4 +544,3 @@ func CountWinnersForDateAndWinningAmount(network network.BlockchainNetwork, toke
 
 	return winnersCount, awardedAmount
 }
-
