@@ -99,8 +99,11 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     registryFactory
   );
 
+  const rootSigner = (await hre.ethers.getSigners())[0];
+
   const registry = await deployRegistry(
     hre,
+    rootSigner,
     registryFactory,
     registryBeacon.address,
     externalOperatorAddress
@@ -108,6 +111,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
 
   const operator = await deployOperator(
     hre,
+    rootSigner,
     operatorFactory,
     operatorBeacon.address,
     externalOperatorAddress,
