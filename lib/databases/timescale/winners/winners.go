@@ -44,6 +44,7 @@ type PendingRewardData struct {
 	RewardType  winners.RewardType
 	Application ethApps.Application
 	WinAmount   misc.BigInt
+	Utility     ethApps.UtilityName
 	RewardTier  int
 }
 
@@ -54,6 +55,7 @@ func InsertWinner(winner Winner) {
 		tokenShortName    = winner.TokenDetails.TokenShortName
 		tokenDecimals     = winner.TokenDetails.TokenDecimals
 		applicationString = winner.Application
+		utility           = winner.Utility
 
 		statementText string
 	)
@@ -72,7 +74,8 @@ func InsertWinner(winner Winner) {
 				token_short_name,
 				token_decimals,
 				reward_type,
-				ethereum_application
+				ethereum_application,
+				utility_name
 			)`,
 			TableWinners,
 		)
@@ -90,7 +93,8 @@ func InsertWinner(winner Winner) {
 				token_short_name,
 				token_decimals,
 				reward_type,
-				solana_application
+				solana_application,
+				utility_name
 			)`,
 			TableWinners,
 		)
@@ -108,7 +112,8 @@ func InsertWinner(winner Winner) {
 			$8,
 			$9,
 			$10,
-			$11
+			$11,
+			$12
 		);`
 
 	_, err := timescaleClient.Exec(
@@ -124,6 +129,7 @@ func InsertWinner(winner Winner) {
 		tokenDecimals,
 		winner.RewardType,
 		applicationString,
+		utility,
 	)
 
 	if err != nil {
@@ -278,6 +284,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			application,
 			send_transaction_hash,
 			win_amount,
+			utility_name,
 			reward_tier
 		;`,
 
@@ -316,6 +323,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			application_ string
 			sendHash_    string
 			winAmount    misc.BigInt
+			utilityName_ string
 			rewardTier   int
 		)
 
@@ -324,6 +332,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			&application_,
 			&sendHash_,
 			&winAmount,
+			&utilityName_,
 			&rewardTier,
 		)
 
@@ -365,11 +374,14 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			rewardType = "receive"
 		}
 
+		utilityName := ethApps.UtilityName(utilityName_)
+
 		reward := PendingRewardData{
 			SendHash:    sendHash,
 			RewardType:  rewardType,
 			Application: application,
 			WinAmount:   winAmount,
+			Utility:     utilityName,
 			RewardTier:  rewardTier,
 		}
 

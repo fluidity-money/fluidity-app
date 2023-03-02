@@ -3,6 +3,7 @@ FROM fluidity/build-container:latest AS build
 WORKDIR /usr/local/src/fluidity/cmd/microservice-ethereum-worker-spooler
 
 COPY . .
+
 RUN make
 
 
@@ -12,6 +13,7 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-worker-spool
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
+	"wait-for-database.sh", \
 	"./microservice-ethereum-worker-spooler.out" \
 ]
 

@@ -110,6 +110,7 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 	for i, pendingReward := range pendingRewards {
 		var (
 			appString      = pendingReward.Application.String()
+			utility        = pendingReward.Utility
 			sendHashString = pendingReward.SendHash.String()
 			rewardType     = pendingReward.RewardType
 			winAmount      = pendingReward.WinAmount
@@ -129,6 +130,7 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			BatchLastBlock:      endBlock,
 			RewardTier:          rewardTier,
 			TokenDetails:        details,
+			Utility:             utility,
 		}
 	}
 

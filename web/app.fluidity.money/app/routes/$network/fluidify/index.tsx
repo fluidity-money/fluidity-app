@@ -20,12 +20,12 @@ import {
   LinkButton,
   Text,
   useViewport,
+  ConnectedWallet,
+  ConnectedWalletModal,
+  FluidifyCard,
 } from "@fluidity-money/surfing";
 import Draggable from "~/components/Draggable";
-import FluidifyCard from "~/components/FluidifyCard";
-import ConnectedWallet from "~/components/ConnectedWallet";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import SwapCircle from "~/components/Fluidify/SwapCircle";
 import FluidifyForm from "~/components/Fluidify/FluidifyForm";
 import SwapCompleteModal from "~/components/SwapCompleteModal";

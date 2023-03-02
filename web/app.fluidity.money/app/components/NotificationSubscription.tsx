@@ -157,6 +157,7 @@ export const NotificationSubscription = ({
         },
         window.location.protocol === "https:"
           ? {
+              host: "https://fanfare.fluidity.money",
               path: "/socket.io",
               transports: ["websocket"],
               secure: true,

@@ -120,6 +120,6 @@ func TestGetGTrade_v6_1SwapFee(t *testing.T) {
 	// Non-Fluid transfer
 	fluidTokenAddr = common.HexToAddress("0x6B175474E89094C44Da98b954EedeAC495271d0F")
 	fees, err = GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
-	assert.Error(t, err)
+	assert.Nil(t, err)
 	assert.Nil(t, fees)
 }

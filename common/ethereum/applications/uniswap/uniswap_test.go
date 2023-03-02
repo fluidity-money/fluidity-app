@@ -60,6 +60,9 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	callMethods["token0()"] = map[string]interface{}{
 		"": "0x0000000000000000000000000000000000000000000000000000000000000000",
 	}
+	callMethods["token1()"] = map[string]interface{}{
+		"": "0x0000000000000000000000000000000000000000000000000000000000000abc",
+	}
 	rpcMethods["eth_getCode"] = "0x0"
 
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
@@ -148,6 +151,9 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	// add the "token0" call to the client
 	callMethods["token0()"] = map[string]interface{}{
 		"": "0x0000000000000000000000000000000000000000000000000000000000000000",
+	}
+	callMethods["token1()"] = map[string]interface{}{
+		"": "0x0000000000000000000000000000000000000000000000000000000000000abc",
 	}
 	callMethods["fee()"] = map[string]interface{}{
 		"": "0x0000000000000000000000000000000000000000000000000000000000000064",
