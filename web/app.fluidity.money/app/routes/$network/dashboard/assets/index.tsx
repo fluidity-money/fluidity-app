@@ -139,9 +139,14 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     regAmt: new BN(0),
   });
 
+  const queryString = `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}`;
+
+  const { data } = useCache<ITokenStatistics>(address ? queryString : "", true);
+
+  const navigate = useNavigate();
+
   const regularContract = token.isFluidOf;
 
-  if (!network) throw new Error("no network");
   if (!regularContract)
     throw new Error(`no regular contract for ${token.symbol}`);
 
@@ -161,10 +166,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     })();
   }, [connected]);
 
-  const queryString = `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}`;
-
-  const { data } = useCache<ITokenStatistics>(address ? queryString : "", true);
-
   if (!data) return <></>;
 
   const { topPrize, avgPrize, topAssetPrize, activity } = data;
@@ -173,8 +174,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     activity,
     getUsdFromTokenAmount(quantities.fluidAmt || new BN(0), token.decimals)
   );
-
-  const navigate = useNavigate();
 
   return (
     <motion.div style={{ marginBottom: "1em" }} variants={assetVariants}>

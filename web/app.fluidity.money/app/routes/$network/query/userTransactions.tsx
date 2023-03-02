@@ -49,13 +49,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const { data: winnersData, errors: winnersErr } = address
-      ? await useUserRewardsByAddress(network ?? "", address)
-      : await useUserRewardsAll(network ?? "");
-
-    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
-      ? await useUserPendingRewardsByAddress(network ?? "", address)
-      : await useUserPendingRewardsAll(network ?? "");
+    const [
+      { data: winnersData, errors: winnersErr },
+      { data: pendingWinnersData, errors: pendingWinnersErr },
+    ] = await Promise.all(
+      address
+        ? [
+          useUserRewardsByAddress(network ?? "", address),
+          useUserPendingRewardsByAddress(network ?? "", address),
+        ]
+        : [
+          useUserRewardsAll(network ?? ""),
+          useUserPendingRewardsAll(network ?? ""),
+        ]
+    );
 
     if (
       winnersErr ||
@@ -123,7 +130,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
     // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
-    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+    for (let i = 0; i < JointPayoutAddrs.length; i += 100) {
       const { data: transactionsData, errors: transactionsErr } =
         await (async () => {
           switch (true) {
@@ -198,7 +205,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-            (currency === "DAI" || currency === "fDAI")
+              (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -227,8 +234,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         tx.sender === MintAddress
           ? "in"
           : tx.receiver === MintAddress
-          ? "out"
-          : undefined;
+            ? "out"
+            : undefined;
 
       const winner = jointWinnersMap[tx.hash];
       const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
@@ -241,9 +248,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           : ((winner as Winner)?.winning_address as unknown as string) ?? "",
         reward: winner
           ? (isFromPendingWin
-              ? (winner as PendingWinner).win_amount
-              : (winner as Winner).winning_amount) /
-            10 ** winner.token_decimals
+            ? (winner as PendingWinner).win_amount
+            : (winner as Winner).winning_amount) /
+          10 ** winner.token_decimals
           : 0,
         hash: tx.hash,
         rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
