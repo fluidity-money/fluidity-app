@@ -5,10 +5,13 @@
 package main
 
 import (
+	"math/big"
+
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 func main() {
@@ -44,12 +47,25 @@ func main() {
 			})
 		}
 
+		// sender payouts are 80%, so multiply by 1.25 to get the full volume
+		var (
+			amountInt = &amount.Int
+			four      = big.NewInt(4)
+
+			quarter = new(big.Int)
+		)
+
+		// a + (a / 4)
+		quarter = quarter.Div(amountInt, four)
+		volume_ := amount.Add(amountInt, quarter)
+		volume := misc.NewBigIntFromInt(*volume_)
+
 		transactionAttributes := winners.TransactionAttributes{
 			Network:         network,
 			Application:     application,
 			TransactionHash: transactionHash,
 			Address:         winnerAddress,
-			Amount:          amount,
+			Amount:          volume,
 			TokenDetails:    tokenDetails,
 			RewardTier:      rewardTier,
 		}
