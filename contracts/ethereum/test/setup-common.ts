@@ -9,6 +9,7 @@ import type {
   FluidityBindings } from "../types";
 
 import {
+  getFactories,
   deployFluidity,
   deployBeacons } from "../deployment";
 
@@ -38,36 +39,16 @@ before(async function () {
     operatorCouncilSigner,
     operatorOperatorSigner,
     govTokenOwnerSigner,
-    fwEthAccountSigner
+    fwEthAccountSigner,
+    veGovSigner,
+    registrySigner
   ] = await hre.ethers.getSigners();
 
   const councilAddress = await operatorCouncilSigner.getAddress();
 
-  const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
+  commonFactories = await getFactories(hre);
 
-  const veGovLockupFactory = await hre.ethers.getContractFactory("VEGovLockup");
-
-  const registryFactory = await hre.ethers.getContractFactory("Registry");
-
-  const operatorFactory = await hre.ethers.getContractFactory("Operator");
-
-  const tokenFactory = await hre.ethers.getContractFactory("Token");
-
-  const compoundLiquidityProviderFactory = await hre.ethers.getContractFactory(
-    "CompoundLiquidityProvider"
-  );
-
-  const aaveV2LiquidityProviderFactory = await hre.ethers.getContractFactory(
-    "AaveV2LiquidityProvider"
-  );
-
-  const aaveV3LiquidityProviderFactory = await hre.ethers.getContractFactory(
-    "AaveV3LiquidityProvider"
-  );
-
-  const daoFactory = await hre.ethers.getContractFactory("DAOV1");
-
-  commonFactories = {
+  const {
     token: tokenFactory,
     govToken: govTokenFactory,
     veGovLockup: veGovLockupFactory,
@@ -77,7 +58,7 @@ before(async function () {
     aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
     dao: daoFactory,
-  };
+  } = commonFactories;
 
   const [
     tokenBeacon,
@@ -114,15 +95,24 @@ before(async function () {
   } = await deployFluidity(
     hre,
     councilAddress,
+
     "Fluidity Money Token",
     "FLUID",
     18,
-    1,
+    10000000,
 
     registryFactory,
+    registrySigner,
+
     operatorFactory,
+    operatorOperatorSigner,
+
     govTokenFactory,
+    govTokenOwnerSigner,
+
     veGovLockupFactory,
+    veGovSigner,
+
     daoFactory,
 
     registryBeacon.address,
@@ -168,7 +158,7 @@ before(async function () {
       externalOperator: operator.connect(operatorOperatorSigner),
     },
     registry: {
-      externalOperator: registry.connect(operatorOperatorSigner)
+      externalOperator: registry.connect(registrySigner)
     },
     govToken: {
       owner: govToken.connect(govTokenOwnerSigner),

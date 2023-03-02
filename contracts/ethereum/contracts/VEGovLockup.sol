@@ -3,13 +3,19 @@
 pragma solidity 0.8.11;
 pragma abicoder v2;
 
+import "../interfaces/IVEGovLockup.sol";
 import "../interfaces/IERC20.sol";
 
-/// @dev default maxLockTime to use as the max amount of time that could be locked up
-uint256 constant MAX_LOCK_TIME = 100;
+/// @dev MIN_LOCK_TIME to use as the min amount of time that BPT could
+///      be locked
+uint256 constant MIN_LOCK_TIME = 7 days;
+
+/// @dev MAX_LOCK_TIME to use as the max amount of time that could be
+///      locked up
+uint256 constant MAX_LOCK_TIME = 365 days;
 
 /// @dev FP_COEFFICIENT to use as the floating point coefficient
-uint256 constant FP_COEFFICIENT = 1e6;
+uint256 constant FP_COEFFICIENT = 1e18;
 
 struct Lockup {
     uint256 lockTime;
@@ -17,12 +23,22 @@ struct Lockup {
     uint256 lockTimestamp;
 }
 
-contract VEGovLockup {
+contract VEGovLockup is IVEGovLockup {
+    event LockCreated(address indexed spender, uint256 amount);
+
+    event LockBPTIncreased(address indexed spender, uint256 extraBPT);
+
+    event LockTimeIncreased(address indexed spender, uint256 extraTime);
+
+    event LockWithdrew(address indexed spender, uint256 bptAmount);
+
     IERC20 private token_;
 
-    mapping (address => Lockup) lockups_;
+    mapping (address => Lockup) private lockups_;
 
-    function swag(IERC20 _token) public {
+    uint256 tokenAmountDeposited_;
+
+    constructor(IERC20 _token) {
         token_ = _token;
     }
 
@@ -38,18 +54,24 @@ contract VEGovLockup {
         return lockups_[_spender].lockTimestamp;
     }
 
-    function getVEFluidBalance(uint256 _bptLocked, uint256 _lockTime) public pure returns (uint256) {
+    function minLockTime() public pure returns (uint256) {
+        return MIN_LOCK_TIME;
+    }
+
+    function maxLockTime() public pure returns (uint256) {
+        return MAX_LOCK_TIME;
+    }
+
+    function getVEFluidBalance(
+        uint256 _bptLocked,
+        uint256 _lockTime
+    ) public pure returns (uint256) {
         return FP_COEFFICIENT * (_bptLocked * _lockTime) / MAX_LOCK_TIME;
     }
 
     /// @notice veFluidBalanceAtLock for the VE gov that the user receives at lock
     function getVEFluidBalanceAtLock(address _spender) public view returns (uint256) {
         return getVEFluidBalance(getBPTLocked(_spender), getLockTime(_spender));
-    }
-
-    /// @notice bptDecay to calculate how much bpt you get back per second
-    function getBPTDecay(address _spender) public view returns (uint256) {
-        return FP_COEFFICIENT * getBPTLocked(_spender) / getLockTime(_spender);
     }
 
     /// @notice veFluidDecayPerSecond to calculate how much VE Fluid you burn per second
@@ -67,80 +89,90 @@ contract VEGovLockup {
         uint256 veFluidDecayPerSecond = getVEFluidDecayPerSecond(_spender);
         uint256 secondsSinceLock = getSecondsSinceLock(_spender);
 
+        if (secondsSinceLock >= getLockTime(_spender)) return 0;
+
         return veFluidBalanceAtLock - (veFluidDecayPerSecond * secondsSinceLock);
     }
 
-    function timestamp() public view returns (uint256) {
-        return block.timestamp;
-    }
-
-    /// @notice createLock for the user with the amount given (only one position!)
-    function createLock(uint256 _amount, uint256 _lockTime) public returns (uint256) {
-        require(_amount > 0, "amount = 0");
-        require(_lockTime > 0, "lock time = 0");
-        require(_lockTime < MAX_LOCK_TIME, "lock time too great");
-
-        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
-
-        require(rc, "failed to transfer");
-
-        require(lockups_[msg.sender].bptLocked == 0, "already locked");
-
-        lockups_[msg.sender].lockTime = _lockTime;
-        lockups_[msg.sender].bptLocked = _amount;
-        lockups_[msg.sender].lockTimestamp = block.timestamp;
-
-        return block.timestamp;
+    function totalSupply() public view returns (uint256) {
+        return tokenAmountDeposited_;
     }
 
     function getLockExists(address _spender) public view returns (bool) {
         return lockups_[_spender].lockTime > 0;
     }
 
-    function extendLockTime(address _spender, uint256 _amount) internal view returns (uint256) {
-        uint256 newLockTimestamp = block.timestamp;
+    /// @notice createLock for the user with the amount given (only one position!)
+    function createLock(uint256 _amount, uint256 _lockTime) public {
+        require(_amount > 0, "amount = 0");
+        require(!getLockExists(msg.sender), "lock exists");
+        require(_lockTime >= MIN_LOCK_TIME, "lock time too small");
+        require(_lockTime <= MAX_LOCK_TIME, "lock time too great");
+
+        emit LockCreated(msg.sender, _amount);
+
+        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
+
+        require(rc, "failed to transfer");
+
+        tokenAmountDeposited_ += _amount;
+
+        require(lockups_[msg.sender].bptLocked == 0, "already locked");
+
+        lockups_[msg.sender].lockTime = _lockTime;
+        lockups_[msg.sender].bptLocked = _amount;
+        lockups_[msg.sender].lockTimestamp = block.timestamp;
+    }
+
+    function extendLockTime(
+        address _spender,
+        uint256 _extraLockTime
+    ) internal view returns (uint256) {
+        uint256 currentTimestamp = block.timestamp;
 
         uint256 lockTimestamp = getLockTimestamp(_spender);
 
         uint256 lockTime = getLockTime(_spender);
 
-        bool lockPeriodPassed = newLockTimestamp + lockTimestamp > lockTime;
+        bool lockPeriodPassed = currentTimestamp - lockTimestamp > lockTime;
 
         if (lockPeriodPassed) {
-            return _amount;
+            return _extraLockTime;
         } else {
             // extend the lock time by taking the amount of time remaining in the
             // lock and adding the new time that we want to it too
-            return lockTime - newLockTimestamp - lockTimestamp + _amount;
+            return lockTime - (currentTimestamp - lockTimestamp) + _extraLockTime;
         }
     }
 
-    function increaseBptAmount(uint256 _amount) public returns (uint256) {
+    function increaseBPTAmount(uint256 _amount) public {
         require(_amount > 0, "amount = 0");
         require(getLockExists(msg.sender), "lock doesn't exist");
+
+        emit LockBPTIncreased(msg.sender, _amount);
 
         bool rc = token_.transferFrom(msg.sender, address(this), _amount);
 
         require(rc, "failed to transfer tokens");
 
-        uint256 newBptLocked = getBPTLocked(msg.sender) + _amount;
+        tokenAmountDeposited_ += _amount;
+
+        uint256 newBPTLocked = getBPTLocked(msg.sender) + _amount;
 
         uint256 newLockTime = extendLockTime(msg.sender, 0);
 
         lockups_[msg.sender] = Lockup({
             lockTime: newLockTime,
-            bptLocked: newBptLocked,
+            bptLocked: newBPTLocked,
             lockTimestamp: block.timestamp
         });
-
-        require(newLockTime <= MAX_LOCK_TIME, "too long");
-
-        return block.timestamp;
     }
 
     function increaseLockTime(uint256 _extraLockTime) public {
         require(_extraLockTime > 0, "extra lock time = 0");
         require(getLockExists(msg.sender), "lock doesn't exist");
+
+        emit LockTimeIncreased(msg.sender, _extraLockTime);
 
         uint256 newLockTime = extendLockTime(msg.sender, _extraLockTime);
 
@@ -162,30 +194,20 @@ contract VEGovLockup {
         });
     }
 
-    function withdraw(uint256 _bptAmount) public {
-        require(_bptAmonut > 0, "bpt amount = 0");
+    function withdraw() public {
         require(getLockExists(msg.sender), "lock doesn't exist");
+        require(hasLockExpired(msg.sender), "lock hasn't expired");
 
-        uint256 bptWithdrawable = 0;
+        uint256 bptLocked = getBPTLocked(msg.sender);
 
-        require(bptWithdrawable >= _bptAmount, "withdrawing too much");
+        emit LockWithdrew(msg.sender, bptLocked);
 
-        bool rc = token_.transfer(msg.sender, _bptAmount);
+        bool rc = token_.transfer(msg.sender, bptLocked);
 
-        require(rc, "failed to transfer tokens");
+        require(rc, "failed to transfer tokens out");
 
-        uint256 newBptLocked = getBPTLocked(msg.sender) - _amount;
+        tokenAmountDeposited_ -= bptLocked;
 
-        uint256 newLockTime = extendLockTime(msg.sender, 0);
-
-        lockups_[msg.sender] = Lockup({
-            lockTime: newLockTime,
-            bptLocked: newBptLocked,
-            lockTimestamp: block.timestamp
-        });
-
-        require(newLockTime <= MAX_LOCK_TIME, "too long");
-
-        return block.timestamp;
+        disableLock(msg.sender);
     }
 }

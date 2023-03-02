@@ -1,20 +1,65 @@
 
 import { ethers } from 'ethers';
+
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-import type { FluidityContracts, Token, TokenAddresses } from './types';
+import type {
+  FluidityContracts,
+  FluidityFactories,
+  Token,
+  TokenAddresses } from './types';
 
-export const deployTestUtility = async (
+export const getFactories = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<FluidityFactories> => {
+  const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
+
+  const veGovLockupFactory = await hre.ethers.getContractFactory("VEGovLockup");
+
+  const registryFactory = await hre.ethers.getContractFactory("Registry");
+
+  const operatorFactory = await hre.ethers.getContractFactory("Operator");
+
+  const tokenFactory = await hre.ethers.getContractFactory("Token");
+
+  const compoundLiquidityProviderFactory = await hre.ethers.getContractFactory(
+    "CompoundLiquidityProvider"
+  );
+
+  const aaveV2LiquidityProviderFactory = await hre.ethers.getContractFactory(
+    "AaveV2LiquidityProvider"
+  );
+
+  const aaveV3LiquidityProviderFactory = await hre.ethers.getContractFactory(
+    "AaveV3LiquidityProvider"
+  );
+
+  const daoFactory = await hre.ethers.getContractFactory("DAOV1");
+
+  return {
+    token: tokenFactory,
+    govToken: govTokenFactory,
+    veGovLockup: veGovLockupFactory,
+    registry: registryFactory,
+    operator: operatorFactory,
+    compoundLiquidityProvider: compoundLiquidityProviderFactory,
+    aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
+    aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
+    dao: daoFactory,
+  };
+};
+
+export const deployTestUtilityWithoutDAO = async (
   hre: HardhatRuntimeEnvironment,
-  boundOperatorOperator: ethers.Contract,
+  operator: ethers.Contract,
   token: string,
 ) => {
   const factory = await hre.ethers.getContractFactory("TestClient");
-  const client = await factory.deploy(boundOperatorOperator.address);
+  const client = await factory.deploy(operator.address);
 
   await client.deployed();
 
-  await boundOperatorOperator.updateUtilityClients([{
+  await operator.updateUtilityClients([{
     name: "test",
     overwrite: false,
     token,
@@ -118,6 +163,10 @@ export const deployTokens = async (
       boundOperatorOperator.address,
     );
 
+    console.log(`bound registry operator signer: ${await boundRegistryOperator.signer.getAddress()}`);
+
+    console.log(`bound registry operator: ${await boundRegistryOperator.operator()}`);
+
     await boundRegistryOperator.updateUtilityClients([{
       name: "FLUID",
       overwrite: false,
@@ -142,13 +191,14 @@ export const deployTokens = async (
 
 export const deployRegistry = async(
   hre: HardhatRuntimeEnvironment,
+  signer: ethers.Signer,
   factory: ethers.ContractFactory,
   beaconAddress: string,
   operatorAddress: string
 ): Promise<ethers.Contract> => {
   const beaconProxy = await hre.upgrades.deployBeaconProxy(
     beaconAddress,
-    factory,
+    factory.connect(signer),
     [operatorAddress],
     {
       initializer: "init(address)"
@@ -160,6 +210,7 @@ export const deployRegistry = async(
 
 export const deployOperator = async(
   hre: HardhatRuntimeEnvironment,
+  signer: ethers.Signer,
   factory: ethers.ContractFactory,
   beaconAddress: string,
   operatorAddress: string,
@@ -168,7 +219,7 @@ export const deployOperator = async(
 ): Promise<ethers.Contract> => {
   const beaconProxy = await hre.upgrades.deployBeaconProxy(
     beaconAddress,
-    factory,
+    factory.connect(signer),
     [operatorAddress, emergencyCouncilAddress, registryAddress],
     {
       initializer: "init(address,address,address)"
@@ -180,11 +231,12 @@ export const deployOperator = async(
 
 export const deployGovToken = async(
   factory: ethers.ContractFactory,
+  signer: ethers.Signer,
   name: string,
   symbol: string,
   decimals: number,
   totalSupply: number
-): Promise<ethers.Contract> => factory.deploy(
+): Promise<ethers.Contract> => factory.connect(signer).deploy(
   name,
   symbol,
   decimals,
@@ -193,12 +245,9 @@ export const deployGovToken = async(
 
 export const deployVeGovLockup = async (
   factory: ethers.ContractFactory,
-  emergencyCouncil: string,
+  signer: ethers.Signer,
   voteTokenAddress: string
-): Promise<ethers.Contract> => factory.deploy(
-  emergencyCouncil,
-  voteTokenAddress
-);
+): Promise<ethers.Contract> => factory.connect(signer).deploy(voteTokenAddress);
 
 export const deployDAOV1 = async(
   factory: ethers.ContractFactory,
@@ -220,36 +269,43 @@ export const deployFluidity = async (
   govTokenTotalSupply: number,
 
   registryFactory: ethers.ContractFactory,
+  registrySigner: ethers.Signer,
+
   operatorFactory: ethers.ContractFactory,
+  operatorSigner: ethers.Signer,
+
   govTokenFactory: ethers.ContractFactory,
+  govTokenSigner: ethers.Signer,
+
   veGovLockupFactory: ethers.ContractFactory,
+  veGovLockupSigner: ethers.Signer,
+
   daoFactory: ethers.ContractFactory,
 
   registryBeaconAddress: string,
   operatorBeaconAddress: string
 ): Promise<FluidityContracts> => {
-  const rootSigner = (await hre.ethers.getSigners())[0];
-
-  const rootSignerAddress = await rootSigner.getAddress();
-
   const registry = await deployRegistry(
     hre,
+    registrySigner,
     registryFactory,
     registryBeaconAddress,
-    rootSignerAddress
+    await registrySigner.getAddress()
   );
 
   const operator = await deployOperator(
     hre,
+    operatorSigner,
     operatorFactory,
     operatorBeaconAddress,
-    rootSignerAddress,
+    await operatorSigner.getAddress(),
     emergencyCouncilAddress,
     registry.address
   );
 
   const govToken = await deployGovToken(
     govTokenFactory,
+    govTokenSigner,
     govTokenName,
     govTokenSymbol,
     govTokenDecimals,
@@ -258,7 +314,7 @@ export const deployFluidity = async (
 
   const veGovLockup = await deployVeGovLockup(
     veGovLockupFactory,
-    emergencyCouncilAddress,
+    veGovLockupSigner,
     govToken.address
   );
 
@@ -267,12 +323,6 @@ export const deployFluidity = async (
     emergencyCouncilAddress,
     veGovLockup.address
   );
-
-  await veGovLockup.updateOperator(dao.address);
-
-  await registry.updateOperator(dao.address);
-
-  await operator.updateOperator(dao.address);
 
   return {
     operator: operator,

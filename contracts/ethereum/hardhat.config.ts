@@ -1,17 +1,28 @@
+
 import "@nomiclabs/hardhat-waffle";
+
 import "@openzeppelin/hardhat-upgrades";
+
 import "hardhat-docgen";
+
 import { task, subtask } from "hardhat/config";
+
 import type { HardhatUserConfig } from "hardhat/types";
+
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
 
 import {
-  deployTokens,
-  deployOperator,
   setOracles,
   forknetTakeFunds,
-  mustEnv,
-  deployTestUtility } from './script-utils';
+  mustEnv } from './script-utils';
+
+import {
+  getFactories,
+  deployBeacons,
+  deployTokens,
+  deployRegistry,
+  deployOperator,
+  deployTestUtilityWithoutDAO } from './deployment';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -59,18 +70,49 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
       ],
     );
   }
+
   await hre.run("forknet:take-usdt");
 
-  const [tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory] =
-    await deployFactories(hre);
+  const {
+    token: tokenFactory,
+    compoundLiquidityProvider: compoundFactory,
+    aaveV2LiquidityProvider: aaveV2Factory,
+    aaveV3LiquidityProvider: aaveV3Factory,
+    operator: operatorFactory,
+    registry: registryFactory
+  } = await getFactories(hre);
 
-  const registry = await deployRegistry(hre, externalOperatorAddress);
+  const [
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon,
+    operatorBeacon,
+    registryBeacon
+  ] = await deployBeacons(
+    hre,
+    tokenFactory,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory,
+    operatorFactory,
+    registryFactory
+  );
+
+  const registry = await deployRegistry(
+    hre,
+    registryFactory,
+    registryBeacon.address,
+    externalOperatorAddress
+  );
 
   const operator = await deployOperator(
     hre,
+    operatorFactory,
+    operatorBeacon.address,
     externalOperatorAddress,
-    emergencyCouncilKey,
-    registry
+    emergencyCouncilAddress,
+    registry.address
   );
 
   const { tokens } = await deployTokens(
@@ -85,13 +127,13 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     externalOperatorAddress,
 
     tokenFactory,
-    tokenBeacon,
+    tokenBeacon.address,
     compoundFactory,
-    compoundBeacon,
+    compoundBeacon.address,
     aaveV2Factory,
-    aaveV2Beacon,
+    aaveV2Beacon.address,
     aaveV3Factory,
-    aaveV3Beacon
+    aaveV3Beacon.address
   );
 
   await setOracles(
@@ -102,7 +144,7 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     operator,
   );
 
-  const testClient = await deployTestUtility(
+  const testClient = await deployTestUtilityWithoutDAO(
     hre,
     operator,
     tokens["fUSDt"].deployedToken.address

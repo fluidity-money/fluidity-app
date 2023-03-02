@@ -116,6 +116,8 @@ abstract contract BaseNativeToken is IERC20 {
         // Saves gas for limited approvals.
         uint256 allowed = allowance_[_from][msg.sender];
 
+        require(allowed >= _amount, "needs approval");
+
         if (allowed != type(uint256).max)
             allowance_[_from][msg.sender] = allowed - _amount;
 

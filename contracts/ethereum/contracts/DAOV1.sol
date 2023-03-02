@@ -170,7 +170,7 @@ contract DAOV1 {
         uint256 _againstAmount,
         bool _isDelegateCall,
         bytes calldata _calldata
-    ) public {
+    ) public returns (bytes32) {
         require(_target != address(0), "null address");
 
         bytes32 proposalId = newProposalId(
@@ -198,6 +198,8 @@ contract DAOV1 {
 
         if (_againstAmount > 0)
             voteAgainst(proposalId, _againstAmount);
+
+        return proposalId;
     }
 
     function getProposalKilled(bytes32 _proposalId) public view returns (bool) {
@@ -236,10 +238,21 @@ contract DAOV1 {
         return proposals_[_proposalId].targetContract == address(0);
     }
 
+    function isVEGovTotalSupply3Percent(uint256 _x) public view returns (bool) {
+        uint256 totalSupply = lockupSource_.totalSupply();
+        return _x * 1e18 >= 1e18 * totalSupply * 3 / 100;
+    }
+
     /// @notice getProposalPassing check if the proposal has enough votes
     ///         to pass
     function getProposalPassing(bytes32 _proposalId) public view returns (bool) {
-        return proposals_[_proposalId].votesFor > proposals_[_proposalId].votesAgainst;
+        uint256 votesFor = proposals_[_proposalId].votesFor;
+
+        bool hasMinimumVotes = isVEGovTotalSupply3Percent(votesFor);
+
+        bool hasMoreVotes = votesFor > proposals_[_proposalId].votesAgainst;
+
+        return hasMinimumVotes && hasMoreVotes;
     }
 
     function getProposalStatus(bytes32 _proposalId) public view returns (ProposalStatus) {
