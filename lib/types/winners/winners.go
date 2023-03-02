@@ -34,6 +34,7 @@ type Winner struct {
 	Application              string                    `json:"application"`
 	BatchFirstBlock          misc.BigInt               `json:"first_block"`
 	BatchLastBlock           misc.BigInt               `json:"last_block"`
+	RewardTier               int                       `json:"reward_tier"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }

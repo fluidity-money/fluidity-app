@@ -39,6 +39,7 @@ type (
 		ToWinAmount     map[applications.UtilityName]Payout `json:"to_win_amount"`
 		TokenDetails    token_details.TokenDetails          `json:"token_details"`
 		Application     applications.Application            `json:"application"`
+		RewardTier      int                                 `json:"reward_tier"`
 	}
 
 	EthereumReward struct {

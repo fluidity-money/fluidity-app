@@ -143,6 +143,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			ToWinAmount:     toWinAmounts,
 			TokenDetails:    tokenDetails,
 			Application:     application,
+			RewardTier:      winningBalls,
 		}
 
 		winAnnouncements = append(winAnnouncements, winAnnouncement)

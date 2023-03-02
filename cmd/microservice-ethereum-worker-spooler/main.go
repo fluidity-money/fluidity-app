@@ -71,6 +71,7 @@ func main() {
 				recipientAddress = announcement.ToAddress
 				toWinAmount      = announcement.ToWinAmount
 				application      = announcement.Application
+				rewardTier       = announcement.RewardTier
 
 				blockNumber    = uint64(blockNumberInt.Int64())
 			)
@@ -86,6 +87,7 @@ func main() {
 				recipientAddress,
 				toWinAmount,
 				application,
+				rewardTier,
 			)
 
 			var totalWinAmount float64

@@ -113,6 +113,7 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			sendHashString = pendingReward.SendHash.String()
 			rewardType     = pendingReward.RewardType
 			winAmount      = pendingReward.WinAmount
+			rewardTier     = pendingReward.RewardTier
 		)
 
 		winners[i] = winnersDb.Winner{
@@ -126,6 +127,7 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			RewardType:          rewardType,
 			BatchFirstBlock:     startBlock,
 			BatchLastBlock:      endBlock,
+			RewardTier:          rewardTier,
 			TokenDetails:        details,
 		}
 	}
