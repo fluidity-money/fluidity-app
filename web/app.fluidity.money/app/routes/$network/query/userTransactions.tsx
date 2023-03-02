@@ -49,13 +49,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const { data: winnersData, errors: winnersErr } = address
-      ? await useUserRewardsByAddress(network ?? "", address)
-      : await useUserRewardsAll(network ?? "");
-
-    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
-      ? await useUserPendingRewardsByAddress(network ?? "", address)
-      : await useUserPendingRewardsAll(network ?? "");
+    const [
+      { data: winnersData, errors: winnersErr },
+      { data: pendingWinnersData, errors: pendingWinnersErr },
+    ] = await Promise.all(
+      address
+        ? [
+            useUserRewardsByAddress(network ?? "", address),
+            useUserPendingRewardsByAddress(network ?? "", address),
+          ]
+        : [
+            useUserRewardsAll(network ?? ""),
+            useUserPendingRewardsAll(network ?? ""),
+          ]
+    );
 
     if (
       winnersErr ||
@@ -123,7 +130,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
     // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
-    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+    for (let i = 0; i < JointPayoutAddrs.length; i += 100) {
       const { data: transactionsData, errors: transactionsErr } =
         await (async () => {
           switch (true) {
