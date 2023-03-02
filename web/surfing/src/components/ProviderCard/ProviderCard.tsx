@@ -18,28 +18,30 @@ interface IProviderCard {
 
 const ProviderCard = ({ name, prize, avgPrize, size }: IProviderCard) => {
   const cardProps =
-    size === "lg" ? styles["provider-card-large"] : styles["provider-card-medium"];
+    size === "lg" ? styles.lg : styles.md;
+
+  const classProps = `${cardProps} ${styles.ProviderCard}`
 
   return (
-    <Card className={cardProps}>
-      <section className={styles['card-left']}>
+    <Card className={classProps}>
+      <div className={styles.left}>
         {/* Icon */}
         <ProviderIcon provider={name} />
 
         {/* Provider Name */}
-        <section className={styles['card-section']}>
-          <Heading className={styles['card-token-name']} as={"h5"}>
+        <div className={styles.section}>
+          <Heading className={styles.name} as={"h5"}>
             {name === "Fluidity" ? "Transacting ƒAssets" : name}
           </Heading>
           <Text>{numberToMonetaryString(avgPrize)} Avg prize/tx</Text>
-        </section>
-      </section>
+        </div>
+      </div>
 
       {/* Provider Prize */}
-      <section className={styles['card-section']}>
+      <div className={styles.section}>
         <Text prominent={true}>{numberToMonetaryString(prize)}</Text>
         <Text>Top prize</Text>
-      </section>
+      </div>
     </Card>
   );
 };
