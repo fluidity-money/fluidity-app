@@ -1,4 +1,4 @@
-import { Token } from "~/util/chainUtils/tokens";
+import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
@@ -113,8 +113,6 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
     })();
   }, [connected]);
 
-  const decimals = new BN(10).pow(new BN(token.decimals));
-
   return (
     <motion.div variants={assetVariants} style={{ marginBottom: "1em" }}>
       <CollapsibleCard expanded={false} type="box">
@@ -122,7 +120,7 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
           <TokenCard
             showLabels
             token={token}
-            regAmt={amount.div(decimals).toNumber() || 0}
+            regAmt={getUsdFromTokenAmount(amount, token.decimals)}
             value={1}
             onButtonPress={() =>
               navigate(`/${network}/fluidify?token=${token.symbol}`)

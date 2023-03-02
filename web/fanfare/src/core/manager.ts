@@ -18,24 +18,24 @@ export const manager = (
         }
         
         const onError = (_: Error) => {
-            // TODO: Sentry or something
             failureCount += 1;
+            if (failureCount >= config.unhealthyThreshold) {
+                onUnhealthy(provider);
+                setTimeout(() => {
+                    provider.onTransaction(onTransaction);
+                }, 300000);
+                return;
+            }
+            provider.onTransaction(onTransaction);
         }
         
         const onWatchdogFailure = () => {
-            failureCount += 1;
+            onError(new Error("Watchdog failure, reconnecting..."));
         }
         
         provider.onTransaction(onTransaction);
         provider.onError(onError);
         provider.onWatchdogFailure(onWatchdogFailure)
-        provider
-
-        setInterval(() => {
-            if (failureCount >= config.unhealthyThreshold) {
-                onUnhealthy(provider);
-            }
-        }, 10000)
     })
 
     return {

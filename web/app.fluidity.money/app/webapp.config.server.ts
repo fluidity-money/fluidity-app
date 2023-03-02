@@ -68,7 +68,6 @@ const OptionsSchema = z.object({
         .array(
           z.object({
             name: z.string(),
-            img: z.string(),
             link: z.object({
               fUSDC: z.string(),
               fUSDT: z.string(),
@@ -81,34 +80,6 @@ const OptionsSchema = z.object({
         .min(1),
     })
   ),
-  provider_icons: z.object({
-    Aave: z.string(),
-    Aldrin: z.string(),
-    Circle: z.string(),
-    Compound: z.string(),
-    Dodo: z.string(),
-    Jupiter: z.string(),
-    Lemniscap: z.string(),
-    Maker: z.string(),
-    Multicoin: z.string(),
-    Orca: z.string(),
-    Polygon: z.string(),
-    Saber: z.string(),
-    Solana: z.string(),
-    Solend: z.string(),
-    Uniswap: z.string(),
-    Sushiswap: z.string(),
-    Fluidity: z.string(),
-    Balancer: z.string(),
-    Oneinch: z.string(),
-    Mooniswap: z.string(),
-    Curve: z.string(),
-    Multichain: z.string(),
-    "XY Finance": z.string(),
-    Raydium: z.string(),
-    Lifinity: z.string(),
-    Mercurial: z.string(),
-  }),
 });
 
 export type Options = z.infer<typeof OptionsSchema>;

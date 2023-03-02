@@ -101,65 +101,10 @@
   background: linear-gradient(to right, black, white, white, black);
 }
 
-.provider-card-large {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-top: 10px;
-  width: 444px;
-  height: 72px;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
-
-.provider-card-medium {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  width: 360px;
-  height: 96px;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
-
-.card-inner {
-  display: grid;
-  grid-template-columns: 2.5fr 1fr;
-  align-items: top;
-  background: unset;
-  border-radius: 12px;
-  border-style: none;
-  margin-top: auto;
-  margin-bottom: auto;
-  border-width: 2px;
-  outline: unset;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  gap: 2em;
-}
-
 .unclaimed-inner {
+  display: grid;
+  gap: 4em;
   grid-template-columns: 1.5fr 1fr;
-}
-
-.card-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-token-name {
-  margin: 0;
-}
-
-.card-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
-.card-left > img {
-  width: 2.5em;
 }
 
 .rewards-carousel {
@@ -183,13 +128,16 @@
     gap: 2em;
   }
 
-  .card-inner {
-    grid-template-columns: 1fr;
-    gap: 0;
+  .unclaimed-inner {
+    display: flex;
+    flex-direction: column;
   }
+
   #unclaimed-left {
+    display: flex;
     justify-content: center;
   }
+  
   #infobox {
     margin-left: 0;
     max-width: 450px;
@@ -238,11 +186,6 @@
 
   .no-user-rewards > section > span {
     text-align: center;
-  }
-
-  .provider-card-large {
-    width: 88vw;
-    min-width: 300px;
   }
 
   #infobox {
