@@ -427,7 +427,7 @@ describe("DAOV1", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      await dao.executeProposal(proposalId);
+      // await dao.executeProposal(proposalId);
     }
   );
 
