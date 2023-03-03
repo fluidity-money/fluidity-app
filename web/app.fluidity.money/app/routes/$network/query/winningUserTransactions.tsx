@@ -26,6 +26,7 @@ export type TransactionsLoaderData = {
   transactions: Transaction[];
   page: number;
   count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -114,8 +115,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           },
         }
       );
-
-      return new Error("Server could not fulfill request");
+      return Error("Server could not fulfill request");
     }
 
     const {
@@ -216,7 +216,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       transactions: mergedTransactions,
       count: winnersData.winners.length,
       loaded: true,
-    } as TransactionsLoaderData);
+    } satisfies TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

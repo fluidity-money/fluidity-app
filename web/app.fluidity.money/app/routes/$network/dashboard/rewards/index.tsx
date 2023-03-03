@@ -2,7 +2,7 @@ import type { Chain } from "~/util/chainUtils/chains";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
-import type { TransactionsLoaderData } from "../../query/userTransactions";
+import type { TransactionsLoaderData } from "../../query/winningUserTransactions";
 import type { RewardsLoaderData } from "../../query/dashboard/rewards";
 import type { UnclaimedRewardsLoaderData } from "../../query/dashboard/unclaimedRewards";
 
@@ -145,11 +145,11 @@ export default function Rewards() {
 
   const { connected, address, tokens } = useContext(FluidityFacadeContext);
 
-  const userRewardsData = useFetcher<RewardsLoaderData>();
+  const userRewardsData = useFetcher();
 
-  const userTransactionsData = useFetcher<TransactionsLoaderData>();
+  const userTransactionsData = useFetcher();
 
-  const userUnclaimedRewardsData = useFetcher<UnclaimedRewardsLoaderData>();
+  const userUnclaimedRewardsData = useFetcher();
 
   useEffect(() => {
     if (!address) return;

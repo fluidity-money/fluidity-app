@@ -326,8 +326,6 @@ export default function Home() {
     },
   };
 
-  console.log(data.user.home.loaded);
-
   useEffect(() => {
     if (!connected) return;
 

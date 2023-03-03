@@ -48,14 +48,16 @@ type AssetStatisticsRequest = {
   };
 };
 
+export type AssetPrize = {
+  winning_amount: number;
+  transaction_hash: string;
+};
+
 type AssetStatisticsResponse = {
   data?: {
     user: {
       aggregate: {
-        max: {
-          winning_amount: number;
-          transaction_hash: string;
-        };
+        max: AssetPrize;
         avg: {
           winning_amount: number;
         };
@@ -63,10 +65,7 @@ type AssetStatisticsResponse = {
     };
     global: {
       aggregate: {
-        max: {
-          winning_amount: number;
-          transaction_hash: string;
-        };
+        max: AssetPrize;
       };
     };
   };

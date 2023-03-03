@@ -5,6 +5,7 @@ import { useUserTransactionCountByAddressTimestamp } from "~/queries";
 
 export type ProjectedWinData = {
   projectedWin: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -53,7 +54,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     return json({
       projectedWin,
-    } as ProjectedWinData);
+      loaded: true,
+    } satisfies ProjectedWinData);
   } catch (err) {
     captureException(new Error(`Could not fetch historical rewards: ${err}`), {
       tags: {

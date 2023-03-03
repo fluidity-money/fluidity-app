@@ -1,47 +1,32 @@
+import type { AssetPrize } from "~/queries/useAssetStatistics";
 import type { TransactionsLoaderData } from "../../userTransactions";
 
-import BN from "bn.js";
 import { LoaderFunction } from "react-router-dom";
 import useAssetStatistics from "~/queries/useAssetStatistics";
 import { jsonGet } from "~/util";
 import {
   getTokenFromAddress,
   getTokenFromSymbol,
-  Token,
 } from "~/util/chainUtils/tokens";
+import { json } from "@remix-run/node";
 
-export type ITokenHeader = {
-  token: Token;
-  fluidAmt: BN;
-  regAmt: BN;
+export type AssetActivity = {
+  desc: string;
   value: number;
-  topPrize: {
-    winning_amount: number;
-    transaction_hash: string;
-  };
-  avgPrize: number;
-  topAssetPrize: {
-    winning_amount: number;
-    transaction_hash: string;
-  };
-  activity: {
-    desc: string;
-    value: number;
-    reward: number;
-    transaction: string;
-    time: number;
-  }[];
+  reward: number;
+  transaction: string;
+  time: number;
 };
 
-export type ITokenStatistics = Omit<
-  ITokenHeader,
-  "token" | "fluidAmt" | "regAmt" | "value"
->;
+export type AssetLoaderData = {
+  topPrize: AssetPrize;
+  avgPrize: number;
+  topAssetPrize: AssetPrize;
+  activity: Array<AssetActivity>;
+  loaded: boolean;
+};
 
-export const loader: LoaderFunction = async ({
-  request,
-  params,
-}): Promise<ITokenStatistics> => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
   const token = url.searchParams.get("token");
@@ -74,30 +59,31 @@ export const loader: LoaderFunction = async ({
       page: 1,
       address,
       token: fluidTokenAddr,
-    }).then((res) =>
-      res.transactions?.map((tx) => {
-        const desc = tx.sender === address ? "Sent" : "Received";
-        const value = tx.value;
-        const reward = tx.reward;
-        const transaction = tx.hash;
-        const time = tx.timestamp;
-
-        return { desc, value, reward, transaction, time };
-      })
-    ),
+    }),
   ]);
 
   if (!assetStatistics.data) throw new Error("Couldn't fetch asset data.");
   if (!activity) throw new Error("Couldn't fetch activity data.");
 
+  const parsedActivity = activity.transactions?.map((tx) => {
+    const desc = tx.sender === address ? "Sent" : "Received";
+    const value = tx.value;
+    const reward = tx.reward;
+    const transaction = tx.hash;
+    const time = tx.timestamp;
+
+    return { desc, value, reward, transaction, time };
+  });
+
   const topPrize = assetStatistics.data.user.aggregate.max;
   const avgPrize = assetStatistics.data.user.aggregate.avg.winning_amount;
   const topAssetPrize = assetStatistics.data.global.aggregate.max;
 
-  return {
+  return json({
     topPrize,
     avgPrize,
     topAssetPrize,
-    activity,
-  };
+    activity: parsedActivity,
+    loaded: true,
+  } satisfies AssetLoaderData);
 };

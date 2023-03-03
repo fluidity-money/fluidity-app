@@ -11,6 +11,11 @@ import { hashMessage } from "@ethersproject/hash";
 import nacl from "tweetnacl";
 import { ethers } from "ethers";
 
+export type AddReferralRes = {
+  success: boolean;
+  msg: unknown;
+};
+
 const validAddress = (input: string, network: string): boolean => {
   try {
     return chainType(network) === "evm"
@@ -112,11 +117,11 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json({
       success: true,
       msg: res.data,
-    });
+    } satisfies AddReferralRes);
   } catch (e) {
     return json({
       success: false,
       msg: e,
-    });
+    } satisfies AddReferralRes);
   }
 };
