@@ -1,10 +1,10 @@
-import type {
+import {
+  json,
   LinksFunction,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
 
-import { json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -26,23 +26,28 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
+  AssetsIcon,
   Text,
   Heading,
   ChainSelectorButton,
   BlockchainModal,
   numberToMonetaryString,
   useViewport,
+  ConnectedWalletModal,
+  ConnectedWallet,
+  Modal,
+  ProvideLiquidity,
+  Provider,
+  ChainName,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
-import ProvideLiquidity from "~/components/ProvideLiquidity";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import ConnectedWallet from "~/components/ConnectedWallet";
-import Modal from "~/components/Modal";
 import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
-import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
+import { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -54,6 +59,13 @@ export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
+
+  // Sanitize names from config with Provider names
+  Object.keys(provider).forEach((chain) => {
+    provider[chain].providers.forEach((provider) => {
+      provider.name = getProviderDisplayName(provider.name);
+    });
+  });
 
   const tokensConfig = config.config;
 
@@ -110,13 +122,41 @@ const routeMapper = (route: string) => {
 
 type LoaderData = {
   fromRedirect: boolean;
-  network: string;
-  provider: typeof config.liquidity_providers;
-  tokensConfig: typeof config.config;
+  network: ChainName;
+  provider: {
+    [x: string]: {
+      providers: {
+        name: Provider;
+        link: {
+          fUSDC: string;
+          fUSDT: string;
+          fTUSD?: string;
+          fFRAX?: string;
+          fDAI?: string;
+        };
+      }[];
+    };
+  };
+  tokensConfig: {
+    [x: string]: {
+      tokens: {
+        symbol: Tokens;
+        address: string;
+        name: string;
+        logo: string;
+        colour: string;
+        isFluidOf?: string;
+        obligationAccount?: string;
+        dataAccount?: string;
+        decimals: number;
+        userMintLimit?: number;
+      }[];
+    };
+  };
 };
 
 export default function Dashboard() {
-  const { network } = useLoaderData<LoaderData>();
+  const { network, provider, tokensConfig } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -126,6 +166,7 @@ export default function Dashboard() {
 
   const { showExperiment, client } = useContext(SplitContext);
   const showArbitrum = showExperiment("enable-arbitrum");
+  const showAssets = showExperiment("enable-assets-page");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -168,10 +209,10 @@ export default function Dashboard() {
   }[] = [
     { home: { name: "Dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { assets: { name: "Assets", icon: <AssetsIcon /> } },
   ];
 
-  const chainNameMap: Record<string, {name: string; icon: JSX.Element}> =
-  {
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
       name: "ETH",
       icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -295,7 +336,9 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({name}) => showArbitrum ? true : name !== "ARB")}
+            options={Object.values(chainNameMap).filter(({ name }) =>
+              showArbitrum ? true : name !== "ARB"
+            )}
             setOption={handleSetChain}
             mobile={isMobile}
           />
@@ -322,33 +365,37 @@ export default function Dashboard() {
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
         {/* Nav Bar */}
         <ul>
-          {navigationMap.map((obj, index) => {
-            const key = Object.keys(obj)[0];
-            const { name, icon } = Object.values(obj)[0];
-            const active = index === activeIndex;
+          {navigationMap
+            .filter((obj) =>
+              showAssets ? true : Object.keys(obj)[0] !== "assets"
+            )
+            .map((obj, index) => {
+              const key = Object.keys(obj)[0];
+              const { name, icon } = Object.values(obj)[0];
+              const active = index === activeIndex;
 
-            return (
-              <li key={key}>
-                {index === activeIndex ? (
-                  <motion.div className={"active"} layoutId="active" />
-                ) : (
-                  <div />
-                )}
-                <Link to={key}>
-                  <Text
-                    prominent={active}
-                    className={
-                      active
-                        ? "dashboard-navbar-active"
-                        : "dashboard-navbar-default"
-                    }
-                  >
-                    {icon} {name}
-                  </Text>
-                </Link>
-              </li>
-            );
-          })}
+              return (
+                <li key={key}>
+                  {index === activeIndex ? (
+                    <motion.div className={"active"} layoutId="active" />
+                  ) : (
+                    <div />
+                  )}
+                  <Link to={key}>
+                    <Text
+                      prominent={active}
+                      className={
+                        active
+                          ? "dashboard-navbar-active"
+                          : "dashboard-navbar-default"
+                      }
+                    >
+                      {icon} {name}
+                    </Text>
+                  </Link>
+                </li>
+              );
+            })}
         </ul>
 
         {/* Connect Wallet Button */}
@@ -507,8 +554,16 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-        {/* Provide Luquidity*/}
-        {!openMobModal && <ProvideLiquidity />}
+        {/* Provide Liquidity*/}
+        <div className="pad-main" style={{ marginBottom: "2em" }}>
+          {!openMobModal && (
+            <ProvideLiquidity
+              provider={provider}
+              network={network}
+              tokensConfig={tokensConfig}
+            />
+          )}
+        </div>
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&
@@ -556,10 +611,6 @@ export default function Dashboard() {
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
-            {/* Version */}
-            <a href={"/"}>
-              <Text>Fluidity Money</Text>
-            </a>
             {/* Terms */}
             <a
               href={
@@ -575,7 +626,7 @@ export default function Dashboard() {
                 "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
               }
             >
-              <Text>Privacy policy</Text>
+              <Text>Privacy Policy</Text>
             </a>
 
             {/* Audits Completed */}
@@ -595,7 +646,7 @@ export default function Dashboard() {
             {/* Source code */}
             {showExperiment("enable-source-code") && (
               <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                <Text>Source code</Text>
+                <Text>Source Code</Text>
               </a>
             )}
           </section>

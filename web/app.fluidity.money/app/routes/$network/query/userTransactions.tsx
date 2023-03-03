@@ -39,6 +39,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
+  const token = url.searchParams.get("token");
   const page_ = url.searchParams.get("page");
 
   if (!network || !page_) return new Error("Invalid Request");
@@ -48,13 +49,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const { data: winnersData, errors: winnersErr } = address
-      ? await useUserRewardsByAddress(network ?? "", address)
-      : await useUserRewardsAll(network ?? "");
-
-    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
-      ? await useUserPendingRewardsByAddress(network ?? "", address)
-      : await useUserPendingRewardsAll(network ?? "");
+    const [
+      { data: winnersData, errors: winnersErr },
+      { data: pendingWinnersData, errors: pendingWinnersErr },
+    ] = await Promise.all(
+      address
+        ? [
+            useUserRewardsByAddress(network ?? "", address),
+            useUserPendingRewardsByAddress(network ?? "", address),
+          ]
+        : [
+            useUserRewardsAll(network ?? ""),
+            useUserPendingRewardsAll(network ?? ""),
+          ]
+    );
 
     if (
       winnersErr ||
@@ -122,7 +130,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
     // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
-    for (let i = 0; i <= JointPayoutAddrs.length; i += 100) {
+    for (let i = 0; i < JointPayoutAddrs.length; i += 100) {
       const { data: transactionsData, errors: transactionsErr } =
         await (async () => {
           switch (true) {
@@ -130,7 +138,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsByAddress(
                 network,
-                getTokenForNetwork(network),
+                token ? [token] : getTokenForNetwork(network),
                 page,
                 address as string,
                 JointPayoutAddrs.slice(i, i + 99),
@@ -141,7 +149,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
               return useUserTransactionsAll(
                 network,
-                getTokenForNetwork(network),
+                token ? [token] : getTokenForNetwork(network),
                 page,
                 JointPayoutAddrs.slice(i, i + 99),
                 limit === Infinity ? 12 : limit

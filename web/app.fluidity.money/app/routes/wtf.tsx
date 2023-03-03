@@ -25,9 +25,9 @@ import {
   appendLeading0x,
   Video,
   useViewport,
+  Modal,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
-import Modal from "~/components/Modal";
 import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";

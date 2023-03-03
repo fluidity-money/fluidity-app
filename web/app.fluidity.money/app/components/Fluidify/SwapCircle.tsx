@@ -1,8 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Video } from "@fluidity-money/surfing";
+import { Video, BloomEffect } from "@fluidity-money/surfing";
 import FluidityHotSpot from "~/components/Fluidify/FluidifyHotSpot";
 import AugmentedToken from "~/types/AugmentedToken";
-import BloomEffect from "~/components/BloomEffect";
 import { ColorMap } from "~/webapp.config.server";
 
 interface ISwapCircleProps {

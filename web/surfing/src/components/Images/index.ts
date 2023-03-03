@@ -7,6 +7,7 @@ import { ArrowUp } from "./ArrowUp";
 import { Trophy } from "./Trophy";
 import { Twitter } from "./Twitter";
 import { DashboardIcon } from "./Dashboard";
+import { WarningIcon } from "./WarningIcon";
 import { DaoIcon } from "./Dao";
 import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
@@ -23,6 +24,7 @@ export {
   Trophy,
   Twitter,
   DashboardIcon,
+  WarningIcon,
   DaoIcon,
   AssetsIcon,
   ProviderIcon,

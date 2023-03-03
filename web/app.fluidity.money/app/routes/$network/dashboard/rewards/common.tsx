@@ -35,21 +35,17 @@ const UserRewards = ({
   return (
     <>
       {/* Info card*/}
-      <Card
-        id="user-rewards"
-        className="card-outer"
-        component="div"
-        rounded={true}
-        type="box"
-      >
-        <div className="card-inner unclaimed-inner">
-          {/* Icon */}
-          <img
-            id="card-logo"
-            src="/images/fluidTokensMetallicCropped.svg"
-            alt="tokens"
-            style={{ width: 200 }}
-          />
+      <Card rounded type="holobox" style={{ padding: "2em" }}>
+        <div className="unclaimed-inner">
+          <section id="unclaimed-left">
+            {/* Icon */}
+            <img
+              id="card-logo"
+              src="/images/fluidTokensMetallicCropped.svg"
+              alt="tokens"
+              style={{ width: 200 }}
+            />
+          </section>
 
           {/* Unclaimed fluid rewards */}
           <section id="unclaimed">

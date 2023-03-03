@@ -21,8 +21,8 @@ export type TransactionProvider = {
     /** @method onWatchdogFailure A callback that is called when the watchdog fails. */
     onWatchdogFailure: (err: () => void) => void;
 
-    /** @method watchdog - A method that is called to check if the provider is healthy. */
-    watchdog(): void;
     /** @method name - A method that returns the name of the provider. */
     name: () => string;
 }
+
+export { Transaction };

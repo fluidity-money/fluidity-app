@@ -5,8 +5,6 @@ import type { LinksFunction, LoaderFunction } from "@remix-run/node";
 import type { TransactionsLoaderData } from "../../query/userTransactions";
 import type { RewardsLoaderData } from "../../query/dashboard/rewards";
 import type { UnclaimedRewardsLoaderData } from "../../query/dashboard/unclaimedRewards";
-import type { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
-import type { Providers } from "@fluidity-money/surfing/dist/types/components/Images/ProviderIcon/ProviderIcon";
 
 import {
   transactionActivityLabel,
@@ -28,21 +26,19 @@ import {
   trimAddress,
   LinkButton,
   useViewport,
-  Token,
   HoverButton,
+  LabelledValue,
   ProviderIcon,
+  ProviderCard,
+  Token as TokenIcon,
+  Provider
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
-import {
-  LabelledValue,
-  ProviderCard,
-  ToolTipContent,
-  useToolTip,
-} from "~/components";
+import { ToolTipContent, useToolTip } from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
-import config, { colors } from "~/webapp.config.server";
+import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
 
 export const links: LinksFunction = () => {
@@ -52,8 +48,6 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
-  const icons = config.provider_icons;
-
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
@@ -61,7 +55,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   return json({
     network,
-    icons,
     page: txTablePage,
     colors: (await colors)[network as string],
   });
@@ -533,8 +526,8 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <Token token={`f${activeTokenPerformance[0].token}` as Tokens} />
-                  {`f${activeTokenPerformance[0].token}` as Tokens}
+                  <TokenIcon token={`f${activeTokenPerformance[0].token}` satisfies Token} />
+                  {`f${activeTokenPerformance[0].token}` satisfies Token}
                 </div>
               </LabelledValue>
             </div>
@@ -559,7 +552,7 @@ export default function Rewards() {
           <div className="statistics-set">
             <LabelledValue label={"Highest Reward Distribution"}>
               <div className="highest-performer-child">
-                <ProviderIcon provider={rewarders[0]?.name as Providers} />
+                <ProviderIcon provider={rewarders[0]?.name as Provider} />
                 {rewarders[0]?.name === "Fluidity"
                   ? "Transacting ƒAssets"
                   : rewarders[0]?.name}

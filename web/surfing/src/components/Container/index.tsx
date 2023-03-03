@@ -12,6 +12,7 @@ import { Partner } from "./Partner";
 import { MotionContinuousCarousel } from "./MotionContinuousCarousel";
 import { TokenCard } from "./TokenCard";
 import { TokenDetails } from "./TokenDetails";
+import { FluidifyCard } from "./FluidifyCard";
 
 export {
   Row,
@@ -24,4 +25,5 @@ export {
   MotionContinuousCarousel,
   TokenCard,
   TokenDetails,
+  FluidifyCard
 };

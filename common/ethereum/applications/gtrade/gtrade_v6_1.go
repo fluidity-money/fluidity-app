@@ -14,6 +14,7 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -119,8 +120,11 @@ var gtradeV6_1PairAbi ethAbi.ABI
 // erc20Abi set by init.go to generate the ERC20 Transfer struct
 var erc20Abi ethAbi.ABI
 
-// GetgtradeV6_1Fees returns gtrade V6_1's fee of the amount swapped.
-// The fee is dependent on the pool being swapped on
+// GetGtradeV6_1Fees returns Gtrade V6_1's fee of the amount swapped.
+// GTrade fees are split into 3 components, RolloverFee, FundingFee
+// (which may be negative in cases of rewards), and ClosingFee.
+// These fees are transferred to the Pool 'Manager', as well as the token
+// We find and add these transfers to calculate the fees
 func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
@@ -131,11 +135,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != gtradeV6_1FeesChargedLogTopic {
-		return nil, fmt.Errorf(
-			"Incorrect Log Topic (%v, expected %v)",
-			logTopic,
-			gtradeV6_1FeesChargedLogTopic,
-		)
+		return nil, nil
 	}
 
 	unpacked, err := gtradeV6_1PairAbi.Unpack("FeesCharged", transfer.Log.Data)
@@ -231,15 +231,19 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	// Check token is fluid, otherwise err
 	contractAddr = ethereum.ConvertInternalAddress(transfer.Log.Address)
 	if contractAddr != fluidTokenContract {
-		return nil, fmt.Errorf(
-			"First GTrade Fee Transfer in transaction %#v does not involve fluid token - skipping!",
-			transfer.TransactionHash.String(),
-		)
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a GTrade swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
 	}
 
 	// Check Sender is GTrade Storage
-	sender := firstFeeTransferLog.Topics[1]
-	if sender.String() != storageT.String() {
+	sender := ethCommon.HexToAddress(firstFeeTransferLog.Topics[1].String())
+	if sender != storageT {
 		return nil, fmt.Errorf(
 			"Unexpected Sender (%v) in GTrade Fee Transfer (Expected %v)",
 			sender.String(),
@@ -248,7 +252,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	}
 
 	// firstFee is the amount of the first fee transfer
-	feeBuffer := []interface{}{unpacked[1]}
+	feeBuffer := []interface{}{unpacked[0]}
 	firstFee, err := ethereum.CoerceBoundContractResultsToRat(feeBuffer)
 
 	if err != nil {
@@ -283,15 +287,19 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	// Check token is fluid, otherwise err
 	contractAddr = ethereum.ConvertInternalAddress(transfer.Log.Address)
 	if contractAddr != fluidTokenContract {
-		return nil, fmt.Errorf(
-			"First GTrade Fee Transfer in transaction %#v does not involve fluid token - skipping!",
-			transfer.TransactionHash.String(),
-		)
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a GTrade swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
 	}
 
 	// Check Sender is GTrade Storage
-	sender = firstFeeTransferLog.Topics[1]
-	if sender.String() != storageT.String() {
+	sender = ethCommon.HexToAddress(secondFeeTransferLog.Topics[1].String())
+	if sender != storageT {
 		return nil, fmt.Errorf(
 			"Unexpected Sender (%v) in GTrade Fee Transfer (Expected %v)",
 			sender.String(),
@@ -300,7 +308,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	}
 
 	// secondFee is the amount of the second fee transfer
-	feeBuffer[0] = unpacked[1]
+	feeBuffer[0] = unpacked[0]
 	secondFee, err := ethereum.CoerceBoundContractResultsToRat(feeBuffer)
 
 	if err != nil {

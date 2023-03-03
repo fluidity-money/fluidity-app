@@ -14,7 +14,7 @@ const Tooltip = ({
   ...props
 }: ITooltip) => {
   return (
-    <Card style={{...style, padding: '1em'}} type="frosted" rounded>
+    <Card style={style} type="frosted" rounded>
       {children}
     </Card>
   );

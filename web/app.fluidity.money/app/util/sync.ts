@@ -6,17 +6,15 @@ export const useSync = <T>(
   initial: T | undefined
 ): [T | undefined, (value: T | undefined) => void] => {
   const [loaded, setLoaded] = useState(false);
-  const [sync, setSync] = useState<T | undefined>(
-    initial
-  );
+  const [sync, setSync] = useState<T | undefined>(initial);
 
   useEffect(() => {
     if (!loaded) {
-        localforage.getItem(key).then((value) => {
-            setSync(value as T);
-            setLoaded(true);
-        });
-        return;
+      localforage.getItem(key).then((value) => {
+        setSync(value as T);
+        setLoaded(true);
+      });
+      return;
     }
     localforage.setItem(key, sync);
   }, [key, sync]);

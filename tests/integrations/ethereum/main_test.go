@@ -42,7 +42,7 @@ type integrationTest struct {
 	FluidTokenDecimals   int               `json:"token_decimals"`
 	FluidContractAddress ethCommon.Address `json:"contract_address"`
 
-	RpcMethods  map[string]interface{} `json:"rpc_methods"`
+	RpcMethods  map[string]interface{}            `json:"rpc_methods"`
 	CallMethods map[string]map[string]interface{} `json:"call_methods"`
 
 	Client *ethclient.Client
@@ -107,7 +107,7 @@ func init() {
 	apeswapTests := unmarshalJsonTestOrFatal(integrationTestApeSwap)
 	tests = append(tests, apeswapTests...)
 
-	saddleTests:= unmarshalJsonTestOrFatal(integrationTestSaddle)
+	saddleTests := unmarshalJsonTestOrFatal(integrationTestSaddle)
 	tests = append(tests, saddleTests...)
 }
 
@@ -143,7 +143,7 @@ func TestIntegrations(t *testing.T) {
 			convertedReceipt = common.ConvertGethReceipt(*txReceipt)
 		}
 
-		fees, _, emission, err := applications.GetApplicationFee(
+		fees, emission, err := applications.GetApplicationFee(
 			transfer,
 			client,
 			fluidAddress,

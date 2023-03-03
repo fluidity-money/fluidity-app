@@ -18,7 +18,7 @@ import {
   trimAddress,
   numberToMonetaryString,
   useViewport,
-  Tooltip
+  Tooltip,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -725,7 +725,10 @@ export default function Home() {
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100%", height: "400px", mixBlendMode: 'screen' }}>
+        <div
+          className="graph"
+          style={{ width: "100%", height: "400px", mixBlendMode: "screen" }}
+        >
           <div className="statistics-row pad-main">
             {graphTransformers.map((filter, i) => (
               <button
@@ -760,9 +763,9 @@ export default function Home() {
                 <Tooltip
                   style={{
                     minWidth: 160,
-                    gap: '0.4em',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    gap: "0.4em",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   <Text>{format(datum.timestamp, "dd/MM/yy")}</Text>
@@ -774,10 +777,10 @@ export default function Home() {
                     </Text>
                   </div>
                   <div>
-                    <Text prominent>{numberToMonetaryString(datum.amount)}</Text>
-                    <Text>
-                      {' '}swapped
+                    <Text prominent>
+                      {numberToMonetaryString(datum.amount)}
                     </Text>
+                    <Text> swapped</Text>
                   </div>
                 </Tooltip>
               ) : (

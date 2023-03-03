@@ -4,3 +4,5 @@ export { default as useUserUnclaimedRewards } from "./useUserUnclaimedRewards";
 export * from "./useUserRewards";
 export * from "./useUserYield";
 export { default as useTokenRewardStatistics } from './useTokenRewardStatistics'
+export * from "./useReferrals";
+export * from "./addReferral";

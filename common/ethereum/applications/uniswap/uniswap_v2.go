@@ -13,85 +13,86 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 const uniswapV2SwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 
 const uniswapV2PairAbiString = `[
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "sender",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount0In",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount1In",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount0Out",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount1Out",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        }
-      ],
-      "name": "Swap",
-      "type": "event"
-    },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount0In",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount1In",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount0Out",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount1Out",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "Swap",
+    "type": "event"
+  },
 	{
-      "constant": true,
-      "inputs": [],
-      "name": "token0",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-	  "constant": true,
-      "inputs": [],
-      "name": "token1",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    }
+    "constant": true,
+    "inputs": [],
+    "name": "token0",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+		"constant": true,
+    "inputs": [],
+    "name": "token1",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
 ]`
 
 // uniswapV2PairAbi set by init.go to generate the ABI code
@@ -110,11 +111,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != uniswapV2SwapLogTopic {
-		return nil, fmt.Errorf(
-			"Incorrect Log Topic! (%v, expected %v)",
-			logTopic,
-			uniswapV2SwapLogTopic,
-		)
+		return nil, nil
 	}
 
 	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
@@ -145,6 +142,8 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	// convert the pair contract's address to the go ethereum address type
 	contractAddr := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
+	fmt.Println("contract", contractAddr)
+
 	// figure out which token is which in the pair contract
 	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token0")
 
@@ -160,6 +159,24 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	if err != nil {
 		return nil, fmt.Errorf(
 			"Failed to coerce token0 address! %v",
+			err,
+		)
+	}
+
+	token1addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token1")
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get token1 address! %v",
+			err,
+		)
+	}
+
+	token1addr, err := ethereum.CoerceBoundContractResultsToAddress(token1addr_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce token1 address! %v",
 			err,
 		)
 	}
@@ -190,11 +207,23 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	var (
 		// Whether token0 is the fluid token
 		fluidIndex0 = token0addr == fluidTokenContract
+		// Whether swap contains any fluid tokens
+		swapContainsFluid = fluidIndex0 || (token1addr == fluidTokenContract)
 		// Whether amount0 is equal to zero
 		amount0IsZero = amount0in.Cmp(zeroRat) == 0
 	)
 
 	switch true {
+	case !swapContainsFluid:
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Received a UniswapV2 swap in transaction %#v not involving the fluid token - skipping!",
+				transfer.TransactionHash.String(),
+			)
+		})
+
+		return nil, nil
+
 	case fluidIndex0 && amount0IsZero:
 		inTokenIsFluid = false
 		fluidTransferAmount = amount0out
