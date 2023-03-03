@@ -86,18 +86,17 @@ function ErrorBoundary() {
   );
 }
 
-type CacheData = RewardsLoaderData &
-  TransactionsLoaderData &
-  Partial<UnclaimedRewardsLoaderData>;
+type CacheData = {
+  rewards: RewardsLoaderData;
+  transactions: TransactionsLoaderData;
+  unclaimed: UnclaimedRewardsLoaderData;
+};
 
-const SAFE_DEFAULT: CacheData = {
+const SAFE_DEFAULT_REWARDS: RewardsLoaderData = {
   // Only used in Rewards
-  count: 0,
   network: "ethereum",
   fluidTokenMap: {},
-  transactions: [],
   totalPrizePool: 0,
-  page: 0,
   loaded: false,
   fluidPairs: 0,
   networkFee: 0,
@@ -116,6 +115,19 @@ const SAFE_DEFAULT: CacheData = {
     year: [],
     all: [],
   },
+};
+
+const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
+  count: 0,
+  page: 0,
+  loaded: false,
+  transactions: [],
+};
+
+const SAFE_DEFAULT_UNCLAIMED: UnclaimedRewardsLoaderData = {
+  unclaimedTokenAddrs: [],
+  userUnclaimedRewards: 0,
+  loaded: false,
 };
 
 export default function Rewards() {
@@ -155,20 +167,38 @@ export default function Rewards() {
     );
   }, [address, page]);
 
-  const [userFluidPairs, setUserFluidPairs] = useState(SAFE_DEFAULT.fluidPairs);
+  const [userFluidPairs, setUserFluidPairs] = useState(
+    SAFE_DEFAULT_REWARDS.fluidPairs
+  );
 
-  const data: { user: CacheData; global: CacheData } = {
+  const data: { global: CacheData; user: CacheData } = {
     global: {
-      ...SAFE_DEFAULT,
-      ...rewardsData,
-      ...globalTransactionsData,
+      rewards: {
+        ...SAFE_DEFAULT_REWARDS,
+        ...rewardsData,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...globalTransactionsData,
+      },
+      unclaimed: {
+        ...SAFE_DEFAULT_UNCLAIMED,
+      },
     },
     user: {
-      ...SAFE_DEFAULT,
-      ...userRewardsData.data,
-      ...userTransactionsData.data,
-      ...userUnclaimedRewardsData.data,
-      fluidPairs: userFluidPairs,
+      rewards: {
+        ...SAFE_DEFAULT_REWARDS,
+        ...userRewardsData.data,
+        fluidPairs: userFluidPairs,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...userTransactionsData.data,
+      },
+      unclaimed: {
+        ...SAFE_DEFAULT_UNCLAIMED,
+        ...userUnclaimedRewardsData.data,
+      },
     },
   };
 
@@ -191,44 +221,44 @@ export default function Rewards() {
     width > 0 && width < tableBreakpoint
       ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
       : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "WINNER",
-          },
-          {
-            name: "REWARDED TIME",
-            alignRight: true,
-          },
-        ];
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "WINNER",
+        },
+        {
+          name: "REWARDED TIME",
+          alignRight: true,
+        },
+      ];
 
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({ sender, receiver }: Transaction) =>
-            [sender, receiver].includes(address),
-          name: "MY REWARDS",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({ sender, receiver }: Transaction) =>
+          [sender, receiver].includes(address),
+        name: "MY REWARDS",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
@@ -275,19 +305,32 @@ export default function Rewards() {
     userUnclaimedRewards,
     unclaimedTokenAddrs,
     weeklyRewards,
+    txLoaded,
   } = useMemo(() => {
+    const {
+      rewards: rewardsData,
+      transactions: txData,
+      unclaimed,
+    } = activeTableFilterIndex ? data.user : data.global;
+
     const {
       fluidPairs,
       networkFee,
       gasFee,
-      transactions,
       totalPrizePool,
       timestamp,
       rewarders,
+      loaded: rewardsLoaded,
       rewards,
+    } = rewardsData;
+
+    const { transactions, loaded: txLoaded } = txData;
+
+    const {
       userUnclaimedRewards,
       unclaimedTokenAddrs,
-    } = activeTableFilterIndex ? data.user : data.global;
+      loaded: unclaimedLoaded,
+    } = unclaimed;
 
     const {
       week: weeklyYield,
@@ -333,6 +376,9 @@ export default function Rewards() {
       userUnclaimedRewards,
       unclaimedTokenAddrs,
       weeklyRewards,
+      rewardsLoaded,
+      txLoaded,
+      unclaimedLoaded,
     };
   }, [
     activeTableFilterIndex,
@@ -594,11 +640,7 @@ export default function Rewards() {
           filters={txTableFilters}
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
-          loaded={
-            activeTableFilterIndex
-              ? userTransactionsData.data?.loaded
-              : globalTransactionsData?.loaded
-          }
+          loaded={txLoaded}
           showLoadingAnimation={true}
         />
       </section>

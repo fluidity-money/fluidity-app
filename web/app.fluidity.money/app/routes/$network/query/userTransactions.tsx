@@ -55,13 +55,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ] = await Promise.all(
       address
         ? [
-            useUserRewardsByAddress(network ?? "", address),
-            useUserPendingRewardsByAddress(network ?? "", address),
-          ]
+          useUserRewardsByAddress(network ?? "", address),
+          useUserPendingRewardsByAddress(network ?? "", address),
+        ]
         : [
-            useUserRewardsAll(network ?? ""),
-            useUserPendingRewardsAll(network ?? ""),
-          ]
+          useUserRewardsAll(network ?? ""),
+          useUserPendingRewardsAll(network ?? ""),
+        ]
     );
 
     if (
@@ -205,7 +205,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-            (currency === "DAI" || currency === "fDAI")
+              (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -234,8 +234,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         tx.sender === MintAddress
           ? "in"
           : tx.receiver === MintAddress
-          ? "out"
-          : undefined;
+            ? "out"
+            : undefined;
 
       const winner = jointWinnersMap[tx.hash];
       const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
@@ -248,9 +248,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           : ((winner as Winner)?.winning_address as unknown as string) ?? "",
         reward: winner
           ? (isFromPendingWin
-              ? (winner as PendingWinner).win_amount
-              : (winner as Winner).winning_amount) /
-            10 ** winner.token_decimals
+            ? (winner as PendingWinner).win_amount
+            : (winner as Winner).winning_amount) /
+          10 ** winner.token_decimals
           : 0,
         hash: tx.hash,
         rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
@@ -272,7 +272,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       page,
       transactions: mergedTransactions,
       count: Object.keys(winnersMap).length,
-    } as TransactionsLoaderData);
+      loaded: true,
+    } satisfies TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

@@ -184,7 +184,10 @@ type LoaderData = {
   };
 };
 
-type CacheData = HomeLoaderData & TransactionsLoaderData;
+type CacheData = {
+  home: HomeLoaderData;
+  transactions: TransactionsLoaderData;
+};
 
 function ErrorBoundary(error: Error) {
   console.log(error);
@@ -204,11 +207,9 @@ function ErrorBoundary(error: Error) {
   );
 }
 
-const SAFE_DEFAULT: CacheData = {
+const SAFE_DEFAULT_HOME: HomeLoaderData = {
   totalPrizePool: 0,
-  count: 0,
   network: "ethereum",
-  transactions: [],
   loaded: false,
   rewards: {
     day: [],
@@ -220,7 +221,13 @@ const SAFE_DEFAULT: CacheData = {
   volume: [],
   totalFluidPairs: 0,
   timestamp: 0,
+};
+
+const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
+  count: 0,
   page: 0,
+  transactions: [],
+  loaded: false,
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -289,7 +296,7 @@ export default function Home() {
   }, [address, page]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
-    SAFE_DEFAULT.totalFluidPairs
+    SAFE_DEFAULT_HOME.totalFluidPairs
   );
 
   const data: {
@@ -297,17 +304,29 @@ export default function Home() {
     user: CacheData;
   } = {
     global: {
-      ...SAFE_DEFAULT,
-      ...homeData,
-      ...globalTransactionsData,
+      home: {
+        ...SAFE_DEFAULT_HOME,
+        ...homeData,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...globalTransactionsData,
+      },
     },
     user: {
-      ...SAFE_DEFAULT,
-      ...userHomeData.data,
-      ...userTransactionsData.data,
-      totalFluidPairs: userFluidPairs,
+      home: {
+        ...SAFE_DEFAULT_HOME,
+        ...userHomeData.data,
+        totalFluidPairs: userFluidPairs,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...userTransactionsData.data,
+      },
     },
   };
+
+  console.log(data.user.home.loaded);
 
   useEffect(() => {
     if (!connected) return;
@@ -338,56 +357,56 @@ export default function Home() {
   const txTableColumns = isSmallMobile
     ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
     : isMobile
-    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
-    : isTablet
-    ? [
-        { name: "ACTIVITY" },
-        { name: "VALUE" },
-        { name: "REWARD" },
-        { name: "ACCOUNT" },
-      ]
-    : [
-        {
-          name: "ACTIVITY",
-        },
-        {
-          name: "VALUE",
-        },
-        {
-          name: "REWARD",
-        },
-        {
-          name: "ACCOUNT",
-        },
-        {
-          name: "TIME",
-          alignRight: true,
-        },
-      ];
+      ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+      : isTablet
+        ? [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "ACCOUNT" },
+        ]
+        : [
+          {
+            name: "ACTIVITY",
+          },
+          {
+            name: "VALUE",
+          },
+          {
+            name: "REWARD",
+          },
+          {
+            name: "ACCOUNT",
+          },
+          {
+            name: "TIME",
+            alignRight: true,
+          },
+        ];
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({
-            sender,
-            receiver,
-          }: {
-            sender: string;
-            receiver: string;
-          }) => [sender, receiver].includes(address),
-          name: "MY DASHBOARD",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({
+          sender,
+          receiver,
+        }: {
+          sender: string;
+          receiver: string;
+        }) => [sender, receiver].includes(address),
+        name: "MY DASHBOARD",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   const {
     totalPrizePool,
@@ -399,15 +418,23 @@ export default function Home() {
     graphTransformedTransactions,
     fluidPairs,
     timestamp,
+    homeLoaded,
+    txLoaded,
   } = useMemo(() => {
+    const { home, transactions: txData } = activeTableFilterIndex
+      ? data.user
+      : data.global;
+
     const {
-      transactions,
       volume,
       rewards,
       totalFluidPairs,
       timestamp,
       totalPrizePool,
-    } = activeTableFilterIndex ? data.user : data.global;
+      loaded: homeLoaded,
+    } = home;
+
+    const { transactions, loaded: txLoaded } = txData;
 
     const {
       day: dailyRewards,
@@ -451,6 +478,8 @@ export default function Home() {
       fluidPairs: totalFluidPairs,
       timestamp,
       totalPrizePool,
+      homeLoaded,
+      txLoaded,
     };
   }, [
     activeTableFilterIndex,
@@ -586,8 +615,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
+                      ? "Weekly available rewards"
+                      : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -597,9 +626,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
+                        ({ network: rewardNetwork }) =>
+                          rewardNetwork === network
+                      )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
@@ -805,6 +834,7 @@ export default function Home() {
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
           filters={txTableFilters}
+          loaded={txLoaded}
         />
       </section>
     </>

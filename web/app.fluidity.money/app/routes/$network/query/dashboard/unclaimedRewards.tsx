@@ -8,6 +8,7 @@ import config from "~/webapp.config.server";
 export type UnclaimedRewardsLoaderData = {
   userUnclaimedRewards: number;
   unclaimedTokenAddrs: string[];
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -48,10 +49,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (map, token) =>
         token.isFluidOf
           ? {
-              ...map,
-              [token.symbol]: token.address,
-              [token.symbol.slice(1)]: token.address,
-            }
+            ...map,
+            [token.symbol]: token.address,
+            [token.symbol.slice(1)]: token.address,
+          }
           : map,
       {} as { [symbol: string]: string }
     );

@@ -107,7 +107,7 @@ const Table = <T,>(props: ITable<T>) => {
 
       {/* Table */}
       {data.length === 0 ? (
-        loaded !== true ? (
+        !loaded ? (
           <>
             Fetching table data...
             <div className="center-table-loading-anim loader-dots">
@@ -117,7 +117,7 @@ const Table = <T,>(props: ITable<T>) => {
         ) : (
           <>
             <div className="center-table-loading-anim loader-dots">
-              <Text size="lg">No reward record found!</Text>
+              <Text size="lg">No reward records found!</Text>
             </div>
           </>
         )

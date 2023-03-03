@@ -207,10 +207,10 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  ];
+      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+      { rewards: { name: "Rewards", icon: <Trophy /> } },
+      { assets: { name: "Assets", icon: <AssetsIcon /> } },
+    ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -303,9 +303,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
@@ -348,9 +348,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           version={"primary"}
           buttontype="text"
           size={"medium"}
@@ -527,9 +526,7 @@ export default function Dashboard() {
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.000005
-                ? `$0`
-                : numberToMonetaryString(unclaimedRewards)}
+              {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
             {(isTablet || isMobile) && (
