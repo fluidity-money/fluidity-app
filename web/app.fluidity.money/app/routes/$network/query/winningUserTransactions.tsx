@@ -85,6 +85,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           Date.parse(second.awarded_time) - Date.parse(first.awarded_time)
       );
 
+    // If no wins found, return early
+    if (!winnersData.winners.length) {
+      return json({
+        page,
+        transactions: [],
+        count: winnersData.winners.length,
+        loaded: true,
+      } satisfies TransactionsLoaderData);
+    }
+
     // winnersMap looks up if a transaction was the send that caused a win
     const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
 
@@ -145,7 +155,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-            (currency === "DAI" || currency === "fDAI")
+              (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -186,8 +196,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           tx.sender === MintAddress
             ? "in"
             : tx.receiver === MintAddress
-            ? "out"
-            : undefined;
+              ? "out"
+              : undefined;
 
         return {
           sender: tx.sender,
