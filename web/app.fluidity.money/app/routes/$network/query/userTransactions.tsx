@@ -272,7 +272,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       page,
       transactions: mergedTransactions,
       count: Object.keys(winnersMap).length,
-    } as TransactionsLoaderData);
+      loaded: true,
+    } satisfies TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

@@ -1,3 +1,5 @@
+import type { AssetLoaderData } from "../../query/dashboard/assets";
+
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useEffect, useState } from "react";
 import {
@@ -11,7 +13,6 @@ import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useCache } from "~/hooks/useCache";
 import BN from "bn.js";
-import { ITokenStatistics } from "../../query/dashboard/assets";
 import { motion } from "framer-motion";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 
@@ -141,7 +142,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const queryString = `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}`;
 
-  const { data } = useCache<ITokenStatistics>(address ? queryString : "", true);
+  const { data } = useCache<AssetLoaderData>(address ? queryString : "", true);
 
   const navigate = useNavigate();
 

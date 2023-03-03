@@ -14,6 +14,7 @@ export type UnclaimedLoaderData = {
   unclaimedTokens: TokenUnclaimedReward[];
   userUnclaimedRewards: number;
   userClaimedRewards: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -73,7 +74,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       unclaimedTokens: unclaimedTokens,
       userUnclaimedRewards,
       userClaimedRewards,
-    } as UnclaimedLoaderData);
+      loaded: true,
+    } satisfies UnclaimedLoaderData);
   } catch (err) {
     throw new Error(`Could not fetch Unclaimed Rewards on ${network}: ${err}`);
   }
