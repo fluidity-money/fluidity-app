@@ -42,7 +42,7 @@ type ITable<T> = {
 
   activeFilterIndex?: number;
 
-  loaded?: boolean | undefined;
+  loaded: boolean;
 
   showLoadingAnimation?: boolean;
 };
