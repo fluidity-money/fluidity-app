@@ -102,7 +102,7 @@ const UnclaimedWinnings = () => {
     userUnclaimedRewards,
     userClaimedRewards,
     loaded,
-  } = {
+  }: UnclaimedLoaderData = {
     ...SAFE_DEFAULT_UNCLAIMED,
     ...unclaimedData.data,
   };
