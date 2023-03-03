@@ -26,6 +26,7 @@ import {
   Video,
   useViewport,
   Modal,
+  Tooltip,
 } from "@fluidity-money/surfing";
 import { useLoaderData } from "@remix-run/react";
 import { captureException } from "@sentry/react";
@@ -33,6 +34,7 @@ import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
 import { generateMeta } from "~/util/tweeter";
 import { SplitContext } from "contexts/SplitProvider";
+import { MintAddress } from "~/types/MintAddress";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -214,28 +216,29 @@ export default function IndexPage() {
                 d.winning_amount_scaled * 1000000 + 1,
             }}
             renderTooltip={({ datum }: { datum: HighestRewardMonthly }) => (
-              <div className={"graph-tooltip-container"}>
-                <div className={"graph-tooltip"}>
-                  <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                    {format(parseISO(datum.awarded_day), "dd/MM/yy")}
-                  </span>
-                  <br />
-                  <br />
-                  <span>
-                    <span>{trimAddress(datum.winning_address)}</span>
-                  </span>
-                  <br />
-                  <br />
-                  <span>
-                    <span>
-                      {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
-                    </span>
-                    <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                      prize awarded
-                    </span>
-                  </span>
+              <Tooltip
+                style={{
+                  minWidth: 160,
+                  gap: "0.4em",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text>{format(parseISO(datum.awarded_day), "dd/MM/yy")}</Text>
+                <div>
+                  <Text prominent>
+                    {datum.winning_address === MintAddress
+                      ? "Mint Address"
+                      : trimAddress(datum.winning_address)}
+                  </Text>
                 </div>
-              </div>
+                <div>
+                  <Text prominent>
+                    {numberToMonetaryString(datum.winning_amount_scaled)}{" "}
+                  </Text>
+                  <Text>prize awarded</Text>
+                </div>
+              </Tooltip>
             )}
           />
         </div>
