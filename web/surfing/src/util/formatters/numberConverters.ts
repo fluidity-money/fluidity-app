@@ -79,7 +79,7 @@ const toSignificantDecimals = (num: number, decimals_?: number): string => {
 
   return `${numberToCommaSeparated(wholeValue)}${wholeDecimalValue === 0
       ? ""
-      : `.${wholeDecimalValue}`.padStart(decimalsToFirstSig, "0")
+      : `.${wholeDecimalValue.toString().padStart(decimalsToFirstSig, "0")}`
     }`;
 };
 
