@@ -30,8 +30,9 @@ import {
   LabelledValue,
   ProviderIcon,
   ProviderCard,
-  Token as TokenIcon,
-  Provider
+  TokenIcon,
+  Provider, 
+  Token
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -275,16 +276,12 @@ export default function Rewards() {
     count,
     hasRewarders,
     fluidPairs,
-    networkFee,
-    gasFee,
     transactions,
     rewarders,
     activeYield,
     totalPrizePool,
     timestamp,
     userUnclaimedRewards,
-    unclaimedTokenAddrs,
-    weeklyRewards,
     activeTokenPerformance,
     hasTokenPerformance,
   } = useMemo(() => {
@@ -526,8 +523,8 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <TokenIcon token={`f${activeTokenPerformance[0].token}` satisfies Token} />
-                  {`f${activeTokenPerformance[0].token}` satisfies Token}
+                  <TokenIcon token={`f${activeTokenPerformance[0].token}` as Token} />
+                  {`f${activeTokenPerformance[0].token}` as Token}
                 </div>
               </LabelledValue>
             </div>

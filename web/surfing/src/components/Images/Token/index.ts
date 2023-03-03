@@ -1,3 +1,1 @@
-import Token from "./Token";
-
-export { Token };
+export { default as TokenIcon } from './TokenIcon'

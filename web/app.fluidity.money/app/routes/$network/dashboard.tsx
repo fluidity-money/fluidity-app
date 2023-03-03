@@ -39,6 +39,7 @@ import {
   ProvideLiquidity,
   Provider,
   ChainName,
+  Token
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -46,7 +47,6 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-import { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
 import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
@@ -140,7 +140,7 @@ type LoaderData = {
   tokensConfig: {
     [x: string]: {
       tokens: {
-        symbol: Tokens;
+        symbol: Token;
         address: string;
         name: string;
         logo: string;

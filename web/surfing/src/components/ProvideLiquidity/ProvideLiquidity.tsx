@@ -1,14 +1,13 @@
-import { Card, Heading, Text, BloomEffect, Token, ArrowDown, ProviderIcon } from "../";
+import { Card, Heading, Text, BloomEffect, TokenIcon, ArrowDown, ProviderIcon } from "../";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useClickOutside } from "~/util";
-import { Tokens } from "../Images/Token/Token";
-import { Provider } from "~/types";
+import { Provider, Token } from "~/types";
 
 import styles from './ProvideLiquidity.module.scss'
 
 type TokenType = {
-  symbol: Tokens;
+  symbol: Token;
   name: string;
   logo: string;
   address: string;
@@ -50,7 +49,7 @@ interface IProvideLiquidity {
   tokensConfig: {
     [x: string]: {
         tokens: {
-            symbol: Tokens;
+            symbol: Token;
             address: string;
             name: string;
             logo: string;
@@ -135,7 +134,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
                 width: 32,
               }}
               >
-                <Token token={option.symbol}/>
+                <TokenIcon token={option.symbol}/>
               </div>
             </button>
           </li>
@@ -186,7 +185,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
                 transform: "translate(41%, 41%)",
               }}
             >
-              <Token token={poolToken.symbol} />
+              <TokenIcon token={poolToken.symbol} />
             </div>
           </div>
         </section>

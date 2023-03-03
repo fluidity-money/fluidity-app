@@ -1,8 +1,9 @@
 import style from "./Token.module.scss";
+import type { Token } from "~/types";
 
 const baseImgPath = "https://static.fluidity.money/assets/tokens";
 
-const tokenImgMap = {
+const tokenImgMap: {[K in Token]: string} = {
   USDC: "usdc.svg",
   fUSDC: "fUSDC.svg",
   USDT: "usdt.svg",
@@ -15,13 +16,11 @@ const tokenImgMap = {
   fDAI: "fDAI.svg",
 } as const;
 
-export type Tokens = keyof typeof tokenImgMap;
-
-type IToken = Partial<HTMLImageElement> & {
-  token: Tokens;
+type ITokenIcon = Partial<HTMLImageElement> & {
+  token: Token;
 };
 
-const Token = ({ token, className }: IToken) => (
+const TokenIcon = ({ token, className }: ITokenIcon) => (
   <img
     className={className}
     src={`${baseImgPath}/${tokenImgMap[token]}`}
@@ -29,4 +28,4 @@ const Token = ({ token, className }: IToken) => (
   />
 );
 
-export default Token;
+export default TokenIcon;
