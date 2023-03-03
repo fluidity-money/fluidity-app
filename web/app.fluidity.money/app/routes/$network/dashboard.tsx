@@ -128,8 +128,8 @@ type LoaderData = {
       providers: {
         name: Provider;
         link: {
-          fUSDC: string;
-          fUSDT: string;
+          fUSDC?: string;
+          fUSDT?: string;
           fTUSD?: string;
           fFRAX?: string;
           fDAI?: string;
