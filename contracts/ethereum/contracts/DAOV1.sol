@@ -356,7 +356,7 @@ contract DAOV1 {
     ///      locked up for the vote
     function voteFor(bytes32 _proposalId, uint256 _amount) public {
         require(getProposalExists(_proposalId), "proposal does not exist");
-        require(getProposalVoteable(_proposalId), "proposal frozen");
+        require(getProposalVoteable(_proposalId), "proposal not voteable");
 
         require(
           getAmountAvailable(_proposalId, msg.sender) >= _amount,
@@ -371,7 +371,7 @@ contract DAOV1 {
     /// @dev _vote to provide the vote for
     function voteAgainst(bytes32 _proposalId, uint256 _amount) public {
         require(getProposalExists(_proposalId), "proposal does not exist");
-        require(getProposalVoteable(_proposalId), "proposal frozen");
+        require(getProposalVoteable(_proposalId), "proposal not voteable");
 
         require(
           getAmountAvailable(_proposalId, msg.sender) >= _amount,

@@ -7,15 +7,15 @@ const TEN_DAYS_PLUS_1 = 864000 + 1;
 
 const ELEVEN_DAYS_PLUS_1 = TEN_DAYS_PLUS_1 + 950400;
 
-export const PROPOSAL_STATE_UNFINISHED = 0;
+export const PROPOSAL_STATUS_UNFINISHED = 0;
 
-export const PROPOSAL_STATE_FROZEN = 1;
+export const PROPOSAL_STATUS_FROZEN = 1;
 
-export const PROPOSAL_STATE_SUCCEEDED = 2;
+export const PROPOSAL_STATUS_SUCCEEDED = 2;
 
-export const PROPOSAL_STATE_EXECUTED = 3;
+export const PROPOSAL_STATUS_EXECUTED = 3;
 
-export const PROPOSAL_STATE_FAILED = 4;
+export const PROPOSAL_STATUS_FAILED = 4;
 
 export const advanceTimeToFrozen = async (
   hre: HardhatRuntimeEnvironment

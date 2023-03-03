@@ -17,10 +17,10 @@ import { expectGt, expectEq } from "./test-utils";
 import {
   advanceTimePastProposalFinished,
   advanceTimeToFrozen,
-  PROPOSAL_STATE_UNFINISHED,
-  PROPOSAL_STATE_FROZEN,
-  PROPOSAL_STATE_SUCCEEDED,
-  PROPOSAL_STATE_FAILED } from '../dao';
+  PROPOSAL_STATUS_UNFINISHED,
+  PROPOSAL_STATUS_FROZEN,
+  PROPOSAL_STATUS_SUCCEEDED,
+  PROPOSAL_STATUS_FAILED } from '../dao';
 
 const GOV_TO_LOCK = 1000;
 
@@ -176,7 +176,7 @@ describe("DAOV1", async () => {
 
       let proposalStatus = await dao.getProposalStatus(proposalId);
 
-      expectEq(proposalStatus, PROPOSAL_STATE_UNFINISHED);
+      expectEq(proposalStatus, PROPOSAL_STATUS_UNFINISHED);
 
       await advanceTimeToFrozen(hre);
 
@@ -192,7 +192,7 @@ describe("DAOV1", async () => {
 
       proposalStatus = await dao.getProposalStatus(proposalId);
 
-      expectEq(proposalStatus, PROPOSAL_STATE_FROZEN);
+      expectEq(proposalStatus, PROPOSAL_STATUS_FROZEN);
     }
   );
 
@@ -252,7 +252,7 @@ describe("DAOV1", async () => {
 
       expectEq(
         await dao.getProposalStatus(proposalId),
-        PROPOSAL_STATE_UNFINISHED
+        PROPOSAL_STATUS_UNFINISHED
       );
 
       await advanceTimePastProposalFinished(hre);
@@ -266,7 +266,7 @@ describe("DAOV1", async () => {
 
       expectEq(
         await dao.getProposalStatus(proposalId),
-        PROPOSAL_STATE_SUCCEEDED
+        PROPOSAL_STATUS_SUCCEEDED
       );
 
       const previousAmount = await testDAOUpdates.amount();
@@ -329,7 +329,7 @@ describe("DAOV1", async () => {
 
       expectEq(
         await dao.getProposalStatus(proposalId),
-        PROPOSAL_STATE_UNFINISHED
+        PROPOSAL_STATUS_UNFINISHED
       );
 
       await advanceTimePastProposalFinished(hre);
@@ -343,7 +343,7 @@ describe("DAOV1", async () => {
 
       expectEq(
         await dao.getProposalStatus(proposalId),
-        PROPOSAL_STATE_FAILED
+        PROPOSAL_STATUS_FAILED
       );
 
       await expect(dao.executeProposal(proposalId))
@@ -432,8 +432,55 @@ describe("DAOV1", async () => {
   );
 
   it(
-    "should fail if someone tries to vote when it's concluded",
+    "should fail if someone tries to vote after voting's over",
     async () => {
+      // to do this, we set the hidden value in the contract, attempt to
+      // call the function for upgrades in the V2 contract (and assume
+      // that it reverts), then upgrade the contract to query that
+      // information
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const proposalHash = "0x07";
+
+      const proposalId = await dao.callStatic.createProposal(
+        proposalHash,
+        testDAOUpgradeableBeaconProxy.address,
+        0,
+        0,
+        false,
+        "0x00"
+      );
+
+      await dao.createProposal(
+        proposalHash,
+        testDAOUpgradeableBeaconProxy.address,
+        0,
+        0,
+        false,
+        "0x00"
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      // advance time with an empty transaction
+
+      await govTokenSigner1.sendTransaction({
+        to: govTokenSigner1Address,
+        from: govTokenSigner1Address
+      });
+
+      expectEq(
+        await dao.getProposalStatus(proposalId),
+        PROPOSAL_STATUS_FAILED
+      );
+
+      await expect(dao.voteFor(proposalId, veGovBalance))
+        .to.be.revertedWith("proposal not voteable");
     }
   );
 
