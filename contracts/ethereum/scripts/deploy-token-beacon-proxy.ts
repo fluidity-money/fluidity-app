@@ -36,7 +36,7 @@ const main = async () => {
     const symbol = mustEnv(ENV_SYMBOL);
     const name = mustEnv(ENV_NAME);
 
-    const tokenFactory = await hre.ethers.getContractFactory("Token");
+    const tokenFactory = await hre.ethers.getContractFactory("TokenV1");
     const compoundFactory = await hre.ethers.getContractFactory("CompoundLiquidityProvider");
     const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
     const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");

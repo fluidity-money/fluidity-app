@@ -25,7 +25,7 @@ uint constant BLOCK_REWARDED = 1;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
-contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
+contract TokenV1 is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
     using SafeERC20 for IERC20;
 
     // erc20 props
@@ -55,7 +55,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @dev deprecated, worker config is now handled externally
     // solhint-disable-next-line var-name-mixedcase
-    address private __deprecated_7;
+    address private __deprecated_1;
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
 
@@ -65,15 +65,27 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @dev account to use that created the contract (multisig account)
     address private operator_;
 
-    /// @dev the block number of the last block that's been included in a batched reward
-    uint private lastRewardedBlock_;
+    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
 
-    /// @dev [address] => [[block number] => [has the block been manually rewarded by this user?]]
-    mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
+    /// @dev deprecated, we don't track the last rewarded block for manual
+    ///      rewards anymore
+    // solhint-disable-next-line var-name-mixedcase
+    uint private __deprecated_2;
 
-    /// @dev amount a user has manually rewarded, to be removed from their batched rewards
+    /// @dev [address] => [[block number] => [has the block been manually
+    ///      rewarded by this user?]]
+    /// @dev deprecated, we don't do manual rewards anymore
+    // solhint-disable-nex-line var-name-mixedcase
+    mapping (address => mapping(uint => uint)) private __deprecated_3;
+
+    /// @dev amount a user has manually rewarded, to be removed from their
+    ///      batched rewards
     /// @dev [address] => [amount manually rewarded]
-    mapping (address => uint) private manualRewardDebt_;
+    /// @dev deprecated, we don't do manual rewards anymore
+    // solhint-disable-nex-line var-name-mixedcase
+    mapping (address => uint) private __deprecated_4;
+
+    /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
 
     /// @dev the largest amount a reward can be to not get quarantined
     uint private maxUncheckedReward_;
@@ -83,7 +95,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
 
-    // solhint-disable-start unused-state-variable, state-variables-that-could-be-declared-constant
+    // slither-disable-start unused_state_variable state-variables-that-could-be-declared-constant
 
     /*
      * These slots were used for the feature "mint limits" which we've
@@ -92,29 +104,29 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    bool private __deprecated_1;
+    bool private __deprecated_5;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    mapping (address => uint) private __deprecated_2;
+    mapping (address => uint) private __deprecated_6;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    mapping (address => uint) private __deprecated_3;
+    mapping (address => uint) private __deprecated_7;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    uint private __deprecated_4;
+    uint private __deprecated_8;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    uint private __deprecated_5;
+    uint private __deprecated_9;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    uint private __deprecated_6;
+    uint private __deprecated_10;
 
-    // solhint-disable-end
+    // slither-disable-end
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
 
@@ -452,10 +464,11 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     ) external override returns (bool) {
         bool rc;
 
-        rc = Token(_token).transferFrom(msg.sender, address(this), _amount);
+        rc = TokenV1(_token).transferFrom(msg.sender, address(this), _amount);
+
         if (!rc) return false;
 
-        rc = Token(_token).transfer(_beneficiary, _amount);
+        rc = TokenV1(_token).transfer(_beneficiary, _amount);
 
         return rc;
     }

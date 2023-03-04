@@ -3,6 +3,8 @@ import "@nomiclabs/hardhat-waffle";
 
 import "@openzeppelin/hardhat-upgrades";
 
+import "hardhat-dependency-compiler";
+
 import "hardhat-docgen";
 
 import { task, subtask } from "hardhat/config";
@@ -244,6 +246,11 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.FLU_ETHERSCAN_API
+  },
+  dependencyCompiler: {
+    paths: [
+      "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol"
+    ]
   },
   networks: {
     localhost: {

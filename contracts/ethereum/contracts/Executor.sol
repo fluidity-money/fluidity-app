@@ -25,8 +25,6 @@ struct OracleUpdate {
 }
 
 contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
-    /// @dev the utility name of the fluid token
-    string constant private FLUID_TOKEN = "FLUID";
 
     /// @notice emitted when the rng oracles are changed to a new address
     event OracleChanged(

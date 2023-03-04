@@ -37,7 +37,7 @@ export const forknetTakeFunds = async (
     });
 
     const impersonatedToken = await hre.ethers.getContractAt(
-      "Token",
+      "TokenV1",
       token.address,
       await hre.ethers.getSigner(token.owner),
     );

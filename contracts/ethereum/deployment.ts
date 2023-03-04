@@ -22,7 +22,7 @@ export const getFactories = async (
 
   const operatorFactory = await hre.ethers.getContractFactory("Executor");
 
-  const tokenFactory = await hre.ethers.getContractFactory("Token");
+  const tokenFactory = await hre.ethers.getContractFactory("TokenV1");
 
   const compoundLiquidityProviderFactory = await hre.ethers.getContractFactory(
     "CompoundLiquidityProvider"

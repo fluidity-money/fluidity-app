@@ -26,7 +26,7 @@ async function main() {
 async function makeTxn(account: SignerWithAddress) {
   const token = await hre.ethers.getContractAt(
     tokenAddress,
-    "Token",
+    "TokenV1",
     account
   );
   const usdt = await hre.ethers.getContractAt(

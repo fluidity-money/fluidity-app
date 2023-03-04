@@ -24,7 +24,7 @@ import {
     PoolAddressesProviderInterface as AaveV3PoolAddressesProviderInterface
 } from "../../interfaces/aaveV3/ATokenInterfaces.sol";
 
-import { Token } from "../Token.sol";
+import { TokenV1 } from "../TokenV1.sol";
 
 import "../Executor.sol";
 
@@ -35,7 +35,7 @@ import "../AaveV2LiquidityProvider.sol";
 import "../AaveV3LiquidityProvider.sol";
 
 /// @dev selector for the token's init function
-bytes4 constant TOKEN_INIT_SELECTOR = Token.init.selector;
+bytes4 constant TOKEN_INIT_SELECTOR = TokenV1.init.selector;
 
 /// @dev selector for compound's liquidity provider init function
 bytes4 constant LIQUIDITY_PROVIDER_COMPOUND_INIT_SELECTOR =
