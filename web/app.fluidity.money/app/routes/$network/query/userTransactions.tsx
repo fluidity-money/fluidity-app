@@ -124,18 +124,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
     ];
 
-    const userTransactionsData: {
-      [network: string]: {
-        transfers: RawUserTransaction[];
-      };
-    } = {
-      [network]: {
-        transfers: [],
-      },
-    };
-
-    const chunkArray = <T,>(list: T[], size: number): T[][] =>
-      list.reduce(
+    const chunkArray = <T,>(arr: T[], size: number): T[][] =>
+      arr.reduce(
         (chunkedArr, el, index) => {
           const chunkIndex = Math.floor(index / size);
 
@@ -154,7 +144,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     // jointPayoutAddrs at a time
     // we do a split and send in 99 if array length of jointPayoutAddrs is
     // greater than 100.
-    userTransactionsData[network].transfers = (
+    const rawUserTransfers = (
       await Promise.all(
         chunkArray(jointPayoutAddrs, 100).map(async (filterHashes) => {
           const { data: transactionsData, errors: transactionsErr } =
@@ -202,12 +192,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       )
     ).flat();
 
-    const {
-      [network as string]: { transfers: transactions },
-    } = userTransactionsData;
-
     // Destructure GraphQL data
-    const userTransactions: UserTransaction[] = transactions.map(
+    const userTransactions: UserTransaction[] = rawUserTransfers.map(
       (transaction) => {
         const {
           sender: { address: sender },
