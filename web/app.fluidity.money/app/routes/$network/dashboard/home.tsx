@@ -184,7 +184,10 @@ type LoaderData = {
   };
 };
 
-type CacheData = HomeLoaderData & TransactionsLoaderData;
+type CacheData = {
+  home: HomeLoaderData;
+  transactions: TransactionsLoaderData;
+};
 
 function ErrorBoundary(error: Error) {
   console.log(error);
@@ -204,11 +207,9 @@ function ErrorBoundary(error: Error) {
   );
 }
 
-const SAFE_DEFAULT: CacheData = {
+const SAFE_DEFAULT_HOME: HomeLoaderData = {
   totalPrizePool: 0,
-  count: 0,
   network: "ethereum",
-  transactions: [],
   loaded: false,
   rewards: {
     day: [],
@@ -220,7 +221,13 @@ const SAFE_DEFAULT: CacheData = {
   volume: [],
   totalFluidPairs: 0,
   timestamp: 0,
+};
+
+const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
+  count: 0,
   page: 0,
+  transactions: [],
+  loaded: false,
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -289,7 +296,7 @@ export default function Home() {
   }, [address, page]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
-    SAFE_DEFAULT.totalFluidPairs
+    SAFE_DEFAULT_HOME.totalFluidPairs
   );
 
   const data: {
@@ -297,15 +304,25 @@ export default function Home() {
     user: CacheData;
   } = {
     global: {
-      ...SAFE_DEFAULT,
-      ...homeData,
-      ...globalTransactionsData,
+      home: {
+        ...SAFE_DEFAULT_HOME,
+        ...homeData,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...globalTransactionsData,
+      },
     },
     user: {
-      ...SAFE_DEFAULT,
-      ...userHomeData.data,
-      ...userTransactionsData.data,
-      totalFluidPairs: userFluidPairs,
+      home: {
+        ...SAFE_DEFAULT_HOME,
+        ...userHomeData.data,
+        totalFluidPairs: userFluidPairs,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...userTransactionsData.data,
+      },
     },
   };
 
@@ -399,15 +416,22 @@ export default function Home() {
     graphTransformedTransactions,
     fluidPairs,
     timestamp,
+    txLoaded,
   } = useMemo(() => {
+    const { home, transactions: txData } = activeTableFilterIndex
+      ? data.user
+      : data.global;
+
     const {
-      transactions,
       volume,
       rewards,
       totalFluidPairs,
       timestamp,
       totalPrizePool,
-    } = activeTableFilterIndex ? data.user : data.global;
+      loaded: homeLoaded,
+    } = home;
+
+    const { transactions, loaded: txLoaded } = txData;
 
     const {
       day: dailyRewards,
@@ -451,6 +475,8 @@ export default function Home() {
       fluidPairs: totalFluidPairs,
       timestamp,
       totalPrizePool,
+      homeLoaded,
+      txLoaded,
     };
   }, [
     activeTableFilterIndex,
@@ -805,6 +831,7 @@ export default function Home() {
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
           filters={txTableFilters}
+          loaded={txLoaded}
         />
       </section>
     </>

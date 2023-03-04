@@ -7,7 +7,7 @@ import {
 import { Chain } from "./chainUtils/chains";
 
 type ProviderWithRewards = {
-  name: Provider;
+  name: string;
   prize: number;
   avgPrize: number;
 };

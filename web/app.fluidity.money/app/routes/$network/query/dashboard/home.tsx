@@ -17,10 +17,11 @@ export type HomeLoaderData = {
   totalFluidPairs: number;
   network: Chain;
   timestamp: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { network } = params;
+  const network = (params.network ?? "") as Chain;
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
@@ -73,7 +74,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       totalFluidPairs: fluidPairs,
       network,
       timestamp,
-    } as HomeLoaderData);
+      loaded: true,
+    } satisfies HomeLoaderData);
   } catch (err) {
     console.log(err);
     throw new Error(`Could not fetch Transactions on ${network}: ${err}`);

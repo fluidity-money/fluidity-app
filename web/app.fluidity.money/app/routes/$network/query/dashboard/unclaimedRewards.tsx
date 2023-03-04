@@ -8,6 +8,7 @@ import config from "~/webapp.config.server";
 export type UnclaimedRewardsLoaderData = {
   userUnclaimedRewards: number;
   unclaimedTokenAddrs: string[];
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -63,7 +64,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return json({
       userUnclaimedRewards,
       unclaimedTokenAddrs,
-    } as UnclaimedRewardsLoaderData);
+      loaded: true,
+    } satisfies UnclaimedRewardsLoaderData);
   } catch (err) {
     console.log(err);
     throw new Error(
