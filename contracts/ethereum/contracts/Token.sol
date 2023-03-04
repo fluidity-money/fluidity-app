@@ -18,11 +18,22 @@ import "../interfaces/ITransferWithBeneficiary.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+/// @dev VERSION of this contract
+uint8 constant VERSION = 1;
+
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
 /// @dev sentinel to indicate a block has been rewarded in the
 /// @dev pastRewards_ and rewardedBlocks_ maps
 uint constant BLOCK_REWARDED = 1;
+
+// keccak256("Erc20InPermit(address owner,address spender,uint256 amount,uint256 nonce,uint256 deadline)")
+bytes32 constant EIP721_ERC20_IN_PERMIT_SELECTOR =
+  0x0b14ea134078420dd9754a6ce4e5d616f93b65ef26688ce0b4758f6d684c866a;
+
+// keccak(1)
+bytes32 constant VERSION_KECCAK =
+  0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
@@ -143,19 +154,26 @@ contract Token is
 
     /* ~~~~~~~~~~` ORACLE PAYOUTS ~~~~~~~~~~ */
 
-    /// @dev account that can call the reward function, should be the /operator contract/
+    /// @dev account that can call the reward function, should be the
+    ///      operator contract/
     address private oracle_;
 
     /* ~~~~~~~~~~` ERC2612 ~~~~~~~~~~ */
 
-    mapping (address => uint256) private nonces_;
+    mapping (address => uint256) private permitNonces_;
 
     uint256 private initialChainId_;
 
     bytes32 private initialDomainSeparator_;
 
+    /* ~~~~~~~~~~` GASLESS ERC20 IN ~~~~~~~~~~ */
+
+    mapping (address => uint256) private erc20InForNonces_;
+
+    mapping (address => mapping (address => uint256)) private erc20InApprovals_;
+
     /**
-     * @notice computeDomainSeparator that's used for EIP2612
+     * @notice computeDomainSeparator that's used for EIP712
      */
     function computeDomainSeparator() internal view virtual returns (bytes32) {
         return
@@ -163,7 +181,7 @@ contract Token is
                 abi.encode(
                     keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
                     keccak256(bytes(name_)),
-                    keccak256("1"),
+                    VERSION_KECCAK,
                     block.chainid,
                     address(this)
                 )
@@ -204,7 +222,7 @@ contract Token is
         require(_operator != address(0), "operator zero");
         require(_oracle != address(0), "oracle zero");
 
-        version_ = 1;
+        version_ = VERSION;
 
         // remember the operator for signing off on oracle changes, large payouts
         operator_ = _operator;
@@ -298,8 +316,7 @@ contract Token is
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /// @inheritdoc IToken
-    function erc20In(uint amount) public returns (uint) {
+    function _erc20In(address _spender, uint256 _amount) internal returns (uint256) {
         require(noEmergencyMode(), "emergency mode!");
 
         // take underlying tokens from the user
@@ -308,7 +325,7 @@ contract Token is
 
         uint originalBalance = underlying.balanceOf(address(this));
 
-        underlying.safeTransferFrom(msg.sender, address(this), amount);
+        underlying.safeTransferFrom(_spender, address(this), _amount);
 
         uint finalBalance = underlying.balanceOf(address(this));
 
@@ -334,10 +351,83 @@ contract Token is
     }
 
     /// @inheritdoc IToken
+    function erc20In(uint _amount) public returns (uint) {
+        return _erc20In(msg.sender, _amount);
+    }
+
+    /// @inheritdoc IToken
     // slither-disable-next-line reentrancy-no-eth
-    function erc20InTo(address recipient, uint256 amount) public {
-        erc20In(amount);
-        transfer(recipient, amount);
+    function erc20InTo(address _recipient, uint256 _amount) public returns (uint256 ) {
+        uint256 amountIn = erc20In(_amount);
+        transfer(_recipient, _amount);
+        return amountIn;
+    }
+
+    function _erc20InApprove(
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) internal {
+        emit MintApproval(_owner, _spender, _amount);
+        erc20InApprovals_[_owner][_spender] = _amount;
+    }
+
+    function erc20InApprove(address _spender, uint256 _amount) public {
+        _erc20InApprove(msg.sender, _spender, _amount);
+    }
+
+    /// @inheritdoc IToken
+    function erc20InPermit(
+        address _owner,
+        address _spender,
+        uint256 _amount,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) public {
+        // solhint-disable-next-line not-rely-on-time
+        require(_deadline >= block.timestamp, "deadline expired");
+
+        emit MintApproval(_owner, _spender, _amount);
+
+        // presumably the user won't be able to overflow the nonce
+        unchecked {
+            address recoveredAddress = ecrecover(
+                keccak256(
+                    abi.encodePacked(
+                        "\x19\x01",
+                        DOMAIN_SEPARATOR(),
+                        keccak256(
+                            abi.encode(
+                                EIP721_ERC20_IN_PERMIT_SELECTOR,
+                                _owner,
+                                _spender,
+                                _amount,
+                                erc20InForNonces_[_spender]++,
+                                _deadline
+                            )
+                        )
+                    )
+                ),
+                _v,
+                _r,
+                _s
+            );
+
+            require(recoveredAddress != address(0), "invalid signer");
+
+            require(recoveredAddress == _spender, "invalid signer");
+
+            _erc20InApprove(_owner, _spender, _amount);
+        }
+    }
+
+    function erc20InFor(address _owner, uint256 _amount) public returns (uint256) {
+        // should revert if the user doesn't have the allowance
+        erc20InApprovals_[_owner][msg.sender] -= _amount;
+
+        return _erc20In(_owner, _amount);
     }
 
     /// @inheritdoc IToken
@@ -633,15 +723,14 @@ contract Token is
         address spender,
         uint256 amount
     ) internal virtual {
+        require(owner != address(0), "approve from zero");
+
+        emit Approval(owner, spender, amount);
 
         // solhint-disable-next-line reason-string
-        require(owner != address(0), "ERC20: approve from the zero address");
-
-        // solhint-disable-next-line reason-string
-        require(spender != address(0), "ERC20: approve to the zero address");
+        require(spender != address(0), "approve to zero");
 
         allowances_[owner][spender] = amount;
-        emit Approval(owner, spender, amount);
     }
 
     function _spendAllowance(
@@ -649,25 +738,29 @@ contract Token is
         address spender,
         uint256 amount
     ) internal virtual {
-
         uint256 currentAllowance = allowance(owner, spender);
+
         if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            require(currentAllowance >= amount, "insufficient allowance");
+
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
             }
         }
     }
 
+    /// @inheritdoc IERC2612
     function nonces(address _owner) public view returns (uint256) {
-        return nonces_[_owner];
+        return permitNonces_[_owner];
     }
 
+    /// @inheritdoc IEIP712
     // solhint-disable-next-line func-name-mixedcase
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
         return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
     }
 
+    /// @inheritdoc IERC2612
     function permit(
         address _owner,
         address _spender,
@@ -688,13 +781,11 @@ contract Token is
                         DOMAIN_SEPARATOR(),
                         keccak256(
                             abi.encode(
-                                keccak256(
-                                    "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-                                ),
+                                EIP721_PERMIT_SELECTOR,
                                 _owner,
                                 _spender,
                                 _value,
-                                nonces_[_owner]++,
+                                permitNonces_[_owner]++,
                                 _deadline
                             )
                         )

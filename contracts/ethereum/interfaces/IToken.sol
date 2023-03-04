@@ -16,35 +16,42 @@ interface IToken is IERC20 {
     /// @notice emitted when a reward is quarantined for being too large
     event BlockedReward(
         address indexed winner,
-        uint amount,
-        uint startBlock,
-        uint endBlock
+        uint256 amount,
+        uint256 startBlock,
+        uint256 endBlock
     );
 
     /// @notice emitted when a blocked reward is released
     event UnblockReward(
         bytes32 indexed originalRewardTx,
         address indexed winner,
-        uint amount,
-        uint startBlock,
-        uint endBlock
+        uint256 amount,
+        uint256 startBlock,
+        uint256 endBlock
     );
 
     /// @notice emitted when an underlying token is wrapped into a fluid asset
-    event MintFluid(address indexed addr, uint amount);
+    event MintFluid(address indexed addr, uint256 amount);
 
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
-    event BurnFluid(address indexed addr, uint amount);
+    event BurnFluid(address indexed addr, uint256 amount);
 
     /// @notice emitted when a new operator takes over the contract management
     event OperatorChanged(address indexed oldOperator, address indexed newOperator);
 
     /// @notice emitted when restrictions
-    event MaxUncheckedRewardLimitChanged(uint amount);
+    event MaxUncheckedRewardLimitChanged(uint256 amount);
 
     /// @notice updating the reward quarantine before manual signoff
     /// @notice by the multisig (with updateRewardQuarantineThreshold)
-    event RewardQuarantineThresholdUpdated(uint amount);
+    event RewardQuarantineThresholdUpdated(uint256 amount);
+
+    /// @notice emitted when a user is permitted to mint on behalf of another user
+    event MintApproval(
+        address indexed owner,
+        address indexed spender,
+        uint256 amount
+    );
 
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
@@ -61,7 +68,9 @@ interface IToken is IERC20 {
     function underlyingToken() external view returns (IERC20);
 
     /// @notice updates the reward quarantine threshold if called by the operator
-    function updateRewardQuarantineThreshold(uint) external;
+    function updateRewardQuarantineThreshold(uint256) external;
+
+    function erc20InApprove(address _spender, uint256 _amount) external;
 
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
@@ -71,7 +80,9 @@ interface IToken is IERC20 {
      * @param _amount the number of tokens to wrap
      * @return the number of tokens wrapped
      */
-    function erc20In(uint _amount) external returns (uint);
+    function erc20In(uint256 _amount) external returns (uint256);
+
+    function erc20InFor(address _owner, uint256 _amount) external returns (uint256);
 
     /**
      * @notice erc20InTo wraps the `amount` given and transfers the tokens to `receiver`
@@ -79,21 +90,43 @@ interface IToken is IERC20 {
      * @param _recipient of the wrapped assets
      * @param _amount to wrap and send to the recipient
      */
-    function erc20InTo(address _recipient, uint256 _amount) external;
+    function erc20InTo(address _recipient, uint256 _amount) external returns (uint256);
+
+    /**
+     * @notice erc20InPermit to permit the wrapping of assets on
+     *         behalf of a user with a signature
+     *
+     * @param _owner that we're approving the wrapping of assets of
+     * @param _spender that is permitted to wrap the assets
+     * @param _amount of assets that we want to wrap for the user
+     * @param _deadline that this erc20InFor must be wrapped by
+     * @param _v recovery id of the transaction signature
+     * @param _r output of the transaction signature
+     * @param _s ss
+     */
+    function erc20InPermit(
+        address _owner,
+        address _spender,
+        uint256 _amount,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) external;
 
     /**
      * @notice unwraps `amount` of fluid tokens back to underlying
      *
      * @param _amount the number of fluid tokens to unwrap
      */
-    function erc20Out(uint _amount) external;
+    function erc20Out(uint256 _amount) external;
 
     /**
      * @notice calculates the size of the reward pool (the interest we've earned)
      *
      * @return the number of tokens in the reward pool
      */
-    function rewardPoolAmount() external returns (uint);
+    function rewardPoolAmount() external returns (uint256);
 
     /**
      * @notice admin function, unblocks a reward that was quarantined for being too large
@@ -114,17 +147,17 @@ interface IToken is IERC20 {
     function unblockReward(
         bytes32 _rewardTx,
         address _user,
-        uint _amount,
+        uint256 _amount,
         bool _payout,
-        uint _firstBlock,
-        uint _lastBlock
+        uint256 _firstBlock,
+        uint256 _lastBlock
     )
         external;
 
     /**
      * @notice return the max unchecked reward that's currently set
      */
-    function maxUncheckedReward() external view returns (uint);
+    function maxUncheckedReward() external view returns (uint256);
 
     /// @notice upgrade the underlying ILiquidityProvider to a new source
     function upgradeLiquidityProvider(ILiquidityProvider newPool) external;

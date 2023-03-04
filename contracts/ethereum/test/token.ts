@@ -170,6 +170,15 @@ describe("Token", async function () {
         expectEq(initialAmount.add(drainGangAmount), newAmount);
     });
 
+    it("approves wrapping of assets for other users", async () => {
+    });
+
+    it("tracks allowances properly", async () => {
+    });
+
+    it("permits wrapping of assets in a gasless way", async () => {
+    });
+
     it("does approvals correctly using eip2612", async () => {
     });
 });

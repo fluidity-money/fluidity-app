@@ -200,6 +200,8 @@ abstract contract BaseNativeToken is IERC20, IERC2612 {
         // solhint-disable-next-line not-rely-on-time
         require(_deadline >= block.timestamp, "PERMIT_DEADLINE_EXPIRED");
 
+        emit Approval(_owner, _spender, _value);
+
         // Unchecked because the only math done is incrementing
         // the owner's nonce which cannot realistically overflow.
         unchecked {
@@ -233,8 +235,6 @@ abstract contract BaseNativeToken is IERC20, IERC2612 {
 
             allowance_[recoveredAddress][_spender] = _value;
         }
-
-        emit Approval(_owner, _spender, _value);
     }
 
     // solhint-disable-next-line func-name-mixedcase
