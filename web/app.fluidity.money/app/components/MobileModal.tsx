@@ -55,7 +55,7 @@ export default function MobileModal({
     FluidityFacadeContext
   );
 
-  const { showExperiment, client } = useContext(SplitContext);
+  const { showExperiment } = useContext(SplitContext);
   const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
 
@@ -104,7 +104,7 @@ export default function MobileModal({
           handleModal={setChainModalVisibility}
           option={chains[network as "ethereum" | "solana"]}
           options={Object.values(chains).filter(
-            ({ name }) => name !== "ARB" || showExperiment("enable-arbitrum")
+            ({ name }) => name !== "ARB" || showArbitrum
           )}
           setOption={handleSetChain}
           mobile={true}
@@ -212,11 +212,7 @@ export default function MobileModal({
               <nav className={"navbar-v2 "}>
                 <ul>
                   {navigationMap
-                    .filter(
-                      ({ name }) =>
-                        name !== "Assets" ||
-                        showExperiment("enable-assets-page")
-                    )
+                    .filter(({ name }) => name !== "Assets" || showAssets)
                     .map(
                       (
                         obj: { name: string; icon: JSX.Element },
