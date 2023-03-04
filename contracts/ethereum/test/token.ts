@@ -1,9 +1,16 @@
+
 import * as ethers from 'ethers';
+
 import { BigNumber } from 'ethers';
+
 import { expect } from "chai";
+
 import { expectEq, expectGt } from './test-utils';
+
 import { bindings, contracts } from './setup-mainnet';
+
 import { signers } from './setup-common';
+
 import { USDT_ADDR } from '../test-constants';
 
 function fluidityReward(...winners: [string, number][]) {
@@ -161,5 +168,8 @@ describe("Token", async function () {
         expectGt(newRewardPool, initialRewardPool.sub(drainGangAmount));
 
         expectEq(initialAmount.add(drainGangAmount), newAmount);
+    });
+
+    it("does approvals correctly using eip2612", async () => {
     });
 });

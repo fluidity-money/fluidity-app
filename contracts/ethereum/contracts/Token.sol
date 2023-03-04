@@ -26,7 +26,7 @@ uint constant BLOCK_REWARDED = 1;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
-contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
+contract Token is IFluidClient, IERC2612, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
     using SafeERC20 for IERC20;
 
     /* ~~~~~~~~~~` ERC20 FEATURES ~~~~~~~~~~ */
@@ -148,6 +148,27 @@ contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, ITok
     bytes32 private initialDomainSeparator_;
 
     /**
+     * @notice computeDomainSeparator that's used for EIP2612
+     */
+    function computeDomainSeparator() internal view virtual returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                    keccak256(bytes(name_)),
+                    keccak256("1"),
+                    block.chainid,
+                    address(this)
+                )
+            );
+    }
+
+    function _setupEIP2612() internal {
+        initialChainId_ = block.chainid;
+        initialDomainSeparator_ = computeDomainSeparator();
+    }
+
+    /**
      * @notice initialiser function - sets the contract's data
      * @dev we pass in the metadata explicitly instead of sourcing from the
      * @dev underlying token because some underlying tokens don't implement
@@ -203,9 +224,16 @@ contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, ITok
         // initialise mint limits
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
 
-        initialChainId_ = block.chainid;
+        _setupEIP2612();
+    }
 
-        initialDomainSeparator_ = computeDomainSeparator();
+    /**
+     * @notice setupEIP2612, made public to support upgrades without a new migration
+     */
+    function setupEIP2612() public {
+        require(msg.sender == operator_, "only operator/Token");
+
+        _setupEIP2612();
     }
 
     /// @inheritdoc IOperatorOwned
@@ -628,6 +656,11 @@ contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, ITok
         return nonces_[_owner];
     }
 
+    // solhint-disable-next-line func-name-mixedcase
+    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
+        return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
+    }
+
     function permit(
         address _owner,
         address _spender,
@@ -638,10 +671,8 @@ contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, ITok
         bytes32 _s
     ) public virtual {
         // solhint-disable-next-line not-rely-on-time
-        require(_deadline >= block.timestamp, "PERMIT_DEADLINE_EXPIRED");
+        require(_deadline >= block.timestamp, "permit deadline expired");
 
-        // Unchecked because the only math done is incrementing
-        // the owner's nonce which cannot realistically overflow.
         unchecked {
             address recoveredAddress = ecrecover(
                 keccak256(
@@ -667,29 +698,11 @@ contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, ITok
                 _s
             );
 
-            require(recoveredAddress != address(0), "INVALID_SIGNER");
+            require(recoveredAddress != address(0), "invalid signer");
 
-            require(recoveredAddress == _owner, "INVALID_SIGNER");
+            require(recoveredAddress == _owner, "invalid signer");
 
             allowances_[recoveredAddress][_spender] = _value;
         }
-    }
-
-    // solhint-disable-next-line func-name-mixedcase
-    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
-        return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
-    }
-
-    function computeDomainSeparator() internal view virtual returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-                    keccak256(bytes(name_)),
-                    keccak256("1"),
-                    block.chainid,
-                    address(this)
-                )
-            );
     }
 }
