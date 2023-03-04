@@ -6,7 +6,7 @@ const ENV_TOKEN_BEACON_ADDRESS = `FLU_ETHEREUM_TOKEN_BEACON_ADDRESS`;
 const main = async () => {
     const backendAddress = mustEnv(ENV_TOKEN_BEACON_ADDRESS);
 
-    const tokenFactory = await hre.ethers.getContractFactory("TokenV1");
+    const tokenFactory = await hre.ethers.getContractFactory("Token");
 
     const tokenBeacon = await hre.ethers.getContractAt(
         [

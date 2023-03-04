@@ -25,7 +25,7 @@ uint constant BLOCK_REWARDED = 1;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
-contract TokenV1 is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
+contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
     using SafeERC20 for IERC20;
 
     // erc20 props
@@ -95,7 +95,7 @@ contract TokenV1 is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEme
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
 
-    // slither-disable-start unused_state_variable state-variables-that-could-be-declared-constant
+    // slither-disable-start unused-state, state-variables-that-could-be-declared-constant
 
     /*
      * These slots were used for the feature "mint limits" which we've
@@ -464,11 +464,11 @@ contract TokenV1 is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEme
     ) external override returns (bool) {
         bool rc;
 
-        rc = TokenV1(_token).transferFrom(msg.sender, address(this), _amount);
+        rc = Token(_token).transferFrom(msg.sender, address(this), _amount);
 
         if (!rc) return false;
 
-        rc = TokenV1(_token).transfer(_beneficiary, _amount);
+        rc = Token(_token).transfer(_beneficiary, _amount);
 
         return rc;
     }
