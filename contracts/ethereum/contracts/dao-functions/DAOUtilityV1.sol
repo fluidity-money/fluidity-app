@@ -34,6 +34,8 @@ import "../AaveV2LiquidityProvider.sol";
 
 import "../AaveV3LiquidityProvider.sol";
 
+import "hardhat/console.sol";
+
 /// @dev selector for the token's init function
 bytes4 constant TOKEN_INIT_SELECTOR = Token.init.selector;
 
@@ -224,6 +226,8 @@ contract DAOUtilityV1 {
      * @param _args to destructure in the creation of the AAVE v3 LiquidityProvider
      * @param _beacon to use to source the implementation address
      * @param _registry to use to register the token deployment
+     *
+     * @dev WARNING! untested
      */
     function deployNewAaveV3LiquidityProvider(
         AaveV3LiquidityProviderCreationArguments memory _args,
@@ -307,6 +311,8 @@ contract DAOUtilityV1 {
             _aaveV2LiquidityProviderBeacon,
             _registry
         );
+
+        _tokenArgs.liquidityProvider = lp;
 
         IToken token = deployNewToken(
             _tokenArgs,
@@ -526,14 +532,15 @@ contract DAOUtilityV1 {
     }
 
     /// @notice disableAddresses given using `enableEmergencyMode()`
-    function disableAddresses(IEmergencyMode[] memory _addresses) public {
-        for (uint256 i = 0; i < _addresses.length; i++)
+    function disableAddresses(IEmergencyMode[] calldata _addresses) public {
+        console.log("starting to iterate through to enable emergency mode!");
+        for (uint256 i = 0; i < _addresses.length; ++i)
             _addresses[i].enableEmergencyMode();
     }
 
     /// @notice enableAddresses given using `enableEmergencyMode()`
-    function enableAddresses(IEmergencyMode[] memory _addresses) public {
-        for (uint256 i = 0; i < _addresses.length; i++)
+    function enableAddresses(IEmergencyMode[] calldata _addresses) public {
+        for (uint256 i = 0; i < _addresses.length; ++i)
             _addresses[i].disableEmergencyMode();
     }
 }

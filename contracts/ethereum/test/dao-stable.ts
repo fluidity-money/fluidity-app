@@ -36,7 +36,12 @@ import {
 
 import {
   USDC_ADDR,
-  CUSDC_ADDR } from '../test-constants';
+  CUSDC_ADDR,
+  AAVE_V2_POOL_PROVIDER_ADDR,
+  FEI_ADDR,
+  AFEI_ADDR,
+  TUSD_ADDR,
+  CTUSD_ADDR } from '../test-constants';
 
 import { EMPTY_ADDRESS } from '../script-utils';
 
@@ -88,6 +93,8 @@ describe("DAOStable", async () => {
 
   let operator: ethers.Contract;
 
+  let aaveV2BeaconAddress: string;
+
   let compoundBeaconAddress: string;
 
   let govTokenSigner1Address: string;
@@ -109,6 +116,7 @@ describe("DAOStable", async () => {
       token: tokenBeaconAddress,
       registry: registryBeaconAddress,
       compoundLiquidityProvider: compoundBeaconAddress,
+      aaveV2LiquidityProvider: aaveV2BeaconAddress,
       operator: operatorBeaconAddress
     } = commonBeaconAddresses);
 
@@ -704,38 +712,274 @@ describe("DAOStable", async () => {
   );
 
   it(
-    "should succeed in using the DAO utility code to deploy a new aave token with default arb trf vars",
-    async () => {
-    }
-  );
+    "should succeed in using the DAO utility code to deploy a new aave V2 token with default arb trf vars",
+    async function() {
+      if (!isRunningOnMainnet) this.skip();
 
-  it(
-    "should succeed in using the DAO utility code to deploy a new liquidity pool",
-    async () => {
-    }
-  );
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
 
-  it(
-    "should succeed in using the DAO utility code to upgrade the beacon for a token",
-    async () => {
-    }
-  );
+      expectGt(veGovBalance, 1);
 
-  it(
-    "should succeed in using the DAO utility code to upgrade the beacon for a token",
-    async () => {
+      veGovBalance = 1;
+
+      const tokenDecimals = 18;
+
+      const daoUtilityV1Tx =
+        await daoUtilityV1.populateTransaction.deployNewAaveV2TokenWithDefaultArbTrfVars(
+          tokenBeaconAddress,
+          aaveV2BeaconAddress,
+          registry.address,
+          {
+            addressProvider: AAVE_V2_POOL_PROVIDER_ADDR,
+            aToken: AFEI_ADDR,
+          },
+          {
+            liquidityProvider: EMPTY_ADDRESS,
+            fluidTokenName: "Fluid Fei 2",
+            fluidSymbol: "fFEI2",
+            emergencyCouncil: govTokenSigner1Address,
+            oracle: govTokenSigner1Address,
+            decimals: tokenDecimals
+          },
+          operator.address
+        );
+
+      const daoUtilityV1Calldata = daoUtilityV1Tx.data!;
+
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x3d",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1Calldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      const returnData = await callAndExecuteProposal(dao, proposalId);
+
+      const [
+        liquidityProviderAddress,
+        tokenAddress
+      ] = hre.ethers.utils.defaultAbiCoder.decode(
+        ["address", "address"],
+        returnData
+      );
+
+      expect(await tokenFactory.attach(tokenAddress).decimals())
+        .to.be.equal(tokenDecimals);
+
+      expect(await compoundFactory.attach(liquidityProviderAddress).underlying_())
+        .to.be.hexEqual(FEI_ADDR);
+
+      expect(await registry.getTrfVariables(tokenAddress))
+        .to.deep.equal(await daoUtilityV1.defaultArbitrumTrfVariables());
     }
   );
 
   it(
     "should succeed in using the DAO utility code to update TRF variables for a token",
-    async () => {
+    async function() {
+      if (!isRunningOnMainnet) this.skip();
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const tokenDecimals = 18;
+
+      const daoUtilityV1DeployTx =
+        await daoUtilityV1.populateTransaction.deployNewAaveV2TokenWithDefaultArbTrfVars(
+          tokenBeaconAddress,
+          aaveV2BeaconAddress,
+          registry.address,
+          {
+            addressProvider: AAVE_V2_POOL_PROVIDER_ADDR,
+            aToken: AFEI_ADDR,
+          },
+          {
+            liquidityProvider: EMPTY_ADDRESS,
+            fluidTokenName: "Fluid Fei 3",
+            fluidSymbol: "fFEI3",
+            emergencyCouncil: govTokenSigner1Address,
+            oracle: govTokenSigner1Address,
+            decimals: tokenDecimals
+          },
+          operator.address
+        );
+
+      const daoUtilityV1DeployCalldata = daoUtilityV1DeployTx.data!;
+
+      let proposalId = await callAndSendProposal(
+        dao,
+        "0x3d",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1DeployCalldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      const returnData = await callAndExecuteProposal(dao, proposalId);
+
+      const [
+        liquidityProviderAddress,
+        tokenAddress
+      ] = hre.ethers.utils.defaultAbiCoder.decode(
+        ["address", "address"],
+        returnData
+      );
+
+      expect(await tokenFactory.attach(tokenAddress).decimals())
+        .to.be.equal(tokenDecimals);
+
+      expect(await compoundFactory.attach(liquidityProviderAddress).underlying_())
+        .to.be.hexEqual(FEI_ADDR);
+
+      expect(await registry.getTrfVariables(tokenAddress))
+        .to.deep.equal(await daoUtilityV1.defaultArbitrumTrfVariables());
+
+      const daoUtilityV1UpdateTx =
+        await daoUtilityV1.populateTransaction.updateTrfVariables(
+          registry.address,
+          tokenAddress,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        );
+
+      const daoUtilityV1UpdateCalldata = daoUtilityV1UpdateTx.data!;
+
+      proposalId = await callAndSendProposal(
+        dao,
+        "0x4d",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1UpdateCalldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await dao.executeProposal(proposalId);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      const trfVariables = await registry.getTrfVariables(tokenAddress);
+
+      expect(trfVariables.currentAtxTransactionMargin).to.equal(1);
+      expect(trfVariables.defaultTransfersInBlock).to.equal(2);
+      expect(trfVariables.spoolerInstantRewardThreshold).to.equal(3);
+      expect(trfVariables.spoolerBatchedRewardThreshold).to.equal(4);
+      expect(trfVariables.defaultSecondsSinceLastBlock).to.equal(5);
+      expect(trfVariables.atxBufferSize).to.equal(6);
     }
   );
 
   it(
     "should succeed in using the DAO utility code to disable a token",
-    async () => {
+    async function() {
+      if (!isRunningOnMainnet) this.skip();
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const tokenDecimals = 18;
+
+      const daoUtilityV1DeployTx =
+        await daoUtilityV1.populateTransaction.deployNewCompoundTokenWithDefaultArbTrfVars(
+          tokenBeaconAddress,
+          compoundBeaconAddress,
+          registry.address,
+          {
+            cToken: CTUSD_ADDR,
+          },
+          {
+            liquidityProvider: EMPTY_ADDRESS,
+            fluidTokenName: "Fluid TUSD 2",
+            fluidSymbol: "fTUSD2",
+            emergencyCouncil: govTokenSigner1Address,
+            oracle: govTokenSigner1Address,
+            decimals: tokenDecimals
+          },
+          operator.address
+        );
+
+      const daoUtilityV1DeployCalldata = daoUtilityV1DeployTx.data!;
+
+      let proposalId = await callAndSendProposal(
+        dao,
+        "0x77",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1DeployCalldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      const returnData = await callAndExecuteProposal(dao, proposalId);
+
+      const [
+        liquidityProviderAddress,
+        tokenAddress
+      ] = hre.ethers.utils.defaultAbiCoder.decode(
+        ["address", "address"],
+        returnData
+      );
+
+      expect(await tokenFactory.attach(tokenAddress).decimals())
+        .to.be.equal(tokenDecimals);
+
+      expect(await compoundFactory.attach(liquidityProviderAddress).underlying_())
+        .to.be.hexEqual(TUSD_ADDR);
+
+      expect(await registry.getTrfVariables(tokenAddress))
+        .to.deep.equal(await daoUtilityV1.defaultArbitrumTrfVariables());
+
+      const daoUtilityV1DisableTx =
+        await daoUtilityV1.populateTransaction.disableAddresses([tokenAddress]);
+
+      const daoUtilityV1DisableCalldata = daoUtilityV1DisableTx.data!;
+
+      proposalId = await callAndSendProposal(
+        dao,
+        "0x99",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1DisableCalldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      await callAndExecuteProposal(dao, proposalId);
+
+      expect(await tokenFactory.attach(tokenAddress).noEmergencyMode())
+        .to.be.false;
     }
   );
 
@@ -775,7 +1019,26 @@ describe("DAOStable", async () => {
 
   it(
     "should fail to vote on a proposal that isn't live yet",
-    async () => {
+    async function() {
+      if (!isRunningOnMainnet) this.skip();
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const proposalId = await dao.callStatic.createProposal(
+        "0x99",
+        govTokenSigner1Address,
+        0,
+        0,
+        false,
+        "0x00"
+      );
+
+      await expect(dao.callStatic.voteFor(proposalId, 1))
+        .to.be.revertedWith("proposal does not exist");
     }
   );
 });

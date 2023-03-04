@@ -13,7 +13,7 @@ function fluidityReward(...winners: [string, number][]) {
     ]];
 }
 
-describe("TokenV1", async function () {
+describe("Token", async function () {
     let fUsdtOperator: ethers.Contract;
     let fUsdtAccount: ethers.Contract;
     let fUsdtOracle: ethers.Contract;
