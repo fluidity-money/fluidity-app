@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-pragma solidity ^0.8.11;
+pragma solidity 0.8.16;
 
 import "../interfaces/IERC20.sol";
 
@@ -226,7 +226,9 @@ abstract contract BaseNativeToken is IERC20 {
                 _s
             );
 
-            require(recoveredAddress != address(0) && recoveredAddress == _owner, "INVALID_SIGNER");
+            require(recoveredAddress != address(0), "INVALID_SIGNER");
+
+            require(recoveredAddress == _owner, "INVALID_SIGNER");
 
             allowance_[recoveredAddress][_spender] = _value;
         }

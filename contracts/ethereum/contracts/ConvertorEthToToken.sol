@@ -4,7 +4,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/IWETH.sol";
@@ -26,7 +26,11 @@ contract ConvertorEthToToken {
 
     function wrapEth() public payable {
         IWETH(wethAddress_).deposit{value: msg.value}();
-        IWETH(wethAddress_).approve(address(tokenAddress_), msg.value);
+
+        bool rc = IWETH(wethAddress_).approve(address(tokenAddress_), msg.value);
+
+        require(rc, "approve failed");
+
         tokenAddress_.erc20InFor(msg.sender, msg.value);
     }
 
@@ -35,9 +39,16 @@ contract ConvertorEthToToken {
     }
 
     function unwrapEth(uint256 _amount) public {
-        tokenAddress_.transferFrom(msg.sender, address(this), _amount);
+        bool rc = tokenAddress_.transferFrom(msg.sender, address(this), _amount);
+
+        require(rc, "transfer from failed");
+
         tokenAddress_.erc20Out(_amount);
+
         IWETH(wethAddress_).withdraw(_amount);
-        payable(msg.sender).transfer(_amount);
+
+        (rc,) = payable(msg.sender).call{value: _amount}("");
+
+        require(rc, "transfer out failed");
     }
 }

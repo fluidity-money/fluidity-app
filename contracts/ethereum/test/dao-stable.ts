@@ -5,6 +5,8 @@ import { expect } from 'chai';
 
 import type { ethers } from 'ethers';
 
+import { keccak256 } from '@ethersproject/keccak256';
+
 import {
   commonContracts,
   commonBindings,
@@ -472,6 +474,45 @@ describe("DAOStable", async () => {
       expect(hidden).to.be.equal(hiddenSecretWord);
     }
   );
+
+  it(
+    "should hash the input data correctly",
+    async () => {
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const ipfsHash = "0x1234";
+      const target = govTokenSigner1Address;
+      const isDelegateCall = true;
+      const calldata = "0x00";
+
+      const bytes = hre.ethers.utils.defaultAbiCoder.encode(
+        [ "bytes", "address", "bool", "bytes" ],
+        [
+          ipfsHash,
+          target,
+          isDelegateCall,
+          calldata
+        ]
+      );
+
+      const proposalId_ = keccak256(hre.ethers.utils.arrayify(bytes));
+
+      const proposalId = await dao.callStatic.createProposal(
+        ipfsHash,
+        target,
+        0,
+        0,
+        isDelegateCall,
+        calldata
+      );
+
+      expect(proposalId).to.be.hexEqual(proposalId_);
+    }
+  )
 
   it(
     "should fail if someone tries to vote after voting's over",

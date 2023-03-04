@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity ^0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
+
+import "./ProposalStatus.sol";
 
 import "../interfaces/IToken.sol";
 import "../interfaces/IVEGovLockup.sol";
@@ -12,20 +14,7 @@ uint256 constant DEFAULT_VOTE_BLOCK_TIME = 10 days;
 /// @dev default vote timelock once a vote has been ratified
 uint256 constant DEFAULT_FROZEN_TIME = 24 hours;
 
-enum ProposalStatus {
-    UNFINISHED,
-    FROZEN,
-    SUCCEEDED,
-    EXECUTED,
-    FAILED,
-    KILLED
-}
-
 struct Proposal {
-    /// @notice targetContract to delegateCall to, if it's set to address(0)
-    ///         it's been executed
-    address targetContract;
-
     /// @notice ratificationTs to use as the timestamp of when voting finished
     uint256 ratificationTs;
 
@@ -40,6 +29,10 @@ struct Proposal {
 
     /// @notice votes that were made by users
     mapping(address => uint256) votes;
+
+    /// @notice targetContract to delegateCall to, if it's set to address(0)
+    ///         it's been executed
+    address targetContract;
 
     /// @notice killed by the emergency council?
     bool killed;
@@ -74,6 +67,10 @@ contract DAOStable {
 
     mapping(bytes32 => Proposal) private proposals_;
 
+    // @dev locked_ is set to true to prevent reentrancy (and set to false at
+    // the end of the function)
+    bool private locked_;
+
     /// @notice init the contract with the operator, creating an empty
     ///         set of ballots
     /// @dev _council to use
@@ -81,7 +78,9 @@ contract DAOStable {
         address _emergencyCouncil,
         IVEGovLockup _lockupSource
     ) {
+        // slither-disable-next-line missing-zero-address-validation
         emergencyCouncil_ = _emergencyCouncil;
+
         lockupSource_ = _lockupSource;
     }
 
@@ -144,12 +143,12 @@ contract DAOStable {
         bool _isDelegateCall,
         bytes calldata _calldata
     ) internal pure returns (bytes32) {
-        return keccak256(bytes.concat(abi.encode(
+        return keccak256(abi.encode(
             _ipfsHash,
             _target,
             _isDelegateCall,
             _calldata
-        )));
+        ));
     }
 
     /**
@@ -247,8 +246,17 @@ contract DAOStable {
         return ratificationTs - currentTs;
     }
 
+    function isAddressZero(address _comp) internal pure returns (bool t) {
+        // solhint-disable-next-line inline-assembly
+        assembly {
+            t := iszero(_comp)
+        }
+
+        return t;
+    }
+
     function getProposalExecuted(bytes32 _proposalId) public view returns (bool) {
-        return proposals_[_proposalId].targetContract == address(0);
+        return isAddressZero(proposals_[_proposalId].targetContract);
     }
 
     /// @notice getProposalPassing check if the proposal has enough votes
@@ -385,7 +393,11 @@ contract DAOStable {
     function executeProposal(bytes32 _proposalId) public returns (bytes memory) {
         require(getProposalReadyToExecute(_proposalId), "proposal can't execute");
 
+        require(!locked_, "reentrant!");
+
         Proposal storage proposal = proposals_[_proposalId];
+
+        locked_ = true;
 
         bool rc;
         bytes memory returnData;
@@ -421,6 +433,8 @@ contract DAOStable {
         // mark the contract as executed
 
         proposal.targetContract = address(0);
+
+        locked_ = false;
 
         return returnData;
     }

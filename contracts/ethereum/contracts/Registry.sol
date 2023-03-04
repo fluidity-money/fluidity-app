@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity ^0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/ILiquidityProvider.sol";
@@ -74,7 +74,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     function registerManyTokens(ITokenOperatorOwned[] calldata _tokens) public {
         require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
-        for (uint i = 0; i < _tokens.length; i++)
+        for (uint i = 0; i < _tokens.length; ++i)
           _registerToken(_tokens[i]);
     }
 
@@ -90,7 +90,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     function registerManyLiquidityProviders(ILiquidityProvider[] calldata _lps) public {
         require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
-        for (uint i = 0; i < _lps.length; i++)
+        for (uint i = 0; i < _lps.length; ++i)
           _registerLiquidityProvider(_lps[i]);
     }
 
@@ -121,6 +121,8 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
 
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator(), "only operator");
+        require(_newOperator != address(0), "zero operator");
+
         operator_ = _newOperator;
     }
 
@@ -134,7 +136,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     function updateUtilityClients(FluidityClientChange[] memory _clients) public {
         require(msg.sender == operator_, "only operator");
 
-        for (uint i = 0; i < _clients.length; i++) {
+        for (uint i = 0; i < _clients.length; ++i) {
             FluidityClientChange memory change = _clients[i];
 
             address oldClient = address(getFluidityClient(change.token, change.name));
@@ -181,7 +183,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     ) public returns (ScannedUtilityVars[] memory) {
         ScannedUtilityVars[] memory vars = new ScannedUtilityVars[](_names.length);
 
-        for (uint i = 0; i < _names.length; i++) {
+        for (uint i = 0; i < _names.length; ++i) {
             string memory name = _names[i];
 
             vars[i].name = name;

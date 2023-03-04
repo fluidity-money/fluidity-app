@@ -4,7 +4,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
@@ -48,6 +48,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     // for migrations
     uint private version_;
 
+    // @custom:security non-reentrant
     ILiquidityProvider private pool_;
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
@@ -82,6 +83,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
 
+    // solhint-disable-start unused-state-variable, state-variables-that-could-be-declared-constant
+
     /*
      * These slots were used for the feature "mint limits" which we've
      * since entirely pulled.
@@ -110,6 +113,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
     uint private __deprecated_6;
+
+    // solhint-disable-end
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
 
@@ -142,6 +147,9 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         address _oracle
     ) public {
         require(version_ == 0, "contract is already initialised");
+        require(_operator != address(0), "operator zero");
+        require(_oracle != address(0), "oracle zero");
+
         version_ = 1;
 
         // remember the operator for signing off on oracle changes, large payouts
@@ -156,6 +164,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         pool_ = ILiquidityProvider(_liquidityProvider);
 
         // sanity check
+        // slither-disable-next-line unused-return
         underlyingToken().totalSupply();
 
         noEmergencyMode_ = true;
@@ -170,12 +179,13 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     }
 
     /// @inheritdoc IOperatorOwned
-    function updateOperator(address newOperator) public {
+    function updateOperator(address _newOperator) public {
         require(msg.sender == operator(), "operator only");
+        require(_newOperator != address(0), "new operator zero");
 
-        operator_ = newOperator;
+        operator_ = _newOperator;
 
-        emit OperatorChanged(operator_, newOperator);
+        emit OperatorChanged(operator_, _newOperator);
     }
 
     function emergencyCouncil() public view returns (address) {
@@ -259,6 +269,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     }
 
     /// @inheritdoc IToken
+    // slither-disable-next-line reentrancy-no-eth
     function erc20InFor(address recipient, uint256 amount) public {
         erc20In(amount);
         transfer(recipient, amount);
@@ -406,11 +417,6 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     function totalSupply() public view returns (uint256) { return totalSupply_; }
     function balanceOf(address account) public view returns (uint256) {
        return balances_[account];
-    }
-
-    function setDecimals(uint8 _decimals) public {
-      require(msg.sender == operator(), "operator only");
-      decimals_ = _decimals;
     }
 
     function transfer(address to, uint256 amount) public returns (bool) {

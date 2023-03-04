@@ -4,7 +4,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
@@ -83,6 +83,8 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
 
     function updateOperator(address _newOperator) public {
         require(operator() == msg.sender, "only operator");
+        require(_newOperator != address(0), "no zero operator");
+
         operator_ = _newOperator;
     }
 

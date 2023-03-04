@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity ^0.8.11;
+pragma solidity 0.8.16;
 
 interface CErc20Interface {
     // inherited from CErc20Storage

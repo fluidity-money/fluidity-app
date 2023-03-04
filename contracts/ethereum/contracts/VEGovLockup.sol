@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/IVEGovLockup.sol";
 import "../interfaces/IERC20.sol";
+
+import "./openzeppelin/SafeERC20.sol";
 
 /// @dev MIN_LOCK_TIME to use as the min amount of time that BPT could
 ///      be locked
@@ -24,6 +26,8 @@ struct Lockup {
 }
 
 contract VEGovLockup is IVEGovLockup {
+    using SafeERC20 for IERC20;
+
     event LockCreated(address indexed spender, uint256 amount);
 
     event LockBPTIncreased(address indexed spender, uint256 extraBPT);

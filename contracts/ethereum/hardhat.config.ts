@@ -90,8 +90,8 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
     operatorBeacon,
     registryBeacon
   ] = await deployBeacons(
-    hre,
     tokenFactory,
+    externalOperatorAddress,
     compoundFactory,
     aaveV2Factory,
     aaveV3Factory,
@@ -227,7 +227,7 @@ if (process.env.FLU_FORKNET_NETWORK === "goerli" && process.env.FLU_ETHEREUM_FOR
  */
 module.exports = {
   solidity: {
-    version: "0.8.11",
+    version: "0.8.16",
     settings: {
       optimizer: {
         enabled: true,
@@ -241,9 +241,6 @@ module.exports = {
         revertStrings: "debug",
       }
     },
-  },
-  vyper: {
-    compilers: [{ version: "0.3.7" }],
   },
   etherscan: {
     apiKey: process.env.FLU_ETHERSCAN_API
