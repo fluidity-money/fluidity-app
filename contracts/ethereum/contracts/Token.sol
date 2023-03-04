@@ -33,7 +33,7 @@ bytes32 constant EIP721_ERC20_IN_PERMIT_SELECTOR =
 
 // keccak(1)
 bytes32 constant VERSION_KECCAK =
-  0xb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf6;
+  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
