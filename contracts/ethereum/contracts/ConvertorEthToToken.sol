@@ -31,7 +31,7 @@ contract ConvertorEthToToken {
 
         require(rc, "approve failed");
 
-        tokenAddress_.erc20InFor(msg.sender, msg.value);
+        tokenAddress_.erc20InTo(msg.sender, msg.value);
     }
 
     receive() external payable {

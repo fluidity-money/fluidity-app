@@ -74,12 +74,12 @@ interface IToken is IERC20 {
     function erc20In(uint _amount) external returns (uint);
 
     /**
-     * @notice wraps the `amount` given and transfers the tokens to `receiver`
+     * @notice erc20InTo wraps the `amount` given and transfers the tokens to `receiver`
      *
      * @param _recipient of the wrapped assets
      * @param _amount to wrap and send to the recipient
      */
-    function erc20InFor(address _recipient, uint256 _amount) external;
+    function erc20InTo(address _recipient, uint256 _amount) external;
 
     /**
      * @notice unwraps `amount` of fluid tokens back to underlying

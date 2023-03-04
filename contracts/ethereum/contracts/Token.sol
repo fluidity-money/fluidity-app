@@ -26,7 +26,14 @@ uint constant BLOCK_REWARDED = 1;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
-contract Token is IFluidClient, IERC2612, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
+contract Token is
+    IFluidClient,
+    IERC2612,
+    ITransferWithBeneficiary,
+    IToken,
+    IEmergencyMode,
+    IOperatorOwned
+{
     using SafeERC20 for IERC20;
 
     /* ~~~~~~~~~~` ERC20 FEATURES ~~~~~~~~~~ */
@@ -328,7 +335,7 @@ contract Token is IFluidClient, IERC2612, ITransferWithBeneficiary, IToken, IEme
 
     /// @inheritdoc IToken
     // slither-disable-next-line reentrancy-no-eth
-    function erc20InFor(address recipient, uint256 amount) public {
+    function erc20InTo(address recipient, uint256 amount) public {
         erc20In(amount);
         transfer(recipient, amount);
     }
