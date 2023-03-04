@@ -248,7 +248,6 @@ contract DAOStable {
 
     function isAddressZero(address _comp) internal pure returns (bool t) {
         // solhint-disable-next-line inline-assembly
-        // slither-disable-next-line assembly
         assembly {
             t := iszero(_comp)
         }
@@ -394,6 +393,8 @@ contract DAOStable {
     function executeProposal(bytes32 _proposalId) public returns (bytes memory) {
         require(getProposalReadyToExecute(_proposalId), "proposal can't execute");
 
+        // solhint-disable-start reentrancy-no-eth
+
         require(!locked_, "reentrant!");
 
         Proposal storage proposal = proposals_[_proposalId];
@@ -436,6 +437,8 @@ contract DAOStable {
         proposal.targetContract = address(0);
 
         locked_ = false;
+
+        // solhint-disable-end reentrancy-no-eth
 
         return returnData;
     }

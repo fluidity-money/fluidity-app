@@ -95,7 +95,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
 
-    // slither-disable-start unused-state, state-variables-that-could-be-declared-constant
+    // slither-disable-start unused-state constable-states naming-convention
 
     /*
      * These slots were used for the feature "mint limits" which we've

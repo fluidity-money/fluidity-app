@@ -169,15 +169,15 @@ contract VEGovLockup is IVEGovLockup {
 
         emit LockCreated(msg.sender, _amount);
 
-        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
-
-        require(rc, "failed to transfer");
-
         tokenAmountDeposited_ += _amount;
 
         lockups_[msg.sender].lockTime = _lockTime;
         lockups_[msg.sender].bptLocked = _amount;
         lockups_[msg.sender].lockTimestamp = block.timestamp;
+
+        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
+
+        require(rc, "failed to transfer");
     }
 
     function extendLockTime(
@@ -212,10 +212,6 @@ contract VEGovLockup is IVEGovLockup {
 
         emit LockBPTIncreased(msg.sender, _amount);
 
-        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
-
-        require(rc, "failed to transfer tokens");
-
         tokenAmountDeposited_ += _amount;
 
         uint256 newBPTLocked = getBPTLocked(msg.sender) + _amount;
@@ -227,6 +223,10 @@ contract VEGovLockup is IVEGovLockup {
             bptLocked: newBPTLocked,
             lockTimestamp: block.timestamp
         });
+
+        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
+
+        require(rc, "failed to transfer tokens");
     }
 
     /**
@@ -273,12 +273,12 @@ contract VEGovLockup is IVEGovLockup {
 
         emit LockWithdrew(msg.sender, bptLocked);
 
-        bool rc = token_.transfer(msg.sender, bptLocked);
-
-        require(rc, "failed to transfer tokens out");
-
         tokenAmountDeposited_ -= bptLocked;
 
         disableLock(msg.sender);
+
+        bool rc = token_.transfer(msg.sender, bptLocked);
+
+        require(rc, "failed to transfer tokens out");
     }
 }

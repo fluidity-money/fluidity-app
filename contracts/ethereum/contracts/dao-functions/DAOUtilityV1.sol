@@ -34,8 +34,6 @@ import "../AaveV2LiquidityProvider.sol";
 
 import "../AaveV3LiquidityProvider.sol";
 
-import "hardhat/console.sol";
-
 /// @dev selector for the token's init function
 bytes4 constant TOKEN_INIT_SELECTOR = Token.init.selector;
 
@@ -533,7 +531,6 @@ contract DAOUtilityV1 {
 
     /// @notice disableAddresses given using `enableEmergencyMode()`
     function disableAddresses(IEmergencyMode[] calldata _addresses) public {
-        console.log("starting to iterate through to enable emergency mode!");
         for (uint256 i = 0; i < _addresses.length; ++i)
             _addresses[i].enableEmergencyMode();
     }

@@ -47,6 +47,7 @@ contract ConvertorEthToToken {
 
         IWETH(wethAddress_).withdraw(_amount);
 
+        // slither-disable-next-line low-level-calls
         (rc,) = payable(msg.sender).call{value: _amount}("");
 
         require(rc, "transfer out failed");

@@ -63,10 +63,10 @@ contract Staking {
     function depositToken(IERC20 _token, uint256 _amount) public {
         require(tokens_[_token], "token not supported");
 
+        balances_[msg.sender][_token] += _amount;
+
         bool rc = _token.transferFrom(msg.sender, address(this), _amount);
 
         require(rc, "transfer from failed");
-
-        balances_[msg.sender][_token] += _amount;
     }
 }
