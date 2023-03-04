@@ -26,7 +26,7 @@ import {
 
 import { Token } from "../Token.sol";
 
-import "../Operator.sol";
+import "../Executor.sol";
 
 import "../CompoundLiquidityProvider.sol";
 
@@ -103,7 +103,7 @@ contract DAOUtilityV1 {
      * @notice deployNewToken and register it with Registry
      * @param _args to get the arguments to create the token with
      * @param _trfVariables to use for the trf variables
-     * @param _operator to use to configure the token configuration for the deployed asset
+     * @param _executor to use to configure the token configuration for the deployed asset
      *
      * @dev uses the sender address as the operator/emergency council!
      */
@@ -112,7 +112,7 @@ contract DAOUtilityV1 {
         IBeacon _beacon,
         TrfVariables memory _trfVariables,
         IRegistry _registry,
-        Operator _operator
+        Executor _executor
     ) public returns (IToken) {
         BeaconProxy beaconProxy = new BeaconProxy(
             address(_beacon),
@@ -124,7 +124,7 @@ contract DAOUtilityV1 {
                 _args.fluidSymbol,                // _symbol
                 _args.emergencyCouncil,           // _emergencyCouncil
                 address(this),                    // _operator
-                address(_operator)                // _oracle
+                address(_executor)                // _oracle
             )
          );
 
@@ -147,7 +147,7 @@ contract DAOUtilityV1 {
 
          // start to set up the operator for the token deployed
 
-         _operator.updateOracle(address(beaconProxy), address(_args.oracle));
+         _executor.updateOracle(address(beaconProxy), address(_args.oracle));
 
          return token;
     }
@@ -266,7 +266,7 @@ contract DAOUtilityV1 {
 
         // registry arguments
         TrfVariables memory _trfVariables,
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         ILiquidityProvider lp = deployNewCompoundLiquidityProvider(
             _lpArgs,
@@ -281,7 +281,7 @@ contract DAOUtilityV1 {
             _tokenBeacon,
             _trfVariables,
             _registry,
-            _operator
+            _executor
         );
 
         return (lp, token);
@@ -300,7 +300,7 @@ contract DAOUtilityV1 {
 
         // registry arguments
         TrfVariables memory _trfVariables,
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         ILiquidityProvider lp = deployNewAaveV2LiquidityProvider(
             _lpArgs,
@@ -313,7 +313,7 @@ contract DAOUtilityV1 {
             _tokenBeacon,
             _trfVariables,
             _registry,
-            _operator
+            _executor
         );
 
         return (lp, token);
@@ -332,7 +332,7 @@ contract DAOUtilityV1 {
 
         // registry arguments
         TrfVariables memory _trfVariables,
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         ILiquidityProvider lp = deployNewAaveV3LiquidityProvider(
             _lpArgs,
@@ -347,7 +347,7 @@ contract DAOUtilityV1 {
             _tokenBeacon,
             _trfVariables,
             _registry,
-            _operator
+            _executor
         );
 
         return (lp, token);
@@ -365,7 +365,7 @@ contract DAOUtilityV1 {
         TokenCreationArguments memory _tokenArgs,
 
         // registry arguments
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         return deployNewCompoundToken(
             _tokenBeacon,
@@ -374,7 +374,7 @@ contract DAOUtilityV1 {
             _lpArgs,
             _tokenArgs,
             defaultEthereumTrfVariables(),
-            _operator
+            _executor
         );
     }
 
@@ -390,7 +390,7 @@ contract DAOUtilityV1 {
         TokenCreationArguments memory _tokenArgs,
 
         // registry arguments
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         return deployNewAaveV2Token(
             _tokenBeacon,
@@ -399,7 +399,7 @@ contract DAOUtilityV1 {
             _lpArgs,
             _tokenArgs,
             defaultEthereumTrfVariables(),
-            _operator
+            _executor
         );
     }
 
@@ -415,7 +415,7 @@ contract DAOUtilityV1 {
         TokenCreationArguments memory _tokenArgs,
 
         // registry arguments
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         return deployNewAaveV3Token(
             _tokenBeacon,
@@ -424,7 +424,7 @@ contract DAOUtilityV1 {
             _lpArgs,
             _tokenArgs,
             defaultEthereumTrfVariables(),
-            _operator
+            _executor
         );
     }
 
@@ -440,7 +440,7 @@ contract DAOUtilityV1 {
         TokenCreationArguments memory _tokenArgs,
 
         // registry arguments
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         return deployNewCompoundToken(
             _tokenBeacon,
@@ -449,7 +449,7 @@ contract DAOUtilityV1 {
             _lpArgs,
             _tokenArgs,
             defaultArbitrumTrfVariables(),
-            _operator
+            _executor
         );
     }
 
@@ -465,7 +465,7 @@ contract DAOUtilityV1 {
         TokenCreationArguments memory _tokenArgs,
 
         // registry arguments
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         return deployNewAaveV2Token(
             _tokenBeacon,
@@ -474,7 +474,7 @@ contract DAOUtilityV1 {
             _lpArgs,
             _tokenArgs,
             defaultArbitrumTrfVariables(),
-            _operator
+            _executor
         );
     }
 
@@ -490,7 +490,7 @@ contract DAOUtilityV1 {
         TokenCreationArguments memory _tokenArgs,
 
         // registry arguments
-        Operator _operator
+        Executor _executor
     ) public returns (ILiquidityProvider, IToken) {
         return deployNewAaveV3Token(
             _tokenBeacon,
@@ -499,7 +499,7 @@ contract DAOUtilityV1 {
             _lpArgs,
             _tokenArgs,
             defaultArbitrumTrfVariables(),
-            _operator
+            _executor
         );
     }
 

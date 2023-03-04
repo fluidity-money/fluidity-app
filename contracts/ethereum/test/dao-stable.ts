@@ -42,7 +42,7 @@ const GOV_TO_LOCK = 1000;
 
 const advanceTime = sendEmptyTransaction;
 
-describe("DAOV1", async () => {
+describe("DAOStable", async () => {
   let isRunningOnMainnet: boolean;
 
   let govToken: ethers.Contract;

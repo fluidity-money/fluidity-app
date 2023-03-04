@@ -24,7 +24,7 @@ struct OracleUpdate {
     address newOracle;
 }
 
-contract Operator is IEmergencyMode, IUtilityGauges, IOperatorOwned {
+contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     /// @dev the utility name of the fluid token
     string constant private FLUID_TOKEN = "FLUID";
 

@@ -20,7 +20,7 @@ export const getFactories = async (
 
   const registryFactory = await hre.ethers.getContractFactory("Registry");
 
-  const operatorFactory = await hre.ethers.getContractFactory("Operator");
+  const operatorFactory = await hre.ethers.getContractFactory("Executor");
 
   const tokenFactory = await hre.ethers.getContractFactory("Token");
 
@@ -36,7 +36,7 @@ export const getFactories = async (
     "AaveV3LiquidityProvider"
   );
 
-  const daoFactory = await hre.ethers.getContractFactory("DAOV1");
+  const daoFactory = await hre.ethers.getContractFactory("DAOStable");
 
   return {
     upgradeableBeacon: upgradeableBeaconFactory,
@@ -260,7 +260,7 @@ export const deployVeGovLockup = async (
   voteTokenAddress: string
 ): Promise<ethers.Contract> => factory.connect(signer).deploy(voteTokenAddress);
 
-export const deployDAOV1 = async(
+export const deployDAOStable = async(
   factory: ethers.ContractFactory,
   emergencyCouncil: string,
   veGovLockupAddress: string
@@ -329,7 +329,7 @@ export const deployFluidity = async (
     govToken.address
   );
 
-  const dao = await deployDAOV1(
+  const dao = await deployDAOStable(
     daoFactory,
     emergencyCouncilAddress,
     veGovLockup.address

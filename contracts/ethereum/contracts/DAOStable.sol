@@ -6,8 +6,6 @@ pragma abicoder v2;
 import "../interfaces/IToken.sol";
 import "../interfaces/IVEGovLockup.sol";
 
-import "./Operator.sol";
-
 /// @dev default time to wait before a vote is possibly ratified after it's submission
 uint256 constant DEFAULT_VOTE_BLOCK_TIME = 10 days;
 
@@ -55,7 +53,7 @@ struct Proposal {
  * doing contract upgrades, allocating amounts using utility gauges to
  * different protocols
  */
-contract DAOV1 {
+contract DAOStable {
 
     event VoteCreated(bytes32 indexed proposalId);
 
