@@ -12,6 +12,8 @@ import type {
 export const getFactories = async (
   hre: HardhatRuntimeEnvironment
 ): Promise<FluidityFactories> => {
+  const upgradeableBeaconFactory = await hre.ethers.getContractFactory("UpgradeableBeacon");
+
   const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
 
   const veGovLockupFactory = await hre.ethers.getContractFactory("VEGovLockup");
@@ -37,6 +39,7 @@ export const getFactories = async (
   const daoFactory = await hre.ethers.getContractFactory("DAOV1");
 
   return {
+    upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
     govToken: govTokenFactory,
     veGovLockup: veGovLockupFactory,
@@ -69,11 +72,27 @@ export const deployTestUtilityWithoutDAO = async (
   return client;
 };
 
+export const deployBeacon = async (
+  upgradeableBeaconFactory: ethers.ContractFactory,
+  ownerAddress: string,
+  implFactory: ethers.ContractFactory
+): Promise<ethers.Contract> => {
+  const impl = await implFactory.deploy();
+  const beacon = await upgradeableBeaconFactory.deploy(impl.address);
+  await beacon.transferOwnership(ownerAddress);
+  return beacon;
+};
+
 export const deployBeacons = async(
-  hre: HardhatRuntimeEnvironment,
+  upgradeableBeaconFactory: ethers.ContractFactory,
+  ownerAddress: string,
   ...factories: ethers.ContractFactory[]
 ): Promise<ethers.Contract[]> =>
-  Promise.all(factories.map((v) => hre.upgrades.deployBeacon(v)));
+  Promise.all(factories.map((v) => deployBeacon(
+    upgradeableBeaconFactory,
+    ownerAddress,
+    v
+  )));
 
 // deployTokens, registering the utility clients against the registry
 // (not listing the tokens here though)
@@ -105,8 +124,6 @@ export const deployTokens = async (
   const tokenAddresses: TokenAddresses = {};
 
   for (const token of tokens) {
-    console.log(`deploying ${token.name}`);
-
     let deployedPool: ethers.Contract;
 
     const deployedToken = await hre.upgrades.deployBeaconProxy(
@@ -163,10 +180,6 @@ export const deployTokens = async (
       boundOperatorOperator.address,
     );
 
-    console.log(`bound registry operator signer: ${await boundRegistryOperator.signer.getAddress()}`);
-
-    console.log(`bound registry operator: ${await boundRegistryOperator.operator()}`);
-
     await boundRegistryOperator.updateUtilityClients([{
       name: "FLUID",
       overwrite: false,
@@ -180,8 +193,6 @@ export const deployTokens = async (
     }]);
 
     tokenAddresses[token.symbol] = {deployedToken, deployedPool};
-
-    console.log(`deployed ${token.name} to ${deployedToken.address}`);
   }
 
   return {

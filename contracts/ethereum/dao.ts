@@ -33,7 +33,7 @@ export const advanceTimePastProposalFinished = async (
     [ ELEVEN_DAYS_PLUS_1 ]
   );
 
-export const executeCalldataOnDAOVoteAllAndAdvanceTime = async(
+export const executeCalldataOnDAOVoteAllAndAdvanceTime = async (
   hre: HardhatRuntimeEnvironment,
   dao: ethers.Contract,
   veGov: ethers.Contract,

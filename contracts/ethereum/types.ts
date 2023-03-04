@@ -38,6 +38,7 @@ export type FluidityBeaconAddresses = {
 };
 
 export type FluidityFactories = {
+  upgradeableBeacon: ethers.ContractFactory,
   govToken: ethers.ContractFactory,
   veGovLockup: ethers.ContractFactory,
   registry: ethers.ContractFactory,

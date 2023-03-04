@@ -8,11 +8,21 @@ import type { ethers } from 'ethers';
 import {
   commonContracts,
   commonBindings,
+  commonFactories,
+  commonBeaconAddresses,
   signers } from './setup-common';
 
-import { deployBeacons } from '../deployment';
+import {
+  deployBeacons,
+  deployRegistry,
+  deployOperator } from '../deployment';
 
-import { expectGt, expectEq } from "./test-utils";
+import {
+  expectGt,
+  expectEq,
+  sendEmptyTransaction,
+  callAndSendProposal,
+  callAndExecuteProposal } from "./test-utils";
 
 import {
   advanceTimePastProposalFinished,
@@ -22,9 +32,19 @@ import {
   PROPOSAL_STATUS_SUCCEEDED,
   PROPOSAL_STATUS_FAILED } from '../dao';
 
+import {
+  USDC_ADDR,
+  CUSDC_ADDR } from '../test-constants';
+
+import { EMPTY_ADDRESS } from '../script-utils';
+
 const GOV_TO_LOCK = 1000;
 
+const advanceTime = sendEmptyTransaction;
+
 describe("DAOV1", async () => {
+  let isRunningOnMainnet: boolean;
+
   let govToken: ethers.Contract;
 
   let govTokenSigner1: ethers.Signer;
@@ -42,15 +62,39 @@ describe("DAOV1", async () => {
   let testDAOUpgradeableV1Factory: ethers.ContractFactory;
   let testDAOUpgradeableV2Factory: ethers.ContractFactory;
 
+  let tokenFactory: ethers.ContractFactory;
+
+  let compoundFactory: ethers.ContractFactory;
+
+  let daoUtilityV1Factory: ethers.ContractFactory;
+
+  let daoUtilityV1: ethers.Contract;
+
+  let testDAOUpgradeableBubbleUpRevert: ethers.Contract;
+
   let testDAOUpgradeableBeacon: ethers.Contract;
 
   let testDAOUpgradeableBeaconProxy: ethers.Contract;
+
+  let tokenBeaconAddress: string;
+
+  let registryBeaconAddress: string;
+
+  let registry: ethers.Contract;
+
+  let operatorBeaconAddress: string;
+
+  let operator: ethers.Contract;
+
+  let compoundBeaconAddress: string;
 
   let govTokenSigner1Address: string;
   let govTokenSigner2Address: string;
   let govTokenSigner3Address: string;
 
   before(async () => {
+    isRunningOnMainnet = process.env.FLU_FORKNET_NETWORK === "mainnet";
+
     govToken = commonBindings.govToken.owner;
 
     ({
@@ -59,16 +103,54 @@ describe("DAOV1", async () => {
       extraSigner2: govTokenSigner3
     } = signers.govToken);
 
-    veGovLockup = commonContracts.veGovLockup.connect(govTokenSigner1);
-    dao = commonContracts.dao.connect(govTokenSigner1);
+    ({
+      token: tokenBeaconAddress,
+      registry: registryBeaconAddress,
+      compoundLiquidityProvider: compoundBeaconAddress,
+      operator: operatorBeaconAddress
+    } = commonBeaconAddresses);
 
-    const testDAOUpdatesFactory = await hre.ethers.getContractFactory(
-      "TestDAOUpdates"
-    );
+    ({
+      token: tokenFactory,
+      compoundLiquidityProvider: compoundFactory
+    } = commonFactories);
+
+    const {
+      registry: registryFactory,
+      operator: operatorFactory
+    } = commonFactories;
 
     govTokenSigner1Address = await govTokenSigner1.getAddress();
     govTokenSigner2Address = await govTokenSigner2.getAddress();
     govTokenSigner3Address = await govTokenSigner3.getAddress();
+
+    const upgradeableBeaconFactory = commonFactories.upgradeableBeacon;
+
+    veGovLockup = commonContracts.veGovLockup.connect(govTokenSigner1);
+
+    dao = commonContracts.dao.connect(govTokenSigner1);
+
+    registry = await deployRegistry(
+      hre,
+      govTokenSigner1,
+      registryFactory,
+      registryBeaconAddress,
+      dao.address
+    );
+
+    operator = await deployOperator(
+      hre,
+      govTokenSigner1,
+      operatorFactory,
+      operatorBeaconAddress,
+      dao.address,
+      govTokenSigner1Address,
+      registry.address
+    );
+
+    const testDAOUpdatesFactory = await hre.ethers.getContractFactory(
+      "TestDAOUpdates"
+    );
 
     testDAOUpdates = await testDAOUpdatesFactory.deploy(dao.address);
 
@@ -80,10 +162,22 @@ describe("DAOV1", async () => {
       "TestDAOUpgradeableV2"
     );
 
+    daoUtilityV1Factory = await hre.ethers.getContractFactory("DAOUtilityV1");
+
+    daoUtilityV1 = await daoUtilityV1Factory.deploy();
+
+    const testDAOUpgradeableBubbleUpRevertFactory = await hre.ethers.getContractFactory(
+      "TestDAOUpgradeableBubbleUpRevert"
+    );
+
+    testDAOUpgradeableBubbleUpRevert =
+      await testDAOUpgradeableBubbleUpRevertFactory.deploy();
+
     testDAOUpgradeableV2Impl = await testDAOUpgradeableV2Factory.deploy();
 
     [ testDAOUpgradeableBeacon ] = await deployBeacons(
-      hre,
+      upgradeableBeaconFactory,
+      dao.address,
       testDAOUpgradeableV1Factory
     );
 
@@ -153,16 +247,8 @@ describe("DAOV1", async () => {
 
       veGovBalance = veGovBalance.div(3);
 
-      const proposalId = await dao.callStatic.createProposal(
-        "0x01",
-        testDAOUpdates.address,
-        veGovBalance,
-        0,
-        false,
-        "0x01"
-      );
-
-      await dao.createProposal(
+      const proposalId = await callAndSendProposal(
+        dao,
         "0x01",
         testDAOUpdates.address,
         veGovBalance,
@@ -180,12 +266,9 @@ describe("DAOV1", async () => {
 
       await advanceTimeToFrozen(hre);
 
-      // advance time with an empty transaction
+      // advance time
 
-      await govTokenSigner1.sendTransaction({
-        to: govTokenSigner1Address,
-        from: govTokenSigner1Address
-      });
+      await advanceTime(govTokenSigner1);
 
       await expect(dao.callStatic.executeProposal(proposalId))
         .to.be.revertedWith("proposal can't execute");
@@ -216,19 +299,9 @@ describe("DAOV1", async () => {
 
       const updateAmountCalldata = updateAmountTx.data!;
 
-      const proposalHash = "0x02";
-
-      const proposalId = await dao.callStatic.createProposal(
-        proposalHash,
-        testDAOUpdates.address,
-        veGovBalance,
-        0,
-        false,
-        updateAmountCalldata
-      );
-
-      await dao.createProposal(
-        proposalHash,
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x02",
         testDAOUpdates.address,
         veGovBalance,
         0,
@@ -238,8 +311,6 @@ describe("DAOV1", async () => {
 
       // the balance should be the same as the main signer since we locked the
       // same amount for the same time
-
-      console.log(`ve gov balance: ${veGovBalance}`);
 
       const signer2Balance = veGovBalance.sub(100);
 
@@ -257,12 +328,7 @@ describe("DAOV1", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      // advance time with an empty transaction
-
-      await govTokenSigner1.sendTransaction({
-        to: govTokenSigner1Address,
-        from: govTokenSigner1Address
-      });
+      await advanceTime(govTokenSigner1);
 
       expectEq(
         await dao.getProposalStatus(proposalId),
@@ -294,19 +360,9 @@ describe("DAOV1", async () => {
 
       veGovBalance = 100;
 
-      const proposalHash = "0x04";
-
-      const proposalId = await dao.callStatic.createProposal(
-        proposalHash,
-        testDAOUpdates.address,
-        veGovBalance,
-        0,
-        false,
-        "0x00"
-      );
-
-      await dao.createProposal(
-        proposalHash,
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x04",
         testDAOUpdates.address,
         veGovBalance,
         0,
@@ -316,11 +372,7 @@ describe("DAOV1", async () => {
 
       const againstBalance = 100;
 
-      console.log("gov token 2");
-
       await dao.connect(govTokenSigner2).voteAgainst(proposalId, againstBalance);
-
-      console.log("gov token 3");
 
       await dao.connect(govTokenSigner3).voteAgainst(proposalId, againstBalance);
 
@@ -334,12 +386,7 @@ describe("DAOV1", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      // advance time with an empty transaction
-
-      await govTokenSigner1.sendTransaction({
-        to: govTokenSigner1Address,
-        from: govTokenSigner1Address
-      });
+      await advanceTime(govTokenSigner1);
 
       expectEq(
         await dao.getProposalStatus(proposalId),
@@ -363,28 +410,24 @@ describe("DAOV1", async () => {
 
       expectGt(veGovBalance, 1);
 
+      // make sure that the dao is actually the owner of the beacon so we can upgrade it
+
+      expect(await testDAOUpgradeableBeacon.owner()).to.be.hexEqual(dao.address);
+
       veGovBalance = 1;
 
-      let proposalHash = "0x05";
+      const hiddenSecretWord = "secret word";
 
       const setHiddenTx =
         await testDAOUpgradeableBeaconProxy.populateTransaction.setHidden(
-          "secret word"
+          hiddenSecretWord
         );
 
       const setHiddenCalldata = setHiddenTx.data!;
 
-      let proposalId = await dao.callStatic.createProposal(
-        proposalHash,
-        testDAOUpgradeableBeaconProxy.address,
-        veGovBalance,
-        0,
-        false,
-        setHiddenCalldata
-      );
-
-      await dao.createProposal(
-        proposalHash,
+      let proposalId = await callAndSendProposal(
+        dao,
+        "0x05",
         testDAOUpgradeableBeaconProxy.address,
         veGovBalance,
         0,
@@ -396,48 +439,45 @@ describe("DAOV1", async () => {
 
       await dao.executeProposal(proposalId);
 
-      proposalHash = "0x06";
-
-      // time for us to upgrade the beacon that powers this contract
-
-      const beaconUpgradeToTx =
-        await testDAOUpgradeableBeacon.populateTransaction.upgradeTo(
-          testDAOUpgradeableV2Impl.address
-        );
-
-      const beaconUpgradeToCalldata = beaconUpgradeToTx.data!;
-
-      proposalId = await dao.callStatic.createProposal(
-        proposalHash,
-        testDAOUpgradeableBeacon.address,
-        veGovBalance,
-        0,
-        false,
-        beaconUpgradeToCalldata
+      const upgradeFragment = testDAOUpgradeableBeacon.interface.getFunction(
+        "upgradeTo"
       );
 
-      await dao.createProposal(
-        proposalHash,
-        testDAOUpgradeableBeacon.address,
+      const upgradeCalldata =
+        testDAOUpgradeableBeacon.interface.encodeFunctionData(
+          upgradeFragment,
+          [testDAOUpgradeableV2Impl.address]
+        );
+
+      const testDAOUpgradeableBeaconAddress = testDAOUpgradeableBeacon.address;
+
+      proposalId = await callAndSendProposal(
+        dao,
+        "0x06",
+        testDAOUpgradeableBeaconAddress,
         veGovBalance,
         0,
         false,
-        beaconUpgradeToCalldata
+        upgradeCalldata
       );
 
       await advanceTimePastProposalFinished(hre);
 
-      // await dao.executeProposal(proposalId);
+      await dao.executeProposal(proposalId);
+
+      const hidden = await testDAOUpgradeableV2Factory
+        .attach(testDAOUpgradeableBeaconProxy.address)
+        .getHidden();
+
+      expect(hidden).to.be.equal(hiddenSecretWord);
     }
   );
 
   it(
     "should fail if someone tries to vote after voting's over",
     async () => {
-      // to do this, we set the hidden value in the contract, attempt to
-      // call the function for upgrades in the V2 contract (and assume
-      // that it reverts), then upgrade the contract to query that
-      // information
+      // to do this, we set the votes in a proposal to make it fail then try to
+      // vote for it after it's finished after verifying the state is accurate
 
       let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
 
@@ -445,19 +485,9 @@ describe("DAOV1", async () => {
 
       veGovBalance = 1;
 
-      const proposalHash = "0x07";
-
-      const proposalId = await dao.callStatic.createProposal(
-        proposalHash,
-        testDAOUpgradeableBeaconProxy.address,
-        0,
-        0,
-        false,
-        "0x00"
-      );
-
-      await dao.createProposal(
-        proposalHash,
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x07",
         testDAOUpgradeableBeaconProxy.address,
         0,
         0,
@@ -467,12 +497,7 @@ describe("DAOV1", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      // advance time with an empty transaction
-
-      await govTokenSigner1.sendTransaction({
-        to: govTokenSigner1Address,
-        from: govTokenSigner1Address
-      });
+      await advanceTime(govTokenSigner1);
 
       expectEq(
         await dao.getProposalStatus(proposalId),
@@ -485,14 +510,155 @@ describe("DAOV1", async () => {
   );
 
   it(
-    "should succeed in using the DAO utility code to deploy a new compound token",
-    async () => {
+    "should succeed in using the DAO utility code for deployNewCompoundToken",
+    async function() {
+      if (!isRunningOnMainnet) this.skip();
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const tokenDecimals = 6;
+
+      const trfVariables = {
+        currentAtxTransactionMargin: 123,
+        defaultTransfersInBlock: 2222,
+        spoolerInstantRewardThreshold: 1881,
+        spoolerBatchedRewardThreshold: 99,
+        defaultSecondsSinceLastBlock: 122,
+        atxBufferSize: 10
+      };
+
+      const daoUtilityV1Tx = await daoUtilityV1.populateTransaction.deployNewCompoundToken(
+        tokenBeaconAddress,
+        compoundBeaconAddress,
+        registry.address,
+        {
+          cToken: CUSDC_ADDR,
+        },
+        {
+          liquidityProvider: EMPTY_ADDRESS,
+          fluidTokenName: "Fluid USDC 2",
+          fluidSymbol: "fUSDC2",
+          emergencyCouncil: govTokenSigner1Address,
+          oracle: govTokenSigner1Address,
+          decimals: tokenDecimals
+        },
+        trfVariables,
+        operator.address
+      );
+
+      const daoUtilityV1Calldata = daoUtilityV1Tx.data!;
+
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x01",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1Calldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      const returnData = await callAndExecuteProposal(dao, proposalId);
+
+      const [
+        liquidityProviderAddress,
+        tokenAddress
+      ] = hre.ethers.utils.defaultAbiCoder.decode(
+        ["address", "address"],
+        returnData
+      );
+
+      expect(await tokenFactory.attach(tokenAddress).decimals())
+        .to.be.equal(tokenDecimals);
+
+      expect(await compoundFactory.attach(liquidityProviderAddress).underlying_())
+        .to.be.hexEqual(USDC_ADDR);
+
+      const setTrfVariables = await registry.getTrfVariables(tokenAddress);
+
+      expect(setTrfVariables[0]).to.be.equal(trfVariables.currentAtxTransactionMargin);
+      expect(setTrfVariables[1]).to.be.equal(trfVariables.defaultTransfersInBlock);
+      expect(setTrfVariables[2]).to.be.equal(trfVariables.spoolerInstantRewardThreshold);
+      expect(setTrfVariables[3]).to.be.equal(trfVariables.spoolerBatchedRewardThreshold);
+      expect(setTrfVariables[4]).to.be.equal(trfVariables.defaultSecondsSinceLastBlock);
+      expect(setTrfVariables[5]).to.be.equal(trfVariables.atxBufferSize);
     }
   );
 
   it(
-    "should succeed in using the DAO utility code to deploy a new aave token with default eth trf vars",
-    async () => {
+    "should succeed in using the DAO utility code to deploy a new compound token with default eth trf vars",
+    async function() {
+      if (!isRunningOnMainnet) this.skip();
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const tokenDecimals = 6;
+
+      const daoUtilityV1Tx =
+        await daoUtilityV1.populateTransaction.deployNewCompoundTokenWithDefaultEthTrfVars(
+          tokenBeaconAddress,
+          compoundBeaconAddress,
+          registry.address,
+          {
+            cToken: CUSDC_ADDR,
+          },
+          {
+            liquidityProvider: EMPTY_ADDRESS,
+            fluidTokenName: "Fluid USDC 3",
+            fluidSymbol: "fUSDC2",
+            emergencyCouncil: govTokenSigner1Address,
+            oracle: govTokenSigner1Address,
+            decimals: tokenDecimals
+          },
+          operator.address
+        );
+
+      const daoUtilityV1Calldata = daoUtilityV1Tx.data!;
+
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x2d",
+        daoUtilityV1.address,
+        veGovBalance,
+        0,
+        true,
+        daoUtilityV1Calldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await sendEmptyTransaction(govTokenSigner1);
+
+      const returnData = await callAndExecuteProposal(dao, proposalId);
+
+      const [
+        liquidityProviderAddress,
+        tokenAddress
+      ] = hre.ethers.utils.defaultAbiCoder.decode(
+        ["address", "address"],
+        returnData
+      );
+
+      expect(await tokenFactory.attach(tokenAddress).decimals())
+        .to.be.equal(tokenDecimals);
+
+      expect(await compoundFactory.attach(liquidityProviderAddress).underlying_())
+        .to.be.hexEqual(USDC_ADDR);
+
+      expect(await registry.getTrfVariables(tokenAddress))
+        .to.deep.equal(await daoUtilityV1.defaultEthereumTrfVariables());
     }
   );
 
@@ -528,6 +694,46 @@ describe("DAOV1", async () => {
 
   it(
     "should succeed in using the DAO utility code to disable a token",
+    async () => {
+    }
+  );
+
+  it(
+    "should have an error calling a contract then bubbling up the message correctly",
+    async () => {
+      // to do this, we get through a proposal that just calls
+      // TestDAOUpgradeableBubbleUpRevert
+
+      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
+
+      expectGt(veGovBalance, 1);
+
+      veGovBalance = 1;
+
+      const bubbleUpTx =
+        await testDAOUpgradeableBubbleUpRevert.populateTransaction.callMe();
+
+      const bubbleUpCalldata = bubbleUpTx.data!;
+
+      const proposalId = await callAndSendProposal(
+        dao,
+        "0x0a",
+        testDAOUpgradeableBubbleUpRevert.address,
+        veGovBalance,
+        0,
+        false,
+        bubbleUpCalldata
+      );
+
+      await advanceTimePastProposalFinished(hre);
+
+      await expect(dao.executeProposal(proposalId))
+        .to.be.revertedWith("uhoh!");
+    }
+  );
+
+  it(
+    "should fail to vote on a proposal that isn't live yet",
     async () => {
     }
   );

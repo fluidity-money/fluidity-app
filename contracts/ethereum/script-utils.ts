@@ -6,6 +6,8 @@ import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 
 export const readFile = promisify(readFileCb);
 
+export const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 export const mustEnv = (env: string): string => {
   const e = process.env[env];
   if (e === undefined) {
@@ -29,9 +31,6 @@ export const forknetTakeFunds = async (
   tokens: {name: string, owner: string, address: string}[],
 ) => {
   for (const token of tokens) {
-
-    console.log(`taking ${token.name}`);
-
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
       params: [token.owner],
@@ -48,9 +47,6 @@ export const forknetTakeFunds = async (
 
     const initialUsdtBalanceString = initialUsdtBalance.toString();
 
-    console.log(
-      `token holder for ${token.name} has balance ${initialUsdtBalanceString}`);
-
     const amount = initialUsdtBalance.div(accounts.length);
 
     const promises = accounts.map(async address => {
@@ -66,8 +62,6 @@ export const forknetTakeFunds = async (
       method: "hardhat_stopImpersonatingAccount",
       params: [token.owner],
     });
-
-    console.log(`finished taking ${token.name}`);
   }
 };
 
@@ -96,3 +90,4 @@ export const setOracles = async (
     params: [externalOperator],
   });
 };
+

@@ -384,7 +384,7 @@ contract DAOV1 {
     /// @notice execute calldata at a contract target, following a Proposal
     ///         that's been proposed and ratified
     /// @dev _vote to execute once it follows the requirement
-    function executeProposal(bytes32 _proposalId) public {
+    function executeProposal(bytes32 _proposalId) public returns (bytes memory) {
         require(getProposalReadyToExecute(_proposalId), "proposal can't execute");
 
         Proposal storage proposal = proposals_[_proposalId];
@@ -407,18 +407,14 @@ contract DAOV1 {
             );
         }
 
-        // return data under 68 with a failure reverted silently
-
-        uint256 returnDataSize = returnData.length;
-
         // if the return success was false, and the return size is below
         // 68 (size for a revert string), then error out
 
-        if (!rc && returnDataSize > 68) {
+        if (!rc && returnData.length > 68) {
             // an error happened, so we revert with the revert data from before
             // solhint-disable-next-line no-inline-assembly
             assembly {
-                revert(returnData, returnDataSize)
+                revert(add(returnData, 0x20), returnData)
             }
         } else if (!rc) {
             revert("call failed");
@@ -427,6 +423,8 @@ contract DAOV1 {
         // mark the contract as executed
 
         proposal.targetContract = address(0);
+
+        return returnData;
     }
 
     function disableEmergencyCouncil() public {

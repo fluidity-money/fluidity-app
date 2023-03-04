@@ -471,7 +471,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
       uint newPoolAmount = pool_.totalPoolAmount();
 
-      require(newPoolAmount == oldPoolAmount, "total amount bad");
+      require(newPoolAmount >= oldPoolAmount, "total amount bad");
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {

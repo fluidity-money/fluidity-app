@@ -4,7 +4,6 @@ pragma solidity ^0.8.11;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import "../../interfaces/aave/IAToken.sol";
 
@@ -16,8 +15,6 @@ import "../../interfaces/IRegistry.sol";
 import "../../interfaces/IToken.sol";
 import "../../interfaces/ITokenOperatorOwned.sol";
 import "../../interfaces/ITrfVariables.sol";
-
-import "../../interfaces/openzeppelin/IProxyAdmin.sol";
 
 import {
     LendingPoolAddressesProviderInterface as AaveV2LendingPoolAddressesProviderInterface
@@ -66,7 +63,6 @@ struct TokenCreationArguments {
 
 struct CompoundLiquidityProviderCreationArguments {
     CErc20Interface cToken;
-    IRegistry registry;
 }
 
 struct AaveV2LiquidityProviderCreationArguments {
@@ -101,22 +97,6 @@ contract DAOUtilityV1 {
             defaultSecondsSinceLastBlock: 1,
             atxBufferSize: 10
         });
-    }
-
-    function upgradeBeaconWithProxyAdmin(
-        IProxyAdmin _admin,
-        IUpgradeableBeacon _beacon,
-        address _newImplementation
-    ) public {
-        _admin.upgrade(_beacon, _newImplementation);
-    }
-
-    function deployAdminPointBeaconToIt(
-        IUpgradeableBeacon _beacon
-    ) public returns (IProxyAdmin) {
-        IProxyAdmin admin = IProxyAdmin(address(new ProxyAdmin()));
-        _beacon.changeAdmin(admin);
-        return admin;
     }
 
     /**

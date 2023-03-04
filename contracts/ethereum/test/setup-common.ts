@@ -1,4 +1,10 @@
 
+/*
+ * Set up the factories, deploy everything with the default testing
+ * parameters, point each upgradeable beacon to a specific proxy admin,
+ * then set the owner to the dao
+ */
+
 import * as hre from "hardhat";
 
 import type {
@@ -11,7 +17,7 @@ import type {
 import {
   getFactories,
   deployFluidity,
-  deployBeacons } from "../deployment";
+  deployBeacons} from "../deployment";
 
 export let commonFactories: FluidityFactories;
 
@@ -51,6 +57,7 @@ before(async function () {
   commonFactories = await getFactories(hre);
 
   const {
+    upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
     govToken: govTokenFactory,
     veGovLockup: veGovLockupFactory,
@@ -62,15 +69,9 @@ before(async function () {
     dao: daoFactory,
   } = commonFactories;
 
-  const [
-    tokenBeacon,
-    compoundLiquidityProviderBeacon,
-    aaveV2LiquidityProviderBeacon,
-    aaveV3LiquidityProviderBeacon,
-    registryBeacon,
-    operatorBeacon
-  ] = await deployBeacons(
-    hre,
+  const beacons = await deployBeacons(
+    upgradeableBeaconFactory,
+    account1Signer.address,
     tokenFactory,
     compoundLiquidityProviderFactory,
     aaveV2LiquidityProviderFactory,
@@ -78,6 +79,15 @@ before(async function () {
     registryFactory,
     operatorFactory
   );
+
+  const [
+    tokenBeacon,
+    compoundLiquidityProviderBeacon,
+    aaveV2LiquidityProviderBeacon,
+    aaveV3LiquidityProviderBeacon,
+    registryBeacon,
+    operatorBeacon
+  ] = beacons;
 
   commonBeaconAddresses = {
     token: tokenBeacon.address,
@@ -88,13 +98,7 @@ before(async function () {
     operator: operatorBeacon.address
   };
 
-  const {
-    operator,
-    govToken,
-    registry,
-    dao,
-    veGovLockup
-  } = await deployFluidity(
+  commonContracts = await deployFluidity(
     hre,
     councilAddress,
 
@@ -120,6 +124,14 @@ before(async function () {
     registryBeacon.address,
     operatorBeacon.address
   );
+
+  const {
+    operator,
+    govToken,
+    registry,
+    dao,
+    veGovLockup
+  } = commonContracts;
 
   signers = {
     userAccount1: account1Signer,
@@ -152,13 +164,9 @@ before(async function () {
     }
   };
 
-  commonContracts = {
-    operator,
-    govToken,
-    registry,
-    dao,
-    veGovLockup
-  };
+  // transfer ownership of all the deployed beacons to the dao itself
+
+  await Promise.all(beacons.map((b) => b.transferOwnership(dao.address)));
 
   commonBindings = {
     operator: {
