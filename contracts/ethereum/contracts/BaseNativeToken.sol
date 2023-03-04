@@ -3,6 +3,7 @@
 pragma solidity 0.8.16;
 
 import "../interfaces/IERC20.sol";
+import "../interfaces/IERC2612.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
@@ -19,7 +20,7 @@ import "./openzeppelin/SafeERC20.sol";
 * @dev Do not manually set balances without updating totalSupply, as
 * the sum of all user balances must not exceed it.
 */
-abstract contract BaseNativeToken is IERC20 {
+abstract contract BaseNativeToken is IERC20, IERC2612 {
     using SafeERC20 for IERC20;
 
     /*//////////////////////////////////////////////////////////////
@@ -252,6 +253,10 @@ abstract contract BaseNativeToken is IERC20 {
                     address(this)
                 )
             );
+    }
+
+    function nonces(address _owner) public view returns (uint256) {
+        return nonces_[_owner];
     }
 
     /*//////////////////////////////////////////////////////////////

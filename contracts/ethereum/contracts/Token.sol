@@ -9,6 +9,7 @@ pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
+import "../interfaces/IERC2612.sol";
 import "../interfaces/IFluidClient.sol";
 import "../interfaces/ILiquidityProvider.sol";
 import "../interfaces/IOperatorOwned.sol";
@@ -25,10 +26,11 @@ uint constant BLOCK_REWARDED = 1;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
-contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
+contract Token is IFluidClient, IERC20, IERC2612, ITransferWithBeneficiary, IToken, IEmergencyMode, IOperatorOwned {
     using SafeERC20 for IERC20;
 
-    // erc20 props
+    /* ~~~~~~~~~~` ERC20 FEATURES ~~~~~~~~~~ */
+
     mapping(address => uint256) private balances_;
 
     mapping(address => mapping(address => uint256)) private allowances_;
@@ -41,12 +43,16 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     string private symbol_;
 
+    /* ~~~~~~~~~~` HOUSEKEEPING ~~~~~~~~~~ */
+
     /// @dev if false, emergency mode is active - can be called by either the
     /// @dev operator, worker account or emergency council
     bool private noEmergencyMode_;
 
     // for migrations
     uint private version_;
+
+    /* ~~~~~~~~~~` LIQUIDITY PROVIDER ~~~~~~~~~~ */
 
     // @custom:security non-reentrant
     ILiquidityProvider private pool_;
@@ -57,7 +63,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     // solhint-disable-next-line var-name-mixedcase
     address private __deprecated_1;
 
-    /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
+    /* ~~~~~~~~~~` OWNERSHIP ~~~~~~~~~~ */
 
     /// @dev emergency council that can activate emergency mode
     address private emergencyCouncil_;
@@ -85,7 +91,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     // solhint-disable-nex-line var-name-mixedcase
     mapping (address => uint) private __deprecated_4;
 
-    /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
+    /* ~~~~~~~~~~` SECURITY FEATURES ~~~~~~~~~~ */
 
     /// @dev the largest amount a reward can be to not get quarantined
     uint private maxUncheckedReward_;
@@ -128,10 +134,18 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     // slither-disable-end
 
-    /* ~~~~~~~~~~` DEPRECATED SLOTS END ~~~~~~~~~~ */
+    /* ~~~~~~~~~~` ORACLE PAYOUTS ~~~~~~~~~~ */
 
     /// @dev account that can call the reward function, should be the /operator contract/
     address private oracle_;
+
+    /* ~~~~~~~~~~` ERC2612 ~~~~~~~~~~ */
+
+    mapping (address => uint256) private nonces_;
+
+    uint256 private initialChainId_;
+
+    bytes32 private initialDomainSeparator_;
 
     /**
      * @notice initialiser function - sets the contract's data
@@ -188,6 +202,10 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
         // initialise mint limits
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
+
+        initialChainId_ = block.chainid;
+
+        initialDomainSeparator_ = computeDomainSeparator();
     }
 
     /// @inheritdoc IOperatorOwned
@@ -604,5 +622,74 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
                 _approve(owner, spender, currentAllowance - amount);
             }
         }
+    }
+
+    function nonces(address _owner) public view returns (uint256) {
+        return nonces_[_owner];
+    }
+
+    function permit(
+        address _owner,
+        address _spender,
+        uint256 _value,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) public virtual {
+        // solhint-disable-next-line not-rely-on-time
+        require(_deadline >= block.timestamp, "PERMIT_DEADLINE_EXPIRED");
+
+        // Unchecked because the only math done is incrementing
+        // the owner's nonce which cannot realistically overflow.
+        unchecked {
+            address recoveredAddress = ecrecover(
+                keccak256(
+                    abi.encodePacked(
+                        "\x19\x01",
+                        DOMAIN_SEPARATOR(),
+                        keccak256(
+                            abi.encode(
+                                keccak256(
+                                    "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+                                ),
+                                _owner,
+                                _spender,
+                                _value,
+                                nonces_[_owner]++,
+                                _deadline
+                            )
+                        )
+                    )
+                ),
+                _v,
+                _r,
+                _s
+            );
+
+            require(recoveredAddress != address(0), "INVALID_SIGNER");
+
+            require(recoveredAddress == _owner, "INVALID_SIGNER");
+
+            allowances_[recoveredAddress][_spender] = _value;
+        }
+    }
+
+    // solhint-disable-next-line func-name-mixedcase
+    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
+        return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
+    }
+
+    function computeDomainSeparator() internal view virtual returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                    keccak256(bytes(name_)),
+                    keccak256("1"),
+                    block.chainid,
+                    address(this)
+                )
+            );
     }
 }
