@@ -1,3 +1,5 @@
+import type { UserTransaction as RawUserTransaction } from "~/queries";
+
 import type Transaction from "~/types/Transaction";
 import {
   PendingWinner,
@@ -55,13 +57,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ] = await Promise.all(
       address
         ? [
-            useUserRewardsByAddress(network ?? "", address),
-            useUserPendingRewardsByAddress(network ?? "", address),
-          ]
+          useUserRewardsByAddress(network ?? "", address),
+          useUserPendingRewardsByAddress(network ?? "", address),
+        ]
         : [
-            useUserRewardsAll(network ?? ""),
-            useUserPendingRewardsAll(network ?? ""),
-          ]
+          useUserRewardsAll(network ?? ""),
+          useUserPendingRewardsAll(network ?? ""),
+        ]
     );
 
     if (
@@ -118,65 +120,87 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     // Because every ethereum_pending_winners is present in winner
     // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
-    const JointPayoutAddrs = [
+    const jointPayoutAddrs = [
       ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
     ];
 
-    const userTransactionsData = {
-      [network as string]: {
+    const userTransactionsData: {
+      [network: string]: {
+        transfers: RawUserTransaction[];
+      };
+    } = {
+      [network]: {
         transfers: [],
       },
     };
 
-    // Why's this loop here ? - because bitquery cant take in more than 100 jointPayoutAddrs at a time
-    // we do a split and send in 99 if array length of jointPayoutAddrs is greater than 100.
-    for (let i = 0; i < JointPayoutAddrs.length; i += 100) {
-      const { data: transactionsData, errors: transactionsErr } =
-        await (async () => {
-          switch (true) {
-            case !!address: {
-              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
-              return useUserTransactionsByAddress(
-                network,
-                token ? [token] : getTokenForNetwork(network),
-                page,
-                address as string,
-                JointPayoutAddrs.slice(i, i + 99),
-                limit === Infinity ? 12 : limit
-              );
-            }
-            default: {
-              const limit = 12 / Math.ceil(JointPayoutAddrs.length / 100);
-              return useUserTransactionsAll(
-                network,
-                token ? [token] : getTokenForNetwork(network),
-                page,
-                JointPayoutAddrs.slice(i, i + 99),
-                limit === Infinity ? 12 : limit
-              );
-            }
-          }
-        })();
+    const chunkArray = <T,>(list: T[], size: number): T[][] =>
+      list.reduce(
+        (chunkedArr, el, index) => {
+          const chunkIndex = Math.floor(index / size);
 
-      if (!transactionsData || transactionsErr) {
-        captureException(
-          new Error(
-            `Could not fetch User Transactions for ${address}, on ${network}`
-          ),
-          {
-            tags: {
-              section: "dashboard",
-            },
+          if (!chunkedArr[chunkIndex]) {
+            chunkedArr[chunkIndex] = []; // start a new chunk
           }
-        );
 
-        return new Error("Server could not fulfill request");
-      }
-      Array.prototype.push.apply(
-        userTransactionsData[network as string].transfers,
-        transactionsData[network as string].transfers
+          chunkedArr[chunkIndex].push(el);
+
+          return chunkedArr;
+        },
+        [[]] as T[][]
       );
-    }
+
+    // Why's this loop here ? - because bitquery cant take in more than 100
+    // jointPayoutAddrs at a time
+    // we do a split and send in 99 if array length of jointPayoutAddrs is
+    // greater than 100.
+    userTransactionsData[network].transfers = (
+      await Promise.all(
+        chunkArray(jointPayoutAddrs, 100).map(async (filterHashes) => {
+          const { data: transactionsData, errors: transactionsErr } =
+            await (async () => {
+              switch (true) {
+                case !!address: {
+                  return useUserTransactionsByAddress(
+                    network,
+                    token ? [token] : getTokenForNetwork(network),
+                    page,
+                    address as string,
+                    filterHashes,
+                    12
+                  );
+                }
+                default: {
+                  return useUserTransactionsAll(
+                    network,
+                    token ? [token] : getTokenForNetwork(network),
+                    page,
+                    filterHashes,
+                    12
+                  );
+                }
+              }
+            })();
+
+          if (!transactionsData || transactionsErr) {
+            captureException(
+              new Error(
+                `Could not fetch User Transactions for ${address}, on ${network}`
+              ),
+              {
+                tags: {
+                  section: "dashboard",
+                },
+              }
+            );
+
+            throw new Error("Server could not fulfill request");
+          }
+
+          return transactionsData[network as string].transfers;
+        })
+      )
+    ).flat();
 
     const {
       [network as string]: { transfers: transactions },
@@ -205,7 +229,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-            (currency === "DAI" || currency === "fDAI")
+              (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -234,8 +258,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         tx.sender === MintAddress
           ? "in"
           : tx.receiver === MintAddress
-          ? "out"
-          : undefined;
+            ? "out"
+            : undefined;
 
       const winner = jointWinnersMap[tx.hash];
       const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
@@ -248,9 +272,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           : ((winner as Winner)?.winning_address as unknown as string) ?? "",
         reward: winner
           ? (isFromPendingWin
-              ? (winner as PendingWinner).win_amount
-              : (winner as Winner).winning_amount) /
-            10 ** winner.token_decimals
+            ? (winner as PendingWinner).win_amount
+            : (winner as Winner).winning_amount) /
+          10 ** winner.token_decimals
           : 0,
         hash: tx.hash,
         rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
