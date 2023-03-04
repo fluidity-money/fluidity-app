@@ -516,7 +516,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         require(noEmergencyMode(), "emergency mode");
         require(msg.sender == operator(), "operator only");
 
-        uint256 rewardPool = this.rewardPoolAmount();
+        uint256 rewardPool = rewardPoolAmount();
 
         require(rewardPool >= _amount, "drain too high");
 

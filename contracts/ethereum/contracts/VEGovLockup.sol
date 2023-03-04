@@ -161,9 +161,11 @@ contract VEGovLockup is IVEGovLockup {
     /// @notice createLock for the user with the amount given (only one position!)
     function createLock(uint256 _amount, uint256 _lockTime) public {
         require(_amount > 0, "amount = 0");
-        require(!getLockExists(msg.sender), "lock exists");
+
         require(_lockTime >= MIN_LOCK_TIME, "lock time too small");
         require(_lockTime <= MAX_LOCK_TIME, "lock time too great");
+
+        require(!getLockExists(msg.sender), "lock exists");
 
         emit LockCreated(msg.sender, _amount);
 
@@ -172,8 +174,6 @@ contract VEGovLockup is IVEGovLockup {
         require(rc, "failed to transfer");
 
         tokenAmountDeposited_ += _amount;
-
-        require(lockups_[msg.sender].bptLocked == 0, "already locked");
 
         lockups_[msg.sender].lockTime = _lockTime;
         lockups_[msg.sender].bptLocked = _amount;
@@ -249,6 +249,7 @@ contract VEGovLockup is IVEGovLockup {
     }
 
     function hasLockExpired(address _spender) public view returns (bool) {
+        // slither-disable-next-line incorrect-equality
         return balanceOf(_spender) == 0;
     }
 

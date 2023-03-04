@@ -248,6 +248,7 @@ contract DAOStable {
 
     function isAddressZero(address _comp) internal pure returns (bool t) {
         // solhint-disable-next-line inline-assembly
+        // slither-disable-next-line assembly
         assembly {
             t := iszero(_comp)
         }
