@@ -15,6 +15,8 @@ import "../interfaces/ITokenOperatorOwned.sol";
 import "../interfaces/ITotalRewardPool.sol";
 import "../interfaces/ITrfVariables.sol";
 
+import { UtilityVars } from "../interfaces/IFluidClient.sol";
+
 struct FluidityClientChange {
     string name;
     bool overwrite;
