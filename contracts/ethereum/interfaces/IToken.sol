@@ -70,8 +70,6 @@ interface IToken is IERC20 {
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint256) external;
 
-    function erc20InApprove(address _spender, uint256 _amount) external;
-
     /**
      * @notice wraps `amount` of underlying tokens into fluid tokens
      * @notice requires you to have called the ERC20 `approve` method
@@ -82,8 +80,6 @@ interface IToken is IERC20 {
      */
     function erc20In(uint256 _amount) external returns (uint256);
 
-    function erc20InFor(address _owner, uint256 _amount) external returns (uint256);
-
     /**
      * @notice erc20InTo wraps the `amount` given and transfers the tokens to `receiver`
      *
@@ -91,28 +87,6 @@ interface IToken is IERC20 {
      * @param _amount to wrap and send to the recipient
      */
     function erc20InTo(address _recipient, uint256 _amount) external returns (uint256);
-
-    /**
-     * @notice erc20InPermit to permit the wrapping of assets on
-     *         behalf of a user with a signature
-     *
-     * @param _owner that we're approving the wrapping of assets of
-     * @param _spender that is permitted to wrap the assets
-     * @param _amount of assets that we want to wrap for the user
-     * @param _deadline that this erc20InFor must be wrapped by
-     * @param _v recovery id of the transaction signature
-     * @param _r output of the transaction signature
-     * @param _s ss
-     */
-    function erc20InPermit(
-        address _owner,
-        address _spender,
-        uint256 _amount,
-        uint256 _deadline,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) external;
 
     /**
      * @notice unwraps `amount` of fluid tokens back to underlying

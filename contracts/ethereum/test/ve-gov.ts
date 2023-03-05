@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import { commonContracts } from './setup-common';
 
 const getVEFluidBalanceArgs = [
-  [34,3818718,4000.117085616438356],
+  [34,3818718,4.117085616438356],
   [211,4880256,32.65265144596651],
   [530,6189975,104.0298944063927],
   [60,11708542,22.27652587519026],

@@ -18,22 +18,11 @@ import "../interfaces/ITransferWithBeneficiary.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-/// @dev VERSION of this contract
-uint8 constant VERSION = 1;
-
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
 /// @dev sentinel to indicate a block has been rewarded in the
 /// @dev pastRewards_ and rewardedBlocks_ maps
 uint constant BLOCK_REWARDED = 1;
-
-// keccak256("Erc20InPermit(address owner,address spender,uint256 amount,uint256 nonce,uint256 deadline)")
-bytes32 constant EIP721_ERC20_IN_PERMIT_SELECTOR =
-  0x0b14ea134078420dd9754a6ce4e5d616f93b65ef26688ce0b4758f6d684c866a;
-
-// keccak(1)
-bytes32 constant VERSION_KECCAK =
-  0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
@@ -166,12 +155,6 @@ contract Token is
 
     bytes32 private initialDomainSeparator_;
 
-    /* ~~~~~~~~~~` GASLESS ERC20 IN ~~~~~~~~~~ */
-
-    mapping (address => uint256) private erc20InForNonces_;
-
-    mapping (address => mapping (address => uint256)) private erc20InApprovals_;
-
     /**
      * @notice computeDomainSeparator that's used for EIP712
      */
@@ -181,7 +164,7 @@ contract Token is
                 abi.encode(
                     keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
                     keccak256(bytes(name_)),
-                    VERSION_KECCAK,
+                    keccak256("1"),
                     block.chainid,
                     address(this)
                 )
@@ -222,7 +205,7 @@ contract Token is
         require(_operator != address(0), "operator zero");
         require(_oracle != address(0), "oracle zero");
 
-        version_ = VERSION;
+        version_ = 1;
 
         // remember the operator for signing off on oracle changes, large payouts
         operator_ = _operator;
@@ -361,73 +344,6 @@ contract Token is
         uint256 amountIn = erc20In(_amount);
         transfer(_recipient, _amount);
         return amountIn;
-    }
-
-    function _erc20InApprove(
-        address _owner,
-        address _spender,
-        uint256 _amount
-    ) internal {
-        emit MintApproval(_owner, _spender, _amount);
-        erc20InApprovals_[_owner][_spender] = _amount;
-    }
-
-    function erc20InApprove(address _spender, uint256 _amount) public {
-        _erc20InApprove(msg.sender, _spender, _amount);
-    }
-
-    /// @inheritdoc IToken
-    function erc20InPermit(
-        address _owner,
-        address _spender,
-        uint256 _amount,
-        uint256 _deadline,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    ) public {
-        // solhint-disable-next-line not-rely-on-time
-        require(_deadline >= block.timestamp, "deadline expired");
-
-        emit MintApproval(_owner, _spender, _amount);
-
-        // presumably the user won't be able to overflow the nonce
-        unchecked {
-            address recoveredAddress = ecrecover(
-                keccak256(
-                    abi.encodePacked(
-                        "\x19\x01",
-                        DOMAIN_SEPARATOR(),
-                        keccak256(
-                            abi.encode(
-                                EIP721_ERC20_IN_PERMIT_SELECTOR,
-                                _owner,
-                                _spender,
-                                _amount,
-                                erc20InForNonces_[_spender]++,
-                                _deadline
-                            )
-                        )
-                    )
-                ),
-                _v,
-                _r,
-                _s
-            );
-
-            require(recoveredAddress != address(0), "invalid signer");
-
-            require(recoveredAddress == _spender, "invalid signer");
-
-            _erc20InApprove(_owner, _spender, _amount);
-        }
-    }
-
-    function erc20InFor(address _owner, uint256 _amount) public returns (uint256) {
-        // should revert if the user doesn't have the allowance
-        erc20InApprovals_[_owner][msg.sender] -= _amount;
-
-        return _erc20In(_owner, _amount);
     }
 
     /// @inheritdoc IToken
