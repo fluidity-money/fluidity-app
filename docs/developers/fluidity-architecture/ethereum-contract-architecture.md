@@ -1,5 +1,7 @@
 # 💠 Ethereum contract architecture
 
+[https://github.com/fluidity-money/fluidity-app/tree/production/contracts/ethereum](https://github.com/fluidity-money/fluidity-app/tree/production/contracts/ethereum)
+
 Ethereum support is built as a trio of contracts:
 
 1. Token - the token for the wrapped asset being traded/transferred, supporting swapping in, swapping out, ERC20 features
