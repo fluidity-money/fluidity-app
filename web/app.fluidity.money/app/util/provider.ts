@@ -5,6 +5,7 @@ const lowerCaseProviderNames: { [K: string]: Provider } = {
   aldrin: "Aldrin",
   aldrinv1: "Aldrin",
   aldrinv2: "Aldrin",
+  camelot: "Camelot",
   circle: "Circle",
   compound: "Compound",
   dodo: "Dodo",
