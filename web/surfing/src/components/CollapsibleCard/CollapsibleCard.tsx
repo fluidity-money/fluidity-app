@@ -5,7 +5,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useState } from "react";
 
-import { Card, TokenCard, ArrowUp, TokenDetails, TriangleDown } from "~/components";
+import { Card, TriangleDown } from "~/components";
 
 import styles from "./CollapsibleCard.module.scss";
 
@@ -20,28 +20,6 @@ export type Token = {
   decimals: number;
   colour: string;
 };
-
-type asset = {
-  token: Token
-  fluidAmt: string
-  regAmt: string
-  value: number
-  topPrize: { 
-    winning_amount: number
-    transaction_hash: string
-  }
-  avgPrize: number
-  topAssetPrize: { 
-    winning_amount: number
-    transaction_hash: string
-  }
-  activity: {
-    desc: string
-    value: number
-    reward: number
-    transaction: string
-  }[]
-}
 
 interface ISummary {
   children: React.ReactNode
