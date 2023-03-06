@@ -353,3 +353,9 @@ logo = "/assets/wallets/coin98.svg"
 name = "Mainnet"
 address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
 
+[contract.prize_pool]
+ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
+arbitrum = "0x3cc6115Cd787dC6A3C9440D7e3B0d76c15C82Bb4"
+solana = ""
+
+
