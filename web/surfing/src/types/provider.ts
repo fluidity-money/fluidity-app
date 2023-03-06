@@ -1,6 +1,7 @@
 export type Provider =
   | "Aave"
   | "Aldrin"
+  | "Camelot"
   | "Circle"
   | "Compound"
   | "Dodo"
