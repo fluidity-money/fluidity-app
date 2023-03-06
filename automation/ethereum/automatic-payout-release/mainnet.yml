@@ -1,0 +1,76 @@
+services:
+  - microservice_ethereum_automatic_payout_release_usdt:
+      service_name: microservice-ethereum-automatic-payout-release-ethereum-usdt
+      docker_image: microservice-ethereum-automatic-payout-release
+      dockerfile_path: ./cmd/microservice-ethereum-automatic-payout-release
+      deployment_type: cron
+
+      ENV_FLU_WORKER_ID: ethereum-microservice-automatic-payout-release-ethereum-usdt
+      ENV_FLU_ETHEREUM_NETWORK: ethereum
+      ENV_FLU_ETHEREUM_TOKEN_NAME: USDT
+      ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 6
+
+      event_role: ecseventsrole
+      event_rule: microservice-ethereum-automatic-payout-release-cron
+      event_schedule: rate(1 day) #every day
+
+  - microservice_ethereum_automatic_payout_release_usdc:
+      service_name: microservice-ethereum-automatic-payout-release-ethereum-usdc
+      docker_image: microservice-ethereum-automatic-payout-release
+      dockerfile_path: ./cmd/microservice-ethereum-automatic-payout-release
+      deployment_type: cron
+
+      ENV_FLU_WORKER_ID: ethereum-microservice-automatic-payout-release-ethereum-usdc
+      ENV_FLU_ETHEREUM_NETWORK: ethereum
+      ENV_FLU_ETHEREUM_TOKEN_NAME: USDC
+      ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 6
+
+      event_role: ecseventsrole
+      event_rule: microservice-ethereum-automatic-payout-release-cron
+      event_schedule: rate(1 day) #every day
+
+  - microservice_ethereum_automatic_payout_release_dai:
+      service_name: microservice-ethereum-automatic-payout-release-ethereum-dai
+      docker_image: microservice-ethereum-automatic-payout-release
+      dockerfile_path: ./cmd/microservice-ethereum-automatic-payout-release
+      deployment_type: cron
+
+      env_flu_worker_id: ethereum-microservice-automatic-payout-release-ethereum-dai
+      env_flu_ethereum_network: ethereum
+      env_flu_ethereum_token_name: dai
+      env_flu_ethereum_token_decimals: 18
+
+      event_role: ecseventsrole
+      event_rule: microservice-ethereum-automatic-payout-release-cron
+      event_schedule: rate(1 day) #every day
+
+  - microservice_ethereum_automatic_payout_release_tusd:
+      service_name: microservice-ethereum-automatic-payout-release-ethereum-tusd
+      docker_image: microservice-ethereum-automatic-payout-release
+      dockerfile_path: ./cmd/microservice-ethereum-automatic-payout-release
+      deployment_type: cron
+
+      env_flu_worker_id: ethereum-microservice-automatic-payout-release-ethereum-tusd
+      env_flu_ethereum_network: ethereum
+      env_flu_ethereum_token_name: TUSD
+      env_flu_ethereum_token_decimals: 18
+
+      event_role: ecseventsrole
+      event_rule: microservice-ethereum-automatic-payout-release-cron
+      event_schedule: rate(1 day) #every day
+
+  - microservice_ethereum_automatic_payout_release_frax:
+      service_name: microservice-ethereum-automatic-payout-release-ethereum-frax
+      docker_image: microservice-ethereum-automatic-payout-release
+      dockerfile_path: ./cmd/microservice-ethereum-automatic-payout-release
+      deployment_type: cron
+
+      env_flu_worker_id: ethereum-microservice-automatic-payout-release-ethereum-frax
+      env_flu_ethereum_network: ethereum
+      env_flu_ethereum_token_name: FRAX
+      env_flu_ethereum_token_decimals: 18
+
+      event_role: ecseventsrole
+      event_rule: microservice-ethereum-automatic-payout-release-cron
+      event_schedule: rate(1 day) #every day
+

@@ -5,6 +5,8 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -17,8 +19,11 @@ const (
     // EnvPublishAmqpQueueName is the queue to post batched winners down
     EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
-    // EnvTokens to list which tokens to send winnings for
-    EnvTokens = `FLU_ETHEREUM_TOKENS_LIST`
+    // EnvTokenName to fetch winnings with
+    EnvTokenName = `FLU_ETHERUM_TOKEN_NAME`
+
+    // EnvTokenDecimals to fetch winnings with
+    EnvTokenDecimals = `FLU_ETHERUM_TOKEN_DECIMALS`
 
     // EnvNetwork to differentiate between eth, arbitrum, etc
     EnvNetwork = `FLU_ETHEREUM_NETWORK`
@@ -27,25 +32,21 @@ const (
 func main() {
     var (
         senderQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-        tokenList       = util.GetEnvOrFatal(EnvTokens)
+        shortName       = util.GetEnvOrFatal(EnvTokenName)
+        decimals_       = util.GetEnvOrFatal(EnvTokenDecimals)
         network_        = util.GetEnvOrFatal(EnvNetwork)
     )
 
-    baseTokens := util.GetTokensListBase(tokenList)
+    decimals, err := strconv.ParseInt(decimals_, 10, 32)
 
-    tokens := make([]token_details.TokenDetails, len(baseTokens))
-    for i, token := range baseTokens {
-        decimalsFloat, _ := token.TokenDecimals.Float64()
-
-        decimals := int(decimalsFloat)
-
-        token := token_details.New(
-            token.TokenName,
-            decimals,
-        )
-
-        tokens[i] = token
+    if err != nil {
+        log.Fatal(func(k *log.Log) {
+            k.Message = "Failed to parse token decimals from env!"
+            k.Payload = err
+        })
     }
+
+    token := token_details.New(shortName, int(decimals))
 
     net, err := network.ParseEthereumNetwork(network_)
 
@@ -59,27 +60,34 @@ func main() {
         })
     }
 
-    for _, token := range tokens {
+
+    rewards, foundRewards, err := spooler.GetRewards(net, token)
+
+    if err != nil {
+        log.Fatal(func(k *log.Log) {
+            k.Format(
+                "Failed to get rewards for token %s! %+v",
+                token,
+                err,
+            )
+        })
+    }
+
+    if foundRewards {
         log.App(func(k *log.Log) {
             k.Format(
-                "Now processing network %s, token %s",
-                net,
-                token,
+                "Sending rewards for token %s",
+                shortName,
             )
         })
 
-        rewards, err := spooler.GetRewards(net, token)
-
-        if err != nil {
-            log.Fatal(func(k *log.Log) {
-                k.Format(
-                    "Failed to get rewards for token %s! %+v",
-                    token,
-                    err,
-                )
-            })
-        }
-
         queue.SendMessage(senderQueueName, rewards)
+    } else {
+        log.App(func(k *log.Log) {
+            k.Format(
+                "No rewards for token %s found!",
+                shortName,
+            )
+        })
     }
 }

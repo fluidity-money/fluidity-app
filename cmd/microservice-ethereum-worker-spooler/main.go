@@ -139,7 +139,7 @@ func main() {
 				k.Format("Sending rewards for token %v", shortName)
 			})
 
-			rewards, err := commonSpooler.GetRewards(dbNetwork, shortName)
+			rewards, found, err := commonSpooler.GetRewards(dbNetwork, shortName)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -147,6 +147,15 @@ func main() {
 						"Failed to get rewards for token %s! %+v",
 						shortName,
 						err,
+					)
+				})
+			}
+
+			if !found {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Trying to send rewards for token %s but no rewards found!",
+						shortName,
 					)
 				})
 			}

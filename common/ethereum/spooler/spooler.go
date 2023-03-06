@@ -10,20 +10,17 @@ import (
 )
 
 // flushes the reward queue, returning the batch to send
-func GetRewards(dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) (worker.EthereumSpooledRewards, error) {
+func GetRewards(dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) (worker.EthereumSpooledRewards, bool, error) {
 	transactions := spooler.GetAndRemoveRewardsForToken(dbNetwork, token)
 
 	if len(transactions) == 0 {
-		return worker.EthereumSpooledRewards{}, fmt.Errorf(
-			"Trying to send rewards with nothing in database for token %+v!",
-			token,
-		)
+		return worker.EthereumSpooledRewards{}, false, nil
 	}
 
 	firstBlock, lastBlock, spooledRewards, err := BatchWinnings(transactions, token)
 
 	if err != nil {
-		return worker.EthereumSpooledRewards{}, fmt.Errorf(
+		return worker.EthereumSpooledRewards{}, false, fmt.Errorf(
 			"Failed to batch rewards! %w",
 			err,
 		)
@@ -37,5 +34,5 @@ func GetRewards(dbNetwork network.BlockchainNetwork, token token_details.TokenDe
 		Rewards:    spooledRewards,
 	}
 
-	return rewards, nil
+	return rewards, true, nil
 }
