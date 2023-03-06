@@ -1,0 +1,21 @@
+import { Canvas, Meta, Story } from "@storybook/addon-docs";
+
+import { ProviderCard } from "./";
+
+<Meta title="Container/ProviderCard" component={ProviderCard} />
+
+export const Template = (args) => <ProviderCard {...args} />;
+
+<Canvas>
+  <Story
+    name="ProviderCard"
+    args={{
+      name: 'Uniswap',
+      prize: 12,
+      avgPrize: 2.1,
+      size: 'md'
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

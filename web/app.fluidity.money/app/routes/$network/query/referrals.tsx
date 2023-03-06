@@ -34,5 +34,5 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({
     numReferrals,
     loaded: true,
-  } as ReferralCountData);
+  } satisfies ReferralCountData);
 };

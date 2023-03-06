@@ -25,10 +25,11 @@ export type RewardsLoaderData = {
   networkFee: number;
   gasFee: number;
   timestamp: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const network = params.network ?? "";
+  const network = (params.network ?? "") as Chain;
   const fluidPairs = config.config[network ?? ""].fluidAssets.length;
 
   const networkFee = 0.002;
@@ -91,7 +92,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       networkFee,
       gasFee,
       timestamp: new Date().getTime(),
-    } as RewardsLoaderData);
+      loaded: true,
+    } satisfies RewardsLoaderData);
   } catch (err) {
     throw new Error(`Could not fetch Rewards on ${network}: ${err}`);
   } // Fail silently - for now.

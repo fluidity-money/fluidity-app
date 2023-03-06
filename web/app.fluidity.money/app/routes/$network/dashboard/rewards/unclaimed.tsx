@@ -72,11 +72,12 @@ type LoaderData = {
   network: Chain;
 };
 
-const SAFE_DEFAULT = {
+const SAFE_DEFAULT_UNCLAIMED = {
   unclaimedTxs: [],
   unclaimedTokens: [],
   userUnclaimedRewards: 0,
   userClaimedRewards: 0,
+  loaded: false,
 };
 
 const UnclaimedWinnings = () => {
@@ -100,8 +101,9 @@ const UnclaimedWinnings = () => {
     unclaimedTokens,
     userUnclaimedRewards,
     userClaimedRewards,
-  } = {
-    ...SAFE_DEFAULT,
+    loaded,
+  }: UnclaimedLoaderData = {
+    ...SAFE_DEFAULT_UNCLAIMED,
     ...unclaimedData.data,
   };
 
@@ -322,6 +324,7 @@ const UnclaimedWinnings = () => {
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
+            loaded={loaded}
           />
         )}
         {winningTableViewIndex === 1 && (
@@ -338,6 +341,7 @@ const UnclaimedWinnings = () => {
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
+            loaded={loaded}
           />
         )}
       </section>

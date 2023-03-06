@@ -527,9 +527,7 @@ export default function Dashboard() {
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.000005
-                ? `$0`
-                : numberToMonetaryString(unclaimedRewards)}
+              {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
             {(isTablet || isMobile) && (
