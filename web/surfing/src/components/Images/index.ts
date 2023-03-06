@@ -13,6 +13,8 @@ import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
 import { TokenIcon } from "./Token";
 import { InfoCircle } from "./InfoCircle";
+import { CaretLeft } from "./CaretLeft";
+import { CaretRight } from "./CaretRight";
 
 export {
   ArrowRight,
@@ -30,4 +32,6 @@ export {
   ProviderIcon,
   TokenIcon,
   InfoCircle,
+  CaretLeft,
+  CaretRight,
 };
