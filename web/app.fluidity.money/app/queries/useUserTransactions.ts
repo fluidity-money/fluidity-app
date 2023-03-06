@@ -101,8 +101,10 @@ const queryByAddress: Queryable = {
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
-          sender_address: { _eq: $address }
-          _or: { recipient_address: { _eq: $address } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
         }
         order_by: { time: desc }
         limit: $limit
@@ -435,6 +437,7 @@ const useUserTransactionsByAddress = async (
     const arbParsedTransfers = hasuraTransfers.map((transfer) => {
       let senderAddress = "";
       let recipientAddress = "";
+
       // only senderAddress is defined by user actions
       switch (transfer.type) {
         case "send":
@@ -466,8 +469,11 @@ const useUserTransactionsByAddress = async (
     });
 
     return {
-      ...result,
-      transfers: arbParsedTransfers,
+      data: {
+        [network]: {
+          transfers: arbParsedTransfers,
+        },
+      },
     };
   }
 

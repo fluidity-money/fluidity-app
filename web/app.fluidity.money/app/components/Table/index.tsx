@@ -117,7 +117,7 @@ const Table = <T,>(props: ITable<T>) => {
         ) : (
           <>
             <div className="center-table-loading-anim loader-dots">
-              <Text size="lg">No reward records found!</Text>
+              <Text size="lg">No records found!</Text>
             </div>
           </>
         )
