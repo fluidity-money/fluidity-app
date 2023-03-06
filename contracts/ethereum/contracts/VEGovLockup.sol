@@ -91,9 +91,7 @@ contract VEGovLockup is IVEGovLockup {
         return calcVEFluidDecayPerSecond(getBPTLocked(_spender));
     }
 
-    function getSecondsSinceLock(
-        address _spender
-    ) public view returns (uint256) {
+    function getSecondsSinceLock(address _spender) public view returns (uint256) {
         return block.timestamp - getLockTimestamp(_spender);
     }
 
@@ -205,32 +203,50 @@ contract VEGovLockup is IVEGovLockup {
         }
     }
 
+    function _increaseBPTAmount(address _spender, uint256 _amount) internal {
+        require(_amount > 0, "amount = 0");
+        require(getLockExists(_spender), "lock doesn't exist");
+
+        emit LockBPTIncreased(_spender, _amount);
+
+        tokenAmountDeposited_ += _amount;
+
+        uint256 newBPTLocked = getBPTLocked(_spender) + _amount;
+
+        uint256 newLockTime = extendLockTime(_spender, 0);
+
+        lockups_[_spender] = Lockup({
+            lockTime: newLockTime,
+            bptLocked: newBPTLocked,
+            lockTimestamp: block.timestamp
+        });
+
+        bool rc = token_.transferFrom(_spender, address(this), _amount);
+
+        require(rc, "failed to transfer tokens");
+    }
+
     /**
      * @notice increaseBPTAmount deposited in the current lockup
      *
      * @param _amount of BPT to increase the amount with
      */
     function increaseBPTAmount(uint256 _amount) public {
-        require(_amount > 0, "amount = 0");
-        require(getLockExists(msg.sender), "lock doesn't exist");
+        _increaseBPTAmount(msg.sender, _amount);
+    }
 
-        emit LockBPTIncreased(msg.sender, _amount);
+    function _increaseLockTime(address _spender, uint256 _extraLockTime) internal {
+        require(_extraLockTime > 0, "extra lock time = 0");
+        require(getLockExists(_spender), "lock doesn't exist");
 
-        tokenAmountDeposited_ += _amount;
+        emit LockTimeIncreased(_spender, _extraLockTime);
 
-        uint256 newBPTLocked = getBPTLocked(msg.sender) + _amount;
+        uint256 newLockTime = extendLockTime(_spender, _extraLockTime);
 
-        uint256 newLockTime = extendLockTime(msg.sender, 0);
+        require(newLockTime <= MAX_LOCK_TIME, "too long");
 
-        lockups_[msg.sender] = Lockup({
-            lockTime: newLockTime,
-            bptLocked: newBPTLocked,
-            lockTimestamp: block.timestamp
-        });
-
-        bool rc = token_.transferFrom(msg.sender, address(this), _amount);
-
-        require(rc, "failed to transfer tokens");
+        lockups_[_spender].lockTime = newLockTime;
+        lockups_[_spender].lockTimestamp = block.timestamp;
     }
 
     /**
@@ -239,17 +255,12 @@ contract VEGovLockup is IVEGovLockup {
      * @param _extraLockTime to increase the lock by
      */
      function increaseLockTime(uint256 _extraLockTime) public {
-        require(_extraLockTime > 0, "extra lock time = 0");
-        require(getLockExists(msg.sender), "lock doesn't exist");
+         _increaseLockTime(msg.sender, _extraLockTime);
+     }
 
-        emit LockTimeIncreased(msg.sender, _extraLockTime);
-
-        uint256 newLockTime = extendLockTime(msg.sender, _extraLockTime);
-
-        require(newLockTime <= MAX_LOCK_TIME, "too long");
-
-        lockups_[msg.sender].lockTime = newLockTime;
-        lockups_[msg.sender].lockTimestamp = block.timestamp;
+    function increaseLockTimeIncreaseAmount(uint256 _extraTime, uint256 _extraAmount) public {
+        _increaseLockTime(msg.sender, _extraTime);
+        _increaseBPTAmount(msg.sender, _extraAmount);
     }
 
     function hasLockExpired(address _spender) public view returns (bool) {

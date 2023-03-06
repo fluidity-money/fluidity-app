@@ -1,11 +1,20 @@
 
+import * as hre from 'hardhat';
+
 import type { ethers } from 'ethers';
 
 import { BigNumber } from 'ethers';
 
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 
-import { commonContracts } from './setup-common';
+import {
+  commonContracts,
+  commonFactories,
+  signers } from './setup-common';
+
+import { deployGovToken, deployVEGovLockup } from '../deployment';
+
+import { advanceTime, sendEmptyTransaction } from './test-utils';
 
 const getVEFluidBalanceArgs = [
   [34,3818718,4.117085616438356],
@@ -110,7 +119,116 @@ const getVEFluidBalanceArgs = [
   [639,1809229,36.659605878995436]
 ];
 
-const lockMoveForwardIncreaseAmountIncreaseTime1 = [
+const getVEFluidDecayPerSecondArgs = [
+  [963,3.05365296803653e-05],
+  [535,1.6964738711314055e-05],
+  [604,1.915271435819381e-05],
+  [713,2.260908168442415e-05],
+  [43,1.3635210553018772e-06],
+  [697,2.2101725012683916e-05],
+  [130,4.122272957889396e-06],
+  [403,1.2779046169457128e-05],
+  [28,8.878741755454085e-07],
+  [414,1.3127853881278538e-05],
+  [712,2.2577371892440387e-05],
+  [77,2.441653982749873e-06],
+  [848,2.6889903602232368e-05],
+  [512,1.6235413495687468e-05],
+  [285,9.037290715372907e-06],
+  [559,1.7725773718924403e-05],
+  [112,3.551496702181634e-06],
+  [953,3.021943176052765e-05],
+  [274,8.688483003551497e-06],
+  [78,2.4733637747336377e-06],
+  [677,2.1467529173008624e-05],
+  [645,2.0452815829528157e-05],
+  [354,1.1225266362252664e-05],
+  [289,9.164129883307965e-06],
+  [101,3.202688990360223e-06],
+  [75,2.378234398782344e-06],
+  [588,1.8645357686453578e-05],
+  [666,2.1118721461187216e-05],
+  [888,2.815829528158295e-05],
+  [501,1.5886605783866056e-05],
+  [123,3.900304414003044e-06],
+  [702,2.226027397260274e-05],
+  [813,2.578006088280061e-05],
+  [719,2.279934043632674e-05],
+  [272,8.625063419583968e-06],
+  [348,1.1035007610350076e-05],
+  [571,1.810629122272958e-05],
+  [951,3.015601217656012e-05],
+  [445,1.4110857432775241e-05],
+  [9,2.853881278538813e-07],
+  [656,2.080162354134957e-05],
+  [522,1.6552511415525115e-05],
+  [452,1.4332825976661593e-05],
+  [297,9.417808219178083e-06],
+  [579,1.8359969558599695e-05],
+  [349,1.106671740233384e-05],
+  [231,7.3249619482496195e-06],
+  [866,2.746067985794013e-05],
+  [547,1.7345256215119227e-05],
+  [22,6.976154236428209e-07],
+  [270,8.561643835616438e-06],
+  [188,5.9614408929477425e-06],
+  [428,1.3571790969051244e-05],
+  [875,2.774606798579401e-05],
+  [94,2.9807204464738713e-06],
+  [63,1.997716894977169e-06],
+  [679,2.1530948756976156e-05],
+  [25,7.927447995941147e-07],
+  [973,3.0853627600202945e-05],
+  [747,2.3687214611872146e-05],
+  [180,5.707762557077626e-06],
+  [408,1.293759512937595e-05],
+  [753,2.3877473363774734e-05],
+  [410,1.300101471334348e-05],
+  [316,1.0020294266869609e-05],
+  [948,3.006088280060883e-05],
+  [142,4.502790461694572e-06],
+  [208,6.595636732623034e-06],
+  [792,2.5114155251141553e-05],
+  [453,1.4364535768645357e-05],
+  [269,8.529934043632674e-06],
+  [502,1.5918315575849824e-05],
+  [289,9.164129883307965e-06],
+  [139,4.407661085743278e-06],
+  [364,1.154236428209031e-05],
+  [797,2.5272704211060377e-05],
+  [254,8.054287163876204e-06],
+  [453,1.4364535768645357e-05],
+  [871,2.7619228817858955e-05],
+  [492,1.5601217656012176e-05],
+  [340,1.078132927447996e-05],
+  [838,2.6572805682394724e-05],
+  [169,5.358954845256215e-06],
+  [699,2.2165144596651447e-05],
+  [507,1.6076864535768644e-05],
+  [554,1.756722475900558e-05],
+  [635,2.0135717909690513e-05],
+  [187,5.929731100963978e-06],
+  [423,1.341324200913242e-05],
+  [630,1.997716894977169e-05],
+  [836,2.6509386098427196e-05],
+  [661,2.0960172501268392e-05],
+  [985,3.123414510400812e-05],
+  [816,2.58751902587519e-05],
+  [222,7.039573820395738e-06],
+  [511,1.6203703703703704e-05],
+  [981,3.110730593607306e-05],
+  [855,2.711187214611872e-05],
+  [441,1.3984018264840183e-05],
+  [643,2.038939624556063e-05]
+];
+
+const simpleLockTests = [
+  [791,10430362,7317551,78.0769121321664],
+  [167,17322579,4314549,68.88448154490106],
+  [27,2756897,2466765,0.2484006849315068]
+];
+
+const timedLockTests = [
   [217,12660118,135,15670069,1963169,181.43],
   [836,26081081,716,3997823,14505940,412.83],
   [674,18313231,303,11536965,10446450,414.7],
@@ -132,7 +250,7 @@ const lockMoveForwardIncreaseAmountIncreaseTime1 = [
   [741,22257048,654,6369122,15062620,318.7],
   [511,12238416,207,1980535,7900907,102.38],
   [526,29566175,300,1679421,16865590,239.85],
-    [823,29081713,888,2036182,4849936,685.52],
+  [823,29081713,888,2036182,4849936,685.52],
   [251,6542524,306,22208274,5386078,185.96],
   [3,21759657,476,6776389,8228535,1.93],
   [199,16056025,48,7548924,6564366,107.53],
@@ -160,10 +278,7 @@ const lockMoveForwardIncreaseAmountIncreaseTime1 = [
   [785,12310211,165,18210874,9868462,514.09],
   [857,4499667,885,18258033,2884025,540.07],
   [546,9600933,79,19677255,202345,503.41],
-  [16,20757203,636,5440690,15596016,5.38]
-];
-
-const lockMoveForwardIncreaseAmountIncreaseTime2 = [
+  [16,20757203,636,5440690,15596016,5.38],
   [968,14977585,592,2183559,14689906,75.85],
   [848,17045667,835,5629741,10554189,325.94],
   [439,16447437,261,5123265,10675399,151.67],
@@ -216,52 +331,287 @@ const lockMoveForwardIncreaseAmountIncreaseTime2 = [
   [477,28990620,552,993710,7813896,335.34]
 ];
 
-// const lockMoveForwardIncreaseAmountIncreaseTimeToOutput = async(
-  // veGovLockup: ethers.Contract,
-  // [
-    // initialBpt: number,
-    // lockTime: number,
-    // bptAdded: number,
-    // lockTimeAdded: number,
-    // secondsToProgress: number,
-    // output: number
-  // ]
-// ) => {
-//
-// };
-
-const testGetVEFluidBalance = async (
-  veGovLockup: ethers.Contract,
-  bptLocked: number,
-  lockTime: number,
-  veFluid: any
-) => {
-  const out = await veGovLockup.getVEFluidBalance(bptLocked, lockTime);
-  expect(out).to.be.equal(veFluid);
-};
+const timedBPTIncreaseTests = [
+  [754,23193397,4376961,928,1003.5909865550482],
+  [585,9159107,6216231,17,56.17742744799594],
+  [597,1809562,1514467,753,12.632491438356164],
+  [849,26536951,1055715,581,1155.4467110603755],
+  [920,30298608,29909726,42,11.862775367833587],
+  [995,4754128,1066812,145,133.29338660578387],
+  [471,2539827,2303143,96,4.2554486301369865],
+  [892,9388412,376142,875,504.9683247716895],
+  [823,3817760,1094743,131,82.37437271689498],
+  [377,8549813,6818504,558,51.330984113394216],
+  [859,24686674,7067412,669,853.6983871131405],
+  [777,31475948,1304211,892,1596.7982322742264],
+  [701,20224755,2880822,834,844.2077991818874],
+  [859,797347,503966,618,13.740605561897514],
+  [135,16859631,12461555,395,73.91489979705733],
+  [874,8852420,5805522,83,92.46199219939118],
+  [508,29220479,2545642,524,872.9208455098934],
+  [593,6924083,6631238,244,7.772427226027397],
+  [297,2951908,124306,757,94.50445547945205],
+  [470,17648886,776820,957,763.4588464611872],
+  [558,13521079,4767685,818,381.93398477929986],
+  [907,21338672,2126944,518,868.1098554033485],
+  [505,17712031,8642359,475,281.84546423135464],
+  [363,6179058,5414256,591,23.136133561643835],
+  [740,17950008,15977240,911,103.28005986808726],
+  [438,10567407,3079087,161,142.23438863521056],
+  [609,16786672,1459210,287,435.48344596651447],
+  [788,16765876,5088227,510,480.64397520294267],
+  [526,30375407,16892225,917,616.9530576484018],
+  [392,12485844,6276896,989,271.8974247843734],
+  [144,1089349,40160,299,14.738417269152714],
+  [822,22923956,18977484,598,177.70136478944698],
+  [530,18642216,4714916,768,573.2380580923389],
+  [334,20437629,16211689,202,71.82597158802638],
+  [743,27741504,21569688,104,165.7638302891933],
+  [502,8793697,1662483,681,267.5109767250127],
+  [230,15653669,14581398,54,9.656423262303399],
+  [855,24226336,12914768,417,456.2504596651446],
+  [604,25448801,3307323,884,1044.7272724505328],
+  [171,13786379,10413068,310,51.4511222412481],
+  [973,18141875,14185721,121,137.2410095129376],
+  [811,8027771,7434137,690,28.25483999238965],
+  [324,23785537,9530296,788,502.6581681887367],
+  [109,13609545,11159928,981,84.66776160578387],
+  [522,21258305,18776014,96,48.64459151445966],
+  [570,18096562,10192514,825,349.6368264840183],
+  [503,6315428,1871068,42,76.80670345002537],
+  [885,12466841,350777,120,386.1188584474886],
+  [908,30496565,16982627,728,701.0655304414003],
+  [5,23056632,5483913,469,264.125723173516],
+  [372,27392978,15880370,39,150.04064840182647],
+  [825,18460134,13237178,761,262.6714934043633],
+  [992,12773133,3233226,541,463.74547916666666],
+  [420,21825411,14283629,394,194.66674746321664],
+  [746,3431421,1223773,466,84.84491933028919],
+  [552,4478682,1667753,253,71.75284896626079],
+  [445,20826934,1873150,253,419.5123424657534],
+  [936,35596,26005,292,0.3734699391171994],
+  [379,16165290,14133518,740,72.09388850837138],
+  [491,12533201,6769578,846,244.3545139205987],
+  [675,26807032,26200712,32,13.592980720446473],
+  [18,22173750,17040821,828,137.69843778538814],
+  [653,8941911,2398359,783,297.9623500761035],
+  [750,4127576,2135561,343,69.04085473744293],
+  [513,694092,371651,242,7.719525462962963],
+  [22,25375328,16545921,634,183.66600050735667],
+  [688,10058692,3714760,559,250.8524608066971],
+  [9,25961604,17420305,604,166.02664532597666],
+  [547,27761871,4068357,515,797.8980171232877],
+  [171,2421164,1097213,128,12.552681031202436],
+  [190,12305413,5490935,775,208.52268106291223],
+  [71,10965403,3682501,460,122.62877226027398],
+  [69,9749247,105325,817,270.9447898274987],
+  [815,28519610,13073917,46,421.70033209665144],
+  [727,10993196,4172841,830,336.7355636415525],
+  [658,24047224,4408587,790,901.7233122780315],
+  [658,10404794,4200737,421,212.27097612252663],
+  [378,9198318,5508377,699,126.01682068112633],
+  [564,25305923,22294660,985,147.9086246511923],
+  [494,6517153,3267002,465,98.83608602866565],
+  [621,2039839,2039178,816,0.03011976788432268],
+  [911,17343471,12739877,219,164.95627917300862],
+  [140,5481156,1812631,305,51.76603326357179],
+  [314,17239635,2539738,618,434.43379008117705],
+  [666,13141350,10397590,194,74.82349061390157],
+  [903,29053468,12515200,528,750.4522294520548],
+  [173,23797086,9437338,160,151.6297591324201],
+  [326,21142407,20947245,292,3.824521689497717],
+  [719,14252988,14078324,191,5.040088787417554],
+  [567,22567683,7691345,61,296.2436664129883],
+  [450,19888215,12884650,609,235.18440306316592],
+  [112,15751142,13646700,485,39.838656582952815],
+  [227,21503268,15004719,617,173.92108561643835],
+  [688,23208734,16401112,621,282.57157527904616],
+  [713,1706598,50258,599,68.90912227295789],
+  [162,28039873,17176476,116,95.76434443176053],
+  [259,16911779,4066764,773,420.34676179604264],
+  [89,21825078,6954962,417,238.59331227803145],
+  [148,19997809,15179976,637,119.92639856037545],
+  [738,28754136,16807993,983,651.9315101154236]
+];
 
 describe("VEGovLockup", async () => {
+  let veGovLockupFactory: ethers.ContractFactory;
+
+  let govTokenFactory: ethers.ContractFactory;
+
   let veGovLockup: ethers.Contract;
+
+  let veGovTokenSigner: ethers.Signer;
+
+  let veGovTokenSignerAddress: string;
 
   before(async () => {
     veGovLockup = commonContracts.veGovLockup;
+
+    ({
+      veGovLockup: veGovLockupFactory,
+      govToken: govTokenFactory
+    } = commonFactories);
+
+    veGovTokenSigner = signers.govToken.owner;
+
+    veGovTokenSignerAddress = await veGovTokenSigner.getAddress();
   });
 
-  it("test the get ve fluid balance function", async () => {
-    await Promise.all(getVEFluidBalanceArgs.map(([bptLocked, lockTime, veFluid], i) => {
-      return testGetVEFluidBalance(
-        veGovLockup,
-        bptLocked,
-        lockTime,
-        BigInt(veFluid * 1e18)
-      )
+  it("have the ve fluid decay per second function work accurately", async () => {
+    await Promise.all(getVEFluidDecayPerSecondArgs.map(async ([bptLocked, expectedOut]) => {
+      const input = BigNumber.from(Math.floor(bptLocked));
+
+      expect(await veGovLockup.calcVEFluidDecayPerSecond(input))
+        .to.be.equal(Math.floor(expectedOut * 1e18))
     }));
   });
 
-  it("test batch #1", async () => {
+  it("have the get ve fluid balance function work accurately", async () => {
+    await Promise.all(getVEFluidBalanceArgs.map(async ([bptLocked, lockTime, veFluid_], i) => {
+      const veFluid = BigInt(veFluid_ * 1e18);
+
+      const out = await veGovLockup.getVEFluidBalance(bptLocked, lockTime);
+
+      assert(
+        BigNumber.from(veFluid).sub(out).abs().lt(1e6),
+        `${veFluid} at pos ${i} is not the same as ${out} which is too different!`
+      );
+    }));
+  });
+
+  it("should wrap X amount, should advance time by Y, should return", async () => {
+    for (const [bptLocked, lockTime, secondsToAdvance, expected_] of simpleLockTests) {
+      const newToken = await deployGovToken(
+        govTokenFactory,
+        veGovTokenSigner,
+        "should wrap",
+        "test",
+        18,
+        1000
+      );
+
+      const newVEGovLockup = await deployVEGovLockup(
+        veGovLockupFactory,
+        veGovTokenSigner,
+        newToken.address
+      );
+
+      await newToken.approve(newVEGovLockup.address, bptLocked);
+
+      await newVEGovLockup.createLock(bptLocked, lockTime);
+
+      await advanceTime(hre, secondsToAdvance);
+
+      await sendEmptyTransaction(veGovTokenSigner);
+
+      const bal = await newVEGovLockup.balanceOf(veGovTokenSignerAddress);
+
+      const expected = BigInt(expected_ * 1e18);
+
+      assert(
+        BigNumber.from(bal).sub(expected).abs().lt(1e7),
+        `${bal} is not the same as ${expected}`
+      );
+    }
+  });
+
+  it("create lock, pass time, add extra bpt, compare", async() => {
+    for (const lockTest of timedBPTIncreaseTests) {
+      const [
+        bptLocked,
+        lockTime,
+        bptAdded,
+        secondsToAdvance,
+        expected_
+      ] = lockTest;
+
+      const newToken = await deployGovToken(
+        govTokenFactory,
+        veGovTokenSigner,
+        "should wrap",
+        "test",
+        18,
+        1e10
+      );
+
+      const newVEGovLockup = await deployVEGovLockup(
+        veGovLockupFactory,
+        veGovTokenSigner,
+        newToken.address
+      );
+
+      await newToken.approve(
+        newVEGovLockup.address,
+        bptLocked + bptAdded
+      );
+
+      await newVEGovLockup.createLock(bptLocked, lockTime);
+
+      await advanceTime(hre, secondsToAdvance);
+
+      await newVEGovLockup.increaseBPTAmount(bptAdded);
+
+      const bal = await newVEGovLockup.balanceOf(veGovTokenSignerAddress);
+
+      const expected = BigInt(expected_ * 1e18);
+
+      assert(
+        BigNumber.from(bal).sub(expected).abs().lt(1e7),
+        `${bal} is not the same as ${expected}`
+      );
+    }
 
   });
 
-  it("test batch #2", async () => {
+  it("create lock, increase lock time, create more bpt and extend time", async() => {
+    for (const lockTest of timedLockTests) {
+      const [
+        bptLocked,
+        lockTime,
+        bptAddedAfterLock,
+        lockTimeAdded,
+        secondsToAdvance,
+        expected_
+      ] = lockTest;
+
+      const newToken = await deployGovToken(
+        govTokenFactory,
+        veGovTokenSigner,
+        "should wrap",
+        "test",
+        18,
+        1000
+      );
+
+      const newVEGovLockup = await deployVEGovLockup(
+        veGovLockupFactory,
+        veGovTokenSigner,
+        newToken.address
+      );
+
+      await newToken.approve(
+        newVEGovLockup.address,
+        bptLocked + bptAddedAfterLock
+      );
+
+      await newVEGovLockup.createLock(bptLocked, lockTime);
+
+      await advanceTime(hre, secondsToAdvance);
+
+      await newVEGovLockup.increaseLockTimeIncreaseAmount(
+        lockTimeAdded,
+        bptAddedAfterLock
+      );
+
+      const bal = await newVEGovLockup.balanceOf(veGovTokenSignerAddress);
+
+      const expected = BigInt(expected_ * 1e18);
+
+      assert(
+        BigNumber.from(bal).sub(expected).abs().lt(1e7),
+        `${bal} is not the same as ${expected}`
+      );
+    }
   });
 });

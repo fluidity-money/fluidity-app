@@ -149,7 +149,9 @@ contract Token is
 
     /* ~~~~~~~~~~` ERC2612 ~~~~~~~~~~ */
 
-    mapping (address => uint256) private permitNonces_;
+    // @dev nonces_ would be used for permit only, but it could be used for
+    //      every off-chain sign if needed
+    mapping (address => uint256) private nonces_;
 
     uint256 private initialChainId_;
 
@@ -667,7 +669,7 @@ contract Token is
 
     /// @inheritdoc IERC2612
     function nonces(address _owner) public view returns (uint256) {
-        return permitNonces_[_owner];
+        return nonces_[_owner];
     }
 
     /// @inheritdoc IEIP712
@@ -701,7 +703,7 @@ contract Token is
                                 _owner,
                                 _spender,
                                 _value,
-                                permitNonces_[_owner]++,
+                                nonces_[_owner]++,
                                 _deadline
                             )
                         )

@@ -3,6 +3,8 @@ import * as ethers from 'ethers';
 
 import { assert } from 'chai';
 
+import type { HardhatRuntimeEnvironment } from 'hardhat';
+
 import { EMPTY_ADDRESS } from '../script-utils';
 
 export const expectEq = (a: ethers.BigNumberish, b: ethers.BigNumberish) => {
@@ -61,3 +63,12 @@ export const callAndExecuteProposal = async (
   await dao.executeProposal(proposalId);
   return bytes;
 };
+
+export const advanceTime = async (
+  hre: HardhatRuntimeEnvironment,
+  seconds: number
+) =>
+  await hre.network.provider.send(
+    "evm_increaseTime",
+    [ seconds ]
+  );

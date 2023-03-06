@@ -3,6 +3,8 @@ import { ethers } from 'ethers';
 
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
 
+import { advanceTime } from './test/test-utils';
+
 const TEN_DAYS_PLUS_1 = 864000 + 1;
 
 const ELEVEN_DAYS_PLUS_1 = TEN_DAYS_PLUS_1 + 950400;
@@ -20,18 +22,12 @@ export const PROPOSAL_STATUS_FAILED = 4;
 export const advanceTimeToFrozen = async (
   hre: HardhatRuntimeEnvironment
 ) =>
-  await hre.network.provider.send(
-    "evm_increaseTime",
-    [ TEN_DAYS_PLUS_1 ]
-  );
+  advanceTime(hre, TEN_DAYS_PLUS_1);
 
 export const advanceTimePastProposalFinished = async (
   hre: HardhatRuntimeEnvironment
 ) =>
-  await hre.network.provider.send(
-    "evm_increaseTime",
-    [ ELEVEN_DAYS_PLUS_1 ]
-  );
+  advanceTime(hre, ELEVEN_DAYS_PLUS_1);
 
 export const executeCalldataOnDAOVoteAllAndAdvanceTime = async (
   hre: HardhatRuntimeEnvironment,

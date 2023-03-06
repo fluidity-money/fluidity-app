@@ -254,7 +254,7 @@ export const deployGovToken = async(
   totalSupply
 );
 
-export const deployVeGovLockup = async (
+export const deployVEGovLockup = async (
   factory: ethers.ContractFactory,
   signer: ethers.Signer,
   voteTokenAddress: string
@@ -323,7 +323,7 @@ export const deployFluidity = async (
     govTokenTotalSupply
   );
 
-  const veGovLockup = await deployVeGovLockup(
+  const veGovLockup = await deployVEGovLockup(
     veGovLockupFactory,
     veGovLockupSigner,
     govToken.address
