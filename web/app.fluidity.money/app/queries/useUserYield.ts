@@ -54,31 +54,31 @@ const queryByAddress = gql`
   query TotalRewards($network: network_blockchain!, $address: String!) {
     day: total_reward(
       where: { network: { _eq: $network } }
-      args: { i: "1 day", address: $address }
+      args: { i: "1 day", filter_address: $address }
     ) {
       ...rewardFields
     }
     week: total_reward(
       where: { network: { _eq: $network } }
-      args: { i: "1 week", address: $address }
+      args: { i: "1 week", filter_address: $address }
     ) {
       ...rewardFields
     }
     month: total_reward(
       where: { network: { _eq: $network } }
-      args: { i: "1 month", address: $address }
+      args: { i: "1 month", filter_address: $address }
     ) {
       ...rewardFields
     }
     year: total_reward(
       where: { network: { _eq: $network } }
-      args: { i: "1 year", address: $address }
+      args: { i: "1 year", filter_address: $address }
     ) {
       ...rewardFields
     }
     all: total_reward(
       where: { network: { _eq: $network } }
-      args: { address: $address }
+      args: { filter_address: $address }
     ) {
       ...rewardFields
     }

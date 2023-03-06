@@ -16,9 +16,7 @@ const jsonPost = async <
       body: JSON.stringify(body),
     });
 
-    const json = await res.json();
-
-    return json;
+    return res.json();
   } catch (e) {
     throw new Error(`Could not parse JSON: ${e}`);
   }
