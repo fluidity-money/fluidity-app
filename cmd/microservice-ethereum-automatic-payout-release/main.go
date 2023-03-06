@@ -67,7 +67,7 @@ func main() {
         log.Fatal(func(k *log.Log) {
             k.Format(
                 "Failed to get rewards for token %s! %+v",
-                token,
+                shortName,
                 err,
             )
         })

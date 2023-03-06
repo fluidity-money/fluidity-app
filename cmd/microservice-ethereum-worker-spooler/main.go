@@ -129,23 +129,23 @@ func main() {
 			}
 		}
 
-		for shortName, send := range toSend {
+		for token, send := range toSend {
 			if !send {
 				// should never happen
 				continue
 			}
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Sending rewards for token %v", shortName)
+				k.Format("Sending rewards for token %v", token)
 			})
 
-			rewards, found, err := commonSpooler.GetRewards(dbNetwork, shortName)
+			rewards, found, err := commonSpooler.GetRewards(dbNetwork, token)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
 						"Failed to get rewards for token %s! %+v",
-						shortName,
+						token.TokenShortName,
 						err,
 					)
 				})
@@ -155,7 +155,7 @@ func main() {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
 						"Trying to send rewards for token %s but no rewards found!",
-						shortName,
+						token.TokenShortName,
 					)
 				})
 			}
