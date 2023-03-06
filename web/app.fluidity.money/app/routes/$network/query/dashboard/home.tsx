@@ -31,11 +31,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const timestamp = new Date().getTime();
 
   const mainnetId = 0;
-  const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
+  const infuraRpc = config.drivers[network][mainnetId].rpc.http;
 
   const provider = new JsonRpcProvider(infuraRpc);
 
-  const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+  const rewardPoolAddr = config.contract.prize_pool[network] ?? "";
 
   try {
     const [
@@ -46,14 +46,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
       address
         ? jsonGet<{ address: string }, { volume: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`,
-            {
-              address,
-            }
-          )
+          `${url.origin}/${network}/query/volumeStats`,
+          {
+            address,
+          }
+        )
         : jsonGet<Record<string, never>, { volume: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`
-          ),
+          `${url.origin}/${network}/query/volumeStats`
+        ),
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),
