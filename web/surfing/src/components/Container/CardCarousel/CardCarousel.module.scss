@@ -1,0 +1,81 @@
+@use 'common' as *;
+
+.CardCarousel {
+  position: relative;
+  min-width: 300px;
+
+  .content {
+    width: 100%;
+    height:auto;
+    min-height: 100px;
+    position: relative;
+    overflow-x: hidden;
+
+    .slide {
+      cursor: grab;
+      position: absolute;
+      max-width: 100%;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .arrow {
+    background-color: black;
+    cursor: pointer;
+    border-radius: 100px;
+    width: 2em;
+    height: 2em;
+    border: 1px solid map-get($border, "default");
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute; 
+    left: -1em;
+    bottom: -1em;
+  
+    &:last-child {
+      left: auto;
+      right: -1em;
+    }
+  
+    svg {
+      width: 0.7em;
+      height: 0.7em;
+
+      path {
+        fill: map-get($border, "default")
+      }
+    }
+
+    &:hover {
+      border: 1px solid white;
+      path {
+        fill: white;
+      }
+    }
+  }
+
+  .navbar {
+    margin-top: 1em;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1em;
+
+    .dot {
+      width: 0.4em;
+      height: 0.4em;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      background-color: rgba(255,255,255,0.5);
+
+      &.active {
+        background-color: white;
+      }
+    }
+  }
+}
+

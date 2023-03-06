@@ -4,7 +4,7 @@
 
 import styles from "./Card.module.scss";
 
-interface ICard {
+export interface ICard {
   component?: "div" | "button" | "tr";
   style?: React.CSSProperties;
   rounded?: boolean;

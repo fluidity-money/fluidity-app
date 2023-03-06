@@ -1,0 +1,31 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import CardCarousel from "./CardCarousel";
+import { Text } from './../../'
+
+<Meta
+    title="Container/CardCarousel"
+    component={CardCarousel}
+/>
+
+export const Template = ({props}) => <CardCarousel {...props}>
+  <Text>Slide 1</Text>
+  <Text>Slide 2</Text>
+</CardCarousel>;
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Card Carousel</Title>
+    <Subtitle>General Card Component</Subtitle>
+    
+    <h2>Card Carousel</h2>
+    <Story
+        name="Card Carousel"
+        args={{
+            component: "div",
+            type: "box",
+            rounded: true,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>
