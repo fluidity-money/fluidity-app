@@ -33,15 +33,6 @@ Ethereum support is built as a trio of contracts:
 3. Token aggregates the remaining pool amount
 4. Token rewards each user with the internal reward function `rewardPool`
 
-#### Manual reward process (manualReward)
-
-1. User identifies that they won a small reward by accessing an endpoint on the webapp
-2. Webapp generates a signature of random numbers and the first and last block for the end user to supply to the function
-3. User calls the function from the webapp
-4. Token validates the signature produced by the webapp
-5. Token tracks the amount the user won for the block period
-6. Token rewards the user with the internal reward function (`rewardPool`)
-
 #### Reward pool amount calculation (rewardPool)
 
 1. LiquidityProvider calculates the balance of the underlying assets based on the exchange rate of the cTokens/aTokens held in the Compound/AAVE pool&#x20;
