@@ -306,14 +306,6 @@ fUSDT = "https://www.jup.ag/"
 [liquidity_providers.arbitrum]
 
 [[liquidity_providers.arbitrum.providers]]
-name= "aave"
-
-[liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
-fUSDT = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
-fDAI = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
-
-[[liquidity_providers.arbitrum.providers]]
 name= "uniswap"
 
 [liquidity_providers.arbitrum.providers.link]
