@@ -1,6 +1,6 @@
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
 import { BigNumber } from "ethers";
-import { Contract, ContractInterface } from "ethers";
+import { Contract } from "ethers";
 import BN from "big.js";
 
 import PrizePoolABI from "./prizePoolABI.json";
@@ -54,17 +54,34 @@ type PrizePool = {
   decimals: number;
 };
 
+const prizePoolConfig = {
+  ethereum: {
+    address: "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0",
+    rpc: process.env.FLU_ETH_RPC_HTTP,
+  },
+  arbitrum: {
+    address: "0x3cc6115Cd787dC6A3C9440D7e3B0d76c15C82Bb4",
+    rpc: process.env.FLU_ARB_RPC_HTTP,
+  },
+};
+
+export const getEthTotalPrizePool = () => getEvmTotalPrizePool("ethereum");
+
+export const getArbTotalPrizePool = () => getEvmTotalPrizePool("arbitrum");
+
 // Returns total prize pool from aggregated contract
-export const getEthTotalPrizePool = async (): Promise<number> => {
-  const provider = new JsonRpcProvider(process.env.FLU_ETH_RPC_HTTP);
-  const poolAddress: string = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
-  const poolABI: ContractInterface = PrizePoolABI;
+const getEvmTotalPrizePool = async (
+  chain: "ethereum" | "arbitrum"
+): Promise<number> => {
+  const { address, rpc } = prizePoolConfig[chain];
+
+  const provider = new JsonRpcProvider(rpc);
 
   try {
-    const rewardPoolContract = new Contract(poolAddress, poolABI, provider);
+    const rewardPoolContract = new Contract(address, PrizePoolABI, provider);
 
     if (!rewardPoolContract)
-      throw new Error(`Could not instantiate Reward Pool at ${poolAddress}`);
+      throw new Error(`Could not instantiate Reward Pool at ${address}`);
 
     const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
 

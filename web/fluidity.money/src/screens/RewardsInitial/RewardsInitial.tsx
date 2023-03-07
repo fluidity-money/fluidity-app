@@ -20,10 +20,17 @@ const RewardsInitial = ({ changeScreen, carouselInfo }: IProps) => {
   );
 
   useEffect(() => {
-    chain === `ETH` && setPrizePool(onChainData.data?.ethPool || 0);
-
-    chain === `SOL` && setPrizePool(onChainData.data?.solPool || 0);
-  }, [onChainData.data?.ethPool, onChainData.data?.solPool, chain]);
+    switch (chain) {
+      case "ETH":
+        return setPrizePool(onChainData.data?.ethPool || 0);
+      case "ARB":
+        return setPrizePool(onChainData.data?.arbPool || 0);
+      case "SOL":
+        return setPrizePool(onChainData.data?.solPool || 0);
+      default:
+        return setPrizePool(0);
+    }
+  }, [onChainData.loading, chain]);
 
   return (
     <AnimatePresence>
