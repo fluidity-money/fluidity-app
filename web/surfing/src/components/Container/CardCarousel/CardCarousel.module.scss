@@ -2,15 +2,13 @@
 
 .CardCarousel {
   position: relative;
-  min-width: 300px;
 
   .content {
-    width: 100%;
-    height:auto;
-    min-height: 100px;
     position: relative;
-    overflow-x: hidden;
-
+    overflow: hidden;
+    width: 350px;
+    height: 200px;
+  
     .slide {
       cursor: grab;
       position: absolute;
@@ -21,7 +19,7 @@
   }
 
   .arrow {
-    background-color: black;
+    background-color: map-get($bg, "default");
     cursor: pointer;
     border-radius: 100px;
     width: 2em;
@@ -70,7 +68,7 @@
       border-radius: 100px;
       cursor: pointer;
       transition: all 0.3s ease-in-out;
-      background-color: rgba(255,255,255,0.5);
+      background-color: map-get($border, "default");
 
       &.active {
         background-color: white;
@@ -79,3 +77,10 @@
   }
 }
 
+.SlideContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

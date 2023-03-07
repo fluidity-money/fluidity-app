@@ -1,18 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
 import { Card, CaretLeft, CaretRight, Text } from '~/components/';
 import { ICard } from '../Card/Card';
 
 import styles from './CardCarousel.module.scss'
 
-interface ICardCarousel extends Partial<ICard> {
-  children: React.ReactNode[];
-}
-
 const variants = {
   enter: (direction: number) => {
     return {
-      x: direction > 0 ? 300 : -300,
+      x: direction > 0 ? 350 : -350,
       opacity: 0
     };
   },
@@ -24,7 +20,7 @@ const variants = {
   exit: (direction: number) => {
     return {
       zIndex: 0,
-      x: direction < 0 ? 300 : -300,
+      x: direction < 0 ? 350 : -350,
       opacity: 0
     };
   }
@@ -34,6 +30,22 @@ const swipeConfidenceThreshold = 10000;
 const swipePower = (offset: number, velocity: number) => {
   return Math.abs(offset) * velocity;
 };
+
+interface ISlide {
+  children: React.ReactNode;
+}
+
+const Slide: React.FC<ISlide> = ({ children }) => {
+  return (
+    <div className={styles.SlideContent}>
+      {children}
+    </div>
+  )
+}
+
+interface ICardCarousel extends Partial<ICard> {
+  children: ReactElement<ISlide>[];
+}
 
 const CardCarousel: React.FC<ICardCarousel> = ({
   children,
@@ -66,7 +78,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
             animate="center"
             exit="exit"
             transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
+              x: { type: "spring", stiffness: 350, damping: 30 },
               opacity: { duration: 0.2 }
             }}
             drag="x"
@@ -111,4 +123,4 @@ const CardCarousel: React.FC<ICardCarousel> = ({
   );
 };
 
-export default CardCarousel;
+export default Object.assign(CardCarousel, { Slide })
