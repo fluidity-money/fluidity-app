@@ -1,4 +1,4 @@
-import { Card, Heading, Text, BloomEffect, TokenIcon, ArrowDown, ProviderIcon } from "../";
+import { Card, Heading, Text, BloomEffect, TokenIcon, ArrowDown, ProviderIcon } from "../..";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useClickOutside } from "~/util";

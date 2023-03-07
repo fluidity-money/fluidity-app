@@ -1,0 +1,41 @@
+
+.providers {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 3em;
+  width: 100%;
+  height: 3.5em;
+
+  a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 3.5em;
+    -webkit-user-drag: none;
+
+
+    
+    img {
+      position: absolute;
+      width: 100%;
+    -webkit-user-drag: none;
+
+      object-fit: contain;
+    }
+
+    &:first-child,
+    &:last-child {
+      position: absolute;
+      top: 4em;
+      left: 0;
+    }
+
+    &:last-child {
+      left: auto;
+      right: 0;
+    }
+  }
+}

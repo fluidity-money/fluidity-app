@@ -11,7 +11,7 @@ import { WarningIcon } from "./WarningIcon";
 import { DaoIcon } from "./Dao";
 import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
-import { TokenIcon } from "./Token";
+import { TokenIcon } from "./TokenIcon";
 import { InfoCircle } from "./InfoCircle";
 import { CaretLeft } from "./CaretLeft";
 import { CaretRight } from "./CaretRight";
