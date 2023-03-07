@@ -218,10 +218,7 @@ contract VEGovLockup is IVEGovLockup {
         return sum;
     }
 
-    function extendLockTime(
-        address _spender,
-        uint256 _extraLockTime
-    ) internal view returns (uint256) {
+    function getRemainingLockTime(address _spender) public view returns (uint256) {
         uint256 currentTimestamp = block.timestamp;
 
         uint256 lockTimestamp = getLockTimestamp(_spender);
@@ -231,12 +228,17 @@ contract VEGovLockup is IVEGovLockup {
         bool lockPeriodPassed = currentTimestamp - lockTimestamp > lockTime;
 
         if (lockPeriodPassed) {
-            return _extraLockTime;
+            return 0;
         } else {
-            // extend the lock time by taking the amount of time remaining in the
-            // lock and adding the new time that we want to it too
-            return lockTime - (currentTimestamp - lockTimestamp) + _extraLockTime;
+            return lockTime - (currentTimestamp - lockTimestamp);
         }
+    }
+
+    function extendLockTime(
+        address _spender,
+        uint256 _extraLockTime
+    ) internal view returns (uint256) {
+        return getRemainingLockTime(_spender) + _extraLockTime;
     }
 
     function _increaseBPTAmount(address _spender, uint256 _amount) internal {

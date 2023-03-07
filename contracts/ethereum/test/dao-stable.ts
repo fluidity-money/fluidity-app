@@ -1011,8 +1011,6 @@ describe("DAOStable", async () => {
         "0x00"
       );
 
-      await dao.voteAgainstMax(proposalId);
-
       await expect(dao.callStatic.voteFor(proposalId, 1))
         .to.be.revertedWith("proposal does not exist");
     }
