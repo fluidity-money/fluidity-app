@@ -45,7 +45,7 @@ import {
 
 import { EMPTY_ADDRESS } from '../script-utils';
 
-const GOV_TO_LOCK = 1000;
+const GOV_TO_LOCK = 3;
 
 const advanceTime = sendEmptyTransaction;
 
@@ -319,6 +319,8 @@ describe("DAOStable", async () => {
         updateAmountCalldata
       );
 
+      await dao.voteForMax(proposalId);
+
       // the balance should be the same as the main signer since we locked the
       // same amount for the same time
 
@@ -366,9 +368,9 @@ describe("DAOStable", async () => {
 
       let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
 
-      expectGt(veGovBalance, 300);
+      expectGt(veGovBalance, 3e6);
 
-      veGovBalance = 100;
+      veGovBalance = 1e6;
 
       const proposalId = await callAndSendProposal(
         dao,
@@ -380,7 +382,7 @@ describe("DAOStable", async () => {
         "0x00"
       );
 
-      const againstBalance = 100;
+      const againstBalance = 1e6;
 
       await dao.connect(govTokenSigner2).voteAgainst(proposalId, againstBalance);
 
@@ -416,15 +418,9 @@ describe("DAOStable", async () => {
       // that it reverts), then upgrade the contract to query that
       // information
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
       // make sure that the dao is actually the owner of the beacon so we can upgrade it
 
       expect(await testDAOUpgradeableBeacon.owner()).to.be.hexEqual(dao.address);
-
-      veGovBalance = 1;
 
       const hiddenSecretWord = "secret word";
 
@@ -439,11 +435,13 @@ describe("DAOStable", async () => {
         dao,
         "0x05",
         testDAOUpgradeableBeaconProxy.address,
-        veGovBalance,
+        0,
         0,
         false,
         setHiddenCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -465,11 +463,13 @@ describe("DAOStable", async () => {
         dao,
         "0x06",
         testDAOUpgradeableBeaconAddress,
-        veGovBalance,
+        0,
         0,
         false,
         upgradeCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -563,12 +563,6 @@ describe("DAOStable", async () => {
     async function() {
       if (!isRunningOnMainnet) this.skip();
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
-
       const tokenDecimals = 6;
 
       const trfVariables = {
@@ -605,11 +599,13 @@ describe("DAOStable", async () => {
         dao,
         "0x01",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1Calldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -647,12 +643,6 @@ describe("DAOStable", async () => {
     async function() {
       if (!isRunningOnMainnet) this.skip();
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
-
       const tokenDecimals = 6;
 
       const daoUtilityV1Tx =
@@ -680,11 +670,13 @@ describe("DAOStable", async () => {
         dao,
         "0x2d",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1Calldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -716,12 +708,6 @@ describe("DAOStable", async () => {
     async function() {
       if (!isRunningOnMainnet) this.skip();
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
-
       const tokenDecimals = 18;
 
       const daoUtilityV1Tx =
@@ -750,11 +736,13 @@ describe("DAOStable", async () => {
         dao,
         "0x3d",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1Calldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -786,12 +774,6 @@ describe("DAOStable", async () => {
     async function() {
       if (!isRunningOnMainnet) this.skip();
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
-
       const tokenDecimals = 18;
 
       const daoUtilityV1DeployTx =
@@ -820,11 +802,13 @@ describe("DAOStable", async () => {
         dao,
         "0x3d",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1DeployCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -867,11 +851,13 @@ describe("DAOStable", async () => {
         dao,
         "0x4d",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1UpdateCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -894,12 +880,6 @@ describe("DAOStable", async () => {
     "should succeed in using the DAO utility code to disable a token",
     async function() {
       if (!isRunningOnMainnet) this.skip();
-
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
 
       const tokenDecimals = 18;
 
@@ -928,11 +908,13 @@ describe("DAOStable", async () => {
         dao,
         "0x77",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1DeployCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -966,11 +948,13 @@ describe("DAOStable", async () => {
         dao,
         "0x99",
         daoUtilityV1.address,
-        veGovBalance,
+        0,
         0,
         true,
         daoUtilityV1DisableCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -989,12 +973,6 @@ describe("DAOStable", async () => {
       // to do this, we get through a proposal that just calls
       // TestDAOUpgradeableBubbleUpRevert
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
-
       const bubbleUpTx =
         await testDAOUpgradeableBubbleUpRevert.populateTransaction.callMe();
 
@@ -1004,11 +982,13 @@ describe("DAOStable", async () => {
         dao,
         "0x0a",
         testDAOUpgradeableBubbleUpRevert.address,
-        veGovBalance,
+        0,
         0,
         false,
         bubbleUpCalldata
       );
+
+      await dao.voteForMax(proposalId);
 
       await advanceTimePastProposalFinished(hre);
 
@@ -1022,12 +1002,6 @@ describe("DAOStable", async () => {
     async function() {
       if (!isRunningOnMainnet) this.skip();
 
-      let veGovBalance = await veGovLockup.balanceOf(govTokenSigner1Address);
-
-      expectGt(veGovBalance, 1);
-
-      veGovBalance = 1;
-
       const proposalId = await dao.callStatic.createProposal(
         "0x99",
         govTokenSigner1Address,
@@ -1037,8 +1011,14 @@ describe("DAOStable", async () => {
         "0x00"
       );
 
+      await dao.voteAgainstMax(proposalId);
+
       await expect(dao.callStatic.voteFor(proposalId, 1))
         .to.be.revertedWith("proposal does not exist");
     }
   );
+
+  it("should fail if the amount voted is less than 3%", async () => {
+
+  });
 });

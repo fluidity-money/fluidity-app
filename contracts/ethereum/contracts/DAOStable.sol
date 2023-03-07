@@ -18,6 +18,10 @@ uint256 constant DEFAULT_VOTE_BLOCK_TIME = 10 days;
 /// @dev default vote timelock once a vote has been ratified
 uint256 constant DEFAULT_FROZEN_TIME = 24 hours;
 
+/// @dev default window that a proposal can be executed in after being
+///      voted in
+uint256 constant DEFAULT_EXECUTABLE_WINDOW = 24 hours;
+
 struct Proposal {
     /// @notice ratificationTs to use as the timestamp of when voting finished
     uint256 ratificationTs;
@@ -263,14 +267,36 @@ contract DAOStable {
         return isAddressZero(proposals_[_proposalId].targetContract);
     }
 
+    function threePercentTotalSupply() internal view returns (uint256) {
+        return lockupSource_.totalSupply() * 3 / 100;
+    }
+
     /// @notice getProposalPassing check if the proposal has enough votes
     ///         to pass
     function getProposalPassing(bytes32 _proposalId) public view returns (bool) {
         uint256 votesFor = proposals_[_proposalId].votesFor;
+        uint256 votesAgainst = proposals_[_proposalId].votesAgainst;
 
-        bool hasMoreVotes = votesFor > proposals_[_proposalId].votesAgainst;
+        bool hasMoreVotes = votesFor > votesAgainst;
 
-        return hasMoreVotes;
+        if (!hasMoreVotes) return false;
+
+        // this should be easy since the value in the past versus the value now
+        // should have changed the value of the underlying past 3%
+
+        bool hasMoreThanThreePercentSupply = votesFor - votesAgainst > threePercentTotalSupply();
+
+        return hasMoreThanThreePercentSupply;
+    }
+
+    function getInProposalExecutableWindow(bytes32 _proposalId) public view returns (bool) {
+        uint256 maxTime =
+            proposals_[_proposalId].ratificationTs +
+            DEFAULT_FROZEN_TIME +
+            DEFAULT_VOTE_BLOCK_TIME +
+            DEFAULT_EXECUTABLE_WINDOW;
+
+        return block.timestamp < maxTime;
     }
 
     function getProposalStatus(bytes32 _proposalId) public view returns (ProposalStatus) {
@@ -289,6 +315,9 @@ contract DAOStable {
         // has the proposal already been executed?
         bool proposalExecuted = getProposalExecuted(_proposalId);
 
+        // is the proposal in the window to be executed?
+        bool inProposalExecutableWindow = getInProposalExecutableWindow(_proposalId);
+
         if (proposalKilled) return ProposalStatus.KILLED;
 
         // if the vote passed, and it's past the period of freeze, and it's
@@ -300,7 +329,7 @@ contract DAOStable {
         // if the vote passed, and it's past the period of freeze, and it's
         // not been executed, then it's ready
 
-        if (proposalFrozenPeriodOver && proposalPassing)
+        if (proposalFrozenPeriodOver && proposalPassing && inProposalExecutableWindow)
             return ProposalStatus.SUCCEEDED;
 
         // if the proposal's voting is complete, and the proposal is
@@ -311,7 +340,7 @@ contract DAOStable {
         // if the proposal is over, but the proposal doesn't have enough
         // votes, it fails
 
-        if (proposalVotingOver) return ProposalStatus.FAILED;
+        if (proposalVotingOver || !inProposalExecutableWindow) return ProposalStatus.FAILED;
 
         // if the proposal is still in progress, it's unfinished
 
@@ -376,6 +405,10 @@ contract DAOStable {
         _voteFor(msg.sender, _proposalId, _amount);
     }
 
+    function voteForMax(bytes32 _proposalId) public {
+        voteFor(_proposalId, getAmountAvailable(_proposalId, msg.sender));
+    }
+
     /// @notice voteAgainst the Vote given for the amount, reducing the
     ///         amount for it stored in the contract
     /// @dev _vote to provide the vote for
@@ -389,6 +422,10 @@ contract DAOStable {
         );
 
         _voteAgainst(msg.sender, _proposalId, _amount);
+    }
+
+    function voteAgainstMax(bytes32 _proposalId) public {
+        voteAgainst(_proposalId, getAmountAvailable(_proposalId, msg.sender));
     }
 
     /// @notice execute calldata at a contract target, following a Proposal

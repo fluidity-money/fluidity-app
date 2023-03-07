@@ -22,15 +22,14 @@ contract ConvertorEthToToken {
     constructor(IToken _tokenAddress, IWETH _wethAddress) {
         tokenAddress_ = _tokenAddress;
         wethAddress_ = payable(address(_wethAddress));
+
+        bool rc = IWETH(wethAddress_).approve(address(tokenAddress_), 2 **256 - 1);
+
+        require(rc, "approve failed");
     }
 
     function wrapEth() public payable {
         IWETH(wethAddress_).deposit{value: msg.value}();
-
-        bool rc = IWETH(wethAddress_).approve(address(tokenAddress_), msg.value);
-
-        require(rc, "approve failed");
-
         tokenAddress_.erc20InTo(msg.sender, msg.value);
     }
 

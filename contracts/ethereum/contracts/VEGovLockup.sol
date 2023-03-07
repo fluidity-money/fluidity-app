@@ -42,24 +42,38 @@ contract VEGovLockup is IVEGovLockup {
 
     IERC20 private token_;
 
-    mapping (address => Lockup) private lockups_;
+    mapping (address => uint) private locations_;
+
+    Lockup[] private lockups_;
 
     uint256 tokenAmountDeposited_;
 
     constructor(IERC20 _token) {
         token_ = _token;
+
+        // default immutable lockup value
+
+        lockups_.push(Lockup({
+            lockTime: 0,
+            bptLocked: 0,
+            lockTimestamp: 0
+        }));
+    }
+
+    function findLockup(address _spender) internal view returns (Lockup memory) {
+        return lockups_[locations_[_spender]];
     }
 
     function getLockTime(address _spender) public view returns (uint256) {
-        return lockups_[_spender].lockTime;
+        return findLockup(_spender).lockTime;
     }
 
     function getBPTLocked(address _spender) public view returns (uint256) {
-        return lockups_[_spender].bptLocked;
+        return findLockup(_spender).bptLocked;
     }
 
     function getLockTimestamp(address _spender) public view returns (uint256) {
-        return lockups_[_spender].lockTimestamp;
+        return findLockup(_spender).lockTimestamp;
     }
 
     function minLockTime() public pure returns (uint256) {
@@ -112,7 +126,6 @@ contract VEGovLockup is IVEGovLockup {
         uint256 _lockTime,
         uint256 _secondsSinceLock
     ) public pure returns (uint256) {
-
         if (_secondsSinceLock >= _lockTime) return 0;
 
         return _veFluidBalanceAtLock - (_veFluidDecayPerSecond * _secondsSinceLock);
@@ -135,6 +148,9 @@ contract VEGovLockup is IVEGovLockup {
         uint256 _currentTimestamp
     ) public pure returns (uint256) {
         uint256 veFluidBalanceAtLock = getVEFluidBalance(_bptLocked, _lockTime);
+
+        if (_currentTimestamp == _lockTimestamp) return veFluidBalanceAtLock;
+
         uint256 veFluidDecayPerSecond = calcVEFluidDecayPerSecond(_bptLocked);
         uint256 secondsSinceLock = _currentTimestamp - _lockTimestamp;
 
@@ -157,7 +173,7 @@ contract VEGovLockup is IVEGovLockup {
     }
 
     function getLockExists(address _spender) public view returns (bool) {
-        return lockups_[_spender].lockTime > 0;
+        return findLockup(_spender).lockTime > 0;
     }
 
     /// @notice createLock for the user with the amount given (only one position!)
@@ -173,13 +189,33 @@ contract VEGovLockup is IVEGovLockup {
 
         tokenAmountDeposited_ += _amount;
 
-        lockups_[msg.sender].lockTime = _lockTime;
-        lockups_[msg.sender].bptLocked = _amount;
-        lockups_[msg.sender].lockTimestamp = block.timestamp;
+        uint pos = lockups_.length;
+
+        lockups_.push(Lockup({
+            lockTime: _lockTime,
+            bptLocked: _amount,
+            lockTimestamp: block.timestamp
+        }));
+
+        locations_[msg.sender] = pos;
 
         bool rc = token_.transferFrom(msg.sender, address(this), _amount);
 
         require(rc, "failed to transfer");
+    }
+
+    function totalSupply() public view returns (uint256) {
+        uint256 sum = 0;
+
+        for (uint i = 0; i < lockups_.length; ++i)
+            sum += balanceOfWith(
+                lockups_[i].bptLocked,
+                lockups_[i].lockTime,
+                lockups_[i].lockTimestamp,
+                block.timestamp
+            );
+
+        return sum;
     }
 
     function extendLockTime(
@@ -215,7 +251,7 @@ contract VEGovLockup is IVEGovLockup {
 
         uint256 newLockTime = extendLockTime(_spender, 0);
 
-        lockups_[_spender] = Lockup({
+        lockups_[locations_[_spender]] = Lockup({
             lockTime: newLockTime,
             bptLocked: newBPTLocked,
             lockTimestamp: block.timestamp
@@ -245,8 +281,8 @@ contract VEGovLockup is IVEGovLockup {
 
         require(newLockTime <= MAX_LOCK_TIME, "too long");
 
-        lockups_[_spender].lockTime = newLockTime;
-        lockups_[_spender].lockTimestamp = block.timestamp;
+        lockups_[locations_[_spender]].lockTime = newLockTime;
+        lockups_[locations_[_spender]].lockTimestamp = block.timestamp;
     }
 
     /**
@@ -269,7 +305,7 @@ contract VEGovLockup is IVEGovLockup {
     }
 
     function disableLock(address _spender) internal {
-        lockups_[_spender] = Lockup({
+        lockups_[locations_[_spender]] = Lockup({
             lockTime: 0,
             bptLocked: 0,
             lockTimestamp: 0

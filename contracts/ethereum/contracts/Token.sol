@@ -20,10 +20,6 @@ import "./openzeppelin/SafeERC20.sol";
 
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
-/// @dev sentinel to indicate a block has been rewarded in the
-/// @dev pastRewards_ and rewardedBlocks_ maps
-uint constant BLOCK_REWARDED = 1;
-
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
 contract Token is
@@ -637,18 +633,18 @@ contract Token is
     }
 
     function _approve(
-        address owner,
-        address spender,
-        uint256 amount
+        address _owner,
+        address _spender,
+        uint256 _amount
     ) internal virtual {
-        require(owner != address(0), "approve from zero");
+        require(_owner != address(0), "approve from zero");
 
-        emit Approval(owner, spender, amount);
+        emit Approval(_owner, _spender, _amount);
 
         // solhint-disable-next-line reason-string
-        require(spender != address(0), "approve to zero");
+        require(_spender != address(0), "approve to zero");
 
-        allowances_[owner][spender] = amount;
+        allowances_[_owner][_spender] = _amount;
     }
 
     function _spendAllowance(
