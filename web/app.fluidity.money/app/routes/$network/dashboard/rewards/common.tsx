@@ -11,6 +11,7 @@ import {
   Spinner,
 } from "@fluidity-money/surfing";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { networkMapper } from "~/util";
 
 type IUserRewards = {
   claimNow: boolean;
@@ -39,10 +40,10 @@ const UserRewards = ({
 
   const buttonText = claimNow ? "Claim now with fees" : "View breakdown";
 
-  const networkNotEth = network !== "ethereum";
+  const networkNotEvm = network !== "ethereum" && network !== "arbitrum";
 
   const onClick = async () => {
-    if (networkNotEth) return;
+    if (networkNotEvm) return;
 
     if (!claimNow) return navigate(`/${network}/dashboard/rewards/unclaimed`);
 
@@ -91,14 +92,8 @@ const UserRewards = ({
   return (
     <>
       {/* Info card*/}
-      <Card
-        id="user-rewards"
-        className="card-outer"
-        component="div"
-        rounded={true}
-        type={"box"}
-      >
-        <div className="card-inner unclaimed-inner">
+      <Card rounded type="holobox" style={{ padding: "2em" }}>
+        <div className="unclaimed-inner">
           <section id="unclaimed-left">
             {/* Icon */}
             <img
@@ -131,7 +126,7 @@ const UserRewards = ({
                   handleClick={onClick}
                   className="view-breakdown-button"
                 >
-                  {networkNotEth ? "Coming Soon!" : buttonText}
+                  {networkNotEvm ? "Coming Soon!" : buttonText}
                 </GeneralButton>
               )}
             </section>
@@ -157,14 +152,14 @@ const UserRewards = ({
             <section className="fees">
               <Text size="xs">Network fee</Text>
               <Text size="xs">
-                {networkFee} {network === "ethereum" ? "ETH" : "SOL"}
+                {networkFee} {networkMapper(network)}
               </Text>
             </section>
             <hr className="line" />
             <section className="fees">
               <Text size="xs">Gas fee</Text>
               <Text size="xs">
-                {gasFee} {network === "ethereum" ? "ETH" : "SOL"}
+                {gasFee} {networkMapper(network)}
               </Text>
             </section>
             <hr className="line" />

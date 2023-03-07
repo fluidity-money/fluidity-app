@@ -74,11 +74,6 @@
   margin: 0;
 }
 
-.unclaimed-total {
-  margin: 0;
-  font-size: 3em;
-}
-
 .claims-title {
   margin: 0 0 5px 0;
 }
@@ -106,99 +101,10 @@
   background: linear-gradient(to right, black, white, white, black);
 }
 
-.provider-card-large {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-top: 10px;
-  width: 444px;
-  height: 72px;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
-
-.provider-card-medium {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  width: 360px;
-  height: 96px;
-  justify-content: space-between;
-  box-sizing: border-box;
-}
-
-.card-outer {
-  position: relative;
-  border-radius: 30px;
-}
-
-.card-outer::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2px;
-  border-radius: 12px;
-  background: conic-gradient(
-    from 209.59deg at 50% 50%,
-    #f3b8d8 0deg,
-    #b793e9 50.06deg,
-    #9fd4f3 85.94deg,
-    #ffd2c4 134.97deg,
-    #fbf3f3 172.05deg,
-    #d9abdf 200.75deg,
-    #af9ce3 224.67deg,
-    #aae4e1 259.36deg,
-    #c6ead0 298.82deg,
-    #ffffff 328.72deg,
-    #fdb5e4 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.card-inner {
-  display: grid;
-  grid-template-columns: 2.5fr 1fr;
-  align-items: top;
-  background: unset;
-  border-radius: 12px;
-  border-style: none;
-  margin-top: auto;
-  margin-bottom: auto;
-  border-width: 2px;
-  outline: unset;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  gap: 2em;
-}
-
 .unclaimed-inner {
+  display: grid;
+  gap: 4em;
   grid-template-columns: 1.5fr 1fr;
-}
-
-.card-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-token-name {
-  margin: 0;
-}
-
-.card-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
-.card-left > img {
-  width: 2.5em;
 }
 
 .rewards-carousel {
@@ -222,13 +128,16 @@
     gap: 2em;
   }
 
-  .card-inner {
-    grid-template-columns: 1fr;
-    gap: 0;
+  .unclaimed-inner {
+    display: flex;
+    flex-direction: column;
   }
+
   #unclaimed-left {
+    display: flex;
     justify-content: center;
   }
+
   #infobox {
     margin-left: 0;
     max-width: 450px;
@@ -277,11 +186,6 @@
 
   .no-user-rewards > section > span {
     text-align: center;
-  }
-
-  .provider-card-large {
-    width: 88vw;
-    min-width: 300px;
   }
 
   #infobox {

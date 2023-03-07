@@ -72,11 +72,12 @@ type LoaderData = {
   network: Chain;
 };
 
-const SAFE_DEFAULT = {
+const SAFE_DEFAULT_UNCLAIMED = {
   unclaimedTxs: [],
   unclaimedTokens: [],
   userUnclaimedRewards: 0,
   userClaimedRewards: 0,
+  loaded: false,
 };
 
 const UnclaimedWinnings = () => {
@@ -100,8 +101,9 @@ const UnclaimedWinnings = () => {
     unclaimedTokens,
     userUnclaimedRewards,
     userClaimedRewards,
-  } = {
-    ...SAFE_DEFAULT,
+    loaded,
+  }: UnclaimedLoaderData = {
+    ...SAFE_DEFAULT_UNCLAIMED,
     ...unclaimedData.data,
   };
 
@@ -280,20 +282,21 @@ const UnclaimedWinnings = () => {
 
   return (
     <div className="pad-main">
-      {/* Info Card - Only accessible for Ethereum */}
-      {network === "ethereum" && !!userUnclaimedRewards && (
-        <UserRewards
-          claimNow={true}
-          unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={userClaimedRewards}
-          network={network}
-          networkFee={networkFee}
-          gasFee={gasFee}
-          tokenAddrs={unclaimedTokens.map(
-            ({ symbol }) => fluidTokenMap[symbol]
-          )}
-        />
-      )}
+      {/* Info Card - Only accessible for Ethereum/Arbitrum */}
+      {(network === "ethereum" || network === "arbitrum") &&
+        !!userUnclaimedRewards && (
+          <UserRewards
+            claimNow={true}
+            unclaimedRewards={userUnclaimedRewards}
+            claimedRewards={userClaimedRewards}
+            network={network}
+            networkFee={networkFee}
+            gasFee={gasFee}
+            tokenAddrs={unclaimedTokens.map(
+              ({ symbol }) => fluidTokenMap[symbol]
+            )}
+          />
+        )}
 
       {!!address && unclaimedData.state === "loading" && (
         <div style={{ marginBottom: "12px" }}>
@@ -321,6 +324,7 @@ const UnclaimedWinnings = () => {
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
+            loaded={loaded}
           />
         )}
         {winningTableViewIndex === 1 && (
@@ -337,6 +341,7 @@ const UnclaimedWinnings = () => {
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
+            loaded={loaded}
           />
         )}
       </section>

@@ -104,8 +104,8 @@ type (
 		MaxPriorityFeePerGas       misc.BigInt `json:"max_priority_fee_per_gas"`
 		MaxPriorityFeePerGasNormal float64     `json:"max_priority_fee_per_gas_normal"`
 
-		MaxFeePerGas misc.BigInt `json:"max_fee_per_gas"`
-		MaxFeePerGasNormal float64 `json:"max_fee_per_gas_normal"`
+		MaxFeePerGas       misc.BigInt `json:"max_fee_per_gas"`
+		MaxFeePerGasNormal float64     `json:"max_fee_per_gas_normal"`
 
 		EffectiveGasPriceNormal float64 `json:"effective_gas_price_normal"`
 
@@ -199,6 +199,7 @@ type (
 
 	// app fees for ethereum transactions
 	EthereumAppFees struct {
+		UniswapV3        float64 `json:"uniswap_v3"`
 		UniswapV2        float64 `json:"uniswap_v2"`
 		BalancerV2       float64 `json:"balancer_v2"`
 		OneInchV2        float64 `json:"oneinch_v2"`
@@ -210,6 +211,8 @@ type (
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
+		Saddle           float64 `json:"saddle"`
+		GTradeV6_1       float64 `json:"gtrade_v6_1"`
 	}
 )
 

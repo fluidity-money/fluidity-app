@@ -52,10 +52,10 @@ type (
 	}
 
 	EthereumSpooledRewards struct {
-		Network    network.BlockchainNetwork                                 `json:"network"`
-		Token      token_details.TokenDetails                                `json:"token_details"`
-		FirstBlock *misc.BigInt                                              `json:"first_block"`
-		LastBlock  *misc.BigInt                                              `json:"last_block"`
+		Network    network.BlockchainNetwork                                     `json:"network"`
+		Token      token_details.TokenDetails                                    `json:"token_details"`
+		FirstBlock *misc.BigInt                                                  `json:"first_block"`
+		LastBlock  *misc.BigInt                                                  `json:"last_block"`
 		Rewards    map[applications.UtilityName]map[ethereum.Address]misc.BigInt `json:"rewards"`
 	}
 

@@ -17,7 +17,7 @@ import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
-import { SplitContextProvider } from "./util/split";
+import { SplitContextProvider } from "contexts/SplitProvider";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
@@ -228,11 +228,12 @@ function App() {
     }
   }, [location, GTAG_ID]);
 
-  const [cookieConsent, setCookieConsent] = useState(true);
+  const [activatedCookieConsent, setActivatedCookieConsent] = useState(true);
   useEffect(() => {
     const _cookieConsent = localStorage.getItem("cookieConsent");
+
     if (!_cookieConsent) {
-      setCookieConsent(false);
+      setActivatedCookieConsent(false);
     }
   }, []);
 
@@ -318,18 +319,19 @@ function App() {
               width="0"
               style={{
                 display: "none",
-                visibility: "hidden"
+                visibility: "hidden",
               }}
             ></iframe>
           </noscript>
         )}
         <CookieConsent
-          activated={cookieConsent}
+          activated={activatedCookieConsent}
           url={
             "https://static.fluidity.money/assets/fluidity-privacy-policy.pdf"
           }
-          callBack={() => {
-            setCookieConsent(true);
+          callback={() => {
+            localStorage.setItem("cookieConsent", "true");
+            setActivatedCookieConsent(true);
           }}
         />
         <CacheProvider sha={gitSha}>

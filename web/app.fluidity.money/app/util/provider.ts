@@ -1,0 +1,48 @@
+import { Provider } from "@fluidity-money/surfing";
+
+const lowerCaseProviderNames: { [K: string]: Provider } = {
+  aave: "Aave",
+  aldrin: "Aldrin",
+  aldrinv1: "Aldrin",
+  aldrinv2: "Aldrin",
+  camelot: "Camelot",
+  circle: "Circle",
+  compound: "Compound",
+  dodo: "Dodo",
+  dodo_v2: "Dodo",
+  jupiter: "Jupiter",
+  lemniscap: "Lemniscap",
+  maker: "Maker",
+  multicoin: "Multicoin",
+  orca: "Orca",
+  polygon: "Polygon",
+  saber: "Saber",
+  solana: "Solana",
+  solend: "Solend",
+  uniswap: "Uniswap",
+  uniswap_v2: "Uniswap",
+  sushiswap: "Sushiswap",
+  fluidity: "Fluidity",
+  spl: "Fluidity",
+  none: "Fluidity",
+  oneinch: "Oneinch",
+  "1inch": "Oneinch",
+  oneinch_v1: "Oneinch",
+  oneinch_v2: "Oneinch",
+  oneinch_fixedrate: "Oneinch",
+  balancer: "Balancer",
+  balancer_v2: "Balancer",
+  mooniswap: "Mooniswap",
+  curve: "Curve",
+  multichain: "Multichain",
+  "xy finance": "XY Finance",
+  xy: "XY Finance",
+  xy_finance: "XY Finance",
+  raydium: "Raydium",
+  lifinity: "Lifinity",
+  mercurial: "Mercurial",
+};
+
+export const getProviderDisplayName = (name: string) => {
+  return lowerCaseProviderNames[name.toLowerCase()];
+};

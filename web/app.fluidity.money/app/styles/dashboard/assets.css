@@ -1,0 +1,263 @@
+.assets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3em;
+}
+
+.assets-active-filter {
+  font-weight: 700;
+}
+
+.assets-active-filter-underline {
+  height: 2px;
+  width: 100%;
+  background-color: white;
+  margin-top: 0.5em;
+}
+
+.assets-navigation {
+  display: flex;
+  gap: 1em;
+}
+
+.assets-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.assets-balance > h1 {
+  margin: 0;
+  margin-bottom: -0.2em;
+}
+
+#user-rewards {
+  width: auto;
+  padding: 2em;
+  margin-bottom: 2em;
+  max-width: 60em;
+}
+
+#performance {
+  margin-bottom: 6em;
+}
+
+#infobox {
+  padding: 1.5em;
+  width: 90%;
+  justify-self: flex-end;
+}
+
+#unclaimed {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 2em 1.5em;
+}
+
+#unclaimed-left {
+  display: flex;
+}
+
+#spend-to-earn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.spendToEarnHeading {
+  margin-top: 0;
+}
+
+.statistics-set > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.highest-performer-child {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
+.statistics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 2em;
+}
+
+.graph-ceiling {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.no-user-rewards {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6em;
+  margin-top: 3em;
+}
+
+.row-value {
+  padding: 0;
+  margin: 0;
+}
+
+.unclaimed-total {
+  margin: 0;
+  font-size: 3em;
+}
+
+.claims-title {
+  margin: 0 0 5px 0;
+}
+
+.view-breakdown-button {
+  width: 100%;
+  text-align: center;
+}
+
+.fees {
+  display: flex;
+  justify-content: space-between;
+}
+
+.line {
+  border: none;
+  height: 0.025em;
+  background-color: white;
+  width: 99%;
+}
+
+.gradient-line {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, black, white, white, black);
+}
+
+.unclaimed-inner {
+  grid-template-columns: 1.5fr 1fr;
+}
+
+.rewards-carousel {
+  margin-left: -30px;
+  margin-bottom: 50px;
+}
+
+.carousel-card-container {
+  width: 360px;
+  margin-right: 20px;
+  margin-bottom: 50px;
+}
+
+.highest-performer-child .provider-img {
+  width: 1.1em;
+}
+
+@media (max-width: 1200px) {
+  .no-user-rewards {
+    flex-direction: column;
+    gap: 2em;
+  }
+
+  .card-inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  #unclaimed-left {
+    justify-content: center;
+  }
+  #infobox {
+    margin-left: 0;
+    max-width: 450px;
+    justify-self: center;
+  }
+  .statistics-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 950px) {
+  #unclaimed-left {
+    flex-direction: column;
+    align-items: center;
+  }
+  #unclaimed {
+    align-items: center;
+    gap: 0.5em;
+    padding: 0;
+  }
+  .statistics-set .container .value > h1 {
+    font-size: 1.75em;
+  }
+
+  #infobox {
+    max-width: 300px;
+  }
+
+  #spend-to-earn > h2 {
+    margin-bottom: 0.3em;
+  }
+}
+
+@media (max-width: 500px) {
+  .no-user-rewards {
+    align-items: center;
+    margin-bottom: 2em;
+    margin-top: 2em;
+  }
+
+  .no-user-rewards > section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .no-user-rewards > section > span {
+    text-align: center;
+  }
+
+  #infobox {
+    padding: 0.5em;
+  }
+
+  #spend-to-earn {
+    align-items: center;
+  }
+
+  #user-rewards {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+}
+
+@media (max-width: 365px) {
+  .statistics-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reward-ceiling {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-bottom: 2rem;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
+}
+
+.center-table-loading-anim {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

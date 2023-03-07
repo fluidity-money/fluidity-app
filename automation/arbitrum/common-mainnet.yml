@@ -17,7 +17,7 @@ SECRET_FLU_NPM_GITHUB_TOKEN: /fluidity/npm/github_token
 SECRET_FLU_SENTRY_URL: /fluidity/sentryUrl
 SECRET_FLU_FRONTEND_SENTRY_URL: /fluidity/frontend/sentryURL
 SECRET_FLU_REDIS_ADDR: /fluidity/arbitrum/data/redis/endpoint
-SECRET_FLU_TIMESCALE_URI: /fluidity/timescale/uri
+SECRET_FLU_TIMESCALE_URI: /fluidity/arbitrum/timescale/uri
 SECRET_FLU_POSTGRES_URI: /fluidity/arbitrum/data/postgres/uri
 SECRET_FLU_AMQP_QUEUE_ADDR: /fluidity/arbitrum/data/rabbitmq/uri
 SECRET_FLU_MORALIS_TOKEN: /fluidity/moralis/token

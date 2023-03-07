@@ -38,8 +38,8 @@ const (
 	// EnvContractAddress to use to find the Fluid contract to identify transfers
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
-	// EnvOperatorAddress to query to get utility info
-	EnvOperatorAddress = `FLU_ETHEREUM_OPERATOR_ADDR`
+	// EnvRegistryAddress to query to get utility info
+	EnvRegistryAddress = `FLU_ETHEREUM_REGISTRY_ADDR`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
@@ -69,7 +69,7 @@ func main() {
 	var (
 		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
-		operatorAddress          = mustEthereumAddressFromEnv(EnvOperatorAddress)
+		registryAddress          = mustEthereumAddressFromEnv(EnvRegistryAddress)
 		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
@@ -103,8 +103,6 @@ func main() {
 			k.Payload = err
 		})
 	}
-
-	underlyingTokenDecimalsRat := exponentiate(underlyingTokenDecimals)
 
 	ethereumDecimalsRat := big.NewRat(EthereumDecimals, 1)
 
@@ -264,25 +262,12 @@ func main() {
 
 		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
 
-		sizeOfThePool, err := fluidity.GetRewardPool(
-			gethClient,
-			contractAddress,
-		)
-
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get the prize pool in the Fluidity contract! Address %#v!",
-					contractAddress.String(),
-				)
-
+				k.Message = "Failed to get the price of eth from chainlink!"
 				k.Payload = err
 			})
 		}
-
-		// normalise the size of the pool to a normal number!
-
-		sizeOfThePool.Quo(sizeOfThePool, underlyingTokenDecimalsRat)
 
 		var blockAnnouncements []worker.EthereumAnnouncement
 
@@ -400,7 +385,9 @@ func main() {
 
 					application = transfer.Decorator.Application
 
-					transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+					if applicationFeeUsd != nil {
+						transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+					}
 
 					if utility != "" {
 						fluidClients = append(fluidClients, utility)
@@ -410,7 +397,7 @@ func main() {
 				// fetch the token amount, exchange rate, etc from chain
 				pools, err := fluidity.GetUtilityVars(
 					gethClient,
-					operatorAddress,
+					registryAddress,
 					contractAddress,
 					fluidClients,
 					defaultDeltaWeightNum,

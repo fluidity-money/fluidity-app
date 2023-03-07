@@ -19,13 +19,14 @@ import {
   LoadingDots,
   useViewport,
   Video,
+  ConnectedWalletModal,
+  ConnectedWallet,
+  Modal,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import Modal from "~/components/Modal";
-import ConnectedWallet from "~/components/ConnectedWallet";
-import { ConnectedWalletModal } from "~/components/ConnectedWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -58,6 +59,7 @@ const NetworkPage = () => {
   const { connected, address, rawAddress, disconnect } = useContext(
     FluidityFacadeContext
   );
+  const { showExperiment } = useContext(SplitContext);
   const navigate = useNavigate();
 
   const projectedWinningsData = useFetcher<ProjectedWinData>();
@@ -84,10 +86,14 @@ const NetworkPage = () => {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chainNameMap = {
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
       name: "ETH",
       icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    arbitrum: {
+      name: "ARB",
+      icon: <img src="/assets/chains/arbIcon.svg" />,
     },
     solana: {
       name: "SOL",
@@ -177,7 +183,10 @@ const NetworkPage = () => {
                 <BlockchainModal
                   handleModal={setChainModalVisibility}
                   option={chainNameMap[network as "ethereum" | "solana"]}
-                  options={Object.values(chainNameMap)}
+                  options={Object.values(chainNameMap).filter(
+                    ({ name }) =>
+                      name !== "ARB" || showExperiment("enable-arbitrum")
+                  )}
                   setOption={(chain: string) =>
                     navigate(`/${networkMapper(chain)}/dashboard/home`)
                   }
@@ -216,7 +225,7 @@ const NetworkPage = () => {
                   <LoadingDots />
                 </div>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Loading your last 50 transactions...
+                  Loading your transactions from last week...
                 </Text>
                 <br />
               </>
@@ -232,8 +241,8 @@ const NetworkPage = () => {
                   {numberToMonetaryString(projectedWin)}
                 </Display>
                 <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on your last 50
-                  transactions.
+                  Would have been your winnings, based on your transactions last
+                  week.
                 </Text>
                 <br />
               </>

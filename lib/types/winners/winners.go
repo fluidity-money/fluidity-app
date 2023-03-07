@@ -7,6 +7,7 @@ package winners
 import (
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -32,6 +33,7 @@ type Winner struct {
 	RewardType				 RewardType                `json:"reward_type"`
 	// this is the stringified result of either an ethereum.Application or solana.Application
 	Application              string                    `json:"application"`
+	Utility                  applications.UtilityName  `json:"utility"`
 	BatchFirstBlock          misc.BigInt               `json:"first_block"`
 	BatchLastBlock           misc.BigInt               `json:"last_block"`
 

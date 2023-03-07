@@ -9,8 +9,11 @@ button {
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
   width: fit-content;
   height: fit-content;
+  padding: 1em;
   
   &.heading {
     > * {
@@ -24,7 +27,6 @@ button {
 
   &.transparent {
     background-color: $white-a5;
-    background-filter: blur(10px);
   }
 
   &.box {
@@ -32,13 +34,42 @@ button {
   }
 
   &.holobox {
-    border: 2px solid;
-    border-image-slice: 1;
-    border-image-source: $holo;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 2px;
+      background: $holo;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    &.rounded {
+      &::before {
+        border-radius: 12px;
+      }
+    }
   }
 
   &.rounded {
     border-radius: 12px;
+  }
+
+  &.frosted {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.102);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur( 10px );
   }
   
   &.disabled {

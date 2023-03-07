@@ -96,7 +96,7 @@ func main() {
 
 		logging.Debug(func(k *logging.Log) {
 			k.Format(
-				"Found a log, address was %v, matching %v",
+				"Found a log, address was %v, trying to match %v",
 				logAddress,
 				filterAddress,
 			)
@@ -105,6 +105,14 @@ func main() {
 		// address doesn't match our target contract!
 
 		if filterAddress != logAddressString {
+			logging.Debug(func(k *logging.Log) {
+				k.Format(
+					"Address %s doesn't match %s, skipping!",
+					logAddress,
+					filterAddress,
+				)
+			})
+
 			return
 		}
 

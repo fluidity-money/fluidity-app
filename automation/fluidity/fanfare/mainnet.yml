@@ -1,0 +1,21 @@
+SERVICES:
+  - FANFARE:
+      SERVICE_NAME: fluidity-fanfare
+      DOCKER_IMAGE: fluidity.fanfare
+      DOCKERFILE_PATH: ./web/fanfare
+      TARGET_GROUP: flu-fanfare-tg
+      SECRET_FLU_HASURA_ENDPOINT: /fluidity/hasura/rpc_http
+      SECRET_FLU_HASURA_SECRET: /fluidity/hasura/key
+      SECRET_FLU_ETH_WS_RPC: /fluidity/ethereum/websocket_url
+      SECRET_FLU_ETH_HEARTBEAT: /fluidity/ethereum/heartbeat
+      SECRET_FLU_ARB_WS_RPC: /fluidity/arbitrum/websocket_url
+      SECRET_FLU_ARB_HEARTBEAT: /fluidity/arbitrum/heartbeat
+      SECRET_FLU_SOL_WS_RPC: /fluidity/solana/websocket_url
+      SECRET_FLU_SOL_HEARTBEAT: /fluidity/solana/heartbeat
+      ENV_PORT: 80
+      CPU_LIMIT: 512
+      MEM_LIMIT: 1024
+      
+      DOCKER_ARGS:
+        SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
+  
