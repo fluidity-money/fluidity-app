@@ -1,4 +1,4 @@
-services:
+SERVICES:
   - microservice_ethereum_automatic_payout_release_usdt:
       SERVICE_NAME: microservice-ethereum-automatic-payout-release-ethereum-usdt
       DOCKER_IMAGE: microservice-ethereum-automatic-payout-release
