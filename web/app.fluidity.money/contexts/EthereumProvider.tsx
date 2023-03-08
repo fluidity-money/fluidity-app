@@ -18,7 +18,6 @@ import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
-  getTotalPrizePool,
   getUserMintLimit,
   userMintLimitEnabled,
   manualRewardToken,
@@ -33,7 +32,6 @@ import { Buffer } from "buffer";
 import useWindow from "~/hooks/useWindow";
 import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
 
-import RewardPoolAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
@@ -273,9 +271,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
