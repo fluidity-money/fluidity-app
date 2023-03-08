@@ -1,4 +1,3 @@
-import style from "./Token.module.scss";
 import type { Token } from "~/types";
 
 const baseImgPath = "https://static.fluidity.money/assets/tokens";
@@ -17,11 +16,13 @@ const tokenImgMap: {[K in Token]: string} = {
 } as const;
 
 type ITokenIcon = Partial<HTMLImageElement> & {
-  token: Token;
+  token: Token
+  style?: React.CSSProperties
 };
 
-const TokenIcon = ({ token, className }: ITokenIcon) => (
+const TokenIcon = ({ token, className, style }: ITokenIcon) => (
   <img
+    style={style}
     className={className}
     src={`${baseImgPath}/${tokenImgMap[token]}`}
     alt={token}
