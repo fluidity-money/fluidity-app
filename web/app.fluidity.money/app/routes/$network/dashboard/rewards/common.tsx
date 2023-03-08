@@ -11,7 +11,7 @@ import {
   Spinner,
 } from "@fluidity-money/surfing";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { networkMapper } from "~/util";
+import { getChainNativeToken } from "~/util/chainUtils/chains";
 
 type IUserRewards = {
   claimNow: boolean;
@@ -152,14 +152,14 @@ const UserRewards = ({
             <section className="fees">
               <Text size="xs">Network fee</Text>
               <Text size="xs">
-                {networkFee} {networkMapper(network)}
+                {networkFee} {getChainNativeToken(network)}
               </Text>
             </section>
             <hr className="line" />
             <section className="fees">
               <Text size="xs">Gas fee</Text>
               <Text size="xs">
-                {gasFee} {networkMapper(network)}
+                {gasFee} {getChainNativeToken(network)}
               </Text>
             </section>
             <hr className="line" />

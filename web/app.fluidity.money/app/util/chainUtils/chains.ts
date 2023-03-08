@@ -24,4 +24,16 @@ const getChainId = (network: Chain): number => {
   }
 };
 
-export { chainType, getChainId };
+const getChainNativeToken = (network: string): string => {
+  switch (network) {
+    case "ethereum":
+    case "arbitrum":
+      return "ETH";
+    case "solana":
+      return "SOL";
+    default:
+      return "";
+  }
+};
+
+export { chainType, getChainId, getChainNativeToken };
