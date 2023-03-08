@@ -1,4 +1,3 @@
-import { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "@remix-run/react";
 import {
   Card,
@@ -10,8 +9,6 @@ import {
   Heading,
   useViewport,
 } from "@fluidity-money/surfing";
-import FluidityFacadeContext from "contexts/FluidityFacade";
-import { networkMapper } from "~/util";
 
 type IUserRewards = {
   claimNow: boolean;
