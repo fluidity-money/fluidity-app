@@ -43,25 +43,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const prizePoolPromise: Promise<number> = (() => {
       switch (chainType(network)) {
         case "evm": {
-          const ethInfuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
-
-          const ethProvider = new JsonRpcProvider(ethInfuraRpc);
-
-          const ethRewardPoolAddr =
-            config.contract.prize_pool["ethereum"] ?? "";
-
-          const arbInfuraRpc = config.drivers["arbitrum"][mainnetId].rpc.http;
-
-          const arbProvider = new JsonRpcProvider(arbInfuraRpc);
-
-          const arbRewardPoolAddr =
-            config.contract.prize_pool["arbitrum"] ?? "";
-
           return Promise.resolve(
-            Promise.all([
-              getTotalPrizePool(ethProvider, ethRewardPoolAddr, RewardAbi),
-              getTotalPrizePool(arbProvider, arbRewardPoolAddr, RewardAbi),
-            ]).then((prizePools) =>
+            Promise.all(
+              ["ethereum", "arbitrum"].map((network) => {
+                const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+                const provider = new JsonRpcProvider(infuraRpc);
+
+                const rewardPoolAddr =
+                  config.contract.prize_pool[network as Chain];
+
+                return getTotalPrizePool(provider, rewardPoolAddr, RewardAbi);
+              })
+            ).then((prizePools) =>
               prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
             )
           );
