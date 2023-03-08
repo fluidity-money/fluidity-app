@@ -20,8 +20,8 @@ const handler: NextApiHandler = async (_, res) => {
 
   res.status(200).json({
     totalTransactions,
-    ethPool,
-    arbPool,
+    ethPool: ethPool + arbPool,
+    arbPool: arbPool + ethPool,
     solPool,
   } as RewardPoolRes);
 };

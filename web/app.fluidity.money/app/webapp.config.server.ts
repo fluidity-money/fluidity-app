@@ -106,9 +106,9 @@ const getColors = async () => {
         process.env.NODE_ENV === "test"
           ? Buffer.from([255, 255, 255, 0])
           : await sharp(join(__dirname, "../public", logo))
-            .resize(1, 1)
-            .raw()
-            .toBuffer();
+              .resize(1, 1)
+              .raw()
+              .toBuffer();
       tokenColors.push({
         symbol,
         color: `#${colors.toString("hex").substring(0, 6)}`,

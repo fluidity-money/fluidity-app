@@ -1,4 +1,4 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 import type { LoaderFunction } from "@remix-run/node";
 import type { Rewarders } from "~/util/rewardAggregates";
 
@@ -40,11 +40,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     const mainnetId = 0;
-    const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+    const prizePoolPromise: Promise<number> = (() => {
+      switch (chainType(network)) {
+        case "evm": {
+          return Promise.resolve(
+            Promise.all(
+              ["ethereum", "arbitrum"].map((network) => {
+                const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+                const provider = new JsonRpcProvider(infuraRpc);
 
-    const provider = new JsonRpcProvider(infuraRpc);
+                const rewardPoolAddr =
+                  config.contract.prize_pool[network as Chain];
 
-    const rewardPoolAddr = config.contract.prize_pool[network];
+                return getTotalPrizePool(provider, rewardPoolAddr, RewardAbi);
+              })
+            ).then((prizePools) =>
+              prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
+            )
+          );
+        }
+        default:
+          return Promise.resolve(0);
+      }
+    })();
 
     const { tokens } = config.config[network];
 
@@ -52,10 +70,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (map, token) =>
         token.isFluidOf
           ? {
-            ...map,
-            [token.symbol]: token.address,
-            [token.symbol.slice(1)]: token.address,
-          }
+              ...map,
+              [token.symbol]: token.address,
+              [token.symbol.slice(1)]: token.address,
+            }
           : map,
       {}
     );
@@ -65,7 +83,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       { data: rewardsData, errors: rewardsErr },
       { data: appRewardData, errors: appRewardErrors },
     ] = await Promise.all([
-      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      prizePoolPromise,
       address
         ? useUserYieldByAddress(network, address)
         : useUserYieldAll(network),
