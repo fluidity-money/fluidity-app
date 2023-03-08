@@ -535,6 +535,13 @@ export default function Rewards() {
 
   return (
     <div className="pad-main">
+      <div style={{ marginBottom: "12px" }}>
+        <Text>
+          {isFirstLoad || !timestamp
+            ? "Loading data..."
+            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+        </Text>
+      </div>
       <div className="reward-ctas">
         {/* Info Cards */}
         {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
@@ -626,13 +633,6 @@ export default function Rewards() {
 
       {/* Reward Performance */}
       <section id="performance">
-        <div style={{ marginBottom: "12px" }}>
-          <Text>
-            {isFirstLoad || !timestamp
-              ? "Loading data..."
-              : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
-          </Text>
-        </div>
         <div className="statistics-row">
           <div className="statistics-set">
             <LabelledValue
