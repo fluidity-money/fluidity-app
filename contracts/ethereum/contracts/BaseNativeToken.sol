@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity >=0.8.0;
 
-import "./IERC20.sol";
+pragma solidity 0.8.16;
+
+import "../interfaces/IERC20.sol";
+import "../interfaces/IERC2612.sol";
+
 import "./openzeppelin/SafeERC20.sol";
 
 /**
@@ -17,12 +20,14 @@ import "./openzeppelin/SafeERC20.sol";
 * @dev Do not manually set balances without updating totalSupply, as
 * the sum of all user balances must not exceed it.
 */
-abstract contract BaseNativeToken is IERC20 {
+abstract contract BaseNativeToken is IERC20, IERC2612 {
     using SafeERC20 for IERC20;
 
     /*//////////////////////////////////////////////////////////////
                             METADATA STORAGE
     //////////////////////////////////////////////////////////////*/
+
+    bool private created_;
 
     string private name_;
 
@@ -58,7 +63,11 @@ abstract contract BaseNativeToken is IERC20 {
         string memory _name,
         string memory _symbol,
         uint8 _decimals
-    ) virtual internal {
+    ) public {
+        require(!created_, "already initialised");
+
+        created_ = true;
+
         name_ = _name;
         symbol_ = _symbol;
         decimals_ = _decimals;
@@ -107,6 +116,8 @@ abstract contract BaseNativeToken is IERC20 {
     ) public virtual returns (bool) {
         // Saves gas for limited approvals.
         uint256 allowed = allowance_[_from][msg.sender];
+
+        require(allowed >= _amount, "needs approval");
 
         if (allowed != type(uint256).max)
             allowance_[_from][msg.sender] = allowed - _amount;
@@ -186,7 +197,10 @@ abstract contract BaseNativeToken is IERC20 {
         bytes32 _r,
         bytes32 _s
     ) public virtual {
+        // solhint-disable-next-line not-rely-on-time
         require(_deadline >= block.timestamp, "PERMIT_DEADLINE_EXPIRED");
+
+        emit Approval(_owner, _spender, _value);
 
         // Unchecked because the only math done is incrementing
         // the owner's nonce which cannot realistically overflow.
@@ -215,14 +229,15 @@ abstract contract BaseNativeToken is IERC20 {
                 _s
             );
 
-            require(recoveredAddress != address(0) && recoveredAddress == _owner, "INVALID_SIGNER");
+            require(recoveredAddress != address(0), "INVALID_SIGNER");
+
+            require(recoveredAddress == _owner, "INVALID_SIGNER");
 
             allowance_[recoveredAddress][_spender] = _value;
         }
-
-        emit Approval(_owner, _spender, _value);
     }
 
+    // solhint-disable-next-line func-name-mixedcase
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
         return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
     }
@@ -238,6 +253,10 @@ abstract contract BaseNativeToken is IERC20 {
                     address(this)
                 )
             );
+    }
+
+    function nonces(address _owner) public view returns (uint256) {
+        return nonces_[_owner];
     }
 
     /*//////////////////////////////////////////////////////////////

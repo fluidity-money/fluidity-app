@@ -1,11 +1,19 @@
+
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, forknetTakeFunds } from "../script-utils";
+
+import { forknetTakeFunds } from "../script-utils";
+
+import { deployTokens } from "../deployment";
+
 import { AAVE_V3_GOERLI_POOL_PROVIDER_ADDR, GoerliTokenList } from "../test-constants";
+
 import {
-    commonBeacons, commonBindings,
+    commonBeaconAddresses,
+    commonBindings,
     commonContracts,
-    commonFactories, signers
+    commonFactories,
+    signers
 } from "./setup-common";
 
 
@@ -32,13 +40,26 @@ before(async function() {
   const toDeploy = [GoerliTokenList["usdc"]];
 
   // deploy fUsdc
-  await forknetTakeFunds(hre, [await signers.userAccount1.getAddress()], [GoerliTokenList["usdc"]]);
 
-  const { tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory } =
-    commonFactories;
+  await forknetTakeFunds(
+    hre,
+    [await signers.userAccount1.getAddress()],
+    [GoerliTokenList["usdc"]]
+  );
 
-  const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
-    commonBeacons;
+  const {
+    token: tokenFactory,
+    compoundLiquidityProvider: compoundFactory,
+    aaveV2LiquidityProvider: aaveV2Factory,
+    aaveV3LiquidityProvider: aaveV3Factory
+  } = commonFactories;
+
+  const {
+    token: tokenBeacon,
+    compoundLiquidityProvider: compoundBeacon,
+    aaveV2LiquidityProvider: aaveV2Beacon,
+    aaveV3LiquidityProvider: aaveV3Beacon
+  } = commonBeaconAddresses;
 
   const emergencyCouncilAddress = await signers.token.emergencyCouncil.getAddress();
 
