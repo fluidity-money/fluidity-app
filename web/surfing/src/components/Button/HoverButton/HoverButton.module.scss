@@ -103,13 +103,8 @@
   letter-spacing: 0.05em;
 }
 
-.hoverContainer {
-  margin-top: 0.5em;
-  cursor: default;
-  position: absolute;
-  box-sizing: border-box;
-  padding: 1em;
-  backdrop-filter: blur(5px);
-  z-index: 1;
-  width: fit-content;
+.pseudoBridge {
+  position: absolute; 
+  width: auto;
+  padding-top: 12px;
 }
