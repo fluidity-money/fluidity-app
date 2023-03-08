@@ -644,13 +644,14 @@ export default function Rewards() {
 
           {hasTokenPerformance && (
             <div className="statistics-set">
-              <LabelledValue label={"Highest performer"}>
-                <div className="highest-performer-child">
+              <LabelledValue label={"Highest performer"}
+                icon={
                   <TokenIcon
                     token={`f${activeTokenPerformance[0].token}` as Token}
                   />
-                  {`f${activeTokenPerformance[0].token}` as Token}
-                </div>
+                }
+              >
+                {`f${activeTokenPerformance[0].token}` as Token}
               </LabelledValue>
             </div>
           )}
@@ -672,20 +673,28 @@ export default function Rewards() {
 
           {hasRewarders && (
             <div className="statistics-set">
-              <LabelledValue label={"Highest Reward Distribution"}>
-                <div className="highest-performer-child">
+              <LabelledValue
+                label={"Highest Reward Distribution"}
+                icon={
                   <ProviderIcon provider={rewarders[0]?.name as Provider} />
-                  {rewarders[0]?.name === "Fluidity"
-                    ? "Transacting ƒAssets"
-                    : rewarders[0]?.name}
-                </div>
+                }
+              >
+                {rewarders[0]?.name === "Fluidity"
+                  ? "Transacting ƒAssets"
+                  : rewarders[0]?.name}
               </LabelledValue>
               <HoverButton
                 size="medium"
                 hoverComp={
                   <>
-                    <ProviderIcon provider={rewarders[0]?.name} className="hover-provider-icon"/>
-                    <Display size="xxxs" style={{whiteSpace: 'nowrap', marginBottom: 12}}>
+                    <ProviderIcon
+                      provider={rewarders[0]?.name}
+                      className="hover-provider-icon"
+                    />
+                    <Display
+                      size="xxxs"
+                      style={{ whiteSpace: "nowrap", marginBottom: 12 }}
+                    >
                       {rewarders[0]?.name === "Fluidity"
                         ? "Transacting ƒAssets"
                         : rewarders[0]?.name}
@@ -694,7 +703,7 @@ export default function Rewards() {
                       Fluidity wraps assets into fluid assets and generates
                       yield every time fluid assets are used.
                     </Text>
-                    <div className="hover-prizes" style={{marginTop: 12}}>
+                    <div className="hover-prizes" style={{ marginTop: 12 }}>
                       <div className="hover-prize-value">
                         <Text prominent>
                           {numberToMonetaryString(rewarders[0].avgPrize)}
