@@ -1,4 +1,4 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 import type { LoaderFunction } from "@remix-run/node";
 import type { Rewarders } from "~/util/rewardAggregates";
 
@@ -40,11 +40,36 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     const mainnetId = 0;
-    const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+    const prizePoolPromise: Promise<number> = (() => {
+      switch (chainType(network)) {
+        case "evm": {
+          const ethInfuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
 
-    const provider = new JsonRpcProvider(infuraRpc);
+          const ethProvider = new JsonRpcProvider(ethInfuraRpc);
 
-    const rewardPoolAddr = config.contract.prize_pool[network];
+          const ethRewardPoolAddr =
+            config.contract.prize_pool["ethereum"] ?? "";
+
+          const arbInfuraRpc = config.drivers["arbitrum"][mainnetId].rpc.http;
+
+          const arbProvider = new JsonRpcProvider(arbInfuraRpc);
+
+          const arbRewardPoolAddr =
+            config.contract.prize_pool["arbitrum"] ?? "";
+
+          return Promise.resolve(
+            Promise.all([
+              getTotalPrizePool(ethProvider, ethRewardPoolAddr, RewardAbi),
+              getTotalPrizePool(arbProvider, arbRewardPoolAddr, RewardAbi),
+            ]).then((prizePools) =>
+              prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
+            )
+          );
+        }
+        default:
+          return Promise.resolve(0);
+      }
+    })();
 
     const { tokens } = config.config[network];
 
@@ -65,7 +90,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       { data: rewardsData, errors: rewardsErr },
       { data: appRewardData, errors: appRewardErrors },
     ] = await Promise.all([
-      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      prizePoolPromise,
       address
         ? useUserYieldByAddress(network, address)
         : useUserYieldAll(network),

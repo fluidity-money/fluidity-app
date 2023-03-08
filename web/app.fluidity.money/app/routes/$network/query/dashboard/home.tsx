@@ -1,4 +1,4 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 import type { Volume } from "../volumeStats";
 import type { TimeSepUserYield } from "~/queries/useUserYield";
 
@@ -31,11 +31,35 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const timestamp = new Date().getTime();
 
   const mainnetId = 0;
-  const infuraRpc = config.drivers[network][mainnetId].rpc.http;
 
-  const provider = new JsonRpcProvider(infuraRpc);
+  const prizePoolPromise: Promise<number> = (() => {
+    switch (chainType(network)) {
+      case "evm": {
+        const ethInfuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
 
-  const rewardPoolAddr = config.contract.prize_pool[network] ?? "";
+        const ethProvider = new JsonRpcProvider(ethInfuraRpc);
+
+        const ethRewardPoolAddr = config.contract.prize_pool["ethereum"] ?? "";
+
+        const arbInfuraRpc = config.drivers["arbitrum"][mainnetId].rpc.http;
+
+        const arbProvider = new JsonRpcProvider(arbInfuraRpc);
+
+        const arbRewardPoolAddr = config.contract.prize_pool["arbitrum"] ?? "";
+
+        return Promise.resolve(
+          Promise.all([
+            getTotalPrizePool(ethProvider, ethRewardPoolAddr, RewardAbi),
+            getTotalPrizePool(arbProvider, arbRewardPoolAddr, RewardAbi),
+          ]).then((prizePools) =>
+            prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
+          )
+        );
+      }
+      default:
+        return Promise.resolve(0);
+    }
+  })();
 
   try {
     const [
@@ -43,7 +67,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       { volume },
       { data: rewardsData, errors: rewardsErr },
     ] = await Promise.all([
-      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      prizePoolPromise,
       address
         ? jsonGet<{ address: string }, { volume: Volume[] }>(
           `${url.origin}/${network}/query/volumeStats`,

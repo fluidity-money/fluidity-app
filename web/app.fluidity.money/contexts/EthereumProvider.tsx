@@ -273,9 +273,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
       : undefined;
   };
 
@@ -319,7 +319,7 @@ const EthereumFacade = ({
   };
 
   /**
-   * getPrizePool attempts to watch asset.
+   * addToken attempts to watch asset.
    *
    * Will fail on non-Metamask compliant wallets.
    */
@@ -338,18 +338,6 @@ const EthereumFacade = ({
     };
 
     return connector?.watchAsset?.(watchToken);
-  };
-
-  // getPrizePool returns total prize pool.
-  const getPrizePool = async (): Promise<number> => {
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return 0;
-    }
-    const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
-
-    return getTotalPrizePool(signer.provider, rewardPoolAddr, RewardPoolAbi);
   };
 
   // getFluidTokens returns FLUID tokens user holds.
@@ -399,7 +387,6 @@ const EthereumFacade = ({
         amountMinted,
         balance: getBalance,
         tokens: getFluidTokens,
-        prizePool: getPrizePool,
         disconnect: deactivate,
         useConnectorType,
         rawAddress: account ?? "",
