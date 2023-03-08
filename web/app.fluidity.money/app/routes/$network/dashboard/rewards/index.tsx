@@ -33,6 +33,8 @@ import {
   TokenIcon,
   Provider,
   Token,
+  CardCarousel,
+  Display,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -533,19 +535,72 @@ export default function Rewards() {
 
   return (
     <div className="pad-main">
-      {/* Info Cards */}
-      {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
-        <UserRewards
-          claimNow={false}
-          unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={activeYield}
-          network={network}
-        />
-      ) : (
-        <NoUserRewards 
-          prizePool={totalPrizePool}
-        />
-      )}
+      <div className="reward-ctas">
+        {/* Info Cards */}
+        {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
+          <UserRewards
+            claimNow={false}
+            unclaimedRewards={userUnclaimedRewards}
+            claimedRewards={activeYield}
+            network={network}
+          />
+        ) : (
+          <NoUserRewards prizePool={totalPrizePool} />
+        )}
+
+        <CardCarousel>
+          <CardCarousel.Slide>
+            <div className="rewards-cta-providers">
+              <a
+                onClick={(e) => {
+                  e?.stopPropagation();
+                  // addToken?.('fUSDC');
+                }}
+              >
+                {/* <BloomEffect type="static" color={"red"} width={80} /> */}
+                <ProviderIcon provider="Fluidity" />
+              </a>
+              <a href="https://app.1inch.io/#/1/simple/swap/ETH/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/import-token">
+                {/* <BloomEffect type="static" color={"red"} width={80} /> */}
+                <ProviderIcon provider="Oneinch" />
+              </a>
+              <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+                <ProviderIcon provider="Sushiswap" />
+              </a>
+              <a href="https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest">
+                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+                <ProviderIcon provider="Balancer" />
+              </a>
+            </div>
+            <Display size="xxxs">Spend To Earn</Display>
+            <Text>Use Fluid Assets to generate yield.</Text>
+          </CardCarousel.Slide>
+          <CardCarousel.Slide>
+            <div className={"rewards-cta-providers"}>
+              <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+                <ProviderIcon provider="Sushiswap" />
+              </a>
+              <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
+                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+                <ProviderIcon provider="Uniswap" />
+              </a>
+              <a href="#">
+                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+                <ProviderIcon provider="Multichain" />
+              </a>
+              <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
+                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+                <ProviderIcon provider="Dodo" />
+              </a>
+            </div>
+            <Display size="xxxs">Swap To Earn</Display>
+            <Text>Swap Fluid Assets to generate yield.</Text>
+          </CardCarousel.Slide>
+        </CardCarousel>
+      </div>
+
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
           {activeTableFilterIndex ? "My" : "Global"} Reward Performance
@@ -571,7 +626,7 @@ export default function Rewards() {
 
       {/* Reward Performance */}
       <section id="performance">
-        <div style={{ marginBottom: "12px" }}> 
+        <div style={{ marginBottom: "12px" }}>
           <Text>
             {isFirstLoad || !timestamp
               ? "Loading data..."
@@ -591,7 +646,9 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue label={"Highest performer"}>
                 <div className="highest-performer-child">
-                  <TokenIcon token={`f${activeTokenPerformance[0].token}` as Token} />
+                  <TokenIcon
+                    token={`f${activeTokenPerformance[0].token}` as Token}
+                  />
                   {`f${activeTokenPerformance[0].token}` as Token}
                 </div>
               </LabelledValue>
@@ -623,29 +680,39 @@ export default function Rewards() {
                     : rewarders[0]?.name}
                 </div>
               </LabelledValue>
-              <HoverButton size="medium" hoverComp={
-                <>
-                  <ProviderIcon provider={rewarders[0]?.name} />
-                  <section>
-                    <Heading as="h5">
-                      {rewarders[0]?.name === "Fluidity"
-                        ? "Transacting ƒAssets"
-                        : rewarders[0]?.name}
-                    </Heading>
-                    <Text>Fluidity wraps assets into fluid assets and generates yield every time fluid assets are used</Text>
-                  </section>
-                  <section>
-                    <div>
-                      <Text prominent>{numberToMonetaryString(rewarders[0].avgPrize)}</Text>
-                      <Text>Avg prize/trans</Text>
-                    </div>
-                    <div>
-                      <Text prominent>{numberToMonetaryString(rewarders[0].prize)}</Text>
-                      <Text>Top prize</Text>
-                    </div>
-                  </section>
-                </>
-              }>
+              <HoverButton
+                size="medium"
+                hoverComp={
+                  <>
+                    <ProviderIcon provider={rewarders[0]?.name} />
+                    <section>
+                      <Heading as="h5">
+                        {rewarders[0]?.name === "Fluidity"
+                          ? "Transacting ƒAssets"
+                          : rewarders[0]?.name}
+                      </Heading>
+                      <Text>
+                        Fluidity wraps assets into fluid assets and generates
+                        yield every time fluid assets are used
+                      </Text>
+                    </section>
+                    <section>
+                      <div>
+                        <Text prominent>
+                          {numberToMonetaryString(rewarders[0].avgPrize)}
+                        </Text>
+                        <Text>Avg prize/trans</Text>
+                      </div>
+                      <div>
+                        <Text prominent>
+                          {numberToMonetaryString(rewarders[0].prize)}
+                        </Text>
+                        <Text>Top prize</Text>
+                      </div>
+                    </section>
+                  </>
+                }
+              >
                 Hover for Details
               </HoverButton>
             </div>
