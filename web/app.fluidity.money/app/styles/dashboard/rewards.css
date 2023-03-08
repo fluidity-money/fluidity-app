@@ -278,3 +278,18 @@
   left: auto;
   right: 0;
 }
+
+.hover-prizes {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.hover-prize-value {
+  display: flex;
+  flex-direction: column;
+}
+
+.hover-provider-icon {
+  width: 3em;
+}

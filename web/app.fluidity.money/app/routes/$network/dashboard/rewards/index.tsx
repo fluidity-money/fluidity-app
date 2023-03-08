@@ -684,32 +684,30 @@ export default function Rewards() {
                 size="medium"
                 hoverComp={
                   <>
-                    <ProviderIcon provider={rewarders[0]?.name} />
-                    <section>
-                      <Heading as="h5">
-                        {rewarders[0]?.name === "Fluidity"
-                          ? "Transacting ƒAssets"
-                          : rewarders[0]?.name}
-                      </Heading>
-                      <Text>
-                        Fluidity wraps assets into fluid assets and generates
-                        yield every time fluid assets are used
-                      </Text>
-                    </section>
-                    <section>
-                      <div>
+                    <ProviderIcon provider={rewarders[0]?.name} className="hover-provider-icon"/>
+                    <Display size="xxxs" style={{whiteSpace: 'nowrap', marginBottom: 12}}>
+                      {rewarders[0]?.name === "Fluidity"
+                        ? "Transacting ƒAssets"
+                        : rewarders[0]?.name}
+                    </Display>
+                    <Text>
+                      Fluidity wraps assets into fluid assets and generates
+                      yield every time fluid assets are used.
+                    </Text>
+                    <div className="hover-prizes" style={{marginTop: 12}}>
+                      <div className="hover-prize-value">
                         <Text prominent>
                           {numberToMonetaryString(rewarders[0].avgPrize)}
                         </Text>
                         <Text>Avg prize/trans</Text>
                       </div>
-                      <div>
+                      <div className="hover-prize-value">
                         <Text prominent>
                           {numberToMonetaryString(rewarders[0].prize)}
                         </Text>
                         <Text>Top prize</Text>
                       </div>
-                    </section>
+                    </div>
                   </>
                 }
               >
