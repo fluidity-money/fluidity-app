@@ -46,14 +46,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
       address
         ? jsonGet<{ address: string }, { volume: Volume[] }>(
-          `${url.origin}/${network}/query/volumeStats`,
-          {
-            address,
-          }
-        )
+            `${url.origin}/${network}/query/volumeStats`,
+            {
+              address,
+            }
+          )
         : jsonGet<Record<string, never>, { volume: Volume[] }>(
-          `${url.origin}/${network}/query/volumeStats`
-        ),
+            `${url.origin}/${network}/query/volumeStats`
+          ),
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),
