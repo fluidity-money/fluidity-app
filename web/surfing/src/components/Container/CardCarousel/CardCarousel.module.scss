@@ -19,7 +19,8 @@
   }
 
   .arrow {
-    background-color: map-get($bg, "default");
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     cursor: pointer;
     border-radius: 100px;
     width: 2em;
