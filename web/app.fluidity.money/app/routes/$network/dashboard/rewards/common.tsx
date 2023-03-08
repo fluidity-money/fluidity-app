@@ -32,51 +32,50 @@ const UserRewards = ({
   return (
     <>
       {/* Info card*/}
-      <Card rounded type="holobox" style={{ padding: "2em" }}>
-        <div className="unclaimed-inner">
-          <section id="unclaimed-left">
-            {/* Icon */}
-            <img
-              id="card-logo"
-              src="/images/fluidTokensMetallicCropped.svg"
-              alt="tokens"
-              style={{ width: 200 }}
-            />
-          </section>
+      <Card rounded type="holobox" className="unclaimed-rewards">
+        <div id="unclaimed-left">
+          {/* Icon */}
+          <img
+            id="card-logo"
+            src="/images/fluidTokensMetallicCropped.svg"
+            alt="tokens"
+            style={{ width: 200 }}
+          />
 
           {/* Unclaimed fluid rewards */}
-          <section id="unclaimed">
-            <Text size="md">Unclaimed fluid rewards</Text>
+          <div id="unclaimed">
+            <Text size="sm" style={{whiteSpace: 'nowrap'}}>Unclaimed fluid rewards</Text>
             <Display className="unclaimed-total" size={"sm"}>
               {numberToMonetaryString(unclaimedRewards)}
             </Display>
             {!claimNow && (
               <GeneralButton
-                size={"large"}
+                size={"medium"}
                 version={"primary"}
                 buttontype="text"
                 handleClick={onClick}
                 className="view-breakdown-button"
+                style={{whiteSpace: 'nowrap'}}
               >
                 View Breakdown
               </GeneralButton>
             )
           }
-          </section>
+          </div>
+        </div>
 
-          {/* Auto-claims infobox */}
-          <section id="infobox">
-            <Heading className="claims-title" as="h5">
-              Auto-claims
-            </Heading>
+        {/* Auto-claims infobox */}
+        <div id="infobox">
+          <Heading className="claims-title" as="h5">
+            Auto-claims
+          </Heading>
 
-            <Text size={"xs"}>
-              Rewards will be claimed automatically without fees when market
-              volume is reached. Claiming before this, time will incur
-              instant-claim fees stated below.
-              <br />
-            </Text>
-          </section>
+          <Text size={"xs"}>
+            Rewards will be claimed automatically without fees when market
+            volume is reached. Claiming before this, time will incur
+            instant-claim fees stated below.
+            <br />
+          </Text>
         </div>
       </Card>
 

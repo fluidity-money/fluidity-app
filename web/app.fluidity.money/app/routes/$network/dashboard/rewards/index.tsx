@@ -143,6 +143,60 @@ const SAFE_DEFAULT_UNCLAIMED: UnclaimedRewardsLoaderData = {
   loaded: false,
 };
 
+const SpendToEarnCTA = () => {
+  return <CardCarousel>
+  <CardCarousel.Slide>
+    <div className="rewards-cta-providers">
+      <a
+        onClick={(e) => {
+          e?.stopPropagation();
+          // addToken?.('fUSDC');
+        }}
+      >
+        {/* <BloomEffect type="static" color={"red"} width={80} /> */}
+        <ProviderIcon provider="Fluidity" />
+      </a>
+      <a href="https://app.1inch.io/#/1/simple/swap/ETH/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/import-token">
+        {/* <BloomEffect type="static" color={"red"} width={80} /> */}
+        <ProviderIcon provider="Oneinch" />
+      </a>
+      <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+        {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+        <ProviderIcon provider="Sushiswap" />
+      </a>
+      <a href="https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest">
+        {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+        <ProviderIcon provider="Balancer" />
+      </a>
+    </div>
+    <Display size="xxxs">Spend To Earn</Display>
+    <Text>Use Fluid Assets to generate yield.</Text>
+  </CardCarousel.Slide>
+  <CardCarousel.Slide>
+    <div className={"rewards-cta-providers"}>
+      <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+        {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+        <ProviderIcon provider="Sushiswap" />
+      </a>
+      <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
+        {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+        <ProviderIcon provider="Uniswap" />
+      </a>
+      <a href="#">
+        {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+        <ProviderIcon provider="Multichain" />
+      </a>
+      <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
+        {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+        <ProviderIcon provider="Dodo" />
+      </a>
+    </div>
+    <Display size="xxxs">Swap To Earn</Display>
+    <Text>Swap Fluid Assets to generate yield.</Text>
+  </CardCarousel.Slide>
+</CardCarousel>
+}
+
 export default function Rewards() {
   const { network, page, colors } = useLoaderData<LoaderData>();
 
@@ -535,15 +589,18 @@ export default function Rewards() {
 
   return (
     <div className="pad-main">
-      <div style={{ marginBottom: "12px" }}>
+
+      {/* Loading State */}
+      <div style={{ marginBottom: "18px" }}>
         <Text>
           {isFirstLoad || !timestamp
             ? "Loading data..."
             : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
         </Text>
       </div>
+
+      {/* Info Cards */}
       <div className="reward-ctas">
-        {/* Info Cards */}
         {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
           <UserRewards
             claimNow={false}
@@ -552,64 +609,16 @@ export default function Rewards() {
             network={network}
           />
         ) : (
-          <NoUserRewards prizePool={totalPrizePool} />
+          <>
+            <NoUserRewards prizePool={totalPrizePool} />
+            <SpendToEarnCTA />
+          </>
         )}
-
-        <CardCarousel>
-          <CardCarousel.Slide>
-            <div className="rewards-cta-providers">
-              <a
-                onClick={(e) => {
-                  e?.stopPropagation();
-                  // addToken?.('fUSDC');
-                }}
-              >
-                {/* <BloomEffect type="static" color={"red"} width={80} /> */}
-                <ProviderIcon provider="Fluidity" />
-              </a>
-              <a href="https://app.1inch.io/#/1/simple/swap/ETH/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/import-token">
-                {/* <BloomEffect type="static" color={"red"} width={80} /> */}
-                <ProviderIcon provider="Oneinch" />
-              </a>
-              <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
-                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-                <ProviderIcon provider="Sushiswap" />
-              </a>
-              <a href="https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest">
-                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-                <ProviderIcon provider="Balancer" />
-              </a>
-            </div>
-            <Display size="xxxs">Spend To Earn</Display>
-            <Text>Use Fluid Assets to generate yield.</Text>
-          </CardCarousel.Slide>
-          <CardCarousel.Slide>
-            <div className={"rewards-cta-providers"}>
-              <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
-                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-                <ProviderIcon provider="Sushiswap" />
-              </a>
-              <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
-                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-                <ProviderIcon provider="Uniswap" />
-              </a>
-              <a href="#">
-                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-                <ProviderIcon provider="Multichain" />
-              </a>
-              <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
-                {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-                <ProviderIcon provider="Dodo" />
-              </a>
-            </div>
-            <Display size="xxxs">Swap To Earn</Display>
-            <Text>Swap Fluid Assets to generate yield.</Text>
-          </CardCarousel.Slide>
-        </CardCarousel>
       </div>
 
+      {/* Heading & Filters */}
       <div className="reward-ceiling">
-        <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
+        <Heading  className="reward-performance" as={mobileView ? "h3" : "h2"}>
           {activeTableFilterIndex ? "My" : "Global"} Reward Performance
         </Heading>
 

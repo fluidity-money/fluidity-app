@@ -9,29 +9,37 @@
   margin-bottom: 3em;
 }
 
-#infobox {
-  padding: 1.5em;
-  width: 90%;
-  justify-self: flex-end;
-}
-
 #infobox > h5 {
   margin: 0;
 }
 
+.unclaimed-rewards {
+  flex-direction: row;
+  gap: 6em;
+  padding: 2em;
+  width: calc(100% - 4em);
+  max-width: 1200px;
+}
+
+#infobox {
+  min-width: 200px;
+  max-width: 450px;
+}
+
 #unclaimed {
+  flex-grow: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.5em;
-  padding: 2em 1.5em;
 }
 
 #unclaimed-left {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 2em;
 }
 
 #unclaimed-left > h1 {
@@ -112,12 +120,6 @@
   background: linear-gradient(to right, black, white, white, black);
 }
 
-.unclaimed-inner {
-  display: grid;
-  gap: 4em;
-  grid-template-columns: 1.5fr 1fr;
-}
-
 .rewards-carousel {
   margin-left: -30px;
   margin-bottom: 50px;
@@ -135,10 +137,17 @@
     gap: 0;
   }
 
+  .unclaimed-rewards {
+    flex-direction: column;
+    align-items: center;
+    gap: 2em;
+    padding: 2em;
+  }
 
   #unclaimed-left {
     display: flex;
     justify-content: center;
+    gap: 1em;
   }
 
   #infobox {
@@ -207,6 +216,15 @@
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
+  column-gap: 2em;
+  row-gap: 1em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.reward-ceiling > h2,
+.reward-ceiling > h3 {
+  margin: 0;
 }
 
 .filter-row {
