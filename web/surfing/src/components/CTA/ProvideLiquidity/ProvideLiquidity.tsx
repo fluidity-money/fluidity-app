@@ -1,10 +1,19 @@
-import { Card, Heading, Text, BloomEffect, TokenIcon, ArrowDown, ProviderIcon } from "../..";
+
+import {
+  Card,
+  Heading,
+  Text,
+  BloomEffect,
+  TokenIcon,
+  ArrowDown,
+  ProviderIcon,
+} from "~/components";
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { useClickOutside } from "~/util";
 import { Provider, Token } from "~/types";
 
-import styles from './ProvideLiquidity.module.scss'
+import styles from "./ProvideLiquidity.module.scss";
 
 type TokenType = {
   symbol: Token;
@@ -31,8 +40,8 @@ const child = {
 type AugmentedProvider = {
   name: Provider;
   link: {
-    fUSDC: string;
-    fUSDT: string;
+    fUSDC?: string;
+    fUSDT?: string;
     fTUSD?: string;
     fFRAX?: string;
     fDAI?: string;
@@ -42,9 +51,9 @@ type AugmentedProvider = {
 interface IProvideLiquidity {
   provider: {
     [x: string]: {
-        providers: AugmentedProvider[];
+      providers: AugmentedProvider[];
     };
-}
+  };
   network: string;
   tokensConfig: {
     [x: string]: {
@@ -61,11 +70,11 @@ interface IProvideLiquidity {
             userMintLimit?: number;
         }[];
     };
-}
+  };
 }
 
 const ProvideLiquidity = (props: IProvideLiquidity) => {
-  const { provider, network, tokensConfig } = props
+  const { provider, network, tokensConfig } = props;
 
   // type for TOML type
   type FluidTokens = "fUSDC" | "fUSDT" | "fTUSD" | "fFRAX" | "fDAI";
@@ -81,29 +90,28 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
     network === "ethereum"
       ? provider["ethereum"].providers
       : network === "solana"
-      ? provider["solana"].providers
-      : provider["arbitrum"].providers;
+        ? provider["solana"].providers
+        : provider["arbitrum"].providers;
 
-  const liqidityProviders = (
+  const LiquidityProviders = () => (
     <div className={styles["liquidity-providers"]}>
-      {providers.map((provider: AugmentedProvider) => (
-        <motion.a
-          key={provider.name}
-          href={provider.link[poolToken.symbol as FluidTokens]}
-          rel="noopener noreferrer"
-          target="_blank"
-          variants={parent}
-          initial="variantA"
-          whileHover="variantB"
-        >
-          <motion.div
-            variants={child}
-            style={{ width: 72, height: 72 }}
+      {providers
+        .filter((provider) => !!provider.link[poolToken.symbol as FluidTokens])
+        .map((provider: AugmentedProvider) => (
+          <motion.a
+            key={provider.name}
+            href={provider.link[poolToken.symbol as FluidTokens]}
+            rel="noopener noreferrer"
+            target="_blank"
+            variants={parent}
+            initial="variantA"
+            whileHover="variantB"
           >
-            <ProviderIcon provider={provider.name}/>
-          </motion.div>
-        </motion.a>
-      ))}
+            <motion.div variants={child} style={{ width: 72, height: 72 }}>
+              <ProviderIcon provider={provider.name} />
+            </motion.div>
+          </motion.a>
+        ))}
     </div>
   );
 
@@ -114,7 +122,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
     setTimeout(() => setOpenDropdown(false), 200)
   );
 
-  const dropdownOptions = (
+  const DropdownOptions = () => (
     <div className={styles["dropdown-options"]}>
       <ul>
         {fluidTokens.map((option: TokenType) => (
@@ -130,9 +138,9 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
               </Text>
               <div
                 style={{
-                height: 32,
-                width: 32,
-              }}
+                  height: 32,
+                  width: 32,
+                }}
               >
                 <TokenIcon token={option.symbol}/>
               </div>
@@ -144,51 +152,47 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   );
 
   return (
-    <Card
-      className={styles.ProvideLiquidity}
-      rounded
-      type={"holobox"}
-    >
-        <section className={styles['provide-liquidity-left']}>
-          <Heading as="h2" className={styles["provide-heading"]}>
-            Provide Liquidity for{" "}
-            <button
-              ref={dropdownRef}
-              className={styles["open-provider-dropdown"]}
-              onClick={() => {
-                setOpenDropdown(!openDropdown);
-              }}
-            >
-              <Heading as="h1" className={styles["fluid-liquidity-token"]}>
-                {`ƒ${poolToken.symbol?.slice(1)}`}
-              </Heading>
-              <ArrowDown width={18} fill={'white'}/>
-              {openDropdown && dropdownOptions}
-            </button>
-          </Heading>
-          
-          {liqidityProviders}
+    <Card className={styles.ProvideLiquidity} rounded type={"holobox"}>
+      <section className={styles["provide-liquidity-left"]}>
+        <Heading as="h2" className={styles["provide-heading"]}>
+          Provide Liquidity for{" "}
+          <button
+            ref={dropdownRef}
+            className={styles["open-provider-dropdown"]}
+            onClick={() => {
+              setOpenDropdown(!openDropdown);
+            }}
+          >
+            <Heading as="h1" className={styles["fluid-liquidity-token"]}>
+              {`ƒ${poolToken.symbol?.slice(1)}`}
+            </Heading>
+            <ArrowDown width={18} fill={"white"} />
+            {openDropdown && <DropdownOptions />}
+          </button>
+        </Heading>
 
-          <Text size="lg">
-            Make your assets work harder for your rewards. Get involved.
-          </Text>
-        </section>
-        <section className={styles["provide-liquidity-right"]}>
-          <div className={styles["provide-liquidity-right-images"]}>
-            <BloomEffect color={poolToken.colour} type={"static"} />
-            <span className={styles["dashed-circle"]}></span>
-            <div
-              style={{
-                height: 110,
-                width: 110,
-                position: "absolute",
-                transform: "translate(41%, 41%)",
-              }}
-            >
-              <TokenIcon token={poolToken.symbol} />
-            </div>
+        <LiquidityProviders />
+
+        <Text size="lg">
+          Make your assets work harder for your rewards. Get involved.
+        </Text>
+      </section>
+      <section className={styles["provide-liquidity-right"]}>
+        <div className={styles["provide-liquidity-right-images"]}>
+          <BloomEffect color={poolToken.colour} type={"static"} />
+          <span className={styles["dashed-circle"]}></span>
+          <div
+            style={{
+              height: 110,
+              width: 110,
+              position: "absolute",
+              transform: "translate(41%, 41%)",
+            }}
+          >
+            <TokenIcon token={poolToken.symbol} />
           </div>
-        </section>
+        </div>
+      </section>
     </Card>
   );
 };

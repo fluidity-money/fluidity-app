@@ -29,10 +29,11 @@ export type RewardsLoaderData = {
   networkFee: number;
   gasFee: number;
   timestamp: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const network = params.network ?? "";
+  const network = (params.network ?? "") as Chain;
   const fluidPairs = config.config[network ?? ""].fluidAssets.length;
 
   const networkFee = 0.002;
@@ -43,11 +44,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     const mainnetId = 0;
-    const infuraRpc = config.drivers["ethereum"][mainnetId].rpc.http;
+    const infuraRpc = config.drivers[network][mainnetId].rpc.http;
 
     const provider = new JsonRpcProvider(infuraRpc);
 
-    const rewardPoolAddr = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0";
+    const rewardPoolAddr = config.contract.prize_pool[network];
 
     const { tokens } = config.config[network];
 
@@ -55,10 +56,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (map, token) =>
         token.isFluidOf
           ? {
-              ...map,
-              [token.symbol]: token.address,
-              [token.symbol.slice(1)]: token.address,
-            }
+            ...map,
+            [token.symbol]: token.address,
+            [token.symbol.slice(1)]: token.address,
+          }
           : map,
       {}
     );
@@ -104,7 +105,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       gasFee,
       tokenPerformance,
       timestamp: new Date().getTime(),
-    } as RewardsLoaderData);
+      loaded: true,
+    } satisfies RewardsLoaderData);
   } catch (err) {
     throw new Error(`Could not fetch Rewards on ${network}: ${err}`);
   } // Fail silently - for now.

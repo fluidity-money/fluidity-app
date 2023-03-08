@@ -101,8 +101,10 @@ const queryByAddress: Queryable = {
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
-          sender_address: { _eq: $address }
-          _or: { recipient_address: { _eq: $address } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
         }
         order_by: { time: desc }
         limit: $limit
@@ -203,11 +205,10 @@ const queryByTxHash: Queryable = {
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
-          transaction_hash: { in: $transactions }
+          transaction_hash: { _in: $transactions }
         }
         order_by: { time: desc }
         limit: $limit
-        offset: $offset
       ) {
         sender_address
         recipient_address
@@ -432,9 +433,11 @@ const useUserTransactionsByAddress = async (
   if (network === "arbitrum" && result.data) {
     const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data
       .transfers;
-    result.data[network].transfers = hasuraTransfers.map((transfer) => {
+
+    const arbParsedTransfers = hasuraTransfers.map((transfer) => {
       let senderAddress = "";
       let recipientAddress = "";
+
       // only senderAddress is defined by user actions
       switch (transfer.type) {
         case "send":
@@ -464,6 +467,14 @@ const useUserTransactionsByAddress = async (
         block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
       };
     });
+
+    return {
+      data: {
+        [network]: {
+          transfers: arbParsedTransfers,
+        },
+      },
+    };
   }
 
   return result;
@@ -475,7 +486,7 @@ const useUserTransactionsByTxHash = async (
   filterHashes: string[],
   tokens: string[],
   limit = 12
-) => {
+): Promise<UserTransactionsRes> => {
   const variables = {
     transactions,
     filterHashes,
@@ -502,10 +513,12 @@ const useUserTransactionsByTxHash = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
-    const hasuraTransfers = (result as unknown as HasuraUserTransactionRes).data
-      .transfers;
-    result.data[network].transfers = hasuraTransfers.map((transfer) => {
+  if (network === "arbitrum" && !!result.data) {
+    const {
+      data: { transfers: hasuraTransfers },
+    } = result as unknown as HasuraUserTransactionRes;
+
+    const arbParsedTransfers = hasuraTransfers.map((transfer) => {
       let senderAddress = "";
       let recipientAddress = "";
       // only senderAddress is defined by user actions
@@ -537,6 +550,17 @@ const useUserTransactionsByTxHash = async (
         block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
       };
     });
+
+    return {
+      ...result,
+      data: {
+        ...result.data,
+        arbitrum: {
+          ...result.data.arbitrum,
+          transfers: arbParsedTransfers,
+        },
+      },
+    };
   }
 
   return result;

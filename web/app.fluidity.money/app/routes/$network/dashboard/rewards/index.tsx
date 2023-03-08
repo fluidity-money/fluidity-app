@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { NoUserRewards, UserRewards } from "./common";
+import { UserRewards, NoUserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { MintAddress } from "~/types/MintAddress";
 import {
@@ -26,12 +26,12 @@ import {
   trimAddress,
   LinkButton,
   useViewport,
-  HoverButton,
   LabelledValue,
   ProviderIcon,
   ProviderCard,
+  HoverButton,
   TokenIcon,
-  Provider, 
+  Provider,
   Token,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
@@ -70,8 +70,8 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary(error) {
-  console.log(error)
+function ErrorBoundary(error: Error) {
+  console.error(error);
   return (
     <div
       className="pad-main"
@@ -91,18 +91,17 @@ function ErrorBoundary(error) {
   );
 }
 
-type CacheData = RewardsLoaderData &
-  TransactionsLoaderData &
-  Partial<UnclaimedRewardsLoaderData>;
+type CacheData = {
+  rewards: RewardsLoaderData;
+  transactions: TransactionsLoaderData;
+  unclaimed: UnclaimedRewardsLoaderData;
+};
 
-const SAFE_DEFAULT: CacheData = {
+const SAFE_DEFAULT_REWARDS: RewardsLoaderData = {
   // Only used in Rewards
-  count: 0,
   network: "ethereum",
   fluidTokenMap: {},
-  transactions: [],
   totalPrizePool: 0,
-  page: 0,
   loaded: false,
   fluidPairs: 0,
   networkFee: 0,
@@ -129,6 +128,19 @@ const SAFE_DEFAULT: CacheData = {
   },
 };
 
+const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
+  count: 0,
+  page: 0,
+  loaded: false,
+  transactions: [],
+};
+
+const SAFE_DEFAULT_UNCLAIMED: UnclaimedRewardsLoaderData = {
+  unclaimedTokenAddrs: [],
+  userUnclaimedRewards: 0,
+  loaded: false,
+};
+
 export default function Rewards() {
   const { network, page, colors } = useLoaderData<LoaderData>();
 
@@ -144,11 +156,11 @@ export default function Rewards() {
 
   const { connected, address, tokens } = useContext(FluidityFacadeContext);
 
-  const userRewardsData = useFetcher<RewardsLoaderData>();
+  const userRewardsData = useFetcher();
 
-  const userTransactionsData = useFetcher<TransactionsLoaderData>();
+  const userTransactionsData = useFetcher();
 
-  const userUnclaimedRewardsData = useFetcher<UnclaimedRewardsLoaderData>();
+  const userUnclaimedRewardsData = useFetcher();
 
   useEffect(() => {
     if (!address) return;
@@ -166,20 +178,38 @@ export default function Rewards() {
     );
   }, [address, page]);
 
-  const [userFluidPairs, setUserFluidPairs] = useState(SAFE_DEFAULT.fluidPairs);
+  const [userFluidPairs, setUserFluidPairs] = useState(
+    SAFE_DEFAULT_REWARDS.fluidPairs
+  );
 
-  const data: { user: CacheData; global: CacheData } = {
+  const data: { global: CacheData; user: CacheData } = {
     global: {
-      ...SAFE_DEFAULT,
-      ...rewardsData,
-      ...globalTransactionsData,
+      rewards: {
+        ...SAFE_DEFAULT_REWARDS,
+        ...rewardsData,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...globalTransactionsData,
+      },
+      unclaimed: {
+        ...SAFE_DEFAULT_UNCLAIMED,
+      },
     },
     user: {
-      ...SAFE_DEFAULT,
-      ...userRewardsData.data,
-      ...userTransactionsData.data,
-      ...userUnclaimedRewardsData.data,
-      fluidPairs: userFluidPairs,
+      rewards: {
+        ...SAFE_DEFAULT_REWARDS,
+        ...userRewardsData.data,
+        fluidPairs: userFluidPairs,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...userTransactionsData.data,
+      },
+      unclaimed: {
+        ...SAFE_DEFAULT_UNCLAIMED,
+        ...userUnclaimedRewardsData.data,
+      },
     },
   };
 
@@ -282,43 +312,78 @@ export default function Rewards() {
     totalPrizePool,
     timestamp,
     userUnclaimedRewards,
-    activeTokenPerformance,
+    weeklyRewards,
+    unclaimedTokenAddrs,
+    txLoaded,
     hasTokenPerformance,
+    activeTokenPerformance,
   } = useMemo(() => {
+    const {
+      rewards: rewardsData,
+      transactions: txData,
+      unclaimed,
+    } = activeTableFilterIndex ? data.user : data.global;
+
     const {
       fluidPairs,
       networkFee,
       gasFee,
-      transactions,
       totalPrizePool,
       timestamp,
       rewarders,
+      loaded: rewardsLoaded,
       rewards,
+      tokenPerformance,
+    } = rewardsData;
+
+    const { transactions, loaded: txLoaded } = txData;
+
+    const {
       userUnclaimedRewards,
       unclaimedTokenAddrs,
-      tokenPerformance,
-    } = activeTableFilterIndex ? data.user : data.global;
+      loaded: unclaimedLoaded,
+    } = unclaimed;
+
+    const {
+      week: weeklyYield,
+      month: monthlyYield,
+      year: yearlyYield,
+      all: allYield,
+    } = rewards;
+
+    const {
+      week: weeklyRewards,
+      month: monthlyRewards,
+      year: yearlyRewards,
+      all: allRewards,
+    } = rewarders;
+
+    const {
+      week: weeklyTokenPerformance,
+      month: monthlyTokenPerformance,
+      year: yearlyTokenPerformance,
+      all: allTokenPerformance,
+    } = tokenPerformance
 
     const [activeRewards, activeYield, activeTokenPerformance] = (() => {
       switch (activeRewardFilterIndex) {
         case 1:
-          return [rewarders.week, rewards.week, tokenPerformance.week];
+          return [weeklyRewards, weeklyYield, weeklyTokenPerformance];
         case 2:
-          return [rewarders.month, rewards.month, tokenPerformance.month];
+          return [monthlyRewards, monthlyYield, monthlyTokenPerformance];
         case 3:
-          return [rewarders.year, rewards.year, tokenPerformance.year];
+          return [yearlyRewards, yearlyYield, yearlyTokenPerformance];
         case 0:
         default:
-          return [rewarders.all, rewards.all, tokenPerformance.all];
+          return [allRewards, allYield, allTokenPerformance];
       }
     })();
 
     const hasRewarders = !!activeRewards.length;
-
     const hasTokenPerformance = !!activeTokenPerformance.length;
 
     return {
-      count: rewards.all[0]?.count || 0,
+      count: allYield.length ? allYield[0].count : 0,
       hasRewarders,
       fluidPairs,
       networkFee,
@@ -326,11 +391,14 @@ export default function Rewards() {
       transactions,
       rewarders: activeRewards,
       timestamp,
-      activeYield: activeYield[0]?.total_reward || 0,
+      activeYield: activeYield.length ? activeYield[0].total_reward : 0,
       totalPrizePool,
       userUnclaimedRewards,
       unclaimedTokenAddrs,
-      weeklyRewards: rewarders.week,
+      weeklyRewards,
+      rewardsLoaded,
+      txLoaded,
+      unclaimedLoaded,
       activeTokenPerformance,
       hasTokenPerformance,
     };
@@ -474,9 +542,9 @@ export default function Rewards() {
           network={network}
         />
       ) : (
-        <div>
-          <NoUserRewards prizePool={totalPrizePool} />
-        </div>
+        <NoUserRewards 
+          prizePool={totalPrizePool}
+        />
       )}
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
@@ -503,7 +571,7 @@ export default function Rewards() {
 
       {/* Reward Performance */}
       <section id="performance">
-        <div>
+        <div style={{ marginBottom: "12px" }}> 
           <Text>
             {isFirstLoad || !timestamp
               ? "Loading data..."
@@ -545,45 +613,44 @@ export default function Rewards() {
             </Link>
           </div>
 
-        {hasRewarders && (
-          <div className="statistics-set">
-            <LabelledValue label={"Highest Reward Distribution"}>
-              <div className="highest-performer-child">
-                <ProviderIcon provider={rewarders[0]?.name as Provider} />
-                {rewarders[0]?.name === "Fluidity"
-                  ? "Transacting ƒAssets"
-                  : rewarders[0]?.name}
-              </div>
-            </LabelledValue>
-            <HoverButton size="medium" hoverComp={
-              <>
-                <ProviderIcon provider={rewarders[0]?.name} />
-                <section>
-                  <Heading as="h5">
-                    {rewarders[0]?.name === "Fluidity"
-                      ? "Transacting ƒAssets"
-                      : rewarders[0]?.name}
-                  </Heading>
-                  <Text>Fluidity wraps assets into fluid assets and generates yield every time fluid assets are used</Text>
-                </section>
-                <section>
-                  <div>
-                    <Text prominent>{numberToMonetaryString(rewarders[0].avgPrize)}</Text>
-                    <Text>Avg prize/trans</Text>
-                  </div>
-                  <div>
-                    <Text prominent>{numberToMonetaryString(rewarders[0].prize)}</Text>
-                    <Text>Top prize</Text>
-                  </div>
-                </section>
-              </>
-            }>
-              Hover for Details
-            </HoverButton>
-          </div>
-        )}
+          {hasRewarders && (
+            <div className="statistics-set">
+              <LabelledValue label={"Highest Reward Distribution"}>
+                <div className="highest-performer-child">
+                  <ProviderIcon provider={rewarders[0]?.name as Provider} />
+                  {rewarders[0]?.name === "Fluidity"
+                    ? "Transacting ƒAssets"
+                    : rewarders[0]?.name}
+                </div>
+              </LabelledValue>
+              <HoverButton size="medium" hoverComp={
+                <>
+                  <ProviderIcon provider={rewarders[0]?.name} />
+                  <section>
+                    <Heading as="h5">
+                      {rewarders[0]?.name === "Fluidity"
+                        ? "Transacting ƒAssets"
+                        : rewarders[0]?.name}
+                    </Heading>
+                    <Text>Fluidity wraps assets into fluid assets and generates yield every time fluid assets are used</Text>
+                  </section>
+                  <section>
+                    <div>
+                      <Text prominent>{numberToMonetaryString(rewarders[0].avgPrize)}</Text>
+                      <Text>Avg prize/trans</Text>
+                    </div>
+                    <div>
+                      <Text prominent>{numberToMonetaryString(rewarders[0].prize)}</Text>
+                      <Text>Top prize</Text>
+                    </div>
+                  </section>
+                </>
+              }>
+                Hover for Details
+              </HoverButton>
+            </div>
+          )}
         </div>
-
       </section>
 
       <section id="table">
@@ -600,11 +667,7 @@ export default function Rewards() {
           filters={txTableFilters}
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
-          loaded={
-            activeTableFilterIndex
-              ? userTransactionsData.data?.loaded
-              : globalTransactionsData?.loaded
-          }
+          loaded={txLoaded}
           showLoadingAnimation={true}
         />
       </section>

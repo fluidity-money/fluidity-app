@@ -11,6 +11,7 @@ const providerImgNames: { [K in Provider]: string } = {
   Aave: "aave-aave-logo.png",
   Aldrin: "Aldrin.svg",
   Circle: "circle-icon-inset-300.png",
+  Camelot: "Camelot.svg",
   Compound: "Compound.svg",
   Dodo: "DODO.png",
   Jupiter: "Jupiter.svg",
