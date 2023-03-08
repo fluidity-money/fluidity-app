@@ -18,7 +18,14 @@ const Tooltip = ({
   ...props
 }: ITooltip) => {
   return (
-    <Card style={style} type="frosted" rounded onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <Card 
+      style={style} 
+      type="frosted" 
+      rounded 
+      onMouseEnter={onMouseEnter} 
+      onMouseLeave={onMouseLeave} 
+      className={styles.Tooltip}
+    >
       {children}
     </Card>
   );
