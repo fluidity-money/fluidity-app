@@ -1,0 +1,30 @@
+services:
+  - microservice_ethereum_automatic_payout_release_usdt:
+      SERVICE_NAME: microservice-ethereum-automatic-payout-release-arbitrum-usdt
+      DOCKER_IMAGE: microservice-ethereum-automatic-payout-release
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-automatic-payout-release
+      DEPLOYMENT_TYPE: CRON
+
+      ENV_FLU_WORKER_ID: ethereum-microservice-automatic-payout-release-arbitrum-usdt
+      ENV_FLU_ETHEREUM_NETWORK: arbitrum
+      ENV_FLU_ETHEREUM_TOKEN_NAME: USDT
+      ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 6
+
+      EVENT_ROLE: ecsEventsRole
+      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
+      EVENT_SCHEDULE: cron(30 1 * * ? *) # 1:30utc / 11am acst every day
+
+  - microservice_ethereum_automatic_payout_release_usdc:
+      SERVICE_NAME: microservice-ethereum-automatic-payout-release-arbitrum-usdc
+      DOCKER_IMAGE: microservice-ethereum-automatic-payout-release
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-automatic-payout-release
+      DEPLOYMENT_TYPE: CRON
+
+      ENV_FLU_WORKER_ID: ethereum-microservice-automatic-payout-release-arbitrum-usdc
+      ENV_FLU_ETHEREUM_NETWORK: arbitrum
+      ENV_FLU_ETHEREUM_TOKEN_NAME: USDC
+      ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 6
+
+      EVENT_ROLE: ecsEventsRole
+      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
+      EVENT_SCHEDULE: cron(30 1 * * ? *) # 1:30utc / 11am acst every day
