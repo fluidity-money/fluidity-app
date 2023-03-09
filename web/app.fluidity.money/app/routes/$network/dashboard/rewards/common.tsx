@@ -119,24 +119,21 @@ const NoUserRewards = ({prizePool}: INoUserRewards) => {
   return (
     <Card
       id="no-user-rewards"
-      className="card-outer"
       component="div"
       rounded={true}
-      type={isMobile ? "transparent" : "box"}
+      type={isMobile ? "transparent" : "holobox"}
     >
-      <div className="card-inner unclaimed-inner">
-        <section id="unclaimed-left">
-          <Text>Total Prize Pool</Text>
-          <Display size={"sm"}><strong>{numberToMonetaryString(prizePool)}</strong></Display>
-        </section>
+      <div id="unclaimed-left">
+        <Text>Total Prize Pool</Text>
+        <Display size={"sm"}><strong>{numberToMonetaryString(prizePool)}</strong></Display>
+      </div>
 
-        {/* Auto-claims infobox */}
-        <section id="infobox">
-          <Heading as="h5">No Unclaimed Rewards</Heading>
-          <Text>You currently have no unclaimed rewards</Text>
-          <br/>
-          <Text>Use, Send & Receive Fluid Assets to gain yield</Text>
-        </section>
+      {/* Auto-claims infobox */}
+      <div id="infobox">
+        <Heading as="h5">No Unclaimed Rewards</Heading>
+        <Text>You currently have no unclaimed rewards</Text>
+        <br/>
+        <Text>Use, Send & Receive Fluid Assets to gain yield</Text>
       </div>
     </Card>
   )

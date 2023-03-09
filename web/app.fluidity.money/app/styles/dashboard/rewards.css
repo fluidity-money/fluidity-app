@@ -85,8 +85,20 @@
 
 #no-user-rewards {
   display: flex;
+  padding: 2em;
+  height: calc(100% - 4em);
+  width: calc(100% - 4em);
+  flex-direction: row;
   justify-content: space-between;
-  margin: 6em;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.reward-ctas {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2em;
+  grid-template-rows: max-content;
 }
 
 .row-value {
@@ -154,6 +166,10 @@
     margin-left: 0;
     max-width: 450px;
     justify-self: center;
+  }
+
+  .reward-ctas {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -237,13 +253,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.rewards-ctas {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
 }
 
 .rewards-cta-providers {
