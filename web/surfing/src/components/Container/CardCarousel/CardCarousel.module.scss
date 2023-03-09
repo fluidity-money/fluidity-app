@@ -2,6 +2,7 @@
 
 .CardCarousel {
   position: relative;
+  align-items: center;
 
   .content {
     position: relative;
@@ -80,8 +81,8 @@
     gap: 1em;
 
     .dot {
-      width: 0.4em;
-      height: 0.4em;
+      width: 0.5em;
+      height: 0.5em;
       border-radius: 100px;
       cursor: pointer;
       transition: all 0.3s ease-in-out;
@@ -89,6 +90,39 @@
 
       &.active {
         background-color: white;
+      }
+    }
+  }
+
+  &.compact {
+    .content {
+      width: 350px;
+      height: 120px;
+    }
+
+    .bottomNavbar {
+      position: absolute;
+      bottom: -1.3em;
+      display: flex;
+      flex-direction: row;
+      border: 1px solid map-get($border, "default");
+      border-radius: 100px;
+      height: 2.6em;
+      backdrop-filter: blur(10px);
+      gap: 2em;
+      align-items: center;
+
+      &.box-prominent {
+        border: 1px solid map-get($border, "prominent");
+      }
+
+      .navbar {
+        align-items: center;
+        margin: 0;
+      }
+
+      svg {
+        height: 0.8em;
       }
     }
   }

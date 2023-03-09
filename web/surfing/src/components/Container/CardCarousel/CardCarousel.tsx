@@ -45,16 +45,19 @@ const Slide: React.FC<ISlide> = ({ children }) => {
 
 interface ICardCarousel extends ICard {
   children: ReactElement<ISlide>[];
+  size?: "compact" | "normal"
 }
 
 const CardCarousel: React.FC<ICardCarousel> = ({
   children,
   type="box",
   rounded=true,
+  size="normal",
   ...props
 }) => {
 
   const slides = children.length
+  const isCompact = size === "compact"
 
   const [[slide, direction], setSlide] = useState([0, 0])
 
@@ -64,16 +67,50 @@ const CardCarousel: React.FC<ICardCarousel> = ({
 
   if (slides < 2) return null
 
+  const Navigation = () => (
+    <>
+      <div
+        className={`${!isCompact ? styles.arrow : ''} ${styles[type]}`}
+        onClick={() => {
+          paginate(-1);
+        }}
+      >
+        <CaretLeft />
+      </div>
+      <div className={styles.navbar}>
+        {children.map((_, i) => (
+          <div
+            key={i}
+            className={`${slide === i ? styles.active : ""} ${styles.dot}`}
+            onClick={() => {
+              setSlide([i, i > slide ? 1 : -1]);
+            }}
+          />
+        ))}
+      </div>
+      <div
+        className={`${!isCompact ? styles.arrow : ''} ${styles[type]}`}
+        onClick={() => {
+          paginate(1);
+        }}
+      >
+        <CaretRight />
+      </div>
+    </>
+  );
+
   return (
-    <Card {...props} type={type} rounded={rounded} className={styles.CardCarousel}>
+    <Card
+      {...props}
+      type={type}
+      rounded={rounded}
+      className={`${styles.CardCarousel} ${styles[size]}`}
+    >
       <div className={styles.content}>
-        <AnimatePresence
-          initial={false}
-          custom={direction}
-        >
-          <motion.div 
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div
             className={styles.slide}
-            key={`card-carousel-${slide}`} 
+            key={`card-carousel-${slide}`}
             custom={direction}
             variants={variants}
             initial="enter"
@@ -81,14 +118,14 @@ const CardCarousel: React.FC<ICardCarousel> = ({
             exit="exit"
             transition={{
               x: { type: "spring", stiffness: 350, damping: 30 },
-              opacity: { duration: 0.2 }
+              opacity: { duration: 0.2 },
             }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={1}
             onDragEnd={(e, { offset, velocity }) => {
               const swipe = swipePower(offset.x, velocity.x);
-  
+
               if (swipe < -swipeConfidenceThreshold) {
                 paginate(1);
               } else if (swipe > swipeConfidenceThreshold) {
@@ -96,31 +133,17 @@ const CardCarousel: React.FC<ICardCarousel> = ({
               }
             }}
           >
-            { children[slide] }
+            {children[slide]}
           </motion.div>
         </AnimatePresence>
       </div>
-      <div className={`${styles.arrow} ${styles[type]}`} onClick={() => {
-        paginate(-1)
-      }}>
-        <CaretLeft />
-      </div>
-      <div className={styles.navbar}>
-        {children.map((_, i) => (
-          <div 
-            key={i} 
-            className={`${slide === i ? styles.active : ''} ${styles.dot}`} 
-            onClick={() => {
-              setSlide([i, i > slide ? 1 : -1])
-            }}
-          />
-        ))}
-      </div>
-      <div className={`${styles.arrow} ${styles[type]}`} onClick={() => {
-        paginate(1)
-      }}>
-        <CaretRight />
-      </div>
+      {isCompact ? (
+        <div className={`${styles.bottomNavbar} ${styles[type]}`}>
+          <Navigation />
+        </div>
+      ) : (
+        <Navigation />
+      )}
     </Card>
   );
 };

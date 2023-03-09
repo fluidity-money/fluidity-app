@@ -23,17 +23,16 @@ export const Template = (props) => <CardCarousel {...props}>
     <Story
         name="Card Carousel"
         args={{
-            type: "transparent",
-            rounded: false,
+            type: "box",
         }}
     >
         {Template.bind({})}
     </Story>
     <Story
-        name="Card Carousel w/ Navbar"
+        name="Card Carousel (Compact)"
         args={{
             type: "box-prominent",
-            rounded: true,
+            size: "compact",
         }}
     >
         {Template.bind({})}
