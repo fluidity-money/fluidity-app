@@ -22,17 +22,3 @@ SERVICES:
     ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-spooler-dai
     ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.dai
     ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.dai
-
- - SPOOLER_TUSD:
-    SERVICE_NAME: microservice-arbitrum-worker-spooler-tusd
-    ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-spooler-tusd
-    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.tusd
-    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.tusd
-
- - SPOOLER_FRAX:
-    SERVICE_NAME: microservice-arbitrum-worker-spooler-frax
-    ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-spooler-frax
-    ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.frax
-    ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.frax
-
-
