@@ -49,6 +49,8 @@ interface ICardCarousel extends Partial<ICard> {
 
 const CardCarousel: React.FC<ICardCarousel> = ({
   children,
+  type="box",
+  rounded=true,
   ...props
 }) => {
 
@@ -63,7 +65,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
   if (slides < 2) return null
 
   return (
-    <Card {...props} type="box" rounded className={styles.CardCarousel}>
+    <Card {...props} type={type} rounded={rounded} className={styles.CardCarousel}>
       <div className={styles.content}>
         <AnimatePresence
           initial={false}
