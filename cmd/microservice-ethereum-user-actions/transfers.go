@@ -52,9 +52,9 @@ func handleTransfer(network_ network.BlockchainNetwork, transactionHash ethereum
 		})
 	}
 
-	// from address is empty, must be a swap after-effect! ignore!
+	// transfers from or to the zero address are swaps
 
-	if transfer.SenderAddress == ZeroAddress {
+	if transfer.SenderAddress == ZeroAddress || transfer.RecipientAddress == ZeroAddress {
 		return
 	}
 
