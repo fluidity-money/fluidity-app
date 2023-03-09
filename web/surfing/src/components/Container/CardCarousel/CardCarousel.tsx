@@ -43,7 +43,7 @@ const Slide: React.FC<ISlide> = ({ children }) => {
   )
 }
 
-interface ICardCarousel extends Partial<ICard> {
+interface ICardCarousel extends ICard {
   children: ReactElement<ISlide>[];
 }
 
@@ -100,7 +100,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
           </motion.div>
         </AnimatePresence>
       </div>
-      <div className={styles.arrow} onClick={() => {
+      <div className={`${styles.arrow} ${styles[type]}`} onClick={() => {
         paginate(-1)
       }}>
         <CaretLeft />
@@ -116,7 +116,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
           />
         ))}
       </div>
-      <div className={styles.arrow} onClick={() => {
+      <div className={`${styles.arrow} ${styles[type]}`} onClick={() => {
         paginate(1)
       }}>
         <CaretRight />

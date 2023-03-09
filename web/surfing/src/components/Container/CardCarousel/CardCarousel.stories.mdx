@@ -8,7 +8,7 @@ import { Text } from './../../'
     component={CardCarousel}
 />
 
-export const Template = ({props}) => <CardCarousel {...props}>
+export const Template = (props) => <CardCarousel {...props}>
     <CardCarousel.Slide>
         <Text>Slide 1</Text>
     </CardCarousel.Slide>
@@ -32,7 +32,7 @@ export const Template = ({props}) => <CardCarousel {...props}>
     <Story
         name="Card Carousel w/ Navbar"
         args={{
-            type:"box",
+            type: "box-prominent",
             rounded: true,
         }}
     >
