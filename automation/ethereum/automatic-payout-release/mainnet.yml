@@ -9,6 +9,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_NETWORK: ethereum
       ENV_FLU_ETHEREUM_TOKEN_NAME: USDT
       ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 6
+      ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.usdt
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
@@ -24,6 +25,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_NETWORK: ethereum
       ENV_FLU_ETHEREUM_TOKEN_NAME: USDC
       ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 6
+      ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.usdc
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
@@ -39,6 +41,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_NETWORK: ethereum
       ENV_FLU_ETHEREUM_TOKEN_NAME: dai
       ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 18
+      ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.dai
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
@@ -54,6 +57,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_NETWORK: ethereum
       ENV_FLU_ETHEREUM_TOKEN_NAME: TUSD
       ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 18
+      ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.tusd
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
@@ -69,6 +73,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_NETWORK: ethereum
       ENV_FLU_ETHEREUM_TOKEN_NAME: FRAX
       ENV_FLU_ETHEREUM_TOKEN_DECIMALS: 18
+      ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: ethereum.winners.batched.frax
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
