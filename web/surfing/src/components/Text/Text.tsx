@@ -5,6 +5,7 @@ type TextProps = {
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
   prominent?: boolean;
   className?: string;
+  style?: React.CSSProperties;
   bold?: boolean;
   holo?: boolean;
   as?: "span" | "p";
@@ -18,6 +19,7 @@ const Text = ({
   bold = false,
   className,
   holo = false,
+  style,
   ...props
 }: TextProps) => {
   const classNameProps = className || "";
@@ -30,7 +32,7 @@ const Text = ({
 
   const Component = as || "span";
   return (
-    <Component className={classProps} {...props}>
+    <Component style={style} className={classProps} {...props}>
       {children}
     </Component>
   );

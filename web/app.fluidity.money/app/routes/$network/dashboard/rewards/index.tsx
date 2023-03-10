@@ -315,8 +315,6 @@ export default function Rewards() {
     totalPrizePool,
     timestamp,
     userUnclaimedRewards,
-    weeklyRewards,
-    unclaimedTokenAddrs,
     txLoaded,
     hasTokenPerformance,
     activeTokenPerformance,

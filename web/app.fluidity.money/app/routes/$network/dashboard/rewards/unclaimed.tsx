@@ -40,18 +40,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     {}
   );
 
-  const fluidTokenMap = tokens.reduce(
-    (map, token) =>
-      token.isFluidOf
-        ? {
-            ...map,
-            [token.symbol]: token.address,
-            [token.symbol.slice(1)]: token.address,
-          }
-        : map,
-    {}
-  );
-
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
@@ -59,7 +47,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return json({
     tokenDetailsMap,
-    fluidTokenMap,
     page,
     network,
   });
@@ -67,7 +54,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 type LoaderData = {
   tokenDetailsMap: { [tokenName: string]: { logo: string; address: string } };
-  fluidTokenMap: { [tokenName: string]: string };
   page: number;
   network: Chain;
 };
@@ -81,7 +67,7 @@ const SAFE_DEFAULT_UNCLAIMED = {
 };
 
 const UnclaimedWinnings = () => {
-  const { network, fluidTokenMap, tokenDetailsMap } =
+  const { network, tokenDetailsMap } =
     useLoaderData<LoaderData>();
 
   const { address } = useContext(FluidityFacadeContext);
@@ -106,11 +92,6 @@ const UnclaimedWinnings = () => {
     ...SAFE_DEFAULT_UNCLAIMED,
     ...unclaimedData.data,
   };
-
-  const [{ networkFee, gasFee }] = useState({
-    networkFee: 0,
-    gasFee: 0,
-  });
 
   const location = useLocation();
 
