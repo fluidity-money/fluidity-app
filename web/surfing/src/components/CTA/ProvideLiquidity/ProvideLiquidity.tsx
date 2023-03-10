@@ -122,34 +122,44 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
     setTimeout(() => setOpenDropdown(false), 200)
   );
 
-  const DropdownOptions = () => (
-    <div className={styles["dropdown-options"]}>
-      <ul>
-        {fluidTokens.map((option: TokenType) => (
-          <li key={`${option.name} ${option.logo}`}>
-            <button
-              className={styles["token-option"]}
-              onClick={() => {
-                setPoolToken(() => option);
-              }}
-            >
-              <Text size="xl" prominent={true}>
-                {option.symbol}
-              </Text>
-              <div
-                style={{
-                  height: 32,
-                  width: 32,
+  const DropdownOptions = () => {
+    const supportedFluidTokenNames = new Set(
+      providers.map((provider) => Object.keys(provider.link)).flat()
+    );
+
+    const supportedFluidTokens = fluidTokens.filter((fluidToken) =>
+      supportedFluidTokenNames.has(fluidToken.symbol)
+    );
+
+    return (
+      <div className={styles["dropdown-options"]}>
+        <ul>
+          {supportedFluidTokens.map((option: TokenType) => (
+            <li key={`${option.name} ${option.logo}`}>
+              <button
+                className={styles["token-option"]}
+                onClick={() => {
+                  setPoolToken(() => option);
                 }}
               >
-                <TokenIcon token={option.symbol}/>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+                <Text size="xl" prominent={true}>
+                  {option.symbol}
+                </Text>
+                <div
+                  style={{
+                    height: 32,
+                    width: 32,
+                  }}
+                >
+                  <TokenIcon token={option.symbol} />
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
   return (
     <Card className={styles.ProvideLiquidity} rounded type={"holobox"}>

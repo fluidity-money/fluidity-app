@@ -70,7 +70,6 @@ describe("token aave integration", async function () {
     for (let i = 0; i < 100; i++) {
       await hre.network.provider.send("evm_mine");
     }
-    console.log("done mining");
     const finalPoolAmount = await fFeiAccount.callStatic.rewardPoolAmount();
     expectGt(finalPoolAmount, initialPoolAmount);
     console.log(`aave earned ${finalPoolAmount.sub(initialPoolAmount).toString()} interest over 99 blocks`);

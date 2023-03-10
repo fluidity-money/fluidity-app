@@ -5,6 +5,7 @@ SERVICES:
       DOCKERFILE_PATH: ./web/fluidity.money
       SECRET_FLU_HASURA_KEY: /fluidity/hasura/key
       SECRET_FLU_ETH_RPC_HTTP: /fluidity/ethereum/http_url
+      SECRET_FLU_ARB_RPC_HTTP: /fluidity/arbitrum/http_url
       DEPLOYMENT_TYPE: CODEDEPLOY
       CODEDEPLOY_WAIT_TIME: 60 #minutes
       LOAD_BALANCER: flu-mainnet-fluidity-alb
@@ -20,7 +21,7 @@ SERVICES:
       DOCKER_ARGS:
         SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
         SECRET_GITHUB_TOKEN: /fluidity/npm/github_token
-  
+
   - BACKEND:
       SERVICE_NAME: fluidity-money-backend
       DOCKER_IMAGE: fluidity.money-backend
