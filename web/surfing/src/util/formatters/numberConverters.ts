@@ -26,7 +26,6 @@ const numberToMonetaryString = (dollars: number): string => {
   if (dollars < 0.01) return `$${toSignificantDecimals(dollars, 1)}`;
 
   const decimalValues = Math.round((dollars * 100) % 100);
-  O;
   const decimalCarry = Math.floor(decimalValues / 100);
   const decimalValues2Dec = decimalValues % 100;
 
