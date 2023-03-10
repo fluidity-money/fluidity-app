@@ -1,7 +1,7 @@
 import { Provider } from "@fluidity-money/surfing";
 
 export const getProviderDisplayName = (name?: string): Provider => {
-  switch (name) {
+  switch (name?.toLowerCase()) {
     case "aave":
       return "Aave";
     case "aldrin":
