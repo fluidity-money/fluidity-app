@@ -2,7 +2,6 @@ import {
   TokenReward,
   TokenRewardResponse,
 } from "~/queries/useTokenRewardStatistics";
-import config from '~/webapp.config.server'
 
 export type TokenPerformance = {
   week: TokenReward[];
@@ -37,11 +36,10 @@ const aggregateTokens = (
 };
 
 const aggregateTokenInterval = (rewards?: TokenReward[]) =>
-  rewards
-    ?.map(({token, average_reward, highest_reward}) => ({
-      token,
-      avgPrize: average_reward,
-      prize: highest_reward,
-    }))
+  rewards?.map(({ token, average_reward, highest_reward }) => ({
+    token,
+    avgPrize: average_reward,
+    prize: highest_reward,
+  }));
 
 export { aggregateTokens };

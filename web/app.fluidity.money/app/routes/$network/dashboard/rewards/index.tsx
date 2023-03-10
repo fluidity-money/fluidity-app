@@ -35,7 +35,7 @@ import {
   Token,
   CardCarousel,
   Display,
-  WalletIcon
+  WalletIcon,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -157,7 +157,9 @@ export default function Rewards() {
     `/${network}/query/winningUserTransactions?page=${page}`
   );
 
-  const { connected, address, tokens, addToken } = useContext(FluidityFacadeContext);
+  const { connected, address, tokens, addToken } = useContext(
+    FluidityFacadeContext
+  );
 
   const userRewardsData = useFetcher();
 
@@ -364,7 +366,7 @@ export default function Rewards() {
       month: monthlyTokenPerformance,
       year: yearlyTokenPerformance,
       all: allTokenPerformance,
-    } = tokenPerformance
+    } = tokenPerformance;
 
     const [activeRewards, activeYield, activeTokenPerformance] = (() => {
       switch (activeRewardFilterIndex) {
@@ -538,14 +540,16 @@ export default function Rewards() {
         size={mobileView ? "compact" : "normal"}
         type={"box-prominent"}
       >
-        <CardCarousel.Slide className={mobileView ? 'compactSlide' : ''}>
-          <div className={`rewards-cta-providers ${mobileView ? 'compact' : ''}`}>
+        <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
+          <div
+            className={`rewards-cta-providers ${mobileView ? "compact" : ""}`}
+          >
             <a
               onClick={(e) => {
-                e?.stopPropagation()
-                if (!connected || !addToken) return
-                
-                addToken('fUSDC')
+                e?.stopPropagation();
+                if (!connected || !addToken) return;
+
+                addToken("fUSDC");
               }}
             >
               {/* <BloomEffect type="static" color={"red"} width={80} /> */}
@@ -565,10 +569,12 @@ export default function Rewards() {
             </a>
           </div>
           <Display size="xxxs">Spend To Earn</Display>
-          { !mobileView && <Text>Use Fluid Assets to generate yield.</Text>}
+          {!mobileView && <Text>Use Fluid Assets to generate yield.</Text>}
         </CardCarousel.Slide>
-        <CardCarousel.Slide className={mobileView ? 'compactSlide' : ''}>
-          <div className={`rewards-cta-providers ${mobileView ? 'compact' : ''}`}>
+        <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
+          <div
+            className={`rewards-cta-providers ${mobileView ? "compact" : ""}`}
+          >
             <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
               {/* <BloomEffect type="static" color={"red"} width={80}/> */}
               <ProviderIcon provider="Sushiswap" />
@@ -587,7 +593,7 @@ export default function Rewards() {
             </a>
           </div>
           <Display size="xxxs">Swap To Earn</Display>
-          { !mobileView && <Text>Swap Fluid Assets to generate yield.</Text>}
+          {!mobileView && <Text>Swap Fluid Assets to generate yield.</Text>}
         </CardCarousel.Slide>
       </CardCarousel>
     );

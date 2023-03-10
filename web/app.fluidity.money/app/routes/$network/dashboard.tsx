@@ -39,7 +39,7 @@ import {
   ProvideLiquidity,
   Provider,
   ChainName,
-  Token
+  Token,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ConnectWalletModal from "~/components/ConnectWalletModal";

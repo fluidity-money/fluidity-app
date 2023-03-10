@@ -1,5 +1,5 @@
 import { gql, jsonPost } from "~/util";
-import { Chain } from "~/util/chainUtils/chains"
+import { Chain } from "~/util/chainUtils/chains";
 
 const query = gql`
   fragment tokenPerformanceFields on token_performance_return {
@@ -11,28 +11,28 @@ const query = gql`
   query TokenPerformance($network: network_blockchain!) {
     week: token_performance(
       limit: 1
-      order_by: {highest_reward: asc}
+      order_by: { highest_reward: asc }
       args: { filter_network: $network, i: "1 week" }
     ) {
       ...tokenPerformanceFields
     }
     month: token_performance(
       limit: 1
-      order_by: {highest_reward: asc}
+      order_by: { highest_reward: asc }
       args: { filter_network: $network, i: "1 month" }
     ) {
       ...tokenPerformanceFields
     }
     year: token_performance(
       limit: 1
-      order_by: {highest_reward: asc}
+      order_by: { highest_reward: asc }
       args: { filter_network: $network, i: "1 year" }
     ) {
       ...tokenPerformanceFields
     }
     all: token_performance(
       limit: 1
-      order_by: {highest_reward: asc}
+      order_by: { highest_reward: asc }
       args: { filter_network: $network }
     ) {
       ...tokenPerformanceFields
@@ -40,10 +40,8 @@ const query = gql`
   }
 `;
 
-const useTokenRewardStatistics = async (
-  network: Chain | string
-) => {
-  const variables = { network, };
+const useTokenRewardStatistics = async (network: Chain | string) => {
+  const variables = { network };
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,

@@ -67,8 +67,7 @@ const SAFE_DEFAULT_UNCLAIMED = {
 };
 
 const UnclaimedWinnings = () => {
-  const { network, tokenDetailsMap } =
-    useLoaderData<LoaderData>();
+  const { network, tokenDetailsMap } = useLoaderData<LoaderData>();
 
   const { address } = useContext(FluidityFacadeContext);
 

@@ -70,7 +70,7 @@
 
 .statistics-row {
   display: flex;
-  flex-wrap:wrap;
+  flex-wrap: wrap;
   row-gap: 1em;
   column-gap: 4em;
   margin-top: 12px;
@@ -264,7 +264,7 @@
   height: 3.5em;
 }
 
-.rewards-cta-providers>a {
+.rewards-cta-providers > a {
   position: relative;
   display: flex;
   align-items: center;
@@ -274,33 +274,33 @@
   -webkit-user-drag: none;
 }
 
-.rewards-cta-providers>a>img {
+.rewards-cta-providers > a > img {
   position: absolute;
   width: 100%;
   -webkit-user-drag: none;
   object-fit: contain;
 }
 
-.rewards-cta-providers>a:first-child>img,
-.rewards-cta-providers>a:last-child>img {
+.rewards-cta-providers > a:first-child > img,
+.rewards-cta-providers > a:last-child > img {
   position: absolute;
   top: 4em;
   left: 0;
 }
 
-.rewards-cta-providers>a:last-child>img {
+.rewards-cta-providers > a:last-child > img {
   left: auto;
   right: 0;
 }
 
-.rewards-cta-providers.compact>a>img {
+.rewards-cta-providers.compact > a > img {
   top: 0;
 }
 
 .compactSlide {
   flex-direction: column-reverse;
 }
-.compactSlide>h1{
+.compactSlide > h1 {
   margin: 0;
   margin-bottom: 0.8em;
 }
