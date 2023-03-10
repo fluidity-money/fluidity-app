@@ -57,7 +57,7 @@ func InsertWinner(winner Winner) {
 	)
 
 	switch winner.Network {
-	case network.NetworkEthereum:
+	case network.NetworkArbitrum, network.NetworkEthereum:
 		statementText = fmt.Sprintf(
 			`INSERT INTO %s (
 				network,
