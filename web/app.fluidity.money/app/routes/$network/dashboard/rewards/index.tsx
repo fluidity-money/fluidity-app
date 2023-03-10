@@ -157,7 +157,7 @@ export default function Rewards() {
     `/${network}/query/winningUserTransactions?page=${page}`
   );
 
-  const { connected, address, tokens } = useContext(FluidityFacadeContext);
+  const { connected, address, tokens, addToken } = useContext(FluidityFacadeContext);
 
   const userRewardsData = useFetcher();
 
@@ -545,7 +545,9 @@ export default function Rewards() {
             <a
               onClick={(e) => {
                 e?.stopPropagation()
-                alert('fku')
+                if (!connected || !addToken) return
+                
+                addToken('fUSDC')
               }}
             >
               {/* <BloomEffect type="static" color={"red"} width={80} /> */}
