@@ -293,6 +293,18 @@
   right: 0;
 }
 
+.rewards-cta-providers.compact>a>img {
+  top: 0;
+}
+
+.compactSlide {
+  flex-direction: column-reverse;
+}
+.compactSlide>h1{
+  margin: 0;
+  margin-bottom: 0.8em;
+}
+
 .hover-prizes {
   display: flex;
   flex-direction: row;

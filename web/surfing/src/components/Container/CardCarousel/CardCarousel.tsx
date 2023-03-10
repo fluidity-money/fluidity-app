@@ -33,11 +33,13 @@ const swipePower = (offset: number, velocity: number) => {
 
 interface ISlide {
   children: React.ReactNode;
+  className?: string;
 }
 
-const Slide: React.FC<ISlide> = ({ children }) => {
+const Slide: React.FC<ISlide> = ({ className='', children }) => {
+  const classes = `${styles.SlideContent} ${className}`
   return (
-    <div className={styles.SlideContent}>
+    <div className={classes}>
       {children}
     </div>
   )
