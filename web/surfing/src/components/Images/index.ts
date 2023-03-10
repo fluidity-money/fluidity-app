@@ -11,6 +11,7 @@ import { WarningIcon } from "./WarningIcon";
 import { DaoIcon } from "./Dao";
 import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
+import { WalletIcon } from './WalletIcon'
 import { TokenIcon } from "./TokenIcon";
 import { InfoCircle } from "./InfoCircle";
 import { CaretLeft } from "./CaretLeft";
@@ -30,6 +31,7 @@ export {
   DaoIcon,
   AssetsIcon,
   ProviderIcon,
+  WalletIcon,
   TokenIcon,
   InfoCircle,
   CaretLeft,
