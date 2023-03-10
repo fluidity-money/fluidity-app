@@ -24,6 +24,7 @@ export type Rewarders = {
 const aggregateRewards = (
   rewardData: ApplicationRewardResponse<Chain>["data"]
 ): Rewarders => {
+  console.log(rewardData);
   const aggregatedRewarders = {
     week: aggregateRewardInterval(rewardData?.week),
     month: aggregateRewardInterval(rewardData?.month),
