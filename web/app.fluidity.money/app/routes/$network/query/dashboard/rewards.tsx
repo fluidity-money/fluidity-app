@@ -77,7 +77,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           : map,
       {}
     );
-
     const [
       totalPrizePool,
       { data: rewardsData, errors: rewardsErr },
