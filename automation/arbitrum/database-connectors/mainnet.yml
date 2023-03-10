@@ -4,18 +4,15 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/connector-common-winners-timescale
       DOCKER_IMAGE: connector-common-winners-timescale
       ENV_FLU_WORKER_ID: arbitrum-connector-common-winners-timescale
-      SECRET_FLU_TIMESCALE_URI: /fluidity/arbitrum/timescale/uri
 
   - CONNECTOR_COMMON_EMISSIONS_TIMESCALE:
       SERVICE_NAME: connector-common-emissions-timescale-arbitrum
       DOCKERFILE_PATH: ./cmd/connector-common-emissions-timescale
       DOCKER_IMAGE: connector-common-emissions-timescale
       ENV_FLU_WORKER_ID: arbitrum-connector-common-emissions-timescale
-      SECRET_FLU_TIMESCALE_URI: /fluidity/arbitrum/timescale/uri
 
   - CONNECTORS_COMMON_USER_ACTIONS_TIMESCALE:
       SERVICE_NAME: connector-common-user-actions-timescale-arbitrum
       DOCKER_IMAGE: connector-common-user-actions-timescale
       DOCKERFILE_PATH: ./cmd/connector-common-user-actions-timescale
       ENV_FLU_WORKER_ID: arbitrum-connector-common-user-actions-timescale
-      SECRET_FLU_TIMESCALE_URI: /fluidity/arbitrum/timescale/uri
