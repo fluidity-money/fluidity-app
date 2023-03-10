@@ -96,6 +96,14 @@ const SwapCompleteModal = ({
                   width={500}
                   className="bloom"
                 />
+                <motion.img
+                  variants={variants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  src={tokenPair?.logo}
+                  className="swap-token"
+                />
                 <Video
                   className="swapping-video"
                   src={"/videos/LoadingOther.webm"}
@@ -106,14 +114,6 @@ const SwapCompleteModal = ({
                     setPlayVideo(false);
                   }}
                   playbackRate={1.5}
-                />
-                <motion.img
-                  variants={variants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  src={tokenPair?.logo}
-                  className="swap-token"
                 />
               </motion.div>
             </AnimatePresence>
