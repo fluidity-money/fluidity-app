@@ -26,9 +26,13 @@ const numberToMonetaryString = (dollars: number): string => {
   if (dollars < 0.01) return `$${toSignificantDecimals(dollars, 1)}`;
 
   const decimalValues = Math.round((dollars * 100) % 100);
-  const paddedDecimals = `${decimalValues}`.padStart(2, "0");
+  O;
+  const decimalCarry = Math.floor(decimalValues / 100);
+  const decimalValues2Dec = decimalValues % 100;
 
-  const commaSepWholeValues = numberToCommaSeparated(dollars);
+  const paddedDecimals = `${decimalValues2Dec}`.padStart(2, "0");
+
+  const commaSepWholeValues = numberToCommaSeparated(dollars + decimalCarry);
 
   return `$${commaSepWholeValues}.${paddedDecimals}`;
 };
