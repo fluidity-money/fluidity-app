@@ -10,5 +10,11 @@ import (
 )
 
 func main() {
-	queue.WinnersAll(database.InsertWinner)
+	queue.WinnersAll(func(winner database.Winner) {
+		log.Debug(func(k *log.Log) {
+			k.Format("Inserting winner %v", winner)
+		})
+
+		database.InsertWinner(winner)
+	})
 }

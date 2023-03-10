@@ -7,6 +7,7 @@ package timescale
 import (
 	"database/sql"
 	"regexp"
+	"crypto/sha256"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -32,6 +33,17 @@ func init() {
 			k.Payload = err
 		})
 	}
+
+	log.Debug(func(k *log.Log) {
+		hash := sha256.Sum256([]byte(databaseUri))
+
+		k.Context = Context
+
+		k.Format(
+			"Opened a database connection to hash %x",
+			string(hash[:]),
+		)
+	})
 
 	if _, err := client.Exec("SELECT 1"); err != nil {
 		// hide sensitive uri components in log output

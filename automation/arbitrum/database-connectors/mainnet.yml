@@ -18,3 +18,4 @@ SERVICES:
       DOCKER_IMAGE: connector-common-user-actions-timescale
       DOCKERFILE_PATH: ./cmd/connector-common-user-actions-timescale
       ENV_FLU_WORKER_ID: arbitrum-connector-common-user-actions-timescale
+      SECRET_FLU_TIMESCALE_URI: /fluidity/arbitrum/timescale/uri
