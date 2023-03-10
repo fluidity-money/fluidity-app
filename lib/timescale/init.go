@@ -41,7 +41,7 @@ func init() {
 
 		k.Format(
 			"Opened a database connection to hash %x",
-			string(hash[:]),
+			hash,
 		)
 	})
 
