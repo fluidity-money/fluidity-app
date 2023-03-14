@@ -237,44 +237,44 @@ export default function Rewards() {
     width > 0 && width < tableBreakpoint
       ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
       : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "WINNER",
-          },
-          {
-            name: "REWARDED TIME",
-            alignRight: true,
-          },
-        ];
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "WINNER",
+        },
+        {
+          name: "REWARDED TIME",
+          alignRight: true,
+        },
+      ];
 
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({ sender, receiver }: Transaction) =>
-            [sender, receiver].includes(address),
-          name: "MY REWARDS",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({ sender, receiver }: Transaction) =>
+          [sender, receiver].includes(address),
+        name: "MY REWARDS",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
@@ -568,7 +568,9 @@ export default function Rewards() {
               <ProviderIcon provider="Balancer" />
             </a>
           </div>
-          <Display size="xxxs">Spend To Earn</Display>
+          <Display size="xxxs">
+            Spend To Earn
+          </Display>
           {!mobileView && <Text>Use Fluid Assets to generate yield.</Text>}
         </CardCarousel.Slide>
         <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>

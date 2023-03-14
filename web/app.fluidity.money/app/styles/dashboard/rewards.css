@@ -36,7 +36,7 @@
 
 #unclaimed-left {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2em;
@@ -89,9 +89,10 @@
   height: calc(100% - 4em);
   width: calc(100% - 4em);
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
   flex-wrap: wrap;
+  text-align: center;
 }
 
 .reward-ctas {
@@ -99,6 +100,7 @@
   grid-template-columns: 1fr auto;
   gap: 2em;
   grid-template-rows: max-content;
+  align-self: center;
 }
 
 .row-value {
