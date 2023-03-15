@@ -6,6 +6,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	ethApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -57,7 +59,7 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			network,
 			address,
 			transaction_hash,
-			amount,
+			volume,
 			reward_tier,
 			application
 		)
@@ -85,7 +87,7 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 		transactionAttributes.TransactionHash,
 		transactionAttributes.Amount,
 		transactionAttributes.RewardTier,
-		transactionAttributes.Application,
+		transactionAttributes.Application.String(),
 	)
 
 	if err != nil {
@@ -95,4 +97,95 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			k.Payload = err
 		})
 	}
+}
+
+// GetTransactionAttributes to fetch the attributes of a winning user
+func GetTransactionAttributes(address ethereum.Address) []TransactionAttributes {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT
+			network,
+			transaction_hash,
+			address,
+			volume,
+			token_short_name,
+			token_decimals,
+			reward_tier,
+			application
+
+		FROM %v
+		WHERE address = $1`,
+
+		TableWinningTransactionAttributes,
+	)
+
+	rows, err := timescaleClient.Query(
+		statementText,
+		address,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to get transaction attributes with address %v!",
+				address,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	defer rows.Close()
+
+	attributes := make([]TransactionAttributes, 0)
+
+	for rows.Next() {
+		var (
+			transactionAttributes TransactionAttributes 
+			applicationEthereum      string
+		)
+
+		err := rows.Scan(
+			&transactionAttributes.Network,
+			&transactionAttributes.TransactionHash,
+			&transactionAttributes.Address,
+			&transactionAttributes.Amount,
+			&transactionAttributes.TokenDetails.TokenShortName,
+			&transactionAttributes.TokenDetails.TokenDecimals,
+			&transactionAttributes.RewardTier,
+			&applicationEthereum,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "Failed to scan a row of transaction attributes!"
+				k.Payload = err
+			})
+		}
+
+		var application ethApps.Application
+
+		switch transactionAttributes.Network {
+		case network.NetworkEthereum, network.NetworkArbitrum:
+			application, err = ethApps.ParseApplicationName(applicationEthereum)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Failed to convert application name into application!"
+					k.Payload = err
+				})
+			}
+		}
+
+		transactionAttributes.Application = application
+
+		attributes = append(attributes, transactionAttributes)
+	}
+
+	return attributes 
 }

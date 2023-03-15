@@ -7,7 +7,7 @@ CREATE TABLE winning_transaction_attributes (
     address VARCHAR NOT NULL,
     transaction_hash VARCHAR NOT NULL,
     volume BIGINT NOT NULL,
-    reward_tier INT NOT NULL
+    reward_tier INT NOT NULL,
     application ethereum_application NOT NULL -- 'none' is a regular send
 );
 
