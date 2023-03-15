@@ -167,7 +167,15 @@ services:
     environment:
       <<: *flu-envs
       <<: *util-mining-test-envs
-      FLU_WORKER_ID: microservice-etheruem-track-winners
+      FLU_WORKER_ID: microservice-ethereum-track-winners
+    restart: on-failure
+
+  microservice-ethereum-track-transaction-attributes:
+    build:
+      context: ../../cmd/microservice-ethereum-track-transaction-attributes/
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: microservice-ethereum-track-transaction-attributes
     restart: on-failure
 
   test-utility-mining:
@@ -196,3 +204,24 @@ services:
       <<: *util-mining-test-envs
     restart: "no"
 
+  test-transaction-attributes:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - spooler
+      - microservice-ethereum-track-winners-util-mining
+      - microservice-ethereum-track-transaction-attributes
+    environment:
+      FLU_TEST: TestTransactionAttributes 
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler-in
+      FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out 
+      FLU_ETHEREUM_NETWORK: ethereum
+      <<: *flu-envs
+      <<: *util-mining-test-envs
+    restart: "no"
