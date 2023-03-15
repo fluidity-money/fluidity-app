@@ -475,7 +475,7 @@ func GetLastBlocksTransactionCount(tokenShortName string, network network.Blockc
 
 	defer rows.Close()
 
-	sum := 0
+	sum = 0
 
 	blocks = make([]uint64, 0)
 

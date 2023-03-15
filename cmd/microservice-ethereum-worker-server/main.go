@@ -233,8 +233,6 @@ func main() {
 		// if this block is abnormal and could be an attack, we don't use the
 		// average!
 
-		transfersInBlockRat := new(big.Rat).SetInt64(int64(transfersInBlock))
-
 		transfersInEpochRat := new(big.Rat).SetInt64(int64(transfersInEpoch))
 
 		epochBlocksRat := new(big.Rat).SetInt64(int64(epochBlocks))
