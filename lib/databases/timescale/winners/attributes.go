@@ -144,8 +144,8 @@ func GetTransactionAttributes(address ethereum.Address) []TransactionAttributes 
 
 	for rows.Next() {
 		var (
-			transactionAttributes TransactionAttributes 
-			applicationEthereum      string
+			transactionAttributes TransactionAttributes
+			applicationEthereum   string
 		)
 
 		err := rows.Scan(
@@ -187,5 +187,5 @@ func GetTransactionAttributes(address ethereum.Address) []TransactionAttributes 
 		attributes = append(attributes, transactionAttributes)
 	}
 
-	return attributes 
+	return attributes
 }
