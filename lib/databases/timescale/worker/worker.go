@@ -434,9 +434,9 @@ func InsertEmissions(emission Emission) {
 	}
 }
 
-// GetAverageAtx, rounding up the average, taking the returned float64 and
-// casting it to an integer
-func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, blocks []uint64, transactionCounts []int) {
+// GetLastBlocksTransactionCount, returning the average
+// and sum of the transactions
+func GetLastBlocksTransactionCount(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, sum int, blocks []uint64, transactionCounts []int) {
 
 	timescaleClient := timescale.Client()
 
@@ -506,7 +506,7 @@ func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, lim
 
 	average = sum / len(transactionCounts)
 
-	return average, blocks, transactionCounts
+	return average, sum, blocks, transactionCounts
 }
 
 // InsertTransactionCount for a block number for the number of transactions
