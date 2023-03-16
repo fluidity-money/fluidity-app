@@ -88,11 +88,11 @@
   padding: 2em;
   height: calc(100% - 4em);
   width: calc(100% - 4em);
-  flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
-  flex-wrap: wrap;
   text-align: center;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .reward-ctas {
@@ -100,7 +100,8 @@
   grid-template-columns: 1fr auto;
   gap: 2em;
   grid-template-rows: max-content;
-  align-self: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .row-value {

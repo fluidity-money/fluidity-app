@@ -1,8 +1,8 @@
-@use 'common' as *;
+@use "common" as *;
 
 button {
   cursor: pointer;
-  
+
   &:disabled {
     cursor: default;
   }
@@ -14,7 +14,7 @@ button {
   width: fit-content;
   height: fit-content;
   padding: 1em;
-  
+
   &.heading {
     > * {
       flex: 0 0;
@@ -26,7 +26,7 @@ button {
   }
 
   &.transparent {
-    background-color: $white-a5;
+    background-color: transparent;
   }
 
   &.box {
@@ -50,7 +50,8 @@ button {
       bottom: 0;
       padding: 2px;
       background: $holo;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
@@ -73,9 +74,9 @@ button {
     border: 1px solid rgba(255, 255, 255, 0.102);
 
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur( 10px );
+    -webkit-backdrop-filter: blur(10px);
   }
-  
+
   &.disabled {
     cursor: disabled;
     border-color: map-get($border, "disabled");
