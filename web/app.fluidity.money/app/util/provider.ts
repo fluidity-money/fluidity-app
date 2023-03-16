@@ -31,6 +31,8 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Polygon";
     case "saber":
       return "Saber";
+    case "saddle":
+      return "Saddle";
     case "solana":
       return "Solana";
     case "solend":
