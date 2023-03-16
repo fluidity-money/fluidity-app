@@ -138,7 +138,7 @@ const NoUserRewards = ({ prizePool }: INoUserRewards) => {
       <div id="infobox">
         {isMobile ? (
           <>
-            <Text size="medium" code prominent>
+            <Text size="md" code prominent>
               NO UNCLAIMED REWARDS
             </Text>
             <br />
