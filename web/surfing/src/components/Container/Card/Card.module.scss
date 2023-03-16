@@ -33,6 +33,10 @@ button {
     border: 1px solid map-get($border, "default");
   }
 
+  &.box-prominent {
+    border: 1px solid map-get($border, "prominent");
+  }
+
   &.holobox {
     position: relative;
 

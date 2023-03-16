@@ -1,16 +1,19 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
+  gap: 0.4em;
   
   > .value {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: 0.8em;
+    white-space: nowrap;
 
     > img, svg {
-      height: 1.2em;
+      width: 2.4em;
+      aspect-ratio: 1/1;
+      object-fit: contain;
     }
   }
 
