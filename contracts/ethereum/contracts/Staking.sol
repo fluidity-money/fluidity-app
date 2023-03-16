@@ -9,9 +9,9 @@ pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
+import "../interfaces/ISaddleSwapV1.sol";
 import "../interfaces/IStaking.sol";
 import "../interfaces/IToken.sol";
-import "../interfaces/ISaddleSwapV1.sol";
 import "../interfaces/IUniswapV2Router02.sol";
 
 import "./openzeppelin/SafeERC20.sol";
@@ -25,7 +25,7 @@ import "./openzeppelin/SafeERC20.sol";
 *
 * * In the following protocols:
 * - Saddle
-* - Concave
+* - Camelot
 * - SushiSwap
 */
 
@@ -41,20 +41,26 @@ struct Deposit {
     uint256 saddleUsdcProvided;
     uint256 saddleWethProvided;
 
-    // concave
+    // sushiswap
+    uint256 sushiswapFusdcProvided;
+    uint256 sushiswapUsdcProvided;
+    uint256 sushiswapWethProvided;
 
-    // uniswap
-    uint256 uniswapV2FusdcProvided;
-    uint256 uniswapV2UsdcProvided;
-    uint256 uniswapV2WethProvided;
+    // camelot
+    uint256 camelotFusdcProvided;
+    uint256 camelotUsdcProvided;
+    uint256 camelotWethProvided;
 }
 
 enum DepositType {
     SADDLE_FUSDC_USDC,
     SADDLE_FUSDC_WETH,
 
-    UNISWAP_FUSDC_USDC,
-    UNISWAP_FUSDC_WETH
+    SUSHISWAP_FUSDC_USDC,
+    SUSHISWAP_FUSDC_WETH,
+
+    CAMELOT_FUSDC_USDC,
+    CAMELOT_FUSDC_WETH
 }
 
 contract Staking {
@@ -79,7 +85,9 @@ contract Staking {
 
     ISaddleSwapV1 private immutable saddleSwapV1FusdcUsdc_;
 
-    IUniswapV2Router02 private immutable uniswapV2Router_;
+    IUniswapV2Router02 private immutable sushiswapRouter_;
+
+    IUniswapV2Router02 private immutable camelotRouter_;
 
     mapping (address => Deposit[]) private deposits_;
 
@@ -89,7 +97,8 @@ contract Staking {
         IERC20 _usdc,
         ISaddleSwapV1 _saddleSwapV1FusdcEth,
         ISaddleSwapV1 _saddleSwapV1FusdcUsdc,
-        IUniswapV2Router02 _uniswapV2Router
+        IUniswapV2Router02 _sushiswapRouter,
+        IUniswapV2Router02 _camelotRouter
     ) {
         fUsdc_ = _fUsdc;
         wEth_ = _wEth;
@@ -97,7 +106,8 @@ contract Staking {
 
         saddleSwapV1FusdcWeth_ = _saddleSwapV1FusdcEth;
         saddleSwapV1FusdcUsdc_ = _saddleSwapV1FusdcUsdc;
-        uniswapV2Router_ = _uniswapV2Router;
+        sushiswapRouter_ = _sushiswapRouter;
+        camelotRouter_ = _camelotRouter;
 
         fUsdc_.safeApprove(address(saddleSwapV1FusdcWeth_), MAX_UINT256);
         wEth_.safeApprove(address(saddleSwapV1FusdcWeth_), MAX_UINT256);
@@ -105,9 +115,13 @@ contract Staking {
         fUsdc_.safeApprove(address(saddleSwapV1FusdcUsdc_), MAX_UINT256);
         usdc_.safeApprove(address(saddleSwapV1FusdcUsdc_), MAX_UINT256);
 
-        fUsdc_.safeApprove(address(_uniswapV2Router), MAX_UINT256);
-        usdc_.safeApprove(address(_uniswapV2Router), MAX_UINT256);
-        wEth_.safeApprove(address(_uniswapV2Router), MAX_UINT256);
+        fUsdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
+        usdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
+        wEth_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
+
+        fUsdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
+        usdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
+        wEth_.safeApprove(address(camelotRouter_), MAX_UINT256);
     }
 
     function depositToSaddle(
@@ -136,12 +150,13 @@ contract Staking {
     }
 
     function depositToUniswapV2Router(
+        IUniswapV2Router02 _router,
         address _token0,
         address _token1,
         uint256 _token0Amount,
         uint256 _token1Amount
     ) internal returns (uint256 amountA, uint256 amountB, uint256 liquidity) {
-        return uniswapV2Router_.addLiquidity(
+        return _router.addLiquidity(
             _token0,
             _token1,
             _token0Amount,
@@ -174,21 +189,39 @@ contract Staking {
             );
         }
 
-        else if (_deposit.uniswapV2FusdcProvided > 0 && _deposit.uniswapV2UsdcProvided > 0) {
+        else if (_deposit.sushiswapFusdcProvided > 0 && _deposit.sushiswapUsdcProvided > 0) {
             emit DepositMade(
                 _spender,
-                _deposit.uniswapV2FusdcProvided,
-                _deposit.uniswapV2UsdcProvided,
-                DepositType.UNISWAP_FUSDC_USDC
+                _deposit.sushiswapFusdcProvided,
+                _deposit.sushiswapUsdcProvided,
+                DepositType.SUSHISWAP_FUSDC_USDC
             );
         }
 
-        else if (_deposit.uniswapV2FusdcProvided > 0 && _deposit.uniswapV2WethProvided > 0) {
+        else if (_deposit.sushiswapFusdcProvided > 0 && _deposit.sushiswapWethProvided > 0) {
             emit DepositMade(
                 _spender,
-                _deposit.uniswapV2FusdcProvided,
-                _deposit.uniswapV2WethProvided,
-                DepositType.UNISWAP_FUSDC_WETH
+                _deposit.sushiswapFusdcProvided,
+                _deposit.sushiswapWethProvided,
+                DepositType.SUSHISWAP_FUSDC_WETH
+            );
+        }
+
+        else if (_deposit.camelotFusdcProvided > 0 && _deposit.camelotUsdcProvided > 0) {
+            emit DepositMade(
+                _spender,
+                _deposit.camelotFusdcProvided,
+                _deposit.camelotUsdcProvided,
+                DepositType.CAMELOT_FUSDC_USDC
+            );
+        }
+
+        else if (_deposit.camelotFusdcProvided > 0 && _deposit.camelotWethProvided > 0) {
+            emit DepositMade(
+                _spender,
+                _deposit.camelotFusdcProvided,
+                _deposit.camelotWethProvided,
+                DepositType.CAMELOT_FUSDC_WETH
             );
         }
 
@@ -217,9 +250,12 @@ contract Staking {
             saddleFusdcProvided: _fUsdcAmount,
             saddleUsdcProvided: _usdcAmount,
             saddleWethProvided: _wethAmount,
-            uniswapV2FusdcProvided: 0,
-            uniswapV2UsdcProvided: 0,
-            uniswapV2WethProvided: 0
+            camelotFusdcProvided: 0,
+            camelotUsdcProvided: 0,
+            camelotWethProvided: 0,
+            sushiswapFusdcProvided: 0,
+            sushiswapUsdcProvided: 0,
+            sushiswapWethProvided: 0
         });
     }
 
@@ -270,7 +306,7 @@ contract Staking {
         }
     }
 
-    function uniswapDeposit(
+    function sushiswapDeposit(
         uint256 _lockupLength,
         uint256 _fUsdcAmount,
         uint256 _usdcAmount,
@@ -281,13 +317,16 @@ contract Staking {
             saddleFusdcProvided: 0,
             saddleUsdcProvided: 0,
             saddleWethProvided: 0,
-            uniswapV2FusdcProvided: _fUsdcAmount,
-            uniswapV2UsdcProvided: _usdcAmount,
-            uniswapV2WethProvided: _wethAmount
+            camelotFusdcProvided: 0,
+            camelotUsdcProvided: 0,
+            camelotWethProvided: 0,
+            sushiswapFusdcProvided: _fUsdcAmount,
+            sushiswapUsdcProvided: _usdcAmount,
+            sushiswapWethProvided: _wethAmount
         });
     }
 
-    function receiveUniswapV2Deposit(
+    function receiveSushiswapDeposit(
         address _recipient,
         uint256 _lockupLength,
         uint256 _fUsdcAmount,
@@ -300,13 +339,14 @@ contract Staking {
             usdc_.safeTransferFrom(msg.sender, address(this), _usdcAmount);
 
             depositToUniswapV2Router(
+                sushiswapRouter_,
                 address(fUsdc_),
                 address(usdc_),
                 _fUsdcAmount,
                 _usdcAmount
             );
 
-            recordDeposit(_recipient,uniswapDeposit(
+            recordDeposit(_recipient,sushiswapDeposit(
                 _lockupLength,
                 _fUsdcAmount,
                 _usdcAmount,
@@ -318,13 +358,86 @@ contract Staking {
             usdc_.safeTransferFrom(msg.sender, address(this), _wEthAmount);
 
             depositToUniswapV2Router(
+                sushiswapRouter_,
                 address(fUsdc_),
                 address(wEth_),
                 _fUsdcAmount,
                 _wEthAmount
             );
 
-            recordDeposit(_recipient,uniswapDeposit(
+            recordDeposit(_recipient, sushiswapDeposit(
+                _lockupLength,
+                _fUsdcAmount,
+                0,
+                _wEthAmount
+            ));
+        }
+
+        else {
+            revert("weth|usdc not supplied");
+        }
+    }
+
+    function camelotDeposit(
+        uint256 _lockupLength,
+        uint256 _fUsdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount
+    ) internal pure returns (Deposit memory) {
+        return Deposit({
+            lockupLength: _lockupLength,
+            saddleFusdcProvided: 0,
+            saddleUsdcProvided: 0,
+            saddleWethProvided: 0,
+            camelotFusdcProvided: 0,
+            camelotUsdcProvided: 0,
+            camelotWethProvided: 0,
+            sushiswapFusdcProvided: _fUsdcAmount,
+            sushiswapUsdcProvided: _usdcAmount,
+            sushiswapWethProvided: _wethAmount
+        });
+    }
+
+    function receiveCamelotDeposit(
+        address _recipient,
+        uint256 _lockupLength,
+        uint256 _fUsdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wEthAmount
+    ) public {
+        requireAmountsTransferFusdc(_lockupLength, _fUsdcAmount);
+
+        if (_usdcAmount > 0) {
+            usdc_.safeTransferFrom(msg.sender, address(this), _usdcAmount);
+
+            depositToUniswapV2Router(
+                camelotRouter_,
+                address(fUsdc_),
+                address(usdc_),
+                _fUsdcAmount,
+                _usdcAmount
+            );
+
+            recordDeposit(_recipient, camelotDeposit(
+                _lockupLength,
+                _fUsdcAmount,
+                _usdcAmount,
+                0
+            ));
+        }
+
+        else if (_wEthAmount > 0) {
+            usdc_.safeTransferFrom(msg.sender, address(this), _wEthAmount);
+
+            depositToUniswapV2Router(
+                camelotRouter_,
+                address(fUsdc_),
+                address(wEth_),
+                _fUsdcAmount,
+                _wEthAmount
+            );
+
+            recordDeposit(_recipient, camelotDeposit(
                 _lockupLength,
                 _fUsdcAmount,
                 0,

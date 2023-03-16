@@ -9,13 +9,13 @@ pragma abicoder v2;
 
 interface IUniswapV2Router02 {
     function addLiquidity(
-      address _tokenA,
-      address _tokenB,
-      uint _amountADesired,
-      uint _amountBDesired,
-      uint _amountAMin,
-      uint _amountBMin,
-      address _to,
-      uint _deadline
+        address _tokenA,
+        address _tokenB,
+        uint _amountADesired,
+        uint _amountBDesired,
+        uint _amountAMin,
+        uint _amountBMin,
+        address _to,
+        uint _deadline
     ) external returns (uint amountA, uint amountB, uint liquidity);
 }
