@@ -385,6 +385,11 @@ contract Token is
         return IERC20(token);
     }
 
+    /// @inheritdoc IToken
+    function underlyingLp() public view returns (ILiquidityProvider) {
+        return pool_;
+    }
+
     /**
      * @dev rewards two users from the reward pool
      * @dev mints tokens and emits the reward event
