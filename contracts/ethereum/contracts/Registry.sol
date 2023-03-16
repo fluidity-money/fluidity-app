@@ -109,7 +109,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
         for (uint i = 0; i < tokens_.length; i++) {
             IToken token = tokens_[i];
 
-            uint256 amount = token.rewardPoolAmount() + token.totalSupply();
+            uint256 amount = token.underlyingLp().totalPoolAmount();
 
             uint8 decimals = token.decimals();
 

@@ -9,7 +9,7 @@ interface ITotalRewardPool {
      *
      * @return the total TVL as 1e18
     */
-    function getTVL() external retruns (uint256);
+    function getTVL() external returns (uint256);
 
     /**
      * @notice getTotalRewardPool for each token that's known by the

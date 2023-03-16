@@ -67,6 +67,11 @@ interface IToken is IERC20 {
      */
     function underlyingToken() external view returns (IERC20);
 
+    /**
+     * @notice underlyingLp that's in use for the liquidity provider
+     */
+    function underlyingLp() external view returns (ILiquidityProvider);
+
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint256) external;
 
