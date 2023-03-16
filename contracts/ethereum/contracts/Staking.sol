@@ -206,6 +206,23 @@ contract Staking {
         fUsdc_.safeTransferFrom(msg.sender, address(this), _fUsdcAmount);
     }
 
+    function saddleDeposit(
+        uint256 _lockupLength,
+        uint256 _fUsdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount
+    ) internal pure returns (Deposit memory) {
+        return Deposit({
+            lockupLength: _lockupLength,
+            saddleFusdcProvided: _fUsdcAmount,
+            saddleUsdcProvided: _usdcAmount,
+            saddleWethProvided: _wethAmount,
+            uniswapV2FusdcProvided: 0,
+            uniswapV2UsdcProvided: 0,
+            uniswapV2WethProvided: 0
+        });
+    }
+
     function receiveSaddleDeposit(
         address _recipient,
         uint256 _lockupLength,
@@ -223,11 +240,12 @@ contract Staking {
 
             depositToSaddle(saddleSwapV1FusdcUsdc_, _fUsdcAmount, _usdcAmount);
 
-            recordDeposit(_recipient, Deposit({
-                lockupLength: _lockupLength,
-                saddleFusdcProvided: _fUsdcAmount,
-                saddleUsdcprovided: _usdcAmount
-            }));
+            recordDeposit(_recipient, saddleDeposit(
+                _lockupLength,
+                _fUsdcAmount,
+                _usdcAmount,
+                0
+            ));
         }
 
         // or alternatively we supply fusdc/weth instead
@@ -237,11 +255,12 @@ contract Staking {
 
             depositToSaddle(saddleSwapV1FusdcWeth_, _fUsdcAmount, _wEthAmount);
 
-            recordDeposit(_recipient, Deposit({
-                lockupLength: _lockupLength,
-                saddleFusdcProvided: _fUsdcAmount,
-                saddleWethprovided: _wEthAmount
-            }));
+            recordDeposit(_recipient, saddleDeposit(
+                _lockupLength,
+                _fUsdcAmount,
+                0,
+                _wEthAmount
+            ));
         }
 
         // if the user didn't supply anything, we revert
@@ -249,6 +268,23 @@ contract Staking {
         else {
             revert("weth|usdc not supplied");
         }
+    }
+
+    function uniswapDeposit(
+        uint256 _lockupLength,
+        uint256 _fUsdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount
+    ) internal pure returns (Deposit memory) {
+        return Deposit({
+            lockupLength: _lockupLength,
+            saddleFusdcProvided: 0,
+            saddleUsdcProvided: 0,
+            saddleWethProvided: 0,
+            uniswapV2FusdcProvided: _fUsdcAmount,
+            uniswapV2UsdcProvided: _usdcAmount,
+            uniswapV2WethProvided: _wethAmount
+        });
     }
 
     function receiveUniswapV2Deposit(
@@ -270,11 +306,12 @@ contract Staking {
                 _usdcAmount
             );
 
-            recordDeposit(_recipient, Deposit({
-                lockupLength: _lockupLength,
-                uniswapV2FusdcProvided: _fUsdcAmount,
-                uniswapV2UsdcProvided: _usdcAmount
-            }));
+            recordDeposit(_recipient,uniswapDeposit(
+                _lockupLength,
+                _fUsdcAmount,
+                _usdcAmount,
+                0
+            ));
         }
 
         else if (_wEthAmount > 0) {
@@ -287,11 +324,12 @@ contract Staking {
                 _wEthAmount
             );
 
-            recordDeposit(_recipient, Deposit({
-                lockupLength: _lockupLength,
-                uniswapV2FusdcProvided: _fUsdcAmount,
-                uniswapV2WethProvided: _wEthAmount
-            }));
+            recordDeposit(_recipient,uniswapDeposit(
+                _lockupLength,
+                _fUsdcAmount,
+                0,
+                _wEthAmount
+            ));
         }
 
         else {
