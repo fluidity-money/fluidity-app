@@ -552,25 +552,23 @@ export default function Rewards() {
                 addToken("fUSDC");
               }}
             >
-              {/* <BloomEffect type="static" color={"red"} width={80} /> */}
+              {/*<BloomEffect type="static" color={"#cf661d"} width={100} />*/}
               <WalletIcon wallet="metamask" />
             </a>
             <a href="https://app.1inch.io/#/1/simple/swap/ETH/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/import-token">
-              {/* <BloomEffect type="static" color={"red"} width={80} /> */}
+              {/*<BloomEffect type="static" color={"red"} width={100} />*/}
               <ProviderIcon provider="Oneinch" />
             </a>
             <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
-              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+              {/*<BloomEffect type="static" color={"#e65da9"} width={100} />*/}
               <ProviderIcon provider="Sushiswap" />
             </a>
             <a href="https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest">
-              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+              {/*<BloomEffect type="static" color={"#825902"} width={100} />*/}
               <ProviderIcon provider="Balancer" />
             </a>
           </div>
-          <Display size="xxxs">
-            Spend To Earn
-          </Display>
+          <Display size="xxxs">Spend To Earn</Display>
           {!mobileView && <Text>Use Fluid Assets to generate yield.</Text>}
         </CardCarousel.Slide>
         <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>

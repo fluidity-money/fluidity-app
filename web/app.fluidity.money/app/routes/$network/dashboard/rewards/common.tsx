@@ -126,13 +126,26 @@ const NoUserRewards = ({ prizePool }: INoUserRewards) => {
       <div id="unclaimed-left">
         <Text size="lg">Total Prize Pool</Text>
         <Display size={"sm"}>
-          <strong>{numberToMonetaryString(prizePool)}</strong>
+          {isMobile ? (
+            numberToMonetaryString(prizePool)
+          ) : (
+            <strong>{numberToMonetaryString(prizePool)}</strong>
+          )}
         </Display>
       </div>
 
       {/* Auto-claims infobox */}
       <div id="infobox">
-        <Heading as="h4">No Unclaimed Rewards</Heading>
+        {isMobile ? (
+          <>
+            <Text size="medium" code prominent>
+              NO UNCLAIMED REWARDS
+            </Text>
+            <br />
+          </>
+        ) : (
+          <Heading as="h4">No Unclaimed Rewards</Heading>
+        )}
         <Text>You currently have no unclaimed rewards</Text>
         <br />
         <Text>Use, Send & Receive Fluid Assets to gain yield</Text>

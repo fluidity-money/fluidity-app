@@ -1,29 +1,29 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { ReactElement, useState } from 'react';
-import { Card, CaretLeft, CaretRight, Text } from '~/components/';
-import { ICard } from '../Card/Card';
+import { AnimatePresence, motion } from "framer-motion";
+import { ReactElement, useState } from "react";
+import { Card, CaretLeft, CaretRight, Text } from "~/components/";
+import { ICard } from "../Card/Card";
 
-import styles from './CardCarousel.module.scss'
+import styles from "./CardCarousel.module.scss";
 
 const variants = {
   enter: (direction: number) => {
     return {
       x: direction > 0 ? 350 : -350,
-      opacity: 0
+      opacity: 0,
     };
   },
   center: {
-    zIndex: 1,
+    zIndex: 0,
     x: 0,
-    opacity: 1
+    opacity: 1,
   },
   exit: (direction: number) => {
     return {
       zIndex: 0,
       x: direction < 0 ? 350 : -350,
-      opacity: 0
+      opacity: 0,
     };
-  }
+  },
 };
 
 const swipeConfidenceThreshold = 10000;
@@ -36,43 +36,45 @@ interface ISlide {
   className?: string;
 }
 
-const Slide: React.FC<ISlide> = ({ className='', children }) => {
-  const classes = `${styles.SlideContent} ${className}`
-  return (
-    <div className={classes}>
-      {children}
-    </div>
-  )
-}
+const Slide: React.FC<ISlide> = ({ className = "", children }) => {
+  const classes = `${styles.SlideContent} ${className}`;
+  return <div className={classes}>{children}</div>;
+};
 
 interface ICardCarousel extends ICard {
   children: ReactElement<ISlide>[];
-  size?: "compact" | "normal"
+  size?: "compact" | "normal";
 }
 
 const CardCarousel: React.FC<ICardCarousel> = ({
   children,
-  type="box",
-  rounded=true,
-  size="normal",
+  type = "box",
+  rounded = true,
+  size = "normal",
   ...props
 }) => {
+  const slides = children.length;
+  const isCompact = size === "compact";
 
-  const slides = children.length
-  const isCompact = size === "compact"
-
-  const [[slide, direction], setSlide] = useState([0, 0])
+  const [[slide, direction], setSlide] = useState([0, 0]);
 
   const paginate = (dir: number) => {
-    setSlide(([slide, direction]) => [(slide+dir < slides && slide+dir >= 0) ? slide + dir : dir === 1 ? 0 : slides-1, dir]);
+    setSlide(([slide, direction]) => [
+      slide + dir < slides && slide + dir >= 0
+        ? slide + dir
+        : dir === 1
+          ? 0
+          : slides - 1,
+      dir,
+    ]);
   };
 
-  if (slides < 2) return null
+  if (slides < 2) return null;
 
   const Navigation = () => (
     <>
       <div
-        className={`${!isCompact ? styles.arrow : ''} ${styles[type]}`}
+        className={`${!isCompact ? styles.arrow : ""} ${styles[type]}`}
         onClick={() => {
           paginate(-1);
         }}
@@ -91,7 +93,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
         ))}
       </div>
       <div
-        className={`${!isCompact ? styles.arrow : ''} ${styles[type]}`}
+        className={`${!isCompact ? styles.arrow : ""} ${styles[type]}`}
         onClick={() => {
           paginate(1);
         }}
@@ -150,4 +152,4 @@ const CardCarousel: React.FC<ICardCarousel> = ({
   );
 };
 
-export default Object.assign(CardCarousel, { Slide })
+export default Object.assign(CardCarousel, { Slide });

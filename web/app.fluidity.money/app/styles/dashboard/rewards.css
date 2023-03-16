@@ -9,7 +9,7 @@
   margin-bottom: 3em;
 }
 
-#infobox > h5 {
+#infobox > h4 {
   margin: 0;
 }
 
@@ -260,46 +260,37 @@
 .rewards-cta-providers {
   position: relative;
   display: flex;
-  justify-content: center;
-  gap: 3em;
-  width: 100%;
+  justify-content: space-around;
+  gap: 2.5em;
+  width: 350px;
   height: 3.5em;
 }
 
 .rewards-cta-providers > a {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   width: 3.5em;
   -webkit-user-drag: none;
 }
 
-.rewards-cta-providers > a > img {
-  position: absolute;
-  width: 100%;
+.rewards-cta-providers > a > * {
+  cursor: pointer;
+  width: 3.5em;
   -webkit-user-drag: none;
-  object-fit: contain;
 }
 
-.rewards-cta-providers > a:first-child > img,
-.rewards-cta-providers > a:last-child > img {
-  position: absolute;
-  top: 4em;
-  left: 0;
+.rewards-cta-providers > a:first-child,
+.rewards-cta-providers > a:last-child {
+  margin-top: 4em;
 }
 
-.rewards-cta-providers > a:last-child > img {
-  left: auto;
-  right: 0;
-}
-
-.rewards-cta-providers.compact > a > img {
-  top: 0;
+.rewards-cta-providers.compact > a:first-child,
+.rewards-cta-providers.compact > a:last-child {
+  margin-top: 0em;
 }
 
 .compactSlide {
+  width: 100%;
   flex-direction: column-reverse;
 }
 .compactSlide > h1 {
