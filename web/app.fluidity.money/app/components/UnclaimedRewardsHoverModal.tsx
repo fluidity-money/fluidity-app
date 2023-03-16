@@ -20,7 +20,6 @@ const UnclaimedRewardsHoverModal = ({
   return (
     <Tooltip
       style={{
-        position: "absolute",
         right: 64,
         top: 80,
         flexDirection: "row",

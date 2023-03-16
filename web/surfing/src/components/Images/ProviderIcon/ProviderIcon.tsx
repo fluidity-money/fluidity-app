@@ -1,15 +1,15 @@
 import { Provider } from '~/types'
 import { getProviderImgPath } from '~/util/liquidityProviders/providers';
 
-import style from "./ProviderIcon.module.scss";
-
 type IProviderIcon = Partial<HTMLImageElement> & {
   provider: Provider;
+  style?: React.CSSProperties;
 };
 
-const ProviderIcon = ({ provider, className }: IProviderIcon) => (
+const ProviderIcon = ({ provider, className, style}: IProviderIcon) => (
   <img
-    className={`${style.provider} ${className}`}
+    style={style}
+    className={className}
     src={getProviderImgPath(provider)}
     alt={provider}
   />
