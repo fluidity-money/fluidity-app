@@ -12,6 +12,7 @@ RUN ["npm", "i"]
 RUN ["forge", "install", "foundry-rs/forge-std", "--no-git", "--no-commit"]
 
 COPY ./foundry.toml .
+COPY ./interfaces/ ./interfaces
 COPY ./contracts/ ./contracts
 
 RUN forge build --config-path foundry.toml

@@ -504,7 +504,7 @@ func GetLastBlocksTransactionCount(tokenShortName string, network network.Blockc
 		sum += transactionCount
 	}
 
-	average = sum / len(transactionCounts)
+	average = sum / limit
 
 	return average, sum, blocks, transactionCounts
 }

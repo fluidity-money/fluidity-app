@@ -216,9 +216,10 @@ func main() {
 		}
 
 		log.Debugf(
-			"Average transfers in block: %#v! Transfers in block: %#v!",
+			"Average transfers in block: %#v! Transfers in block: %#v! Transfers in epoch: %#v!",
 			averageTransfersInBlock,
 			transfersInBlock,
+			transfersInEpoch,
 		)
 
 		// Sets the average transfers to a default number if the average is less than the default
