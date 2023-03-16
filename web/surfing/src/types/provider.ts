@@ -12,6 +12,7 @@ export type Provider =
   | "Orca"
   | "Polygon"
   | "Saber"
+  | "Saddle"
   | "Solana"
   | "Solend"
   | "Uniswap"
