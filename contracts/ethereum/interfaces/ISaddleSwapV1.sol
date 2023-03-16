@@ -7,5 +7,10 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-interface IStaking {
+interface ISaddleSwapV1 {
+    function addLiquidity(
+        uint256[] memory amounts,
+        uint256 minToMint,
+        uint256 deadline
+    ) external;
 }
