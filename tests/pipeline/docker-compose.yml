@@ -161,7 +161,7 @@ services:
       FLU_ETHEREUM_TOKENS_LIST: "0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e:fUSDT:6,0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab:testClient:18"
     restart: on-failure
 
-  microservice-ethereum-track-winners-util-mining:
+  microservice-ethereum-track-winners:
     build:
       context: ../../cmd/microservice-ethereum-track-winners/
     environment:
@@ -196,7 +196,7 @@ services:
       - spooler
       - microservice-ethereum-worker-sender-util-mining
       - connector-ethereum-reward-logs-amqp-util-mining
-      - microservice-ethereum-track-winners-util-mining
+      - microservice-ethereum-track-winners
     environment:
       FLU_TEST: TestPipelineUtilityMining
       FLU_WORKER_ID: tests
@@ -214,7 +214,7 @@ services:
       - postgres
       - timescale
       - spooler
-      - microservice-ethereum-track-winners-util-mining
+      - microservice-ethereum-track-winners
       - microservice-ethereum-track-transaction-attributes
     environment:
       FLU_TEST: TestTransactionAttributes 
