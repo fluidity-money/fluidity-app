@@ -1,7 +1,7 @@
 import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import {
   json,
   LinksFunction,
@@ -151,36 +151,26 @@ export default function IndexPage() {
   const navigate = useNavigate();
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
-  const { showExperiment } = useContext(SplitContext);
 
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chains = showExperiment("enable-arbitrum")
-    ? [
-        {
-          name: "ETH",
-          icon: <img src="/assets/chains/ethIcon.svg" />,
-        },
-        {
-          name: "ARB",
-          icon: <img src="/assets/chains/ethIcon.svg" />,
-        },
-        {
-          name: "SOL",
-          icon: <img src="/assets/chains/solanaIcon.svg" />,
-        },
-      ]
-    : [
-        {
-          name: "ETH",
-          icon: <img src="/assets/chains/ethIcon.svg" />,
-        },
-        {
-          name: "SOL",
-          icon: <img src="/assets/chains/solanaIcon.svg" />,
-        },
-      ];
+  const chains =
+    [
+      {
+        name: "ETH",
+        icon: <img src="/assets/chains/ethIcon.svg" />,
+      },
+      {
+        name: "ARB",
+        icon: <img src="/assets/chains/ethIcon.svg" />,
+      },
+      {
+        name: "SOL",
+        icon: <img src="/assets/chains/solanaIcon.svg" />,
+      },
+    ];
+
 
   return (
     <>

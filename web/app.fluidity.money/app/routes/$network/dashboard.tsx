@@ -165,7 +165,6 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
 
   const url = useLocation();
@@ -336,9 +335,7 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({ name }) =>
-              showArbitrum ? true : name !== "ARB"
-            )}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />
