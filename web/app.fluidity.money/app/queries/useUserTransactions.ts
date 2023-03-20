@@ -458,9 +458,11 @@ const useUserTransactionsByAddress = async (
       return {
         sender: { address: senderAddress },
         receiver: { address: recipientAddress },
-        amount: addDecimalToBn(
-          new BN(String(transfer.amount)),
-          transfer.token_decimals
+        amount: parseFloat(
+          addDecimalToBn(
+            new BN(String(transfer.amount)),
+            transfer.token_decimals
+          )
         ),
         currency: { symbol: "f" + transfer.token_short_name },
         transaction: { hash: transfer.transaction_hash },
@@ -541,10 +543,12 @@ const useUserTransactionsByTxHash = async (
       return {
         sender: { address: senderAddress },
         receiver: { address: recipientAddress },
-        amount: Number(addDecimalToBn(
-          new BN(String(transfer.amount)),
-          transfer.token_decimals
-        )),
+        amount: Number(
+          addDecimalToBn(
+            new BN(String(transfer.amount)),
+            transfer.token_decimals
+          )
+        ),
         currency: { symbol: "f" + transfer.token_short_name },
         transaction: { hash: transfer.transaction_hash },
         block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
@@ -628,10 +632,12 @@ const useUserTransactionsAll = async (
           return {
             sender: { address: senderAddress },
             receiver: { address: recipientAddress },
-            amount: Number(addDecimalToBn(
-              new BN(String(transfer.amount)),
-              transfer.token_decimals
-            )),
+            amount: Number(
+              addDecimalToBn(
+                new BN(String(transfer.amount)),
+                transfer.token_decimals
+              )
+            ),
             currency: { symbol: "f" + transfer.token_short_name },
             transaction: { hash: transfer.transaction_hash },
             block: {
