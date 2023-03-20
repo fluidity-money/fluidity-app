@@ -79,6 +79,27 @@ export const Template = ({children, ...props}) => <Card {...props}>
         {Template.bind({})}
     </Story>
     <Story
+        name="Holo Card"
+        args={{
+            component: "div",
+            rounded: true,
+            type: "holo",
+            children: <>
+                <ReactSvg />
+                <div>
+                    <h2 style={{color:"black"}}>Solana</h2>
+                    <h4 style={{color:"black"}}>$12.34 Avg prize/trans</h4>
+                </div>
+                <div>
+                    <h3 style={{color:"black"}}>$351,879</h3>
+                    <h4 style={{color:"black"}}>Top prize</h4>
+                </div>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
         name="Rounded Card"
         args={{
             component: "div",

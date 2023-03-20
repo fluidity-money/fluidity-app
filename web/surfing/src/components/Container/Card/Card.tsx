@@ -9,7 +9,7 @@ export interface ICard {
   style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
-  type?: "gray" | "box" | "box-prominent" | "holobox" | "transparent" | "frosted";
+  type?: "gray" | "box" | "box-prominent" | "holo" | "holobox" | "transparent" | "frosted";
   [_: string]: any;
 }
 

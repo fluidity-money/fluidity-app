@@ -37,6 +37,24 @@ button {
     border: 1px solid map-get($border, "prominent");
   }
 
+  &.holo {
+    overflow: auto;
+    position: relative;
+  }
+
+  &.holo::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: $holo;
+    filter: blur(15px);
+  }
+
   &.holobox {
     position: relative;
 
