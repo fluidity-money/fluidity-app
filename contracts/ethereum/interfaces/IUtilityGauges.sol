@@ -8,5 +8,9 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 interface IUtilityGauges {
-    // solhint-disable-previous-line no-empty-blocks
+    function votesAvailable(address spender) external returns (uint256);
+    function votesAvailable() external returns (uint256);
+    function vote(address gauge, uint256 weight) external;
+    function getWeight(address gauge) external returns (uint256, uint256);
+    function addUtility(address gauge) external;
 }
