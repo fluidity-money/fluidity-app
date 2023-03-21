@@ -10,7 +10,7 @@ pragma abicoder v2;
 interface IUtilityGauges {
     function votesAvailable(address spender) external returns (uint256);
     function votesAvailable() external returns (uint256);
-    function vote(address gauge, uint256 weight) external;
-    function getWeight(address gauge) external returns (uint256, uint256);
-    function addUtility(address gauge) external;
+    function vote(address token, string memory gauge, uint256 weight) external;
+    function getWeight(address token, string memory gauge) external returns (uint256, uint256);
+    function addUtility(address token, string memory gauge) external;
 }

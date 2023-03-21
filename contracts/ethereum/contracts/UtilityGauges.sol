@@ -14,9 +14,9 @@ import "../interfaces/IOperatorOwned.sol";
 contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     uint256 constant GAUGE_EPOCH_LENGTH = 7 days;
 
-    event UtilityGaugesReset(uint256 timestamp);
-    event Voted(address gauge, uint256 weight, uint256 gaugeWeight);
-    event NewGauge(address gauge);
+    event UtilityGaugesReset(uint256 indexed timestamp);
+    event Voted(address indexed token, string indexed gauge, uint256 indexed weight, uint256 gaugeWeight);
+    event NewGauge(address indexed token, string indexed gauge);
 
     struct GaugeWeight {
         uint256 weight;
@@ -40,8 +40,8 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
 
     uint256 lastReset_;
 
-    /// @dev contract address => voting
-    mapping (address => GaugeWeight) weights_;
+    /// @dev token address => utility => voting
+    mapping (address => mapping (string => GaugeWeight)) weights_;
 
     mapping (address => UserVotes) userAmountVoted_;
 
@@ -90,6 +90,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
 
         return _votesAvailableStale(spender);
     }
+
     function votesAvailable() public returns (uint256) {
         return votesAvailable(msg.sender);
     }
@@ -107,12 +108,12 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return votes.votes;
     }
 
-    function vote(address gauge, uint256 weight) public {
+    function vote(address token, string memory gauge, uint256 weight) public {
         _checkEpoch();
 
         require(_votesAvailableStale(msg.sender) >= weight, "not enough votes");
 
-        GaugeWeight storage data = weights_[gauge];
+        GaugeWeight storage data = weights_[token][gauge];
 
         require(data.lastReset != 0, "utility gauge doesn't exist");
 
@@ -126,13 +127,13 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         userAmountVoted_[msg.sender].votes += weight;
         totalWeight_ += weight;
 
-        emit Voted(gauge, weight, data.weight);
+        emit Voted(token, gauge, weight, data.weight);
     }
 
-    function getWeight(address gauge) public returns (uint256, uint256) {
+    function getWeight(address token, string memory gauge) public returns (uint256, uint256) {
         _checkEpoch();
 
-        GaugeWeight memory data = weights_[gauge];
+        GaugeWeight memory data = weights_[token][gauge];
 
         uint256 weight;
 
@@ -145,15 +146,15 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return (weight, totalWeight_);
     }
 
-    function addUtility(address gauge) public {
+    function addUtility(address token, string memory gauge) public {
         require(msg.sender == operator(), "operator only");
 
-        GaugeWeight storage data = weights_[gauge];
+        GaugeWeight storage data = weights_[token][gauge];
 
         require(data.lastReset == 0, "utility gauge already exists");
 
         data.lastReset = lastReset_;
 
-        emit NewGauge(gauge);
+        emit NewGauge(token, gauge);
     }
 }
