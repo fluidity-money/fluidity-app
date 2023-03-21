@@ -1,7 +1,7 @@
 import { gql, Queryable, jsonPost } from "~/util";
 import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
 import BN from "bn.js";
-import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
+import { addDecimalToBn } from "~/util/chainUtils/tokens";
 import { MintAddress } from "~/types/MintAddress";
 
 const queryByAddress: Queryable = {
@@ -458,9 +458,11 @@ const useUserTransactionsByAddress = async (
       return {
         sender: { address: senderAddress },
         receiver: { address: recipientAddress },
-        amount: getUsdFromTokenAmount(
-          new BN(String(transfer.amount)),
-          transfer.token_decimals
+        amount: parseFloat(
+          addDecimalToBn(
+            new BN(String(transfer.amount)),
+            transfer.token_decimals
+          )
         ),
         currency: { symbol: "f" + transfer.token_short_name },
         transaction: { hash: transfer.transaction_hash },
@@ -541,9 +543,11 @@ const useUserTransactionsByTxHash = async (
       return {
         sender: { address: senderAddress },
         receiver: { address: recipientAddress },
-        amount: getUsdFromTokenAmount(
-          new BN(String(transfer.amount)),
-          transfer.token_decimals
+        amount: Number(
+          addDecimalToBn(
+            new BN(String(transfer.amount)),
+            transfer.token_decimals
+          )
         ),
         currency: { symbol: "f" + transfer.token_short_name },
         transaction: { hash: transfer.transaction_hash },
@@ -628,9 +632,11 @@ const useUserTransactionsAll = async (
           return {
             sender: { address: senderAddress },
             receiver: { address: recipientAddress },
-            amount: getUsdFromTokenAmount(
-              new BN(String(transfer.amount)),
-              transfer.token_decimals
+            amount: Number(
+              addDecimalToBn(
+                new BN(String(transfer.amount)),
+                transfer.token_decimals
+              )
             ),
             currency: { symbol: "f" + transfer.token_short_name },
             transaction: { hash: transfer.transaction_hash },
