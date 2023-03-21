@@ -10,6 +10,8 @@ export interface ICard {
   rounded?: boolean;
   disabled?: boolean;
   type?: "gray" | "box" | "box-prominent" | "holo" | "holobox" | "transparent" | "frosted";
+  fill?: boolean;
+  shimmer?: boolean;
   [_: string]: any;
 }
 
@@ -21,6 +23,8 @@ const Card = ({
   disabled,
   children,
   type,
+  fill = false,
+  shimmer = false,
   ...props
 }: ICard) => {
   const classProps = className || "";
@@ -29,8 +33,10 @@ const Card = ({
   const typeClass = styles[type || "gray"];
 
   const allClasses = `${styles.card} ${typeClass} ${
-    rounded && styles.rounded
-  } ${disabled && styles.disabled} ${classProps}`;
+    rounded ? styles.rounded : ''
+  } ${disabled ? styles.disabled : ''}
+  ${fill ? styles.fill : ''} ${shimmer ? styles.shimmer : ''}
+  ${classProps}`;
 
   return (
     <Component style={style} className={allClasses} disabled={disabled} {...props}>
