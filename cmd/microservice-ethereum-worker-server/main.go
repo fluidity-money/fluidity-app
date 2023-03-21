@@ -75,11 +75,10 @@ func main() {
 		dbNetwork network.BlockchainNetwork
 	)
 
-
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
-    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
 			k.Payload = err
 		})
@@ -118,7 +117,7 @@ func main() {
 		message.Decode(&hintedBlock)
 
 		// set the configuration using what's in the database for the block
-		log.Debug(func (k *log.Log) {
+		log.Debug(func(k *log.Log) {
 			k.Message = "About to fetch worker config from postgres!"
 		})
 		var (
@@ -133,9 +132,17 @@ func main() {
 		)
 
 		var (
-			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
-			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
-			secondsSinceLastBlock          = defaultSecondsSinceLastBlock
+			defaultDeltaWeightNum   = big.NewInt(1)
+			defaultDeltaWeightDenom = big.NewInt(31536000)
+		)
+
+		var (
+			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(
+				currentAtxTransactionMargin,
+			)
+
+			secondsInOneYearRat   = new(big.Rat).SetUint64(SecondsInOneYear)
+			secondsSinceLastBlock = defaultSecondsSinceLastBlock
 		)
 
 		var (
@@ -143,7 +150,8 @@ func main() {
 			blockNumber       = hintedBlock.BlockNumber
 			blockHash         = hintedBlock.BlockHash
 			fluidTransactions = hintedBlock.DecoratedTransactions
-			transfersInBlock  int
+
+			transfersInBlock int
 		)
 
 		for _, transfers := range fluidTransactions {
@@ -279,7 +287,7 @@ func main() {
 		for _, transaction := range fluidTransactions {
 
 			var (
-				receipt     = transaction.Receipt
+				receipt = transaction.Receipt
 
 				transactionHash      = transaction.Transaction.Hash
 				transferType         = transaction.Transaction.Type
@@ -322,7 +330,11 @@ func main() {
 			// and normalise the gas tip cap by multiplying
 			// ethereum decimals then converting to USD
 
-			normalisedGasTipCapRat := weiToUsd(gasTipCapRat, ethPriceUsd, ethereumDecimalsRat)
+			normalisedGasTipCapRat := weiToUsd(
+				gasTipCapRat,
+				ethPriceUsd,
+				ethereumDecimalsRat,
+			)
 
 			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
 
@@ -331,7 +343,11 @@ func main() {
 
 			blockBaseFeeRat := new(big.Rat).SetInt(&blockBaseFee.Int)
 
-			normalisedBlockBaseFeePerGasRat := weiToUsd(blockBaseFeeRat, ethPriceUsd, ethereumDecimalsRat)
+			normalisedBlockBaseFeePerGasRat := weiToUsd(
+				blockBaseFeeRat,
+				ethPriceUsd,
+				ethereumDecimalsRat,
+			)
 
 			emission.BlockBaseFeeNormal, _ = normalisedBlockBaseFeePerGasRat.Float64()
 
@@ -347,7 +363,11 @@ func main() {
 				maxPriorityFeePerGasRat,
 			)
 
-			normalisedEffectiveGasPriceRat := weiToUsd(effectiveGasPrice, ethPriceUsd, ethereumDecimalsRat)
+			normalisedEffectiveGasPriceRat := weiToUsd(
+				effectiveGasPrice,
+				ethPriceUsd,
+				ethereumDecimalsRat,
+			)
 
 			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
 
@@ -372,34 +392,65 @@ func main() {
 				var (
 					transferFeeNormal = new(big.Rat).Set(feePerTransfer)
 
-					senderAddress    = transfer.SenderAddress
-					recipientAddress = transfer.RecipientAddress
-					appEmission      = transfer.AppEmissions
+					senderAddress_    = transfer.SenderAddress
+					recipientAddress_ = transfer.RecipientAddress
+					appEmission       = transfer.AppEmissions
+
+					// the fluid token is always included
+					fluidClients = []appTypes.UtilityName{appTypes.UtilityFluid}
 				)
 
-				application := applications.ApplicationNone 
+				var (
+					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
+					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
+				)
+
+				application := applications.ApplicationNone
 
 				if transfer.Decorator != nil {
-					applicationFeeUsd := transfer.Decorator.ApplicationFee
+					var (
+						applicationFeeUsd = transfer.Decorator.ApplicationFee
+						utility           = transfer.Decorator.UtilityName
+					)
+
 					application = transfer.Decorator.Application
 
-					transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+					if applicationFeeUsd != nil {
+						transferFeeNormal.Add(transferFeeNormal, applicationFeeUsd)
+					}
+
+					if utility != "" {
+						fluidClients = append(fluidClients, utility)
+					}
+				}
+
+				// fetch the token amount, exchange rate, etc from chain
+
+				pools, err := fluidity.GetUtilityVars(
+					gethClient,
+					registryAddress,
+					contractAddress,
+					fluidClients,
+					defaultDeltaWeightNum,
+					defaultDeltaWeightDenom,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Message = "Failed to get trf vars from chain!"
+						k.Payload = err
+					})
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
 
 				var (
-					winningClasses   = fluidity.WinningClasses
-					deltaWeightNum   = fluidity.DeltaWeightNum
-					deltaWeightDenom = fluidity.DeltaWeightDenom
-					payoutFreqNum    = fluidity.PayoutFreqNum
-					payoutFreqDenom  = fluidity.PayoutFreqDenom
+					winningClasses  = fluidity.WinningClasses
+					payoutFreqNum   = fluidity.PayoutFreqNum
+					payoutFreqDenom = fluidity.PayoutFreqDenom
 				)
 
-				var (
-					deltaWeight = big.NewRat(deltaWeightNum, deltaWeightDenom)
-					payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
-				)
+				payoutFreq := big.NewRat(payoutFreqNum, payoutFreqDenom)
 
 				randomN, randomPayouts, _ := probability.WinningChances(
 					transferFeeNormal,
