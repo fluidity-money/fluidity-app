@@ -51,6 +51,10 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     /// @dev token => oracle
     mapping(address => address) private oracles_;
 
+    /// @dev recipient address => address of the actual recipient (ie, Token
+    ///      treasury)
+    mapping(address => address) private feeSwitches_;
+
     /**
      * @notice intialise the worker config for each of the tokens in the map
      *
@@ -152,6 +156,13 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
         return oracles_[msg.sender];
     }
 
+    function setFeeSwitch(address _originalAddress, address _newRecipient) public {
+        require(noEmergencyMode(), "emergency mode!");
+        require(msg.sender == operator(), "only operator");
+
+        feeSwitches_[_originalAddress] = _newRecipient;
+    }
+
     function reward(
         address _token,
         FluidityReward[] calldata _rewards,
@@ -166,6 +177,14 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
 
         for (uint i = 0; i < _rewards.length; i++) {
             FluidityReward memory fluidReward = _rewards[i];
+
+            for (uint x = 0; x < fluidReward.rewards.length; x++) {
+                address altRecipient = feeSwitches_[fluidReward.rewards[i].winner];
+
+                if (altRecipient != address(0)) {
+                    fluidReward.rewards[x].winner = altRecipient;
+                }
+            }
 
             IFluidClient client = registry_.getFluidityClient(
                 _token,
