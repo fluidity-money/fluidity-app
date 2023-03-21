@@ -8,7 +8,7 @@
   align-items: center;
 
 
-  .deck {
+  .deck { margin-top: 2em;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(50, 20%);
@@ -20,14 +20,33 @@
   }
 
   .slide {
+    top: 0;
     box-sizing:border-box;
     position: absolute;
     width: 100%;
     height: 100%;
     z-index: 0;
+    pointer-events: none;
   
     &.active {
       cursor: grab;
+      z-index: 1;
+      pointer-events: auto;
     }
+  }
+}
+
+.card {
+  padding: 0;
+  height: fit-content;
+
+  img {
+    width: 100%;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    aspect-ratio: 1;
+    object-fit: cover;
   }
 }

@@ -29,12 +29,7 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
 
   const paginate = (dir: number,) => {
     setSlide(([slide, direction]) => [
-      slide + dir < slides && slide + dir >= 0
-        ? slide + dir
-        : dir === 1
-          ? 0
-          : slides - 1,
-      dir,
+      (slide + dir < slides && slide + dir >= 0) ? slide + dir : slide, dir
     ]);
   };
 
@@ -66,8 +61,8 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
           {
             left: `calc(-${slide} * 60%)`,
             transition: {
-              type: "easeInOut",
-              duration: 0.3,
+              type: "easeOut",
+              duration: 0.4,
             }
 
           }
@@ -77,6 +72,7 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
           {children.map((child, index) => {
             const isActive = index === slide;
             const isLeft = index < slide;
+            const distance = isLeft ? slide - index : index - slide;
             return (
               <motion.div
                 className={`${styles.slide} ${isActive ? styles.active : ''}`} 
@@ -84,18 +80,22 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
                 // onMouseDown={e=> controls.start(e)}
                 style={{
                   gridColumn: `${((index * 3)+1)} / span 5 `,
-                  zIndex: isActive ? 1 : 0,
                 }}
                 animate={{
-                  top: isActive ? 0 : (isLeft ? -50 : 50),
-                  rotateZ: isActive ? 0 : (isLeft ? -10 : 10),
-                  opacity: isActive ? 1 : 0.2,
+                  top: isActive ? 0 : (isLeft ? -100*distance : 100*distance),
+                  rotateZ: isActive ? 0 : (isLeft ? -8*distance : 8*distance),
+                  opacity: isActive ? 1 : (1/Math.pow(distance*3, 2)).toFixed(2),
                   transition: {
-                    duration: 0.2,
+                    duration: 0.4,
+                    ease: "easeOut",
                   }
                 }}
               >
-                {child}
+                <Card
+                  {...child.props}
+                  shimmer={isActive}
+                  className={styles.card}
+                />
               </motion.div>
             );
           })}
