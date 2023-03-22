@@ -6,6 +6,8 @@ package log
 
 import "time"
 
+//
+
 const (
 	// EnvDebug is the environment variable that's tested to see if debugging
 	// should be turned on.
