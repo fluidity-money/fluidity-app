@@ -1,8 +1,15 @@
-import { Card, CardCarousel, Display, Heading, LabelledValue, LinkButton, NavBar, Text, HeroCarousel } from "@fluidity-money/surfing";
+import { Card,  Heading, LabelledValue, LinkButton, Text, HeroCarousel } from "@fluidity-money/surfing";
 import { Table } from "~/components";
 
 const AirdropStats = () => {
-  return <div>
+  return <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+    }}
+  >
     <LabelledValue label="EPOCH DAYS LEFT">
       20
     </LabelledValue>
@@ -109,22 +116,24 @@ const Airdrop = () => {
             style={{
               display: "flex",
               flexDirection: "column",
+              gap: "2em",
               zIndex: 1,
             }}
           >
             <Heading>Welcome to Fluidity&apos;s Airdrop Event!</Heading>
-            <Text>
-              Lorem ipsum dolor sit amet.
-              <LinkButton
-                size="medium"
-                type="external"
-                handleClick={() => {
-                  return;
-                }}
-              >
-                Learn more
-              </LinkButton>
-            </Text>
+            <div>
+              <Text>Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate metus, ac convallis lectus porttitor et. Donec maximus gravida mauris, eget tempor felis tristique sit amet. Pellentesque at hendrerit nibh, eu porttitor dui.
+                <LinkButton
+                  size="medium"
+                  type="external"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Learn more
+                </LinkButton>
+              </Text>
+            </div>
             <AirdropStats />
             <MultiplierTasks />
             <MyMultiplier />
