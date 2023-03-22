@@ -44,7 +44,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
 
     IVEGovLockup lockupSource_;
 
-    uint256 lastReset_;
+    uint256 public lastReset_;
 
     /// @dev token address => utility => voting
     mapping (address => mapping (string => GaugeWeight)) weights_;
@@ -76,7 +76,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     /// @dev updates the lastReset_ variable
     /// @dev must be called before lastReset_ or totalWeight_ are used!
     function _checkEpoch() internal {
-        if (block.timestamp > lastReset_ + GAUGE_EPOCH_LENGTH) {
+        if (block.timestamp > (lastReset_ + GAUGE_EPOCH_LENGTH)) {
             // calculate how many epochs we're ahead by, and only move forward by that length
 
             // how much time we're ahead by
@@ -184,6 +184,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
      */
     function addUtility(address token, string memory gauge) public {
         require(msg.sender == operator(), "operator only");
+        _checkEpoch();
 
         GaugeWeight storage data = weights_[token][gauge];
 
