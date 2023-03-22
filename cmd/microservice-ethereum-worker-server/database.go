@@ -9,7 +9,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	postgres "github.com /fluidity-money/fluidity-app/lib/databases/postgres/worker"
+	postgres "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 )
 
 func addAndComputeAverageAtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers, limit int) (int, []uint64, []int) {
