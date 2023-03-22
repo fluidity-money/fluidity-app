@@ -171,7 +171,6 @@ export default function Dashboard() {
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton  = showExperiment("feature-network-visible");
-  //const showMobileNetworkButton  = true;
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");

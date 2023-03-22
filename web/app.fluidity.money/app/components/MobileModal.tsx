@@ -60,7 +60,6 @@ export default function MobileModal({
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton  = showExperiment("feature-network-visible");
-  //const showMobileNetworkButton  = true;
 
   const [animation, setAnimation] = useState(true);
 
