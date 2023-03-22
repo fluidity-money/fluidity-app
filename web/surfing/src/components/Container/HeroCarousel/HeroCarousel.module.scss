@@ -7,8 +7,21 @@
   flex-direction: column;
   align-items: center;
 
+  .nav { 
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+    -khtml-user-select: none;
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+  }
 
-  .deck { margin-top: 2em;
+  .deck { 
+    margin-top: 1em;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(50, 20%);
@@ -17,6 +30,7 @@
     height: fit-content;
     width: 100%;
     overflow: visible;
+    aspect-ratio: 1/1;
   }
 
   .slide {
@@ -38,7 +52,7 @@
 
 .card {
   padding: 0;
-  height: fit-content;
+  aspect-ratio: 1;
 
   img {
     width: 100%;

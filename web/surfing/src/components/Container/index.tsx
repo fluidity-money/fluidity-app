@@ -14,6 +14,7 @@ import { TokenCard } from "./TokenCard";
 import { TokenDetails } from "./TokenDetails";
 import { FluidifyCard } from "./FluidifyCard";
 import { CardCarousel } from "./CardCarousel";
+import { HeroCarousel } from "./HeroCarousel";
 
 export {
   Row,
@@ -27,5 +28,6 @@ export {
   TokenCard,
   TokenDetails,
   FluidifyCard,
-  CardCarousel
+  CardCarousel,
+  HeroCarousel
 };

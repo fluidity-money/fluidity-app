@@ -115,6 +115,8 @@ const routeMapper = (route: string) => {
       return "ASSETS";
     case "/dao":
       return "DAO";
+    case "/airdrop":
+      return "AIRDROP";
     default:
       return "DASHBOARD";
   }
@@ -207,10 +209,11 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  ];
+      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+      { rewards: { name: "Rewards", icon: <Trophy /> } },
+      { assets: { name: "Assets", icon: <AssetsIcon /> } },
+      { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+    ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -303,9 +306,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
@@ -348,9 +351,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           version={"primary"}
           buttontype="text"
           size={"medium"}

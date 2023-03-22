@@ -9,7 +9,7 @@ import { Text, Card } from './../../'
 />
 
 export const Template = (props) => <div style={{width: 500, marginLeft: 'auto', marginRight: 'auto'}}>
-    <HeroCarousel {...props}>
+    <HeroCarousel {...props} title="BOTTLES I'VE EARNED">
         <Card
           type="frosted"
           fill
@@ -59,6 +59,7 @@ export const Template = (props) => <div style={{width: 500, marginLeft: 'auto', 
           <img src="/src/assets/images/img3.png"/>
         </Card>
     </HeroCarousel>
+    <div style={{height:50,width:50,background:'red'}}/>
 </div>;
 
 <Canvas columns={1} withSource="open" withToolbar >
