@@ -382,17 +382,12 @@ func main() {
 				var (
 					transferFeeNormal = new(big.Rat).Set(feePerTransfer)
 
-					senderAddress_    = transfer.SenderAddress
-					recipientAddress_ = transfer.RecipientAddress
+					senderAddress    = transfer.SenderAddress
+					recipientAddress = transfer.RecipientAddress
 					appEmission       = transfer.AppEmissions
 
 					// the fluid token is always included
 					fluidClients = []appTypes.UtilityName{appTypes.UtilityFluid}
-				)
-
-				var (
-					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
-					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
 				)
 
 				application := applications.ApplicationNone
