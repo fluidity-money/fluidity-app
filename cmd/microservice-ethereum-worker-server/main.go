@@ -4,6 +4,8 @@
 
 package main
 
+//
+
 import (
 	"math/big"
 	"strconv"
@@ -377,7 +379,7 @@ func main() {
 					appEmission      = transfer.AppEmissions
 				)
 
-				application := applications.ApplicationNone 
+				application := applications.ApplicationNone
 
 				if transfer.Decorator != nil {
 					applicationFeeUsd := transfer.Decorator.ApplicationFee
