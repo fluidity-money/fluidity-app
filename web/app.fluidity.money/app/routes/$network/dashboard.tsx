@@ -170,6 +170,8 @@ export default function Dashboard() {
   const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton  = showExperiment("feature-network-visible");
+  //const showMobileNetworkButton  = true;
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -500,6 +502,15 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
+            {(isTablet || isMobile) && showMobileNetworkButton && (
+              <>
+            <ChainSelectorButton chain={chainNameMap[network as "ethereum" | "solana"]} 
+            onClick={() => setChainModalVisibility(true)}
+            
+             />
+            </>
+            )}
+           
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (

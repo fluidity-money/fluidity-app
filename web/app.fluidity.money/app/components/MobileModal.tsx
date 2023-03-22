@@ -59,6 +59,8 @@ export default function MobileModal({
   const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton  = showExperiment("feature-network-visible");
+  //const showMobileNetworkButton  = true;
 
   const [animation, setAnimation] = useState(true);
 
@@ -149,6 +151,13 @@ export default function MobileModal({
 
             {/* Navigation Buttons */}
             <div className="mobile-navbar-right">
+              {/* Chain Switcher */}
+              {showMobileNetworkButton ? (
+                  <ChainSelectorButton
+                  chain={chains[network as "ethereum" | "solana"]}
+                  onClick={() => setChainModalVisibility(true)}
+                  />
+                  ) : null}
               {/* Prize Money */}
               <GeneralButton
                 version={"transparent"}
@@ -205,10 +214,13 @@ export default function MobileModal({
                 )}
 
                 {/* Chain Switcher */}
-                <ChainSelectorButton
-                  chain={chains[network as "ethereum" | "solana"]}
-                  onClick={() => setChainModalVisibility(true)}
-                />
+                {showMobileNetworkButton ? null :
+                 <ChainSelectorButton
+                chain={chains[network as "ethereum" | "solana"]}
+                onClick={() => setChainModalVisibility(true)}
+                />}
+                
+
               </section>
               {/* Navigation between pages */}
               <nav className={"navbar-v2 "}>
