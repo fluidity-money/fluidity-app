@@ -113,7 +113,14 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
             votes.lastReset = lastReset_;
         }
 
-        return votes.votes;
+        uint256 votesSpent = votes.votes;
+        uint256 totalVotesAvailable = lockupSource_.balanceOf(spender);
+
+        if (votesSpent > totalVotesAvailable) {
+            return 0;
+        }
+
+        return totalVotesAvailable - votesSpent;
     }
 
     /**
