@@ -115,6 +115,8 @@ const routeMapper = (route: string) => {
       return "ASSETS";
     case "/dao":
       return "DAO";
+    case "/airdrop":
+      return "AIRDROP";
     default:
       return "DASHBOARD";
   }
@@ -167,6 +169,7 @@ export default function Dashboard() {
   const { showExperiment, client } = useContext(SplitContext);
   const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -207,10 +210,11 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  ];
+      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+      { rewards: { name: "Rewards", icon: <Trophy /> } },
+      { assets: { name: "Assets", icon: <AssetsIcon /> } },
+      { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+    ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -366,8 +370,9 @@ export default function Dashboard() {
         {/* Nav Bar */}
         <ul>
           {navigationMap
-            .filter((obj) =>
-              showAssets ? true : Object.keys(obj)[0] !== "assets"
+            .filter((obj) => showAssets ? true : Object.keys(obj)[0] !== "assets"
+            )
+            .filter((obj) => showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
             )
             .map((obj, index) => {
               const key = Object.keys(obj)[0];
