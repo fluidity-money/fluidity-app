@@ -1,7 +1,10 @@
+
 import hre from 'hardhat';
-const ethers = hre.ethers;
+
 import "@nomiclabs/hardhat-waffle";
-import {USUAL_FUSDT_ADDR} from '../test-constants';
+
+import {USUAL_FUSDT_ADDR} from '../mainnet-constants';
+
 import { optionalEnv } from '../script-utils';
 
 const EnvContractAddress = `FLU_ETHEREUM_SPAM_TRANSFERS_CONTRACT_ADDRESS`;
@@ -10,7 +13,7 @@ const EnvContractAddress = `FLU_ETHEREUM_SPAM_TRANSFERS_CONTRACT_ADDRESS`;
 async function main() {
   const targetAddress = optionalEnv(EnvContractAddress, USUAL_FUSDT_ADDR);
 
-  const [from, to] = (await ethers.getSigners())
+  const [from, to] = (await hre.ethers.getSigners())
 
   const token = await hre.ethers.getContractAt(
     targetAddress,
@@ -18,7 +21,7 @@ async function main() {
     from,
   );
 
-  const amount = ethers.utils.parseUnits("10",6);
+  const amount = hre.ethers.utils.parseUnits("10",6);
 
   const res = await token.transfer(to.address, amount);
   await res.wait();

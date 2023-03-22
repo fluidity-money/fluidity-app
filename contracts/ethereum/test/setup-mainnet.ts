@@ -6,7 +6,7 @@ import { deployTokens } from "../deployment";
 
 import {
   AAVE_V2_POOL_PROVIDER_ADDR,
-  TokenList } from "../test-constants";
+  TokenList } from "../mainnet-constants";
 
 import {
   commonBindings,

@@ -1,11 +1,11 @@
 
-import * as ethers from 'ethers';
+import * as ethers from "ethers";
 
-import { assert } from 'chai';
+import { assert } from "chai";
 
-import type { HardhatRuntimeEnvironment } from 'hardhat';
+import type { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { EMPTY_ADDRESS } from '../script-utils';
+import { EMPTY_ADDRESS } from "../script-utils";
 
 export const expectEq = (a: ethers.BigNumberish, b: ethers.BigNumberish) => {
     const aBN = ethers.BigNumber.from(a);

@@ -6,7 +6,9 @@ import { forknetTakeFunds } from "../script-utils";
 
 import { deployTokens } from "../deployment";
 
-import { AAVE_V3_GOERLI_POOL_PROVIDER_ADDR, GoerliTokenList } from "../test-constants";
+import {
+  AAVE_V3_GOERLI_POOL_PROVIDER_ADDR,
+  TokenList } from "./goerli-constants";
 
 import {
     commonBeaconAddresses,
@@ -37,14 +39,14 @@ before(async function() {
     return;
   }
 
-  const toDeploy = [GoerliTokenList["usdc"]];
+  const toDeploy = [TokenList["usdc"]];
 
   // deploy fUsdc
 
   await forknetTakeFunds(
     hre,
     [await signers.userAccount1.getAddress()],
-    [GoerliTokenList["usdc"]]
+    [TokenList["usdc"]]
   );
 
   const {
@@ -95,7 +97,7 @@ before(async function() {
   bindings = {
     ...commonBindings,
     usdc: {
-      base: await hre.ethers.getContractAt("IERC20", GoerliTokenList["usdc"].address, signers.userAccount1),
+      base: await hre.ethers.getContractAt("IERC20", TokenList["usdc"].address, signers.userAccount1),
       fluid: contracts.usdc.deployedToken.connect(signers.userAccount1),
     }
   };

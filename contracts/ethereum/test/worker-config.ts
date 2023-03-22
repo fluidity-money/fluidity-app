@@ -11,9 +11,8 @@ describe("worker config", async function () {
   let fFeiAccount: ethers.Contract;
 
   before(async function () {
-    if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
+    if (process.env.FLU_FORKNET_NETWORK !== "mainnet")
       return this.skip();
-    }
 
     ({
       usdt: { fluidAccount1: fUsdtAccount },

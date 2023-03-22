@@ -26,7 +26,9 @@ import {
   deployOperator,
   deployTestUtilityWithoutDAO } from './deployment';
 
-import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
+import {
+  AAVE_V2_POOL_PROVIDER_ADDR,
+  TokenList } from "./mainnet-constants";
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
@@ -249,7 +251,8 @@ module.exports = {
   },
   dependencyCompiler: {
     paths: [
-      "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol"
+      "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+      "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol"
     ]
   },
   networks: {

@@ -1,7 +1,11 @@
-import hre from 'hardhat';
-import { USUAL_FUSDT_ADDR } from '../test-constants';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { optionalEnv } from '../script-utils';
+
+import hre from "hardhat";
+
+import { USUAL_FUSDT_ADDR } from "../mainnet-constants";
+
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+
+import { optionalEnv } from "../script-utils";
 
 const EnvContractAddress = `FLU_ETHEREUM_SPAM_TRANSFERS_CONTRACT_ADDRESS`;
 

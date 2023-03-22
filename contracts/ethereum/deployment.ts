@@ -38,6 +38,8 @@ export const getFactories = async (
 
   const daoFactory = await hre.ethers.getContractFactory("DAOStable");
 
+  const staking = await hre.ethers.getContractFactory("Staking");
+
   return {
     upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
@@ -49,6 +51,7 @@ export const getFactories = async (
     aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
     dao: daoFactory,
+    staking: staking
   };
 };
 
