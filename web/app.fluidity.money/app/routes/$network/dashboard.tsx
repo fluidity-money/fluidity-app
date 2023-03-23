@@ -167,7 +167,6 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton  = showExperiment("feature-network-visible");
@@ -341,9 +340,7 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network satisfies ChainName]}
-            options={Object.values(chainNameMap).filter(({ name }) =>
-              showArbitrum ? true : name !== "ARB"
-            )}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />

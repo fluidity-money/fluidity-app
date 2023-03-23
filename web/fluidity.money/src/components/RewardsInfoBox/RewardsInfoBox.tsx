@@ -13,7 +13,6 @@ import {
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { useSplitContext } from "hooks/SplitContext";
 
 interface IRewardBoxProps {
   totalTransactions: number;
@@ -35,8 +34,6 @@ const RewardsInfoBox = ({
   loading,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
-  const { showExperiment } = useSplitContext();
-  const showArb = showExperiment("enable-arbitrum");
 
   const showRewardPool = type === "black";
 
@@ -62,7 +59,6 @@ const RewardsInfoBox = ({
       name: chain,
       icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
     }))
-    .filter(({ name }) => name !== "ARB" || showArb);
 
   const [prizePool, setPrizePool] = useState<number>(0);
 

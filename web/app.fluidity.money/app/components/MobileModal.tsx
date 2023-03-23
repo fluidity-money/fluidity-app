@@ -57,7 +57,6 @@ export default function MobileModal({
   );
 
   const { showExperiment } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton  = showExperiment("feature-network-visible");
@@ -106,9 +105,7 @@ export default function MobileModal({
         <BlockchainModal
           handleModal={setChainModalVisibility}
           option={chains[network satisfies ChainName]}
-          options={Object.values(chains).filter(
-            ({ name }) => name !== "ARB" || showArbitrum
-          )}
+          options={Object.values(chains)}
           setOption={handleSetChain}
           mobile={true}
         />

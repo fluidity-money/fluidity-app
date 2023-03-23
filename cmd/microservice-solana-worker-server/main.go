@@ -101,6 +101,8 @@ func main() {
 
 		solanaBlockTime := workerConfig.SolanaBlockTime
 
+		solanaBlockTimeRat := new(big.Rat).SetUint64(solanaBlockTime)
+
 		// emissions in this loop should only contain information relevant to the
 		// entire slot set here so that if any point the loop for the transfers
 		// shorts that it'll send out with information relevant to that transfer
@@ -119,7 +121,7 @@ func main() {
 			}
 		}
 
-		atx := probability.CalculateAtx(solanaBlockTime, fluidTransfers)
+		atx := probability.CalculateAtx(solanaBlockTimeRat, fluidTransfers)
 
 		// normalise the amount to be consistent with USDC as a floating point
 

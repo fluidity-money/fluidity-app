@@ -132,6 +132,7 @@ func main() {
 			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
 			atxBufferSize                = workerConfig.AtxBufferSize
+			epochBlocks                  = workerConfig.EpochBlocks
 		)
 
 		var (
@@ -161,7 +162,11 @@ func main() {
 			transfersInBlock += len(transfers.Transfers)
 		}
 
-		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
+		secondsSinceLastBlockRat := new(big.Rat).SetFloat64(secondsSinceLastBlock)
+
+		secondsSinceLastEpochFloat := secondsSinceLastBlock * float64(epochBlocks)
+
+		secondsSinceLastEpoch := uint64(secondsSinceLastEpochFloat)
 
 		emission := worker.NewEthereumEmission()
 
@@ -171,14 +176,26 @@ func main() {
 
 		emission.EthereumBlockNumber = blockNumber
 
-		emission.SecondsSinceLastBlock = secondsSinceLastBlock
+		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
+
+		addBtx(
 			dbNetwork,
 			blockNumber.Uint64(),
 			tokenName,
 			transfersInBlock,
+		)
+
+		averageTransfersInBlock, _, atxBlocks, atxTxCounts := computeTransactionsSumAndAverage(
+			dbNetwork,
+			tokenName,
 			atxBufferSize,
+		)
+
+		_, transfersInEpoch, _, _ := computeTransactionsSumAndAverage(
+			dbNetwork,
+			tokenName,
+			epochBlocks,
 		)
 
 		emission.AtxBufferSize = atxBufferSize
@@ -202,9 +219,10 @@ func main() {
 		}
 
 		log.Debugf(
-			"Average transfers in block: %#v! Transfers in block: %#v!",
+			"Average transfers in block: %#v! Transfers in block: %#v! Transfers in epoch: %#v!",
 			averageTransfersInBlock,
 			transfersInBlock,
+			transfersInEpoch,
 		)
 
 		// Sets the average transfers to a default number if the average is less than the default
@@ -219,10 +237,18 @@ func main() {
 		// if this block is abnormal and could be an attack, we don't use the
 		// average!
 
-		transfersInBlockRat := new(big.Rat).SetInt64(int64(transfersInBlock))
+		transfersInEpochRat := new(big.Rat).SetInt64(int64(transfersInEpoch))
+
+		epochBlocksRat := new(big.Rat).SetInt64(int64(epochBlocks))
+
+		// average transfers in block over the current epoch
+		transfersInBlockOverEpoch := new(big.Rat).Quo(
+			transfersInEpochRat,
+			epochBlocksRat,
+		)
 
 		currentAtxTransactionMarginRatCmp := new(big.Rat).Add(
-			transfersInBlockRat,
+			transfersInBlockOverEpoch,
 			currentAtxTransactionMarginRat,
 		)
 
@@ -246,21 +272,23 @@ func main() {
 
 		if currentAtxTransactionMarginRatCmp.Cmp(averageTransfersInBlockRat) > 0 {
 
-			currentAtx = new(big.Rat).Mul(secondsInOneYearRat, transfersInBlockRat)
+			currentAtx = new(big.Rat).Mul(
+				secondsInOneYearRat,
+				transfersInBlockOverEpoch,
+			)
 
 			currentAtx.Quo(currentAtx, secondsSinceLastBlockRat)
 
-			btx = transfersInBlock
+			btx = transfersInEpoch
 
 		} else {
 
 			currentAtx = probability.CalculateAtx(
-				secondsSinceLastBlock,
+				secondsSinceLastBlockRat,
 				averageTransfersInBlock,
 			)
 
-			btx = averageTransfersInBlock
-
+			btx = averageTransfersInBlock * epochBlocks
 		}
 
 		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
@@ -449,7 +477,7 @@ func main() {
 					pools,
 					winningClasses,
 					btx,
-					secondsSinceLastBlock,
+					secondsSinceLastEpoch,
 					emission,
 				)
 
