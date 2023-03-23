@@ -1,4 +1,4 @@
-import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
+import ERC20 from '@openzeppelin/contracts/build/contracts/IERC20Metadata.json';
 
 const abi = ERC20.abi;
 

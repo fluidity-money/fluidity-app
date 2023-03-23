@@ -36,13 +36,6 @@ const firehose = createEventBus(
 // Initialize the firehose
 firehose.subscribe(() => {});
 
-
-const registry = new Map<string, Subscriber<Transaction>>();
-
-const firehose = createEventBus(
-  ...config.services
-)
-
 // Prepare for commands
 io.on("connection", (socket) => {
   const {
