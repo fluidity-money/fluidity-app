@@ -1,0 +1,17 @@
+.ProgressBar {
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+  padding: 0;
+
+  .bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease-in-out;
+    background-color: white;
+    border-radius: 0 100px 100px 0;
+  }
+}

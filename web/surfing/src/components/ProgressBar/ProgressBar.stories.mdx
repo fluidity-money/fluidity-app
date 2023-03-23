@@ -1,0 +1,29 @@
+import { Meta, Canvas, Story, Title, Subtitle, ArgsTable } from "@storybook/addon-docs";
+
+import { ProgressBar } from "./";
+
+import { Text, NavBar } from '../'
+
+<Meta title="ProgressBar" component={ProgressBar} />
+
+export const Template = (args) => <div style={{position:'relative'}}>
+  <ProgressBar 
+    {...args}
+  />
+</div>;
+
+<Title>Progress Bar</Title>
+
+<Canvas columns={1}  withSource="open" withToolbar>
+    <Story
+        name="Progress Bar"
+        args={{
+            value: 50,
+            max: 100,
+            rounded: true,
+            type: 'frosted'
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>
