@@ -5,9 +5,11 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
+	timescale "github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	postgres "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 )
 
 func addBtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers int) {
@@ -15,7 +17,7 @@ func addBtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortNa
 		k.Message = "About to insert a transaction count into timescale!"
 	})
 
-	worker.InsertTransactionCount(
+	timescale.InsertTransactionCount(
 		blockNumber,
 		tokenShortName,
 		transfers,
@@ -33,4 +35,14 @@ func computeTransactionsSumAndAverage(network_ network.BlockchainNetwork, tokenS
 		network_,
 		limit,
 	)
+}
+
+func lookupFeeSwitch(addr ethereum.Address, network_ network.BlockchainNetwork) ethereum.Address {
+	feeSwitch := postgres.GetFeeSwitch(addr, network_)
+
+	if feeSwitch == nil {
+		return addr
+	}
+
+	return feeSwitch.NewAddress
 }

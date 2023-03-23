@@ -58,6 +58,7 @@ export default function MobileModal({
   const { showExperiment } = useContext(SplitContext);
   const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const [animation, setAnimation] = useState(true);
 
@@ -214,6 +215,7 @@ export default function MobileModal({
                 <ul>
                   {navigationMap
                     .filter(({ name }) => name !== "Assets" || showAssets)
+                    .filter(({ name }) => name !== "Airdrop" || showAirdrop)
                     .map(
                       (
                         obj: { name: string; icon: JSX.Element },

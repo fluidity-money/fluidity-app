@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -214,6 +215,12 @@ type (
 		Apeswap          float64 `json:"apeswap"`
 		Saddle           float64 `json:"saddle"`
 		GTradeV6_1       float64 `json:"gtrade_v6_1"`
+	}
+
+	FeeSwitch struct {
+		OriginalAddress ethereum.Address          `json:"original_address"`
+		NewAddress      ethereum.Address          `json:"new_address"`
+		Network         network.BlockchainNetwork `json:"network"`
 	}
 )
 
