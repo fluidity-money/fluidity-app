@@ -25,6 +25,8 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 		TableFeeSwitch,
 	)
 
+	_, _ = postgresClient.Exec("insert into cunts values ($1)", originalAddress)
+
 	row := postgresClient.QueryRow(statementText, network_, originalAddress)
 
 	if err := row.Err(); err != nil {
