@@ -42,6 +42,16 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 
 	switch err := row.Scan(&feeSwitch.NewAddress); err {
 	case sql.ErrNoRows:
+		log.Debug(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to find the fee switch replacement for the address %v, network %v",
+				originalAddress,
+				network_,
+			)
+		})
+
 		return nil
 
 	default:
@@ -51,6 +61,17 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 			k.Payload = err
 		})
 	}
+
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Found the fee switch replacement for the address %v, network %v, is %v",
+			originalAddress,
+			network_,
+			feeSwitch.NewAddress,
+		)
+	})
 
 	return &feeSwitch
 }
