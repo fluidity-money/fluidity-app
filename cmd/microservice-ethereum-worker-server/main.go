@@ -378,10 +378,30 @@ func main() {
 					appEmission       = transfer.AppEmissions
 				)
 
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Looking up the sender address %v, and the recipient address %v in the transaction hash %v in the fee switch database",
+						senderAddress_,
+						recipientAddress_,
+						transactionHash,
+					)
+				})
+
 				var (
 					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
 					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
 				)
+
+				log.App(func(k *log.Log) {
+					k.Format(
+						"For up the sender address %v, and the recipient address %v, the new sender address %v and new recipient address %v for the transaction hash %v in the fee switch database was found",
+						senderAddress_,
+						recipientAddress_,
+						senderAddress,
+						recipientAddress,
+						transactionHash,
+					)
+				})
 
 				application := applications.ApplicationNone
 
