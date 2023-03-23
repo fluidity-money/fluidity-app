@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
     debug && socket.emit("debug", `Subscribing to ${protocol} ${address}...`)
     
     BelongsToView(firehose, address).subscribe((transaction) => {
-      socket.emit("transactions", transaction);
+      socket.emit("Transactions", transaction);
     });
   })
 
