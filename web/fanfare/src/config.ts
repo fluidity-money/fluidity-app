@@ -4,13 +4,14 @@ import {
 
  import {
     GraphQLObserver,
+    TransactionObserver
  } from './observers';
-import { TransactionObserver } from './observers/TransactionObserver';
 import { EthereumConnector } from './connectors/Ethereum';
 
 
 export default mergeSettings({
     unhealthyThreshold: 5,
+    debug: false,
     services: [
         // GraphQLObserver(
         //     'wss://localhost:4000/graphql',
