@@ -1,14 +1,13 @@
 import express from "express";
 
 import { createServer } from "http";
-import { Observable, Subscriber } from "rxjs";
+import { Subscriber } from "rxjs";
 import { Server } from "socket.io";
+import config from "./config";
 
 import { uuid } from "./core/global";
-import { Transaction } from "./types/OutputMessage";
-
-import config from "./config";
 import { createEventBus } from "./core/register";
+import { Transaction } from "./types/OutputMessage";
 import { BelongsToView } from "./views/BelongsToView";
 
 const port = process.env.PORT as unknown as number || 3111;
@@ -25,12 +24,18 @@ const io = new Server(httpServer, {
   },
 });
 
+const { debug } = config;
 
 const registry = new Map<string, Subscriber<Transaction>>();
 
 const firehose = createEventBus(
-  ...config.services
+  config,
+  ...config.services,
 )
+
+// Initialize the firehose
+firehose.subscribe(() => {});
+
 
 // Prepare for commands
 io.on("connection", (socket) => {
@@ -44,16 +49,20 @@ io.on("connection", (socket) => {
     socket.emit("pong", `pong [${uuid}]`);
   });
 
-  socket.on("subscribeTransactions", ({ protocol, address }) => {
+  socket.on("subscribeTransactions", (protocol, address) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
+
+    debug && socket.emit("debug", `Subscribing to ${protocol} ${address}...`)
     
     BelongsToView(firehose, address).subscribe((transaction) => {
-      socket.emit("Transactions", transaction);
+      socket.emit("transactions", transaction);
     });
   })
 
 
   socket.on("disconnect", () => {
+    debug && socket.emit("debug", `Unsubscribing...`)
+
     registry.delete(socket.id);
   });
 });

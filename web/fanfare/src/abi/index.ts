@@ -1,5 +1,5 @@
-import IERC20 from '@openzeppelin/contracts/build/contracts/IERC20.json';
+import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 
-const abi = IERC20.abi;
+const abi = ERC20.abi;
 
 export { abi as ERC20 };
