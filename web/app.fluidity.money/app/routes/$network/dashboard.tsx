@@ -56,7 +56,7 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ params }) => {
   const ethereumWallets = config.config["ethereum"].wallets;
 
-  const network = params.network ?? "";
+  const network: ChainName = params.network ?? "";
 
   const provider = config.liquidity_providers;
 
@@ -242,7 +242,7 @@ export default function Dashboard() {
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: string) => {
+  const handleSetChain = (network: ChainName) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -330,7 +330,7 @@ export default function Dashboard() {
 
         <ChainSelectorButton
           className="selector-button"
-          chain={chainNameMap[network as "ethereum" | "solana"]}
+          chain={chainNameMap[network satisfies ChainName]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -340,7 +340,7 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={chainNameMap[network as "ethereum" | "solana"]}
+            option={chainNameMap[network satisfies ChainName]}
             options={Object.values(chainNameMap).filter(({ name }) =>
               showArbitrum ? true : name !== "ARB"
             )}
@@ -502,12 +502,9 @@ export default function Dashboard() {
             </GeneralButton>
             */}
             {(isTablet || isMobile) && showMobileNetworkButton && (
-              <>
-            <ChainSelectorButton chain={chainNameMap[network as "ethereum" | "solana"]} 
+            <ChainSelectorButton chain={chainNameMap[network satisfies ChainName]} 
             onClick={() => setChainModalVisibility(true)}
-            
-             />
-            </>
+            />
             )}
            
 
