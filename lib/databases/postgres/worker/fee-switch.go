@@ -40,8 +40,9 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 		Network:         network_,
 	}
 
-	switch err := row.Scan(&feeSwitch.NewAddress); err {
-	case sql.ErrNoRows:
+	err := row.Scan(&feeSwitch.NewAddress)
+
+	if err == sql.ErrNoRows {
 		log.Debug(func(k *log.Log) {
 			k.Context = Context
 
@@ -53,11 +54,9 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 		})
 
 		return nil
+	}
 
-	case nil:
-		// do nothing
-
-	default:
+	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 			k.Message = "Failed to decode fee switch code!"
