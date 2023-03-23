@@ -26,7 +26,7 @@ main {
   grid-area: main;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   overflow-y: scroll;
-  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .pad-main {
