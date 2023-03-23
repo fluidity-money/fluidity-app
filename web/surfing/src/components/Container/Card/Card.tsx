@@ -38,11 +38,15 @@ const Card = ({
   ${fill ? styles.fill : ''} ${shimmer ? styles.shimmer : ''}
   ${classProps}`;
 
-  return (
+  const CardContent = (
     <Component style={style} className={allClasses} disabled={disabled} {...props}>
       {children}
     </Component>
-  );
+  )
+
+  if (shimmer) return <div className={`${styles.shimmerWrapper} ${rounded ? styles.rounded : ''} ${fill ? styles.fill : ''}`}>{CardContent}</div>
+
+  return CardContent
 };
 
 export default Card;
