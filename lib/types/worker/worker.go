@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -179,6 +180,14 @@ type (
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
+	}
+
+	// FeeSwitch type supporting replacing an address payout with another
+	// address that should be paid instead
+	FeeSwitch struct {
+		OriginalAddress ethereum.Address          `json:"original_address"`
+		NewAddress      ethereum.Address          `json:"new_address"`
+		Network         network.BlockchainNetwork `json:"network"`
 	}
 )
 

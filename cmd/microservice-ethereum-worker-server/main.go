@@ -77,11 +77,10 @@ func main() {
 		dbNetwork network.BlockchainNetwork
 	)
 
-
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
-    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
 			k.Payload = err
 		})
@@ -120,7 +119,7 @@ func main() {
 		message.Decode(&hintedBlock)
 
 		// set the configuration using what's in the database for the block
-		log.Debug(func (k *log.Log) {
+		log.Debug(func(k *log.Log) {
 			k.Message = "About to fetch worker config from postgres!"
 		})
 		var (
@@ -281,7 +280,7 @@ func main() {
 		for _, transaction := range fluidTransactions {
 
 			var (
-				receipt     = transaction.Receipt
+				receipt = transaction.Receipt
 
 				transactionHash      = transaction.Transaction.Hash
 				transferType         = transaction.Transaction.Type
@@ -374,9 +373,14 @@ func main() {
 				var (
 					transferFeeNormal = new(big.Rat).Set(feePerTransfer)
 
-					senderAddress    = transfer.SenderAddress
-					recipientAddress = transfer.RecipientAddress
-					appEmission      = transfer.AppEmissions
+					senderAddress_    = transfer.SenderAddress
+					recipientAddress_ = transfer.RecipientAddress
+					appEmission       = transfer.AppEmissions
+				)
+
+				var (
+					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
+					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
 				)
 
 				application := applications.ApplicationNone
