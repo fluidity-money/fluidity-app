@@ -61,10 +61,7 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			token_short_name,
 			token_decimals,
 			network,
-<<<<<<< HEAD
 			awarded_time,
-=======
->>>>>>> develop
 			address,
 			transaction_hash,
 			volume,
@@ -80,12 +77,9 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			$5,
 			$6,
 			$7,
-<<<<<<< HEAD
 			$8,
 			$9
-=======
 			$8
->>>>>>> develop
 		)`,
 
 		TableWinningTransactionAttributes,
@@ -121,10 +115,7 @@ func GetTransactionAttributes(address ethereum.Address) []TransactionAttributes 
 		`SELECT
 			network,
 			transaction_hash,
-<<<<<<< HEAD
 			awarded_time,
-=======
->>>>>>> develop
 			address,
 			volume,
 			token_short_name,

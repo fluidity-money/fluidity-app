@@ -20,10 +20,7 @@ func main() {
 			network           = winner.Network
 			transactionHash   = winner.SendTransactionHash
 			winnerAddress     = winner.WinnerAddress
-<<<<<<< HEAD
 			awardedTime       = winner.AwardedTime
-=======
->>>>>>> develop
 			amount            = winner.WinningAmount
 			tokenDetails      = winner.TokenDetails
 			rewardTier        = winner.RewardTier
