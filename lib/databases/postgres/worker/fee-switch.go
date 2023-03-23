@@ -54,6 +54,9 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 
 		return nil
 
+	case nil:
+		// do nothing
+
 	default:
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
