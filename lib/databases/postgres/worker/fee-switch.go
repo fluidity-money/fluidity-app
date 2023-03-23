@@ -59,7 +59,7 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Message = "Failed to decode fee switch code!"
+			k.Message = "Failed to decode fee switch code??"
 			k.Payload = err
 		})
 	}
