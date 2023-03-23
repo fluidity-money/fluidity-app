@@ -25,7 +25,7 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 		TableFeeSwitch,
 	)
 
-	row := postgresClient.QueryRow(statementText, network_, originalAddress.String())
+	row := postgresClient.QueryRow(statementText, network_, originalAddress)
 
 	if err := row.Err(); err != nil {
 		log.Fatal(func(k *log.Log) {
