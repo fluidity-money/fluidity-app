@@ -33,7 +33,6 @@ import { captureException } from "@sentry/react";
 import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
 import { generateMeta } from "~/util/tweeter";
-import { SplitContext } from "contexts/SplitProvider";
 import { MintAddress } from "~/types/MintAddress";
 
 export const links: LinksFunction = () => {
