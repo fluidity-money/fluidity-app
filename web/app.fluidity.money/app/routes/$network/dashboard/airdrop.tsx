@@ -1,4 +1,4 @@
-import { Card,  Heading, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight } from "@fluidity-money/surfing";
+import { Card,  Heading, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight, Display } from "@fluidity-money/surfing";
 import { Table } from "~/components";
 
 const AirdropStats = () => {
@@ -66,9 +66,19 @@ const AirdropStats = () => {
 }
 
 const MultiplierTasks = () => {
-  return <Card fill type="holo" rounded style={{zIndex: 0, color: 'black'}}>
-    <Text style={{color: 'black'}} bold size="lg">Multiplier Tasks</Text>
-    <Text style={{color: 'black'}}>Perform displayed tasks to earn the respective multipliers.</Text>
+  return <Card fill type="holo" rounded style={{zIndex: 0, color: 'black', flexDirection: 'row', alignItems: 'center', gap: '2em'}}>
+    <div
+      style={{display: 'flex', flexDirection: 'column', gap: '0.5em', alignItems: 'flex-start'}}
+    >
+      <Text style={{color: 'black'}} bold size="md">Multiplier Tasks</Text>
+      <Text style={{color: 'black'}}>Perform displayed tasks to earn the respective multipliers.</Text>
+    </div>
+    <div>
+      <Display size="sm" style={{color: 'black', margin: 0}} >1x</Display>
+    </div>
+    <div>
+      <Text style={{color: 'black'}}>Perform any type of fAsset transactions <b>in any on-chain protocol</b>, including sending <b>with any wallet</b>.</Text>
+    </div>
   </Card>
 }
 
@@ -253,7 +263,6 @@ const Airdrop = () => {
   return (
     <>
       <div className="pad-main">
-        <Text size="xl">Dashboard</Text>
       </div>
       <div className="pad-main">
         <div
