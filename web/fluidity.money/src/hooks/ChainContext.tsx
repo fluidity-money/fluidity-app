@@ -1,6 +1,7 @@
 // Copyright 2022 Fluidity Money. All rights reserved. Use of this
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
+import type { RewardPoolRes } from "pages/api/reward_pool";
 
 import { Dispatch, SetStateAction, useEffect } from "react";
 import type { Winner, WinnersRes } from "data/winners";
@@ -8,17 +9,11 @@ import type {
   LargestDailyWinner,
   LargestMonthlyWinnersRes,
 } from "data/monthlyLargestWinners";
-import type { Tvl, TvlRes } from "data/tvl";
 import type { TransactionCount } from "data/userActions";
 
 import { createContext, useContext, useState } from "react";
-import {
-  SupportedChains,
-  SupportedChainsList,
-  formatToGraphQLDate,
-} from "@fluidity-money/surfing";
+import { SupportedChains, SupportedChainsList } from "@fluidity-money/surfing";
 import { useWinningTransactions } from "data/winners";
-import { useLiveTvl } from "data/tvl";
 import { useCountTransactions } from "data/userActions";
 import { useHighestRewardStatistics } from "data/monthlyLargestWinners";
 
@@ -31,12 +26,13 @@ interface ChainState {
 
 type onChainData = {
   data:
-    | {
-        ethPool: number;
-        solPool: number;
-        totalTransactions: number;
-      }
-    | undefined;
+  | {
+    ethPool: number;
+    solPool: number;
+    arbPool: number;
+    totalTransactions: number;
+  }
+  | undefined;
   loading: boolean;
 };
 
@@ -52,7 +48,7 @@ const initChainState = (): ChainState => {
   return {
     chain: "ETH",
     network: "MAINNET",
-    setChain: () => {},
+    setChain: () => { },
     apiState: {
       weekWinnings: [],
       largestDailyWinnings: [],
@@ -115,22 +111,17 @@ const ChainContextProvider = ({
 
     fetch("/api/reward_pool")
       .then((res) => res.json())
-      .then(
-        (data: {
-          ethPool: number;
-          solPool: number;
-          totalTransactions: number;
-        }) => {
-          setOnChainData({
-            data: {
-              ethPool: Number(data.ethPool),
-              solPool: Number(data.solPool),
-              totalTransactions: Number(data.totalTransactions),
-            },
-            loading: false,
-          });
-        }
-      );
+      .then((data: RewardPoolRes) => {
+        setOnChainData({
+          data: {
+            ethPool: Number(data.ethPool),
+            solPool: Number(data.solPool),
+            arbPool: Number(data.arbPool),
+            totalTransactions: Number(data.totalTransactions),
+          },
+          loading: false,
+        });
+      });
   }, []);
 
   return (

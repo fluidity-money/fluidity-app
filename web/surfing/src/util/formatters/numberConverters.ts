@@ -26,9 +26,12 @@ const numberToMonetaryString = (dollars: number): string => {
   if (dollars < 0.01) return `$${toSignificantDecimals(dollars, 1)}`;
 
   const decimalValues = Math.round((dollars * 100) % 100);
-  const paddedDecimals = `${decimalValues}`.padStart(2, "0");
+  const decimalCarry = Math.floor(decimalValues / 100);
+  const decimalValues2Dec = decimalValues % 100;
 
-  const commaSepWholeValues = numberToCommaSeparated(dollars);
+  const paddedDecimals = `${decimalValues2Dec}`.padStart(2, "0");
+
+  const commaSepWholeValues = numberToCommaSeparated(dollars + decimalCarry);
 
   return `$${commaSepWholeValues}.${paddedDecimals}`;
 };
@@ -77,9 +80,10 @@ const toSignificantDecimals = (num: number, decimals_?: number): string => {
     (decimalValue * 10 ** totalSigDecimals) % 10 ** totalSigDecimals
   );
 
-  return `${numberToCommaSeparated(
-    wholeValue
-  )}.${`${wholeDecimalValue}`.padStart(decimalsToFirstSig, "0")}`;
+  return `${numberToCommaSeparated(wholeValue)}${wholeDecimalValue === 0
+      ? ""
+      : `.${wholeDecimalValue.toString().padStart(decimalsToFirstSig, "0")}`
+    }`;
 };
 
 //trim a string to <limit> decimal places
@@ -112,7 +116,7 @@ const shorthandAmountFormatter = (
   const item = lookup
     .slice()
     .reverse()
-    .find(function (item) {
+    .find(function(item) {
       return num >= item.value;
     });
   return item

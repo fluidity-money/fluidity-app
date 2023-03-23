@@ -13,6 +13,7 @@ import { MotionContinuousCarousel } from "./MotionContinuousCarousel";
 import { TokenCard } from "./TokenCard";
 import { TokenDetails } from "./TokenDetails";
 import { FluidifyCard } from "./FluidifyCard";
+import { CardCarousel } from "./CardCarousel";
 
 export {
   Row,
@@ -25,5 +26,6 @@ export {
   MotionContinuousCarousel,
   TokenCard,
   TokenDetails,
-  FluidifyCard
+  FluidifyCard,
+  CardCarousel
 };

@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: GPL
-pragma solidity 0.8.11;
+
+// Copyright 2022 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "./BaseNativeToken.sol";
@@ -9,20 +14,14 @@ import "./BaseNativeToken.sol";
 // init here
 
 contract GovToken is BaseNativeToken {
-    uint8 private version_;
-
-    function init(
+    constructor(
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _totalSupply
-    ) public {
-        require(version_ == 0, "already initialised");
-
-        super.init(_name, _symbol, _decimals);
+    ) {
         _mint(msg.sender, _totalSupply);
-
-        version_ = 1;
+        super.init(_name, _symbol, _decimals);
     }
 
     function burn(uint256 _amount) public {

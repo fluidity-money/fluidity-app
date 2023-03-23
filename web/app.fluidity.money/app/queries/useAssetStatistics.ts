@@ -1,54 +1,63 @@
-import { gql, jsonPost, Queryable } from "~/util";
+import { gql, jsonPost } from "~/util";
 
-const query: Queryable = {
-  ethereum: gql`
-    query GetAssetStatistics($token_name: String!, $address: String!) {
-      user: winners_aggregate(
-        where: {
-          token_short_name: { _eq: $token_name }
-          winning_address: { _eq: $address }
-        }
-      ) {
-        aggregate {
-          avg {
-            winning_amount
-          }
-          max {
-            winning_amount
-            transaction_hash
-          }
-        }
+const query = gql`
+  query GetAssetStatistics(
+    $token_name: String!
+    $address: String!
+    $network: network_blockchain!
+  ) {
+    user: winners_aggregate(
+      where: {
+        token_short_name: { _eq: $token_name }
+        winning_address: { _eq: $address }
+        network: { _eq: $network }
       }
-      global: winners_aggregate(
-        where: { token_short_name: { _eq: $token_name } }
-      ) {
-        aggregate {
-          max {
-            winning_amount
-            transaction_hash
-          }
+    ) {
+      aggregate {
+        avg {
+          winning_amount
+        }
+        max {
+          winning_amount
+          transaction_hash
         }
       }
     }
-  `,
-};
+    global: winners_aggregate(
+      where: {
+        token_short_name: { _eq: $token_name }
+        network: { _eq: $network }
+      }
+    ) {
+      aggregate {
+        max {
+          winning_amount
+          transaction_hash
+        }
+      }
+    }
+  }
+`;
 
 type AssetStatisticsRequest = {
   query: string;
   variables: {
     token_name: string;
     address: string;
+    network: string;
   };
+};
+
+export type AssetPrize = {
+  winning_amount: number;
+  transaction_hash: string;
 };
 
 type AssetStatisticsResponse = {
   data?: {
     user: {
       aggregate: {
-        max: {
-          winning_amount: number;
-          transaction_hash: string;
-        };
+        max: AssetPrize;
         avg: {
           winning_amount: number;
         };
@@ -56,30 +65,28 @@ type AssetStatisticsResponse = {
     };
     global: {
       aggregate: {
-        max: {
-          winning_amount: number;
-          transaction_hash: string;
-        };
+        max: AssetPrize;
       };
     };
   };
   error?: string;
 };
 
-const useAssetStatistics = async (
+const useAssetStatistics = (
   network: string,
   tokenName: string,
   userAddress: string
 ) => {
-  if (network !== "ethereum" && network !== "arbitrum") {
+  if (network === "solana") {
     throw Error(`network ${network} not supported`);
   }
 
   const body = {
-    query: query[network],
+    query: query,
     variables: {
       token_name: tokenName.toUpperCase(),
       address: userAddress,
+      network,
     },
   };
 

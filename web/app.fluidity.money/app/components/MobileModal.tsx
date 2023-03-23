@@ -1,5 +1,6 @@
 import { useNavigate, Link } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { SplitContext } from "contexts/SplitProvider";
 import { useState, useContext, useEffect } from "react";
 import { networkMapper } from "~/util";
 import { AnimatePresence, motion } from "framer-motion";
@@ -53,6 +54,10 @@ export default function MobileModal({
   const { connected, address, rawAddress, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
+
+  const { showExperiment } = useContext(SplitContext);
+  const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const [animation, setAnimation] = useState(true);
 
@@ -202,48 +207,52 @@ export default function MobileModal({
                   onClick={() => setChainModalVisibility(true)}
                 />
               </section>
-
               {/* Navigation between pages */}
               <nav className={"navbar-v2 "}>
                 <ul>
-                  {navigationMap.map(
-                    (
-                      obj: { name: string; icon: JSX.Element },
-                      index: number
-                    ) => {
-                      const key = Object.values(obj)[0];
-                      const { name, icon } = obj;
-                      const active = index === activeIndex;
+                  {navigationMap
+                    .filter(({ name }) => name !== "Assets" || showAssets)
+                    .filter(({ name }) => name !== "Airdrop" || showAirdrop)
+                    .map(
+                      (
+                        obj: { name: string; icon: JSX.Element },
+                        index: number
+                      ) => {
+                        const key = Object.values(obj)[0];
+                        const { name, icon } = obj;
+                        const active = index === activeIndex;
 
-                      return (
-                        <li
-                          key={key as unknown as string}
-                          onClick={() => {
-                            //delay to show page change and allow loading
-                            setTimeout(() => {
-                              setIsOpen(false);
-                            }, 800);
-                          }}
-                        >
-                          {index === activeIndex ? (
-                            <motion.div
-                              className={"active"}
-                              layoutId="active"
-                            />
-                          ) : (
-                            <div />
-                          )}
-                          <Link
-                            to={index === 0 ? "./" : (key as unknown as string)}
+                        return (
+                          <li
+                            key={key as unknown as string}
+                            onClick={() => {
+                              //delay to show page change and allow loading
+                              setTimeout(() => {
+                                setIsOpen(false);
+                              }, 800);
+                            }}
                           >
-                            <Text prominent={active}>
-                              {icon} {name}
-                            </Text>
-                          </Link>
-                        </li>
-                      );
-                    }
-                  )}
+                            {index === activeIndex ? (
+                              <motion.div
+                                className={"active"}
+                                layoutId="active"
+                              />
+                            ) : (
+                              <div />
+                            )}
+                            <Link
+                              to={
+                                index === 0 ? "./" : (key as unknown as string)
+                              }
+                            >
+                              <Text prominent={active}>
+                                {icon} {name}
+                              </Text>
+                            </Link>
+                          </li>
+                        );
+                      }
+                    )}
                 </ul>
               </nav>
             </section>

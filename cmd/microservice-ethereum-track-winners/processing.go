@@ -61,10 +61,10 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 
 func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
 	var (
-		rewardData               = data.RewardData
-		winnerString             = rewardData.Winner.String()
-		startBlock               = *rewardData.StartBlock
-		endBlock                 = *rewardData.EndBlock
+		rewardData   = data.RewardData
+		winnerString = rewardData.Winner.String()
+		startBlock   = *rewardData.StartBlock
+		endBlock     = *rewardData.EndBlock
 
 		winnerAddress = ethereum.AddressFromString(winnerString)
 	)
@@ -99,10 +99,10 @@ func sendRewards(topic string, rewards []winnersDb.Winner) {
 // Convert, returning the internal definition for a winner
 func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHash ethereum.Hash, address ethereum.Address, rewardData fluidity.RewardData, network network.BlockchainNetwork, details token_details.TokenDetails, when time.Time) []winnersDb.Winner {
 	var (
-		hashString     = transactionHash.String()
-		addressString  = address.String()
-		startBlock     = *rewardData.StartBlock
-		endBlock       = *rewardData.StartBlock
+		hashString    = transactionHash.String()
+		addressString = address.String()
+		startBlock    = *rewardData.StartBlock
+		endBlock      = *rewardData.StartBlock
 	)
 
 	winners := make([]winnersDb.Winner, len(pendingRewards))
@@ -110,9 +110,11 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 	for i, pendingReward := range pendingRewards {
 		var (
 			appString      = pendingReward.Application.String()
+			utility        = pendingReward.Utility
 			sendHashString = pendingReward.SendHash.String()
 			rewardType     = pendingReward.RewardType
 			winAmount      = pendingReward.WinAmount
+			rewardTier     = pendingReward.RewardTier
 		)
 
 		winners[i] = winnersDb.Winner{
@@ -126,7 +128,9 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			RewardType:          rewardType,
 			BatchFirstBlock:     startBlock,
 			BatchLastBlock:      endBlock,
+			RewardTier:          rewardTier,
 			TokenDetails:        details,
+			Utility:             utility,
 		}
 	}
 

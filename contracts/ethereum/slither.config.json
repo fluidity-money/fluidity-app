@@ -1,0 +1,5 @@
+{
+    "disable_color": true,
+    "filter_paths": "(openzeppelin|tests)",
+    "detectors_to_exclude": "conformance-to-solidity-naming-conventions,timestamp,assembly"
+}

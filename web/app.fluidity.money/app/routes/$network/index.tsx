@@ -26,7 +26,6 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -59,7 +58,6 @@ const NetworkPage = () => {
   const { connected, address, rawAddress, disconnect } = useContext(
     FluidityFacadeContext
   );
-  const { showExperiment } = useContext(SplitContext);
   const navigate = useNavigate();
 
   const projectedWinningsData = useFetcher<ProjectedWinData>();
@@ -86,32 +84,20 @@ const NetworkPage = () => {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> =
-    showExperiment("enable-arbitrum")
-      ? {
-          ethereum: {
-            name: "ETH",
-            icon: <img src="/assets/chains/ethIcon.svg" />,
-          },
-          arbitrum: {
-            name: "ARB",
-            icon: <img src="/assets/chains/arbIcon.svg" />,
-          },
-          solana: {
-            name: "SOL",
-            icon: <img src="/assets/chains/solanaIcon.svg" />,
-          },
-        }
-      : {
-          ethereum: {
-            name: "ETH",
-            icon: <img src="/assets/chains/ethIcon.svg" />,
-          },
-          solana: {
-            name: "SOL",
-            icon: <img src="/assets/chains/solanaIcon.svg" />,
-          },
-        };
+  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
+    ethereum: {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    arbitrum: {
+      name: "ARB",
+      icon: <img src="/assets/chains/arbIcon.svg" />,
+    },
+    solana: {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  };
 
   useEffect(() => {
     // stop modal pop-up if connected

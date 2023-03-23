@@ -9,6 +9,7 @@ type BloomEffectProps = {
   type: "static" | "pulsing";
   blendMode?: Property.MixBlendMode;
   width?: number;
+  className?: string;
 };
 
 const BloomEffect = (props: BloomEffectProps) => {
@@ -17,6 +18,7 @@ const BloomEffect = (props: BloomEffectProps) => {
     type = "static",
     blendMode,
     width = 70,
+    className,
   } = props;
 
   const [colorStart, colorEnd] = useMemo(() => {
@@ -58,6 +60,7 @@ const BloomEffect = (props: BloomEffectProps) => {
       variants={BloomEffectVariants}
       initial="initial"
       animate={type}
+      className={className ?? ""}
     />
   );
 };

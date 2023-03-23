@@ -4,16 +4,14 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity ^0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "./aave/IAToken.sol";
-
-import "./aaveV3/ATokenInterfaces.sol";
+import "../interfaces/ILiquidityProvider.sol";
+import "../interfaces/aave/IAToken.sol";
+import "../interfaces/aaveV3/ATokenInterfaces.sol";
 
 import "./openzeppelin/SafeERC20.sol";
-
-import "./ILiquidityProvider.sol";
 
 /// @title Liquidity provider using aave V3 pools
 contract AaveV3LiquidityProvider is ILiquidityProvider {
@@ -47,6 +45,7 @@ contract AaveV3LiquidityProvider is ILiquidityProvider {
         address _owner
     ) external {
         require(version_ == 0, "contract is already initialized");
+        require(_owner != address(0), "owner is empty");
 
         version_ = 1;
 
@@ -78,10 +77,7 @@ contract AaveV3LiquidityProvider is ILiquidityProvider {
 
         uint realAmount = pool.withdraw(address(underlying_), _amount, address(this));
 
-        require(
-            _amount == realAmount,
-            "amount aave withdrew was different to requested"
-        );
+        require(_amount == realAmount, "aave withdraw weird");
 
         underlying_.safeTransfer(msg.sender, realAmount);
     }

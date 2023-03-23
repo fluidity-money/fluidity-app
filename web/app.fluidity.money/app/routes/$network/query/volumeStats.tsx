@@ -13,6 +13,11 @@ export type Volume = {
   receiver: string;
 };
 
+export type VolumeLoaderData = {
+  volume?: Array<Volume>;
+  loaded: boolean;
+};
+
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
@@ -70,5 +75,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   return json({
     volume: daiSanitisedVolumes,
-  });
+    loaded: true,
+  } satisfies VolumeLoaderData);
 };

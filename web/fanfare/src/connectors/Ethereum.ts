@@ -23,8 +23,6 @@ export const EthereumConnector = ({
     contractAbi = ERC20,
     name: chainName,
 }: EthereumConnectorProps) => {
-    console.log("")
-
     let onErrorCallback: (err: Error) => void;
     let onWatchdogFailureCallback: () => void;
     let watchdogInterval: NodeJS.Timer;

@@ -49,12 +49,15 @@ func probability(m, n, b int64) *big.Rat {
 func calculateBpy(blockTimeRat *big.Rat, pool worker.UtilityVars) *big.Rat {
 	var (
 		rewardPoolNative = pool.PoolSizeNative
+		decimalScale     = pool.TokenDecimalsScale
 		exchangeRate     = pool.ExchangeRate
 
 		deltaWeight = pool.DeltaWeight
 	)
 
-	rewardPoolUsd := new(big.Rat).Mul(rewardPoolNative, exchangeRate)
+	rewardPoolScaled := new(big.Rat).Quo(rewardPoolNative, decimalScale)
+
+	rewardPoolUsd := new(big.Rat).Mul(rewardPoolScaled, exchangeRate)
 
 	poolBpy := new(big.Rat).Mul(blockTimeRat, rewardPoolUsd)
 
@@ -96,9 +99,9 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 	p := probability(m, n, b)
 
 	// a / p
-	aDivP := new(big.Rat).Mul(
+	aDivP := new(big.Rat).Quo(
 		a,
-		new(big.Rat).Inv(p),
+		p,
 	)
 
 	emission.Payout.Winnings, _ = aDivP.Float64()
@@ -232,8 +235,8 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 				tokenDecimals = pool.TokenDecimalsScale
 				exchangeRate = pool.ExchangeRate
 				bpy = poolBpys[poolIdx]
-
 			)
+
 			frac := calculatePayoutFrac(bpy, totalBpy)
 
 			// clone tokenPayout so we don't mutate

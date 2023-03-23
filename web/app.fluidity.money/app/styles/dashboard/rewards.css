@@ -6,25 +6,44 @@
 }
 
 #performance {
-  margin-bottom: 6em;
+  margin-bottom: 3em;
+}
+
+#infobox > h4 {
+  margin: 0;
+}
+
+.unclaimed-rewards {
+  flex-direction: row;
+  gap: 6em;
+  padding: 2em;
+  width: calc(100% - 4em);
+  max-width: 1200px;
 }
 
 #infobox {
-  padding: 1.5em;
-  width: 90%;
-  justify-self: flex-end;
+  min-width: 200px;
+  max-width: 450px;
 }
 
 #unclaimed {
+  flex-grow: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.5em;
-  padding: 2em 1.5em;
 }
 
 #unclaimed-left {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+}
+
+#unclaimed-left > h1 {
+  margin: 0;
 }
 
 #spend-to-earn {
@@ -37,22 +56,24 @@
   margin-top: 0;
 }
 
-.statistics-set > div {
+.statistics-set {
   display: flex;
   flex-direction: column;
-  gap: 0.25em;
+  gap: 0.4em;
 }
 
 .highest-performer-child {
   display: flex;
   align-items: center;
-  gap: 0.2em;
+  gap: 0.4em;
 }
 
 .statistics-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 2em;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 1em;
+  column-gap: 4em;
+  margin-top: 12px;
 }
 
 .graph-ceiling {
@@ -62,11 +83,25 @@
   align-items: flex-end;
 }
 
-.no-user-rewards {
+#no-user-rewards {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 6em;
-  margin-top: 3em;
+  padding: 2em;
+  height: calc(100% - 4em);
+  width: calc(100% - 4em);
+  justify-content: space-evenly;
+  align-items: center;
+  text-align: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.reward-ctas {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2em;
+  grid-template-rows: max-content;
+  align-items: center;
+  justify-content: center;
 }
 
 .row-value {
@@ -79,7 +114,6 @@
 }
 
 .view-breakdown-button {
-  width: 100%;
   text-align: center;
 }
 
@@ -101,10 +135,6 @@
   background: linear-gradient(to right, black, white, white, black);
 }
 
-.unclaimed-inner {
-  grid-template-columns: 1.5fr 1fr;
-}
-
 .rewards-carousel {
   margin-left: -30px;
   margin-bottom: 50px;
@@ -116,26 +146,33 @@
   margin-bottom: 50px;
 }
 
-.highest-performer-child .provider-img {
-  width: 1.1em;
-}
-
 @media (max-width: 1200px) {
-  .no-user-rewards {
+  .card-inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .unclaimed-rewards {
     flex-direction: column;
+    align-items: center;
     gap: 2em;
+    padding: 2em;
   }
 
   #unclaimed-left {
+    display: flex;
     justify-content: center;
+    gap: 1em;
   }
+
   #infobox {
     margin-left: 0;
     max-width: 450px;
     justify-self: center;
   }
-  .statistics-row {
-    grid-template-columns: 1fr 1fr;
+
+  .reward-ctas {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -193,18 +230,20 @@
   }
 }
 
-@media (max-width: 365px) {
-  .statistics-row {
-    grid-template-columns: 1fr;
-  }
-}
-
 .reward-ceiling {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
-  padding-bottom: 2rem;
+  column-gap: 2em;
+  row-gap: 1em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.reward-ceiling > h2,
+.reward-ceiling > h3 {
+  margin: 0;
 }
 
 .filter-row {
@@ -217,4 +256,60 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.rewards-cta-providers {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  gap: 2.5em;
+  width: 350px;
+  height: 3.5em;
+}
+
+.rewards-cta-providers > a {
+  position: relative;
+  cursor: pointer;
+  width: 3.5em;
+  -webkit-user-drag: none;
+}
+
+.rewards-cta-providers > a > * {
+  cursor: pointer;
+  width: 3.5em;
+  -webkit-user-drag: none;
+}
+
+.rewards-cta-providers > a:first-child,
+.rewards-cta-providers > a:last-child {
+  margin-top: 4em;
+}
+
+.rewards-cta-providers.compact > a:first-child,
+.rewards-cta-providers.compact > a:last-child {
+  margin-top: 0em;
+}
+
+.compactSlide {
+  width: 100%;
+  flex-direction: column-reverse;
+}
+.compactSlide > h1 {
+  margin: 0;
+  margin-bottom: 0.8em;
+}
+
+.hover-prizes {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.hover-prize-value {
+  display: flex;
+  flex-direction: column;
+}
+
+.hover-provider-icon {
+  width: 3em;
 }

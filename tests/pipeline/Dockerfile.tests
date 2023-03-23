@@ -1,0 +1,10 @@
+
+FROM fluidity/build-container:latest
+
+WORKDIR /usr/local/src/fluidity/tests/pipeline
+
+COPY . .
+
+ENTRYPOINT [ \
+	"./run-specific-test.sh" \
+]

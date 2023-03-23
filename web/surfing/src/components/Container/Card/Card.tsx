@@ -4,12 +4,12 @@
 
 import styles from "./Card.module.scss";
 
-interface ICard {
+export interface ICard {
   component?: "div" | "button" | "tr";
   style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
-  type?: "gray" | "box" | "holobox" | "transparent" | "frosted";
+  type?: "gray" | "box" | "box-prominent" | "holobox" | "transparent" | "frosted";
   [_: string]: any;
 }
 

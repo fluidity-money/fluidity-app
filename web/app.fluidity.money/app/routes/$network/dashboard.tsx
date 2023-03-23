@@ -39,6 +39,7 @@ import {
   ProvideLiquidity,
   Provider,
   ChainName,
+  Token,
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -46,7 +47,6 @@ import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-import { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
 import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
@@ -115,6 +115,8 @@ const routeMapper = (route: string) => {
       return "ASSETS";
     case "/dao":
       return "DAO";
+    case "/airdrop":
+      return "AIRDROP";
     default:
       return "DASHBOARD";
   }
@@ -128,8 +130,8 @@ type LoaderData = {
       providers: {
         name: Provider;
         link: {
-          fUSDC: string;
-          fUSDT: string;
+          fUSDC?: string;
+          fUSDT?: string;
           fTUSD?: string;
           fFRAX?: string;
           fDAI?: string;
@@ -140,7 +142,7 @@ type LoaderData = {
   tokensConfig: {
     [x: string]: {
       tokens: {
-        symbol: Tokens;
+        symbol: Token;
         address: string;
         name: string;
         logo: string;
@@ -165,8 +167,8 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -207,10 +209,11 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  ];
+      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+      { rewards: { name: "Rewards", icon: <Trophy /> } },
+      { assets: { name: "Assets", icon: <AssetsIcon /> } },
+      { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+    ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -336,9 +339,7 @@ export default function Dashboard() {
           <BlockchainModal
             handleModal={setChainModalVisibility}
             option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({ name }) =>
-              showArbitrum ? true : name !== "ARB"
-            )}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />
@@ -366,8 +367,9 @@ export default function Dashboard() {
         {/* Nav Bar */}
         <ul>
           {navigationMap
-            .filter((obj) =>
-              showAssets ? true : Object.keys(obj)[0] !== "assets"
+            .filter((obj) => showAssets ? true : Object.keys(obj)[0] !== "assets"
+            )
+            .filter((obj) => showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
             )
             .map((obj, index) => {
               const key = Object.keys(obj)[0];
@@ -527,9 +529,7 @@ export default function Dashboard() {
               }
               icon={<Trophy />}
             >
-              {unclaimedRewards < 0.000005
-                ? `$0`
-                : numberToMonetaryString(unclaimedRewards)}
+              {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
 
             {(isTablet || isMobile) && (
@@ -554,6 +554,7 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
+
         {/* Provide Liquidity*/}
         <div className="pad-main" style={{ marginBottom: "2em" }}>
           {!openMobModal && (

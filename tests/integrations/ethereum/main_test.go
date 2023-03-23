@@ -143,7 +143,7 @@ func TestIntegrations(t *testing.T) {
 			convertedReceipt = common.ConvertGethReceipt(*txReceipt)
 		}
 
-		fees, _, emission, err := applications.GetApplicationFee(
+		fees, emission, err := applications.GetApplicationFee(
 			transfer,
 			client,
 			fluidAddress,

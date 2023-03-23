@@ -5,30 +5,45 @@
 package main
 
 import (
+	postgres "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
+	timescale "github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
-func addAndComputeAverageAtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers, limit int) (int, []uint64, []int) {
-	log.Debug(func (k *log.Log) {
+func addBtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers int) {
+	log.Debug(func(k *log.Log) {
 		k.Message = "About to insert a transaction count into timescale!"
 	})
 
-	worker.InsertTransactionCount(
+	timescale.InsertTransactionCount(
 		blockNumber,
 		tokenShortName,
 		transfers,
 		network_,
 	)
+}
 
-	log.Debug(func (k *log.Log) {
+func computeTransactionsSumAndAverage(network_ network.BlockchainNetwork, tokenShortName string, limit int) (int, int, []uint64, []int) {
+	log.Debug(func(k *log.Log) {
 		k.Message = "About to get average atx from timescale!"
 	})
 
-	return worker.GetAverageAtx(
+	return worker.GetLastBlocksTransactionCount(
 		tokenShortName,
 		network_,
 		limit,
 	)
+}
+
+func lookupFeeSwitch(addr ethereum.Address, network_ network.BlockchainNetwork) ethereum.Address {
+	feeSwitch := postgres.GetFeeSwitch(addr, network_)
+
+	if feeSwitch == nil {
+		return addr
+	}
+
+	return feeSwitch.NewAddress
 }
