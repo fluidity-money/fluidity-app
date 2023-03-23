@@ -7,11 +7,11 @@
   padding: 0;
 
   &.sm {
-    height: 12px;
+    height: 8px;
   }
 
   &.md {
-    height: 18px;
+    height: 16px;
   }
 
   &.lg {
@@ -61,11 +61,11 @@
         background: rgba(255, 255, 255, 0.102);
       }
 
-      &.box, &.gray {
+      &.gray {
         background: map-get($border, "default");
       }
 
-      &.box-prominent {
+      &.box-prominent, &.box {
         background: map-get($border, "prominent");
       }
       
