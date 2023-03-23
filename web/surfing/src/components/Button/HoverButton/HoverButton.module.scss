@@ -1,4 +1,4 @@
-@use 'common' as *;
+@use "common" as *;
 
 .button {
   font-family: "Aeonik Mono";
@@ -13,22 +13,28 @@
   text-transform: uppercase;
   background-color: transparent;
   cursor: pointer;
-  
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  text-align: center;
+  letter-spacing: 0.05em;
+
   .icon {
     display: inline-block;
   }
-  
-  &.white{
+
+  &.white {
     color: map-get($text, "prominent");
-    
+
     .icon {
       stroke: map-get($text, "prominent");
     }
   }
-  
+
   &.gray {
     color: map-get($text, "default");
-    
+
     .icon {
       stroke: map-get($text, "default");
     }
@@ -77,34 +83,23 @@
 }
 
 .small {
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 100%;
-  text-align: center;
-  letter-spacing: 0.05em;
+  font-size: $em-step * 3.5;
 }
 
 .medium {
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-  text-align: center;
-  letter-spacing: 0.05em;
+  font-size: $em-step * 4;
 }
 
 .large {
-  font-style: normal;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 100%;
-  text-align: center;
-  letter-spacing: 0.05em;
+  font-size: $em-step * 5;
+}
+
+.xlarge {
+  font-size: $em-step * 6;
 }
 
 .pseudoBridge {
-  position: absolute; 
+  position: absolute;
   z-index: 1;
   width: auto;
   padding-top: 12px;

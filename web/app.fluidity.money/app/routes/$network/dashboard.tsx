@@ -43,11 +43,13 @@ import {
 } from "@fluidity-money/surfing";
 import BurgerButton from "~/components/BurgerButton";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 import { getProviderDisplayName } from "~/util/provider";
+
+import dashboardStyles from "~/styles/dashboard.css";
+import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardStyles }];
@@ -207,10 +209,10 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  ];
+      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+      { rewards: { name: "Rewards", icon: <Trophy /> } },
+      { assets: { name: "Assets", icon: <AssetsIcon /> } },
+    ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -303,9 +305,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
@@ -348,9 +350,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           version={"primary"}
           buttontype="text"
           size={"medium"}

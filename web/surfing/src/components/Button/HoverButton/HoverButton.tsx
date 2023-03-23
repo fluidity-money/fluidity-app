@@ -4,7 +4,7 @@
 
 import { ButtonHTMLAttributes, useEffect } from "react";
 
-import { useState } from "react"
+import { useState } from "react";
 import { InfoCircle, Tooltip, Text } from "components";
 import styles from "./HoverButton.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,7 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 interface IHoverButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
   children: string;
-  size: "small" | "medium" | "large";
+  size: "small" | "medium" | "large" | "xlarge";
   color?: "white" | "gray";
   hoverComp: React.ReactNode;
 }
@@ -32,9 +32,7 @@ const HoverButton = ({
   const classProps = className || "";
 
   const buttonColorProps = styles[color];
-  const buttonClassProps = `${
-    styles.button
-  } ${buttonColorProps} ${classProps}`;
+  const buttonClassProps = `${styles.button} ${buttonColorProps} ${classProps}`;
 
   const textSizeProps = styles[size];
   const textClassProps = `${styles.text} ${textSizeProps}`;
@@ -42,54 +40,51 @@ const HoverButton = ({
   useEffect(() => {
     if (isHovered || isFocused) {
       setShowTooltip(true);
-      return
+      return;
     }
 
     if (!isHovered) {
       const timer = setTimeout(() => {
         setShowTooltip(false);
-      }
-      , 500);
+      }, 500);
       return () => clearTimeout(timer);
     }
 
     if (!isFocused) {
       setShowTooltip(false);
-      return
+      return;
     }
   }, [isHovered, isFocused]);
 
   return (
-    <div style={{display: "block"}}>
-    <button
-      className={buttonClassProps}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
-      {...props}
-    >
-      <div className={textClassProps}>{children}</div>
-      <InfoCircle className={`${styles.icon} ${classProps}`} />
-    </button>
-    <AnimatePresence>
-    {showTooltip && (
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className={styles.pseudoBridge}
-          onMouseEnter={() => setIsHovered(true)} 
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <Tooltip>
-            {hoverComp}
-          </Tooltip>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
+    <div style={{ display: "block" }}>
+      <button
+        className={buttonClassProps}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        {...props}
+      >
+        <div className={textClassProps}>{children}</div>
+        <InfoCircle className={`${styles.icon} ${classProps}`} />
+      </button>
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className={styles.pseudoBridge}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <Tooltip>{hoverComp}</Tooltip>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
