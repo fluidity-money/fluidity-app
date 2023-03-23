@@ -60,6 +60,10 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
 
     mapping(address => TrfVariables) private trfVariables_;
 
+    /// @dev feeSwitches_ supported by the end worker in it's lookups for
+    ///      payouts
+    mapping(address => address) private feeSwitches_;
+
     function init(address _operator) public {
         require(version_ == 0, "already deployed");
 
@@ -73,12 +77,12 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     function registerToken(ITokenOperatorOwned _token) public {
-        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
+        require(operator() == address(0) || msg.sender == operator_, "not allowed");
         _registerToken(_token);
     }
 
     function registerManyTokens(ITokenOperatorOwned[] calldata _tokens) public {
-        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
+        require(operator() == address(0) || msg.sender == operator_, "not allowed");
 
         for (uint i = 0; i < _tokens.length; ++i)
           _registerToken(_tokens[i]);
@@ -89,15 +93,30 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     function registerLiquidityProvider(ILiquidityProvider _lp) public {
-        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
+        require(operator() == address(0) || msg.sender == operator_, "not allowed");
         _registerLiquidityProvider(_lp);
     }
 
-    function registerManyLiquidityProviders(ILiquidityProvider[] calldata _lps) public {
-        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
+    function registerManyLiquidityProviders(
+        ILiquidityProvider[] calldata _lps
+    ) public {
+        require(operator() == address(0) || msg.sender == operator_, "not allowed");
 
         for (uint i = 0; i < _lps.length; ++i)
           _registerLiquidityProvider(_lps[i]);
+    }
+
+    function registerFeeSwitch(address _old, address _new) public {
+        require(msg.sender == operator(), "not allowed");
+
+        feeSwitches_[_old] = _new;
+    }
+
+    function getFeeSwitch(address _old) public view returns (address) {
+        address newAddr = feeSwitches_[_old];
+
+        if (newAddr == address(0)) return _old;
+        else return newAddr;
     }
 
     function tokens() public view returns (ITokenOperatorOwned[] memory) {
