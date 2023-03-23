@@ -69,8 +69,8 @@ const OptionsSchema = z.object({
           z.object({
             name: z.string(),
             link: z.object({
-              fUSDC: z.string(),
-              fUSDT: z.string(),
+              fUSDC: z.string().optional(),
+              fUSDT: z.string().optional(),
               fTUSD: z.string().optional(),
               fFRAX: z.string().optional(),
               fDAI: z.string().optional(),
@@ -80,6 +80,13 @@ const OptionsSchema = z.object({
         .min(1),
     })
   ),
+  contract: z.object({
+    prize_pool: z.object({
+      ethereum: z.string(),
+      arbitrum: z.string(),
+      solana: z.string(),
+    }),
+  }),
 });
 
 export type Options = z.infer<typeof OptionsSchema>;

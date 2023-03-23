@@ -1,6 +1,7 @@
 export type Provider =
   | "Aave"
   | "Aldrin"
+  | "Camelot"
   | "Circle"
   | "Compound"
   | "Dodo"
@@ -11,6 +12,7 @@ export type Provider =
   | "Orca"
   | "Polygon"
   | "Saber"
+  | "Saddle"
   | "Solana"
   | "Solend"
   | "Uniswap"

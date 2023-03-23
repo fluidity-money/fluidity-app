@@ -1,6 +1,8 @@
 package main_test
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -24,12 +26,35 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+// create log data - payout, first block, last block
+func createLogData(firstBlock, lastBlock int64) (misc.Blob, error) {
+	const zeroData = "0000000000000000000000000000000000000000000000000000000000000000"
+
+	firstBlockHex := fmt.Sprintf("%x", firstBlock)
+	lastBlockHex := fmt.Sprintf("%x", lastBlock)
+
+	// hex encode blocks and pad length
+	firstBlockData := zeroData[:64-len(firstBlockHex)] + firstBlockHex
+	lastBlockData := zeroData[:64-len(lastBlockHex)] + lastBlockHex
+
+	// payout is read from database, so it can be zero
+	logData_ := "0x" + zeroData + firstBlockData + lastBlockData
+	logData, err := hexutil.Decode(logData_)
+
+	if err != nil {
+		return nil, err
+	}
+
+	data := misc.Blob(logData)
+
+	return data, nil
+}
+
 func TestTransactionAttributes(t *testing.T) {
 	var (
 		spoolerInputQueue = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		logsQueue         = ethereum.TopicLogs
 
-		blockNumInt = misc.BigIntFromInt64(69594075)
 		// can't be random as it's also embedded in reward data
 		senderAddress    = ethTypes.AddressFromString("0x7a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
 		recipientAddress = libtest.RandomAddress()
@@ -39,6 +64,10 @@ func TestTransactionAttributes(t *testing.T) {
 		fusdtAddress     = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
 		topicReward      = ethTypes.HashFromString("0xe417c38cb96e748006d0ef1a56fec0de428abac103b6644bc30c745f54f54345")
 		topicWinner      = ethTypes.HashFromString("0x0000000000000000000000007a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
+
+		firstBlock  = rand.Int63n(1000)
+		lastBlock   = rand.Int63n(1002 + firstBlock)
+		blockNumInt = misc.BigIntFromInt64(firstBlock + 1)
 	)
 
 	payouts := make(map[applications.UtilityName]worker.Payout)
@@ -59,16 +88,13 @@ func TestTransactionAttributes(t *testing.T) {
 
 	queue.SendMessage(spoolerInputQueue, announcement)
 
-	// payout, block numbers
-	logData_ := "0x0000000000000000000000000000000000000000000000000000000000020f9c000000000000000000000000000000000000000000000000000000000425ebd5000000000000000000000000000000000000000000000000000000000425ebf9"
-	logData, err := hexutil.Decode(logData_)
+	logData, err := createLogData(firstBlock, lastBlock)
 	require.NoError(t, err)
-	data := misc.Blob(logData)
 
 	log := ethereum.Log{
 		Address:     fusdtAddress,
 		Topics:      []ethTypes.Hash{topicReward, topicWinner},
-		Data:        data,
+		Data:        logData,
 		BlockNumber: misc.BigIntFromInt64(1),
 		TxHash:      transactionHash,
 		TxIndex:     misc.BigIntFromInt64(1),

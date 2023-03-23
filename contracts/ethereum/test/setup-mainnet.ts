@@ -1,16 +1,17 @@
 import { ethers } from "ethers";
 import * as hre from "hardhat";
-import { deployTokens, forknetTakeFunds } from "../script-utils";
+
+import { forknetTakeFunds } from "../script-utils";
+import { deployTokens } from "../deployment";
 
 import {
   AAVE_V2_POOL_PROVIDER_ADDR,
-  REGISTRATION_TYPE_TOKEN,
   TokenList } from "../test-constants";
 
 import {
   commonBindings,
   commonContracts,
-  commonBeacons,
+  commonBeaconAddresses,
   commonFactories,
   signers } from "./setup-common";
 
@@ -67,6 +68,20 @@ before(async function () {
     return;
   }
 
+  const {
+    token: tokenBeacon,
+    compoundLiquidityProvider: compoundBeacon,
+    aaveV2LiquidityProvider: aaveV2Beacon,
+    aaveV3LiquidityProvider: aaveV3Beacon,
+  } = commonBeaconAddresses;
+
+  const {
+    token: tokenFactory,
+    compoundLiquidityProvider: compoundFactory,
+    aaveV2LiquidityProvider: aaveV2Factory,
+    aaveV3LiquidityProvider: aaveV3Factory
+  } = commonFactories;
+
   const toDeploy = [
     TokenList["usdt"],
     TokenList["fei"],
@@ -79,12 +94,6 @@ before(async function () {
     [await signers.userAccount1.getAddress()],
     toDeploy,
   );
-
-  const { tokenFactory, compoundFactory, aaveV2Factory, aaveV3Factory } =
-    commonFactories;
-
-  const { tokenBeacon, compoundBeacon, aaveV2Beacon, aaveV3Beacon } =
-    commonBeacons;
 
   const emergencyCouncilAddress = await signers.token.emergencyCouncil.getAddress();
 
@@ -131,13 +140,8 @@ before(async function () {
 
   const deployedTokens = Object.values(tokens).map(({ deployedToken }) => deployedToken);
 
-  await commonBindings.registry.externalOperator.registerMany(deployedTokens.map((token) => {
-    console.log(token.address);
-    return {
-      type_: REGISTRATION_TYPE_TOKEN,
-      addr: token.address
-    }
-  }));
+  await commonBindings.registry.externalOperator.registerManyTokens(deployedTokens.map((token) =>
+    token.address));
 
   contracts = {
     ...commonContracts,

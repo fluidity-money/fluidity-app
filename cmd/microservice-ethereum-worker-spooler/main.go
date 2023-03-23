@@ -7,6 +7,7 @@ package main
 import (
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
+	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -130,17 +131,38 @@ func main() {
 			}
 		}
 
-		for shortName, send := range toSend {
+		for token, send := range toSend {
 			if !send {
 				// should never happen
 				continue
 			}
 
 			log.Debug(func(k *log.Log) {
-				k.Format("Sending rewards for token %v", shortName)
+				k.Format("Sending rewards for token %v", token)
 			})
 
-			sendRewards(batchedRewardsQueue, dbNetwork, shortName)
+			rewards, found, err := commonSpooler.GetRewards(dbNetwork, token)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get rewards for token %s! %+v",
+						token.TokenShortName,
+						err,
+					)
+				})
+			}
+
+			if !found {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Trying to send rewards for token %s but no rewards found!",
+						token.TokenShortName,
+					)
+				})
+			}
+
+			queue.SendMessage(batchedRewardsQueue, rewards)
 		}
 	})
 }

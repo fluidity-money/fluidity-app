@@ -4,31 +4,36 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "./IERC20.sol";
+import "../interfaces/IEmergencyMode.sol";
+import "../interfaces/IERC20.sol";
+import "../interfaces/IERC2612.sol";
+import "../interfaces/IFluidClient.sol";
+import "../interfaces/ILiquidityProvider.sol";
+import "../interfaces/IOperatorOwned.sol";
+import "../interfaces/IToken.sol";
+import "../interfaces/ITransferWithBeneficiary.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "./ITransferWithBeneficiary.sol";
-
-import "./IFluidClient.sol";
-import "./ILiquidityProvider.sol";
-import "./IEmergencyMode.sol";
-import "./IToken.sol";
+uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
 /// @title The fluid token ERC20 contract
-contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmergencyMode {
+// solhint-disable-next-line max-states-count
+contract Token is
+    IFluidClient,
+    IERC2612,
+    ITransferWithBeneficiary,
+    IToken,
+    IEmergencyMode,
+    IOperatorOwned
+{
     using SafeERC20 for IERC20;
 
-    uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
+    /* ~~~~~~~~~~` ERC20 FEATURES ~~~~~~~~~~ */
 
-    /// @dev sentinel to indicate a block has been rewarded in the
-    /// @dev pastRewards_ and rewardedBlocks_ maps
-    uint private constant BLOCK_REWARDED = 1;
-
-    // erc20 props
     mapping(address => uint256) private balances_;
 
     mapping(address => mapping(address => uint256)) private allowances_;
@@ -41,6 +46,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     string private symbol_;
 
+    /* ~~~~~~~~~~` HOUSEKEEPING ~~~~~~~~~~ */
+
     /// @dev if false, emergency mode is active - can be called by either the
     /// @dev operator, worker account or emergency council
     bool private noEmergencyMode_;
@@ -48,10 +55,18 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     // for migrations
     uint private version_;
 
+    /* ~~~~~~~~~~` LIQUIDITY PROVIDER ~~~~~~~~~~ */
+
+    // @custom:security non-reentrant
     ILiquidityProvider private pool_;
 
+    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
+
     /// @dev deprecated, worker config is now handled externally
-    address private __deprecated_7;
+    // solhint-disable-next-line var-name-mixedcase
+    address private __deprecated_1;
+
+    /* ~~~~~~~~~~` OWNERSHIP ~~~~~~~~~~ */
 
     /// @dev emergency council that can activate emergency mode
     address private emergencyCouncil_;
@@ -59,37 +74,105 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @dev account to use that created the contract (multisig account)
     address private operator_;
 
-    /// @dev the block number of the last block that's been included in a batched reward
-    uint private lastRewardedBlock_;
+    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
 
-    /// @dev [address] => [[block number] => [has the block been manually rewarded by this user?]]
-    mapping (address => mapping(uint => uint)) private manualRewardedBlocks_;
+    /// @dev deprecated, we don't track the last rewarded block for manual
+    ///      rewards anymore
+    // solhint-disable-next-line var-name-mixedcase
+    uint private __deprecated_2;
 
-    /// @dev amount a user has manually rewarded, to be removed from their batched rewards
+    /// @dev [address] => [[block number] => [has the block been manually
+    ///      rewarded by this user?]]
+    /// @dev deprecated, we don't do manual rewards anymore
+    // solhint-disable-nex-line var-name-mixedcase
+    mapping (address => mapping(uint => uint)) private __deprecated_3;
+
+    /// @dev amount a user has manually rewarded, to be removed from their
+    ///      batched rewards
     /// @dev [address] => [amount manually rewarded]
-    mapping (address => uint) private manualRewardDebt_;
+    /// @dev deprecated, we don't do manual rewards anymore
+    // solhint-disable-nex-line var-name-mixedcase
+    mapping (address => uint) private __deprecated_4;
+
+    /* ~~~~~~~~~~` SECURITY FEATURES ~~~~~~~~~~ */
 
     /// @dev the largest amount a reward can be to not get quarantined
-    uint maxUncheckedReward_;
+    uint private maxUncheckedReward_;
 
     /// @dev [address] => [number of tokens the user won that have been quarantined]
-    mapping (address => uint) blockedRewards_;
+    mapping (address => uint) private blockedRewards_;
+
+    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
+
+    // slither-disable-start unused-state constable-states naming-convention
+
+    /*
+     * These slots were used for the feature "mint limits" which we've
+     * since entirely pulled.
+     */
 
     /// @notice deprecated, mint limits no longer exist
-    bool __deprecated_1;
-    /// @notice deprecated, mint limits no longer exist
-    mapping (address => uint) __deprecated_2;
-    /// @notice deprecated, mint limits no longer exist
-    mapping (address => uint) __deprecated_3;
-    /// @notice deprecated, mint limits no longer exist
-    uint __deprecated_4;
-    /// @notice deprecated, mint limits no longer exist
-    uint __deprecated_5;
-    /// @notice deprecated, mint limits no longer exist
-    uint __deprecated_6;
+    // solhint-disable-next-line var-name-mixedcase
+    bool private __deprecated_5;
 
-    /// @dev account that can call the reward function, should be the /operator contract/
-    address oracle_;
+    /// @notice deprecated, mint limits no longer exist
+    // solhint-disable-next-line var-name-mixedcase
+    mapping (address => uint) private __deprecated_6;
+
+    /// @notice deprecated, mint limits no longer exist
+    // solhint-disable-next-line var-name-mixedcase
+    mapping (address => uint) private __deprecated_7;
+
+    /// @notice deprecated, mint limits no longer exist
+    // solhint-disable-next-line var-name-mixedcase
+    uint private __deprecated_8;
+
+    /// @notice deprecated, mint limits no longer exist
+    // solhint-disable-next-line var-name-mixedcase
+    uint private __deprecated_9;
+
+    /// @notice deprecated, mint limits no longer exist
+    // solhint-disable-next-line var-name-mixedcase
+    uint private __deprecated_10;
+
+    // slither-disable-end
+
+    /* ~~~~~~~~~~` ORACLE PAYOUTS ~~~~~~~~~~ */
+
+    /// @dev account that can call the reward function, should be the
+    ///      operator contract/
+    address private oracle_;
+
+    /* ~~~~~~~~~~` ERC2612 ~~~~~~~~~~ */
+
+    // @dev nonces_ would be used for permit only, but it could be used for
+    //      every off-chain sign if needed
+    mapping (address => uint256) private nonces_;
+
+    uint256 private initialChainId_;
+
+    bytes32 private initialDomainSeparator_;
+
+    /**
+     * @notice computeDomainSeparator that's used for EIP712
+     */
+    function computeDomainSeparator() internal view virtual returns (bytes32) {
+        return
+            keccak256(
+                abi.encode(
+                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                    keccak256(bytes(name_)),
+                    keccak256("1"),
+                    block.chainid,
+                    address(this)
+                )
+            );
+    }
+
+    function _setupEIP2612() internal {
+        initialChainId_ = block.chainid;
+        initialDomainSeparator_ = computeDomainSeparator();
+    }
 
     /**
      * @notice initialiser function - sets the contract's data
@@ -117,6 +200,9 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         address _oracle
     ) public {
         require(version_ == 0, "contract is already initialised");
+        require(_operator != address(0), "operator zero");
+        require(_oracle != address(0), "oracle zero");
+
         version_ = 1;
 
         // remember the operator for signing off on oracle changes, large payouts
@@ -131,7 +217,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         pool_ = ILiquidityProvider(_liquidityProvider);
 
         // sanity check
-        pool_.underlying_().totalSupply();
+        // slither-disable-next-line unused-return
+        underlyingToken().totalSupply();
 
         noEmergencyMode_ = true;
 
@@ -142,15 +229,31 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
         // initialise mint limits
         maxUncheckedReward_ = DEFAULT_MAX_UNCHECKED_REWARD;
+
+        _setupEIP2612();
     }
 
-    /// @inheritdoc IToken
-    function updateOperator(address newOperator) public {
-        require(msg.sender == operator_, "only operator can use this function!");
+    /**
+     * @notice setupEIP2612, made public to support upgrades without a new migration
+     */
+    function setupEIP2612() public {
+        require(msg.sender == operator_, "only operator/Token");
 
-        operator_ = newOperator;
+        _setupEIP2612();
+    }
 
-        emit OperatorChanged(operator_, newOperator);
+    /// @inheritdoc IOperatorOwned
+    function updateOperator(address _newOperator) public {
+        require(msg.sender == operator(), "operator only");
+        require(_newOperator != address(0), "new operator zero");
+
+        operator_ = _newOperator;
+
+        emit OperatorChanged(operator_, _newOperator);
+    }
+
+    function emergencyCouncil() public view returns (address) {
+        return emergencyCouncil_;
     }
 
     function noEmergencyMode() public view returns (bool) {
@@ -165,8 +268,8 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IEmergencyMode
     function enableEmergencyMode() public {
         require(
-            msg.sender == operator_ ||
-            msg.sender == emergencyCouncil_ ||
+            msg.sender == operator() ||
+            msg.sender == emergencyCouncil() ||
             msg.sender == oracle(),
             "can't enable emergency mode!"
         );
@@ -178,7 +281,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @inheritdoc IEmergencyMode
     function disableEmergencyMode() public {
-        require(msg.sender == operator_, "only the operator account can use this");
+        require(msg.sender == operator(), "operator only");
 
         noEmergencyMode_ = true;
 
@@ -187,50 +290,72 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     /// @notice updates the reward quarantine threshold if called by the operator
     function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
-        require(msg.sender == operator_, "only the operator account can use this");
+        require(msg.sender == operator(), "operator only");
 
         maxUncheckedReward_ = _maxUncheckedReward;
 
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    /// @inheritdoc IToken
-    function erc20In(uint amount) public returns (uint) {
+    function _erc20In(address _spender, uint256 _amount) internal returns (uint256) {
         require(noEmergencyMode(), "emergency mode!");
 
         // take underlying tokens from the user
-        uint originalBalance = pool_.underlying_().balanceOf(address(this));
-        pool_.underlying_().safeTransferFrom(msg.sender, address(this), amount);
-        uint finalBalance = pool_.underlying_().balanceOf(address(this));
+
+        IERC20 underlying = underlyingToken();
+
+        uint originalBalance = underlying.balanceOf(address(this));
+
+        underlying.safeTransferFrom(_spender, address(this), _amount);
+
+        uint finalBalance = underlying.balanceOf(address(this));
 
         // ensure the token is behaving
-        require(finalBalance > originalBalance, "token balance decreased after transfer");
+
+        require(finalBalance > originalBalance, "bad token bal");
+
         uint realAmount = finalBalance - originalBalance;
 
         // add the tokens to our compound pool
-        pool_.underlying_().safeTransfer(address(pool_), realAmount);
+
+        underlying.safeTransfer(address(pool_), realAmount);
+
         pool_.addToPool(realAmount);
 
         // give the user fluid tokens
+
         _mint(msg.sender, realAmount);
+
         emit MintFluid(msg.sender, realAmount);
+
         return realAmount;
     }
 
     /// @inheritdoc IToken
-    function erc20InFor(address recipient, uint256 amount) public {
-        erc20In(amount);
-        transfer(recipient, amount);
+    function erc20In(uint _amount) public returns (uint) {
+        return _erc20In(msg.sender, _amount);
+    }
+
+    /// @inheritdoc IToken
+    // slither-disable-next-line reentrancy-no-eth
+    function erc20InTo(address _recipient, uint256 _amount) public returns (uint256 ) {
+        uint256 amountIn = erc20In(_amount);
+        transfer(_recipient, _amount);
+        return amountIn;
     }
 
     /// @inheritdoc IToken
     function erc20Out(uint amount) public {
         // take the user's fluid tokens
+
         _burn(msg.sender, amount);
 
         // give them erc20
+
         pool_.takeFromPool(amount);
-        pool_.underlying_().safeTransfer(msg.sender, amount);
+
+        underlyingToken().safeTransfer(msg.sender, amount);
+
         emit BurnFluid(msg.sender, amount);
     }
 
@@ -238,8 +363,31 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     function rewardPoolAmount() public returns (uint) {
         uint totalAmount = pool_.totalPoolAmount();
         uint totalFluid = totalSupply();
-        require(totalAmount >= totalFluid, "balance is less than total supply");
+        require(totalAmount >= totalFluid, "bad underlying liq");
         return totalAmount - totalFluid;
+    }
+
+    /// @inheritdoc IToken
+    function underlyingToken() public view returns (IERC20) {
+        (bool rc, bytes memory returndata) = address(pool_).staticcall(
+            abi.encodeWithSignature("underlying_()")
+        );
+
+        if (!rc) {
+            // solhint-disable-next-line no-inline-assembly
+            assembly {
+                revert(add(returndata, 32), mload(returndata))
+            }
+        }
+
+        (address token) = abi.decode(returndata, (address));
+
+        return IERC20(token);
+    }
+
+    /// @inheritdoc IToken
+    function underlyingLp() public view returns (ILiquidityProvider) {
+        return pool_;
     }
 
     /**
@@ -277,14 +425,14 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IFluidClient
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == oracle(), "only the oracle account can use this");
+        require(msg.sender == oracle(), "only oracle");
 
         uint poolAmount = rewardPoolAmount();
 
         for (uint i = 0; i < rewards.length; i++) {
             Winner memory winner = rewards[i];
 
-            require(poolAmount >= winner.amount, "reward pool empty");
+            require(poolAmount >= winner.amount, "empty reward pool");
 
             poolAmount = poolAmount - winner.amount;
 
@@ -307,12 +455,18 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     }
 
     /// @inheritdoc IToken
-    function unblockReward(bytes32 rewardTx, address user, uint amount, bool payout, uint firstBlock, uint lastBlock) public {
+    function unblockReward(
+        bytes32 rewardTx,
+        address user,
+        uint amount,
+        bool payout,
+        uint firstBlock,
+        uint lastBlock
+    ) public {
         require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator_, "only the operator account can use this");
+        require(msg.sender == operator(), "operator only");
 
-        require(blockedRewards_[user] >= amount,
-            "trying to unblock more than the user has blocked");
+        require(blockedRewards_[user] >= amount, "too much unblock");
 
         blockedRewards_[user] -= amount;
 
@@ -337,11 +491,6 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     function totalSupply() public view returns (uint256) { return totalSupply_; }
     function balanceOf(address account) public view returns (uint256) {
        return balances_[account];
-    }
-
-    function setDecimals(uint8 _decimals) public {
-      require(msg.sender == operator_, "only operator can use this function!");
-      decimals_ = _decimals;
     }
 
     function transfer(address to, uint256 amount) public returns (bool) {
@@ -378,6 +527,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         bool rc;
 
         rc = Token(_token).transferFrom(msg.sender, address(this), _amount);
+
         if (!rc) return false;
 
         rc = Token(_token).transfer(_beneficiary, _amount);
@@ -388,7 +538,7 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IToken
     function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
       require(noEmergencyMode(), "emergency mode");
-      require(msg.sender == operator_, "only operator can use this function");
+      require(msg.sender == operator(), "operator only");
 
       uint oldPoolAmount = pool_.totalPoolAmount();
 
@@ -396,13 +546,13 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
       pool_ = newPool;
 
-      pool_.underlying_().safeTransfer(address(pool_), oldPoolAmount);
+      underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
 
       pool_.addToPool(oldPoolAmount);
 
       uint newPoolAmount = pool_.totalPoolAmount();
 
-      require(newPoolAmount == oldPoolAmount, "total pool amount not equal to new amount!");
+      require(newPoolAmount >= oldPoolAmount, "total amount bad");
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
@@ -412,7 +562,10 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
         uint256 currentAllowance = allowances_[msg.sender][spender];
+
+        // solhint-disable-next-line reason-string
         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
+
         unchecked {
             _approve(msg.sender, spender, currentAllowance - subtractedValue);
         }
@@ -423,11 +576,11 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     /// @inheritdoc IToken
     function drainRewardPool(address _recipient, uint256 _amount) public {
         require(noEmergencyMode(), "emergency mode");
-        require(msg.sender == operator_, "only operator can use this function");
+        require(msg.sender == operator(), "operator only");
 
-        uint256 rewardPool = this.rewardPoolAmount();
+        uint256 rewardPool = rewardPoolAmount();
 
-        require(rewardPool >= _amount, "amount to drain greater than prize pool");
+        require(rewardPool >= _amount, "drain too high");
 
         rewardInternal(_recipient, _amount);
     }
@@ -437,14 +590,21 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         address to,
         uint256 amount
     ) internal {
+        // solhint-disable-next-line reason-string
         require(from != address(0), "ERC20: transfer from the zero address");
+
+        // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
 
         uint256 fromBalance = balances_[from];
+
+        // solhint-disable-next-line reason-string
         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+
         unchecked {
             balances_[from] = fromBalance - amount;
         }
+
         balances_[to] += amount;
 
         emit Transfer(from, to, amount);
@@ -459,28 +619,37 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
     }
 
     function _burn(address account, uint256 amount) internal virtual {
+
+        // solhint-disable-next-line reason-string
         require(account != address(0), "ERC20: burn from the zero address");
 
         uint256 accountBalance = balances_[account];
+
+        // solhint-disable-next-line reason-string
         require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+
         unchecked {
             balances_[account] = accountBalance - amount;
         }
+
         totalSupply_ -= amount;
 
         emit Transfer(account, address(0), amount);
     }
 
     function _approve(
-        address owner,
-        address spender,
-        uint256 amount
+        address _owner,
+        address _spender,
+        uint256 _amount
     ) internal virtual {
-        require(owner != address(0), "ERC20: approve from the zero address");
-        require(spender != address(0), "ERC20: approve to the zero address");
+        require(_owner != address(0), "approve from zero");
 
-        allowances_[owner][spender] = amount;
-        emit Approval(owner, spender, amount);
+        emit Approval(_owner, _spender, _amount);
+
+        // solhint-disable-next-line reason-string
+        require(_spender != address(0), "approve to zero");
+
+        allowances_[_owner][_spender] = _amount;
     }
 
     function _spendAllowance(
@@ -488,13 +657,69 @@ contract Token is IFluidClient, IERC20, ITransferWithBeneficiary, IToken, IEmerg
         address spender,
         uint256 amount
     ) internal virtual {
-
         uint256 currentAllowance = allowance(owner, spender);
+
         if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "ERC20: insufficient allowance");
+            require(currentAllowance >= amount, "insufficient allowance");
+
             unchecked {
                 _approve(owner, spender, currentAllowance - amount);
             }
+        }
+    }
+
+    /// @inheritdoc IERC2612
+    function nonces(address _owner) public view returns (uint256) {
+        return nonces_[_owner];
+    }
+
+    /// @inheritdoc IEIP712
+    // solhint-disable-next-line func-name-mixedcase
+    function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
+        return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
+    }
+
+    /// @inheritdoc IERC2612
+    function permit(
+        address _owner,
+        address _spender,
+        uint256 _value,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) public virtual {
+        // solhint-disable-next-line not-rely-on-time
+        require(_deadline >= block.timestamp, "permit deadline expired");
+
+        unchecked {
+            address recoveredAddress = ecrecover(
+                keccak256(
+                    abi.encodePacked(
+                        "\x19\x01",
+                        DOMAIN_SEPARATOR(),
+                        keccak256(
+                            abi.encode(
+                                EIP721_PERMIT_SELECTOR,
+                                _owner,
+                                _spender,
+                                _value,
+                                nonces_[_owner]++,
+                                _deadline
+                            )
+                        )
+                    )
+                ),
+                _v,
+                _r,
+                _s
+            );
+
+            require(recoveredAddress != address(0), "invalid signer");
+
+            require(recoveredAddress == _owner, "invalid signer");
+
+            allowances_[recoveredAddress][_spender] = _value;
         }
     }
 }

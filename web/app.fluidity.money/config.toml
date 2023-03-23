@@ -306,12 +306,22 @@ fUSDT = "https://www.jup.ag/"
 [liquidity_providers.arbitrum]
 
 [[liquidity_providers.arbitrum.providers]]
-name= "aave"
+name= "uniswap"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
-fUSDT = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
-fDAI = "https://app.aave.com/markets/?marketName=proto_arbitrum_v3"
+fUSDC = "https://app.uniswap.org/#/add/0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
+
+[[liquidity_providers.arbitrum.providers]]
+name= "camelot"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8&token2=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+
+[[liquidity_providers.arbitrum.providers]]
+name= "Saddle"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://saddle.exchange/#/pools/fUSDC-USDC%20pool/deposit"
 
 [[config.ethereum.wallets]]
 name = "Browser"
@@ -340,4 +350,11 @@ logo = "/assets/wallets/coin98.svg"
 [[contract.solana]]
 name = "Mainnet"
 address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
+
+[contract.prize_pool]
+ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
+arbitrum = "0x3cc6115Cd787dC6A3C9440D7e3B0d76c15C82Bb4"
+solana = ""
+
+
 

@@ -80,11 +80,10 @@ func main() {
 		dbNetwork network.BlockchainNetwork
 	)
 
-
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
-    log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
 			k.Payload = err
 		})
@@ -121,7 +120,7 @@ func main() {
 		message.Decode(&hintedBlock)
 
 		// set the configuration using what's in the database for the block
-		log.Debug(func (k *log.Log) {
+		log.Debug(func(k *log.Log) {
 			k.Message = "About to fetch worker config from postgres!"
 		})
 		var (
@@ -133,6 +132,7 @@ func main() {
 			currentAtxTransactionMargin  = workerConfig.CurrentAtxTransactionMargin
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
 			atxBufferSize                = workerConfig.AtxBufferSize
+			epochBlocks                  = workerConfig.EpochBlocks
 		)
 
 		var (
@@ -141,9 +141,12 @@ func main() {
 		)
 
 		var (
-			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(currentAtxTransactionMargin)
-			secondsInOneYearRat            = new(big.Rat).SetUint64(SecondsInOneYear)
-			secondsSinceLastBlock          = defaultSecondsSinceLastBlock
+			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(
+				currentAtxTransactionMargin,
+			)
+
+			secondsInOneYearRat   = new(big.Rat).SetUint64(SecondsInOneYear)
+			secondsSinceLastBlock = defaultSecondsSinceLastBlock
 		)
 
 		var (
@@ -151,14 +154,19 @@ func main() {
 			blockNumber       = hintedBlock.BlockNumber
 			blockHash         = hintedBlock.BlockHash
 			fluidTransactions = hintedBlock.DecoratedTransactions
-			transfersInBlock  int
+
+			transfersInBlock int
 		)
 
 		for _, transfers := range fluidTransactions {
 			transfersInBlock += len(transfers.Transfers)
 		}
 
-		secondsSinceLastBlockRat := new(big.Rat).SetUint64(secondsSinceLastBlock)
+		secondsSinceLastBlockRat := new(big.Rat).SetFloat64(secondsSinceLastBlock)
+
+		secondsSinceLastEpochFloat := secondsSinceLastBlock * float64(epochBlocks)
+
+		secondsSinceLastEpoch := uint64(secondsSinceLastEpochFloat)
 
 		emission := worker.NewEthereumEmission()
 
@@ -168,14 +176,26 @@ func main() {
 
 		emission.EthereumBlockNumber = blockNumber
 
-		emission.SecondsSinceLastBlock = secondsSinceLastBlock
+		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-		averageTransfersInBlock, atxBlocks, atxTxCounts := addAndComputeAverageAtx(
+
+		addBtx(
 			dbNetwork,
 			blockNumber.Uint64(),
 			tokenName,
 			transfersInBlock,
+		)
+
+		averageTransfersInBlock, _, atxBlocks, atxTxCounts := computeTransactionsSumAndAverage(
+			dbNetwork,
+			tokenName,
 			atxBufferSize,
+		)
+
+		_, transfersInEpoch, _, _ := computeTransactionsSumAndAverage(
+			dbNetwork,
+			tokenName,
+			epochBlocks,
 		)
 
 		emission.AtxBufferSize = atxBufferSize
@@ -199,9 +219,10 @@ func main() {
 		}
 
 		log.Debugf(
-			"Average transfers in block: %#v! Transfers in block: %#v!",
+			"Average transfers in block: %#v! Transfers in block: %#v! Transfers in epoch: %#v!",
 			averageTransfersInBlock,
 			transfersInBlock,
+			transfersInEpoch,
 		)
 
 		// Sets the average transfers to a default number if the average is less than the default
@@ -216,10 +237,18 @@ func main() {
 		// if this block is abnormal and could be an attack, we don't use the
 		// average!
 
-		transfersInBlockRat := new(big.Rat).SetInt64(int64(transfersInBlock))
+		transfersInEpochRat := new(big.Rat).SetInt64(int64(transfersInEpoch))
+
+		epochBlocksRat := new(big.Rat).SetInt64(int64(epochBlocks))
+
+		// average transfers in block over the current epoch
+		transfersInBlockOverEpoch := new(big.Rat).Quo(
+			transfersInEpochRat,
+			epochBlocksRat,
+		)
 
 		currentAtxTransactionMarginRatCmp := new(big.Rat).Add(
-			transfersInBlockRat,
+			transfersInBlockOverEpoch,
 			currentAtxTransactionMarginRat,
 		)
 
@@ -243,21 +272,23 @@ func main() {
 
 		if currentAtxTransactionMarginRatCmp.Cmp(averageTransfersInBlockRat) > 0 {
 
-			currentAtx = new(big.Rat).Mul(secondsInOneYearRat, transfersInBlockRat)
+			currentAtx = new(big.Rat).Mul(
+				secondsInOneYearRat,
+				transfersInBlockOverEpoch,
+			)
 
 			currentAtx.Quo(currentAtx, secondsSinceLastBlockRat)
 
-			btx = transfersInBlock
+			btx = transfersInEpoch
 
 		} else {
 
 			currentAtx = probability.CalculateAtx(
-				secondsSinceLastBlock,
+				secondsSinceLastBlockRat,
 				averageTransfersInBlock,
 			)
 
-			btx = averageTransfersInBlock
-
+			btx = averageTransfersInBlock * epochBlocks
 		}
 
 		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
@@ -274,7 +305,7 @@ func main() {
 		for _, transaction := range fluidTransactions {
 
 			var (
-				receipt     = transaction.Receipt
+				receipt = transaction.Receipt
 
 				transactionHash      = transaction.Transaction.Hash
 				transferType         = transaction.Transaction.Type
@@ -317,7 +348,11 @@ func main() {
 			// and normalise the gas tip cap by multiplying
 			// ethereum decimals then converting to USD
 
-			normalisedGasTipCapRat := weiToUsd(gasTipCapRat, ethPriceUsd, ethereumDecimalsRat)
+			normalisedGasTipCapRat := weiToUsd(
+				gasTipCapRat,
+				ethPriceUsd,
+				ethereumDecimalsRat,
+			)
 
 			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
 
@@ -326,7 +361,11 @@ func main() {
 
 			blockBaseFeeRat := new(big.Rat).SetInt(&blockBaseFee.Int)
 
-			normalisedBlockBaseFeePerGasRat := weiToUsd(blockBaseFeeRat, ethPriceUsd, ethereumDecimalsRat)
+			normalisedBlockBaseFeePerGasRat := weiToUsd(
+				blockBaseFeeRat,
+				ethPriceUsd,
+				ethereumDecimalsRat,
+			)
 
 			emission.BlockBaseFeeNormal, _ = normalisedBlockBaseFeePerGasRat.Float64()
 
@@ -342,7 +381,11 @@ func main() {
 				maxPriorityFeePerGasRat,
 			)
 
-			normalisedEffectiveGasPriceRat := weiToUsd(effectiveGasPrice, ethPriceUsd, ethereumDecimalsRat)
+			normalisedEffectiveGasPriceRat := weiToUsd(
+				effectiveGasPrice,
+				ethPriceUsd,
+				ethereumDecimalsRat,
+			)
 
 			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
 
@@ -367,12 +410,17 @@ func main() {
 				var (
 					transferFeeNormal = new(big.Rat).Set(feePerTransfer)
 
-					senderAddress    = transfer.SenderAddress
-					recipientAddress = transfer.RecipientAddress
-					appEmission      = transfer.AppEmissions
+					senderAddress_    = transfer.SenderAddress
+					recipientAddress_ = transfer.RecipientAddress
+					appEmission       = transfer.AppEmissions
 
 					// the fluid token is always included
-					fluidClients = []appTypes.UtilityName{ appTypes.UtilityFluid }
+					fluidClients = []appTypes.UtilityName{appTypes.UtilityFluid}
+				)
+
+				var (
+					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
+					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
 				)
 
 				application := applications.ApplicationNone
@@ -380,7 +428,7 @@ func main() {
 				if transfer.Decorator != nil {
 					var (
 						applicationFeeUsd = transfer.Decorator.ApplicationFee
-						utility = transfer.Decorator.UtilityName
+						utility           = transfer.Decorator.UtilityName
 					)
 
 					application = transfer.Decorator.Application
@@ -395,6 +443,7 @@ func main() {
 				}
 
 				// fetch the token amount, exchange rate, etc from chain
+
 				pools, err := fluidity.GetUtilityVars(
 					gethClient,
 					registryAddress,
@@ -405,7 +454,7 @@ func main() {
 				)
 
 				if err != nil {
-					log.Fatal(func (k *log.Log) {
+					log.Fatal(func(k *log.Log) {
 						k.Message = "Failed to get trf vars from chain!"
 						k.Payload = err
 					})
@@ -414,14 +463,12 @@ func main() {
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
 
 				var (
-					winningClasses   = fluidity.WinningClasses
-					payoutFreqNum    = fluidity.PayoutFreqNum
-					payoutFreqDenom  = fluidity.PayoutFreqDenom
+					winningClasses  = fluidity.WinningClasses
+					payoutFreqNum   = fluidity.PayoutFreqNum
+					payoutFreqDenom = fluidity.PayoutFreqDenom
 				)
 
-				var (
-					payoutFreq  = big.NewRat(payoutFreqNum, payoutFreqDenom)
-				)
+				payoutFreq := big.NewRat(payoutFreqNum, payoutFreqDenom)
 
 				randomN, randomPayouts, _ := probability.WinningChances(
 					transferFeeNormal,
@@ -430,7 +477,7 @@ func main() {
 					pools,
 					winningClasses,
 					btx,
-					secondsSinceLastBlock,
+					secondsSinceLastEpoch,
 					emission,
 				)
 

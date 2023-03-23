@@ -1,9 +1,17 @@
+
 import * as ethers from 'ethers';
+
 import { BigNumber } from 'ethers';
+
 import { expect } from "chai";
+
 import { expectEq, expectGt } from './test-utils';
+
 import { bindings, contracts } from './setup-mainnet';
+
 import { signers } from './setup-common';
+
+import { USDT_ADDR } from '../test-constants';
 
 function fluidityReward(...winners: [string, number][]) {
     return [[
@@ -19,7 +27,6 @@ describe("Token", async function () {
     let fUsdtCouncil: ethers.Contract;
     let fluidToken: string;
     let accountAddr: string;
-    let operatorAddr: string;
 
     before(async function () {
         if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
@@ -35,7 +42,6 @@ describe("Token", async function () {
             },
         } = bindings);
         accountAddr = await signers.userAccount1.getAddress();
-        operatorAddr = await signers.token.externalOperator.getAddress();
         fluidToken = contracts.usdt.deployedToken.address;
     });
 
@@ -88,7 +94,7 @@ describe("Token", async function () {
 
         for (const user of [fUsdtOracle, fUsdtCouncil, fUsdtAccount]) {
             await expect(user.disableEmergencyMode())
-                .to.be.revertedWith("only the operator account can use this");
+                .to.be.revertedWith("operator only");
         }
 
         await fUsdtOperator.disableEmergencyMode();
@@ -100,6 +106,10 @@ describe("Token", async function () {
         await fUsdtOracle.reward(fluidToken, fluidityReward([accountAddr, 100]), 100, 101);
         const change = await fUsdtAccount.balanceOf(accountAddr) - initial;
         expect(change).to.equal(100);
+    });
+
+    it("underlying token function is working fine", async function () {
+        expectEq(await fUsdtAccount.underlyingToken(), USDT_ADDR);
     });
 
     it("prevents absurd rewards", async function () {
@@ -158,5 +168,17 @@ describe("Token", async function () {
         expectGt(newRewardPool, initialRewardPool.sub(drainGangAmount));
 
         expectEq(initialAmount.add(drainGangAmount), newAmount);
+    });
+
+    it("approves wrapping of assets for other users", async () => {
+    });
+
+    it("tracks allowances properly", async () => {
+    });
+
+    it("permits wrapping of assets in a gasless way", async () => {
+    });
+
+    it("does approvals correctly using eip2612", async () => {
     });
 });

@@ -4,14 +4,13 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-pragma solidity ^0.8.11;
+pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "./compound/CTokenInterfaces.sol";
+import "../interfaces/compound/CTokenInterfaces.sol";
+import "../interfaces/ILiquidityProvider.sol";
 
 import "./openzeppelin/SafeERC20.sol";
-
-import "./ILiquidityProvider.sol";
 
 contract CompoundLiquidityProvider is ILiquidityProvider {
     using SafeERC20 for IERC20;
@@ -38,6 +37,7 @@ contract CompoundLiquidityProvider is ILiquidityProvider {
         address _owner
     ) external {
         require(version_ == 0, "contract is already initialised");
+        require(_owner != address(0), "owner is empty");
 
         version_ = 1;
 

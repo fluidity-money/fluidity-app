@@ -41,8 +41,6 @@ describe("converting ethereum to fwETH", async () => {
 
     await ethConvertor.wrapEth({ value: testNewBalance });
 
-    console.log(`balance: ${balanceBeforeWrap}`);
-
     await fwEth.connect(fwEthAccount).approve(ethConvertor.address, testNewBalance);
 
     const balanceAfterWrap = await fwEth.balanceOf(fwEthAccountAddress);
