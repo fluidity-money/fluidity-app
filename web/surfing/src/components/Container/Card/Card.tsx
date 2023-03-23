@@ -44,7 +44,10 @@ const Card = ({
     </Component>
   )
 
-  if (shimmer) return <div className={`${styles.shimmerWrapper} ${rounded ? styles.rounded : ''} ${fill ? styles.fill : ''}`}>{CardContent}</div>
+  if (shimmer) return <div className={`${styles.shimmerWrapper} ${rounded ? styles.rounded : ''} ${fill ? styles.fill : ''}`}>
+    <div className={styles.shimmerBackground} />
+    {CardContent}
+  </div>
 
   return CardContent
 };

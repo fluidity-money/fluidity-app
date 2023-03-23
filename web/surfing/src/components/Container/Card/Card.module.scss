@@ -107,9 +107,8 @@ button {
   }
 
   &.shimmer {
-    display: inline-block;
-    -webkit-mask: linear-gradient(-60deg,#000000 30%,#0005,#000 70%) right/300% 100%;
-    mask: linear-gradient(-60deg,#000000 30%,#0005,#000 70%) right/300% 100%;
+    -webkit-mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.717),#000 60%) right/300% 100%;
+    mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.715),#000 60%) right/300% 100%;
     background-repeat: no-repeat;
     animation: shimmer 5s infinite;
     background-color: black;
@@ -122,17 +121,9 @@ button {
 }
 
 .shimmerWrapper {
-  display: inline-block;
   position: relative;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.266);
-
-  display: flex;
-  flex-direction: column;
-  width: fit-content;
-  height: fit-content;
-  box-sizing: border-box;
-
+ 
   &.fill {
     width: 100%;
   }
@@ -145,5 +136,16 @@ button {
     > * {
       flex: 0 0;
     }
+  }
+
+  .shimmerBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    filter: blur(100px);
+    z-index: -1;
   }
 }
