@@ -56,7 +56,7 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ params }) => {
   const ethereumWallets = config.config["ethereum"].wallets;
 
-  const network: ChainName = params.network ?? "";
+  const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
 
