@@ -552,16 +552,8 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-        {/* Provide Liquidity*/}
-        <div className="pad-main" style={{ marginBottom: "2em" }}>
-          {!openMobModal && (
-            <ProvideLiquidity
-              provider={provider}
-              network={network}
-              tokensConfig={tokensConfig}
-            />
-          )}
-        </div>
+        {/* Provide Luquidity*/}
+        {!openMobModal && <ProvideLiquidity />}
         {/* Modal on hover */}
         {unclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&
