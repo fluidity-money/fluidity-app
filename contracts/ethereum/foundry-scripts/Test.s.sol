@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.11;
+pragma solidity 0.8.16;
 
 import "forge-std/Script.sol";
 
-import "../contracts/IFluidClient.sol";
-import "../contracts/Operator.sol";
+import "../interfaces/IFluidClient.sol";
+import "../contracts/Executor.sol";
 import "../contracts/Registry.sol";
 
 contract FakeFluidToken is IFluidClient {
@@ -54,16 +54,10 @@ contract TestScript is Script {
 
         vm.startBroadcast(deployerKey);
 
-        Registry r = new Registry(
-            externalOperator,
-            IBeacon(address(0)), // tokenBeacon
-            IBeacon(address(0)), // compoundBeacon
-            IBeacon(address(0)), // aaveV1Beacon
-            IBeacon(address(0)) // aaveV2Beacon
-        );
+        Registry r = new Registry();
         require(address(r) == vm.envAddress("FLU_ETHEREUM_REGISTRY_ADDR"), "registry address env is set incorrectly!");
 
-        Operator o = new Operator();
+        Executor o = new Executor();
         require(address(o) == vm.envAddress("FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR"), "operator address env is set incorrectly!");
         o.init(externalOperator, council, r);
 
@@ -87,6 +81,9 @@ contract TestScript is Script {
             deltaWeightDenom: 31536000
         }));
         require(address(utilityClient1) == vm.envAddress("FLU_ETHEREUM_UTIL_CLIENT_ADDR"), "util client address env is set incorrectly!");
+
+        // TODO this is just here because otherwise our nonce change messes up deploy addresses
+        r.init(externalOperator);
 
         vm.stopBroadcast();
         // now become the operator so we can set utility clients and oracles
