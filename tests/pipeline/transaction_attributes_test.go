@@ -91,6 +91,7 @@ func TestTransactionAttributes(t *testing.T) {
 	expectedAttributes := winners.TransactionAttributes{
 		Network:         network.NetworkEthereum,
 		Application:     ethApps.ApplicationNone,
+		AwardedTime:     time.Now(),
 		TransactionHash: transactionHash.String(),
 		Address:         senderAddress.String(),
 		Amount:          expectedAmount,
