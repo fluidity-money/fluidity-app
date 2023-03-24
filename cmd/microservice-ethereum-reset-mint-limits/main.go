@@ -53,7 +53,7 @@ var (
 func main() {
 	var (
 		privateKeys_    = util.GetEnvOrFatal(EnvPrivateKeys)
-		ethereumHttpUrl = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		ethereumHttpUrl = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 
 		mintLimitsPriorStart_ = os.Getenv(EnvMintLimitsPriorStart)
 	)

@@ -57,7 +57,7 @@ type win = struct{
 func main() {
 	var (
 		contractAddrString   = util.GetEnvOrFatal(EnvContractAddress)
-		gethHttpUrl          = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		gethHttpUrl          = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 

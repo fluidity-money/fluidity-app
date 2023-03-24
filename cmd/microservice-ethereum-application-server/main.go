@@ -112,7 +112,7 @@ func main() {
 	var (
 		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
-		gethHttpUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		gethHttpUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		applicationContracts     = appsListFromEnvOrFatal(EnvApplicationContracts)
 	)
