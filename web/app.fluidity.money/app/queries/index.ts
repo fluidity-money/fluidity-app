@@ -5,3 +5,5 @@ export * from "./useUserRewards";
 export * from "./useUserYield";
 export * from "./useReferrals";
 export * from "./addReferral";
+export * from "./useReferralCode";
+export * from "./addReferralCode";
