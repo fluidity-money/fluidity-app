@@ -61,7 +61,7 @@ func main() {
 	var (
 		contractAddrString   = util.GetEnvOrFatal(EnvContractAddress)
 		operatorAddrString   = util.GetEnvOrFatal(EnvOperatorAddress)
-		gethHttpUrl          = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		gethHttpUrl          = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
