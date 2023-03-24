@@ -68,7 +68,7 @@ func intFromEnvOrFatal(env string) int {
 
 func main() {
 	var (
-		gethHttpApi = util.GetEnvOrFatal(EnvGethHttpUrl)
+		gethHttpApi = util.PickEnvOrFatal(EnvGethHttpUrl)
 
 		retries = intFromEnvOrFatal(EnvRetries)
 		delay   = intFromEnvOrFatal(EnvRetryDelay)
