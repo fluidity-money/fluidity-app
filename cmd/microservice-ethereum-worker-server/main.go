@@ -74,7 +74,7 @@ func main() {
 		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		ethereumUrl              = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		ethereumUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		networkId                = util.GetEnvOrFatal(EnvNetwork)
 
 		dbNetwork network.BlockchainNetwork
