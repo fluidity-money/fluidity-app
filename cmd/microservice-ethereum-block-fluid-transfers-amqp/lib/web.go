@@ -154,6 +154,11 @@ func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*B
 			)
 		}
 
+		log.Debugf(
+			"Sending the JSON payload to the HTTP provider: %v",
+			blocksReqBody_,
+		)
+
 		blocksReqBody := bytes.NewBuffer(blocksReqBody_)
 
 		resp, err := http.Post(gethHttpApi, "application/json", blocksReqBody)
