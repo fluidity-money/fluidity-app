@@ -56,7 +56,7 @@ func rotateOracleKeys() {
 	var (
 		awsRegion   = util.GetEnvOrFatal(EnvAwsRegion)
 		bucketName  = util.GetEnvOrFatal(EnvOracleBucketName)
-		gethHttpUrl = util.GetEnvOrFatal(EnvGethHttpUrl)
+		gethHttpUrl = util.PickEnvOrFatal(EnvGethHttpUrl)
 		clusterName = util.GetEnvOrFatal(EnvAwsClusterName)
 		serviceName = util.GetEnvOrFatal(EnvAwsServiceName)
 
