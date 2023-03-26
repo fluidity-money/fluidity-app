@@ -345,18 +345,18 @@ contract Token is
     }
 
     /// @inheritdoc IToken
-    function erc20Out(uint amount) public {
+    function erc20Out(uint _amount) public {
         // take the user's fluid tokens
 
-        _burn(msg.sender, amount);
+        _burn(msg.sender, _amount);
 
         // give them erc20
 
-        pool_.takeFromPool(amount);
+        pool_.takeFromPool(_amount);
 
-        underlyingToken().safeTransfer(msg.sender, amount);
+        underlyingToken().safeTransfer(msg.sender, _amount);
 
-        emit BurnFluid(msg.sender, amount);
+        emit BurnFluid(msg.sender, _amount);
     }
 
     /// @inheritdoc IToken
