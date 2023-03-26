@@ -297,7 +297,11 @@ contract Token is
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    function _erc20In(address _spender, uint256 _amount) internal returns (uint256) {
+    function _erc20In(
+        address _spender,
+        address _beneficiary,
+        uint256 _amount
+    ) internal returns (uint256) {
         require(noEmergencyMode(), "emergency mode!");
 
         // take underlying tokens from the user
@@ -324,24 +328,22 @@ contract Token is
 
         // give the user fluid tokens
 
-        _mint(msg.sender, realAmount);
+        _mint(_beneficiary, realAmount);
 
-        emit MintFluid(msg.sender, realAmount);
+        emit MintFluid(_beneficiary, realAmount);
 
         return realAmount;
     }
 
     /// @inheritdoc IToken
     function erc20In(uint _amount) public returns (uint) {
-        return _erc20In(msg.sender, _amount);
+        return _erc20In(msg.sender, msg.sender, _amount);
     }
 
     /// @inheritdoc IToken
     // slither-disable-next-line reentrancy-no-eth
     function erc20InTo(address _recipient, uint256 _amount) public returns (uint256 ) {
-        uint256 amountIn = erc20In(_amount);
-        transfer(_recipient, _amount);
-        return amountIn;
+        return _erc20In(msg.sender, _recipient, _amount);
     }
 
     /// @inheritdoc IToken
