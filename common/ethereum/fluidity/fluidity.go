@@ -202,7 +202,7 @@ const registryAbiString = `[
 
 var (
 	FluidityContractAbi ethAbi.ABI
-	OperatorAbi         ethAbi.ABI
+	ExecutorAbi         ethAbi.ABI
 	RegistryAbi         ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
 )
@@ -268,10 +268,10 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
+func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
-		operatorAddress,
-		OperatorAbi,
+		executorAddress,
+		ExecutorAbi,
 		client,
 		client,
 		client,
@@ -309,9 +309,9 @@ func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress
 
 	gas, err := ethereum.EstimateGas(
 		client,
-		&OperatorAbi,
+		&ExecutorAbi,
 		transactionOptions,
-		&operatorAddress,
+		&executorAddress,
 		"reward",
 		tokenAddress,
 		rewards,

@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	// EnvOperatorAddress is the contract where the fluidity operator is located
-	EnvOperatorAddress = `FLU_ETHEREUM_OPERATOR_CONTRACT_ADDR`
+	// EnvExecutorAddress is the contract where the fluidity executor is located
+	EnvExecutorAddress = `FLU_ETHEREUM_EXECUTOR_CONTRACT_ADDR`
 
 	// EnvContractAddress is the contract to call when a winner's been found!
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
@@ -60,7 +60,7 @@ type win = struct{
 func main() {
 	var (
 		contractAddrString   = util.GetEnvOrFatal(EnvContractAddress)
-		operatorAddrString   = util.GetEnvOrFatal(EnvOperatorAddress)
+		executorAddrString   = util.GetEnvOrFatal(EnvExecutorAddress)
 		gethHttpUrl          = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
@@ -117,7 +117,7 @@ func main() {
 
 	var (
 		contractAddress_ = ethCommon.HexToAddress(contractAddrString)
-		operatorAddress_ = ethCommon.HexToAddress(operatorAddrString)
+		executorAddress_ = ethCommon.HexToAddress(executorAddrString)
 	)
 
 	transactionOptions, err := ethereum.NewTransactionOptions(ethClient, privateKey)
@@ -145,7 +145,7 @@ func main() {
 		rewardTransactionArguments := callRewardArguments{
 			transactionOptions:    transactionOptions,
 			containerAnnouncement: announcement,
-			operatorAddress:       operatorAddress_,
+			executorAddress:       executorAddress_,
 			contractAddress:       contractAddress_,
 			client:                ethClient,
 			useHardhatFix:         useHardhatFix,
