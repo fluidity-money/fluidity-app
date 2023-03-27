@@ -7,10 +7,15 @@ import { ArrowUp } from "./ArrowUp";
 import { Trophy } from "./Trophy";
 import { Twitter } from "./Twitter";
 import { DashboardIcon } from "./Dashboard";
+import { WarningIcon } from "./WarningIcon";
 import { DaoIcon } from "./Dao";
 import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
-import { Token } from "./Token";
+import { WalletIcon } from './WalletIcon'
+import { TokenIcon } from "./TokenIcon";
+import { InfoCircle } from "./InfoCircle";
+import { CaretLeft } from "./CaretLeft";
+import { CaretRight } from "./CaretRight";
 
 export {
   ArrowRight,
@@ -22,8 +27,13 @@ export {
   Trophy,
   Twitter,
   DashboardIcon,
+  WarningIcon,
   DaoIcon,
   AssetsIcon,
   ProviderIcon,
-  Token,
+  WalletIcon,
+  TokenIcon,
+  InfoCircle,
+  CaretLeft,
+  CaretRight,
 };

@@ -24,7 +24,6 @@ const (
 
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
-
 )
 
 var (
@@ -43,7 +42,7 @@ func main() {
 	network_, err := network.ParseEthereumNetwork(net_)
 
 	if err != nil {
-		log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to read an ethereum network from env!"
 			k.Payload = err
 		})
@@ -70,8 +69,8 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			blockNumber                 = announcement.BlockNumber
 			fromAddress                 = announcement.FromAddress
 			toAddress                   = announcement.ToAddress
-			sourceRandom                = announcement.SourceRandom
-			sourcePayouts               = announcement.SourcePayouts
+			sourceRandom                = announcement.RandomSource
+			sourcePayouts               = announcement.RandomPayouts
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
 			application                 = announcement.Application
@@ -118,7 +117,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			continue
 		}
 
-		fromWinAmount, toWinAmount := calculatePayouts(sourcePayouts, winningBalls)
+		fromWinAmounts, toWinAmounts := probability.CalculatePayoutsSplit(sourcePayouts, winningBalls)
 
 		log.App(func(k *log.Log) {
 			k.Format(
@@ -127,9 +126,9 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 				fromAddress,
 				toAddress,
 				fromAddress,
-				fromWinAmount.String(),
+				formatPayouts(fromWinAmounts),
 				toAddress,
-				toWinAmount.String(),
+				formatPayouts(toWinAmounts),
 			)
 		})
 
@@ -138,11 +137,12 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			TransactionHash: announcementTransactionHash,
 			BlockNumber:     blockNumber,
 			FromAddress:     fromAddress,
-			FromWinAmount:   fromWinAmount,
+			FromWinAmount:   fromWinAmounts,
 			ToAddress:       toAddress,
-			ToWinAmount:     toWinAmount,
+			ToWinAmount:     toWinAmounts,
 			TokenDetails:    tokenDetails,
 			Application:     application,
+			RewardTier:      winningBalls,
 		}
 
 		winAnnouncements = append(winAnnouncements, winAnnouncement)

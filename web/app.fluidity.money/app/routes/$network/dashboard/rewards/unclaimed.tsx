@@ -40,18 +40,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     {}
   );
 
-  const fluidTokenMap = tokens.reduce(
-    (map, token) =>
-      token.isFluidOf
-        ? {
-            ...map,
-            [token.symbol]: token.address,
-            [token.symbol.slice(1)]: token.address,
-          }
-        : map,
-    {}
-  );
-
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
@@ -59,7 +47,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return json({
     tokenDetailsMap,
-    fluidTokenMap,
     page,
     network,
   });
@@ -67,21 +54,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 type LoaderData = {
   tokenDetailsMap: { [tokenName: string]: { logo: string; address: string } };
-  fluidTokenMap: { [tokenName: string]: string };
   page: number;
   network: Chain;
 };
 
-const SAFE_DEFAULT = {
+const SAFE_DEFAULT_UNCLAIMED = {
   unclaimedTxs: [],
   unclaimedTokens: [],
   userUnclaimedRewards: 0,
   userClaimedRewards: 0,
+  loaded: false,
 };
 
 const UnclaimedWinnings = () => {
-  const { network, fluidTokenMap, tokenDetailsMap } =
-    useLoaderData<LoaderData>();
+  const { network, tokenDetailsMap } = useLoaderData<LoaderData>();
 
   const { address } = useContext(FluidityFacadeContext);
 
@@ -100,15 +86,11 @@ const UnclaimedWinnings = () => {
     unclaimedTokens,
     userUnclaimedRewards,
     userClaimedRewards,
-  } = {
-    ...SAFE_DEFAULT,
+    loaded,
+  }: UnclaimedLoaderData = {
+    ...SAFE_DEFAULT_UNCLAIMED,
     ...unclaimedData.data,
   };
-
-  const [{ networkFee, gasFee }] = useState({
-    networkFee: 0,
-    gasFee: 0,
-  });
 
   const location = useLocation();
 
@@ -280,20 +262,16 @@ const UnclaimedWinnings = () => {
 
   return (
     <div className="pad-main">
-      {/* Info Card - Only accessible for Ethereum */}
-      {network === "ethereum" && !!userUnclaimedRewards && (
-        <UserRewards
-          claimNow={true}
-          unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={userClaimedRewards}
-          network={network}
-          networkFee={networkFee}
-          gasFee={gasFee}
-          tokenAddrs={unclaimedTokens.map(
-            ({ symbol }) => fluidTokenMap[symbol]
-          )}
-        />
-      )}
+      {/* Info Card - Only accessible for Ethereum/Arbitrum */}
+      {(network === "ethereum" || network === "arbitrum") &&
+        !!userUnclaimedRewards && (
+          <UserRewards
+            claimNow={true}
+            unclaimedRewards={userUnclaimedRewards}
+            claimedRewards={userClaimedRewards}
+            network={network}
+          />
+        )}
 
       {!!address && unclaimedData.state === "loading" && (
         <div style={{ marginBottom: "12px" }}>
@@ -321,6 +299,7 @@ const UnclaimedWinnings = () => {
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
+            loaded={loaded}
           />
         )}
         {winningTableViewIndex === 1 && (
@@ -337,6 +316,7 @@ const UnclaimedWinnings = () => {
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
+            loaded={loaded}
           />
         )}
       </section>

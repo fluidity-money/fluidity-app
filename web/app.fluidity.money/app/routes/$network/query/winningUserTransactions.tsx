@@ -26,6 +26,7 @@ export type TransactionsLoaderData = {
   transactions: Transaction[];
   page: number;
   count: number;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -84,6 +85,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           Date.parse(second.awarded_time) - Date.parse(first.awarded_time)
       );
 
+    // If no wins found, return early
+    if (!winnersData.winners.length) {
+      return json({
+        page,
+        transactions: [],
+        count: winnersData.winners.length,
+        loaded: true,
+      } satisfies TransactionsLoaderData);
+    }
+
     // winnersMap looks up if a transaction was the send that caused a win
     const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
 
@@ -114,8 +125,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           },
         }
       );
-
-      return new Error("Server could not fulfill request");
+      return Error("Server could not fulfill request");
     }
 
     const {
@@ -144,7 +154,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           timestamp: timestamp * 1000,
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
-            currency === "DAI" || currency === "fDAI"
+            network !== "arbitrum" &&
+            (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -203,7 +214,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           timestamp: new Date(winner.awarded_time).getTime(),
           logo: tokenLogoMap[tx.currency] || defaultLogo,
           provider:
-            (network === "ethereum"
+            (network === "ethereum" || network === "arbitrum"
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
@@ -215,7 +226,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       transactions: mergedTransactions,
       count: winnersData.winners.length,
       loaded: true,
-    } as TransactionsLoaderData);
+    } satisfies TransactionsLoaderData);
   } catch (err) {
     captureException(
       new Error(

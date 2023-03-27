@@ -1,10 +1,30 @@
+
 import "@nomiclabs/hardhat-waffle";
+
 import "@openzeppelin/hardhat-upgrades";
+
+import "hardhat-dependency-compiler";
+
 import "hardhat-docgen";
+
 import { task, subtask } from "hardhat/config";
+
 import type { HardhatUserConfig } from "hardhat/types";
+
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-import { deployTokens, deployWorkerConfig, forknetTakeFunds, mustEnv } from './script-utils';
+
+import {
+  setOracles,
+  forknetTakeFunds,
+  mustEnv } from './script-utils';
+
+import {
+  getFactories,
+  deployBeacons,
+  deployTokens,
+  deployRegistry,
+  deployOperator,
+  deployTestUtilityWithoutDAO } from './deployment';
 
 import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
 
@@ -18,7 +38,7 @@ let oracleAddress: string;
 
 let emergencyCouncilAddress: string;
 
-let operatorAddress: string;
+let externalOperatorAddress: string;
 
 let shouldDeploy: (keyof typeof TokenList)[] = [];
 
@@ -27,7 +47,7 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
   .setAction(async (args, hre) => {
     oracleAddress = mustEnv(oracleKey);
     emergencyCouncilAddress = mustEnv(emergencyCouncilKey);
-    operatorAddress = mustEnv(operatorKey);
+    externalOperatorAddress = mustEnv(operatorKey);
 
     shouldDeploy = args.tokens?.split(',') || Object.keys(TokenList);
 
@@ -43,37 +63,106 @@ task("deploy-forknet", "Starts a node on forked mainnet with the contracts initi
 subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   if (!shouldDeploy.length) return;
 
-  if (!oracleAddress)
-    throw new Error(
-      `Set env variable ${oracleKey} to an 0x123 encoded public key.`);
-
-  if (!emergencyCouncilAddress)
-    throw new Error(
-      `Set env variable ${emergencyCouncilKey} to an 0x123 encoded public key.`);
+  for (const address of [oracleAddress, emergencyCouncilAddress, externalOperatorAddress]) {
+    await hre.network.provider.send(
+      "hardhat_setBalance",
+      [
+        address,
+        "0x1000000000000000000000000000000000000000000000000000000000000000",
+      ],
+    );
+  }
 
   await hre.run("forknet:take-usdt");
 
-  const workerConfigAddress = await deployWorkerConfig(
-    hre,
-    operatorAddress,
-    emergencyCouncilAddress,
+  const {
+    token: tokenFactory,
+    compoundLiquidityProvider: compoundFactory,
+    aaveV2LiquidityProvider: aaveV2Factory,
+    aaveV3LiquidityProvider: aaveV3Factory,
+    operator: operatorFactory,
+    registry: registryFactory
+  } = await getFactories(hre);
+
+  const [
+    tokenBeacon,
+    compoundBeacon,
+    aaveV2Beacon,
+    aaveV3Beacon,
+    operatorBeacon,
+    registryBeacon
+  ] = await deployBeacons(
+    tokenFactory,
+    externalOperatorAddress,
+    compoundFactory,
+    aaveV2Factory,
+    aaveV3Factory,
+    operatorFactory,
+    registryFactory
   );
 
-  await deployTokens(
+  const rootSigner = (await hre.ethers.getSigners())[0];
+
+  const registry = await deployRegistry(
+    hre,
+    rootSigner,
+    registryFactory,
+    registryBeacon.address,
+    externalOperatorAddress
+  );
+
+  const operator = await deployOperator(
+    hre,
+    rootSigner,
+    operatorFactory,
+    operatorBeacon.address,
+    externalOperatorAddress,
+    emergencyCouncilAddress,
+    registry.address
+  );
+
+  const { tokens } = await deployTokens(
     hre,
     shouldDeploy.map(token => TokenList[token]),
     AAVE_V2_POOL_PROVIDER_ADDR,
     "no v3 tokens here",
     emergencyCouncilAddress,
-    operatorAddress,
-    workerConfigAddress,
+    externalOperatorAddress,
+    operator,
+    registry,
+    externalOperatorAddress,
+
+    tokenFactory,
+    tokenBeacon.address,
+    compoundFactory,
+    compoundBeacon.address,
+    aaveV2Factory,
+    aaveV2Beacon.address,
+    aaveV3Factory,
+    aaveV3Beacon.address
   );
+
+  await setOracles(
+    hre,
+    Object.values(tokens).map(t => t.deployedToken.address),
+    externalOperatorAddress,
+    oracleAddress,
+    operator,
+  );
+
+  const testClient = await deployTestUtilityWithoutDAO(
+    hre,
+    operator,
+    tokens["fUSDt"].deployedToken.address
+  );
+
+  console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDt"].deployedToken.address}`);
 
   console.log(`deployment complete`);
 });
 
 subtask("forknet:take-usdt", async (_taskArgs, hre) => {
-  const accounts = (await hre.ethers.getSigners()).slice(0, 10);
+  const accounts = [oracleAddress, ...(await hre.ethers.getSigners()).slice(0, 1).map(a => a.address)];
 
   await forknetTakeFunds(
     hre,
@@ -140,7 +229,7 @@ if (process.env.FLU_FORKNET_NETWORK === "goerli" && process.env.FLU_ETHEREUM_FOR
  */
 module.exports = {
   solidity: {
-    version: "0.8.11",
+    version: "0.8.16",
     settings: {
       optimizer: {
         enabled: true,
@@ -154,6 +243,14 @@ module.exports = {
         revertStrings: "debug",
       }
     },
+  },
+  etherscan: {
+    apiKey: process.env.FLU_ETHERSCAN_API
+  },
+  dependencyCompiler: {
+    paths: [
+      "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol"
+    ]
   },
   networks: {
     localhost: {

@@ -1,17 +1,29 @@
-import { getEthTotalPrizePool, getTotalTransactions } from "data/ethereum";
+import type { NextApiHandler } from "next";
 
-export type IPropPools = {
+import { getEthTotalPrizePool, getTotalTransactions } from "data/ethereum";
+import { getArbTotalPrizePool } from "data/ethereum/prizePool";
+
+export type RewardPoolRes = {
   totalTransactions: number;
   ethPool: number;
+  arbPool: number;
   solPool: number;
 };
 
-const handler = async (req, res) => {
-  const totalTransactions = await getTotalTransactions();
-  const ethPool: number = await getEthTotalPrizePool();
-  const solPool: number = 0;
+const handler: NextApiHandler = async (_, res) => {
+  const [totalTransactions, ethPool, arbPool, solPool] = await Promise.all([
+    getTotalTransactions(),
+    getEthTotalPrizePool(),
+    getArbTotalPrizePool(),
+    Promise.resolve(0),
+  ]);
 
-  res.status(200).json({ totalTransactions, ethPool, solPool });
+  res.status(200).json({
+    totalTransactions,
+    ethPool: ethPool + arbPool,
+    arbPool: arbPool + ethPool,
+    solPool,
+  } as RewardPoolRes);
 };
 
 export default handler;

@@ -1,14 +1,26 @@
 import * as hre from "hardhat";
 import * as ethers from 'ethers';
-import { feiAccount, fFeiAccount } from './setup-mainnet';
 import { expectEq, expectGt } from "./test-utils";
-import { accountAddr } from "./setup-common";
+import { bindings } from "./setup-mainnet";
+import { signers } from "./setup-common";
 
 describe("token aave integration", async function () {
+  let feiAccount: ethers.Contract;
+  let fFeiAccount: ethers.Contract;
+  let accountAddr: string;
+
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();
     }
+
+    ({
+      fei: {
+        base: feiAccount,
+        fluid: fFeiAccount,
+      }
+    } = bindings);
+    accountAddr = await signers.userAccount1.getAddress();
   });
 
   it("should allow depositing erc20 tokens", async function () {
@@ -58,7 +70,6 @@ describe("token aave integration", async function () {
     for (let i = 0; i < 100; i++) {
       await hre.network.provider.send("evm_mine");
     }
-    console.log("done mining");
     const finalPoolAmount = await fFeiAccount.callStatic.rewardPoolAmount();
     expectGt(finalPoolAmount, initialPoolAmount);
     console.log(`aave earned ${finalPoolAmount.sub(initialPoolAmount).toString()} interest over 99 blocks`);

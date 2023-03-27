@@ -27,7 +27,7 @@ const RewardsBackground = ({ carouselInfo }: IProps) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.shade}></div>
+      <div className={styles.shade} />
       <div className={styles.rewardsBackground} ref={ref}>
         {/* use a closure to count iterations with an accumulator */}
         {Array.from({ length: 6 }).map(

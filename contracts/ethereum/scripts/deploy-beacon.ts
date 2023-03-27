@@ -1,6 +1,5 @@
+
 import hre from 'hardhat'
-import { mustEnv } from '../script-utils';
-import type { ethers } from 'ethers';
 
 const tasks: {[k: string]: {contract: string, name: string}} = {
     token: {contract: "Token", name: "token"},

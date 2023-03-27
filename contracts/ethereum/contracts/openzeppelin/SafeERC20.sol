@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)
 
+// Adjusted to use our local IERC20 interface instead of OpenZeppelin's
+
 pragma solidity ^0.8.0;
 
-import "./IERC20.sol";
-import "./Address.sol";
+import "../../interfaces/IERC20.sol";
+
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 /**
  * @title SafeERC20
@@ -16,7 +19,7 @@ import "./Address.sol";
  * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.
  */
 library SafeERC20 {
-    using Address for address;
+    using AddressUpgradeable for address;
 
     function safeTransfer(
         IERC20 token,
@@ -52,7 +55,7 @@ library SafeERC20 {
         // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
         require(
             (value == 0) || (token.allowance(address(this), spender) == 0),
-            "SafeERC20: approve from non-zero to non-zero allowance"
+            "approve from non-zero"
         );
         _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
@@ -73,7 +76,7 @@ library SafeERC20 {
     ) internal {
         unchecked {
             uint256 oldAllowance = token.allowance(address(this), spender);
-            require(oldAllowance >= value, "SafeERC20: decreased allowance below zero");
+            require(oldAllowance >= value, "allowance went below 0");
             uint256 newAllowance = oldAllowance - value;
             _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
         }
@@ -93,7 +96,7 @@ library SafeERC20 {
         bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
         if (returndata.length > 0) {
             // Return data is optional
-            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+            require(abi.decode(returndata, (bool)), "erc20 op failed");
         }
     }
 }

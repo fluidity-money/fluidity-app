@@ -1,16 +1,18 @@
 // constants used for tests / forknet
 // all of these are for mainnet
 
-import { Token } from "./script-utils";
+import type { Token } from './types';
 
 export const AAVE_V2_POOL_PROVIDER_ADDR = '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5';
 
 export const AAVE_V3_GOERLI_POOL_PROVIDER_ADDR = '0xc4dCB5126a3AfEd129BC3668Ea19285A9f56D15D';
 
+export const REGISTRATION_TYPE_TOKEN = 1;
+
 export const USDT_ADDR = '0xdac17f958d2ee523a2206206994597c13d831ec7';
 export const CUSDT_ADDR = '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9';
 export const AUSDT_ADDR = '0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811';
-export const USDT_HOLDER = '0xe59cd29be3be4461d79c0881d238cbe87d64595a';
+export const USDT_HOLDER = '0xf977814e90da44bfa03b6295a0616a897441acec';
 
 export const USDC_ADDR = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
 export const CUSDC_ADDR = '0x39aa39c021dfbae8fac545936693ac917d5e7563';
@@ -28,11 +30,16 @@ export const FEI_ADDR = '0x956F47F50A910163D8BF957Cf5846D573E7f87CA';
 export const AFEI_ADDR = '0x683923dB55Fead99A79Fa01A27EeC3cB19679cC3';
 export const FEI_HOLDER = '0x3a24fea1509e1baeb2d2a7c819a191aa441825ea';
 
+export const WETH_ADDR = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+export const AWETH_ADDR = '0x030ba81f1c18d280636f32af80b9aad02cf0854e';
+export const WETH_HOLDER = '0x57757e3d981446d585af0d9ae4d7df6d64647806';
+
 export const USUAL_FUSDT_ADDR = '0xaE950EEcB370371faa8BAf150f1acBF804051a5f';
 export const USUAL_FUSDC_ADDR = '0x0094D1019251793dB2100026736ee267946B5FA4';
 export const USUAL_FDAI_ADDR = '0xA5F816E2dE025A1bb419eD59652Fa03F249369A9';
 export const USUAL_FTUSD_ADDR = '0xD3a3C51BD460aCE0E83506CD1191Cf77F5eC3415';
 export const USUAL_FFEI_ADDR = '0xF24B32ec321e99053809f52aEbF680F70FE0dc53';
+export const USUAL_FETH_ADDR = '0x4Fe3f5FBAfaDD97E103F6DCc562E39F196afddF9';
 
 const tokens = {
   "usdt": {
@@ -80,6 +87,15 @@ const tokens = {
     address: FEI_ADDR,
     owner: FEI_HOLDER
   },
+  "weth": {
+    backend: 'aaveV2',
+    aaveAddress: AWETH_ADDR,
+    decimals: 18,
+    name: "Fluid WETH",
+    symbol: "fwETH",
+    address: WETH_ADDR,
+    owner: WETH_HOLDER
+  }
 } as const;
 
 export const TokenList: {[k in keyof typeof tokens]: Token} = tokens;

@@ -18,32 +18,34 @@ type (
 	// EthereumAnnouncement contains the data to call the reward function of
 	// the contract with
 	EthereumAnnouncement struct {
-		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		BlockNumber     *misc.BigInt               `json:"block_number"`
-		FromAddress     ethereum.Address           `json:"from_address"`
-		ToAddress       ethereum.Address           `json:"to_address"`
-		SourceRandom    []uint32                   `json:"random_source"`
-		SourcePayouts   []*misc.BigInt             `json:"random_payouts"`
-		TokenDetails    token_details.TokenDetails `json:"token_details"`
-		Emissions       Emission                   `json:"emissions"`
-		Application     applications.Application   `json:"application"`
+		TransactionHash ethereum.Hash                         `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt                          `json:"block_number"`
+		FromAddress     ethereum.Address                      `json:"from_address"`
+		ToAddress       ethereum.Address                      `json:"to_address"`
+		RandomSource    []uint32                              `json:"random_source"`
+		RandomPayouts   map[applications.UtilityName][]Payout `json:"random_payouts"`
+		TokenDetails    token_details.TokenDetails            `json:"token_details"`
+		Emissions       Emission                              `json:"emissions"`
+		Application     applications.Application              `json:"application"`
 	}
 
 	EthereumWinnerAnnouncement struct {
-		Network         network.BlockchainNetwork  `json:"network"`
-		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		BlockNumber     *misc.BigInt               `json:"block_number"`
-		FromAddress     ethereum.Address           `json:"from_address"`
-		ToAddress       ethereum.Address           `json:"to_address"`
-		FromWinAmount   *misc.BigInt               `json:"from_win_amount"`
-		ToWinAmount     *misc.BigInt               `json:"to_win_amount"`
-		TokenDetails    token_details.TokenDetails `json:"token_details"`
-		Application     applications.Application   `json:"application"`
+		Network         network.BlockchainNetwork           `json:"network"`
+		TransactionHash ethereum.Hash                       `json:"transaction_hash"`
+		BlockNumber     *misc.BigInt                        `json:"block_number"`
+		FromAddress     ethereum.Address                    `json:"from_address"`
+		ToAddress       ethereum.Address                    `json:"to_address"`
+		FromWinAmount   map[applications.UtilityName]Payout `json:"from_win_amount"`
+		ToWinAmount     map[applications.UtilityName]Payout `json:"to_win_amount"`
+		TokenDetails    token_details.TokenDetails          `json:"token_details"`
+		Application     applications.Application            `json:"application"`
+		RewardTier      int                                 `json:"reward_tier"`
 	}
 
 	EthereumReward struct {
 		Winner          ethereum.Address           `json:"winner"`
 		WinAmount       *misc.BigInt               `json:"amount"`
+		Utilityname     applications.UtilityName   `json:"utility"`
 		TransactionHash ethereum.Hash              `json:"transaction_hash"`
 		BlockNumber     *misc.BigInt               `json:"block_number"`
 		TokenDetails    token_details.TokenDetails `json:"token_details"`
@@ -51,13 +53,11 @@ type (
 	}
 
 	EthereumSpooledRewards struct {
-		Network         network.BlockchainNetwork  `json:"network"`
-		Token           token_details.TokenDetails `json:"token_details"`
-		Winner          ethereum.Address           `json:"winner"`
-		TransactionHash ethereum.Hash              `json:"transaction_hash"`
-		WinAmount       *misc.BigInt               `json:"amount"`
-		FirstBlock      *misc.BigInt               `json:"first_block"`
-		LastBlock       *misc.BigInt               `json:"last_block"`
+		Network    network.BlockchainNetwork                                     `json:"network"`
+		Token      token_details.TokenDetails                                    `json:"token_details"`
+		FirstBlock *misc.BigInt                                                  `json:"first_block"`
+		LastBlock  *misc.BigInt                                                  `json:"last_block"`
+		Rewards    map[applications.UtilityName]map[ethereum.Address]misc.BigInt `json:"rewards"`
 	}
 
 	EthereumBlockLog struct {
@@ -74,17 +74,19 @@ type (
 	// include application data as needed
 	EthereumWorkerDecorator struct {
 		// Enum corresponding to the application
-		Application	   applications.Application `json:"application"`
+		Application applications.Application `json:"application"`
+		// optional utility corresponding to the application
+		UtilityName applications.UtilityName `json:"utility_name"`
 		// Application fee in USD
-		ApplicationFee *big.Rat                 `json:"application_fee"`
+		ApplicationFee *big.Rat `json:"application_fee"`
 	}
 
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any
 	// associated transfers
 	EthereumDecoratedTransaction struct {
-		Transaction ethereum.Transaction `json:"transaction"`
-		Receipt ethereum.Receipt `json:"receipt"`
-		Transfers []EthereumDecoratedTransfer `json:"transfers"`
+		Transaction ethereum.Transaction        `json:"transaction"`
+		Receipt     ethereum.Receipt            `json:"receipt"`
+		Transfers   []EthereumDecoratedTransfer `json:"transfers"`
 	}
 	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {

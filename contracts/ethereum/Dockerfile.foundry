@@ -1,0 +1,23 @@
+FROM ghcr.io/foundry-rs/foundry:latest
+
+RUN apk add curl git socat npm
+
+WORKDIR /app
+
+RUN mkdir ./lib/
+
+COPY ./package.json .
+RUN ["npm", "i"]
+
+RUN ["forge", "install", "foundry-rs/forge-std", "--no-git", "--no-commit"]
+
+COPY ./foundry.toml .
+COPY ./interfaces/ ./interfaces
+COPY ./contracts/ ./contracts
+
+RUN forge build --config-path foundry.toml
+
+COPY ./foundry-scripts/ ./foundry-scripts
+COPY run-foundry.sh .
+
+CMD ["./run-foundry.sh"]

@@ -14,33 +14,42 @@ import "fmt"
 type Application int64
 
 var applicationNames = []string{
-    "none",
-    "uniswap_v2",
-    "balancer_v2",
-    "oneinch_v2",
-    "oneinch_v1",
-    "mooniswap",
-    "oneinch_fixedrate",
-    "dodo_v2",
-    "curve",
-    "multichain",
-    "xy_finance",
+	"none",
+	"uniswap_v3",
+	"uniswap_v2",
+	"balancer_v2",
+	"oneinch_v2",
+	"oneinch_v1",
+	"mooniswap",
+	"oneinch_fixedrate",
+	"dodo_v2",
+	"curve",
+	"multichain",
+	"xy_finance",
 	"apeswap",
+	"saddle",
+	"gtrade_v6_1",
 }
+
+// Supported utilities, should map to an entry in the onchain Registry
+type UtilityName string
+
+// UtilityFluid is the special utility name for the fluid token itself
+var UtilityFluid UtilityName = "FLUID"
 
 func (app Application) String() string {
 	return applicationNames[app]
 }
 
 func ParseApplicationName(name string) (Application, error) {
-    for i, app := range applicationNames {
-        if app == name {
-            return Application(i), nil
-        }
-    }
+	for i, app := range applicationNames {
+		if app == name {
+			return Application(i), nil
+		}
+	}
 
-    return 0, fmt.Errorf(
-        "unknown app name %s",
-        name,
-    )
+	return 0, fmt.Errorf(
+		"unknown app name %s",
+		name,
+	)
 }

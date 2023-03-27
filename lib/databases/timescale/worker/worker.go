@@ -154,6 +154,7 @@ func InsertEmissions(emission Emission) {
 			transfers_past,
 			seconds_since_last_block,
 
+			uniswap_v3_fee,
 			uniswap_v2_fee,
 			balancer_v_fee,
 			oneinch_v2_fee,
@@ -165,6 +166,8 @@ func InsertEmissions(emission Emission) {
 			multichain_fee,
 			xyfinance_fee,
 			apeswap_fee,
+			saddle_fee,
+			gtrade_fee,
 
 			saber_fee,
 			orca_fee,
@@ -275,30 +278,33 @@ func InsertEmissions(emission Emission) {
 			$66,
 			$67,
 			$68,
-
 			$69,
 			$70,
 			$71,
+
 			$72,
 			$73,
 			$74,
-
 			$75,
 			$76,
 			$77,
+
 			$78,
 			$79,
-
 			$80,
 			$81,
 			$82,
-			$83,
 
+			$83,
 			$84,
 			$85,
 			$86,
+
 			$87,
-			$88
+			$88,
+			$89,
+			$90,
+			$91
 		);`,
 
 		TableEmissions,
@@ -379,6 +385,7 @@ func InsertEmissions(emission Emission) {
 		transfersPast,
 		secondsSinceLastBlock,
 
+		ethAppFees.UniswapV3,
 		ethAppFees.UniswapV2,
 		ethAppFees.BalancerV2,
 		ethAppFees.OneInchV2,
@@ -390,6 +397,8 @@ func InsertEmissions(emission Emission) {
 		ethAppFees.Multichain,
 		ethAppFees.XyFinance,
 		ethAppFees.Apeswap,
+		ethAppFees.Saddle,
+		ethAppFees.GTradeV6_1,
 
 		solAppFees.Saber,
 		solAppFees.Orca,
@@ -425,9 +434,9 @@ func InsertEmissions(emission Emission) {
 	}
 }
 
-// GetAverageAtx, rounding up the average, taking the returned float64 and
-// casting it to an integer
-func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, blocks []uint64, transactionCounts []int) {
+// GetLastBlocksTransactionCount, returning the average
+// and sum of the transactions
+func GetLastBlocksTransactionCount(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, sum int, blocks []uint64, transactionCounts []int) {
 
 	timescaleClient := timescale.Client()
 
@@ -466,7 +475,7 @@ func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, lim
 
 	defer rows.Close()
 
-	sum := 0
+	sum = 0
 
 	blocks = make([]uint64, 0)
 
@@ -495,9 +504,9 @@ func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, lim
 		sum += transactionCount
 	}
 
-	average = sum / len(transactionCounts)
+	average = sum / limit
 
-	return average, blocks, transactionCounts
+	return average, sum, blocks, transactionCounts
 }
 
 // InsertTransactionCount for a block number for the number of transactions

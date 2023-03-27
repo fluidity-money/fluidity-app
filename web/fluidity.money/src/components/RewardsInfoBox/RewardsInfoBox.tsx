@@ -37,20 +37,28 @@ const RewardsInfoBox = ({
 
   const showRewardPool = type === "black";
 
-  const imgLink = (opt: string) =>
-    opt === "ETH"
-      ? "/assets/images/chainIcons/ethIcon.svg"
-      : "/assets/images/chainIcons/solanaIcon.svg";
+  const imgLink = (opt: string) => {
+    switch (opt) {
+      case "ARB":
+        return "/assets/images/chainIcons/solanaIcon.svg";
+      case "SOL":
+        return "/assets/images/chainIcons/arbIcon.svg";
+      case "ETH":
+      default:
+        return "/assets/images/chainIcons/ethIcon.svg";
+    }
+  };
 
   const [showModal, setShowModal] = useState(false);
 
   const { width } = useViewport();
   const mobileBreakpoint = 620;
 
-  const options = Object.keys(SupportedChains).map((chain) => ({
-    name: chain,
-    icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-  }));
+  const chainOptions = Object.keys(SupportedChains)
+    .map((chain) => ({
+      name: chain,
+      icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+    }))
 
   const [prizePool, setPrizePool] = useState<number>(0);
 
@@ -60,11 +68,10 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={`${
-        type === "black"
+      className={`${type === "black"
           ? styles.infoBoxContainer
           : styles.infoBoxContainerStats
-      }`}
+        }`}
     >
       <div
         className={
@@ -78,7 +85,7 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={!loading ? changeScreen : () => {}}>
+        <div onClick={!loading ? changeScreen : () => { }}>
           <Heading as="h1">
             {showRewardPool ? (
               <Suspense>
@@ -122,7 +129,7 @@ const RewardsInfoBox = ({
               icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
             }}
             className={styles.overlap}
-            options={options}
+            options={chainOptions}
             setOption={setChain}
             mobile={width <= mobileBreakpoint && width > 0}
           />

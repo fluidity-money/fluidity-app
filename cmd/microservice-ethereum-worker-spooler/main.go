@@ -5,8 +5,6 @@
 package main
 
 import (
-	"math/big"
-
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
@@ -40,7 +38,7 @@ func main() {
 	dbNetwork, err := network.ParseEthereumNetwork(network_)
 
 	if err != nil {
-		log.Fatal(func (k *log.Log) {
+		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to read the network from env!"
 			k.Payload = err
 		})
@@ -74,9 +72,9 @@ func main() {
 				recipientAddress = announcement.ToAddress
 				toWinAmount      = announcement.ToWinAmount
 				application      = announcement.Application
+				rewardTier       = announcement.RewardTier
 
-				tokenDecimals  = tokenDetails.TokenDecimals
-				blockNumber    = uint64(blockNumberInt.Int64())
+				blockNumber = uint64(blockNumberInt.Int64())
 			)
 
 			// write the sender and receiver to be stored once the win is paid out
@@ -86,53 +84,45 @@ func main() {
 				blockNumber,
 				transactionHash,
 				senderAddress,
-				*fromWinAmount,
+				fromWinAmount,
 				recipientAddress,
-				*toWinAmount,
+				toWinAmount,
 				application,
+				rewardTier,
 			)
 
-			tokenDecimalsScale := bigExp10(int64(tokenDecimals))
+			var totalWinAmount float64
 
-			// winAmount / decimalScale
-			scaledWinAmount := new(big.Rat).SetFrac(&fromWinAmount.Int, tokenDecimalsScale)
-
-			log.Debug(func(k *log.Log) {
-				k.Format("base amt $%s, decimals %s", fromWinAmount.String(), tokenDecimalsScale.String())
-			})
+			// from will always be greater than to
+			for _, payout := range fromWinAmount {
+				totalWinAmount += payout.Usd
+			}
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Reward value is $%s, instant send threshhold is $%f.",
-					scaledWinAmount.FloatString(2),
+					"Reward value is $%f, instant send threshhold is $%f.",
+					totalWinAmount,
 					instantRewardThreshold,
 				)
 			})
 
 			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, tokenDetails)
 
-			scaledBatchedRewards := new(big.Rat).SetFrac(totalRewards, tokenDecimalsScale)
-
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Total pending rewards are $%s, threshhold is $%f.",
-					scaledBatchedRewards.FloatString(2),
+					"Total pending rewards are $%f, threshhold is $%f.",
+					totalRewards,
 					batchedRewardThreshold,
 				)
 			})
 
-			var (
-				scaledWinAmountFloat, _ = scaledWinAmount.Float64()
-				scaledBatchedRewardsFloat, _ = scaledBatchedRewards.Float64()
-			)
-
-			if scaledWinAmountFloat > instantRewardThreshold {
+			if totalWinAmount > instantRewardThreshold {
 				log.Debug(func(k *log.Log) {
 					k.Message = "Transaction won more than instant send threshold, sending instantly!"
 				})
 
 				toSend[tokenDetails] = true
-			} else if scaledBatchedRewardsFloat > batchedRewardThreshold {
+			} else if totalRewards > batchedRewardThreshold {
 				log.Debug(func(k *log.Log) {
 					k.Message = "Total pending rewards are greater than threshold, sending!"
 				})

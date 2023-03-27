@@ -411,197 +411,6 @@ main > footer > section > a {
   cursor: auto;
 }
 
-#provide-liquidity {
-  width: auto;
-  max-width: 60em;
-  padding: 2em;
-  margin-bottom: 2em;
-  margin-left: 64px;
-  margin-right: 64px;
-}
-
-.card-outer {
-  position: relative;
-  border-radius: 30px;
-}
-
-.card-outer::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2px;
-  border-radius: 12px;
-  background: conic-gradient(
-    from 209.59deg at 50% 50%,
-    #f3b8d8 0deg,
-    #b793e9 50.06deg,
-    #9fd4f3 85.94deg,
-    #ffd2c4 134.97deg,
-    #fbf3f3 172.05deg,
-    #d9abdf 200.75deg,
-    #af9ce3 224.67deg,
-    #aae4e1 259.36deg,
-    #c6ead0 298.82deg,
-    #ffffff 328.72deg,
-    #fdb5e4 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-
-.card-inner {
-  display: grid;
-  grid-template-columns: 2.5fr 1fr;
-  align-items: top;
-  background: unset;
-  border-radius: 12px;
-  border-style: none;
-  margin-top: auto;
-  margin-bottom: auto;
-  border-width: 2px;
-  outline: unset;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.provide-liquidity-left {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: flex-start;
-  gap: 1em;
-}
-
-.provide-liquidity-left > div:first-child {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 0.5em;
-  align-items: flex-start;
-}
-
-.provide-liquidity-right {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.provide-liquidity-right-images {
-  position: relative;
-  width: 200px;
-  height: 200px;
-}
-
-.dashed-circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 150px;
-  height: 150px;
-  border: 1px dashed #fff;
-  border-radius: 50%;
-}
-
-.provide-heading {
-  margin: 0;
-}
-
-.liquidity-providers {
-  gap: 0.75em;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.liquidity-providers > a {
-  cursor: pointer;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  width: fit-content;
-}
-
-.liquidity-providers > a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.liquidity-providers > a > img {
-  width: 4.5em;
-}
-
-.fluid-liquidity-token {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-  margin: 0;
-}
-
-.open-provider-dropdown {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  position: relative;
-}
-
-.open-provider-dropdown:hover > h1 {
-  opacity: 0.8;
-}
-
-.open-provider-dropdown:hover > img {
-  opacity: 0.8;
-}
-
-.open-provider-dropdown > img {
-  -webkit-filter: invert(100%);
-  filter: invert(100%);
-}
-
-.dropdown-options {
-  background: rgba(50, 50, 50, 0.65);
-  box-sizing: border-box;
-  padding: 5px;
-  border-radius: 12px;
-  position: absolute;
-  top: 50px;
-  left: -15px;
-  width: 175px;
-  display: flex;
-  flex-direction: column;
-}
-
-.dropdown-options > ul {
-  margin: 0;
-  padding: 0;
-}
-
-.dropdown-options > ul > li {
-  list-style: none;
-}
-
-.token-option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  border-radius: 12px;
-  padding: 4px 8px;
-  box-sizing: border-box;
-}
-
-.token-option:hover {
-  background: rgba(99, 99, 99, 0.75);
-}
-
 .cover {
   position: fixed;
   top: 0;
@@ -617,6 +426,7 @@ main > footer > section > a {
   height: 100vh;
   background-color: transparent;
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
 }
@@ -814,6 +624,10 @@ main > footer > section > a {
   width: 100%;
 }
 
+.unclaimed-total {
+  margin: 0;
+}
+
 .unclaimed-button {
   display: flex;
   align-items: center;
@@ -894,6 +708,7 @@ main > footer > section > a {
 
 .connected-wallet-modal-container {
   position: absolute;
+  z-index: 1;
   width: 100%;
   height: 100%;
   top: 50%;
@@ -979,30 +794,6 @@ main > footer > section > a {
   text-decoration: underline;
   color: white;
   cursor: pointer;
-}
-
-.graph-tooltip {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-width: 160px;
-  gap: 0.4em;
-}
-
-.graph-tooltip-container {
-  position: relative;
-  background-color: rgba(255, 255, 255, 0.05);
-  width: min-content;
-  white-space: nowrap;
-  padding: 10px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: Aeonik, sans-serif;
-  color: white;
-  font-size: 14px;
-  text-align: center;
 }
 
 .view-reward-modal-container {
@@ -1102,33 +893,15 @@ main > footer > section > a {
   margin: -3.5em 0 -4em 0;
 }
 
-.unclaimed-modal-container {
-  cursor: default;
-  position: absolute;
-  box-sizing: border-box;
-  padding: 1em;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(5px);
-  right: 64px;
-  top: 80px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 1em;
-}
-
-.unclaimed-modal-container > section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.unclaimed-modal-container > section > h1 {
-  margin: 0;
-}
-
 #flu-socials {
   margin-bottom: 52px;
+  white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
+}
+
+#flu-socials > section {
+  width: min-content;
 }
 
 @media only screen and (max-width: 850px) {
@@ -1140,26 +913,6 @@ main > footer > section > a {
 @media only screen and (max-width: 500px) {
   .hide-on-mobile {
     display: none;
-  }
-}
-
-@media (max-width: 1200px) {
-  .card-inner {
-    grid-template-columns: 1fr;
-  }
-
-  #provide-liquidity {
-    padding-top: 0;
-  }
-
-  .provide-liquidity-left {
-    order: 1;
-    align-items: center;
-    text-align: center;
-  }
-
-  .provide-liquidity-left > div:first-child {
-    align-items: center;
   }
 }
 
@@ -1206,11 +959,6 @@ main > footer > section > a {
 @media (max-width: 500px) {
   main > footer > section:first-child {
     gap: 0.6em;
-  }
-
-  #provide-liquidity {
-    padding: 1em;
-    margin: 0 0.5em 6.5em;
   }
 
   .connect-wallet-modal-container {

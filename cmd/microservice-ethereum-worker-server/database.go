@@ -6,13 +6,14 @@ package main
 
 import (
 	postgres "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
 	timescale "github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
-func addAndComputeAverageAtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers, limit int) (int, []uint64, []int) {
+func addBtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers int) {
 	log.Debug(func(k *log.Log) {
 		k.Message = "About to insert a transaction count into timescale!"
 	})
@@ -23,12 +24,14 @@ func addAndComputeAverageAtx(network_ network.BlockchainNetwork, blockNumber uin
 		transfers,
 		network_,
 	)
+}
 
+func computeTransactionsSumAndAverage(network_ network.BlockchainNetwork, tokenShortName string, limit int) (int, int, []uint64, []int) {
 	log.Debug(func(k *log.Log) {
 		k.Message = "About to get average atx from timescale!"
 	})
 
-	return timescale.GetAverageAtx(
+	return worker.GetLastBlocksTransactionCount(
 		tokenShortName,
 		network_,
 		limit,

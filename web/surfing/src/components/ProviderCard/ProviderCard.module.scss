@@ -1,0 +1,44 @@
+.ProviderCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  border-radius: 4px;
+
+  &.md {
+    width: 360px;
+    height: 96px;
+  }
+
+  &.lg {
+    width: 444px;
+    height: 72px;
+
+    @media (max-width: 500px) {
+      width: 88vw;
+      min-width: 300px;
+    }
+  }
+
+  .section {
+
+    display: flex;
+    flex-direction: column;
+
+    .name {
+      margin: 0;
+    }
+  }
+
+  .left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+
+    img {
+      width: 2.5em;
+    }
+  }
+}

@@ -123,7 +123,11 @@ func main() {
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to get a block using its hash!"
+				k.Format(
+					"Failed to get a block with hash %#v!",
+					blockHash.String(),
+				)
+
 				k.Payload = err
 			})
 		}
