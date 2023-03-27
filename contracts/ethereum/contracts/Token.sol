@@ -410,11 +410,12 @@ contract Token is
             return;
         }
 
-        rewardInternal(winner, amount);
+        _reward(winner, amount);
+
         emit Reward(winner, amount, firstBlock, lastBlock);
     }
 
-    function rewardInternal(address winner, uint256 amount) internal {
+    function _reward(address winner, uint256 amount) internal {
         require(noEmergencyMode(), "emergency mode!");
 
         // mint some fluid tokens from the interest we've accrued
@@ -471,7 +472,7 @@ contract Token is
         blockedRewards_[user] -= amount;
 
         if (payout) {
-            rewardInternal(user, amount);
+            _reward(user, amount);
             emit UnblockReward(rewardTx, user, amount, firstBlock, lastBlock);
         }
     }
@@ -582,7 +583,7 @@ contract Token is
 
         require(rewardPool >= _amount, "drain too high");
 
-        rewardInternal(_recipient, _amount);
+        _reward(_recipient, _amount);
     }
 
     function _transfer(
