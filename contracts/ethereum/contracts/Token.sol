@@ -369,20 +369,7 @@ contract Token is
 
     /// @inheritdoc IToken
     function underlyingToken() public view returns (IERC20) {
-        (bool rc, bytes memory returndata) = address(pool_).staticcall(
-            abi.encodeWithSignature("underlying_()")
-        );
-
-        if (!rc) {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                revert(add(returndata, 32), mload(returndata))
-            }
-        }
-
-        (address token) = abi.decode(returndata, (address));
-
-        return IERC20(token);
+        return pool_.underlying_();
     }
 
     /// @inheritdoc IToken
