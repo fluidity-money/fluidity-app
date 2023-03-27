@@ -347,18 +347,18 @@ contract Token is
     }
 
     /// @inheritdoc IToken
-    function erc20Out(uint amount) public {
+    function erc20Out(uint _amount) public {
         // take the user's fluid tokens
 
-        _burn(msg.sender, amount);
+        _burn(msg.sender, _amount);
 
         // give them erc20
 
-        pool_.takeFromPool(amount);
+        pool_.takeFromPool(_amount);
 
-        underlyingToken().safeTransfer(msg.sender, amount);
+        underlyingToken().safeTransfer(msg.sender, _amount);
 
-        emit BurnFluid(msg.sender, amount);
+        emit BurnFluid(msg.sender, _amount);
     }
 
     /// @inheritdoc IToken
@@ -612,31 +612,31 @@ contract Token is
         emit Transfer(from, to, amount);
     }
 
-    function _mint(address account, uint256 amount) internal virtual {
-        require(account != address(0), "ERC20: mint to the zero address");
+    function _mint(address _account, uint256 _amount) internal virtual {
+        require(_account != address(0), "ERC20: mint to the zero address");
 
-        totalSupply_ += amount;
-        balances_[account] += amount;
-        emit Transfer(address(0), account, amount);
+        totalSupply_ += _amount;
+        balances_[_account] += _amount;
+        emit Transfer(address(0), _account, _amount);
     }
 
-    function _burn(address account, uint256 amount) internal virtual {
+    function _burn(address _account, uint256 _amount) internal virtual {
 
         // solhint-disable-next-line reason-string
-        require(account != address(0), "ERC20: burn from the zero address");
+        require(_account != address(0), "ERC20: burn from the zero address");
 
-        uint256 accountBalance = balances_[account];
+        uint256 accountBalance = balances_[_account];
 
         // solhint-disable-next-line reason-string
-        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        require(accountBalance >= _amount, "ERC20: burn amount exceeds balance");
 
         unchecked {
-            balances_[account] = accountBalance - amount;
+            balances_[_account] = accountBalance - _amount;
         }
 
-        totalSupply_ -= amount;
+        totalSupply_ -= _amount;
 
-        emit Transfer(account, address(0), amount);
+        emit Transfer(_account, address(0), _amount);
     }
 
     function _approve(
