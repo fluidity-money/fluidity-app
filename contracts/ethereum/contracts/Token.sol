@@ -430,12 +430,22 @@ contract Token is
         }
     }
 
-    /* ~~~~~~~~~~ IMPLEMENTS IOperatorOwned ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ EXTRA FUNCTIONS ~~~~~~~~~~ */
 
-    /// @inheritdoc IOperatorOwned
-    function operator() public view returns (address) { return operator_; }
+    function userAmountMinted(address /* account */) public pure returns (uint) {
+        return 0;
+    }
 
-    /// @inheritdoc IOperatorOwned
+    function updateOracle(address _newOracle) public {
+        require(msg.sender == operator_, "only operator");
+
+        oracle_ = _newOracle;
+    }
+
+    /**
+     * @notice update the operator account to a new address
+     * @param _newOperator the address of the new operator to change to
+     */
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator_, "operator only");
         require(_newOperator != address(0), "new operator zero");
@@ -444,6 +454,11 @@ contract Token is
 
         emit OperatorChanged(operator_, _newOperator);
     }
+
+    /* ~~~~~~~~~~ IMPLEMENTS IOperatorOwned ~~~~~~~~~~ */
+
+    /// @inheritdoc IOperatorOwned
+    function operator() public view returns (address) { return operator_; }
 
     /* ~~~~~~~~~~ IMPLEMENTS IEmergencyMode ~~~~~~~~~~ */
 
@@ -638,79 +653,6 @@ contract Token is
         return vars;
     }
 
-    /* ~~~~~~~~~~ IMPLEMENTS IERC20 ~~~~~~~~~~ */
-
-    // remaining functions are taken from OpenZeppelin's ERC20 implementation
-
-    function name() public view returns (string memory) { return name_; }
-    function symbol() public view returns (string memory) { return symbol_; }
-    function decimals() public view returns (uint8) { return decimals_; }
-    function totalSupply() public view returns (uint256) { return totalSupply_; }
-    function balanceOf(address account) public view returns (uint256) {
-       return balances_[account];
-    }
-
-    function transfer(address _to, uint256 _amount) public returns (bool) {
-        _transfer(msg.sender, _to, _amount);
-        return true;
-    }
-
-    function allowance(
-        address _owner,
-        address _spender
-    ) public view returns (uint256) {
-        return allowances_[_owner][_spender];
-    }
-
-    function approve(address _spender, uint256 _amount) public returns (bool) {
-        _approve(msg.sender, _spender, _amount);
-        return true;
-    }
-
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) public returns (bool) {
-        _spendAllowance(_from, msg.sender, _amount);
-        _transfer(_from, _to, _amount);
-        return true;
-    }
-
-    // not actually a part of IERC20 but we support it anyway
-
-    function increaseAllowance(
-        address _spender,
-        uint256 _addedValue
-    ) public returns (bool) {
-        _approve(
-            msg.sender,
-            _spender,
-            allowances_[msg.sender][_spender] + _addedValue
-        );
-
-        return true;
-    }
-
-    function decreaseAllowance(
-        address _spender,
-        uint256 _subtractedValue
-    ) public returns (bool) {
-        uint256 currentAllowance = allowances_[msg.sender][_spender];
-
-        // solhint-disable-next-line reason-string
-        require(
-            currentAllowance >= _subtractedValue,
-            "ERC20: decreased allowance below zero"
-        );
-
-        unchecked {
-            _approve(msg.sender, _spender, currentAllowance - _subtractedValue);
-        }
-
-        return true;
-    }
-
     /* ~~~~~~~~~~ IMPLEMENTS ITransferWithBeneficiary ~~~~~~~~~~ */
 
     /// @inheritdoc ITransferWithBeneficiary
@@ -791,15 +733,76 @@ contract Token is
         }
     }
 
-    /* ~~~~~~~~~~ EXTRA FUNCTIONS ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ IMPLEMENTS IERC20 ~~~~~~~~~~ */
 
-    function userAmountMinted(address /* account */) public pure returns (uint) {
-        return 0;
+    // remaining functions are taken from OpenZeppelin's ERC20 implementation
+
+    function name() public view returns (string memory) { return name_; }
+    function symbol() public view returns (string memory) { return symbol_; }
+    function decimals() public view returns (uint8) { return decimals_; }
+    function totalSupply() public view returns (uint256) { return totalSupply_; }
+    function balanceOf(address account) public view returns (uint256) {
+       return balances_[account];
     }
 
-    function setOracle(address _newOracle) public {
-        require(msg.sender == operator_, "only operator");
+    function transfer(address _to, uint256 _amount) public returns (bool) {
+        _transfer(msg.sender, _to, _amount);
+        return true;
+    }
 
-        oracle_ = _newOracle;
+    function allowance(
+        address _owner,
+        address _spender
+    ) public view returns (uint256) {
+        return allowances_[_owner][_spender];
+    }
+
+    function approve(address _spender, uint256 _amount) public returns (bool) {
+        _approve(msg.sender, _spender, _amount);
+        return true;
+    }
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) public returns (bool) {
+        _spendAllowance(_from, msg.sender, _amount);
+        _transfer(_from, _to, _amount);
+        return true;
+    }
+
+    // not actually a part of IERC20 but we support it anyway
+
+    function increaseAllowance(
+        address _spender,
+        uint256 _addedValue
+    ) public returns (bool) {
+        _approve(
+            msg.sender,
+            _spender,
+            allowances_[msg.sender][_spender] + _addedValue
+        );
+
+        return true;
+    }
+
+    function decreaseAllowance(
+        address _spender,
+        uint256 _subtractedValue
+    ) public returns (bool) {
+        uint256 currentAllowance = allowances_[msg.sender][_spender];
+
+        // solhint-disable-next-line reason-string
+        require(
+            currentAllowance >= _subtractedValue,
+            "ERC20: decreased allowance below zero"
+        );
+
+        unchecked {
+            _approve(msg.sender, _spender, currentAllowance - _subtractedValue);
+        }
+
+        return true;
     }
 }
