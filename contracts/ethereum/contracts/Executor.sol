@@ -34,7 +34,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     );
 
     /// @dev if false, emergency mode is active!
-    bool private noEmergency_;
+    bool private noEmergencyMode_;
 
     /// @dev for migrations
     uint256 private version_;
@@ -68,7 +68,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
         emergencyCouncil_ = _emergencyCouncil;
         registry_ = _registry;
 
-        noEmergency_ = true;
+        noEmergencyMode_ = true;
     }
 
     function operator() public view returns (address) {
@@ -87,14 +87,14 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     }
 
     function noEmergencyMode() public view returns (bool) {
-        return noEmergency_;
+        return noEmergencyMode_;
     }
 
     function enableEmergencyMode() public {
         bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil();
         require(authorised, "emergency only");
 
-        noEmergency_ = false;
+        noEmergencyMode_ = false;
         emit Emergency(true);
     }
 
@@ -105,7 +105,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     function disableEmergencyMode() public {
         require(msg.sender == operator_, "operator only");
 
-        noEmergency_ = true;
+        noEmergencyMode_ = true;
 
         emit Emergency(false);
     }
@@ -121,7 +121,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     }
 
     function updateOracle(address _contractAddr, address _newOracle) public {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == operator_, "only operator");
 
         _updateOracle(_contractAddr, _newOracle);
@@ -129,7 +129,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
 
     /// @notice updates the trusted oracle to a new address
     function updateOracles(OracleUpdate[] memory _newOracles) public {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == operator_, "only operator");
 
         for (uint i = 0; i < _newOracles.length; i++) {
@@ -148,7 +148,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     )
         public
     {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
 
         require(msg.sender == oracles_[_token], "only oracle");
 
