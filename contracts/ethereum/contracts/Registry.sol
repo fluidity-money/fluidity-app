@@ -143,7 +143,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     function updateOperator(address _newOperator) public {
-        require(msg.sender == operator(), "only operator");
+        require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "zero operator");
 
         operator_ = _newOperator;
