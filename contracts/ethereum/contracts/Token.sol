@@ -32,7 +32,7 @@ contract Token is
 {
     using SafeERC20 for IERC20;
 
-    /* ~~~~~~~~~~` ERC20 FEATURES ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ ERC20 FEATURES ~~~~~~~~~~ */
 
     mapping(address => uint256) private balances_;
 
@@ -46,7 +46,7 @@ contract Token is
 
     string private symbol_;
 
-    /* ~~~~~~~~~~` HOUSEKEEPING ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ HOUSEKEEPING ~~~~~~~~~~ */
 
     /// @dev if false, emergency mode is active - can be called by either the
     /// @dev operator, worker account or emergency council
@@ -55,18 +55,18 @@ contract Token is
     // for migrations
     uint private version_;
 
-    /* ~~~~~~~~~~` LIQUIDITY PROVIDER ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ LIQUIDITY PROVIDER ~~~~~~~~~~ */
 
     // @custom:security non-reentrant
     ILiquidityProvider private pool_;
 
-    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ DEPRECATED SLOTS ~~~~~~~~~~ */
 
     /// @dev deprecated, worker config is now handled externally
     // solhint-disable-next-line var-name-mixedcase
     address private __deprecated_1;
 
-    /* ~~~~~~~~~~` OWNERSHIP ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ OWNERSHIP ~~~~~~~~~~ */
 
     /// @dev emergency council that can activate emergency mode
     address private emergencyCouncil_;
@@ -74,7 +74,7 @@ contract Token is
     /// @dev account to use that created the contract (multisig account)
     address private operator_;
 
-    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ DEPRECATED SLOTS ~~~~~~~~~~ */
 
     /// @dev deprecated, we don't track the last rewarded block for manual
     ///      rewards anymore
@@ -94,7 +94,7 @@ contract Token is
     // solhint-disable-nex-line var-name-mixedcase
     mapping (address => uint) private __deprecated_4;
 
-    /* ~~~~~~~~~~` SECURITY FEATURES ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ SECURITY FEATURES ~~~~~~~~~~ */
 
     /// @dev the largest amount a reward can be to not get quarantined
     uint private maxUncheckedReward_;
@@ -102,7 +102,7 @@ contract Token is
     /// @dev [address] => [number of tokens the user won that have been quarantined]
     mapping (address => uint) private blockedRewards_;
 
-    /* ~~~~~~~~~~` DEPRECATED SLOTS ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ DEPRECATED SLOTS ~~~~~~~~~~ */
 
     // slither-disable-start unused-state constable-states naming-convention
 
@@ -137,13 +137,13 @@ contract Token is
 
     // slither-disable-end
 
-    /* ~~~~~~~~~~` ORACLE PAYOUTS ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ ORACLE PAYOUTS ~~~~~~~~~~ */
 
     /// @dev account that can call the reward function, should be the
     ///      operator contract/
     address private oracle_;
 
-    /* ~~~~~~~~~~` ERC2612 ~~~~~~~~~~ */
+    /* ~~~~~~~~~~ ERC2612 ~~~~~~~~~~ */
 
     // @dev nonces_ would be used for permit only, but it could be used for
     //      every off-chain sign if needed
@@ -152,6 +152,8 @@ contract Token is
     uint256 private initialChainId_;
 
     bytes32 private initialDomainSeparator_;
+
+    /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
     /**
      * @notice computeDomainSeparator that's used for EIP712
@@ -242,60 +244,7 @@ contract Token is
         _setupEIP2612();
     }
 
-    /// @inheritdoc IOperatorOwned
-    function updateOperator(address _newOperator) public {
-        require(msg.sender == operator(), "operator only");
-        require(_newOperator != address(0), "new operator zero");
-
-        operator_ = _newOperator;
-
-        emit OperatorChanged(operator_, _newOperator);
-    }
-
-    function emergencyCouncil() public view returns (address) {
-        return emergencyCouncil_;
-    }
-
-    function noEmergencyMode() public view returns (bool) {
-        return noEmergencyMode_;
-    }
-
-    /// @inheritdoc IToken
-    function oracle() public view returns (address) {
-        return oracle_;
-    }
-
-    /// @inheritdoc IEmergencyMode
-    function enableEmergencyMode() public {
-        require(
-            msg.sender == operator() ||
-            msg.sender == emergencyCouncil() ||
-            msg.sender == oracle(),
-            "can't enable emergency mode!"
-        );
-
-        noEmergencyMode_ = false;
-
-        emit Emergency(true);
-    }
-
-    /// @inheritdoc IEmergencyMode
-    function disableEmergencyMode() public {
-        require(msg.sender == operator(), "operator only");
-
-        noEmergencyMode_ = true;
-
-        emit Emergency(false);
-    }
-
-    /// @notice updates the reward quarantine threshold if called by the operator
-    function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
-        require(msg.sender == operator(), "operator only");
-
-        maxUncheckedReward_ = _maxUncheckedReward;
-
-        emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
-    }
+    /* ~~~~~~~~~~ INTERNAL FUNCTIONS ~~~~~~~~~~ */
 
     /// @dev _erc20In has the possibility depending on the underlying LP
     ///      behaviour to not mint the exact amount of tokens, so it returns it
@@ -305,7 +254,7 @@ contract Token is
         address _beneficiary,
         uint256 _amount
     ) internal returns (uint256) {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
 
         // take underlying tokens from the user
 
@@ -338,17 +287,6 @@ contract Token is
         return realAmount;
     }
 
-    /// @inheritdoc IToken
-    function erc20In(uint _amount) public returns (uint) {
-        return _erc20In(msg.sender, msg.sender, _amount);
-    }
-
-    /// @inheritdoc IToken
-    // slither-disable-next-line reentrancy-no-eth
-    function erc20InTo(address _recipient, uint256 _amount) public returns (uint256 ) {
-        return _erc20In(msg.sender, _recipient, _amount);
-    }
-
     function _erc20Out(
         address _sender,
         address _beneficiary,
@@ -365,6 +303,238 @@ contract Token is
         emit BurnFluid(_sender, _amount);
 
         underlyingToken().safeTransfer(_beneficiary, _amount);
+    }
+
+    /**
+     * @dev rewards two users from the reward pool
+     * @dev mints tokens and emits the reward event
+     *
+     * @param lastBlock the last block in the range being rewarded for
+     * @param winner the address being rewarded
+     * @param amount the amount being rewarded
+     */
+    function _rewardFromPool(
+        uint256 firstBlock,
+        uint256 lastBlock,
+        address winner,
+        uint256 amount
+    ) internal {
+        require(noEmergencyMode_, "emergency mode!");
+
+        if (amount > maxUncheckedReward_) {
+            // quarantine the reward
+            emit BlockedReward(winner, amount, firstBlock, lastBlock);
+
+            blockedRewards_[winner] += amount;
+
+            return;
+        }
+
+        _mint(winner, amount);
+
+        emit Reward(winner, amount, firstBlock, lastBlock);
+    }
+
+
+    function _reward(address winner, uint256 amount) internal {
+        require(noEmergencyMode_, "emergency mode!");
+
+        // mint some fluid tokens from the interest we've accrued
+
+        _mint(winner, amount);
+    }
+
+    /// @dev _transfer is implemented by OpenZeppelin
+    function _transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
+        // solhint-disable-next-line reason-string
+        require(from != address(0), "ERC20: transfer from the zero address");
+
+
+        // solhint-disable-next-line reason-string
+        require(to != address(0), "ERC20: transfer to the zero address");
+
+        uint256 fromBalance = balances_[from];
+
+        // solhint-disable-next-line reason-string
+        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
+
+        unchecked {
+            balances_[from] = fromBalance - amount;
+        }
+
+        balances_[to] += amount;
+
+        emit Transfer(from, to, amount);
+    }
+
+    /// @dev _mint is implemented by OpenZeppelin
+    function _mint(address _account, uint256 _amount) internal virtual {
+        require(_account != address(0), "ERC20: mint to the zero address");
+
+        totalSupply_ += _amount;
+        balances_[_account] += _amount;
+        emit Transfer(address(0), _account, _amount);
+    }
+
+    /// @dev _burn is implemented by OpenZeppelin
+    function _burn(address _account, uint256 _amount) internal virtual {
+        // solhint-disable-next-line reason-string
+        require(_account != address(0), "ERC20: burn from the zero address");
+
+        uint256 accountBalance = balances_[_account];
+
+        // solhint-disable-next-line reason-string
+        require(accountBalance >= _amount, "ERC20: burn amount exceeds balance");
+
+
+        unchecked {
+            balances_[_account] = accountBalance - _amount;
+
+        }
+
+        totalSupply_ -= _amount;
+
+        emit Transfer(_account, address(0), _amount);
+    }
+
+    /// @dev _approve is implemented by OpenZeppelin
+    function _approve(
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) internal virtual {
+        require(_owner != address(0), "approve from zero");
+
+        emit Approval(_owner, _spender, _amount);
+
+        // solhint-disable-next-line reason-string
+        require(_spender != address(0), "approve to zero");
+
+        allowances_[_owner][_spender] = _amount;
+    }
+
+    /// @dev _spendAllowance is implemented by OpenZeppelin
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
+        uint256 currentAllowance = allowance(owner, spender);
+
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "insufficient allowance");
+
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
+        }
+    }
+
+    /* ~~~~~~~~~~ EXTRA FUNCTIONS ~~~~~~~~~~ */
+
+    function userAmountMinted(address /* account */) public pure returns (uint) {
+        return 0;
+    }
+
+    function updateOracle(address _newOracle) public {
+        require(msg.sender == operator_, "only operator");
+
+        oracle_ = _newOracle;
+    }
+
+    /**
+     * @notice update the operator account to a new address
+     * @param _newOperator the address of the new operator to change to
+     */
+    function updateOperator(address _newOperator) public {
+        require(msg.sender == operator_, "operator only");
+        require(_newOperator != address(0), "new operator zero");
+
+        operator_ = _newOperator;
+
+        emit OperatorChanged(operator_, _newOperator);
+    }
+
+    /* ~~~~~~~~~~ IMPLEMENTS IOperatorOwned ~~~~~~~~~~ */
+
+    /// @inheritdoc IOperatorOwned
+    function operator() public view returns (address) { return operator_; }
+
+    /* ~~~~~~~~~~ IMPLEMENTS IEmergencyMode ~~~~~~~~~~ */
+
+    /// @inheritdoc IEmergencyMode
+    function enableEmergencyMode() public {
+        require(
+            msg.sender == operator_ ||
+            msg.sender == emergencyCouncil_ ||
+            msg.sender == oracle_,
+            "can't enable emergency mode!"
+        );
+
+        noEmergencyMode_ = false;
+
+        emit Emergency(true);
+    }
+
+    /// @inheritdoc IEmergencyMode
+    function disableEmergencyMode() public {
+        require(msg.sender == operator_, "operator only");
+
+        noEmergencyMode_ = true;
+
+        emit Emergency(false);
+    }
+
+    function noEmergencyMode() public view returns (bool) {
+        return noEmergencyMode_;
+    }
+
+    function emergencyCouncil() public view returns (address) {
+        return emergencyCouncil_;
+    }
+
+    /* ~~~~~~~~~~ IMPLEMENTS IToken ~~~~~~~~~~ */
+
+    /// @inheritdoc IToken
+    function oracle() public view returns (address) {
+        return oracle_;
+    }
+
+    /// @inheritdoc IToken
+    function underlyingToken() public view returns (IERC20) {
+        return pool_.underlying_();
+    }
+
+    /// @inheritdoc IToken
+    function underlyingLp() public view returns (ILiquidityProvider) {
+        return pool_;
+    }
+
+    /// @notice updates the reward quarantine threshold if called by the operator
+    function updateRewardQuarantineThreshold(uint _maxUncheckedReward) public {
+        require(msg.sender == operator_, "operator only");
+
+        maxUncheckedReward_ = _maxUncheckedReward;
+
+        emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
+    }
+
+    /// @inheritdoc IToken
+    function erc20In(uint _amount) public returns (uint) {
+        return _erc20In(msg.sender, msg.sender, _amount);
+    }
+
+    /// @inheritdoc IToken
+    // slither-disable-next-line reentrancy-no-eth
+    function erc20InTo(
+        address _recipient,
+        uint256 _amount
+    ) public returns (uint256 ) {
+        return _erc20In(msg.sender, _recipient, _amount);
     }
 
     /// @inheritdoc IToken
@@ -386,44 +556,76 @@ contract Token is
     }
 
     /// @inheritdoc IToken
-    function underlyingToken() public view returns (IERC20) {
-        return pool_.underlying_();
+    function unblockReward(
+        bytes32 rewardTx,
+        address user,
+        uint amount,
+        bool payout,
+        uint firstBlock,
+        uint lastBlock
+    ) public {
+        require(noEmergencyMode_, "emergency mode!");
+        require(msg.sender == operator_, "operator only");
+
+        require(blockedRewards_[user] >= amount, "too much unblock");
+
+        blockedRewards_[user] -= amount;
+
+        if (payout) {
+            _reward(user, amount);
+            emit UnblockReward(rewardTx, user, amount, firstBlock, lastBlock);
+        }
     }
 
     /// @inheritdoc IToken
-    function underlyingLp() public view returns (ILiquidityProvider) {
-        return pool_;
+    function maxUncheckedReward() public view returns (uint) {
+        return maxUncheckedReward_;
     }
 
-    /**
-     * @dev rewards two users from the reward pool
-     * @dev mints tokens and emits the reward event
-     *
-     * @param lastBlock the last block in the range being rewarded for
-     * @param winner the address being rewarded
-     * @param amount the amount being rewarded
-     */
-    function rewardFromPool(uint256 firstBlock, uint256 lastBlock, address winner, uint256 amount) internal {
-        require(noEmergencyMode(), "emergency mode!");
+    /// @inheritdoc IToken
+    function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
+      require(noEmergencyMode_, "emergency mode");
+      require(msg.sender == operator_, "operator only");
 
-        if (amount > maxUncheckedReward_) {
-            // quarantine the reward
-            emit BlockedReward(winner, amount, firstBlock, lastBlock);
+      uint oldPoolAmount = pool_.totalPoolAmount();
 
-            blockedRewards_[winner] += amount;
+      pool_.takeFromPool(oldPoolAmount);
 
-            return;
-        }
 
-        _mint(winner, amount);
+      pool_ = newPool;
 
-        emit Reward(winner, amount, firstBlock, lastBlock);
+
+      underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
+
+      pool_.addToPool(oldPoolAmount);
+
+      uint newPoolAmount = pool_.totalPoolAmount();
+
+      require(newPoolAmount >= oldPoolAmount, "total amount bad");
     }
+
+    /// @inheritdoc IToken
+    function drainRewardPool(address _recipient, uint256 _amount) public {
+        require(noEmergencyMode_, "emergency mode");
+        require(msg.sender == operator_, "operator only");
+
+        uint256 rewardPool = rewardPoolAmount();
+
+        require(rewardPool >= _amount, "drain too high");
+
+        _reward(_recipient, _amount);
+    }
+
+    /* ~~~~~~~~~~ IMPLEMENTS IFluidClient ~~~~~~~~~~ */
 
     /// @inheritdoc IFluidClient
-    function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) public {
-        require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == oracle(), "only oracle");
+    function batchReward(
+        Winner[] memory rewards,
+        uint firstBlock,
+        uint lastBlock
+    ) public {
+        require(noEmergencyMode_, "emergency mode!");
+        require(msg.sender == oracle_, "only oracle");
 
         uint poolAmount = rewardPoolAmount();
 
@@ -434,7 +636,12 @@ contract Token is
 
             poolAmount = poolAmount - winner.amount;
 
-            rewardFromPool(firstBlock, lastBlock, winner.winner, winner.amount);
+            _rewardFromPool(
+                firstBlock,
+                lastBlock,
+                winner.winner,
+                winner.amount
+            );
         }
     }
 
@@ -452,68 +659,7 @@ contract Token is
         return vars;
     }
 
-    /// @inheritdoc IToken
-    function unblockReward(
-        bytes32 rewardTx,
-        address user,
-        uint amount,
-        bool payout,
-        uint firstBlock,
-        uint lastBlock
-    ) public {
-        require(noEmergencyMode(), "emergency mode!");
-        require(msg.sender == operator(), "operator only");
-
-        require(blockedRewards_[user] >= amount, "too much unblock");
-
-        blockedRewards_[user] -= amount;
-
-        if (payout) {
-            _mint(user, amount);
-            emit UnblockReward(rewardTx, user, amount, firstBlock, lastBlock);
-        }
-    }
-
-    /// @inheritdoc IToken
-    function maxUncheckedReward() public view returns (uint) { return maxUncheckedReward_; }
-
-    function operator() public view returns (address) { return operator_; }
-
-    function userAmountMinted(address /* account */) public pure returns (uint) { return 0; }
-
-    // remaining functions are taken from OpenZeppelin's ERC20 implementation
-
-    function name() public view returns (string memory) { return name_; }
-    function symbol() public view returns (string memory) { return symbol_; }
-    function decimals() public view returns (uint8) { return decimals_; }
-    function totalSupply() public view returns (uint256) { return totalSupply_; }
-    function balanceOf(address account) public view returns (uint256) {
-       return balances_[account];
-    }
-
-    function transfer(address to, uint256 amount) public returns (bool) {
-        _transfer(msg.sender, to, amount);
-        return true;
-    }
-
-    function allowance(address owner, address spender) public view returns (uint256) {
-        return allowances_[owner][spender];
-    }
-
-    function approve(address spender, uint256 amount) public returns (bool) {
-        _approve(msg.sender, spender, amount);
-        return true;
-    }
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public returns (bool) {
-        _spendAllowance(from, msg.sender, amount);
-        _transfer(from, to, amount);
-        return true;
-    }
+    /* ~~~~~~~~~~ IMPLEMENTS ITransferWithBeneficiary ~~~~~~~~~~ */
 
     /// @inheritdoc ITransferWithBeneficiary
     function transferWithBeneficiary(
@@ -533,138 +679,7 @@ contract Token is
         return rc;
     }
 
-    /// @inheritdoc IToken
-    function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
-      require(noEmergencyMode(), "emergency mode");
-      require(msg.sender == operator(), "operator only");
-
-      uint oldPoolAmount = pool_.totalPoolAmount();
-
-      pool_.takeFromPool(oldPoolAmount);
-
-      pool_ = newPool;
-
-      underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
-
-      pool_.addToPool(oldPoolAmount);
-
-      uint newPoolAmount = pool_.totalPoolAmount();
-
-      require(newPoolAmount >= oldPoolAmount, "total amount bad");
-    }
-
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        _approve(msg.sender, spender, allowances_[msg.sender][spender] + addedValue);
-        return true;
-    }
-
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
-        uint256 currentAllowance = allowances_[msg.sender][spender];
-
-        // solhint-disable-next-line reason-string
-        require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
-
-        unchecked {
-            _approve(msg.sender, spender, currentAllowance - subtractedValue);
-        }
-
-        return true;
-    }
-
-    /// @inheritdoc IToken
-    function drainRewardPool(address _recipient, uint256 _amount) public {
-        require(noEmergencyMode(), "emergency mode");
-        require(msg.sender == operator(), "operator only");
-
-        uint256 rewardPool = rewardPoolAmount();
-
-        require(rewardPool >= _amount, "drain too high");
-
-        _mint(_recipient, _amount);
-    }
-
-    function _transfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal {
-        // solhint-disable-next-line reason-string
-        require(from != address(0), "ERC20: transfer from the zero address");
-
-        // solhint-disable-next-line reason-string
-        require(to != address(0), "ERC20: transfer to the zero address");
-
-        uint256 fromBalance = balances_[from];
-
-        // solhint-disable-next-line reason-string
-        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
-
-        unchecked {
-            balances_[from] = fromBalance - amount;
-        }
-
-        balances_[to] += amount;
-
-        emit Transfer(from, to, amount);
-    }
-
-    function _mint(address _account, uint256 _amount) internal virtual {
-        require(_account != address(0), "ERC20: mint to the zero address");
-
-        totalSupply_ += _amount;
-        balances_[_account] += _amount;
-        emit Transfer(address(0), _account, _amount);
-    }
-
-    function _burn(address _account, uint256 _amount) internal virtual {
-
-        // solhint-disable-next-line reason-string
-        require(_account != address(0), "ERC20: burn from the zero address");
-
-        uint256 accountBalance = balances_[_account];
-
-        // solhint-disable-next-line reason-string
-        require(accountBalance >= _amount, "ERC20: burn amount exceeds balance");
-
-        unchecked {
-            balances_[_account] = accountBalance - _amount;
-        }
-
-        totalSupply_ -= _amount;
-
-        emit Transfer(_account, address(0), _amount);
-    }
-
-    function _approve(
-        address _owner,
-        address _spender,
-        uint256 _amount
-    ) internal virtual {
-        require(_owner != address(0), "approve from zero");
-
-        emit Approval(_owner, _spender, _amount);
-
-        // solhint-disable-next-line reason-string
-        require(_spender != address(0), "approve to zero");
-
-        allowances_[_owner][_spender] = _amount;
-    }
-
-    function _spendAllowance(
-        address owner,
-        address spender,
-        uint256 amount
-    ) internal virtual {
-        uint256 currentAllowance = allowance(owner, spender);
-
-        if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "insufficient allowance");
-
-            unchecked {
-                _approve(owner, spender, currentAllowance - amount);
-            }
-        }
-    }
+    /* ~~~~~~~~~~ IMPLEMENTS IERC2612 ~~~~~~~~~~ */
 
     /// @inheritdoc IERC2612
     function nonces(address _owner) public view returns (uint256) {
@@ -674,7 +689,10 @@ contract Token is
     /// @inheritdoc IEIP712
     // solhint-disable-next-line func-name-mixedcase
     function DOMAIN_SEPARATOR() public view virtual returns (bytes32) {
-        return block.chainid == initialChainId_ ? initialDomainSeparator_ : computeDomainSeparator();
+        return
+            block.chainid == initialChainId_
+                ? initialDomainSeparator_
+                : computeDomainSeparator();
     }
 
     /// @inheritdoc IERC2612
@@ -719,5 +737,78 @@ contract Token is
 
             allowances_[recoveredAddress][_spender] = _value;
         }
+    }
+
+    /* ~~~~~~~~~~ IMPLEMENTS IERC20 ~~~~~~~~~~ */
+
+    // remaining functions are taken from OpenZeppelin's ERC20 implementation
+
+    function name() public view returns (string memory) { return name_; }
+    function symbol() public view returns (string memory) { return symbol_; }
+    function decimals() public view returns (uint8) { return decimals_; }
+    function totalSupply() public view returns (uint256) { return totalSupply_; }
+    function balanceOf(address account) public view returns (uint256) {
+       return balances_[account];
+    }
+
+    function transfer(address _to, uint256 _amount) public returns (bool) {
+        _transfer(msg.sender, _to, _amount);
+        return true;
+    }
+
+    function allowance(
+        address _owner,
+        address _spender
+    ) public view returns (uint256) {
+        return allowances_[_owner][_spender];
+    }
+
+    function approve(address _spender, uint256 _amount) public returns (bool) {
+        _approve(msg.sender, _spender, _amount);
+        return true;
+    }
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) public returns (bool) {
+        _spendAllowance(_from, msg.sender, _amount);
+        _transfer(_from, _to, _amount);
+        return true;
+    }
+
+    // not actually a part of IERC20 but we support it anyway
+
+    function increaseAllowance(
+        address _spender,
+        uint256 _addedValue
+    ) public returns (bool) {
+        _approve(
+            msg.sender,
+            _spender,
+            allowances_[msg.sender][_spender] + _addedValue
+        );
+
+        return true;
+    }
+
+    function decreaseAllowance(
+        address _spender,
+        uint256 _subtractedValue
+    ) public returns (bool) {
+        uint256 currentAllowance = allowances_[msg.sender][_spender];
+
+        // solhint-disable-next-line reason-string
+        require(
+            currentAllowance >= _subtractedValue,
+            "ERC20: decreased allowance below zero"
+        );
+
+        unchecked {
+            _approve(msg.sender, _spender, currentAllowance - _subtractedValue);
+        }
+
+        return true;
     }
 }
