@@ -62,7 +62,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
         IRegistry _registry
     ) public {
         require(version_ == 0, "contract is already initialised");
-        version_ = 2;
+        version_ = 1;
 
         operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
@@ -80,7 +80,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     }
 
     function updateOperator(address _newOperator) public {
-        require(operator() == msg.sender, "only operator");
+        require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "no zero operator");
 
         operator_ = _newOperator;
@@ -138,18 +138,6 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
                 _newOracles[i].newOracle
             );
         }
-    }
-
-    function getWorkerAddress(address _contractAddr) public view returns (address) {
-        require(noEmergencyMode(), "emergency mode!");
-
-        return oracles_[_contractAddr];
-    }
-
-    function getWorkerAddress() public view returns (address) {
-        require(noEmergencyMode(), "emergency mode!");
-
-        return oracles_[msg.sender];
     }
 
     function reward(
