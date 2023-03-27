@@ -300,7 +300,11 @@ contract Token is
     /// @dev _erc20In has the possibility depending on the underlying LP
     ///      behaviour to not mint the exact amount of tokens, so it returns it
     ///      here (currently won't happen on compound/aave)
-    function _erc20In(address _spender, uint256 _amount) internal returns (uint256) {
+    function _erc20In(
+        address _spender,
+        address _beneficiary,
+        uint256 _amount
+    ) internal returns (uint256) {
         require(noEmergencyMode(), "emergency mode!");
 
         // take underlying tokens from the user
