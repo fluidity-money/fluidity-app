@@ -169,6 +169,7 @@ export default function Dashboard() {
   const { showExperiment, client } = useContext(SplitContext);
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton  = showExperiment("feature-network-visible");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -240,7 +241,7 @@ export default function Dashboard() {
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: string) => {
+  const handleSetChain = (network: ChainName) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -328,7 +329,7 @@ export default function Dashboard() {
 
         <ChainSelectorButton
           className="selector-button"
-          chain={chainNameMap[network as "ethereum" | "solana"]}
+          chain={chainNameMap[network satisfies ChainName]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -338,7 +339,7 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={chainNameMap[network as "ethereum" | "solana"]}
+            option={chainNameMap[network satisfies ChainName]}
             options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
@@ -497,6 +498,12 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
+            {(isTablet || isMobile) && showMobileNetworkButton && (
+            <ChainSelectorButton chain={chainNameMap[network satisfies ChainName]} 
+            onClick={() => setChainModalVisibility(true)}
+            />
+            )}
+           
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
