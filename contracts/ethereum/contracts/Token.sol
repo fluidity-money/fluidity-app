@@ -297,6 +297,9 @@ contract Token is
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
+    /// @dev _erc20In has the possibility depending on the underlying LP
+    ///      behaviour to not mint the exact amount of tokens, so it returns it
+    ///      here (currently won't happen on compound/aave)
     function _erc20In(address _spender, uint256 _amount) internal returns (uint256) {
         require(noEmergencyMode(), "emergency mode!");
 
@@ -344,19 +347,32 @@ contract Token is
         return amountIn;
     }
 
-    /// @inheritdoc IToken
-    function erc20Out(uint _amount) public {
+    function _erc20Out(
+        address _sender,
+        address _beneficiary,
+        uint256 _amount
+    ) internal {
         // take the user's fluid tokens
 
-        _burn(msg.sender, _amount);
+        _burn(_sender, _amount);
 
         // give them erc20
 
         pool_.takeFromPool(_amount);
 
-        underlyingToken().safeTransfer(msg.sender, _amount);
+        underlyingToken().safeTransfer(_beneficiary, _amount);
 
-        emit BurnFluid(msg.sender, _amount);
+        emit BurnFluid(_sender, _amount);
+    }
+
+    /// @inheritdoc IToken
+    function erc20Out(uint256 _amount) public {
+        _erc20Out(msg.sender, msg.sender,_amount);
+    }
+
+    /// @inheritdoc IToken
+    function erc20OutTo(address _recipient, uint256 _amount) public {
+        _erc20Out(msg.sender, _recipient, _amount);
     }
 
     /// @inheritdoc IToken
