@@ -23,18 +23,19 @@ import (
 
 type TestStructure struct {
 	Transfer struct {
+		Transaction ethTypes.Hash `json:"transaction"`
 		Log struct {
 			Data    string           `json:"data"`
 			Address ethTypes.Address `json:"address"`
 			Topics  []ethTypes.Hash  `json:"topics"`
 		} `json:"log"`
-		Transaction struct {
-			To   ethTypes.Address `json:"to"`
-			From ethTypes.Address `json:"from"`
-			Hash ethTypes.Hash    `json:"hash"`
-		} `json:"transaction"`
 		Application int `json:"application"`
 	} `json:"transfer"`
+	Transaction struct {
+		To   ethTypes.Address `json:"to"`
+		From ethTypes.Address `json:"from"`
+		Hash ethTypes.Hash    `json:"hash"`
+	} `json:"transaction"`
 	ExpectedSender    string `json:"expected_sender"`
 	ExpectedRecipient string `json:"expected_recipient"`
 	ExpectedFees      string `json:"expected_fees"`
@@ -160,7 +161,7 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 
 		if logSignature == swapSignature {
 			var test TestStructure
-			test.Transfer.Log.Data = base64.RawStdEncoding.EncodeToString(log.Data)
+			test.Transfer.Log.Data = base64.StdEncoding.EncodeToString(log.Data)
 			test.Transfer.Log.Address = ethereum.ConvertGethAddress(log.Address)
 
 			testTopics := make([]ethTypes.Hash, 0)
@@ -169,9 +170,10 @@ func fetchTransactionValues(testChan chan TestStructure, ethClient *ethclient.Cl
 			}
 			test.Transfer.Log.Topics = testTopics
 
-			test.Transfer.Transaction.To = ethereum.ConvertGethAddress(*transaction.To())
-			test.Transfer.Transaction.From = ethereum.ConvertGethAddress(sender)
-			test.Transfer.Transaction.Hash = ethereum.ConvertGethHash(txHash)
+			test.Transaction.To = ethereum.ConvertGethAddress(*transaction.To())
+			test.Transaction.From = ethereum.ConvertGethAddress(sender)
+			test.Transaction.Hash = ethereum.ConvertGethHash(txHash)
+			test.Transfer.Transaction = ethereum.ConvertGethHash(txHash)
 
 			testChan <- test
 		}

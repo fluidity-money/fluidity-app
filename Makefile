@@ -119,6 +119,10 @@ test-contracts: semgrep
 		cd ${CONTRACTS_DIR} && \
 		${MAKE} test
 
+test-pipeline:
+	@cd ${TESTS_DIR}/pipeline && \
+		${MAKE}
+
 test: semgrep test-go test-contracts
 
 lint: semgrep

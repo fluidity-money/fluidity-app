@@ -177,3 +177,5 @@ web/app.fluidity.money/public/assets/tokens/FluidTokenBg.png filter=lfs diff=lfs
 web/app.fluidity.money/public/assets/tokens/fUXD.png filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/assets/tokens/dai.svg filter=lfs diff=lfs merge=lfs -text
 web/app.fluidity.money/public/images/icons/triangleDown.svg filter=lfs diff=lfs merge=lfs -text
+web/app.fluidity.money/public/assets/chains/arbIcon.svg filter=lfs diff=lfs merge=lfs -text
+web/surfing/src/assets/images/warning.svg filter=lfs diff=lfs merge=lfs -text

@@ -21,47 +21,47 @@ const multichainLogAnySwapOut = "0x97116cf6cd4f6412bb47914d6db18da9e16ab2142f543
 
 const multichainAbiString = `[
 {
-	"anonymous": false,
-	"inputs": [
-		{
-			"indexed": true,
-			"internalType": "bytes32",
-			"name": "txhash",
-			"type": "bytes32"
-		},
-		{
-			"indexed": true,
-			"internalType": "address",
-			"name": "token",
-			"type": "address"
-		},
-		{
-			"indexed": true,
-			"internalType": "address",
-			"name": "to",
-			"type": "address"
-		},
-		{
-			"indexed": false,
-			"internalType": "uint256",
-			"name": "amount",
-			"type": "uint256"
-		},
-		{
-			"indexed": false,
-			"internalType": "uint256",
-			"name": "fromChainID",
-			"type": "uint256"
-		},
-		{
-			"indexed": false,
-			"internalType": "uint256",
-			"name": "toChainID",
-			"type": "uint256"
-		}
-	],
-	"name": "LogAnySwap",
-	"type": "event"
+  "anonymous": false,
+  "inputs": [
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "token",
+      "type": "address"
+    },
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "from",
+      "type": "address"
+    },
+    {
+      "indexed": true,
+      "internalType": "address",
+      "name": "to",
+      "type": "address"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "amount",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "fromChainID",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "internalType": "uint256",
+      "name": "toChainID",
+      "type": "uint256"
+    }
+  ],
+  "name": "LogAnySwapOut",
+  "type": "event"
 }]`
 
 const anyswapERC20AbiString = `[
@@ -87,7 +87,7 @@ var anyswapERC20Abi ethAbi.ABI
 // track the receiving pool
 // Fees are calculated as 0.1% for stablecoin swaps, clamped between $40 and $1000 USD
 func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
-	if len(transfer.Log.Topics) < 2 {
+	if len(transfer.Log.Topics) < 1 {
 		return nil, fmt.Errorf("No log topics passed!")
 	}
 
@@ -97,11 +97,11 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 		return nil, nil
 	}
 
-	unpacked, err := multichainAbi.Unpack("LogAnySwap", transfer.Log.Data)
+	unpacked, err := multichainAbi.Unpack("LogAnySwapOut", transfer.Log.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to unpack LogAnySwap log data! %v",
+			"Failed to unpack LogAnySwapOut log data! %v",
 			err,
 		)
 	}

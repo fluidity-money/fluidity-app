@@ -12,10 +12,10 @@ import (
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
-	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -36,6 +36,9 @@ const (
 
 	// EnvApplicationContracts to list the application contracts to monitor
 	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
+
+	// EnvUtilityContracts to list the utility contracts to monitor and tag transactions
+	EnvUtilityContracts = `FLU_ETHEREUM_UTILITY_CONTRACTS`
 
 	// EnvServerWorkQueue to send serverwork down
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
@@ -108,6 +111,35 @@ func appsListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.Applicatio
 	return apps
 }
 
+func utilityListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.UtilityName {
+	utilitiesList := util.GetEnvOrFatal(key)
+
+	utilities := make(map[ethereum.Address]appTypes.UtilityName)
+
+	for _, appAddresses_ := range strings.Split(utilitiesList, ",") {
+		appAddresses := strings.Split(appAddresses_, ":")
+
+		if len(appAddresses) < 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Malformed utilities address line '%s'!",
+					appAddresses_,
+				)
+			})
+		}
+
+		utility := appTypes.UtilityName(appAddresses[0])
+
+		for _, address_ := range appAddresses[1:] {
+			address := ethereum.AddressFromString(address_)
+
+			utilities[address] = utility
+		}
+	}
+
+	return utilities
+}
+
 func main() {
 	var (
 		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
@@ -115,6 +147,7 @@ func main() {
 		gethHttpUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		applicationContracts     = appsListFromEnvOrFatal(EnvApplicationContracts)
+		utilities                = utilityListFromEnvOrFatal(EnvUtilityContracts)
 	)
 
 	contractAddress := ethCommon.HexToAddress(contractAddrString)
@@ -154,6 +187,7 @@ func main() {
 			transactions,
 			blockHash,
 			contractAddress,
+			utilities,
 		)
 
 		if err != nil {
@@ -242,8 +276,12 @@ func main() {
 					})
 				}
 
-				// nil, nil for a skipped event
-				if fee == nil {
+				normalisedAddress := ethereum.AddressFromString(transfer.Log.Address.String())
+
+				utility, utilityFound := utilities[normalisedAddress]
+
+				// we set the decorator if there's an app fee or a utility
+				if fee == nil && !utilityFound {
 					log.App(func(k *log.Log) {
 						k.Format(
 							"Skipping an application transfer for transaction %#v and application %#v!",
@@ -256,7 +294,8 @@ func main() {
 				}
 
 				decorator := &worker.EthereumWorkerDecorator{
-					Application: transfer.Application,
+					Application:    transfer.Application,
+					UtilityName:    utility,
 					ApplicationFee: fee,
 				}
 
@@ -334,15 +373,16 @@ func main() {
 			}
 
 			var (
-				from = fluidTransfer.SenderAddress
-				to   = fluidTransfer.RecipientAddress
+				from      = fluidTransfer.SenderAddress
+				to        = fluidTransfer.RecipientAddress
+				decorator = fluidTransfer.Decorator
 			)
 
 			transfer := worker.EthereumDecoratedTransfer{
 				TransactionHash:  transactionHash,
 				SenderAddress:    from,
 				RecipientAddress: to,
-				Decorator:        nil,
+				Decorator:        decorator,
 				AppEmissions:     worker.EthereumAppFees{},
 			}
 

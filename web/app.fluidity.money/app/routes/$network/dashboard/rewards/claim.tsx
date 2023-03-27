@@ -16,6 +16,7 @@ import {
 
 import claimStyles from "~/styles/dashboard/rewards/claim.css";
 import { generateTweet } from "~/util/tweeter";
+import { networkMapper } from "~/util";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: claimStyles }];
@@ -91,14 +92,14 @@ const ClaimedRewards = () => {
           <section className="spread-text">
             <Text>Network fee</Text>
             <Text>
-              {networkFee} {network === "ethereum" ? "ETH" : "SOL"}
+              {networkFee} {networkMapper(network)}
             </Text>
           </section>
           <hr />
           <section className="spread-text">
             <Text>Gas fee</Text>
             <Text>
-              {gasFee} {network === "ethereum" ? "ETH" : "SOL"}
+              {gasFee} {networkMapper(network)}
             </Text>
           </section>
           <hr />

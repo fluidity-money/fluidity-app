@@ -1,7 +1,6 @@
 -- migrate:up
 DROP FUNCTION total_reward;
 
-
 -- Add Pending Winners to Total Reward calculation
 CREATE FUNCTION total_reward(i INTERVAL DEFAULT now() - to_timestamp('0'), filter_address TEXT DEFAULT null)
 RETURNS SETOF total_reward_return

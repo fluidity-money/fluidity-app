@@ -1,5 +1,5 @@
 import styles from "./styles.css";
-import { Text } from "@fluidity-money/surfing";
+import { Text, WarningIcon } from "@fluidity-money/surfing";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
@@ -39,3 +39,16 @@ export const ToolTipContent = ({
     </div>
   );
 };
+
+export const NetworkTooltip = () => (
+  <div className="network_tooltip">
+    <WarningIcon />
+    <div>
+      <Text prominent={true} bold={true} size="lg">
+        Failed to switch network
+      </Text>
+      <br />
+      <Text size="md">User declined network change</Text>
+    </div>
+  </div>
+);

@@ -1,15 +1,28 @@
 import * as hre from "hardhat";
+import * as ethers from "ethers";
 import { expectEq, expectGt } from "./test-utils";
-import { fAUsdcAccount, usdcAccount } from "./setup-goerli";
-import { accountAddr } from "./setup-common";
-
+import { bindings } from "./setup-goerli";
+import { signers } from "./setup-common";
 
 describe("token aave v3 integration", async function () {
+  let usdcAccount: ethers.Contract;
+  let fAUsdcAccount: ethers.Contract;
+  let accountAddr: string;
+
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "goerli") {
       return this.skip();
     }
+
+    ({
+      usdc: {
+        base: usdcAccount,
+        fluid: fAUsdcAccount,
+      }
+    } = bindings);
+    accountAddr = await signers.userAccount1.getAddress();
   });
+
 
   it("should allow depositing erc20 tokens", async function () {
     const originalDaiBalance = (await usdcAccount.balanceOf(accountAddr));
@@ -58,9 +71,7 @@ describe("token aave v3 integration", async function () {
     for (let i = 0; i < 100; i++) {
       await hre.network.provider.send("evm_mine");
     }
-    console.log("done mining");
     const finalPoolAmount = await fAUsdcAccount.callStatic.rewardPoolAmount();
     expectGt(finalPoolAmount, initialPoolAmount);
-    console.log(`aave v3 earned ${finalPoolAmount.sub(initialPoolAmount).toString()} interest over 99 blocks`);
   });
 });

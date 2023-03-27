@@ -54,6 +54,11 @@ main {
   gap: 0.5em;
 }
 
+.cancel-btn-container {
+  align-self: start;
+  width: 0;
+}
+
 .cancel-btn:hover > svg {
   -webkit-filter: invert(100%);
   filter: invert(100%);
@@ -315,8 +320,8 @@ main {
 }
 
 .video-container {
+  position: relative;
   width: inherit;
-  height: inherit;
   min-height: 300px;
   display: flex;
   align-items: center;
@@ -335,10 +340,10 @@ main {
   width: 100% !important;
 }
 
-.video-container > img {
-  width: calc(clamp(100px, min(0.2vh, 0.2vw), 400px) - 50px);
-  height: calc(clamp(100px, min(0.2vh, 0.2vw), 400px) - 50px);
+.swap-token {
   position: absolute;
+  aspect-ratio: 1/1;
+  height: min(20vh, 20vw);
 }
 
 .search-bar {
@@ -352,41 +357,6 @@ main {
   font-size: 20px;
   line-height: 120%;
   outline: none;
-}
-
-.card-outer {
-  position: relative;
-  border-radius: 30px;
-}
-
-.card-outer::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2px;
-  border-radius: 12px;
-  background: conic-gradient(
-    from 209.59deg at 50% 50%,
-    #f3b8d8 0deg,
-    #b793e9 50.06deg,
-    #9fd4f3 85.94deg,
-    #ffd2c4 134.97deg,
-    #fbf3f3 172.05deg,
-    #d9abdf 200.75deg,
-    #af9ce3 224.67deg,
-    #aae4e1 259.36deg,
-    #c6ead0 298.82deg,
-    #ffffff 328.72deg,
-    #fdb5e4 360deg
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
 }
 
 .cover {
@@ -404,6 +374,7 @@ main {
   height: 100vh;
   background-color: transparent;
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
 }
@@ -716,6 +687,7 @@ main {
 
 .connected-wallet-modal-container {
   position: absolute;
+  z-index: 1;
   width: 100%;
   height: 100%;
   top: 50%;
@@ -816,14 +788,16 @@ main {
 }
 
 .swap-complete-container {
-  background-color: black;
   height: 100vh;
+  width: 100vw;
   top: 0;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
   padding: 2em;
+  position: absolute;
 }
 
 .swap-complete-container > div:first-child {
@@ -837,21 +811,25 @@ main {
   mix-blend-mode: luminosity;
 }
 
+.bloom {
+  height: 1000%;
+  transform: translateY(-45%);
+}
+
 .swap-complete-modal-top {
-  width: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  overflow-y: hidden;
 }
 
 .swap-complete-modal-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: -10%;
   gap: 10px;
   padding: 10px;
+  margin-bottom: max((100vh - 100vw)/2, 0vh);
 }
 
 .swap-complete-modal-content > * {
@@ -963,11 +941,6 @@ main {
     gap: 0.6em;
   }
 
-  #provide-liquidity {
-    padding: 1em;
-    margin: 0 0 2em 0;
-  }
-
   .connect-wallet-modal-container {
     min-width: 300px;
     top: 45%;
@@ -1050,16 +1023,6 @@ main {
     justify-content: center;
     align-items: center;
     gap: 2em;
-  }
-}
-
-@media (max-width: 1200px) {
-  .card-inner {
-    grid-template-columns: 1fr;
-  }
-
-  #provide-liquidity {
-    padding-top: 0;
   }
 }
 

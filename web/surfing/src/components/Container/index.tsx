@@ -10,6 +10,10 @@ import { ContinuousCarousel } from "./ContinuousCarousel";
 import { FooterItem } from "./FooterItem";
 import { Partner } from "./Partner";
 import { MotionContinuousCarousel } from "./MotionContinuousCarousel";
+import { TokenCard } from "./TokenCard";
+import { TokenDetails } from "./TokenDetails";
+import { FluidifyCard } from "./FluidifyCard";
+import { CardCarousel } from "./CardCarousel";
 
 export {
   Row,
@@ -20,4 +24,8 @@ export {
   FooterItem,
   Partner,
   MotionContinuousCarousel,
+  TokenCard,
+  TokenDetails,
+  FluidifyCard,
+  CardCarousel
 };

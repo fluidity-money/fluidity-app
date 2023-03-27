@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 import {
@@ -8,8 +7,8 @@ import {
   LinkButton,
   Twitter,
   useViewport,
+  BloomEffect,
 } from "@fluidity-money/surfing";
-import BloomEffect from "./BloomEffect";
 import { generateTweet } from "~/util/tweeter";
 
 interface IPropsConnectedWalletModal {
@@ -37,19 +36,13 @@ export const ViewRewardModal = ({
   balance,
   forSending,
 }: IPropsConnectedWalletModal) => {
-  const [modal, setModal] = useState<React.ReactPortal | null>(null);
   const { width } = useViewport();
   const isMobile = width < 500 && width > 0;
 
-  useEffect(() => {
-    setModal(
-      createPortal(
+  return visible
+    ? createPortal(
         <>
-          <div
-            className={`view-reward-modal-container ${
-              visible === true ? "show-modal" : "hide-modal"
-            }`}
-          >
+          <div className={`view-reward-modal-container show-modal`}>
             <span className="view-reward-modal-cancel" onClick={close}>
               <LinkButton
                 handleClick={() => close()}
@@ -145,8 +138,5 @@ export const ViewRewardModal = ({
         </>,
         document.body
       )
-    );
-  }, [visible]);
-
-  return modal;
+    : null;
 };

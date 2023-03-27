@@ -11,6 +11,11 @@ server = "https://api.ethereum.fluidity.money"
 # rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
 # server = "https://api.solana.fluidity.money"
 
+[[drivers.arbitrum]]
+label = "Arbitrum"
+testnet = false
+rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -154,13 +159,71 @@ colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 decimals = 6
 
+[config.arbitrum]
+explorer = "https://etherscan.io"
+fluidAssets = [
+    "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
+    "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62",
+    "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b",
+]
+
+[[config.arbitrum.tokens]]
+symbol = "USDC"
+name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
+address = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+colour = "#2775ca"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+colour = "#2775ca"
+isFluidOf = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "USDT"
+name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
+address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+colour = "#12946c"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDT"
+name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
+address = "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62"
+colour = "#12946c"
+isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+decimals = 6
+
+[[config.arbitrum.tokens]]
+symbol = "DAI"
+name = "Dai Stablecoin"
+logo = "/assets/tokens/dai.svg"
+address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+colour = "#825902"
+decimals = 18
+
+[[config.arbitrum.tokens]]
+symbol = "fDAI"
+name = "Fluid DAI"
+logo = "/assets/tokens/fDAI.svg"
+address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
+colour = "#825902"
+isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
+decimals = 18
+
 # liquidity_providers Configurations 
 # eth providers
 [liquidity_providers.ethereum]
 
 [[liquidity_providers.ethereum.providers]]
 name= "uniswap"
-img= "/images/providers/Uniswap.svg"
 
 [liquidity_providers.ethereum.providers.link]
 fUSDC = "https://app.uniswap.org/#/add/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/"
@@ -171,7 +234,6 @@ fDAI = "https://app.uniswap.org/#/add/0x6B175474E89094C44Da98b954EedeAC495271d0F
 
 [[liquidity_providers.ethereum.providers]]
 name= "sushiswap"
-img= "/images/providers/Sushiswap.svg"
 
 [liquidity_providers.ethereum.providers.link]
 fUSDC = "https://www.sushi.com/earn/eth:0xc35466daaa5e61977ec4219d682eeb7beb431726/add"
@@ -182,7 +244,6 @@ fDAI = "https://www.sushi.com/earn"
 
 [[liquidity_providers.ethereum.providers]]
 name= "dodo"
-img= "/images/providers/DODO.png"
 
 [liquidity_providers.ethereum.providers.link]
 fUSDC = "https://app.dodoex.io/earn/add-liquidity?network=mainnet&poolAddress=0x6abd7403878f3a010170a383b4f20285668fd979"
@@ -193,7 +254,6 @@ fDAI = "https://app.dodoex.io/earn?network=mainnet"
 
 [[liquidity_providers.ethereum.providers]]
 name= "balancer"
-img= "/images/providers/balancer.svg"
 
 [liquidity_providers.ethereum.providers.link]
 fUSDC = "https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest"
@@ -204,7 +264,6 @@ fDAI = "https://app.balancer.fi/#/ethereum/pool/create"
 
 [[liquidity_providers.ethereum.providers]]
 name= "1inch"
-img= "/images/providers/1inch.svg"
 
 [liquidity_providers.ethereum.providers.link]
 fUSDC = "https://app.1inch.io/#/1/earn/pools?filter=fUSDC&token0=0x9d1089802ee608ba84c5c98211afe5f37f96b36c&token1=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
@@ -218,7 +277,6 @@ fDAI = "https://app.1inch.io/#/1/earn/pools"
 
 [[liquidity_providers.solana.providers]]
 name= "solend"
-img= "/images/providers/solend.png"
 
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.solend.fi/"
@@ -226,7 +284,6 @@ fUSDT = "https://www.solend.fi/"
 
 [[liquidity_providers.solana.providers]]
 name= "orca"
-img= "/images/providers/Orca.svg"
 
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.orca.so/"
@@ -234,7 +291,6 @@ fUSDT = "https://www.orca.so/"
 
 [[liquidity_providers.solana.providers]]
 name= "saber"
-img= "/images/providers/Saber.svg"
 
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.saber.so/"
@@ -242,40 +298,30 @@ fUSDT = "https://www.saber.so/"
 
 [[liquidity_providers.solana.providers]]
 name= "jupiter"
-img= "/images/providers/Jupiter.svg"
 
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.jup.ag/"
 fUSDT = "https://www.jup.ag/"
 
-# provider icons
-[provider_icons]
-Aave= "/images/providers/aave-aave-logo.png"
-Aldrin= "/images/providers/Aldrin.svg"
-Circle= "/images/providers/circle-icon-inset-300.png"
-Compound= "/images/providers/Compound.svg"
-Dodo= "/images/providers/DODO.png"
-Jupiter= "/images/providers/Jupiter.svg"
-Lemniscap= "/images/providers/Lemniscap.png"
-Maker= "/images/providers/maker-mkr-logo.png"
-Multicoin= "/images/providers/Multicoin.png"
-Orca= "/images/providers/Orca.svg"
-Polygon= "/images/providers/Polygon.svg"
-Saber= "/images/providers/Saber.svg"
-Solana= "/images/providers/Solana.svg"
-Solend= "/images/providers/solend.png"
-Uniswap= "/images/providers/Uniswap.svg"
-Sushiswap= "/images/providers/Sushiswap.svg"
-Fluidity= "/images/logoMetallic.png"
-Oneinch= "/images/providers/1inch.svg"
-Balancer= "/images/providers/balancer.svg"
-Mooniswap="/images/providers/mooniswap.png"
-Curve="/images/providers/curve.png"
-Multichain="/images/providers/multichain.png"
-"XY Finance"="/images/providers/xy_finance.png"
-Raydium="/images/providers/raydium.png"
-Lifinity="/images/providers/lifinity.png"
-Mercurial="/images/providers/mercurial.png"
+[liquidity_providers.arbitrum]
+
+[[liquidity_providers.arbitrum.providers]]
+name= "uniswap"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.uniswap.org/#/add/0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
+
+[[liquidity_providers.arbitrum.providers]]
+name= "camelot"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8&token2=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+
+[[liquidity_providers.arbitrum.providers]]
+name= "Saddle"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://saddle.exchange/#/pools/fUSDC-USDC%20pool/deposit"
 
 [[config.ethereum.wallets]]
 name = "Browser"
@@ -304,4 +350,11 @@ logo = "/assets/wallets/coin98.svg"
 [[contract.solana]]
 name = "Mainnet"
 address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
+
+[contract.prize_pool]
+ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
+arbitrum = "0x3cc6115Cd787dC6A3C9440D7e3B0d76c15C82Bb4"
+solana = ""
+
+
 

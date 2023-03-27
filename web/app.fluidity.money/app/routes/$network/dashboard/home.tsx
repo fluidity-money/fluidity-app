@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
 import { MintAddress } from "~/types/MintAddress";
-import { SplitContext } from "~/util/split";
+import { SplitContext } from "contexts/SplitProvider";
 import {
   Display,
   LineChart,
@@ -18,6 +18,7 @@ import {
   trimAddress,
   numberToMonetaryString,
   useViewport,
+  Tooltip,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -183,7 +184,10 @@ type LoaderData = {
   };
 };
 
-type CacheData = HomeLoaderData & TransactionsLoaderData;
+type CacheData = {
+  home: HomeLoaderData;
+  transactions: TransactionsLoaderData;
+};
 
 function ErrorBoundary(error: Error) {
   console.log(error);
@@ -203,11 +207,9 @@ function ErrorBoundary(error: Error) {
   );
 }
 
-const SAFE_DEFAULT: CacheData = {
+const SAFE_DEFAULT_HOME: HomeLoaderData = {
   totalPrizePool: 0,
-  count: 0,
   network: "ethereum",
-  transactions: [],
   loaded: false,
   rewards: {
     day: [],
@@ -219,7 +221,13 @@ const SAFE_DEFAULT: CacheData = {
   volume: [],
   totalFluidPairs: 0,
   timestamp: 0,
+};
+
+const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
+  count: 0,
   page: 0,
+  transactions: [],
+  loaded: false,
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -288,7 +296,7 @@ export default function Home() {
   }, [address, page]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
-    SAFE_DEFAULT.totalFluidPairs
+    SAFE_DEFAULT_HOME.totalFluidPairs
   );
 
   const data: {
@@ -296,15 +304,25 @@ export default function Home() {
     user: CacheData;
   } = {
     global: {
-      ...SAFE_DEFAULT,
-      ...homeData,
-      ...globalTransactionsData,
+      home: {
+        ...SAFE_DEFAULT_HOME,
+        ...homeData,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...globalTransactionsData,
+      },
     },
     user: {
-      ...SAFE_DEFAULT,
-      ...userHomeData.data,
-      ...userTransactionsData.data,
-      totalFluidPairs: userFluidPairs,
+      home: {
+        ...SAFE_DEFAULT_HOME,
+        ...userHomeData.data,
+        totalFluidPairs: userFluidPairs,
+      },
+      transactions: {
+        ...SAFE_DEFAULT_TRANSACTIONS,
+        ...userTransactionsData.data,
+      },
     },
   };
 
@@ -398,15 +416,22 @@ export default function Home() {
     graphTransformedTransactions,
     fluidPairs,
     timestamp,
+    txLoaded,
   } = useMemo(() => {
+    const { home, transactions: txData } = activeTableFilterIndex
+      ? data.user
+      : data.global;
+
     const {
-      transactions,
       volume,
       rewards,
       totalFluidPairs,
       timestamp,
       totalPrizePool,
-    } = activeTableFilterIndex ? data.user : data.global;
+      loaded: homeLoaded,
+    } = home;
+
+    const { transactions, loaded: txLoaded } = txData;
 
     const {
       day: dailyRewards,
@@ -450,6 +475,8 @@ export default function Home() {
       fluidPairs: totalFluidPairs,
       timestamp,
       totalPrizePool,
+      homeLoaded,
+      txLoaded,
     };
   }, [
     activeTableFilterIndex,
@@ -724,7 +751,10 @@ export default function Home() {
         </div>
 
         {/* Graph */}
-        <div className="graph" style={{ width: "100%", height: "400px" }}>
+        <div
+          className="graph"
+          style={{ width: "100%", height: "400px", mixBlendMode: "screen" }}
+        >
           <div className="statistics-row pad-main">
             {graphTransformers.map((filter, i) => (
               <button
@@ -756,28 +786,29 @@ export default function Home() {
             }}
             renderTooltip={({ datum }: { datum: Volume }) => {
               return datum.amount > 0 ? (
-                <div className={"graph-tooltip-container"}>
-                  <div className={"graph-tooltip"}>
-                    <span style={{ color: "rgba(255,255,255, 50%)" }}>
-                      {format(datum.timestamp, "dd/MM/yy")}
-                    </span>
-                    <br />
-                    <br />
-                    <span>
+                <Tooltip
+                  style={{
+                    minWidth: 160,
+                    gap: "0.4em",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text>{format(datum.timestamp, "dd/MM/yy")}</Text>
+                  <div>
+                    <Text prominent>
                       {datum.sender === MintAddress
                         ? "Mint Address"
                         : trimAddress(datum.sender)}
-                    </span>
-                    <br />
-                    <br />
-                    <span>
-                      <span>{numberToMonetaryString(datum.amount)} </span>
-                      <span style={{ color: "rgba(2555,255,255, 50%)" }}>
-                        swapped
-                      </span>
-                    </span>
+                    </Text>
                   </div>
-                </div>
+                  <div>
+                    <Text prominent>
+                      {numberToMonetaryString(datum.amount)}
+                    </Text>
+                    <Text> swapped</Text>
+                  </div>
+                </Tooltip>
               ) : (
                 <></>
               );
@@ -800,6 +831,7 @@ export default function Home() {
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
           filters={txTableFilters}
+          loaded={txLoaded}
         />
       </section>
     </>

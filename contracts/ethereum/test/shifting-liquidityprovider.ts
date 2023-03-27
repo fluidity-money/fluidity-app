@@ -1,9 +1,9 @@
 import * as hre from 'hardhat';
 import * as ethers from 'ethers';
-import { fUsdtOperator } from './setup-mainnet';
 import { AAVE_V2_POOL_PROVIDER_ADDR, AUSDT_ADDR } from '../test-constants';
+import { bindings, contracts } from './setup-mainnet';
 
-describe("token aave integration", async function () {
+describe("token liquidity provider swapping", async function () {
   before(async function () {
     if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
       return this.skip();
@@ -17,13 +17,15 @@ describe("token aave integration", async function () {
     await newProvider.init(
       AAVE_V2_POOL_PROVIDER_ADDR,
       AUSDT_ADDR,
-      fUsdtOperator.address
+      contracts.usdt.deployedToken.address,
     );
 
     const newProviderAddress = newProvider.address;
 
-    const operatorAddress = await fUsdtOperator.operator();
+    await bindings.usdt.externalOperator.upgradeLiquidityProvider(newProviderAddress);
 
-    await fUsdtOperator.callStatic.upgradeLiquidityProvider(newProviderAddress);
+    const oldProviderAddress = contracts.usdt.deployedPool.address;
+
+    await bindings.usdt.externalOperator.upgradeLiquidityProvider(oldProviderAddress);
   });
 });

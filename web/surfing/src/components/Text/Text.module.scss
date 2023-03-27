@@ -1,24 +1,48 @@
-@use 'common' as *;
+@use "common" as *;
 
 .text {
-    font-family: "Aeonik", sans-serif;
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.01em;
+  font-family: "Aeonik", sans-serif;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 
-    color: map-get($text, "default");
-    stroke: map-get($text, "default");
-    fill: map-get($text, "default");
-    
-    &.prominent {
-        color: map-get($text, "prominent");
-        stroke: map-get($text, "prominent");
-        fill: map-get($text, "prominent");
-    }
-        
-    &.bold {
-        font-weight: 700;
-    }
+  color: map-get($text, "default");
+  stroke: map-get($text, "default");
+  fill: map-get($text, "default");
+
+  &.prominent {
+    color: map-get($text, "prominent");
+    stroke: map-get($text, "prominent");
+    fill: map-get($text, "prominent");
+  }
+
+  &.bold {
+    font-weight: 700;
+  }
+
+  &.holo {
+    background: conic-gradient(
+      from 209.59deg at 50% 50%,
+      #ffd8ed 0deg,
+      #c9b1ea 50.06deg,
+      #b9e0f6 85.94deg,
+      #fcdcd2 134.97deg,
+      #fbf3f3 172.05deg,
+      #e6c1eb 200.75deg,
+      #c2b5e8 224.67deg,
+      #c4ebe9 259.36deg,
+      #d7f1df 298.82deg,
+      #ffffff 328.72deg,
+      #ffd1ef 360deg
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &.code {
+    font-family: "Aeonik Mono";
+  }
 }
 
 .xxl {
@@ -26,21 +50,21 @@
 }
 
 .xl {
-    font-size: $em-step * 6;
+  font-size: $em-step * 6;
 }
 
 .lg {
-    font-size: $em-step * 5;
+  font-size: $em-step * 5;
 }
 
 .md {
-    font-size: $em-step * 4;
+  font-size: $em-step * 4;
 }
 
 .sm {
-    font-size: $em-step * 3.5;
+  font-size: $em-step * 3.5;
 }
 
 .xs {
-    font-size: $em-step * 3;
+  font-size: $em-step * 3;
 }
