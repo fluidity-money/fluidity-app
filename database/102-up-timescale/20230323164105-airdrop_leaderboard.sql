@@ -1,11 +1,11 @@
 --migrate:up
 CREATE TABLE airdrop_leaderboard_return (
-	address VARCHAR,
-	rank BIGINT,
-	referral_count BIGINT,
-	total_lootboxes NUMERIC,
-	highest_reward_tier INT,
-	liquidity_multiplier NUMERIC
+	address VARCHAR NOT NULL,
+	rank BIGINT NOT NULL,
+	referral_count BIGINT NOT NULL,
+	total_lootboxes NUMERIC NOT NULL,
+	highest_reward_tier INT NOT NULL,
+	liquidity_multiplier NUMERIC NOT NULL
 );
 
 CREATE OR REPLACE FUNCTION airdrop_leaderboard()
@@ -16,8 +16,8 @@ AS
 $$
 SELECT 
     address,
-	-- placeholder
-	ROW_NUMBER() OVER () AS rank,
+    -- placeholder
+    ROW_NUMBER() OVER () AS rank,
     COUNT(DISTINCT referee) AS referral_count, 
     SUM(lootbox_count) AS total_lootboxes, 
     MAX(reward_tier) AS highest_reward_tier, 

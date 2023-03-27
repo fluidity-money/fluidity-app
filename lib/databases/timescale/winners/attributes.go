@@ -79,7 +79,6 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			$7,
 			$8,
 			$9
-			$8
 		)`,
 
 		TableWinningTransactionAttributes,

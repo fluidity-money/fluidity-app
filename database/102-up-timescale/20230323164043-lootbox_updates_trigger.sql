@@ -9,7 +9,7 @@ BEGIN
 	-- calculate values for boxes table
 	INSERT INTO lootbox (
 		address,
-        source,
+		source,
 		transaction_hash,
 		awarded_time,
 		volume,
@@ -18,15 +18,15 @@ BEGIN
 	)
 	VALUES (
 		NEW.address,
-        'transaction'
+		'transaction',
 		NEW.transaction_hash,
 		NEW.awarded_time,
 		NEW.volume,
 		NEW.reward_tier,
-		FLOOR(SUM(NEW.volume / (10 ^ NEW.token_decimals) / 3 + calculate_a_y(NEW.address, NEW.awarded_time)).result * protocol_multiplier(NEW.ethereum_application))
+		FLOOR(SUM(NEW.volume / (10 ^ NEW.token_decimals) / 3 + calculate_a_y(NEW.address, NEW.awarded_time)) * protocol_multiplier(NEW.ethereum_application))
 	);
 END;
-$$
+$$;
 
 CREATE TRIGGER trigger_lootbox_calculation
 AFTER INSERT ON winning_transaction_attributes
