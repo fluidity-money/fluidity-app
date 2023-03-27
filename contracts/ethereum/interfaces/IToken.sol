@@ -100,6 +100,14 @@ interface IToken is IERC20 {
      */
     function erc20Out(uint256 _amount) external;
 
+   /**
+     * @notice unwraps `amount` of fluid tokens with the address as recipient
+     *
+     * @param _recipient to receive the underlying tokens to
+     * @param _amount the number of fluid tokens to unwrap
+     */
+    function erc20OutTo(address _recipient, uint256 _amount) external;
+
     /**
      * @notice calculates the size of the reward pool (the interest we've earned)
      *

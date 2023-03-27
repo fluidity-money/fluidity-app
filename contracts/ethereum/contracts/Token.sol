@@ -297,7 +297,14 @@ contract Token is
         emit RewardQuarantineThresholdUpdated(_maxUncheckedReward);
     }
 
-    function _erc20In(address _spender, uint256 _amount) internal returns (uint256) {
+    /// @dev _erc20In has the possibility depending on the underlying LP
+    ///      behaviour to not mint the exact amount of tokens, so it returns it
+    ///      here (currently won't happen on compound/aave)
+    function _erc20In(
+        address _spender,
+        address _beneficiary,
+        uint256 _amount
+    ) internal returns (uint256) {
         require(noEmergencyMode(), "emergency mode!");
 
         // take underlying tokens from the user
@@ -324,39 +331,50 @@ contract Token is
 
         // give the user fluid tokens
 
-        _mint(msg.sender, realAmount);
+        _mint(_beneficiary, realAmount);
 
-        emit MintFluid(msg.sender, realAmount);
+        emit MintFluid(_beneficiary, realAmount);
 
         return realAmount;
     }
 
     /// @inheritdoc IToken
     function erc20In(uint _amount) public returns (uint) {
-        return _erc20In(msg.sender, _amount);
+        return _erc20In(msg.sender, msg.sender, _amount);
     }
 
     /// @inheritdoc IToken
     // slither-disable-next-line reentrancy-no-eth
     function erc20InTo(address _recipient, uint256 _amount) public returns (uint256 ) {
-        uint256 amountIn = erc20In(_amount);
-        transfer(_recipient, _amount);
-        return amountIn;
+        return _erc20In(msg.sender, _recipient, _amount);
     }
 
-    /// @inheritdoc IToken
-    function erc20Out(uint amount) public {
+    function _erc20Out(
+        address _sender,
+        address _beneficiary,
+        uint256 _amount
+    ) internal {
         // take the user's fluid tokens
 
-        _burn(msg.sender, amount);
+        _burn(_sender, _amount);
 
         // give them erc20
 
-        pool_.takeFromPool(amount);
+        pool_.takeFromPool(_amount);
 
-        underlyingToken().safeTransfer(msg.sender, amount);
+        emit BurnFluid(_sender, _amount);
 
-        emit BurnFluid(msg.sender, amount);
+        underlyingToken().safeTransfer(_beneficiary, _amount);
+    }
+
+    /// @inheritdoc IToken
+    function erc20Out(uint256 _amount) public {
+        _erc20Out(msg.sender, msg.sender,_amount);
+    }
+
+    /// @inheritdoc IToken
+    function erc20OutTo(address _recipient, uint256 _amount) public {
+        _erc20Out(msg.sender, _recipient, _amount);
     }
 
     /// @inheritdoc IToken
@@ -369,20 +387,7 @@ contract Token is
 
     /// @inheritdoc IToken
     function underlyingToken() public view returns (IERC20) {
-        (bool rc, bytes memory returndata) = address(pool_).staticcall(
-            abi.encodeWithSignature("underlying_()")
-        );
-
-        if (!rc) {
-            // solhint-disable-next-line no-inline-assembly
-            assembly {
-                revert(add(returndata, 32), mload(returndata))
-            }
-        }
-
-        (address token) = abi.decode(returndata, (address));
-
-        return IERC20(token);
+        return pool_.underlying_();
     }
 
     /// @inheritdoc IToken
@@ -410,16 +415,9 @@ contract Token is
             return;
         }
 
-        rewardInternal(winner, amount);
-        emit Reward(winner, amount, firstBlock, lastBlock);
-    }
-
-    function rewardInternal(address winner, uint256 amount) internal {
-        require(noEmergencyMode(), "emergency mode!");
-
-        // mint some fluid tokens from the interest we've accrued
-
         _mint(winner, amount);
+
+        emit Reward(winner, amount, firstBlock, lastBlock);
     }
 
     /// @inheritdoc IFluidClient
@@ -471,7 +469,7 @@ contract Token is
         blockedRewards_[user] -= amount;
 
         if (payout) {
-            rewardInternal(user, amount);
+            _mint(user, amount);
             emit UnblockReward(rewardTx, user, amount, firstBlock, lastBlock);
         }
     }
@@ -582,7 +580,7 @@ contract Token is
 
         require(rewardPool >= _amount, "drain too high");
 
-        rewardInternal(_recipient, _amount);
+        _mint(_recipient, _amount);
     }
 
     function _transfer(
@@ -610,31 +608,31 @@ contract Token is
         emit Transfer(from, to, amount);
     }
 
-    function _mint(address account, uint256 amount) internal virtual {
-        require(account != address(0), "ERC20: mint to the zero address");
+    function _mint(address _account, uint256 _amount) internal virtual {
+        require(_account != address(0), "ERC20: mint to the zero address");
 
-        totalSupply_ += amount;
-        balances_[account] += amount;
-        emit Transfer(address(0), account, amount);
+        totalSupply_ += _amount;
+        balances_[_account] += _amount;
+        emit Transfer(address(0), _account, _amount);
     }
 
-    function _burn(address account, uint256 amount) internal virtual {
+    function _burn(address _account, uint256 _amount) internal virtual {
 
         // solhint-disable-next-line reason-string
-        require(account != address(0), "ERC20: burn from the zero address");
+        require(_account != address(0), "ERC20: burn from the zero address");
 
-        uint256 accountBalance = balances_[account];
+        uint256 accountBalance = balances_[_account];
 
         // solhint-disable-next-line reason-string
-        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+        require(accountBalance >= _amount, "ERC20: burn amount exceeds balance");
 
         unchecked {
-            balances_[account] = accountBalance - amount;
+            balances_[_account] = accountBalance - _amount;
         }
 
-        totalSupply_ -= amount;
+        totalSupply_ -= _amount;
 
-        emit Transfer(account, address(0), amount);
+        emit Transfer(_account, address(0), _amount);
     }
 
     function _approve(
