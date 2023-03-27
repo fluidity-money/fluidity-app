@@ -360,9 +360,9 @@ contract Token is
 
         pool_.takeFromPool(_amount);
 
-        underlyingToken().safeTransfer(_beneficiary, _amount);
-
         emit BurnFluid(_sender, _amount);
+
+        underlyingToken().safeTransfer(_beneficiary, _amount);
     }
 
     /// @inheritdoc IToken
