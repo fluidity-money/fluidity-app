@@ -254,7 +254,7 @@ contract Token is
         address _beneficiary,
         uint256 _amount
     ) internal returns (uint256) {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
 
         // take underlying tokens from the user
 
@@ -319,7 +319,7 @@ contract Token is
         address winner,
         uint256 amount
     ) internal {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
 
         if (amount > maxUncheckedReward_) {
             // quarantine the reward
@@ -336,7 +336,7 @@ contract Token is
     }
 
     function _reward(address winner, uint256 amount) internal {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
 
         // mint some fluid tokens from the interest we've accrued
 
@@ -545,7 +545,7 @@ contract Token is
         uint firstBlock,
         uint lastBlock
     ) public {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == operator_, "operator only");
 
         require(blockedRewards_[user] >= amount, "too much unblock");
@@ -565,7 +565,7 @@ contract Token is
 
     /// @inheritdoc IToken
     function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
-      require(noEmergencyMode(), "emergency mode");
+      require(noEmergencyMode_, "emergency mode");
       require(msg.sender == operator_, "operator only");
 
       uint oldPoolAmount = pool_.totalPoolAmount();
@@ -585,7 +585,7 @@ contract Token is
 
     /// @inheritdoc IToken
     function drainRewardPool(address _recipient, uint256 _amount) public {
-        require(noEmergencyMode(), "emergency mode");
+        require(noEmergencyMode_, "emergency mode");
         require(msg.sender == operator_, "operator only");
 
         uint256 rewardPool = rewardPoolAmount();
@@ -603,7 +603,7 @@ contract Token is
         uint firstBlock,
         uint lastBlock
     ) public {
-        require(noEmergencyMode(), "emergency mode!");
+        require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
         uint poolAmount = rewardPoolAmount();
