@@ -91,7 +91,7 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
     }
 
     function enableEmergencyMode() public {
-        bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil();
+        bool authorised = msg.sender == operator_ || msg.sender == emergencyCouncil_;
         require(authorised, "emergency only");
 
         noEmergencyMode_ = false;

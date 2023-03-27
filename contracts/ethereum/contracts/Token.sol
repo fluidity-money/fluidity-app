@@ -451,7 +451,7 @@ contract Token is
     function enableEmergencyMode() public {
         require(
             msg.sender == operator_ ||
-            msg.sender == emergencyCouncil() ||
+            msg.sender == emergencyCouncil_ ||
             msg.sender == oracle_,
             "can't enable emergency mode!"
         );
