@@ -254,7 +254,7 @@ module.exports = {
   },
   networks: {
     localhost: {
-      url: "http://localhost:8545",
+      url: "http://127.0.2.1:8545",
       timeout: 100000,
     },
     hardhat: {
