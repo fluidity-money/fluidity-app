@@ -25,7 +25,7 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 		TableFeeSwitch,
 	)
 
-	row := postgresClient.QueryRow(statementText, network_, originalAddress.String())
+	row := postgresClient.QueryRow(statementText, network_, originalAddress)
 
 	if err := row.Err(); err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -42,7 +42,20 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 
 	switch err := row.Scan(&feeSwitch.NewAddress); err {
 	case sql.ErrNoRows:
+		log.Debug(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to find the fee switch replacement for the address %v, network %v",
+				originalAddress,
+				network_,
+			)
+		})
+
 		return nil
+
+	case nil:
+		// do nothing
 
 	default:
 		log.Fatal(func(k *log.Log) {
@@ -51,6 +64,17 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 			k.Payload = err
 		})
 	}
+
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Found the fee switch replacement for the address %v, network %v, is %v",
+			originalAddress,
+			network_,
+			feeSwitch.NewAddress,
+		)
+	})
 
 	return &feeSwitch
 }

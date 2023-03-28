@@ -22,7 +22,7 @@ func TestBatchReward(t *testing.T) {
 		},
 	}
 
-	_, err := OperatorAbi.Pack(
+	_, err := ExecutorAbi.Pack(
 		"reward",
 		common.HexToAddress("0xt0k3n"),
 		testRewardBatch,
