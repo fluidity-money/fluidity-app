@@ -33,8 +33,15 @@ const firehose = createEventBus(
   ...config.services,
 )
 
+let errorState = false;
+
 // Initialize the firehose
-firehose.subscribe(() => {});
+firehose
+  .subscribe({
+    error: error => {
+    console.error(error);
+    errorState = true;
+  }});
 
 // Prepare for commands
 io.on("connection", (socket) => {
@@ -48,7 +55,7 @@ io.on("connection", (socket) => {
     socket.emit("pong", `pong [${uuid}]`);
   });
 
-  socket.on("subscribeTransactions", (protocol, address) => {
+  socket.on("subscribeTransactions", ({protocol, address}) => {
     if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
 
     debug && socket.emit("debug", `Subscribing to ${protocol} ${address}...`)
@@ -67,6 +74,10 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, res) => {
+  if (errorState) {
+    res.status(500).send(`WARN {${uuid}} - Likely RPC connection error`);
+    return;
+  }
   res.send(`OK {${uuid}}`);
 });
 
