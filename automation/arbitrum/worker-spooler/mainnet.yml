@@ -3,6 +3,7 @@ DOCKER_IMAGE: microservice-arbitrum-worker-spooler
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-worker-spooler
 ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
 TASK_MIN_COUNT: 1
+ENV_FLU_AMQP_GOROUTINES_PER_QUEUE: 1
 
 SERVICES:
  - SPOOLER_USDC:
