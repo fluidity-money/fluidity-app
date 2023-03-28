@@ -83,7 +83,6 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 
 	a := new(big.Rat)
 
-	// TODO: Check comparison logic
 	if gTimesAtx.Cmp(delta) < 0 {
 
 		a = new(big.Rat).Quo(g, mRat)
@@ -98,11 +97,21 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 
 	p := probability(m, n, b)
 
-	// a / p
-	aDivP := new(big.Rat).Quo(
-		a,
-		p,
-	)
+	aDivP := new(big.Rat)
+
+	// if p = 0, then we skip the division and return 0
+
+	// p != 0
+	if p != aDivP {
+
+		// a / p
+
+		aDivP = new(big.Rat).Quo(
+			a,
+			p,
+		)
+
+	}
 
 	emission.Payout.Winnings, _ = aDivP.Float64()
 	emission.Payout.P, _ = p.Float64()
