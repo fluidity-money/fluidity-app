@@ -444,6 +444,15 @@ func main() {
 
 				// fetch the token amount, exchange rate, etc from chain
 
+				log.Debugf(
+					"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, with the delta weight number %v, and the delta weight denominator %v",
+					registryAddress,
+					contractAddress,
+					fluidClients,
+					defaultDeltaWeightNum,
+					defaultDeltaWeightDenom,
+				)
+
 				pools, err := fluidity.GetUtilityVars(
 					gethClient,
 					registryAddress,
