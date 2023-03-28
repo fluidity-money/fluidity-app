@@ -46,8 +46,10 @@ const queryByAddressTimestamp: Queryable = {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
           time: { _gt: $timestamp }
-          sender_address: { _eq: $address }
-          _or: { recipient_address: { _eq: $address } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
         }
         order_by: { time: desc }
       ) {

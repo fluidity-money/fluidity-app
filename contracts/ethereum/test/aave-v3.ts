@@ -71,9 +71,7 @@ describe("token aave v3 integration", async function () {
     for (let i = 0; i < 100; i++) {
       await hre.network.provider.send("evm_mine");
     }
-    console.log("done mining");
     const finalPoolAmount = await fAUsdcAccount.callStatic.rewardPoolAmount();
     expectGt(finalPoolAmount, initialPoolAmount);
-    console.log(`aave v3 earned ${finalPoolAmount.sub(initialPoolAmount).toString()} interest over 99 blocks`);
   });
 });

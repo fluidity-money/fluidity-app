@@ -1,7 +1,7 @@
 // constants used for tests / forknet
 // all of these are for mainnet
 
-import { Token } from "./script-utils";
+import type { Token } from './types';
 
 export const AAVE_V2_POOL_PROVIDER_ADDR = '0xb53c1a33016b2dc2ff3653530bff1848a515c8c5';
 

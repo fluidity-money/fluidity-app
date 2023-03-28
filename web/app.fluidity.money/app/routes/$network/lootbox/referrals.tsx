@@ -1,21 +1,25 @@
 import type { LoaderFunction } from "@remix-run/node";
 import type { ReferralCountData } from "../query/referrals";
+import { LinksFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 import { useCache } from "~/hooks/useCache";
 import { useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useState } from "react";
+import { jsonPost } from "~/util";
 import { Text, Heading } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
-import { Buffer } from "buffer";
-
-import { jsonPost } from "~/util";
+import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+import ReferralModal from "~/components/ReferralModal";
 
 type LoaderData = {
   network: string;
   referral: string;
   referralMsg: string;
+};
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: referralModalStyles }];
 };
 
 export const loader: LoaderFunction = ({ request, params }) => {
@@ -64,67 +68,60 @@ const Referral = () => {
   }
 
   return (
-    <div>
-      {/* Num Referrals */}
+    <>
       <div>
-        <Text>Referrals</Text>
-        <Heading>{numReferrals}</Heading>
-      </div>
+        {/* Num Referrals */}
+        <div>
+          <Text>Referrals</Text>
+          <Heading>{numReferrals}</Heading>
+        </div>
 
-      {/* Referral Section */}
-      <form>
-        <input readOnly value={referralCode} />
+        {/* Referral Section */}
+        <form>
+          <input readOnly value={referralCode} />
 
-        <button
-          onClick={(e) => {
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              (async () => {
+                try {
+                  const signedReferrer = await signBuffer?.("Referrer");
+                  setReferralCode(
+                    `/${network}/lootbox/referrals?referral=${address}&referralMsg=${signedReferrer}`
+                  );
+                } catch {
+                  return;
+                }
+              })();
+            }}
+          >
+            Reveal Referral Link
+          </button>
+        </form>
+
+        <form
+          onSubmit={(e) => {
             e.preventDefault();
             (async () => {
-              try {
-                const signedReferrer = await signBuffer?.(
-                  `Hi! From ${address} with ❤️`
-                );
-
-                if (!signedReferrer) return;
-
-                const urlSafeB64 = Buffer.from(
-                  signedReferrer.slice(2),
-                  "hex"
-                ).toString("base64url");
-
-                setReferralCode(
-                  `/${network}/lootbox/referrals?referral=${address}&referralMsg=${urlSafeB64}`
-                );
-              } catch (e) {
-                console.log(e);
-                return;
-              }
+              await jsonPost(`/${network}/query/addReferral`, {
+                referrer: referral,
+                referee: address,
+                referrer_msg: referralMsg,
+                referee_msg: (await signBuffer?.("Referee")) ?? "",
+              });
             })();
           }}
         >
-          Reveal Referral Link
-        </button>
-      </form>
+          <label htmlFor="referrer" />
+          <input readOnly name="referrer" value={referral} />
+          <label htmlFor="address" />
+          <input readOnly name="referee" value={address} />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          (async () => {
-            await jsonPost(`/${network}/query/addReferral`, {
-              referrer: referral,
-              referee: address,
-              referrer_msg: referralMsg,
-              referee_msg: (await signBuffer?.(`🌊 - ${address}`)) ?? "",
-            });
-          })();
-        }}
-      >
-        <label htmlFor="referrer" />
-        <input readOnly name="referrer" value={referral} />
-        <label htmlFor="address" />
-        <input readOnly name="referee" value={address} />
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+      <ReferralModal />
+    </>
   );
 };
 

@@ -39,6 +39,7 @@ type (
 		ToWinAmount     map[applications.UtilityName]Payout `json:"to_win_amount"`
 		TokenDetails    token_details.TokenDetails          `json:"token_details"`
 		Application     applications.Application            `json:"application"`
+		RewardTier      int                                 `json:"reward_tier"`
 	}
 
 	EthereumReward struct {
@@ -83,9 +84,9 @@ type (
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any
 	// associated transfers
 	EthereumDecoratedTransaction struct {
-		Transaction ethereum.Transaction `json:"transaction"`
-		Receipt ethereum.Receipt `json:"receipt"`
-		Transfers []EthereumDecoratedTransfer `json:"transfers"`
+		Transaction ethereum.Transaction        `json:"transaction"`
+		Receipt     ethereum.Receipt            `json:"receipt"`
+		Transfers   []EthereumDecoratedTransfer `json:"transfers"`
 	}
 	// Transfer with application information attached
 	EthereumDecoratedTransfer struct {

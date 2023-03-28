@@ -11,6 +11,11 @@ import nacl from "tweetnacl";
 import { validAddress } from "~/util";
 import { useReferralCodeByCode } from "~/queries";
 
+export type AddReferralRes = {
+  success: boolean;
+  msg: unknown;
+};
+
 export const action: ActionFunction = async ({ request, params }) => {
   const body = await request.json();
   const network = params.network ?? "";
@@ -92,11 +97,11 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json({
       success: true,
       msg: res.data,
-    });
+    } satisfies AddReferralRes);
   } catch (e) {
     return json({
       success: false,
       msg: e,
-    });
+    } satisfies AddReferralRes);
   }
 };

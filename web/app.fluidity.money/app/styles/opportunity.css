@@ -156,6 +156,7 @@ body {
   height: 100vh;
   background-color: transparent;
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
 }
@@ -270,6 +271,7 @@ body {
 
 .connected-wallet-modal-container {
   position: absolute;
+  z-index: 1;
   width: 100%;
   height: 100%;
   top: 50%;
@@ -378,30 +380,6 @@ body {
   text-decoration: underline;
   color: white;
   cursor: pointer;
-}
-
-.graph-tooltip {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-width: 160px;
-  gap: 0.4em;
-}
-
-.graph-tooltip-container {
-  position: relative;
-  background-color: rgba(255, 255, 255, 0.05);
-  width: min-content;
-  white-space: nowrap;
-  padding: 10px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: Aeonik, sans-serif;
-  color: white;
-  font-size: 14px;
-  text-align: center;
 }
 
 .loader-dots {
