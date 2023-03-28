@@ -178,7 +178,6 @@ func main() {
 
 		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-
 		addBtx(
 			dbNetwork,
 			blockNumber.Uint64(),
@@ -192,10 +191,26 @@ func main() {
 			atxBufferSize,
 		)
 
+		log.Debugf(
+			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v",
+			dbNetwork,
+			tokenName,
+			atxBufferSize,
+			averageTransfersInBlock,
+		)
+
 		_, transfersInEpoch, _, _ := computeTransactionsSumAndAverage(
 			dbNetwork,
 			tokenName,
 			epochBlocks,
+		)
+
+		log.Debugf(
+			"Computed transfers in epoch for the network %v, token name %v, atx buffer size %v is %v",
+			dbNetwork,
+			tokenName,
+			atxBufferSize,
+			transfersInEpoch,
 		)
 
 		emission.AtxBufferSize = atxBufferSize
@@ -467,6 +482,21 @@ func main() {
 						k.Message = "Failed to get trf vars from chain!"
 						k.Payload = err
 					})
+				}
+
+				for _, pool := range pools {
+					log.Debugf(
+						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, with the delta weight number %v, and the delta weight denominator %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
+						registryAddress,
+						contractAddress,
+						fluidClients,
+						defaultDeltaWeightNum,
+						defaultDeltaWeightDenom,
+						pool.PoolSizeNative,
+						pool.TokenDecimalsScale,
+						pool.ExchangeRate,
+						pool.DeltaWeight,
+					)
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
