@@ -6,8 +6,12 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { LoaderFunction, json } from "@remix-run/node";
 import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
+import {
+  aggregatePrizePools,
+  getTotalRewardPool,
+} from "~/util/chainUtils/ethereum/transaction";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
 import config from "~/webapp.config.server";
 
 export type HomeLoaderData = {
@@ -37,14 +41,25 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       case "evm": {
         return Promise.resolve(
           Promise.all(
-            ["ethereum", "arbitrum"].map((network) => {
+            [
+              {
+                network: "ethereum",
+                abi: RewardAbi,
+                getPrizePool: aggregatePrizePools,
+              },
+              {
+                network: "arbitrum",
+                abi: TotalRewardPoolAbi,
+                getPrizePool: getTotalRewardPool,
+              },
+            ].map(({ network, abi, getPrizePool }) => {
               const infuraRpc = config.drivers[network][mainnetId].rpc.http;
               const provider = new JsonRpcProvider(infuraRpc);
 
               const rewardPoolAddr =
                 config.contract.prize_pool[network as Chain];
 
-              return getTotalPrizePool(provider, rewardPoolAddr, RewardAbi);
+              return getPrizePool(provider, rewardPoolAddr, abi);
             })
           ).then((prizePools) =>
             prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
@@ -65,14 +80,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       prizePoolPromise,
       address
         ? jsonGet<{ address: string }, { volume: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`,
-            {
-              address,
-            }
-          )
+          `${url.origin}/${network}/query/volumeStats`,
+          {
+            address,
+          }
+        )
         : jsonGet<Record<string, never>, { volume: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`
-          ),
+          `${url.origin}/${network}/query/volumeStats`
+        ),
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),

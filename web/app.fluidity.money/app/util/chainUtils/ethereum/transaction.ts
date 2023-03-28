@@ -295,7 +295,7 @@ type PrizePool = {
 };
 
 // Returns total prize pool from aggregated contract
-export const getTotalPrizePool = async (
+export const aggregatePrizePools = async (
   provider: JsonRpcProvider,
   rewardPoolAddr: string,
   rewardPoolAbi: ContractInterface
@@ -324,6 +324,38 @@ export const getTotalPrizePool = async (
     }, new BN(0));
 
     return totalPrizePool.toNumber();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
+  }
+};
+
+// Returns total prize pool from aggregated contract
+export const getTotalRewardPool = async (
+  provider: JsonRpcProvider,
+  rewardPoolAddr: string,
+  rewardPoolAbi: ContractInterface
+): Promise<number> => {
+  try {
+    const rewardPoolContract = new Contract(
+      rewardPoolAddr,
+      rewardPoolAbi,
+      provider
+    );
+
+    if (!rewardPoolContract)
+      throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
+
+    const totalPrizePool_ =
+      await rewardPoolContract.callStatic.getTotalRewardPool();
+
+    const totalPrizePool = new BN(totalPrizePool_.toString());
+
+    const DECIMALS = new BN(18);
+
+    const decimalsBn = new BN(10).pow(DECIMALS);
+
+    return totalPrizePool.div(decimalsBn).toNumber();
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return 0;

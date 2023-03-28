@@ -4,12 +4,16 @@ import type { Rewarders } from "~/util/rewardAggregates";
 import type { TokenPerformance } from "~/util/tokenAggregate";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
+import {
+  aggregatePrizePools,
+  getTotalRewardPool,
+} from "~/util/chainUtils/ethereum/transaction";
 import { json } from "@remix-run/node";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";
 import { aggregateTokens } from "~/util/tokenAggregate";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
 import config from "~/webapp.config.server";
 import {
   TimeSepUserYield,
@@ -49,14 +53,25 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         case "evm": {
           return Promise.resolve(
             Promise.all(
-              ["ethereum", "arbitrum"].map((network) => {
+              [
+                {
+                  network: "ethereum",
+                  abi: RewardAbi,
+                  getPrizePool: aggregatePrizePools,
+                },
+                {
+                  network: "arbitrum",
+                  abi: TotalRewardPoolAbi,
+                  getPrizePool: getTotalRewardPool,
+                },
+              ].map(({ network, abi, getPrizePool }) => {
                 const infuraRpc = config.drivers[network][mainnetId].rpc.http;
                 const provider = new JsonRpcProvider(infuraRpc);
 
                 const rewardPoolAddr =
                   config.contract.prize_pool[network as Chain];
 
-                return getTotalPrizePool(provider, rewardPoolAddr, RewardAbi);
+                return getPrizePool(provider, rewardPoolAddr, abi);
               })
             ).then((prizePools) =>
               prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
@@ -74,10 +89,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (map, token) =>
         token.isFluidOf
           ? {
-              ...map,
-              [token.symbol]: token.address,
-              [token.symbol.slice(1)]: token.address,
-            }
+            ...map,
+            [token.symbol]: token.address,
+            [token.symbol.slice(1)]: token.address,
+          }
           : map,
       {}
     );
