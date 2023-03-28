@@ -20,7 +20,10 @@ const queryStakingDataByAddress = gql`
   }
 `;
 
-export const useStakingDataByAddress = async (network: string, address: string) => {
+export const useStakingDataByAddress = async (
+  network: string,
+  address: string
+) => {
   const variables = { network, address };
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
@@ -28,7 +31,10 @@ export const useStakingDataByAddress = async (network: string, address: string) 
     query: queryStakingDataByAddress,
   };
 
-  return await jsonPost<ExpectedStakingDataByAddressBody, ExpectedStakingDataByAddressResponse>(
+  return await jsonPost<
+    ExpectedStakingDataByAddressBody,
+    ExpectedStakingDataByAddressResponse
+  >(
     url,
     body,
     process.env.FLU_HASURA_SECRET
