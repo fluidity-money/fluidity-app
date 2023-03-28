@@ -38,6 +38,6 @@ export default mergeSettings({
                     "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
                 ]
             })
-        })
+        }),
     ],
 });

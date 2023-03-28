@@ -18,7 +18,7 @@ type EthereumConnectorProps = {
 }
 
 export const EthereumConnector = ({
-    chainRpcUrl,
+    chainRpcUrl = "",
     contractAddressSet,
     contractAbi = ERC20,
     name: chainName,
@@ -28,8 +28,11 @@ export const EthereumConnector = ({
     let watchdogInterval: NodeJS.Timer;
 
     const onTransaction = (callback: (tx: Transaction) => void) => {
+        if (!chainRpcUrl.startsWith("wss://")) {
+            throw new Error("Fatal: Invalid chain RPC URL");
+        }
         const provider = new Web3(chainRpcUrl).eth;
-
+        
         // Setup watchdog
         watchdogInterval = setInterval(() => {
             // Get the current block number

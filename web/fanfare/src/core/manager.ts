@@ -38,7 +38,11 @@ export const manager = (
             onError(new Error("Watchdog failure, reconnecting..."));
         }
         
-        provider.onTransaction(onTransaction);
+        try {
+            provider.onTransaction(onTransaction);
+        } catch (e) {
+            subscriber.error(e);
+        }
         provider.onError(onError);
         provider.onWatchdogFailure(onWatchdogFailure)
 
