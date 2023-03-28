@@ -178,7 +178,6 @@ func main() {
 
 		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-
 		addBtx(
 			dbNetwork,
 			blockNumber.Uint64(),
@@ -458,6 +457,21 @@ func main() {
 						k.Message = "Failed to get trf vars from chain!"
 						k.Payload = err
 					})
+				}
+
+				for _, pool := range pools {
+					log.Debugf(
+						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, with the delta weight number %v, and the delta weight denominator %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
+						registryAddress,
+						contractAddress,
+						fluidClients,
+						defaultDeltaWeightNum,
+						defaultDeltaWeightDenom,
+						pool.PoolSizeNative,
+						pool.TokenDecimalsScale,
+						pool.ExchangeRate,
+						pool.DeltaWeight,
+					)
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
