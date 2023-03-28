@@ -59,7 +59,7 @@ export default function MobileModal({
   const { showExperiment } = useContext(SplitContext);
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
-  const showMobileNetworkButton  = showExperiment("feature-network-visible");
+  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
 
@@ -149,12 +149,12 @@ export default function MobileModal({
             {/* Navigation Buttons */}
             <div className="mobile-navbar-right">
               {/* Chain Switcher */}
-              {showMobileNetworkButton && 
-                  <ChainSelectorButton
+              {showMobileNetworkButton && (
+                <ChainSelectorButton
                   chain={chains[network satisfies ChainName]}
                   onClick={() => setChainModalVisibility(true)}
-                  />
-                  }
+                />
+              )}
               {/* Prize Money */}
               <GeneralButton
                 version={"transparent"}
@@ -212,12 +212,11 @@ export default function MobileModal({
 
                 {/* Chain Switcher */}
                 {!showMobileNetworkButton && (
-                 <ChainSelectorButton
-                chain={chains[network satisfies ChainName]}
-                onClick={() => setChainModalVisibility(true)}
-                />)}
-                
-
+                  <ChainSelectorButton
+                    chain={chains[network satisfies ChainName]}
+                    onClick={() => setChainModalVisibility(true)}
+                  />
+                )}
               </section>
               {/* Navigation between pages */}
               <nav className={"navbar-v2 "}>
