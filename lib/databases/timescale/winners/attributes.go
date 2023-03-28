@@ -2,6 +2,7 @@ package winners
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
@@ -25,6 +26,9 @@ type TransactionAttributes struct {
 
 	// Application used in the event
 	Application applications.Application `json:"application"`
+
+	// AwardedTime of the winning transaction
+	AwardedTime time.Time `json:"awarded_time"`
 
 	// TransactionHash to find the corresponding transaction for the event
 	TransactionHash string `json:"transaction_hash"`
@@ -57,6 +61,7 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			token_short_name,
 			token_decimals,
 			network,
+			awarded_time,
 			address,
 			transaction_hash,
 			volume,
@@ -72,7 +77,8 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 			$5,
 			$6,
 			$7,
-			$8
+			$8,
+			$9
 		)`,
 
 		TableWinningTransactionAttributes,
@@ -83,6 +89,7 @@ func InsertTransactionAttributes(transactionAttributes TransactionAttributes) {
 		tokenShortName,
 		tokenDecimals,
 		transactionAttributes.Network,
+		transactionAttributes.AwardedTime,
 		transactionAttributes.Address,
 		transactionAttributes.TransactionHash,
 		transactionAttributes.Amount,
@@ -107,6 +114,7 @@ func GetTransactionAttributes(address ethereum.Address) []TransactionAttributes 
 		`SELECT
 			network,
 			transaction_hash,
+			awarded_time,
 			address,
 			volume,
 			token_short_name,
@@ -151,6 +159,7 @@ func GetTransactionAttributes(address ethereum.Address) []TransactionAttributes 
 		err := rows.Scan(
 			&transactionAttributes.Network,
 			&transactionAttributes.TransactionHash,
+			&transactionAttributes.AwardedTime,
 			&transactionAttributes.Address,
 			&transactionAttributes.Amount,
 			&transactionAttributes.TokenDetails.TokenShortName,

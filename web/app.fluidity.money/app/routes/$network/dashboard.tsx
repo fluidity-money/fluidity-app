@@ -561,7 +561,6 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-
         {/* Provide Liquidity*/}
         <div className="pad-main" style={{ marginBottom: "2em" }}>
           {!openMobModal && (
