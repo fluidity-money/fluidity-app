@@ -26,7 +26,7 @@ const (
 	// EnvExecutorAddress is the contract where the fluidity executor is located
 	EnvExecutorAddress = `FLU_ETHEREUM_EXECUTOR_CONTRACT_ADDR`
 
-	// EnvContractAddress is the contract to call when a winner's been found!
+	// EnvContractAddress is the contract to call when a winner's been found
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
