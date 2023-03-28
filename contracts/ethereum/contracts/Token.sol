@@ -330,10 +330,11 @@ contract Token is
             return;
         }
 
-        _reward(winner, amount);
+        _mint(winner, amount);
 
         emit Reward(winner, amount, firstBlock, lastBlock);
     }
+
 
     function _reward(address winner, uint256 amount) internal {
         require(noEmergencyMode_, "emergency mode!");
@@ -351,6 +352,7 @@ contract Token is
     ) internal {
         // solhint-disable-next-line reason-string
         require(from != address(0), "ERC20: transfer from the zero address");
+
 
         // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
@@ -388,8 +390,10 @@ contract Token is
         // solhint-disable-next-line reason-string
         require(accountBalance >= _amount, "ERC20: burn amount exceeds balance");
 
+
         unchecked {
             balances_[_account] = accountBalance - _amount;
+
         }
 
         totalSupply_ -= _amount;
@@ -587,7 +591,9 @@ contract Token is
 
       pool_.takeFromPool(oldPoolAmount);
 
+
       pool_ = newPool;
+
 
       underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
 

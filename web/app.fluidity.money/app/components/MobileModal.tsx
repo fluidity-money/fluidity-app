@@ -14,6 +14,7 @@ import {
   Trophy,
   numberToMonetaryString,
   ConnectedWalletModal,
+  ChainName,
   ConnectedWallet,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -24,7 +25,7 @@ type IMobileModal = {
   activeIndex: number;
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
-  network: string;
+  network: ChainName;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   unclaimedRewards: number;
@@ -58,6 +59,7 @@ export default function MobileModal({
   const { showExperiment } = useContext(SplitContext);
   const showAssets = showExperiment("enable-assets-page");
   const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton  = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
 
@@ -88,7 +90,7 @@ export default function MobileModal({
   }
 
   if (chainModalVisibility) {
-    const handleSetChain = (network: string) => {
+    const handleSetChain = (network: ChainName) => {
       const { pathname } = location;
 
       // Get path components after $network
@@ -102,7 +104,7 @@ export default function MobileModal({
       <div className="select-blockchain-mobile">
         <BlockchainModal
           handleModal={setChainModalVisibility}
-          option={chains[network as "ethereum" | "solana"]}
+          option={chains[network satisfies ChainName]}
           options={Object.values(chains)}
           setOption={handleSetChain}
           mobile={true}
@@ -146,6 +148,13 @@ export default function MobileModal({
 
             {/* Navigation Buttons */}
             <div className="mobile-navbar-right">
+              {/* Chain Switcher */}
+              {showMobileNetworkButton && 
+                  <ChainSelectorButton
+                  chain={chains[network satisfies ChainName]}
+                  onClick={() => setChainModalVisibility(true)}
+                  />
+                  }
               {/* Prize Money */}
               <GeneralButton
                 version={"transparent"}
@@ -202,10 +211,13 @@ export default function MobileModal({
                 )}
 
                 {/* Chain Switcher */}
-                <ChainSelectorButton
-                  chain={chains[network as "ethereum" | "solana"]}
-                  onClick={() => setChainModalVisibility(true)}
-                />
+                {!showMobileNetworkButton && (
+                 <ChainSelectorButton
+                chain={chains[network satisfies ChainName]}
+                onClick={() => setChainModalVisibility(true)}
+                />)}
+                
+
               </section>
               {/* Navigation between pages */}
               <nav className={"navbar-v2 "}>
