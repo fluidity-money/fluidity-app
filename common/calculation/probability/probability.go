@@ -102,7 +102,7 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 	// if p = 0, then we skip the division and return 0
 
 	// p != 0
-	if p != aDivP {
+	if p.Cmp(aDivP) != 0 {
 
 		// a / p
 
