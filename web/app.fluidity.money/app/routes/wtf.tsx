@@ -154,22 +154,20 @@ export default function IndexPage() {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chains =
-    [
-      {
-        name: "ETH",
-        icon: <img src="/assets/chains/ethIcon.svg" />,
-      },
-      {
-        name: "ARB",
-        icon: <img src="/assets/chains/ethIcon.svg" />,
-      },
-      {
-        name: "SOL",
-        icon: <img src="/assets/chains/solanaIcon.svg" />,
-      },
-    ];
-
+  const chains = [
+    {
+      name: "ETH",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    {
+      name: "ARB",
+      icon: <img src="/assets/chains/ethIcon.svg" />,
+    },
+    {
+      name: "SOL",
+      icon: <img src="/assets/chains/solanaIcon.svg" />,
+    },
+  ];
 
   return (
     <>

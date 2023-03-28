@@ -1,5 +1,5 @@
-import {AirdropLeaderboardEntry} from "~/routes/$network/query/airdrop";
-import {jsonPost, gql} from "~/util";
+import { AirdropLeaderboardEntry } from "~/routes/$network/query/airdrop";
+import { jsonPost, gql } from "~/util";
 
 const queryAirdropLeaderboard = gql`
   query AirdropLeaderboard() {
@@ -22,7 +22,10 @@ export const useAirdropLeaderboard = async () => {
     query: queryAirdropLeaderboard,
   };
 
-  return await jsonPost<ExpectedAirdropLeaderboardBody, ExpectedAirdropLeaderboardResponse>(
+  return await jsonPost<
+    ExpectedAirdropLeaderboardBody,
+    ExpectedAirdropLeaderboardResponse
+  >(
     url,
     body,
     process.env.FLU_HASURA_SECRET
@@ -31,15 +34,15 @@ export const useAirdropLeaderboard = async () => {
         }
       : {}
   );
-}
+};
 
 type ExpectedAirdropLeaderboardBody = {
   query: string;
-}
+};
 
 type ExpectedAirdropLeaderboardResponse = {
   data?: {
     leaderboard: Array<AirdropLeaderboardEntry>;
-  }
-  errors?: unknown
-}
+  };
+  errors?: unknown;
+};
