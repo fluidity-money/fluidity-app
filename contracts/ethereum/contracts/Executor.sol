@@ -142,7 +142,6 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
 
     function updateRegistry(IRegistry _newRegistry) public {
         require(msg.sender == operator_, "only operator");
-        require(_newRegistry == address(0), "new address = 0");
 
         registry_ = _newRegistry;
     }
