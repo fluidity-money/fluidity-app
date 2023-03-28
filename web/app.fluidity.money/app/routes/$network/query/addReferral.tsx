@@ -8,7 +8,6 @@ import { PublicKey } from "@solana/web3.js";
 import { recoverAddress } from "ethers/lib/utils";
 import { hashMessage } from "@ethersproject/hash";
 import nacl from "tweetnacl";
-import { ethers } from "ethers";
 import { validAddress } from "~/util";
 import { useReferralCodeByCode } from "~/queries";
 
