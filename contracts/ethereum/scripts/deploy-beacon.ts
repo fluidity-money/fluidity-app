@@ -29,9 +29,4 @@ const main = async () => {
     }
 };
 
-main()
-    .then(() => {
-        console.log(`done!`);
-        process.exit(0);
-    })
-    .catch(console.error);
+main().then(() => console.log("done"));
