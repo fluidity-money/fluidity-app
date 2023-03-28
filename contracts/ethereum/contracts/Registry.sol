@@ -40,6 +40,12 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
         address newClient
     );
 
+    event TokenRegistered(address indexed token);
+
+    event LiquidityProviderRegistered(address indexed lp);
+
+    event FeeSwitchRegistered(address indexed old, address indexed new_);
+
     /// @dev TrfVariablesUpdated in the code
     event TrfVariablesUpdated(TrfVariables old, TrfVariables new_);
 
@@ -73,41 +79,45 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     function _registerToken(ITokenOperatorOwned _token) internal {
+        emit TokenRegistered(address(_token));
         tokens_.push(_token);
     }
 
     function registerToken(ITokenOperatorOwned _token) public {
-        require(operator() == address(0) || msg.sender == operator_, "not allowed");
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
         _registerToken(_token);
     }
 
     function registerManyTokens(ITokenOperatorOwned[] calldata _tokens) public {
-        require(operator() == address(0) || msg.sender == operator_, "not allowed");
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
         for (uint i = 0; i < _tokens.length; ++i)
           _registerToken(_tokens[i]);
     }
 
     function _registerLiquidityProvider(ILiquidityProvider _lp) internal {
+        emit LiquidityProviderRegistered(address(_lp));
         liquidityProviders_.push(_lp);
     }
 
     function registerLiquidityProvider(ILiquidityProvider _lp) public {
-        require(operator() == address(0) || msg.sender == operator_, "not allowed");
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
         _registerLiquidityProvider(_lp);
     }
 
     function registerManyLiquidityProviders(
         ILiquidityProvider[] calldata _lps
     ) public {
-        require(operator() == address(0) || msg.sender == operator_, "not allowed");
+        require(operator_ == address(0) || msg.sender == operator_, "not allowed");
 
         for (uint i = 0; i < _lps.length; ++i)
           _registerLiquidityProvider(_lps[i]);
     }
 
     function registerFeeSwitch(address _old, address _new) public {
-        require(msg.sender == operator(), "not allowed");
+        require(msg.sender == operator_, "not allowed");
+
+        emit FeeSwitchRegistered(_old, _new);
 
         feeSwitches_[_old] = _new;
     }
@@ -117,6 +127,15 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
 
         if (newAddr == address(0)) return _old;
         else return newAddr;
+    }
+
+    function getManyFeeSwitches(address[] memory _addresses) public view returns (address[] memory) {
+        address[] memory feeSwitches = new address[](_addresses.length);
+
+        for (uint i = 0; i < feeSwitches.length; i++)
+            feeSwitches[i] = getFeeSwitch(_addresses[i]);
+
+        return feeSwitches;
     }
 
     function tokens() public view returns (ITokenOperatorOwned[] memory) {
@@ -162,7 +181,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     function updateOperator(address _newOperator) public {
-        require(msg.sender == operator(), "only operator");
+        require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "zero operator");
 
         operator_ = _newOperator;
