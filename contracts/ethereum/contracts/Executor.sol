@@ -140,6 +140,13 @@ contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
         }
     }
 
+    function updateRegistry(address _newRegistry) public {
+        require(msg.sender == operator_, "only operator");
+        require(_newAddress == address(0), "new address = 0");
+
+        registry_ = _newRegistry;
+    }
+
     function reward(
         address _token,
         FluidityReward[] calldata _rewards,
