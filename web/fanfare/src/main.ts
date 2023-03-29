@@ -1,7 +1,7 @@
 import express from "express";
 
 import { createServer } from "http";
-import { Subscriber } from "rxjs";
+import { Subscriber, Subscription } from "rxjs";
 import { Server } from "socket.io";
 import config from "./config";
 
@@ -26,7 +26,7 @@ const io = new Server(httpServer, {
 
 const { debug } = config;
 
-const registry = new Map<string, Subscriber<Transaction>>();
+const registry = new Map<string, Subscription>();
 
 const firehose = createEventBus(
   config,
@@ -60,15 +60,31 @@ io.on("connection", (socket) => {
 
     debug && socket.emit("debug", `Subscribing to ${protocol} ${address}...`)
     
-    BelongsToView(firehose, address).subscribe((transaction) => {
-      socket.emit("Transactions", transaction);
-    });
+    registry.set(socket.id,
+      BelongsToView(firehose, address).subscribe((transaction) => {
+        socket.emit("Transactions", transaction);
+      })
+    )
   })
 
+  socket.on("firehose", () => {
+    if (registry.has(socket.id)) registry.get(socket.id)?.unsubscribe();
+
+    console.log(`[firehose] Subscription ${remoteAddress}:${remotePort}`);
+
+    debug && socket.emit("debug", `Subscribing to firehose...`)
+
+    registry.set(socket.id,
+      firehose.subscribe((transaction) => {
+        socket.emit("Transactions", transaction);
+      })
+    )
+  });
 
   socket.on("disconnect", () => {
-    debug && socket.emit("debug", `Unsubscribing...`)
+    debug && console.log(`[debug] Unsubscribing ${remoteAddress}:${remotePort}...`)
 
+    registry.get(socket.id)?.unsubscribe();
     registry.delete(socket.id);
   });
 });
