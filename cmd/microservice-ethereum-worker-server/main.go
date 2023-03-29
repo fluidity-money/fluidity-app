@@ -251,6 +251,7 @@ func main() {
 
 		// if this block is abnormal and could be an attack, we don't use the
 		// average!
+		//
 
 		transfersInEpochRat := new(big.Rat).SetInt64(int64(transfersInEpoch))
 
