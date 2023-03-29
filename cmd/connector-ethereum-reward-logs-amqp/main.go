@@ -156,6 +156,7 @@ func main() {
 			fluidity.FluidityContractAbi.Events["Transfer"].ID,
 			fluidity.FluidityContractAbi.Events["MintFluid"].ID,
 			fluidity.FluidityContractAbi.Events["BurnFluid"].ID,
+			fluidity.StakingAbi.Events["Staked"].ID,
 		},
 	}
 
