@@ -476,7 +476,8 @@ func main() {
 					})
 				}
 
-				for i, pool := range pools {
+				for _, pool := range pools {
+					//
 					log.Debugf(
 						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
 						registryAddress,
