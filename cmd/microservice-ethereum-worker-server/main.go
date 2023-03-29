@@ -491,7 +491,7 @@ func main() {
 
 					// temporarily set the delta weight
 
-					pool.DeltaWeight = new(big.Rat).SetInt64(31536000)
+					pools[i].DeltaWeight = new(big.Rat).SetInt64(31536000)
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
