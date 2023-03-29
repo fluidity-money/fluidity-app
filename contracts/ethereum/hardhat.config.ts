@@ -155,10 +155,10 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   const testClient = await deployTestUtilityWithoutDAO(
     hre,
     operator,
-    tokens["fUSDt"].deployedToken.address
+    tokens["fUSDT"].deployedToken.address
   );
 
-  console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDt"].deployedToken.address}`);
+  console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDT"].deployedToken.address}`);
 
   console.log(`deployment complete`);
 });
@@ -210,20 +210,40 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
   };
 
 let forkOptions = {};
-if (process.env.FLU_FORKNET_NETWORK === "goerli" && process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI) {
-  forkOptions = {
-    forking: {
-      url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
-      blockNumber: 7906700,
-    },
-  };
-} else if (process.env.FLU_FORKNET_NETWORK == "mainnet" && process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET) {
+
+switch (true) {
+case process.env.FLU_FORKNET_NETWORK == "mainnet":
+case "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env:
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET,
       blockNumber: 14098096,
     },
   };
+
+  break;
+
+case process.env.FLU_FORKNET_NETWORK == "goerli":
+case "FLU_ETHEREUM_FORKNET_URL_GOERLI" in process.env:
+  forkOptions = {
+    forking: {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
+      blockNumber: 7906700,
+    },
+  };
+
+  break;
+
+case process.env.FLU_FORKNET_NETWORK == "arbitrum":
+case "FLU_ETHEREUM_FORKNET_URL_ARBITRUM" in process.env:
+  forkOptions = {
+    forking: {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
+      blockNumber: 72479676,
+    },
+  };
+
+  break;
 }
 
 /**

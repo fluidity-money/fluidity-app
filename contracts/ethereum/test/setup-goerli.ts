@@ -41,7 +41,7 @@ before(async function() {
 
   const toDeploy = [TokenList["usdc"]];
 
-  // deploy fUsdc
+  // deploy fUSDC
 
   await forknetTakeFunds(
     hre,
@@ -92,7 +92,7 @@ before(async function() {
 
   contracts = {
     ...commonContracts,
-    usdc: tokens["fUsdc"],
+    usdc: tokens["fUSDC"],
   };
   bindings = {
     ...commonBindings,

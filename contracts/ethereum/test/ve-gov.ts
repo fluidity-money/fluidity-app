@@ -1,4 +1,7 @@
 
+// these tests are pretty heavy, so we skip them unless this is on the
+// mainnet fork
+
 import * as hre from 'hardhat';
 
 import type { ethers } from 'ethers';
@@ -550,7 +553,10 @@ describe("VEGovLockup", async () => {
 
   let veGovTokenSignerAddress: string;
 
-  before(async () => {
+  before(async function() {
+    if (process.env.FLU_FORKNET_NETWORK !== "mainnet")
+      this.skip();
+
     veGovLockup = commonContracts.veGovLockup;
 
     ({

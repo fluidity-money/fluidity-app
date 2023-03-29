@@ -10,7 +10,8 @@ import {
   SUSHISWAP_ROUTER,
   CAMELOT_FACTORY,
   CAMELOT_ROUTER,
-  SADDLE_SWAP_IMPL } from "./arbitrum-constants";
+  SADDLE_SWAP_IMPL,
+  SADDLE_LP_TOKEN_IMPL } from "./arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
 
@@ -76,39 +77,52 @@ describe("Staking", async () => {
       "TransparentUpgradeableProxy"
     );
 
-    const saddleSwapFactory = await hre.ethers.getContractFactory("ISaddleSwap");
+    const saddleSwapInterface = new ethers.utils.Interface([
+      "function initialize(address[] pooledTokens, uint8[] decimals, string lpTokenName, string lpTokenSymbol, uint256 a, uint256 fee, uint256 adminFee, uint256 withdrawFee, uint256 lpTokenTargetAddress)"
+    ]);
 
     const proxyAdminAddress = await proxySigner.getAddress();
+
+    console.log("about to deploy the transparent proxy");
 
     saddleSwapToken0Token1 = await transparentUpgradeableProxyFactory.deploy(
       SADDLE_SWAP_IMPL,
       proxyAdminAddress,
-      saddleSwapFactory.interface.encodeFunctionData("initialize", [
-        [token0.address, token1.address],
-        [18, 18],
-        "swag",
-        "yolo",
-        100, // a
-        4000000, // swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
-        0, // admin fee
-        4000000 // withdrawal fee
-      ])
+      "0x00"
     );
+
+    console.log("deployment done");
+
+    await (await hre.ethers.getContractAt("ISaddleSwap", saddleSwapToken0Token1.address))
+      .callStatic.initialize(
+        [token0.address, token1.address], // pooledTokens
+        [18, 18], // decimals
+        "swag", // lpTokenName
+        "yolo", // lpTokenSymbol
+        100, // a
+        4000000, // fee, swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
+        0, // admin fee
+        4000000, // withdrawal fee
+        SADDLE_LP_TOKEN_IMPL
+      );
+
+    console.log("about to deploy the second transparent proxy");
 
     await saddleSwapToken0Token1.deployed();
 
     saddleSwapToken0Token2 = await transparentUpgradeableProxyFactory.deploy(
       SADDLE_SWAP_IMPL,
       proxyAdminAddress,
-      saddleSwapFactory.interface.encodeFunctionData("initialize", [
-        [token0.address, token2.address],
-        [18, 18],
-        "swag",
-        "yolo",
+      saddleSwapInterface.encodeFunctionData("initialize", [
+        [token0.address, token2.address], // pooledTokens
+        [18, 18], // decimals
+        "swag", // lpTokenName
+        "yolo", // lpTokenSymbol
         100, // a
-        4000000, // swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
+        4000000, // fee, swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
         0, // admin fee
-        4000000 // withdrawal fee
+        4000000, // withdrawal fee
+        SADDLE_LP_TOKEN_IMPL
       ])
     );
 

@@ -1,2 +1,0 @@
-
-export const REGISTRATION_TYPE_TOKEN = 1;

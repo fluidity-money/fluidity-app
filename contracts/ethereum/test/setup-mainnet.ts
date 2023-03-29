@@ -145,8 +145,8 @@ before(async function () {
 
   contracts = {
     ...commonContracts,
-    usdt: tokens["fUSDt"],
-    fei: tokens["fFei"],
+    usdt: tokens["fUSDT"],
+    fei: tokens["fFEI"],
     dai: tokens["fDAI"],
     weth: tokens["fwETH"],
     ethConvertor
