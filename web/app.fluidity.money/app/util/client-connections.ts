@@ -1,5 +1,5 @@
 import { PipedTransaction } from "drivers/types";
-import io, { ManagerOptions, SocketOptions } from "socket.io-client";
+import io from "socket.io-client";
 
 const DSSocketManager = (
   { onCallback = (payload: PipedTransaction) => payload },
