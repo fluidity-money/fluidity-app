@@ -136,11 +136,6 @@ func main() {
 		)
 
 		var (
-			defaultDeltaWeightNum   = big.NewInt(1)
-			defaultDeltaWeightDenom = big.NewInt(31536000)
-		)
-
-		var (
 			currentAtxTransactionMarginRat = new(big.Rat).SetInt64(
 				currentAtxTransactionMargin,
 			)
@@ -461,12 +456,10 @@ func main() {
 				// fetch the token amount, exchange rate, etc from chain
 
 				log.Debugf(
-					"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, with the delta weight number %v, and the delta weight denominator %v",
+					"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v",
 					registryAddress,
 					contractAddress,
 					fluidClients,
-					defaultDeltaWeightNum,
-					defaultDeltaWeightDenom,
 				)
 
 				pools, err := fluidity.GetUtilityVars(
@@ -474,8 +467,6 @@ func main() {
 					registryAddress,
 					contractAddress,
 					fluidClients,
-					defaultDeltaWeightNum,
-					defaultDeltaWeightDenom,
 				)
 
 				if err != nil {
@@ -487,17 +478,19 @@ func main() {
 
 				for _, pool := range pools {
 					log.Debugf(
-						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, with the delta weight number %v, and the delta weight denominator %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
+						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
 						registryAddress,
 						contractAddress,
 						fluidClients,
-						defaultDeltaWeightNum,
-						defaultDeltaWeightDenom,
 						pool.PoolSizeNative,
 						pool.TokenDecimalsScale,
 						pool.ExchangeRate,
 						pool.DeltaWeight,
 					)
+
+					// temporarily set the delta weight
+
+					pool.DeltaWeight = new(big.Rat).SetInt64(31536000)
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()

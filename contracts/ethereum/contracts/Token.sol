@@ -647,16 +647,14 @@ contract Token is
 
     /// @inheritdoc IFluidClient
     function getUtilityVars() external returns (UtilityVars memory) {
-        UtilityVars memory vars = UtilityVars({
+        return UtilityVars({
             poolSizeNative: rewardPoolAmount(),
             tokenDecimalScale: 10**decimals(),
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
-            deltaWeightNum: 1,
-            deltaWeightDenom: 31536000
+            deltaWeightNum: 31536000,
+            deltaWeightDenom: 1
         });
-
-        return vars;
     }
 
     /* ~~~~~~~~~~ IMPLEMENTS ITransferWithBeneficiary ~~~~~~~~~~ */
