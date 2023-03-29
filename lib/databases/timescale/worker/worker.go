@@ -191,7 +191,10 @@ func InsertEmissions(emission Emission) {
 			max_priority_fee_per_gas_normal,
 			max_fee_per_gas,
 			max_fee_per_gas_normal,
-			effective_gas_price_normal
+			effective_gas_price_normal,
+
+			winning_chances_total_bpy,
+			winning_chances_distribution_pools
 		)
 
 		VALUES (
@@ -304,7 +307,10 @@ func InsertEmissions(emission Emission) {
 			$88,
 			$89,
 			$90,
-			$91
+			$91,
+
+			$92,
+			$93
 		);`,
 
 		TableEmissions,
@@ -423,6 +429,9 @@ func InsertEmissions(emission Emission) {
 		maxFeePerGas,
 		maxFeePerGasNormal,
 		effectiveGasPriceNormal,
+
+		winningChances.TotalBpy,
+		winningChances.DistributionPools,
 	)
 
 	if err != nil {
