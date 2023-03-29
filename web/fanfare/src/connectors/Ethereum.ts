@@ -18,7 +18,7 @@ type EthereumConnectorProps = {
 }
 
 export const EthereumConnector = ({
-    chainRpcUrl,
+    chainRpcUrl = "",
     contractAddressSet,
     contractAbi = ERC20,
     name: chainName,
@@ -28,8 +28,11 @@ export const EthereumConnector = ({
     let watchdogInterval: NodeJS.Timer;
 
     const onTransaction = (callback: (tx: Transaction) => void) => {
+        if (!chainRpcUrl.startsWith("wss://")) {
+            throw new Error("Fatal: Invalid chain RPC URL");
+        }
         const provider = new Web3(chainRpcUrl).eth;
-
+        
         // Setup watchdog
         watchdogInterval = setInterval(() => {
             // Get the current block number
@@ -39,32 +42,35 @@ export const EthereumConnector = ({
                 })
         }, 30000);
 
-        contractAddressSet.forEach((contractAddress) => {
+        contractAddressSet.forEach(async (contractAddress) => {
             const token = new provider.Contract(contractAbi as unknown as AbiItem, contractAddress);
-            token.methods.decimals().call().then((decimals: number) => {
-                token.events.Transfer({
-                    fromBlock: 'latest',
-                }).on('data', (event: {
-                    transactionHash: string;
-                    returnValues: { from: string; to: string; value: BigNumber };
-                }) => {
-                    const { from: source, to: destination, value: amount } = event.returnValues;
+            const name = await token.methods.name().call();
+            const decimals = await token.methods.decimals().call();
 
-                    const uiTokenAmount = amountToDecimalString(amount.toString(), decimals);
+            console.log(`[info] Watching ${name} (${contractAddress}) on ${chainName}`);
 
-                    const transaction: Transaction = {
-                        type: NotificationType.ONCHAIN,
-                        source: source,
-                        destination: destination,
-                        amount: shorthandAmountFormatter(uiTokenAmount, 3),
-                        token: contractAddress,
-                        transactionHash: event.transactionHash,
-                        rewardType: "",
-                    };
-                    callback(transaction);
-                }).on('error', async (error: unknown) => {
-                    onErrorCallback(error as Error);
-                });
+            token.events.Transfer({
+                fromBlock: 'latest',
+            }).on('data', (event: {
+                transactionHash: string;
+                returnValues: { from: string; to: string; value: BigNumber };
+            }) => {
+                const { from: source, to: destination, value: amount } = event.returnValues;
+
+                const uiTokenAmount = amountToDecimalString(amount.toString(), decimals);
+
+                const transaction: Transaction = {
+                    type: NotificationType.ONCHAIN,
+                    source: source,
+                    destination: destination,
+                    amount: shorthandAmountFormatter(uiTokenAmount, 3),
+                    token: contractAddress,
+                    transactionHash: event.transactionHash,
+                    rewardType: "",
+                };
+                callback(transaction);
+            }).on('error', async (error: unknown) => {
+                onErrorCallback(error as Error);
             });
         });
     }

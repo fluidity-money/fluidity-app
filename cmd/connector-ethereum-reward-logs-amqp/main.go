@@ -136,7 +136,7 @@ func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethcl
 
 func main() {
 	var (
-		ethereumWsUrl = util.GetEnvOrFatal(EnvEthereumWsUrl)
+		ethereumWsUrl = util.PickEnvOrFatal(EnvEthereumWsUrl)
 		tokenList_    = util.GetEnvOrFatal(EnvTokenList)
 	)
 

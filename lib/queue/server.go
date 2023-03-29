@@ -26,11 +26,15 @@ var chanAmqpDetails = make(chan amqpDetails)
 
 func queueConsume(queueName, topic, exchangeName, consumerId string, channel *amqp.Channel, deadLetterEnabled bool) (<-chan amqp.Delivery, error) {
 
-	log.Debugf(
-		"Dead letter queue for %s enabled: %v",
-		queueName,
-		deadLetterEnabled,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Dead letter queue for %s enabled: %v",
+			queueName,
+			deadLetterEnabled,
+		)
+	})
 
 	err := channel.ExchangeDeclare(
 		"dead-exchange",
@@ -102,12 +106,16 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		)
 	}
 
-	log.Debugf(
-		"Binding a new queue with name %v and routing key %v on exchange %v!",
-		queueName,
-		topic,
-		exchangeName,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Binding a new queue with name %v and routing key %v on exchange %v!",
+			queueName,
+			topic,
+			exchangeName,
+		)
+	})
 
 	err = channel.QueueBind(
 		queueName,
@@ -126,7 +134,10 @@ func queueConsume(queueName, topic, exchangeName, consumerId string, channel *am
 		)
 	}
 
-	log.Debugf("Bound a queue %#v serving %v!", queueName, topic)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Format("Bound a queue %#v serving %v!", queueName, topic)
+	})
 
 	messageChan, err := channel.Consume(
 		queueName,
@@ -159,11 +170,15 @@ func queuePublish(topic, exchangeName string, content []byte, channel *amqp.Chan
 		Body:         content,
 	}
 
-	log.Debugf(
-		"channel.Publish a message to %#v topic %#v!",
-		exchangeName,
-		topic,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"channel.Publish a message to %#v topic %#v!",
+			exchangeName,
+			topic,
+		)
+	})
 
 	err := channel.Publish(
 		exchangeName,

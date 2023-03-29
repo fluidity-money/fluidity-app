@@ -64,7 +64,10 @@ func (message Message) Decode(decoded interface{}) {
 		})
 	}
 
-	log.Debugf("Successfully decoded a message from JSON!")
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Message = "Successfully decoded a message from JSON!"
+	})
 }
 
 // GetMessages from the AMQP server, calling the function each time a
@@ -164,10 +167,14 @@ func GetMessages(topic string, f func(message Message)) {
 					Content: bodyBuf,
 				})
 
-				log.Debugf(
-					"Asking the server to ack the receipt of %v!",
-					deliveryTag,
-				)
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+
+					k.Format(
+						"Asking the server to ack the receipt of %v!",
+						deliveryTag,
+					)
+				})
 
 				if err := queueAckDeliveryTag(channel, deliveryTag); err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -182,10 +189,10 @@ func GetMessages(topic string, f func(message Message)) {
 					})
 				}
 
-				log.Debugf(
-					"Server acked the reply for %v!",
-					deliveryTag,
-				)
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+					k.Format("Server acked the reply for %v!", deliveryTag)
+				})
 
 				// clean up the retry key
 
@@ -219,7 +226,10 @@ func SendMessage(topic string, content interface{}) {
 
 // SendMessageBytes down a topic, with bytes as content
 func SendMessageBytes(topic string, content []byte) {
-	log.Debugf("Starting to send a publish request to the sending goroutine.")
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Message = "Starting to send a publish request to the sending goroutine."
+	})
 
 	amqpDetails := <-chanAmqpDetails
 
@@ -245,7 +255,10 @@ func SendMessageBytes(topic string, content []byte) {
 		})
 	}
 
-	log.Debugf("Sending goroutine has received the request!")
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Message = "Sending goroutine has received the request!"
+	})
 }
 
 // Finish up, by clearing the buffer

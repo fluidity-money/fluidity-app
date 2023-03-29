@@ -15,12 +15,12 @@ interface ILiquidityProvider {
      * @notice getter for the owner of the pool (account that can deposit and remove from it)
      * @return address of the owning account
      */
-    function owner_() external returns (address);
+    function owner_() external view returns (address);
     /**
      * @notice gets the underlying token (ie, USDt)
      * @return address of the underlying token
      */
-    function underlying_() external returns (IERC20);
+    function underlying_() external view returns (IERC20);
 
     /**
      * @notice adds `amount` of tokens to the pool from the amount in the LiquidityProvider

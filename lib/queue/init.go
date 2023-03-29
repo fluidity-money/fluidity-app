@@ -59,6 +59,11 @@ func init() {
 		})
 	}
 
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Format("Number of goroutines in use is %v", goroutines)
+	})
+
 	client, err := amqp.Dial(queueAddr)
 
 	if err != nil {
@@ -116,11 +121,15 @@ func init() {
 		})
 	}
 
-	log.Debugf(
-		"Declared a queue with name %#v type %#v!",
-		ExchangeName,
-		ExchangeType,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Declared a queue with name %#v type %#v!",
+			ExchangeName,
+			ExchangeType,
+		)
+	})
 
 	log.RegisterShutdown(func() {
 		_ = channel.Close()
