@@ -29,7 +29,7 @@ import {
   LabelledValue,
   ProviderIcon,
   ProviderCard,
-  HoverButton,
+  Hoverable,
   TokenIcon,
   Provider,
   Token,
@@ -705,9 +705,8 @@ export default function Rewards() {
                   ? "Transacting ƒAssets"
                   : rewarders[0]?.name}
               </LabelledValue>
-              <HoverButton
-                size="medium"
-                hoverComp={
+              <Hoverable
+                tooltipContent={
                   <>
                     <ProviderIcon
                       provider={rewarders[0]?.name}
@@ -742,8 +741,8 @@ export default function Rewards() {
                   </>
                 }
               >
-                Hover for Details
-              </HoverButton>
+                <LinkButton size="medium" type="info" handleClick={() => {return}}>Hover for Details</LinkButton>
+              </Hoverable>
             </div>
           )}
         </div>
