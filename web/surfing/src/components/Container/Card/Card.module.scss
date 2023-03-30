@@ -1,19 +1,21 @@
 @use "common" as *;
 
-button {
-  cursor: pointer;
-
-  &:disabled {
-    cursor: default;
-  }
-}
-
 .card {
   display: flex;
   flex-direction: column;
   width: fit-content;
   height: fit-content;
   padding: 1em;
+
+  &.button {
+    all: unset;
+    font-size: 1em;
+    cursor: pointer;
+  
+    &:disabled {
+      cursor: default;
+    }
+  }
 
   &.heading {
     > * {

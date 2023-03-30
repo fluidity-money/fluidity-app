@@ -36,6 +36,7 @@ import {
   CardCarousel,
   Display,
   WalletIcon,
+  TabButton
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -635,18 +636,18 @@ export default function Rewards() {
 
         <div className="filter-row">
           {rewardFilters.map((filter, i) => (
-            <button
+            <TabButton
+              size="default"
               key={`filter-${filter.name}`}
               onClick={() => setActiveRewardFilterIndex(i)}
             >
               <Text
-                size="xl"
                 prominent={activeRewardFilterIndex === i}
                 className={activeRewardFilterIndex === i ? "active-filter" : ""}
               >
                 {filter.name}
               </Text>
-            </button>
+            </TabButton>
           ))}
         </div>
       </div>

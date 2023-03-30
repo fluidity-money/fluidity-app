@@ -56,7 +56,7 @@ const BlockchainModal = ({
     <div ref={blockchainModal} className={classProps}>
       <div className={styles.heading}>
         <Heading as={"h4"}>Select a Blockchain</Heading>
-        <button onClick={() => handleModal(false)}>
+        <button onClick={() => handleModal(false)} style={{all:'unset', cursor: 'pointer'}}>
           <Text size={"xl"} prominent={true}>
             X
           </Text>
@@ -70,10 +70,10 @@ const BlockchainModal = ({
             type={"holobox"}
             rounded={true}
             onClick={() => handleOnClick(i)}
+            style={{flexDirection: 'row', gap: '1em'}}
           >
             {option.icon}
-            {"  "}
-            <Text size={"xl"} prominent={true}>
+            <Text size={"lg"} prominent={true}>
               <strong>{SupportedChains[option.name].name}</strong>
             </Text>
             <Checkmark style={{ marginLeft: "auto", marginRight: "24px" }} />
@@ -89,10 +89,10 @@ const BlockchainModal = ({
               return;
             }}
             disabled={true}
+            style={{flexDirection: 'row', gap: '1em'}}
           >
             {option.icon}
-            {"  "}
-            <Text size={"xl"} className={styles.disabled}>
+            <Text size={"lg"} className={styles.disabled}>
               {SupportedChains[option.name].name}
             </Text>
           </Card>
@@ -103,10 +103,10 @@ const BlockchainModal = ({
             type={"box"}
             rounded={true}
             onClick={() => handleOnClick(i)}
+            style={{flexDirection: 'row', gap: '1em'}}
           >
             {option.icon}
-            {"  "}
-            <Text size={"xl"}>{SupportedChains[option.name].name}</Text>
+            <Text size={"lg"}>{SupportedChains[option.name].name}</Text>
           </Card>
         )
       )}

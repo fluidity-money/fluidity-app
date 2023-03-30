@@ -1,6 +1,7 @@
 @use 'common' as *;
 
 .button {
+  all: unset;
   font-family: "Aeonik Mono";
   display: flex;
   flex-direction: row;

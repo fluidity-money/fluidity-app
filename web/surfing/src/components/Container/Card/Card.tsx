@@ -5,7 +5,7 @@
 import styles from "./Card.module.scss";
 
 export interface ICard {
-  component?: "div" | "button" | "tr";
+  component?: "div" | "button" | "tr"; 
   style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
@@ -27,10 +27,16 @@ const Card = ({
   const Component = component || "div";
 
   const typeClass = styles[type || "gray"];
+  const elementClass = styles[Component];
 
-  const allClasses = `${styles.card} ${typeClass} ${
-    rounded && styles.rounded
-  } ${disabled && styles.disabled} ${classProps}`;
+  const allClasses = `
+    ${styles.card} 
+    ${typeClass} 
+    ${rounded && styles.rounded} 
+    ${elementClass} 
+    ${disabled && styles.disabled} 
+    ${classProps}
+  `;
 
   return (
     <Component style={style} className={allClasses} disabled={disabled} {...props}>

@@ -173,9 +173,9 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
               setOpenDropdown(!openDropdown);
             }}
           >
-            <Heading as="h1" className={styles["fluid-liquidity-token"]}>
+            <span className={styles["fluid-liquidity-token"]}>
               {`ƒ${poolToken.symbol?.slice(1)}`}
-            </Heading>
+            </span>
             <ArrowDown width={18} fill={"white"} />
             {openDropdown && <DropdownOptions />}
           </button>

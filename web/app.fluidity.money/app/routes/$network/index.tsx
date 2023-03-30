@@ -150,7 +150,7 @@ const NetworkPage = () => {
               onClick={() => setChainModalVisibility(true)}
             />
 
-            <div className="connected-wallet">
+            <div>
               {/* Connected Wallet */}
               {address && (
                 <ConnectedWallet

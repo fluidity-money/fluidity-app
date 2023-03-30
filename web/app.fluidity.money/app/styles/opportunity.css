@@ -66,12 +66,6 @@ body {
   margin-top: 3em;
 }
 
-.connected-wallet {
-  display: flex;
-  align-items: center;
-  gap: 0.25em;
-}
-
 .connected-content {
   display: flex;
   flex-direction: column;

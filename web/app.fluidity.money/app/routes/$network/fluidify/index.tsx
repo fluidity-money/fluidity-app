@@ -23,6 +23,7 @@ import {
   ConnectedWallet,
   ConnectedWalletModal,
   FluidifyCard,
+  TabButton
 } from "@fluidity-money/surfing";
 import Draggable from "~/components/Draggable";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -496,18 +497,18 @@ export default function FluidifyToken() {
               {/* Filters*/}
               <div className={"fluidify-token-filters"}>
                 {searchFilters.map((filter, i) => (
-                  <button
+                  <TabButton
+                    size="default"
                     key={`filter-${filter.name}`}
                     onClick={() => setActiveFilterIndex(i)}
                   >
                     <Text
-                      size="lg"
                       prominent={activeFilterIndex === i}
                       className={activeFilterIndex === i ? "selected" : ""}
                     >
                       {filter.name}
                     </Text>
-                  </button>
+                  </TabButton>
                 ))}
               </div>
 

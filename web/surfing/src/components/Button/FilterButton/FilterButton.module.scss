@@ -1,6 +1,7 @@
 @use 'common' as *;
 
 .option {
+  all: unset;
   color: map-get($text, "default");
   margin: 5px;
   padding: 8px 16px;
