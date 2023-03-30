@@ -212,18 +212,11 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-<<<<<<< HEAD
       { home: { name: "Dashboard", icon: <DashboardIcon /> } },
       { rewards: { name: "Rewards", icon: <Trophy /> } },
       { assets: { name: "Assets", icon: <AssetsIcon /> } },
+      { airdrop: { name: "Airdrop", icon: <Trophy /> } },
     ];
-=======
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-    { airdrop: { name: "Airdrop", icon: <Trophy /> } },
-  ];
->>>>>>> develop
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
