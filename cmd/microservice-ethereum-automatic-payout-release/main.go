@@ -20,10 +20,10 @@ const (
     EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
     // EnvTokenName to fetch winnings with
-    EnvTokenName = `FLU_ETHERUM_TOKEN_NAME`
+    EnvTokenName = `FLU_ETHEREUM_TOKEN_NAME`
 
     // EnvTokenDecimals to fetch winnings with
-    EnvTokenDecimals = `FLU_ETHERUM_TOKEN_DECIMALS`
+    EnvTokenDecimals = `FLU_ETHEREUM_TOKEN_DECIMALS`
 
     // EnvNetwork to differentiate between eth, arbitrum, etc
     EnvNetwork = `FLU_ETHEREUM_NETWORK`

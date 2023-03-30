@@ -1,11 +1,12 @@
 import { PipedTransaction } from "drivers/types";
-import io, { ManagerOptions, SocketOptions } from "socket.io-client";
+import io from "socket.io-client";
 
 const DSSocketManager = (
   { onCallback = (payload: PipedTransaction) => payload },
-  opts?: Partial<ManagerOptions & SocketOptions> | undefined
 ) => {
-  const socket = io(opts);
+  const socket = io("wss://fanfare.fluidity.money", {
+    transports: ["websocket"],
+  });
 
   const emitEvent = (protocol: string, address: string) => {
     socket.emit("subscribeTransactions", {

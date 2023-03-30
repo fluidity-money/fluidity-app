@@ -117,6 +117,8 @@ const routeMapper = (route: string) => {
       return "ASSETS";
     case "/dao":
       return "DAO";
+    case "/airdrop":
+      return "AIRDROP";
     default:
       return "DASHBOARD";
   }
@@ -167,8 +169,9 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -209,10 +212,18 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
+<<<<<<< HEAD
       { home: { name: "Dashboard", icon: <DashboardIcon /> } },
       { rewards: { name: "Rewards", icon: <Trophy /> } },
       { assets: { name: "Assets", icon: <AssetsIcon /> } },
     ];
+=======
+    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { assets: { name: "Assets", icon: <AssetsIcon /> } },
+    { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+  ];
+>>>>>>> develop
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -239,7 +250,7 @@ export default function Dashboard() {
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: string) => {
+  const handleSetChain = (network: ChainName) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -327,7 +338,7 @@ export default function Dashboard() {
 
         <ChainSelectorButton
           className="selector-button"
-          chain={chainNameMap[network as "ethereum" | "solana"]}
+          chain={chainNameMap[network satisfies ChainName]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -337,10 +348,8 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({ name }) =>
-              showArbitrum ? true : name !== "ARB"
-            )}
+            option={chainNameMap[network satisfies ChainName]}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />
@@ -369,6 +378,9 @@ export default function Dashboard() {
           {navigationMap
             .filter((obj) =>
               showAssets ? true : Object.keys(obj)[0] !== "assets"
+            )
+            .filter((obj) =>
+              showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
             )
             .map((obj, index) => {
               const key = Object.keys(obj)[0];
@@ -496,6 +508,12 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
+            {(isTablet || isMobile) && showMobileNetworkButton && (
+              <ChainSelectorButton
+                chain={chainNameMap[network satisfies ChainName]}
+                onClick={() => setChainModalVisibility(true)}
+              />
+            )}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
@@ -553,7 +571,6 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-
         {/* Provide Liquidity*/}
         <div className="pad-main" style={{ marginBottom: "2em" }}>
           {!openMobModal && (

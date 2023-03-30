@@ -22,7 +22,7 @@ import (
 const EnvEthereumWsUrl = `FLU_ETHEREUM_WS_URL`
 
 func main() {
-	gethWebsocketUrl := util.GetEnvOrFatal(EnvEthereumWsUrl)
+	gethWebsocketUrl := util.PickEnvOrFatal(EnvEthereumWsUrl)
 
 	rpcClient, err := ethRpc.Dial(gethWebsocketUrl)
 

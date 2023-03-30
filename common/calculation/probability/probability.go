@@ -5,6 +5,7 @@
 package probability
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -83,7 +84,6 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 
 	a := new(big.Rat)
 
-	// TODO: Check comparison logic
 	if gTimesAtx.Cmp(delta) < 0 {
 
 		a = new(big.Rat).Quo(g, mRat)
@@ -98,11 +98,21 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 
 	p := probability(m, n, b)
 
-	// a / p
-	aDivP := new(big.Rat).Quo(
-		a,
-		p,
-	)
+	aDivP := new(big.Rat)
+
+	// if p = 0, then we skip the division and return 0
+
+	// p != 0
+	if p.Cmp(aDivP) != 0 {
+
+		// a / p
+
+		aDivP = new(big.Rat).Quo(
+			a,
+			p,
+		)
+
+	}
 
 	emission.Payout.Winnings, _ = aDivP.Float64()
 	emission.Payout.P, _ = p.Float64()
@@ -196,7 +206,14 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 		poolBpys[i] = bpy
 
 		totalBpy.Add(totalBpy, bpy)
+
+		emission.WinningChances.DistributionPools += fmt.Sprintf(
+			"%v,",
+			pool.DebugString(),
+		)
 	}
+
+	emission.WinningChances.TotalBpy, _ = totalBpy.Float64()
 
 	probabilities = make([]*big.Rat, winningClasses)
 

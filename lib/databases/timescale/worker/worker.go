@@ -167,7 +167,7 @@ func InsertEmissions(emission Emission) {
 			xyfinance_fee,
 			apeswap_fee,
 			saddle_fee,
-			gtrade_fee,
+			gtrade_v6_1_fee,
 
 			saber_fee,
 			orca_fee,
@@ -191,7 +191,10 @@ func InsertEmissions(emission Emission) {
 			max_priority_fee_per_gas_normal,
 			max_fee_per_gas,
 			max_fee_per_gas_normal,
-			effective_gas_price_normal
+			effective_gas_price_normal,
+
+			winning_chances_total_bpy,
+			winning_chances_distribution_pools
 		)
 
 		VALUES (
@@ -304,7 +307,10 @@ func InsertEmissions(emission Emission) {
 			$88,
 			$89,
 			$90,
-			$91
+			$91,
+
+			$92,
+			$93
 		);`,
 
 		TableEmissions,
@@ -423,6 +429,9 @@ func InsertEmissions(emission Emission) {
 		maxFeePerGas,
 		maxFeePerGasNormal,
 		effectiveGasPriceNormal,
+
+		winningChances.TotalBpy,
+		winningChances.DistributionPools,
 	)
 
 	if err != nil {
@@ -434,9 +443,9 @@ func InsertEmissions(emission Emission) {
 	}
 }
 
-// GetAverageAtx, rounding up the average, taking the returned float64 and
-// casting it to an integer
-func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, blocks []uint64, transactionCounts []int) {
+// GetLastBlocksTransactionCount, returning the average
+// and sum of the transactions
+func GetLastBlocksTransactionCount(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, sum int, blocks []uint64, transactionCounts []int) {
 
 	timescaleClient := timescale.Client()
 
@@ -475,7 +484,7 @@ func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, lim
 
 	defer rows.Close()
 
-	sum := 0
+	sum = 0
 
 	blocks = make([]uint64, 0)
 
@@ -504,9 +513,9 @@ func GetAverageAtx(tokenShortName string, network network.BlockchainNetwork, lim
 		sum += transactionCount
 	}
 
-	average = sum / len(transactionCounts)
+	average = sum / limit
 
-	return average, blocks, transactionCounts
+	return average, sum, blocks, transactionCounts
 }
 
 // InsertTransactionCount for a block number for the number of transactions
