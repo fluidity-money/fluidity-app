@@ -91,8 +91,6 @@ describe("Utility gauges", async () => {
     const user1Balance: BigNumber = await utilityGaugesUser1.callStatic['votesAvailable()']();
     const user2Balance: BigNumber = await utilityGaugesUser2.callStatic['votesAvailable()']();
 
-    console.log(`user 1 initial balance: `, user1Balance);
-
     expectGt(user1Balance, 500);
     expectGt(user2Balance, 500);
 
@@ -126,7 +124,6 @@ describe("Utility gauges", async () => {
     expectEq(total1, 0);
 
     const user1Balance: BigNumber = await utilityGaugesUser1.callStatic['votesAvailable()']();
-    console.log(`user 1 balance after reset: `, user1Balance);
     expectGt(user1Balance, depositAmount1);
   });
 

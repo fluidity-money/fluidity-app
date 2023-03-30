@@ -269,8 +269,7 @@ export const deployUtilityGauges = async (
   operator: ethers.Signer,
   veGovLockupAddress: string,
 ): Promise<ethers.Contract> => {
-  const contract = await factory.connect(signer).deploy();
-  await contract.init(await operator.getAddress(), veGovLockupAddress);
+  const contract = await factory.connect(signer).deploy(operator.getAddress(), veGovLockupAddress);
   return contract;
 };
 
