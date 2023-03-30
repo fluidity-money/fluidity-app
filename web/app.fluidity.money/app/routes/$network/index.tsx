@@ -192,8 +192,7 @@ const NetworkPage = () => {
               {/* Connect Wallet Button */}
               {!connected && (
                 <GeneralButton
-                  version={connected ? "transparent" : "primary"}
-                  buttontype="text"
+                  type={connected ? "transparent" : "primary"}
                   size={"medium"}
                   handleClick={() => setWalletModalVisibility(true)}
                   className="connect-wallet-btn"
@@ -251,8 +250,7 @@ const NetworkPage = () => {
             <div className="connected-buttons">
               <GeneralButton
                 size="large"
-                version="primary"
-                buttontype="text"
+                type="primary"
                 handleClick={() => navigate("fluidify")}
               >
                 FLUIDIFY MONEY
@@ -267,8 +265,8 @@ const NetworkPage = () => {
                   <GeneralButton
                     className="share-button"
                     size="large"
-                    version="transparent"
-                    buttontype="icon before"
+                    type="transparent"
+                    layout="before"
                     icon={<Twitter />}
                     handleClick={() => {
                       return;

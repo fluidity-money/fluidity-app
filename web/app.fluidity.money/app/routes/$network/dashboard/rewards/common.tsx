@@ -53,8 +53,7 @@ const UserRewards = ({
             {!claimNow && (
               <GeneralButton
                 size={"medium"}
-                version={"primary"}
-                buttontype="text"
+                type={"primary"}
                 handleClick={onClick}
                 className="view-breakdown-button"
                 style={{ whiteSpace: "nowrap" }}

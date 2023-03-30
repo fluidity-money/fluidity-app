@@ -457,8 +457,7 @@ export default function FluidifyToken() {
                 />
               ) : (
                 <GeneralButton
-                  version={connected || connecting ? "transparent" : "primary"}
-                  buttontype="text"
+                  type={connected || connecting ? "transparent" : "primary"}
                   size={"medium"}
                   handleClick={() =>
                     connecting ? null : setWalletModalVisibility(true)

@@ -52,16 +52,14 @@ const Demo = () => {
           </Text>
           <section>
             <GeneralButton
-              version={"primary"}
-              buttontype={"text"}
+              type={"primary"}
               size={"large"}
               handleClick={handleConnectWallet}
             >
               Connect Wallet
             </GeneralButton>
             <GeneralButton
-              version={"secondary"}
-              buttontype={"text"}
+              type={"secondary"}
               size={width > breakpoint ? "large" : "small"}
               handleClick={handleLaunchFluidity}
             >

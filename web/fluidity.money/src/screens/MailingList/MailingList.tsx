@@ -142,9 +142,8 @@ const MailingList = () => {
             />
           </section>
           <GeneralButton
-            type={"submit"}
-            version={"primary"}
-            buttontype={"text"}
+            buttonType={"submit"}
+            type={"primary"}
             size={"medium"}
             handleClick={() => {}}
           >

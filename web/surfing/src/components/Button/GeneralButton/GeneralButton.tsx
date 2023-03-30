@@ -9,7 +9,7 @@ import styles from "./GeneralButton.module.scss";
 export interface IGeneralButton extends ButtonHTMLAttributes<HTMLButtonElement> {
   type?: "primary" | "secondary" | "transparent";
   size?: "small" | "medium" | "large";
-  handleClick: () => void;
+  handleClick?: () => void;
   children?: React.ReactNode | null;
   icon?: React.ReactNode;
   layout?: "before" | "after";

@@ -100,8 +100,8 @@ export const ConnectedWalletModal = ({
                 </Card>
                 <GeneralButton
                   title={"Disconnect Wallet"}
-                  version="transparent"
-                  buttontype={"icon before"}
+                  type="transparent"
+                  layout={"before"}
                   icon={
                     <img
                       src="/images/icons/disconnectIcon.svg"
