@@ -8,7 +8,7 @@ type Props = {
   children: React.ReactNode;
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   className?: string;
-  color?: "white" | "gray" | "black" | "hollow";
+  color?: "white" | "gray" | "black" | "hollow" | "inherit";
 };
 
 const Heading = ({

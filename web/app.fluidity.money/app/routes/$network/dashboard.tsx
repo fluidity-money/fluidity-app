@@ -353,11 +353,11 @@ export default function Dashboard() {
           className={`fluidify-button-dashboard-mobile rainbow ${
             otherModalOpen ? "z-0" : "z-1"
           }`}
-          type={"primary"}
+          type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
         >
-          <Heading as="h5">
+          <Heading as="h5" color="inherit" style={{margin: 0}}>
             <b>Fluidify Money</b>
           </Heading>
         </GeneralButton>
@@ -508,7 +508,7 @@ export default function Dashboard() {
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
                 className="fluidify-button-dashboard "
-                type={"primary"}
+                type={"secondary"}
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
@@ -533,6 +533,7 @@ export default function Dashboard() {
                   : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
+              style={{fontSize: "1em"}}
             >
               {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
@@ -583,14 +584,14 @@ export default function Dashboard() {
         {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
-            type={"primary"}
+            type={"secondary"}
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
               navigate(`/${network}/fluidify`);
             }}
           >
-            <Heading as="h5">
+            <Heading as="h5" color="inherit" style={{margin: 0}}>
               <b>Fluidify Money</b>
             </Heading>
           </GeneralButton>
