@@ -2,7 +2,7 @@
 
 UPDATE ethereum_pending_reward_type
 	SET reward_tier = 1
-	WHERE reward_tier = NULL;
+	WHERE reward_tier IS NULL;
 
 ALTER TABLE ethereum_pending_reward_type
 	ALTER COLUMN reward_tier SET NOT NULL;
