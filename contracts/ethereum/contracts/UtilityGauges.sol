@@ -59,8 +59,6 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         uint256 lastReset;
     }
 
-    uint8 private version_;
-
     /**
     * @dev operator_ able to access the permissioned functions on this
     * UtilityGauges (note: not Operator)
@@ -85,13 +83,9 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     /// @dev strictly equal to the keys of weights_
     GaugeId[] private gaugesList_;
 
-    function init(address _operator, IVEGovLockup _lockupSource) public {
-        require(version_ == 0, "already deployed");
-
+    constructor(address _operator, IVEGovLockup _lockupSource) {
         operator_ = _operator;
         lockupSource_ = _lockupSource;
-
-        version_ = 1;
     }
 
     /// @inheritdoc IOperatorOwned
@@ -110,29 +104,35 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     /// @dev updates the lastReset_ variable
     /// @dev must be called before lastReset_ or totalWeight_ are used!
     function _checkEpoch() internal {
-        if (block.timestamp > (lastReset_ + GAUGE_EPOCH_LENGTH)) {
-            // calculate how many epochs we're ahead by, and only move forward by that length
-
-            // how much time we're ahead by
-            uint256 delta = block.timestamp - lastReset_;
-            // how many epochs we're ahead by
-            uint256 deltaEpochs = delta / GAUGE_EPOCH_LENGTH;
-            // how much time those epochs covered
-            uint256 deltaEpochsTime = deltaEpochs * GAUGE_EPOCH_LENGTH;
-
-            lastReset_ = lastReset_ + deltaEpochsTime;
-            totalWeight_ = 0;
-
-            emit UtilityGaugesReset(lastReset_);
+        if (block.timestamp <= (lastReset_ + GAUGE_EPOCH_LENGTH)) {
+            // nothing to do
+            return;
         }
+
+        // calculate how many epochs we're ahead by, and only move forward by that length
+        // (round down to the number of epochs)
+
+        // how much time we're ahead by
+        uint256 delta = block.timestamp - lastReset_;
+        // how many epochs we're ahead by
+        uint256 deltaEpochs = delta / GAUGE_EPOCH_LENGTH;
+        // how much time those epochs covered (rounded down)
+        uint256 deltaEpochsTime = deltaEpochs * GAUGE_EPOCH_LENGTH;
+
+        lastReset_ = lastReset_ + deltaEpochsTime;
+        totalWeight_ = 0;
+
+        emit UtilityGaugesReset(lastReset_);
     }
 
+    /// @inheritdoc IUtilityGauges
     function balanceOf(address spender) public returns (uint256) {
         _checkEpoch();
 
         return _votesAvailableStale(spender);
     }
 
+    /// @inheritdoc IUtilityGauges
     function votesAvailable() public returns (uint256) {
         return balanceOf(msg.sender);
     }
@@ -157,13 +157,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return totalVotesAvailable - votesSpent;
     }
 
-    /**
-     * @notice adds votes to a token/utility pair
-     *
-     * @param token the address of the fluid token
-     * @param gauge the name of the utility
-     * @param weight the number of votes to add
-     */
+    /// @inheritdoc IUtilityGauges
     function vote(address token, string memory gauge, uint256 weight) public {
         _checkEpoch();
 
@@ -196,14 +190,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         }
     }
 
-    /**
-     * @notice gets the ratio of votes in a specific gauge
-     *
-     * @param token the address of the fluid token
-     * @param gauge the name of the utility
-     *
-     * @return pair of (number of votes in that utility, number of votes total)
-     */
+    /// @inheritdoc IUtilityGauges
     function getWeight(address token, string memory gauge) public returns (uint256, uint256) {
         _checkEpoch();
 
@@ -212,10 +199,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return (weight, totalWeight_);
     }
 
-    /**
-     * @notice gets info for all gauges
-     * @return array of (gauge id, votes), the total votes, time of last reset, and time of next reset
-     */
+    /// @inheritdoc IUtilityGauges
     function getAllWeights() public returns (GaugeInfo[] memory, uint256, uint256, uint256) {
         _checkEpoch();
 
@@ -231,12 +215,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return (gauges, totalWeight_, lastReset_, lastReset_ + GAUGE_EPOCH_LENGTH);
     }
 
-    /**
-     * @notice operator only, adds a new utility to be voted on
-     *
-     * @param token the address of the fluid token
-     * @param gauge the name of the utility
-     */
+    /// @inheritdoc IUtilityGauges
     function addUtility(address token, string memory gauge) public {
         require(msg.sender == operator(), "operator only");
         _checkEpoch();
@@ -255,14 +234,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         emit NewGauge(token, gauge);
     }
 
-    /**
-     * @notice operator only, removes a utility from voting
-     * @dev this discards user's votes for a bit, but since they're
-     *      reset weekly this should be fine
-     *
-     * @param token the address of the fluid token
-     * @param gauge the name of the utility
-     */
+    /// @inheritdoc IUtilityGauges
     function removeUtility(address token, string memory gauge) public {
         require(msg.sender == operator(), "operator only");
         _checkEpoch();
