@@ -14,21 +14,46 @@ import "../interfaces/IOperatorOwned.sol";
 contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     uint256 constant GAUGE_EPOCH_LENGTH = 7 days;
 
+    /**
+     * @notice emitted when a gauge resets
+     * @param timestamp the timestamp of the reset
+     */
     event UtilityGaugesReset(uint256 indexed timestamp);
+
+    /**
+     * @notice emitted when a user places votes into a gauge
+     *
+     * @param token the address of the token being voted for
+     * @param gauge the name of the gauge being voted for
+     * @param user the user voting
+     * @param weight the amount of votes the user is placing
+     * @param gaugeWeight the amount of votes that are now in the gauge in total
+     * @param totalWeight the amount of votes that are now placed in total
+     */
     event Voted(
         address indexed token,
         string indexed gauge,
         address indexed user,
         uint256 weight,
-        uint256 gaugeWeight
+        uint256 gaugeWeight,
+        uint256 totalWeight
     );
+
+    /**
+     * @notice emitted when a new gauge is added
+     *
+     * @param token the token the gauge is for
+     * @param gauge the name of the utility the gauge is for
+     */
     event NewGauge(address indexed token, string indexed gauge);
 
+    /// @dev votes and reset info for the weights_ map
     struct GaugeWeight {
         uint256 weight;
         uint256 lastReset;
     }
 
+    /// @dev votes and reset info for the userAmountVoted_ map
     struct UserVotes {
         uint256 votes;
         uint256 lastReset;
@@ -42,16 +67,23 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     */
     address private operator_;
 
-    IVEGovLockup lockupSource_;
+    IVEGovLockup private lockupSource_;
 
+    /// @dev timestamp (!!) of the last reset
     uint256 public lastReset_;
 
     /// @dev token address => utility => voting
-    mapping (address => mapping (string => GaugeWeight)) weights_;
+    mapping (address => mapping (string => GaugeWeight)) private weights_;
 
-    mapping (address => UserVotes) userAmountVoted_;
+    /// @dev user address => voting
+    mapping (address => UserVotes) private userAmountVoted_;
 
-    uint256 totalWeight_;
+    /// @dev total number of votes placed
+    uint256 private totalWeight_;
+
+    /// @dev list of utility gauges in the weights_ map
+    /// @dev strictly equal to the keys of weights_
+    GaugeId[] private gaugesList_;
 
     function init(address _operator, IVEGovLockup _lockupSource) public {
         require(version_ == 0, "already deployed");
@@ -62,10 +94,12 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         version_ = 1;
     }
 
+    /// @inheritdoc IOperatorOwned
     function operator() public view returns (address) {
         return operator_;
     }
 
+    /// @inheritdoc IOperatorOwned
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator(), "only operator");
         require(_newOperator != address(0), "zero operator");
@@ -93,14 +127,14 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         }
     }
 
-    function votesAvailable(address spender) public returns (uint256) {
+    function balanceOf(address spender) public returns (uint256) {
         _checkEpoch();
 
         return _votesAvailableStale(spender);
     }
 
     function votesAvailable() public returns (uint256) {
-        return votesAvailable(msg.sender);
+        return balanceOf(msg.sender);
     }
 
     /// @dev gets the amount of user votes without updating the global epoch
@@ -149,7 +183,17 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         userAmountVoted_[msg.sender].votes += weight;
         totalWeight_ += weight;
 
-        emit Voted(token, gauge, msg.sender, weight, data.weight);
+        emit Voted(token, gauge, msg.sender, weight, data.weight, totalWeight_);
+    }
+
+    function _getWeightStale(address token, string memory gauge) internal view returns (uint256) {
+        GaugeWeight memory data = weights_[token][gauge];
+
+        if (data.lastReset < lastReset_) {
+            return 0;
+        } else {
+            return data.weight;
+        }
     }
 
     /**
@@ -163,17 +207,28 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     function getWeight(address token, string memory gauge) public returns (uint256, uint256) {
         _checkEpoch();
 
-        GaugeWeight memory data = weights_[token][gauge];
-
-        uint256 weight;
-
-        if (data.lastReset < lastReset_) {
-            weight = 0;
-        } else {
-            weight = data.weight;
-        }
+        uint256 weight = _getWeightStale(token, gauge);
 
         return (weight, totalWeight_);
+    }
+
+    /**
+     * @notice gets info for all gauges
+     * @return array of (gauge id, votes), the total votes, time of last reset, and time of next reset
+     */
+    function getAllWeights() public returns (GaugeInfo[] memory, uint256, uint256, uint256) {
+        _checkEpoch();
+
+        GaugeInfo[] memory gauges = new GaugeInfo[](gaugesList_.length);
+
+        for (uint i = 0; i < gaugesList_.length; i++) {
+            gauges[i] = GaugeInfo({
+                id: gaugesList_[i],
+                votes: _getWeightStale(gaugesList_[i].token, gaugesList_[i].gauge)
+            });
+        }
+
+        return (gauges, totalWeight_, lastReset_, lastReset_ + GAUGE_EPOCH_LENGTH);
     }
 
     /**
@@ -192,6 +247,50 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
 
         data.lastReset = lastReset_;
 
+        gaugesList_.push(GaugeId({
+            token: token,
+            gauge: gauge
+        }));
+
         emit NewGauge(token, gauge);
+    }
+
+    /**
+     * @notice operator only, removes a utility from voting
+     * @dev this discards user's votes for a bit, but since they're
+     *      reset weekly this should be fine
+     *
+     * @param token the address of the fluid token
+     * @param gauge the name of the utility
+     */
+    function removeUtility(address token, string memory gauge) public {
+        require(msg.sender == operator(), "operator only");
+        _checkEpoch();
+
+        GaugeWeight storage data = weights_[token][gauge];
+        require(data.lastReset != 0, "utility gauge doesn't exist");
+
+        delete weights_[token][gauge];
+
+        // for string comparison
+        bytes32 gaugeNameId = keccak256(abi.encodePacked(gauge));
+
+        // remove the id from our list
+        for (uint i = 0; i < gaugesList_.length; i++) {
+            GaugeId storage id = gaugesList_[i];
+
+            if (id.token == token && keccak256(abi.encodePacked(id.gauge)) == gaugeNameId) {
+                // swap the gauge being removed and the last gauge
+                gaugesList_[i] = gaugesList_[gaugesList_.length - 1];
+
+                // delete the last gauge
+                gaugesList_.pop();
+
+                return;
+            }
+        }
+
+        // otherwise we didn't find the gauge in our list!
+        revert("gauge not found in list!");
     }
 }
