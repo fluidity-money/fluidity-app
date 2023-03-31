@@ -6,41 +6,59 @@
   width: fit-content;
   height: fit-content;
   padding: 1em;
+  box-sizing: border-box;
 
   &.button {
     all: unset;
     font-size: 1em;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    padding: 1em;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    border-color: map-get($border, "disabled");
+    filter: grayscale(100%);
+  }
+
+  // Borders
+  border-width: 0;
+  border-style: none;
+
+  &.solid {
+    border-width: 1px;
+    border-style: solid; 
+  }
+
+  &.dashed {
+    border-width: 1px;
+    border-style: dashed;
+  }
+
   
-    &:disabled {
-      cursor: default;
-    }
-  }
 
-  &.heading {
-    > * {
-      flex: 0 0;
-    }
-  }
-
+  // Colors
   &.gray {
     background-color: $white-a5;
+    border-color: map-get($border, "default");
   }
 
-  &.transparent {
-    background-color: transparent;
+  &.white {
+    background-color: $white;
+    border-color: $white;
   }
 
-  &.box {
-    border: 1px solid map-get($border, "default");
-  }
-
-  &.box-prominent {
-    border: 1px solid map-get($border, "prominent");
-  }
-
-  &.holobox {
+  &.holo {
     position: relative;
+    border: none;
 
     &::before {
       content: "";
@@ -50,7 +68,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      padding: 2px;
+      padding: 1px;
       background: $holo;
       -webkit-mask: linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
@@ -64,24 +82,42 @@
         border-radius: 12px;
       }
     }
+
+    &.dashed {
+      &::before {
+        border: 1px dashed black;
+        padding: 0;
+      }
+    }
+
+    &.none {
+      &::before {
+        border: 1px solid black;
+        padding: 0;
+      }
+    }
+
+    &.frosted {
+      border: none;
+    }
   }
 
-  &.rounded {
-    border-radius: 12px;
+  // Backgrounds
+  &.transparent {
+    background-color: transparent;
   }
 
   &.frosted {
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.102);
-
+    // background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+
+    // Override border styles
+    &.dashed, &.solid, &.none {
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.102);
+    }
   }
 
-  &.disabled {
-    cursor: disabled;
-    border-color: map-get($border, "disabled");
-    filter: grayscale(100%);
-  }
 }

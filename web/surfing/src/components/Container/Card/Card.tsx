@@ -9,33 +9,42 @@ export interface ICard {
   style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
-  type?: "gray" | "box" | "box-prominent" | "holobox" | "transparent" | "frosted";
+
+  type?: "opaque" | "transparent" | "frosted"
+  border?: "solid" | "dashed" | "none";
+  color?: "gray" | "white" | "holo"
+  
   [_: string]: any;
 }
 
 const Card = ({
-  component,
+  component="div",
   style = {},
-  rounded,
-  className,
-  disabled,
+  rounded=true,
+  className="",
+  disabled=false,
   children,
-  type,
+  type="opaque",
+  border="none",
+  color="gray",
   ...props
 }: ICard) => {
-  const classProps = className || "";
-  const Component = component || "div";
+  const Component = component;
 
-  const typeClass = styles[type || "gray"];
-  const elementClass = styles[Component];
+  const typeClass = type !== 'opaque' ? styles[type] : '';
+  const borderClass = styles[border];
+  const colorClass = styles[color];
+  const elementClass = component === 'button' ? styles[component] : '';
+  const propsClass = className;
 
   const allClasses = `
     ${styles.card} 
-    ${typeClass} 
-    ${rounded && styles.rounded} 
+    ${propsClass}
     ${elementClass} 
-    ${disabled && styles.disabled} 
-    ${classProps}
+    ${rounded ? styles.rounded : ''} 
+    ${typeClass} 
+    ${borderClass}
+    ${colorClass}
   `;
 
   return (
