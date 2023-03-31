@@ -162,7 +162,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   };
 
   return (
-    <Card className={styles.ProvideLiquidity} rounded type={"holobox"}>
+    <Card className={styles.ProvideLiquidity} rounded type={"transparent"} color="holo" border="solid">
       <section className={styles["provide-liquidity-left"]}>
         <Heading as="h2" className={styles["provide-heading"]}>
           Provide Liquidity for{" "}

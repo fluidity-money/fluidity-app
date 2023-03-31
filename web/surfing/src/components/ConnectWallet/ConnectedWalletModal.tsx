@@ -81,7 +81,9 @@ export const ConnectedWalletModal = ({
               <div className="connected-wallet-modal-body">
                 <Card
                   className="address-copy-box"
-                  type={"holobox"}
+                  type={"transparent"}
+                  border="solid"
+                  color="holo"
                   rounded
                 >
                   <span

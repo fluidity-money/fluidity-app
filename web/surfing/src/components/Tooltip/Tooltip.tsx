@@ -21,6 +21,8 @@ const Tooltip = ({
     <Card 
       style={style} 
       type="frosted" 
+      color="gray"
+      border="solid"
       rounded 
       onMouseEnter={onMouseEnter} 
       onMouseLeave={onMouseLeave} 

@@ -9,7 +9,6 @@ export const FluidTemplate = () => {
     <>
       <CollapsibleCard
         expanded
-        type="gray"
       >
         <CollapsibleCard.Summary>
           <TokenCard 
@@ -71,7 +70,9 @@ export const RegularTemplate = () => {
   return (
     <>
       <CollapsibleCard
-        type="box"
+        type="transparent"
+        color="gray"
+        border="solid"
       >
         <CollapsibleCard.Summary>
           <TokenCard 

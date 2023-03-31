@@ -32,7 +32,7 @@ const UserRewards = ({
   return (
     <>
       {/* Info card*/}
-      <Card rounded type="holobox" className="unclaimed-rewards">
+      <Card rounded type="transparent" color="holo" border="solid" className="unclaimed-rewards">
         <div id="unclaimed-left">
           {/* Icon */}
           <img
@@ -120,7 +120,9 @@ const NoUserRewards = ({ prizePool }: INoUserRewards) => {
       id="no-user-rewards"
       component="div"
       rounded={true}
-      type={isMobile ? "transparent" : "holobox"}
+      type="transparent"
+      color="holo"
+      border={isMobile ? "none" : "solid"}
     >
       <div id="unclaimed-left">
         <Text size="lg">Total Prize Pool</Text>

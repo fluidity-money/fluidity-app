@@ -67,7 +67,9 @@ const BlockchainModal = ({
           <Card
             component="button"
             className={`${styles.card}`}
-            type={"holobox"}
+            type="transparent" 
+            color="holo" 
+            border="solid"
             rounded={true}
             onClick={() => handleOnClick(i)}
             style={{flexDirection: 'row', gap: '1em'}}
@@ -83,7 +85,9 @@ const BlockchainModal = ({
           <Card
             component="button"
             className={`${styles.card}`}
-            type={"box"}
+            type="transparent" 
+            color="gray" 
+            border="solid"
             rounded={true}
             onClick={() => {
               return;
@@ -100,7 +104,9 @@ const BlockchainModal = ({
           <Card
             component="button"
             className={`${styles.card}`}
-            type={"box"}
+            type="transparent" 
+            color="gray" 
+            border="solid"
             rounded={true}
             onClick={() => handleOnClick(i)}
             style={{flexDirection: 'row', gap: '1em'}}
