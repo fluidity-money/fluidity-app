@@ -93,7 +93,6 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return operator_;
     }
 
-    /// @inheritdoc IOperatorOwned
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator(), "only operator");
         require(_newOperator != address(0), "zero operator");
@@ -264,5 +263,11 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
 
         // otherwise we didn't find the gauge in our list!
         revert("gauge not found in list!");
+    }
+
+    function updateLockupGauge(IVEGovLockup _newLockup) public {
+        require(msg.sender == operator_, "only operator");
+
+        lockupSource_ = _newLockup;
     }
 }
