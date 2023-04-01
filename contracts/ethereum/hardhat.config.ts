@@ -211,9 +211,19 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
 
 let forkOptions = {};
 
-switch (true) {
-case process.env.FLU_FORKNET_NETWORK == "mainnet":
-case "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env:
+const enableMainnet =
+  process.env.FLU_FORKNET_NETWORK == "mainnet" &&
+  "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env;
+
+const enableGoerli =
+  process.env.FLU_FORKNET_NETWORK == "goerli" &&
+  "FLU_ETHEREUM_FORKNET_URL_GOERLI" in process.env;
+
+const enableArbitrum =
+  process.env.FLU_FORKNET_NETWORK == "arbitrum" &&
+  "FLU_ETHEREUM_FORKNET_URL_ARBITRUM" in process.env;
+
+if (enableMainnet)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET,
@@ -221,10 +231,7 @@ case "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env:
     },
   };
 
-  break;
-
-case process.env.FLU_FORKNET_NETWORK == "goerli":
-case "FLU_ETHEREUM_FORKNET_URL_GOERLI" in process.env:
+if (enableGoerli)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
@@ -232,19 +239,13 @@ case "FLU_ETHEREUM_FORKNET_URL_GOERLI" in process.env:
     },
   };
 
-  break;
-
-case process.env.FLU_FORKNET_NETWORK == "arbitrum":
-case "FLU_ETHEREUM_FORKNET_URL_ARBITRUM" in process.env:
+if (enableArbitrum)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
-      blockNumber: 72479676,
+      blockNumber: 72335186,
     },
   };
-
-  break;
-}
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

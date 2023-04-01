@@ -16,6 +16,8 @@ import "../interfaces/IUniswapV2Router02.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 /*
 * Network(s): Ethereum & Arbitrum
 *
@@ -39,29 +41,36 @@ uint256 constant MAX_LOCKUP_TIME = 365 days;
 ///      weights
 uint256 constant MIN_DEPOSIT = 10;
 
+enum LiquidityProvided {
+    FUSDC_USDC,
+    FUSDC_WETH
+}
+
 /// @notice Deposit made by a user
 struct Deposit {
-    // time the deposit was locked up for
-    uint256 lockupLength;
+    uint256 redeemTimestamp;
 
-    // saddle
-    uint256 saddleFusdcProvided;
-    uint256 saddleUsdcProvided;
-    uint256 saddleWethProvided;
+    uint256 saddleLpMinted;
+    uint256 camelotLpMinted;
+    uint256 sushiswapLpMinted;
 
-    // sushiswap
-    uint256 sushiswapFusdcProvided;
-    uint256 sushiswapUsdcProvided;
-    uint256 sushiswapWethProvided;
+    uint256 token0Amount;
+    uint256 token1Amount;
 
-    // camelot
-    uint256 camelotFusdcProvided;
-    uint256 camelotUsdcProvided;
-    uint256 camelotWethProvided;
+    LiquidityProvided typ;
 }
 
 contract Staking {
     using SafeERC20 for IERC20;
+
+    event Staked(
+        address indexed spender,
+        uint256 lockupLength,
+        uint256 lockedTimestamp,
+        uint256 fUsdcAmount,
+        uint256 usdcAmount,
+        uint256 wEthAmount
+    );
 
     uint8 private version_;
 
@@ -75,26 +84,26 @@ contract Staking {
 
     ISaddleSwap private saddleSwapFusdcWeth_;
 
-    IUniswapV2Router02 private sushiswapRouter_;
-
     IUniswapV2Router02 private camelotRouter_;
+
+    IUniswapV2Router02 private sushiswapRouter_;
 
     mapping (address => Deposit[]) private deposits_;
 
     function init(
         IERC20 _fUsdc,
-        IERC20 _wEth,
         IERC20 _usdc,
+        IERC20 _wEth,
         ISaddleSwap _saddleSwapFusdcUsdc,
         ISaddleSwap _saddleSwapFusdcEth,
-        IUniswapV2Router02 _sushiswapRouter,
-        IUniswapV2Router02 _camelotRouter
+        IUniswapV2Router02 _camelotRouter,
+        IUniswapV2Router02 _sushiswapRouter
     ) public {
         require(version_ == 0, "already initialised");
 
         fUsdc_ = _fUsdc;
-        wEth_ = _wEth;
         usdc_ = _usdc;
+        wEth_ = _wEth;
 
         saddleSwapFusdcUsdc_ = _saddleSwapFusdcUsdc;
         saddleSwapFusdcWeth_ = _saddleSwapFusdcEth;
@@ -118,78 +127,109 @@ contract Staking {
         version_ = 1;
     }
 
-    function depositToSaddle(
-        ISaddleSwap _saddlePool,
+    function _depositToSaddle(
+        ISaddleSwap _saddleSwap,
         uint256 _token0Amount,
         uint256 _token1Amount
-    ) internal {
+    ) internal returns (uint256) {
         uint256[] memory amounts = new uint256[](2);
+
         amounts[0] = _token0Amount;
         amounts[1] = _token1Amount;
 
-        _saddlePool.addLiquidity(
+        return _saddleSwap.addLiquidity(
             amounts,
             0,
             block.timestamp + 1 hours
         );
     }
 
-    function depositToUniswapV2Router(
+    function _depositToUniswapV2Router(
         IUniswapV2Router02 _router,
         address _token0,
         address _token1,
         uint256 _token0Amount,
         uint256 _token1Amount
-    ) internal returns (uint256 amountA, uint256 amountB, uint256 liquidity) {
-        return _router.addLiquidity(
+    ) internal returns (uint256 liquidity) {
+        (,,liquidity) = _router.addLiquidity(
             _token0,
             _token1,
             _token0Amount,
             _token1Amount,
-            0,
-            0,
+            _token0Amount,
+            _token1Amount,
             address(this),
             block.timestamp + 1 hours
         );
+
+        return liquidity;
     }
 
-    function recordDeposit(address _spender, Deposit memory _deposit) internal {
-        deposits_[_spender].push(_deposit);
+    function calculateWeights(
+        uint256 _token0Amount,
+        uint256 _token1Amount
+    ) public pure returns (
+        uint256 saddleToken0,
+        uint256 camelotToken0,
+        uint256 sushiToken0,
 
-        // TODO log an event
+        uint256 saddleToken1,
+        uint256 camelotToken1,
+        uint256 sushiToken1
+    ) {
+        saddleToken0 = (_token0Amount * 20) / 100;
+        camelotToken0 = (_token0Amount * 40) / 100;
+        sushiToken0 = (_token0Amount * 40) / 100;
+
+        saddleToken1 = (_token1Amount * 20) / 100;
+        camelotToken1 = (_token1Amount * 40) / 100;
+        sushiToken1 = (_token1Amount * 40) / 100;
+
+        return (
+            saddleToken0,
+            camelotToken0,
+            sushiToken0,
+
+            saddleToken1,
+            camelotToken1,
+            sushiToken1
+        );
     }
 
-    function depositTokens(
-        ISaddleSwap _saddleSwapRouter,
+    function _depositTokens(
+        ISaddleSwap _saddleSwap,
         IERC20 _token0,
         IERC20 _token1,
         uint256 _token0Amount,
         uint256 _token1Amount
-    ) internal returns (
-        uint256 camelotToken0,
-        uint256 saddleToken0,
-        uint256 sushiToken0,
-        uint256 camelotToken1,
-        uint256 saddleToken1,
-        uint256 sushiToken1
-    ) {
+    ) internal returns (Deposit memory dep) {
         require(_token0Amount > MIN_DEPOSIT, "base too small");
         require(_token1Amount > MIN_DEPOSIT, "float too small");
 
         _token0.transferFrom(msg.sender, address(this), _token0Amount);
         _token1.transferFrom(msg.sender, address(this), _token1Amount);
 
-        camelotToken0 = (_token0Amount * 40) / 100;
-        saddleToken0 = (_token0Amount * 20) / 100;
-        sushiToken0 = (_token0Amount * 40) / 100;
+        (
+            uint256 saddleToken0,
+            uint256 camelotToken0,
+            uint256 sushiToken0,
 
-        camelotToken1 = (_token1Amount * 40) / 100;
-        saddleToken1 = (_token1Amount * 20) / 100;
-        sushiToken1 = (_token1Amount * 40) / 100;
+            uint256 saddleToken1,
+            uint256 camelotToken1,
+            uint256 sushiToken1
+        ) = calculateWeights(_token0Amount, _token1Amount);
+
+        // deposit it on saddle
+
+        dep.saddleLpMinted = _depositToSaddle(
+            _saddleSwap,
+            saddleToken0,
+            saddleToken1
+        );
 
         // deposit on camelot
 
-        depositToUniswapV2Router(
+        dep.camelotLpMinted = _depositToUniswapV2Router(
             camelotRouter_,
             address(_token0),
             address(_token1),
@@ -197,13 +237,9 @@ contract Staking {
             camelotToken1
         );
 
-        // deposit it on saddle
-
-        depositToSaddle(_saddleSwapRouter, saddleToken0, saddleToken1);
-
         // deposit it on sushiswap
 
-        depositToUniswapV2Router(
+        dep.sushiswapLpMinted = _depositToUniswapV2Router(
             sushiswapRouter_,
             address(fUsdc_),
             address(usdc_),
@@ -211,29 +247,14 @@ contract Staking {
             sushiToken1
         );
 
-        return (
-            camelotToken0,
-            saddleToken0,
-            sushiToken0,
-            camelotToken1,
-            saddleToken1,
-            sushiToken1
-        );
+        return dep;
     }
 
-    function depositFusdcUsdc(
-        uint256 _lockupLength,
+    function _depositFusdcUsdc(
         uint256 _fUsdcAmount,
         uint256 _usdcAmount
-    ) internal {
-        (
-            uint256 camelotFusdc,
-            uint256 saddleFusdc,
-            uint256 sushiswapFusdc,
-            uint256 camelotUsdc,
-            uint256 saddleUsdc,
-            uint256 sushiswapUsdc
-        ) = depositTokens(
+    ) internal returns (Deposit memory dep){
+        dep = _depositTokens(
             saddleSwapFusdcUsdc_,
             fUsdc_,
             usdc_,
@@ -241,60 +262,34 @@ contract Staking {
             _usdcAmount
         );
 
-        recordDeposit(msg.sender, Deposit({
-            lockupLength: _lockupLength,
-            saddleFusdcProvided: saddleFusdc,
-            saddleUsdcProvided: saddleUsdc,
-            saddleWethProvided: 0,
-            camelotFusdcProvided: camelotFusdc,
-            camelotUsdcProvided: camelotUsdc,
-            camelotWethProvided: 0,
-            sushiswapFusdcProvided: sushiswapFusdc,
-            sushiswapUsdcProvided: sushiswapUsdc,
-            sushiswapWethProvided: 0
-        }));
+        dep.typ = LiquidityProvided.FUSDC_USDC;
+
+        return dep;
     }
 
-    function depositFusdcWeth(
-        uint256 _lockupLength,
+    function _depositFusdcWeth(
         uint256 _fUsdcAmount,
-        uint256 _wethAmount
-    ) internal {
-        (
-            uint256 camelotFusdc,
-            uint256 saddleFusdc,
-            uint256 sushiswapFusdc,
-            uint256 camelotWeth,
-            uint256 saddleWeth,
-            uint256 sushiswapWeth
-        ) = depositTokens(
+        uint256 _wEthAmount
+    ) internal returns (Deposit memory dep) {
+        dep = _depositTokens(
             saddleSwapFusdcWeth_,
             fUsdc_,
             wEth_,
             _fUsdcAmount,
-            _wethAmount
+            _wEthAmount
         );
 
-        recordDeposit(msg.sender, Deposit({
-            lockupLength: _lockupLength,
-            saddleFusdcProvided: saddleFusdc,
-            saddleUsdcProvided: 0,
-            saddleWethProvided: saddleWeth,
-            camelotFusdcProvided: camelotFusdc,
-            camelotUsdcProvided: 0,
-            camelotWethProvided: camelotWeth,
-            sushiswapFusdcProvided: sushiswapFusdc,
-            sushiswapUsdcProvided: 0,
-            sushiswapWethProvided: sushiswapWeth
-        }));
+        dep.typ = LiquidityProvided.FUSDC_WETH;
+
+        return dep;
     }
 
     function deposit(
         uint256 _lockupLength,
         uint256 _fUsdcAmount,
         uint256 _usdcAmount,
-        uint256 _wethAmount
-    ) public {
+        uint256 _wEthAmount
+    ) external returns (uint) {
         // take the amounts given, and allocate 40% to camelot, 20% to saddle and
         // 40% to sushiswap
 
@@ -303,14 +298,140 @@ contract Staking {
 
         bool fUsdcUsdcPair = _fUsdcAmount > 0 && _usdcAmount > 0;
 
-        bool fUsdcWethPair = _fUsdcAmount > 0 && _wethAmount > 0;
+        bool fUsdcWethPair = _fUsdcAmount > 0 && _wEthAmount > 0;
 
         require(!(fUsdcUsdcPair && fUsdcWethPair), "usdc or weth");
 
-        if (fUsdcUsdcPair) {
-            depositFusdcUsdc(_lockupLength, _fUsdcAmount, _usdcAmount);
+        Deposit memory dep;
+
+        if (fUsdcUsdcPair)
+            dep = _depositFusdcUsdc(_fUsdcAmount, _usdcAmount);
+        else
+            dep = _depositFusdcWeth(_fUsdcAmount, _wEthAmount);
+
+        dep.redeemTimestamp = _lockupLength + block.timestamp;
+
+        emit Staked(
+            msg.sender,
+            _lockupLength,
+            block.timestamp,
+            _fUsdcAmount,
+            _usdcAmount,
+            _wEthAmount
+        );
+
+        uint depositId = deposits_[msg.sender].length;
+
+        deposits_[msg.sender].push(dep);
+
+        // the above functions should've added to the deposits so we can return
+        // the latest item in the array there
+
+        return depositId;
+    }
+
+    function _redeemSaddleSwap(
+        ISaddleSwap _saddleSwap,
+        uint256 _token0Amount,
+        uint256 _token1Amount,
+        uint256 _lpTokens
+    ) internal {
+        uint256[] memory amounts = new uint256[](2);
+
+        amounts[0] = _token0Amount;
+        amounts[1] = _token1Amount;
+
+        uint256[] memory burned = _saddleSwap.removeLiquidity(
+            _lpTokens,
+            amounts,
+            block.timestamp + 1 hours
+        );
+
+        require(burned[0] == _token0Amount, "unable to redeem token0");
+        require(burned[1] == _token1Amount, "unable to redeem token1");
+    }
+
+    function _uniswapRedeem(
+        IUniswapV2Router02 _router,
+        IERC20 _token0,
+        IERC20 _token1,
+        uint256 _token0Amount,
+        uint256 _token1Amount,
+        uint256 _lpTokens,
+        address _to
+    ) internal {
+        _router.removeLiquidity(
+            address(_token0),
+            address(_token1),
+            _lpTokens,
+            _token0Amount,
+            _token1Amount,
+            _to,
+            block.timestamp + 1 hours
+        );
+    }
+
+    function depositFinished(address _spender, uint _depositId) public view returns (bool) {
+        return deposits_[_spender][_depositId].redeemTimestamp > block.timestamp;
+    }
+
+    function redeem(uint _depositId) public {
+        require(depositFinished(msg.sender, _depositId), "not finished/not exist");
+
+        Deposit memory dep = deposits_[msg.sender][_depositId];
+
+        ISaddleSwap saddle;
+
+        IERC20 token0 = fUsdc_;
+        IERC20 token1;
+
+        // set the saddleswap pool and token1 depending on the token pairs
+
+        if (dep.typ == LiquidityProvided.FUSDC_USDC) {
+            saddle = saddleSwapFusdcUsdc_;
+            token1 = usdc_;
+        } else if (dep.typ == LiquidityProvided.FUSDC_WETH) {
+            saddle = saddleSwapFusdcWeth_;
+            token1 = wEth_;
         } else {
-            depositFusdcWeth(_lockupLength, _fUsdcAmount, _wethAmount);
+            revert("incorrect liquidity provided");
         }
+
+        (
+            uint256 saddleToken0,
+            uint256 camelotToken0,
+            uint256 sushiToken0,
+
+            uint256 saddleToken1,
+            uint256 camelotToken1,
+            uint256 sushiToken1
+        ) = calculateWeights(dep.token0Amount, dep.token1Amount);
+
+        _redeemSaddleSwap(
+            saddle,
+            saddleToken0,
+            saddleToken1,
+            dep.saddleLpMinted
+        );
+
+        _uniswapRedeem(
+            camelotRouter_,
+            token0,
+            token1,
+            camelotToken0,
+            camelotToken1,
+            dep.camelotLpMinted,
+            msg.sender
+        );
+
+        _uniswapRedeem(
+            sushiswapRouter_,
+            token0,
+            token1,
+            sushiToken0,
+            sushiToken1,
+            dep.sushiswapLpMinted,
+            msg.sender
+        );
     }
 }

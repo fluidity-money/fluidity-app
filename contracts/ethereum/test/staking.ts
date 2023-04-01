@@ -10,10 +10,12 @@ import {
   SUSHISWAP_ROUTER,
   CAMELOT_FACTORY,
   CAMELOT_ROUTER,
-  SADDLE_SWAP_IMPL,
-  SADDLE_LP_TOKEN_IMPL } from "./arbitrum-constants";
+  SADDLE_SWAP_IMPL } from "./arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
+
+// TODO randomise for each token
+const tokenAmount = 100000;
 
 describe("Staking", async () => {
   let stakingSigner: ethers.Signer;
@@ -39,9 +41,8 @@ describe("Staking", async () => {
   let camelotRouter: ethers.Contract;
 
   before(async function() {
-    if (process.env.FLU_FORKNET_NETWORK != "arbitrum") {
+    if (process.env.FLU_FORKNET_NETWORK != "arbitrum")
       this.skip();
-    }
 
     ({
       userAccount1: stakingSigner,
@@ -56,45 +57,52 @@ describe("Staking", async () => {
       "Staking test token",
       "token 0",
       18,
-      100000
+      tokenAmount
     );
+
+    console.log(`token 0: ${token0.address}`);
 
     token1 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
       "token 1",
       18,
-      100000
+      tokenAmount
     );
+
+    console.log(`token 1: ${token1.address}`);
 
     token2 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
       "token 2",
       18,
-      100000
+      tokenAmount
     );
+
+    console.log(`token 2: ${token2.address}`);
 
     const transparentUpgradeableProxyFactory = await hre.ethers.getContractFactory(
       "TransparentUpgradeableProxy"
     );
 
-    const saddleSwapInterface = new ethers.utils.Interface([
-      "function initialize(address[] pooledTokens, uint8[] decimals, string lpTokenName, string lpTokenSymbol, uint256 a, uint256 fee, uint256 adminFee, uint256 withdrawFee, uint256 lpTokenTargetAddress)"
-    ]);
+    const saddleSwapInterface = new ethers.utils.Interface([`
+      function initialize(
+        address[] pooledTokens,
+        uint8[] decimals,
+        string lpTokenName,
+        string lpTokenSymbol,
+        uint256 a,
+        uint256 fee,
+        uint256 adminFee,
+        uint256 withdrawFee
+      )
+    `]);
 
     const proxyAdminAddress = await proxySigner.getAddress();
-
-    console.log("about to deploy the transparent proxy");
 
     saddleSwapToken0Token1 = await transparentUpgradeableProxyFactory.deploy(
       SADDLE_SWAP_IMPL,
       proxyAdminAddress,
-      "0x00"
-    );
-
-    console.log("deployment done");
-
-    await (await hre.ethers.getContractAt("ISaddleSwap", saddleSwapToken0Token1.address))
-      .callStatic.initialize(
+      saddleSwapInterface.encodeFunctionData("initialize", [
         [token0.address, token1.address], // pooledTokens
         [18, 18], // decimals
         "swag", // lpTokenName
@@ -102,13 +110,11 @@ describe("Staking", async () => {
         100, // a
         4000000, // fee, swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
         0, // admin fee
-        4000000, // withdrawal fee
-        SADDLE_LP_TOKEN_IMPL
-      );
+        4000000 // withdrawal fee
+      ])
+    );
 
-    console.log("about to deploy the second transparent proxy");
-
-    await saddleSwapToken0Token1.deployed();
+    console.log(`saddle swap token 0 token 1: ${saddleSwapToken0Token1.address}`);
 
     saddleSwapToken0Token2 = await transparentUpgradeableProxyFactory.deploy(
       SADDLE_SWAP_IMPL,
@@ -121,20 +127,21 @@ describe("Staking", async () => {
         100, // a
         4000000, // fee, swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
         0, // admin fee
-        4000000, // withdrawal fee
-        SADDLE_LP_TOKEN_IMPL
+        4000000 // withdrawal fee
       ])
     );
 
-    await saddleSwapToken0Token2.deployed();
+    console.log(`saddle swap token 0 token 2: ${saddleSwapToken0Token2.address}`);
+
+    console.log(`saddle swap token 0 token 2 impl: ${SADDLE_SWAP_IMPL}`);
 
     const sushiswapFactory = await hre.ethers.getContractAt(
-      "IUniswapV2Factory",
+      "TestUniswapV2Factory",
       SUSHISWAP_FACTORY
     );
 
     sushiswapRouter = await hre.ethers.getContractAt(
-      "IUniswapV2Router02",
+      "TestUniswapV2Router",
       SUSHISWAP_ROUTER
     );
 
@@ -143,12 +150,12 @@ describe("Staking", async () => {
     await sushiswapFactory.createPair(token0.address, token2.address);
 
     const camelotFactory = await hre.ethers.getContractAt(
-      "IUniswapV2Factory",
+      "TestUniswapV2Factory",
       CAMELOT_FACTORY
     );
 
     camelotRouter = await hre.ethers.getContractAt(
-      "IUniswapV2Router02",
+      "TestUniswapV2Router",
       CAMELOT_ROUTER
     );
 
@@ -156,20 +163,28 @@ describe("Staking", async () => {
 
     await camelotFactory.createPair(token0.address, token2.address);
 
-    staking = await stakingFactory.deploy();
+    staking = await stakingFactory.connect(stakingSigner).deploy();
 
-    await staking.init(
+    console.log(`staking signer: ${await stakingSigner.getAddress()}`);
+
+    await staking.connect(stakingSigner).init(
       token0.address,
       token1.address,
       token2.address,
-      saddleSwapToken0Token1,
-      saddleSwapToken0Token2,
-      SUSHISWAP_ROUTER,
-      CAMELOT_ROUTER
+      saddleSwapToken0Token1.address,
+      saddleSwapToken0Token2.address,
+      camelotRouter.address,
+      sushiswapRouter.address
     );
+
+    console.log(`staking address: ${staking.address}`);
+
+    await token0.approve(staking.address, tokenAmount);
+    await token1.approve(staking.address, tokenAmount);
+    await token2.approve(staking.address, tokenAmount);
   });
 
   it("should lock up 100 test token 1 and test token 2", async() => {
-
+    await staking.connect(stakingSigner).deposit(8640000, tokenAmount, tokenAmount, 0);
   });
 });
