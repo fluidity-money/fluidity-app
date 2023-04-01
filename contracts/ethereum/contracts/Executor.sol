@@ -24,7 +24,7 @@ struct OracleUpdate {
     address newOracle;
 }
 
-contract Executor is IEmergencyMode, IUtilityGauges, IOperatorOwned {
+contract Executor is IEmergencyMode, IOperatorOwned {
 
     /// @notice emitted when the rng oracles are changed to a new address
     event OracleChanged(
