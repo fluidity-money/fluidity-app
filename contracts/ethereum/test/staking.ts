@@ -14,6 +14,8 @@ import {
 
 import { signers, commonFactories } from "./setup-common";
 
+import { advanceTime } from "./test-utils";
+
 // TODO randomise for each token
 const tokenAmount = 100000;
 
@@ -185,6 +187,8 @@ describe("Staking", async () => {
   });
 
   it("should lock up 100 test token 1 and test token 2", async() => {
-    await staking.connect(stakingSigner).deposit(8640000, tokenAmount, tokenAmount, 0);
+    await staking.deposit(8640000, tokenAmount, tokenAmount, 0);
+    advanceTime(8640001);
+    await staking.redeem(0);
   });
 });

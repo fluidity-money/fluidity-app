@@ -84,6 +84,10 @@ contract Staking {
 
     ISaddleSwap private saddleSwapFusdcWeth_;
 
+    IERC20 private saddleSwapFusdcUsdcLpToken_;
+
+    IERC20 private saddleSwapFusdcWethLpToken_;
+
     IUniswapV2Router02 private camelotRouter_;
 
     IUniswapV2Router02 private sushiswapRouter_;
@@ -110,6 +114,10 @@ contract Staking {
         sushiswapRouter_ = _sushiswapRouter;
         camelotRouter_ = _camelotRouter;
 
+        saddleSwapFusdcUsdcLpToken_ = saddleSwapFusdcUsdc_.swapStorage().lpToken;
+
+        saddleSwapFusdcWethLpToken_ = saddleSwapFusdcWeth_.swapStorage().lpToken;
+
         fUsdc_.safeApprove(address(saddleSwapFusdcUsdc_), MAX_UINT256);
         usdc_.safeApprove(address(saddleSwapFusdcUsdc_), MAX_UINT256);
 
@@ -131,16 +139,19 @@ contract Staking {
         ISaddleSwap _saddleSwap,
         uint256 _token0Amount,
         uint256 _token1Amount
-    ) internal returns (uint256) {
+    ) internal {
         uint256[] memory amounts = new uint256[](2);
 
         amounts[0] = _token0Amount;
         amounts[1] = _token1Amount;
 
-        return _saddleSwap.addLiquidity(
+        // saddle's lp token calculation seems to have issues, so we calculate
+        // the balance before and after, and don't do it here
+
+        _saddleSwap.addLiquidity(
             amounts,
             0,
-            block.timestamp + 1 hours
+            block.timestamp + 1
         );
     }
 
@@ -159,7 +170,7 @@ contract Staking {
             _token0Amount,
             _token1Amount,
             address(this),
-            block.timestamp + 1 hours
+            block.timestamp + 1
         );
 
         return liquidity;
@@ -219,9 +230,10 @@ contract Staking {
             uint256 sushiToken1
         ) = calculateWeights(_token0Amount, _token1Amount);
 
-        // deposit it on saddle
+        // deposit it on saddle, but ignore the return type to set with the
+        // caller
 
-        dep.saddleLpMinted = _depositToSaddle(
+        _depositToSaddle(
             _saddleSwap,
             saddleToken0,
             saddleToken1
@@ -254,6 +266,8 @@ contract Staking {
         uint256 _fUsdcAmount,
         uint256 _usdcAmount
     ) internal returns (Deposit memory dep){
+        uint256 saddleLpBefore = saddleSwapFusdcUsdcLpToken_.balanceOf(address(this));
+
         dep = _depositTokens(
             saddleSwapFusdcUsdc_,
             fUsdc_,
@@ -261,6 +275,10 @@ contract Staking {
             _fUsdcAmount,
             _usdcAmount
         );
+
+        uint256 saddleLpAfter = saddleSwapFusdcUsdcLpToken_.balanceOf(address(this));
+
+        dep.saddleLpMinted = saddleLpAfter - saddleLpBefore;
 
         dep.typ = LiquidityProvided.FUSDC_USDC;
 
@@ -271,6 +289,8 @@ contract Staking {
         uint256 _fUsdcAmount,
         uint256 _wEthAmount
     ) internal returns (Deposit memory dep) {
+        uint256 saddleLpBefore = saddleSwapFusdcWethLpToken_.balanceOf(address(this));
+
         dep = _depositTokens(
             saddleSwapFusdcWeth_,
             fUsdc_,
@@ -278,6 +298,10 @@ contract Staking {
             _fUsdcAmount,
             _wEthAmount
         );
+
+        uint256 saddleLpAfter = saddleSwapFusdcWethLpToken_.balanceOf(address(this));
+
+        dep.saddleLpMinted = saddleLpAfter - saddleLpBefore;
 
         dep.typ = LiquidityProvided.FUSDC_WETH;
 
@@ -344,7 +368,7 @@ contract Staking {
         uint256[] memory burned = _saddleSwap.removeLiquidity(
             _lpTokens,
             amounts,
-            block.timestamp + 1 hours
+            block.timestamp + 1
         );
 
         require(burned[0] == _token0Amount, "unable to redeem token0");
@@ -360,19 +384,26 @@ contract Staking {
         uint256 _lpTokens,
         address _to
     ) internal {
-        _router.removeLiquidity(
+        (uint256 redeemed0, uint256 redeemed1) = _router.removeLiquidity(
             address(_token0),
             address(_token1),
             _lpTokens,
             _token0Amount,
             _token1Amount,
             _to,
-            block.timestamp + 1 hours
+            block.timestamp + 1
         );
+
+        require(redeemed0 == _token0Amount, "unable to redeem token0");
+        require(redeemed1 == _token1Amount, "unable to redeem token1");
     }
 
     function depositFinished(address _spender, uint _depositId) public view returns (bool) {
         return deposits_[_spender][_depositId].redeemTimestamp > block.timestamp;
+    }
+
+    function _disableDeposit(address _spender, uint _depositId) internal {
+        deposits_[_spender][_depositId].redeemTimestamp = 0;
     }
 
     function redeem(uint _depositId) public {
@@ -433,5 +464,7 @@ contract Staking {
             dep.sushiswapLpMinted,
             msg.sender
         );
+
+        _disableDeposit(msg.sender, _depositId);
     }
 }
