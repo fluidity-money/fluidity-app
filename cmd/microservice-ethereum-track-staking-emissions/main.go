@@ -42,7 +42,7 @@ func classifyStakingEvent(l ethLogs.Log) (ethereum.StakingEvent, error) {
             )
         }
 
-        // fusdcAmount, usdcAmount, wethAmount, lockupLength, lockedTimestamp
+        // lockupLength, lockedTimestamp, fusdcAmount, usdAmount, wethAmount
         if dataLen := len(decodedData); dataLen != 5 {
             return stakingEvent, fmt.Errorf(
                 "Unexpected number of log data! expected %d, got %d!",
@@ -62,9 +62,9 @@ func classifyStakingEvent(l ethLogs.Log) (ethereum.StakingEvent, error) {
 
         var (
             addressString      = logTopics[1].String()
-            usdAmountInt       = decodedData[1].(*big.Int)
-            lockupLengthInt    = decodedData[3].(*big.Int)
-            lockedTimestampInt = decodedData[4].(*big.Int)
+            lockupLengthInt    = decodedData[0].(*big.Int)
+            lockedTimestampInt = decodedData[1].(*big.Int)
+            usdAmountInt       = decodedData[3].(*big.Int)
         )
 
         if !lockedTimestampInt.IsInt64() {

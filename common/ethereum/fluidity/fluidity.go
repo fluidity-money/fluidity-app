@@ -246,11 +246,11 @@ const stakingAbiString = `[
 		"anonymous": false,
 		"inputs": [
 			{ "indexed": true, "internalType": "address", "name": "spender", "type": "address" },
+			{ "indexed": false, "internalType": "uint256", "name": "lockupLength", "type": "uint256" },
+			{ "indexed": false, "internalType": "uint256", "name": "lockedTimestamp", "type": "uint256" },
 			{ "indexed": false, "internalType": "uint256", "name": "fusdcAmount", "type": "uint256" },
 			{ "indexed": false, "internalType": "uint256", "name": "usdcAmount", "type": "uint256" },
-			{ "indexed": false, "internalType": "uint256", "name": "wethAmount", "type": "uint256" },
-			{ "indexed": false, "internalType": "uint256", "name": "lockupLength", "type": "uint256" },
-			{ "indexed": false, "internalType": "uint256", "name": "lockedTimestamp", "type": "uint256" }
+			{ "indexed": false, "internalType": "uint256", "name": "wethAmount", "type": "uint256" }
 		],
 		"name": "Staked",
 		"type": "event"
