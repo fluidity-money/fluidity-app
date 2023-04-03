@@ -6,13 +6,16 @@ import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./GeneralButton.module.scss";
 
-export interface IGeneralButton extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface IGeneralButton {
   type?: "primary" | "secondary" | "transparent";
   size?: "small" | "medium" | "large";
   handleClick?: () => void;
   children?: React.ReactNode | null;
   icon?: React.ReactNode;
   layout?: "before" | "after";
+  disabled?: boolean;
+  className?: string;
+  [key: string]: any;
 }
 
 const GeneralButton: React.FC<IGeneralButton> = ({

@@ -357,7 +357,7 @@ export default function Dashboard() {
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
         >
-          <Heading as="h5" color="inherit" style={{margin: 0}}>
+          <Heading as="h5" color="inherit" style={{ margin: 0 }}>
             <b>Fluidify Money</b>
           </Heading>
         </GeneralButton>
@@ -533,7 +533,7 @@ export default function Dashboard() {
                   : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
-              style={{fontSize: "1em"}}
+              style={{ fontSize: "1em" }}
             >
               {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
@@ -591,7 +591,7 @@ export default function Dashboard() {
               navigate(`/${network}/fluidify`);
             }}
           >
-            <Heading as="h5" color="inherit" style={{margin: 0}}>
+            <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
             </Heading>
           </GeneralButton>

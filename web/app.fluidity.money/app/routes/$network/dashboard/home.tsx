@@ -761,6 +761,7 @@ export default function Home() {
               <TabButton
                 key={`filter-${filter.name}`}
                 onClick={() => setActiveTransformerIndex(i)}
+                size="default"
               >
                 <Text
                   size="sm"

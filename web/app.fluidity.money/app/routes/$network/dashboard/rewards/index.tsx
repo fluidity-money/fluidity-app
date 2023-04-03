@@ -36,7 +36,7 @@ import {
   CardCarousel,
   Display,
   WalletIcon,
-  TabButton
+  TabButton,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -743,7 +743,15 @@ export default function Rewards() {
                   </>
                 }
               >
-                <LinkButton size="medium" type="info" handleClick={() => {return}}>Hover for Details</LinkButton>
+                <LinkButton
+                  size="medium"
+                  type="info"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Hover for Details
+                </LinkButton>
               </Hoverable>
             </div>
           )}

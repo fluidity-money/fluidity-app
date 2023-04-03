@@ -32,7 +32,13 @@ const UserRewards = ({
   return (
     <>
       {/* Info card*/}
-      <Card rounded type="transparent" color="holo" border="solid" className="unclaimed-rewards">
+      <Card
+        rounded
+        type="transparent"
+        color="holo"
+        border="solid"
+        className="unclaimed-rewards"
+      >
         <div id="unclaimed-left">
           {/* Icon */}
           <img

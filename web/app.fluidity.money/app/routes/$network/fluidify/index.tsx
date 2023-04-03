@@ -23,7 +23,7 @@ import {
   ConnectedWallet,
   ConnectedWalletModal,
   FluidifyCard,
-  TabButton
+  TabButton,
 } from "@fluidity-money/surfing";
 import Draggable from "~/components/Draggable";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
