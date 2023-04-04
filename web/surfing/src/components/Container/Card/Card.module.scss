@@ -76,7 +76,8 @@
     border: none;
     overflow: hidden;
     background: $holo-linear;
-    background-size: 1200px;
+    background-size: 1600px;
+    animation: gradient 15s ease infinite;
 
     &.transparent {
       background: none;
@@ -147,6 +148,19 @@
   0%, 10% {-webkit-mask-position: right/300%;}
   90%, 100% {-webkit-mask-position: -50%;}
 }
+
+@keyframes gradient {
+	0% {
+		background-position: 0 0;
+	}
+  50% {
+    background-position: 600px 0;
+  }
+	100% {
+		background-position: 0 0;
+	}
+}
+
 
 .shimmerWrapper {
   position: relative;
