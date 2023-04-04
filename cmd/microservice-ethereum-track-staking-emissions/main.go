@@ -100,6 +100,7 @@ func main() {
                     l.TxHash,
                 )
             })
+            return
         }
         
         airdrop.InsertStakingEvent(stakingEvent)
