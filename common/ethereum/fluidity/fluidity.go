@@ -15,7 +15,6 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
