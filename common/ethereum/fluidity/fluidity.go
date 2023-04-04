@@ -15,6 +15,7 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -333,7 +334,8 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 		for winnerAddress, winAmount := range reward {
 			winner := abiWinner{
 				Winner:    ethereum.ConvertInternalAddress(winnerAddress),
-				WinAmount: &winAmount.Int,
+				// this references a loop variable, so we need to explicitly clone it
+				WinAmount: new(big.Int).Set(&winAmount.Int),
 			}
 
 			winners[i] = winner
