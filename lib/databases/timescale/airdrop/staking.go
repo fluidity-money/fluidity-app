@@ -38,9 +38,9 @@ func InsertStakingEvent(stakingEvent ethereum.StakingEvent) {
     statementText = fmt.Sprintf(
         `INSERT INTO %s (
             address,
-            usdAmount,
-            lockupLength,
-            insertedDate
+            usd_amount,
+            lockup_length,
+            inserted_date
          ) VALUES (
 			$1,
 			$2,
