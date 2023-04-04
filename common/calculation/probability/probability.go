@@ -5,6 +5,7 @@
 package probability
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -205,7 +206,14 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 		poolBpys[i] = bpy
 
 		totalBpy.Add(totalBpy, bpy)
+
+		emission.WinningChances.DistributionPools += fmt.Sprintf(
+			"%v,",
+			pool.DebugString(),
+		)
 	}
+
+	emission.WinningChances.TotalBpy, _ = totalBpy.Float64()
 
 	probabilities = make([]*big.Rat, winningClasses)
 

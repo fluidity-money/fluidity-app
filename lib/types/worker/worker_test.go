@@ -5,6 +5,7 @@
 package worker
 
 import (
+	"math/big"
 	"regexp"
 	"testing"
 	"time"
@@ -14,13 +15,13 @@ import (
 
 func TestUpdate(t *testing.T) {
 	now := time.Now()
-	emission := &Emission{}
+	emission := new(Emission)
 	emission.Update()
 	assert.WithinDuration(t, now, emission.LastUpdated, time.Second)
 }
 
 func TestString(t *testing.T) {
-	emission := &Emission{}
+	emission := new(Emission)
 	emissionString := emission.String()
 
 	whitespaceRegex := regexp.MustCompile(`[\n\t ]`)
@@ -137,11 +138,29 @@ func TestString(t *testing.T) {
 		"probability_2":0,
 		"probability_3":0,
 		"probability_4":0,
-		"probability_5":0
+		"probability_5":0,
+		"total_bpy":0,
+		"distribution_pools":""
 	}
 }
 `
 	expectedString := whitespaceRegex.ReplaceAllString(expectedString_, "")
 
 	assert.Equal(t, expectedString, emissionString)
+}
+
+func TestUtilityVarsDebugString(t *testing.T) {
+	vars := UtilityVars{
+		Name:               "123",
+		PoolSizeNative:     new(big.Rat).SetInt64(123),
+		TokenDecimalsScale: new(big.Rat).SetInt64(999),
+		ExchangeRate:       new(big.Rat).SetInt64(8181),
+		DeltaWeight:        new(big.Rat).SetInt64(999),
+	}
+
+	s := vars.DebugString()
+
+	expected := "123:123:999:8181:999"
+
+	assert.Equal(t, s, expected)
 }

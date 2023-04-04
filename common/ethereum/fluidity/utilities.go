@@ -27,7 +27,7 @@ type (
 )
 
 // GetUtilityVars from a list of utilities, returning if any failed
-func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethCommon.Address, fluidityClients []applications.UtilityName, defaultDeltaWeightNum, defaultDeltaWeightDenom *big.Int) ([]worker.UtilityVars, error) {
+func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethCommon.Address, fluidityClients []applications.UtilityName) ([]worker.UtilityVars, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		registryAddress,
 		RegistryAbi,
@@ -78,11 +78,11 @@ func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethC
 
 		tokenDecimalScaleRat := new(big.Rat).SetInt(tokenDecimalScale)
 
-		exchangeRateRat := new(big.Rat)
+		exchangeRateRat := big.NewRat(1, 1)
 		exchangeRateRat.Num().Set(exchangeRateNum)
 		exchangeRateRat.Denom().Set(exchangeRateDenom)
 
-		deltaWeightRat := new(big.Rat)
+		deltaWeightRat := big.NewRat(1, 1)
 		deltaWeightRat.Num().Set(deltaWeightNum)
 		deltaWeightRat.Denom().Set(deltaWeightDenom)
 

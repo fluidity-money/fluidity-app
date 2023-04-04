@@ -6,6 +6,7 @@ package worker
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"time"
 
@@ -50,14 +51,14 @@ type (
 	// that was previously hardcoded
 	WorkerConfigEthereum struct {
 		Network                       network.BlockchainNetwork `json:"network"`
-		CompoundBlocksPerDay          int     `json:"compound_blocks_per_day"`
-		DefaultSecondsSinceLastBlock  float64 `json:"default_seconds_since_last_block"`
-		CurrentAtxTransactionMargin   int64   `json:"current_atx_transaction_margin"`
-		DefaultTransfersInBlock       int     `json:"default_transfers_in_block"`
-		AtxBufferSize                 int     `json:"atx_buffer_size"`
-		EpochBlocks                   int     `json:"epoch_blocks"`
-		SpoolerInstantRewardThreshold float64 `json:"spooler_instant_reward_threshold"`
-		SpoolerBatchedRewardThreshold float64 `json:"spooler_batched_reward_threshold"`
+		CompoundBlocksPerDay          int                       `json:"compound_blocks_per_day"`
+		DefaultSecondsSinceLastBlock  float64                   `json:"default_seconds_since_last_block"`
+		CurrentAtxTransactionMargin   int64                     `json:"current_atx_transaction_margin"`
+		DefaultTransfersInBlock       int                       `json:"default_transfers_in_block"`
+		AtxBufferSize                 int                       `json:"atx_buffer_size"`
+		EpochBlocks                   int                       `json:"epoch_blocks"`
+		SpoolerInstantRewardThreshold float64                   `json:"spooler_instant_reward_threshold"`
+		SpoolerBatchedRewardThreshold float64                   `json:"spooler_batched_reward_threshold"`
 	}
 
 	// WorkerConfigSolana that was previously hardcoded for Solana only
@@ -173,6 +174,8 @@ type (
 		} `json:"compound_get_token_apy"`
 
 		WinningChances struct {
+			// most of the fields in this struct are labelled as-is in the database
+
 			AtxAtEnd float64 `json:"atx_at_end"`
 
 			Payout1 float64 `json:"payout_1"`
@@ -186,6 +189,9 @@ type (
 			Probability3 float64 `json:"probability_3"`
 			Probability4 float64 `json:"probability_4"`
 			Probability5 float64 `json:"probability_5"`
+
+			TotalBpy          float64 `json:"total_bpy"`
+			DistributionPools string  `json:"distribution_pools"`
 		} `json:"winning_chances"`
 	}
 
@@ -233,4 +239,25 @@ func (emission *Emission) Update() {
 func (emission Emission) String() string {
 	bytes, _ := json.Marshal(emission)
 	return string(bytes)
+}
+
+// DebugString the UtilityVars, returning "name:pool size:token decimals
+// scale:exchange rate:delta weight" for logging purposes
+func (v UtilityVars) DebugString() string {
+	poolSizeNative, _ := v.PoolSizeNative.Float64()
+
+	tokenDecimalsScale, _ := v.TokenDecimalsScale.Float64()
+
+	exchangeRate, _ := v.ExchangeRate.Float64()
+
+	deltaWeight, _ := v.DeltaWeight.Float64()
+
+	return fmt.Sprintf(
+		"%v:%v:%v:%v:%v",
+		v.Name,
+		poolSizeNative,
+		tokenDecimalsScale,
+		exchangeRate,
+		deltaWeight,
+	)
 }

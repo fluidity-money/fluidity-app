@@ -333,7 +333,8 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 		for winnerAddress, winAmount := range reward {
 			winner := abiWinner{
 				Winner:    ethereum.ConvertInternalAddress(winnerAddress),
-				WinAmount: &winAmount.Int,
+				// this references a loop variable, so we need to explicitly clone it
+				WinAmount: new(big.Int).Set(&winAmount.Int),
 			}
 
 			winners[i] = winner
