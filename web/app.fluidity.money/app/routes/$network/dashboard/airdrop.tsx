@@ -1,4 +1,4 @@
-import { Card,  Heading, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight, Display } from "@fluidity-money/surfing";
+import { Card,  Heading, TextButton, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight, Display } from "@fluidity-money/surfing";
 import { Table } from "~/components";
 
 const AirdropStats = () => {
@@ -74,7 +74,11 @@ const MultiplierTasks = () => {
       <Text style={{color: 'black'}}>Perform displayed tasks to earn the respective multipliers.</Text>
     </div>
     <div>
-      <Display size="sm" style={{color: 'black', margin: 0}} >1x</Display>
+      <TextButton
+        style={{textDecorationThickness: '3px'}}
+      >
+        <Display size="sm" style={{color: 'black', margin: 0}} >1x</Display>
+      </TextButton>
     </div>
     <div>
       <Text style={{color: 'black'}}>Perform any type of fAsset transactions <b>in any on-chain protocol</b>, including sending <b>with any wallet</b>.</Text>
@@ -97,9 +101,9 @@ const MyMultiplier = () => {
     </div>
     <GeneralButton
         icon={<ArrowRight/>}
-        buttontype="icon after"
+        layout="after"
         size="small"
-        version="secondary"
+        type="secondary"
         handleClick={() => {return}}
         style={{
           width: '100%',
