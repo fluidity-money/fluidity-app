@@ -1,0 +1,15 @@
+[
+  {
+    "inputs": [],
+    "name": "getTotalRewardPool",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

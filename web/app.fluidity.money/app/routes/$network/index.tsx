@@ -26,7 +26,6 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -59,7 +58,6 @@ const NetworkPage = () => {
   const { connected, address, rawAddress, disconnect } = useContext(
     FluidityFacadeContext
   );
-  const { showExperiment } = useContext(SplitContext);
   const navigate = useNavigate();
 
   const projectedWinningsData = useFetcher<ProjectedWinData>();
@@ -152,7 +150,7 @@ const NetworkPage = () => {
               onClick={() => setChainModalVisibility(true)}
             />
 
-            <div className="connected-wallet">
+            <div>
               {/* Connected Wallet */}
               {address && (
                 <ConnectedWallet
@@ -183,10 +181,7 @@ const NetworkPage = () => {
                 <BlockchainModal
                   handleModal={setChainModalVisibility}
                   option={chainNameMap[network as "ethereum" | "solana"]}
-                  options={Object.values(chainNameMap).filter(
-                    ({ name }) =>
-                      name !== "ARB" || showExperiment("enable-arbitrum")
-                  )}
+                  options={Object.values(chainNameMap)}
                   setOption={(chain: string) =>
                     navigate(`/${networkMapper(chain)}/dashboard/home`)
                   }
@@ -197,8 +192,7 @@ const NetworkPage = () => {
               {/* Connect Wallet Button */}
               {!connected && (
                 <GeneralButton
-                  version={connected ? "transparent" : "primary"}
-                  buttontype="text"
+                  type={connected ? "transparent" : "primary"}
                   size={"medium"}
                   handleClick={() => setWalletModalVisibility(true)}
                   className="connect-wallet-btn"
@@ -256,8 +250,7 @@ const NetworkPage = () => {
             <div className="connected-buttons">
               <GeneralButton
                 size="large"
-                version="primary"
-                buttontype="text"
+                type="primary"
                 handleClick={() => navigate("fluidify")}
               >
                 FLUIDIFY MONEY
@@ -272,8 +265,8 @@ const NetworkPage = () => {
                   <GeneralButton
                     className="share-button"
                     size="large"
-                    version="transparent"
-                    buttontype="icon before"
+                    type="transparent"
+                    layout="before"
                     icon={<Twitter />}
                     handleClick={() => {
                       return;

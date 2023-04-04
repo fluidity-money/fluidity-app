@@ -167,8 +167,9 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -209,11 +210,11 @@ export default function Dashboard() {
   const navigationMap: {
     [key: string]: { name: string; icon: JSX.Element };
   }[] = [
-      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-      { rewards: { name: "Rewards", icon: <Trophy /> } },
-      { assets: { name: "Assets", icon: <AssetsIcon /> } },
-      { airdrop: { name: "Airdrop", icon: <Trophy /> } },
-    ];
+    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+    { rewards: { name: "Rewards", icon: <Trophy /> } },
+    { assets: { name: "Assets", icon: <AssetsIcon /> } },
+    { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+  ];
 
   const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
     ethereum: {
@@ -240,7 +241,7 @@ export default function Dashboard() {
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: string) => {
+  const handleSetChain = (network: ChainName) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -328,7 +329,7 @@ export default function Dashboard() {
 
         <ChainSelectorButton
           className="selector-button"
-          chain={chainNameMap[network as "ethereum" | "solana"]}
+          chain={chainNameMap[network satisfies ChainName]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -338,10 +339,8 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({ name }) =>
-              showArbitrum ? true : name !== "ARB"
-            )}
+            option={chainNameMap[network satisfies ChainName]}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />
@@ -351,14 +350,14 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
-          version={"primary"}
-          buttontype="text"
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
+          type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
         >
-          <Heading as="h5">
+          <Heading as="h5" color="inherit" style={{ margin: 0 }}>
             <b>Fluidify Money</b>
           </Heading>
         </GeneralButton>
@@ -370,6 +369,9 @@ export default function Dashboard() {
           {navigationMap
             .filter((obj) =>
               showAssets ? true : Object.keys(obj)[0] !== "assets"
+            )
+            .filter((obj) =>
+              showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
             )
             .map((obj, index) => {
               const key = Object.keys(obj)[0];
@@ -414,8 +416,7 @@ export default function Dashboard() {
             />
           ) : (
             <GeneralButton
-              version={connected || connecting ? "transparent" : "primary"}
-              buttontype="text"
+              type={connected || connecting ? "transparent" : "primary"}
               size={"medium"}
               handleClick={() =>
                 connecting ? null : setWalletModalVisibility(true)
@@ -438,8 +439,7 @@ export default function Dashboard() {
           />
         ) : (
           <GeneralButton
-            version={connected || connecting ? "transparent" : "primary"}
-            buttontype="text"
+            type={connected || connecting ? "transparent" : "primary"}
             size={"medium"}
             handleClick={() =>
               connecting ? null : setWalletModalVisibility(true)
@@ -497,13 +497,18 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
+            {(isTablet || isMobile) && showMobileNetworkButton && (
+              <ChainSelectorButton
+                chain={chainNameMap[network satisfies ChainName]}
+                onClick={() => setChainModalVisibility(true)}
+              />
+            )}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
                 className="fluidify-button-dashboard "
-                version={"primary"}
-                buttontype="text"
+                type={"secondary"}
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
@@ -519,8 +524,8 @@ export default function Dashboard() {
               onMouseEnter={() => setHoverModal(true)}
               onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
               className="trophy-button"
-              version={"transparent"}
-              buttontype="icon after"
+              type={"transparent"}
+              layout="after"
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
@@ -528,6 +533,7 @@ export default function Dashboard() {
                   : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
+              style={{ fontSize: "1em" }}
             >
               {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
@@ -554,7 +560,6 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-
         {/* Provide Liquidity*/}
         <div className="pad-main" style={{ marginBottom: "2em" }}>
           {!openMobModal && (
@@ -579,15 +584,14 @@ export default function Dashboard() {
         {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
-            version={"primary"}
-            buttontype="text"
+            type={"secondary"}
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
               navigate(`/${network}/fluidify`);
             }}
           >
-            <Heading as="h5">
+            <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
             </Heading>
           </GeneralButton>

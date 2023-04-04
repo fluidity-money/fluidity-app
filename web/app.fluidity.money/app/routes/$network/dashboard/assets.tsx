@@ -135,8 +135,7 @@ const AssetsRoot = () => {
       <div className="pad-main">
         <Heading>Connect Your Wallet to see your Assets!</Heading>
         <GeneralButton
-          version={connected || connecting ? "transparent" : "primary"}
-          buttontype="text"
+          type={connected || connecting ? "transparent" : "primary"}
           size={"medium"}
           handleClick={() =>
             connecting ? null : setWalletModalVisibility(true)

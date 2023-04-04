@@ -14,6 +14,7 @@ import {
   Trophy,
   numberToMonetaryString,
   ConnectedWalletModal,
+  ChainName,
   ConnectedWallet,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -24,7 +25,7 @@ type IMobileModal = {
   activeIndex: number;
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
-  network: string;
+  network: ChainName;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   unclaimedRewards: number;
@@ -56,8 +57,9 @@ export default function MobileModal({
   );
 
   const { showExperiment } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
 
@@ -88,7 +90,7 @@ export default function MobileModal({
   }
 
   if (chainModalVisibility) {
-    const handleSetChain = (network: string) => {
+    const handleSetChain = (network: ChainName) => {
       const { pathname } = location;
 
       // Get path components after $network
@@ -102,10 +104,8 @@ export default function MobileModal({
       <div className="select-blockchain-mobile">
         <BlockchainModal
           handleModal={setChainModalVisibility}
-          option={chains[network as "ethereum" | "solana"]}
-          options={Object.values(chains).filter(
-            ({ name }) => name !== "ARB" || showArbitrum
-          )}
+          option={chains[network satisfies ChainName]}
+          options={Object.values(chains)}
           setOption={handleSetChain}
           mobile={true}
         />
@@ -148,10 +148,17 @@ export default function MobileModal({
 
             {/* Navigation Buttons */}
             <div className="mobile-navbar-right">
+              {/* Chain Switcher */}
+              {showMobileNetworkButton && (
+                <ChainSelectorButton
+                  chain={chains[network satisfies ChainName]}
+                  onClick={() => setChainModalVisibility(true)}
+                />
+              )}
               {/* Prize Money */}
               <GeneralButton
-                version={"transparent"}
-                buttontype="icon after"
+                type={"transparent"}
+                layout="after"
                 size={"small"}
                 className="trophy-button"
                 handleClick={() => {
@@ -189,10 +196,7 @@ export default function MobileModal({
                   />
                 ) : (
                   <GeneralButton
-                    version={
-                      connected || connecting ? "transparent" : "primary"
-                    }
-                    buttontype="text"
+                    type={connected || connecting ? "transparent" : "primary"}
                     size={"medium"}
                     handleClick={() =>
                       connecting ? null : setWalletModalVisibility(true)
@@ -204,16 +208,19 @@ export default function MobileModal({
                 )}
 
                 {/* Chain Switcher */}
-                <ChainSelectorButton
-                  chain={chains[network as "ethereum" | "solana"]}
-                  onClick={() => setChainModalVisibility(true)}
-                />
+                {!showMobileNetworkButton && (
+                  <ChainSelectorButton
+                    chain={chains[network satisfies ChainName]}
+                    onClick={() => setChainModalVisibility(true)}
+                  />
+                )}
               </section>
               {/* Navigation between pages */}
               <nav className={"navbar-v2 "}>
                 <ul>
                   {navigationMap
                     .filter(({ name }) => name !== "Assets" || showAssets)
+                    .filter(({ name }) => name !== "Airdrop" || showAirdrop)
                     .map(
                       (
                         obj: { name: string; icon: JSX.Element },
@@ -260,8 +267,8 @@ export default function MobileModal({
             <section className="mobile-modal-bottom">
               {/* Unclaimed Winnings */}
               <GeneralButton
-                version={"secondary"}
-                buttontype="icon after"
+                type={"secondary"}
+                layout="after"
                 size={"small"}
                 handleClick={() => {
                   setTimeout(() => {
@@ -284,8 +291,7 @@ export default function MobileModal({
 
               {/* Fluidify Money */}
               <GeneralButton
-                version={"primary"}
-                buttontype="text"
+                type={"primary"}
                 size={"medium"}
                 handleClick={() => {
                   setTimeout(() => {

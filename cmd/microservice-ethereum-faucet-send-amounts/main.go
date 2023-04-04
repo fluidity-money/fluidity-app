@@ -48,7 +48,7 @@ func main() {
 	var (
 		ethereumTokensList_ = util.GetEnvOrFatal(EnvTokensList)
 		privateKey_         = util.GetEnvOrFatal(EnvPrivateKey)
-		ethereumHttpAddress = util.GetEnvOrFatal(EnvEthereumHttpUrl)
+		ethereumHttpAddress = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 
 		tokenAddresses = make(map[faucetTypes.FaucetSupportedToken]ethCommon.Address)
 

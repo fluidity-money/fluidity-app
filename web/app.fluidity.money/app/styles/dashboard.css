@@ -155,14 +155,6 @@ main > footer > section {
   width: 60vw;
 }
 
-.fluidify-button-dashboard-mobile > h5 {
-  margin: 0;
-}
-
-.fluidify-button-dashboard-mobile:hover > h5 {
-  color: black;
-}
-
 @media only screen and (max-width: 850px) {
   .fluidify-button-dashboard-mobile {
     bottom: 3vh;
@@ -251,10 +243,6 @@ main > footer > section {
 
 .selector-button {
   padding: 1px 2px;
-}
-
-.trophy-button {
-  font-size: 1em;
 }
 
 main > footer > section > a {
@@ -666,21 +654,6 @@ main > footer > section > a {
 
 .select-blockchain-mobile > div > div {
   padding-left: 0.8em;
-}
-
-.connected-wallet {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  border: 0.5px solid transparent;
-  padding: 0.2em;
-  border-radius: 2em;
-}
-
-.connected-wallet:hover {
-  border: 0.5px solid white;
-  padding: 0.2em;
-  border-radius: 2em;
 }
 
 .holo {

@@ -82,8 +82,7 @@ const Table = <T,>(props: ITable<T>) => {
             {filters.map((filter, i) => (
               <GeneralButton
                 key={`filter-${filter.name}`}
-                version={"secondary"}
-                buttontype="text"
+                type={"secondary"}
                 size={"medium"}
                 handleClick={() => onFilter?.(i)}
                 className={

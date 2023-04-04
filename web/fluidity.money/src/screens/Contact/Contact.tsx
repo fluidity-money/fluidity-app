@@ -10,8 +10,7 @@ const Contact = () => {
     <div className={styles.container}>
       <div>Contact</div>
       <GeneralButton
-        version={"primary"}
-        buttontype={"text"}
+        type={"primary"}
         size={"small"}
         handleClick={function (): void {
           throw new Error("Function not implemented.");

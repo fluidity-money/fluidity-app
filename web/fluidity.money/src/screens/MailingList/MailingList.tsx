@@ -85,7 +85,7 @@ const MailingList = () => {
 
   return (
     <div className={styles.container}>
-      <div>
+      <div className={styles.inner}>
         <Heading as="h3">Stay hydrated</Heading>
         <Text as="p" size={"lg"}>
           Subscribe to our monthly newsletter to stay up to date with our
@@ -142,9 +142,8 @@ const MailingList = () => {
             />
           </section>
           <GeneralButton
-            type={"submit"}
-            version={"primary"}
-            buttontype={"text"}
+            buttonType={"submit"}
+            type={"primary"}
             size={"medium"}
             handleClick={() => {}}
           >

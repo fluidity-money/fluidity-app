@@ -1,4 +1,4 @@
-TESTS := spooler utility-mining transaction-attributes
+TESTS := spooler utility-mining transaction-attributes worker-epochs
 TARGETS := $(addprefix test-, $(TESTS))
 
 DOCKER_COMPOSE := docker compose

@@ -1,0 +1,8 @@
+@use 'common' as *;
+
+.pseudoBridge {
+  position: absolute; 
+  z-index: 1;
+  width: auto;
+  padding-top: 12px;
+}

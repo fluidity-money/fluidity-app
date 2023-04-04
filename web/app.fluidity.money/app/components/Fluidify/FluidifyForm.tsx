@@ -167,10 +167,8 @@ export const FluidifyForm = ({
         <Text size="lg">{assetToken.symbol || ""}</Text>
 
         <GeneralButton
-          version={"transparent"}
+          type={"transparent"}
           size="small"
-          buttontype="text"
-          type={"button"}
           handleClick={inputMaxBalance}
           disabled={
             assetToken.userTokenBalance.eq(new BN(0)) ||
@@ -210,10 +208,9 @@ export const FluidifyForm = ({
 
       {/* Submit Button */}
       <GeneralButton
-        version={"primary"}
+        type={"primary"}
         size="large"
-        buttontype="text"
-        type={"submit"}
+        buttonType={"submit"}
         handleClick={() => null}
         disabled={!assertCanSwap}
         className={"fluidify-form-submit"}

@@ -196,9 +196,8 @@ const SwapCompleteModal = ({
               {/* Dashboard Button */}
               <Link to={`/${network}/dashboard/home`}>
                 <GeneralButton
-                  buttontype="text"
                   size="medium"
-                  version="primary"
+                  type="primary"
                   handleClick={() => {
                     return;
                   }}

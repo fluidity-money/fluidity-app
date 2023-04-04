@@ -2,16 +2,21 @@ import { Observable } from "rxjs";
 import { Transaction } from "../types/OutputMessage";
 import { TransactionProvider } from "../types/Transaction";
 import { onUnhealthy } from "./unhealthy";
-
-import config from "../config";
+import { FanfareConfig } from "../types/Config";
 
 export const manager = (
     provider: TransactionProvider,
+    { 
+        debug,
+        unhealthyThreshold
+    }: FanfareConfig,
 ) => {
     let failureCount = 0;
 
+    debug && console.log(`[debug] Starting manager for ${provider.name()}...`);
     const observable = new Observable<Transaction>((subscriber) => {
         
+        debug && console.log(`[debug] Starting provider for ${provider.name()}...`);
         const onTransaction = (tx: Transaction) => {
             failureCount = 0;
             subscriber.next(tx)
@@ -19,7 +24,7 @@ export const manager = (
         
         const onError = (_: Error) => {
             failureCount += 1;
-            if (failureCount >= config.unhealthyThreshold) {
+            if (failureCount >= unhealthyThreshold) {
                 onUnhealthy(provider);
                 setTimeout(() => {
                     provider.onTransaction(onTransaction);
@@ -33,9 +38,19 @@ export const manager = (
             onError(new Error("Watchdog failure, reconnecting..."));
         }
         
-        provider.onTransaction(onTransaction);
+        try {
+            provider.onTransaction(onTransaction);
+        } catch (e) {
+            subscriber.error(e);
+        }
         provider.onError(onError);
         provider.onWatchdogFailure(onWatchdogFailure)
+
+        setInterval(() => {
+            if (failureCount >= unhealthyThreshold) {
+                onUnhealthy(provider);
+            }
+        }, 10000)
     })
 
     return {

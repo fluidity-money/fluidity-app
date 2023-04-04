@@ -1,13 +1,5 @@
 @use "common" as *;
 
-button {
-  cursor: pointer;
-
-  &:disabled {
-    cursor: default;
-  }
-}
-
 .card {
   display: flex;
   flex-direction: column;
@@ -16,102 +8,151 @@ button {
   padding: 1em;
   box-sizing: border-box;
 
-  &.fill {
-    width: 100%;
-  }
-
-  &.heading {
-    > * {
-      flex: 0 0;
-    }
-  }
-
-  &.gray {
-    background-color: $white-a5;
-  }
-
-  &.transparent {
-    background-color: transparent;
-  }
-
-  &.box {
-    border: 1px solid map-get($border, "default");
-  }
-
-  &.box-prominent {
-    border: 1px solid map-get($border, "prominent");
-  }
-
-  &.holo {
-    overflow: hidden;
-    position: relative;
-  }
-
-  &.holo::before {
-    content: "";
-    position: absolute;
-    pointer-events: none;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
-    z-index: -1;
-    background: $holo;
-    filter: blur(8px);
-  }
-
-  &.holobox {
-    position: relative;
-
-    &::before {
-      content: "";
-      position: absolute;
-      pointer-events: none;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 2px;
-      background: $holo;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
-
-    &.rounded {
-      &::before {
-        border-radius: 12px;
-      }
-    }
-  }
-
-  &.rounded {
-    border-radius: 12px;
-  }
-
-  &.frosted {
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.102);
-
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-
-  &.disabled {
-    cursor: disabled;
-    border-color: map-get($border, "disabled");
-    filter: grayscale(100%);
-  }
-
   &.shimmer {
     -webkit-mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.717),#000 60%) right/300% 100%;
     mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.715),#000 60%) right/300% 100%;
     background-repeat: no-repeat;
     animation: shimmer 5s infinite;
     background-color: black;
+  }
+
+  &.fill {
+    width: 100%;
+  }
+
+  &.button {
+    all: unset;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    padding: 1em;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    border-color: map-get($border, "disabled");
+    filter: grayscale(100%);
+  }
+
+  // Borders
+  border-width: 0;
+  border-style: none;
+
+  &.solid {
+    border-width: 1px;
+    border-style: solid; 
+  }
+
+  &.dashed {
+    border-width: 1px;
+    border-style: dashed;
+  }
+
+  
+
+  // Colors
+  &.gray {
+    background-color: $white-a5;
+    border-color: map-get($border, "default");
+  }
+
+  &.white {
+    background-color: $white;
+    border-color: $white;
+  }
+
+
+  
+
+  &.holo {
+    position: relative;
+    border: none;
+
+    &.opaque {
+      overflow: hidden;
+
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: -20px;
+        left: -20px;
+        right: -20px;
+        bottom: -20px;
+        z-index: -1;
+        background: $holo;
+        filter: blur(8px);
+      }
+    }
+
+
+    &.transparent {
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+  
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
+      }
+  
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
+      }
+  
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
+      }
+  
+      &.frosted {
+        border: none;
+      }
+    }
+  }
+
+  // Backgrounds
+  &.transparent {
+    background-color: transparent;
+  }
+
+  &.frosted {
+    // background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    // Override border styles
+    &.dashed, &.solid, &.none {
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.102);
+    }
   }
 }
 

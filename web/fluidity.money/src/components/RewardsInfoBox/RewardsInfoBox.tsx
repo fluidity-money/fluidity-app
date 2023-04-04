@@ -13,7 +13,6 @@ import {
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { useSplitContext } from "hooks/SplitContext";
 
 interface IRewardBoxProps {
   totalTransactions: number;
@@ -35,16 +34,14 @@ const RewardsInfoBox = ({
   loading,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
-  const { showExperiment } = useSplitContext();
-  const showArb = showExperiment("enable-arbitrum");
 
   const showRewardPool = type === "black";
 
   const imgLink = (opt: string) => {
     switch (opt) {
-      case "ARB":
-        return "/assets/images/chainIcons/solanaIcon.svg";
       case "SOL":
+        return "/assets/images/chainIcons/solanaIcon.svg";
+      case "ARB":
         return "/assets/images/chainIcons/arbIcon.svg";
       case "ETH":
       default:
@@ -57,12 +54,10 @@ const RewardsInfoBox = ({
   const { width } = useViewport();
   const mobileBreakpoint = 620;
 
-  const chainOptions = Object.keys(SupportedChains)
-    .map((chain) => ({
-      name: chain,
-      icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-    }))
-    .filter(({ name }) => name !== "ARB" || showArb);
+  const chainOptions = Object.keys(SupportedChains).map((chain) => ({
+    name: chain,
+    icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+  }));
 
   const [prizePool, setPrizePool] = useState<number>(0);
 

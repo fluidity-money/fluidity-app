@@ -146,29 +146,22 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       await Promise.all(
         chunkArray(jointPayoutAddrs, 100).map(async (filterHashes) => {
           const { data: transactionsData, errors: transactionsErr } =
-            await (async () => {
-              switch (true) {
-                case !!address: {
-                  return useUserTransactionsByAddress(
-                    network,
-                    token ? [token] : getTokenForNetwork(network),
-                    page,
-                    address as string,
-                    filterHashes,
-                    12
-                  );
-                }
-                default: {
-                  return useUserTransactionsAll(
-                    network,
-                    token ? [token] : getTokenForNetwork(network),
-                    page,
-                    filterHashes,
-                    12
-                  );
-                }
-              }
-            })();
+            await (address
+              ? useUserTransactionsByAddress(
+                  network,
+                  token ? [token] : getTokenForNetwork(network),
+                  page,
+                  address as string,
+                  filterHashes,
+                  12
+                )
+              : useUserTransactionsAll(
+                  network,
+                  token ? [token] : getTokenForNetwork(network),
+                  page,
+                  filterHashes,
+                  12
+                ));
 
           if (!transactionsData || transactionsErr) {
             captureException(

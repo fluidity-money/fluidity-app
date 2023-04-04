@@ -5,38 +5,51 @@
 import styles from "./Card.module.scss";
 
 export interface ICard {
-  component?: "div" | "button" | "tr";
+  component?: "div" | "button" | "tr"; 
   style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
-  type?: "gray" | "box" | "box-prominent" | "holo" | "holobox" | "transparent" | "frosted";
   fill?: boolean;
   shimmer?: boolean;
+  type?: "opaque" | "transparent" | "frosted"
+  border?: "solid" | "dashed" | "none";
+  color?: "gray" | "white" | "holo"
   [_: string]: any;
 }
 
 const Card = ({
-  component,
+  component="div",
   style = {},
-  rounded,
-  className,
-  disabled,
+  rounded=true,
+  className="",
+  disabled=false,
   children,
-  type,
   fill = false,
   shimmer = false,
+  type="opaque",
+  border="none",
+  color="gray",
   ...props
 }: ICard) => {
-  const classProps = className || "";
-  const Component = component || "div";
+  const Component = component;
 
-  const typeClass = styles[type || "gray"];
+  const typeClass = type !== 'opaque' ? styles[type] : '';
+  const borderClass = styles[border];
+  const colorClass = styles[color];
+  const elementClass = component === 'button' ? styles[component] : '';
+  const propsClass = className;
 
-  const allClasses = `${styles.card} ${typeClass} ${
-    rounded ? styles.rounded : ''
-  } ${disabled ? styles.disabled : ''}
-  ${fill ? styles.fill : ''} ${shimmer ? styles.shimmer : ''}
-  ${classProps}`;
+  const allClasses = `
+    ${styles.card} 
+    ${propsClass}
+    ${elementClass} 
+    ${rounded ? styles.rounded : ''} 
+    ${fill ? styles.fill : ''}
+    ${shimmer ? styles.shimmer : ''}
+    ${typeClass} 
+    ${borderClass}
+    ${colorClass}
+  `;
 
   const CardContent = (
     <Component style={style} className={allClasses} disabled={disabled} {...props}>

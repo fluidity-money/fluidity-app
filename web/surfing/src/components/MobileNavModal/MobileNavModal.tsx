@@ -46,16 +46,14 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
       </div>
 
       <GeneralButton
-        version={"primary"}
-        buttontype={"text"}
+        type={"primary"}
         size={"large"}
         handleClick={() => {}}
       >
         LAUNCH FLUIDITY
       </GeneralButton>
       <GeneralButton
-        version={"secondary"}
-        buttontype={"text"}
+        type={"secondary"}
         size={"large"}
         handleClick={() => {}}
       >
