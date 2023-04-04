@@ -36,7 +36,7 @@ const Demo = () => {
           loop={true}
         />
 
-        <div id="demo">
+        <div className={styles.inner} id="demo">
           {!!onChainData.data && (
             <>
               <Display size={width > breakpoint ? "lg" : "sm"}>
