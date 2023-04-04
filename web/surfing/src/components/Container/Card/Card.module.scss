@@ -74,26 +74,13 @@
   &.holo {
     position: relative;
     border: none;
-
-    &.opaque {
-      overflow: hidden;
-
-      &::before {
-        content: "";
-        position: absolute;
-        pointer-events: none;
-        top: -20px;
-        left: -20px;
-        right: -20px;
-        bottom: -20px;
-        z-index: -1;
-        background: $holo;
-        filter: blur(8px);
-      }
-    }
-
+    overflow: hidden;
+    background: $holo-linear;
+    background-size: 400% 400%;
 
     &.transparent {
+      background: none;
+
       &::before {
         content: "";
         position: absolute;

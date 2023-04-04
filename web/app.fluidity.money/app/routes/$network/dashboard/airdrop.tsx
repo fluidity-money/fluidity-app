@@ -27,7 +27,7 @@ const AirdropStats = () => {
           max={1}
           size='sm'
           rounded
-          type='box'
+          color="white"
         />
         <Text>60%</Text>
       </div>
@@ -66,7 +66,7 @@ const AirdropStats = () => {
 }
 
 const MultiplierTasks = () => {
-  return <Card fill type="holo" rounded style={{zIndex: 0, color: 'black', flexDirection: 'row', alignItems: 'center', gap: '2em'}}>
+  return <Card fill type="opaque" color="holo" border="none" rounded style={{zIndex: 0, color: 'black', flexDirection: 'row', alignItems: 'center', gap: '2em'}}>
     <div
       style={{display: 'flex', flexDirection: 'column', gap: '0.5em', alignItems: 'flex-start'}}
     >
@@ -128,7 +128,7 @@ const MyMultiplier = () => {
           value={1}
           max={1}
           rounded
-          type='transparent'
+          color="holo"
           size='sm'
         />
       </div>
@@ -143,9 +143,8 @@ const MyMultiplier = () => {
           value={0.5}
           max={1}
           rounded
-          type='transparent'
           size='sm'
-          barColor="gray"
+          color="gray"
         />
       </div>
       <div style={{alignSelf: 'flex-end', marginBottom: '-0.2em'}}>
@@ -159,9 +158,8 @@ const MyMultiplier = () => {
           value={0.05}
           max={1}
           rounded
-          type='transparent'
           size='sm'
-          barColor="gray"
+          color="gray"
         />
       </div>
       <div style={{alignSelf: 'flex-end', marginBottom: '-0.2em'}}>
@@ -175,9 +173,8 @@ const MyMultiplier = () => {
           value={0.05}
           max={1}
           rounded
-          type='transparent'
           size='sm'
-          barColor="gray"
+          color="gray"
         />
       </div>
       <div style={{alignSelf: 'flex-end', marginBottom: '-0.2em'}}>

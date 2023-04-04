@@ -33,6 +33,20 @@ $holo: conic-gradient(
   #fdb5e4 360deg,
 );
 
+$holo-linear: linear-gradient(
+  90deg,
+  #f3b8d8 0%,
+  #b793e9 15.1%,
+  #9fd4f3 26.04%,
+  #ffd2c4 36.46%,
+  #fbf3f3 46.88%,
+  #d9abdf 57.29%,
+  #af9ce3 72.4%,
+  #aae4e1 85.42%,
+  #c6ead0 93.23%,
+  #ffffff 100%
+);
+
 // Neutral
 $grey-100: #151516;
 $grey-90: #323432;

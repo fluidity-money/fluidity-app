@@ -5,7 +5,8 @@ import styles from './ProgressBar.module.scss'
 interface IProgressBar extends ICard {
   value: number
   max: number
-  type?: 'box-prominent' | 'box' | 'holobox' | 'transparent' | 'gray'
+  border?: "solid" | "dashed" | "none";
+  color?: "gray" | "white" | "holo"
   size?: 'sm' | 'md' | 'lg'
   cap?: 'round' | 'square'
   barColor?: string
@@ -15,7 +16,8 @@ interface IProgressBar extends ICard {
 const ProgressBar: React.FC<IProgressBar> = ({
   value,
   max,
-  type='box-prominent',
+  border="solid",
+  color="white",
   props,
   rounded,
   size='md',
@@ -25,18 +27,20 @@ const ProgressBar: React.FC<IProgressBar> = ({
   return <Card 
     className={`${styles.ProgressBar} ${styles[size]}`}
     fill
-    type={type}
+    type={"transparent"}
+    border={border}
+    color={color}
     {...props}
     rounded={rounded}
   >
     <motion.div
-      className={`${styles.barContainer} ${styles[type]} ${styles[cap]}`}
+      className={`${styles.barContainer} ${styles[color]} ${styles[cap]}`}
       style={{width: `${value / max * 100}%`,
       background: barColor ? barColor : ''
     }} 
     >
       <motion.div 
-        className={`${styles.bar} ${styles[size]} ${styles[type]}`} 
+        className={`${styles.bar} ${styles[size]} ${styles[color]}`} 
         style={barColor ? {background: barColor } : {}}
       />
     </motion.div>

@@ -30,7 +30,7 @@
       border-radius: 0 100px 100px 0;
     }
 
-    &.holobox, &.transparent {
+    &.white {
       background-color: white;
     }
 
@@ -41,31 +41,15 @@
       right: 0;
       bottom: 0;
 
-      &.holobox, &.transparent {
-        background: $holo;
-
-        &.sm {
-          filter: blur(4px);
-        }
-        
-        &.md {
-          filter: blur(6px);
-        }
-
-        &.lg {
-          filter: blur(8px);
-        }
-      }
-
-      &.frosted {
-        background: rgba(255, 255, 255, 0.102);
+      &.holo {
+        background: $holo-linear;
       }
 
       &.gray {
         background: map-get($border, "default");
       }
 
-      &.box-prominent, &.box {
+      &.white {
         background: map-get($border, "prominent");
       }
       
