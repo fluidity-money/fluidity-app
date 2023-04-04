@@ -23,7 +23,9 @@ export const Template = (props) => <CardCarousel {...props}>
     <Story
         name="Card Carousel"
         args={{
-            type: "box",
+            type: "transparent",
+            border: "solid",
+            color: "gray"
         }}
     >
         {Template.bind({})}
@@ -31,7 +33,9 @@ export const Template = (props) => <CardCarousel {...props}>
     <Story
         name="Card Carousel (Compact)"
         args={{
-            type: "box-prominent",
+            type: "transparent",
+            border: "solid",
+            color: "white",
             size: "compact",
         }}
     >

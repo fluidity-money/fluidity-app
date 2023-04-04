@@ -71,8 +71,7 @@ const Footer = () => {
               handleClick={() => {
                 window.location.href = "mailto:contact@fluidity.money";
               }}
-              version={"secondary"}
-              buttontype={"text"}
+              type={"secondary"}
               size={
                 width > firstBreakpoint
                   ? "medium"
