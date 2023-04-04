@@ -35,5 +35,5 @@ EXECUTE PROCEDURE update_lootboxes();
 
 --migrate:down
 
-DROP TRIGGER trigger_lootbox_calculation;
-DROP FUNCTION update_lootboxes;
+DROP IF EXISTS TRIGGER trigger_lootbox_calculation;
+DROP IF EXISTS FUNCTION update_lootboxes;
