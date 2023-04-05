@@ -240,7 +240,7 @@ func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
 
         if !lockedTimestampInt.IsInt64() {
 			return stakingEvent, fmt.Errorf(
-				"Decoded a timestamp that was larger than int64! %s", 
+				"Decoded a timestamp that was larger than int64! %v", 
 				lockedTimestampInt.String(),
 			)
         }

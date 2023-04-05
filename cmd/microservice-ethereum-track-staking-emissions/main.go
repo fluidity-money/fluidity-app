@@ -19,7 +19,7 @@ func main() {
         case fluidity.ErrWrongEvent:
             log.Debug(func(k *log.Log) {
                 k.Format(
-                    "Event for log %d of transaction %x was not a staking event!",
+                    "Event for log %v of transaction %v was not a staking event!",
                     l.Index,
                     l.TxHash,
                 )
