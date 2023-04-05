@@ -106,11 +106,7 @@ const AcceptReferralModal = ({
               <ul>You Get</ul> 💸
             </Text>
             <Text prominent size="lg">
-              <strong>10% of their airdrop</strong>
-              <br />
-              earnings throughout
-              <br />
-              the entire Epoch.
+              <strong>10 Loot Bottles</strong>
             </Text>
           </div>
           {/* How it works Box Right*/}
@@ -119,11 +115,11 @@ const AcceptReferralModal = ({
               🍾<ul>They Get</ul>
             </Text>
             <Text prominent size="lg">
-              <strong>10 Loot Bottles,</strong>
+              <strong>10% of your airdrop</strong>
               <br />
-              not affected by
+              earnings throughout
               <br />
-              your 10% reward.
+              the entire Epoch.
             </Text>
           </div>
         </Card>
