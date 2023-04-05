@@ -22,10 +22,31 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json(referralCodeData.lootbox_referral_codes);
 };
 
+export type AddReferralCodeBody = {
+  address: string;
+};
+
+type SuccessfulReferralCodeData = {
+  success: true;
+  msg: {
+    address: string;
+    referralCode: string;
+  };
+};
+
+type FailedReferralCodeData = {
+  success: false;
+  msg: unknown;
+};
+
+export type AddReferralCodeData =
+  | SuccessfulReferralCodeData
+  | FailedReferralCodeData;
+
 export const action: ActionFunction = async ({ request, params }) => {
   const network = params.network ?? "";
 
-  const body = await request.json();
+  const body = (await request.json()) satisfies AddReferralCodeBody;
 
   try {
     const address_ = body["address"] ?? "";
@@ -57,7 +78,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     }
 
     // Generate unique ID
-    const newReferralCode = await (async () => {
+    const genReferralCode = await (async () => {
       const retries = 5;
       let counter = 0;
 
@@ -81,25 +102,31 @@ export const action: ActionFunction = async ({ request, params }) => {
       return undefined;
     })();
 
-    if (!newReferralCode) {
+    if (!genReferralCode) {
       throw new Error("Could not generate unique ID");
     }
 
-    const res = await addReferralCode(address, newReferralCode);
+    const { data, errors } = await addReferralCode(address, genReferralCode);
 
-    if (res.errors || !res.data) {
+    if (errors || !data) {
       throw new Error("Could not insert referral code");
     }
 
+    const { address: newAddress, referral_code: newReferralCode } =
+      data.insert_lootbox_referral_codes_one;
+
     return json({
       success: true,
-      msg: res.data,
-    });
+      msg: {
+        address: newAddress,
+        referralCode: newReferralCode,
+      },
+    } satisfies AddReferralCodeData);
   } catch (e) {
     return json({
       success: false,
-      msg: e,
-    });
+      msg: e as Error,
+    } satisfies AddReferralCodeData);
   }
 };
 

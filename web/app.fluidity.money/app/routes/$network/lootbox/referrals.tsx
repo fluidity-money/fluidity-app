@@ -13,55 +13,51 @@ import { SplitContext } from "contexts/SplitProvider";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import ReferralModal from "~/components/ReferralModal";
 
-type LoaderData = {
-  network: string;
-  referral: string;
-  referralMsg: string;
-};
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: referralModalStyles }];
 };
 
+type LoaderData = {
+  network: string;
+  referralCode: string;
+};
+
 export const loader: LoaderFunction = ({ request, params }) => {
-  const { network } = params;
+  const network = params.network ?? "";
 
   const url = new URL(request.url);
-  const referral = url.searchParams.get("referral") ?? "";
-  const referralMsg = url.searchParams.get("referralMsg") ?? "";
+  const referralCode = url.searchParams.get("referral_code") ?? "";
 
   return json({
     network,
-    referral,
-    referralMsg,
-  } as LoaderData);
+    referralCode,
+  } satisfies LoaderData);
 };
 
 const SAFE_DEFAULT: ReferralCountData = {
   numReferrals: 0,
+  referralCode: "",
   loaded: false,
 };
 
 const Referral = () => {
   const { showExperiment } = useContext(SplitContext);
 
-  const { network, referral, referralMsg } = useLoaderData<LoaderData>();
+  const { network, referralCode: clickedReferralCode } =
+    useLoaderData<LoaderData>();
 
   const { address, connected, signBuffer } = useContext(FluidityFacadeContext);
 
-  const [referralCode, setReferralCode] = useState("");
+  const { data: referralsData } = useCache<ReferralCountData>(
+    address ? `/${network}/query/referrals?address=${address}` : ""
+  );
 
-  const referralData = useCache(
-    `/${network}/query/referrals?address=${address}`
-  ).data;
-
-  const referralsData_ = connected ? referralData : SAFE_DEFAULT;
-
-  const referralsData = {
+  const data = {
     ...SAFE_DEFAULT,
-    ...referralsData_,
+    ...referralsData,
   };
 
-  const { numReferrals } = referralsData;
+  const { numReferrals, referralCode, loaded } = data;
 
   if (!showExperiment("lootbox-referrals")) {
     return <></>;
@@ -77,28 +73,41 @@ const Referral = () => {
         </div>
 
         {/* Referral Section */}
+        <form>
+          <input readOnly value={referralCode} />
+
+          <button>Reveal Referral Link</button>
+        </form>
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
             (async () => {
               await jsonPost(`/${network}/query/addReferral`, {
-                referrer: referral,
                 referee: address,
-                referrer_msg: referralMsg,
-                referee_msg: (await signBuffer?.("Referee")) ?? "",
+                referrer_code: referralCode,
+                referee_msg:
+                  (await signBuffer?.(`${referralCode} 🌊 ${address}`)) ?? "",
               });
             })();
           }}
         >
           <label htmlFor="referrer" />
-          <input readOnly name="referrer" value={referral} />
+          <input readOnly name="referrer" value={referralCode} />
           <label htmlFor="address" />
           <input readOnly name="referee" value={address} />
           <GeneralButton buttonType="submit">submit</GeneralButton>
         </form>
       </div>
 
-      <ReferralModal />
+      <ReferralModal
+        claimed={0}
+        unclaimed={0}
+        progress={0}
+        progressReq={10}
+        referralCode={referralCode}
+        loaded={loaded}
+      />
     </>
   );
 };

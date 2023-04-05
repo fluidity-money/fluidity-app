@@ -13,11 +13,12 @@ import SolanaProvider from "contexts/SolanaProvider";
 import { Fragment } from "react";
 import { Token } from "~/util/chainUtils/tokens.js";
 import { NotificationSubscription } from "~/components/NotificationSubscription";
+import { jsonPost } from "~/util";
 
 type ProviderMap = {
   [key: string]:
-    | ((props: { children: React.ReactNode }) => JSX.Element)
-    | undefined;
+  | ((props: { children: React.ReactNode }) => JSX.Element)
+  | undefined;
 };
 
 const Provider = ({
@@ -86,7 +87,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   };
 };
 
-const ProviderOutlet = () => {
+const ProviderOutlet = ({ network }: { network: string }) => {
   const { connected, address, getDegenScore } = useContext(
     FluidityFacadeContext
   );
@@ -96,14 +97,14 @@ const ProviderOutlet = () => {
   useEffect(() => {
     if (!(address && connected)) return;
 
-    if (!getDegenScore) return;
-
     (async () => {
+      if (!getDegenScore) return;
+
       const degenScore = await getDegenScore(address);
 
       client?.track("connected-user-degen-score", address, degenScore);
     })();
-  }, [address]);
+  }, [address, client]);
 
   return (
     <>
@@ -157,7 +158,7 @@ export default function Network() {
         tokens={tokens}
         colorMap={colors}
       />
-      <ProviderOutlet />
+      <ProviderOutlet network={network} />
     </Provider>
   );
 }
