@@ -51,4 +51,10 @@ func init() {
 	if RewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(stakingAbiString)
+
+	if StakingAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }

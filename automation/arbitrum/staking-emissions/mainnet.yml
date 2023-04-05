@@ -1,0 +1,8 @@
+DOCKER_IMAGE: microservice-arbitrum-track-staking-emissions
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-track-staking-emissions
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
+
+SERVICES:
+  - TRACK_STAKING_EMISSIONS:
+      SERVICE_NAME: microservice-arbitrum-track-staking-emissions
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-track-staking-emissions

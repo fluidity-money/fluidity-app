@@ -28,7 +28,8 @@ LANGUAGE SQL
 STABLE
 AS
 $$
-SELECT (((396.0 / 11315) - ((396.0 / 4129975) * total_days)) * days_elapsed) + ((396.0 * total_days) / 133225) - (31.0 / 365) AS result
+-- cap at 1
+SELECT LEAST(1, (((396.0 / 11315) - ((396.0 / 4129975) * total_days)) * days_elapsed) + ((396.0 * total_days) / 133225) - (31.0 / 365)) AS result
 $$;
 
 -- a user's total liquidity multiplier at time `instant`, obtained by summing the multipliers of all their staking events
