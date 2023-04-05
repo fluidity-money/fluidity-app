@@ -6,7 +6,8 @@ LANGUAGE SQL
 STABLE
 AS
 $$
-SELECT (((396.0 / 11315) - ((396.0 / 4129975) * staking_row.lockup_length)) * days_elapsed) + ((396.0 * staking_row.lockup_length) / 133225) - (31.0 / 365) AS result
+-- cap at 1
+SELECT LEAST(1, (((396.0 / 11315) - ((396.0 / 4129975) * staking_row.lockup_length)) * days_elapsed) + ((396.0 * staking_row.lockup_length) / 133225) - (31.0 / 365)) AS result
 $$;
 
 --migrate:down

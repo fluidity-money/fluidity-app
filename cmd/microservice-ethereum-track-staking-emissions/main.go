@@ -22,6 +22,7 @@ func classifyStakingEvent(l ethLogs.Log) (ethereum.StakingEvent, error) {
     var (
         logTopics = l.Topics
         logData   = l.Data
+
         stakingEvent ethereum.StakingEvent
     )
 
