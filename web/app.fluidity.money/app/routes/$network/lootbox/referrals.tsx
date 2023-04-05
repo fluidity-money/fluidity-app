@@ -6,7 +6,7 @@ import { useCache } from "~/hooks/useCache";
 import { useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useState } from "react";
-import { Text, Heading } from "@fluidity-money/surfing";
+import { Text, Heading, GeneralButton } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
 
 import { jsonPost } from "~/util";
@@ -110,7 +110,7 @@ const Referral = () => {
         <input readOnly name="referrer" value={referral} />
         <label htmlFor="address" />
         <input readOnly name="referee" value={address} />
-        <button type="submit">Submit</button>
+        <GeneralButton buttonType="submit">submit</GeneralButton>
       </form>
     </div>
   );

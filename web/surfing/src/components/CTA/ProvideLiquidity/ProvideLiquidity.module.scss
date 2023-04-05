@@ -18,9 +18,11 @@
       margin: 0;
 
       .open-provider-dropdown {
+        all: unset;
+        cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 0.5em;
+        gap: 0.2em;
         position: relative;
 
         &:hover {
@@ -139,6 +141,8 @@
       list-style: none;
 
       .token-option {
+        all: unset;
+        font-size: 0.8rem;
         display: flex;
         justify-content: space-between;
         align-items: center;

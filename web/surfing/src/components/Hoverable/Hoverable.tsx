@@ -5,39 +5,25 @@
 import { ButtonHTMLAttributes, useEffect } from "react";
 
 import { useState } from "react"
-import { InfoCircle, Tooltip, Text } from "components";
-import styles from "./HoverButton.module.scss";
+import { Tooltip } from "components";
+import styles from "./Hoverable.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface IHoverButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
-  children: string;
-  size: "small" | "medium" | "large";
-  color?: "white" | "gray";
-  hoverComp: React.ReactNode;
+interface IHoverable extends React.HTMLAttributes<HTMLElement> {
+  tooltipContent: React.ReactNode;
 }
 
-const HoverButton = ({
+const Hoverable = ({
   children,
-  size,
-  color = "white",
   className,
-  hoverComp,
+  tooltipContent,
   ...props
-}: IHoverButtonProps) => {
+}: IHoverable) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
   const classProps = className || "";
-
-  const buttonColorProps = styles[color];
-  const buttonClassProps = `${
-    styles.button
-  } ${buttonColorProps} ${classProps}`;
-
-  const textSizeProps = styles[size];
-  const textClassProps = `${styles.text} ${textSizeProps}`;
 
   useEffect(() => {
     if (isHovered || isFocused) {
@@ -60,18 +46,15 @@ const HoverButton = ({
   }, [isHovered, isFocused]);
 
   return (
-    <div style={{display: "block"}}>
-    <button
-      className={buttonClassProps}
+    <div
+      className={classProps}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
       {...props}
     >
-      <div className={textClassProps}>{children}</div>
-      <InfoCircle className={`${styles.icon} ${classProps}`} />
-    </button>
+      {children}
     <AnimatePresence>
     {showTooltip && (
         <motion.div
@@ -84,7 +67,7 @@ const HoverButton = ({
           onMouseLeave={() => setIsHovered(false)}
         >
           <Tooltip>
-            {hoverComp}
+            {tooltipContent}
           </Tooltip>
         </motion.div>
       )}
@@ -93,4 +76,4 @@ const HoverButton = ({
   );
 };
 
-export default HoverButton;
+export default Hoverable;

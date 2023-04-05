@@ -162,7 +162,7 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   };
 
   return (
-    <Card className={styles.ProvideLiquidity} rounded type={"holobox"}>
+    <Card className={styles.ProvideLiquidity} rounded type={"transparent"} color="holo" border="solid">
       <section className={styles["provide-liquidity-left"]}>
         <Heading as="h2" className={styles["provide-heading"]}>
           Provide Liquidity for{" "}
@@ -173,9 +173,9 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
               setOpenDropdown(!openDropdown);
             }}
           >
-            <Heading as="h1" className={styles["fluid-liquidity-token"]}>
+            <span className={styles["fluid-liquidity-token"]}>
               {`ƒ${poolToken.symbol?.slice(1)}`}
-            </Heading>
+            </span>
             <ArrowDown width={18} fill={"white"} />
             {openDropdown && <DropdownOptions />}
           </button>

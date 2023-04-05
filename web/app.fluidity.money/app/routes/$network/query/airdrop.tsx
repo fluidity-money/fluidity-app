@@ -8,7 +8,7 @@ export type StakingEvent = {
   amount: number;
   durationDays: number;
   multiplier: number;
-  inserteddate: string;
+  insertedDate: string;
 };
 
 export type AirdropLeaderboardEntry = {

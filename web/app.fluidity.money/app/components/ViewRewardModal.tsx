@@ -105,8 +105,7 @@ export const ViewRewardModal = ({
                 </Text>
               </span>
               <GeneralButton
-                version={"primary"}
-                buttontype="text"
+                type={"primary"}
                 size={"medium"}
                 handleClick={() => {
                   callback();
@@ -123,8 +122,8 @@ export const ViewRewardModal = ({
                 <GeneralButton
                   className="share-button"
                   size="large"
-                  version="transparent"
-                  buttontype="icon before"
+                  type="transparent"
+                  layout="before"
                   icon={<Twitter />}
                   handleClick={() => {
                     return;

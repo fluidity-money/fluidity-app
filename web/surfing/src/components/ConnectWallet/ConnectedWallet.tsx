@@ -2,6 +2,8 @@ import { Text } from '../'
 import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import { trimAddress, trimAddressShort } from '~/util';
 
+import styles from './ConnectedWallet.module.scss'
+
 type IConnectedWallet = {
   address: string;
   callback: () => void;
@@ -18,7 +20,7 @@ const ConnectedWallet = ({
   return (
     <button
       onClick={callback}
-      className={`connected-wallet ${className ?? ""}`}
+      className={`${styles.ConnectedWallet} ${className ?? ""}`}
     >
       <div className="holo">
         <Jazzicon diameter={36} seed={jsNumberForAddress(address)} />

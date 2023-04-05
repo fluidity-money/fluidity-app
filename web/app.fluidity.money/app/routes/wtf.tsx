@@ -315,8 +315,7 @@ export default function IndexPage() {
 
               <GeneralButton
                 size="large"
-                buttontype="text"
-                version="primary"
+                type="primary"
                 handleClick={() => {
                   setShowChainOpportunityModal(true);
                 }}

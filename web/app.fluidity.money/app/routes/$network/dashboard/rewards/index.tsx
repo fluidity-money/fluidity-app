@@ -29,13 +29,14 @@ import {
   LabelledValue,
   ProviderIcon,
   ProviderCard,
-  HoverButton,
+  Hoverable,
   TokenIcon,
   Provider,
   Token,
   CardCarousel,
   Display,
   WalletIcon,
+  TabButton,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -538,7 +539,9 @@ export default function Rewards() {
     return (
       <CardCarousel
         size={mobileView ? "compact" : "normal"}
-        type={"box-prominent"}
+        type="transparent"
+        color="white"
+        border="solid"
       >
         <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
           <div
@@ -635,18 +638,18 @@ export default function Rewards() {
 
         <div className="filter-row">
           {rewardFilters.map((filter, i) => (
-            <button
+            <TabButton
+              size="default"
               key={`filter-${filter.name}`}
               onClick={() => setActiveRewardFilterIndex(i)}
             >
               <Text
-                size="xl"
                 prominent={activeRewardFilterIndex === i}
                 className={activeRewardFilterIndex === i ? "active-filter" : ""}
               >
                 {filter.name}
               </Text>
-            </button>
+            </TabButton>
           ))}
         </div>
       </div>
@@ -704,9 +707,8 @@ export default function Rewards() {
                   ? "Transacting ƒAssets"
                   : rewarders[0]?.name}
               </LabelledValue>
-              <HoverButton
-                size="medium"
-                hoverComp={
+              <Hoverable
+                tooltipContent={
                   <>
                     <ProviderIcon
                       provider={rewarders[0]?.name}
@@ -741,8 +743,16 @@ export default function Rewards() {
                   </>
                 }
               >
-                Hover for Details
-              </HoverButton>
+                <LinkButton
+                  size="medium"
+                  type="info"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Hover for Details
+                </LinkButton>
+              </Hoverable>
             </div>
           )}
         </div>

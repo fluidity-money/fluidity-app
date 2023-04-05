@@ -20,9 +20,8 @@ export const BurgerMenu = ({ isOpen, setIsOpen }: IBurgerMenuProps) => {
 
   return (
     <GeneralButton
-      version="transparent"
+      type="transparent"
       size="small"
-      buttontype="text"
       handleClick={() => setIsOpen(!isOpen)}
       className={"burger-btn"}
     >

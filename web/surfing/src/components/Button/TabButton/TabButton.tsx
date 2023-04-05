@@ -8,7 +8,7 @@ import styles from "./TabButton.module.scss";
 
 interface ITabButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size: "default" | "small";
-  children: string;
+  children: React.ReactNode;
 }
 
 const TabButton = ({
