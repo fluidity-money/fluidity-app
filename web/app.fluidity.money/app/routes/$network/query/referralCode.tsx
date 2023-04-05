@@ -1,25 +1,63 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ReferralCode } from "~/queries/useReferralCode";
 
 import { useSplitExperiment } from "~/util/split";
 import { json } from "@remix-run/node";
-import { addReferralCode, useReferralCodeByAddress } from "~/queries";
+import {
+  addReferralCode,
+  useReferralByAddress,
+  useReferralCodeByAddress,
+  useReferralCodeByCode,
+} from "~/queries";
 import { validAddress } from "~/util";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export type ReferralCodeData = {
+  referralAddress: string;
+};
+
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const network = params.network ?? "";
+
   const url = new URL(request.url);
-  const address = url.searchParams.get("address");
+  const code = url.searchParams.get("code") ?? "";
+  const address_ = url.searchParams.get("address") ?? "";
 
-  if (!address) throw new Error("Unauthorised");
+  // Normalise addresses
+  const address = address_.toLocaleLowerCase();
 
-  const { data: referralCodeData, errors } = await useReferralCodeByAddress(
-    address
-  );
-
-  if (errors || !referralCodeData) {
-    throw new Error("No address found");
+  // Limit for internal testing
+  if (!useSplitExperiment("lootbox-referrals", true, { user: address })) {
+    throw new Error("Unauthorised");
   }
 
-  return json(referralCodeData.lootbox_referral_codes);
+  // Check valid addresses
+  if (!validAddress(address, network)) {
+    throw new Error("Invalid Address");
+  }
+
+  if (!code) throw new Error("Unauthorised");
+
+  const { data: referralCodeData, errors: referralCodeErr } =
+    await useReferralCodeByCode(code);
+
+  const referralAddress = referralCodeData?.lootbox_referral_codes[0]?.address;
+
+  if (referralCodeErr || !referralAddress) {
+    throw new Error("No code found");
+  }
+
+  const { data: referralData, errors: referralErr } =
+    await useReferralByAddress(referralAddress, address);
+
+  const referralExists = !!referralData?.lootbox_referrals.length;
+
+  if (referralErr || referralExists) {
+    throw new Error("Referral already exists");
+  }
+
+  return json({
+    referralAddress,
+  } satisfies ReferralCodeData);
 };
 
 export type AddReferralCodeBody = {

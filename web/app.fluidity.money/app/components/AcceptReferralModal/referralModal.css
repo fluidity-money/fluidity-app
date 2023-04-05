@@ -39,7 +39,7 @@
 .referrals-inner-box {
   position: relative;
   padding: 0;
-  width: 100%;
+  width: calc(100% - 2px);
 }
 
 .referrals-inner-switcher {
@@ -75,10 +75,10 @@
   align-self: center;
 }
 
-/* .how-it-works-infobox:hover { */
-/*   background-color: white; */
-/*   color: black; */
-/* } */
+.how-it-works-infobox:hover {
+  background-color: white;
+  color: black;
+}
 
 .how-it-works-infobox > :first-child {
   border-right: dashed white;
@@ -105,9 +105,9 @@
 }
 
 .dot.red {
-  background-color: #c93737;
+  background-color: red;
 }
 
 .dot.green {
-  background-color: #05ff00;
+  background-color: green;
 }

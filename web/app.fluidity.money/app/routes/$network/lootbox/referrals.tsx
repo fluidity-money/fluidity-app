@@ -1,5 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 import type { ReferralCountData } from "../query/referrals";
+import { ReferralCodeData } from "../query/referralCode";
 import { LinksFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
@@ -10,11 +11,16 @@ import { useContext, useState } from "react";
 import { jsonPost } from "~/util";
 import { Text, Heading, GeneralButton } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
-import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import ReferralModal from "~/components/ReferralModal";
+import AcceptReferralModal from "~/components/AcceptReferralModal";
+import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+import acceptReferralModalStyles from "~/components/AcceptReferralModal/referralModal.css";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: referralModalStyles }];
+  return [
+    { rel: "stylesheet", href: referralModalStyles },
+    { rel: "stylesheet", href: acceptReferralModalStyles },
+  ];
 };
 
 type LoaderData = {
@@ -34,9 +40,13 @@ export const loader: LoaderFunction = ({ request, params }) => {
   } satisfies LoaderData);
 };
 
-const SAFE_DEFAULT: ReferralCountData = {
-  numReferrals: 0,
+const SAFE_DEFAULT: ReferralCountData & ReferralCodeData = {
+  numActiveReferrerReferrals: 0,
+  numActiveReferreeReferrals: 0,
+  numInactiveReferreeReferrals: 0,
+  inactiveReferrals: [],
   referralCode: "",
+  referralAddress: "",
   loaded: false,
 };
 
@@ -52,12 +62,27 @@ const Referral = () => {
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
 
+  const { data: referralCodeData } = useCache<ReferralCountData>(
+    clickedReferralCode && address
+      ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
+      : ""
+  );
+
   const data = {
     ...SAFE_DEFAULT,
     ...referralsData,
+    ...referralCodeData,
   };
 
-  const { numReferrals, referralCode, loaded } = data;
+  const {
+    numActiveReferrerReferrals,
+    numActiveReferreeReferrals,
+    numInactiveReferreeReferrals,
+    inactiveReferrals,
+    referralCode,
+    referralAddress,
+    loaded,
+  } = data;
 
   if (!showExperiment("lootbox-referrals")) {
     return <></>;
@@ -69,7 +94,7 @@ const Referral = () => {
         {/* Num Referrals */}
         <div>
           <Text>Referrals</Text>
-          <Heading>{numReferrals}</Heading>
+          <Heading>{numActiveReferrerReferrals}</Heading>
         </div>
 
         {/* Referral Section */}
@@ -101,12 +126,19 @@ const Referral = () => {
       </div>
 
       <ReferralModal
-        claimed={0}
-        unclaimed={0}
-        progress={0}
+        referrerClaimed={numActiveReferrerReferrals}
+        refereeClaimed={numActiveReferreeReferrals}
+        refereeUnclaimed={numInactiveReferreeReferrals}
+        progress={inactiveReferrals[0]?.progress || 0}
         progressReq={10}
         referralCode={referralCode}
         loaded={loaded}
+      />
+
+      <AcceptReferralModal
+        network={network}
+        referralCode={clickedReferralCode}
+        referrer={referralAddress}
       />
     </>
   );

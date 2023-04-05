@@ -41,7 +41,7 @@ const addReferralCode = (address: string, code: string) => {
   };
 
   return jsonPost<AddReferralCodeBody, AddReferralCodeRes>(
-    "https://3ec4-2405-6e00-492-6208-4899-8879-7546-8995.au.ngrok.io/v1/graphql",
+    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
     body,
     process.env.FLU_HASURA_SECRET
       ? {

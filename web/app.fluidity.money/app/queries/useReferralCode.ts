@@ -32,12 +32,14 @@ type ReferralCodeByCodeBody = {
   };
 };
 
+export type ReferralCode = {
+  address: string;
+  referral_code: string;
+};
+
 type ReferralCodeRes = {
   data?: {
-    lootbox_referral_codes: Array<{
-      address: string;
-      referral_code: string;
-    }>;
+    lootbox_referral_codes: Array<ReferralCode>;
   };
   errors?: unknown;
 };
@@ -53,7 +55,7 @@ const useReferralCodeByAddress = (address: string) => {
   };
 
   return jsonPost<ReferralCodeByAddressBody, ReferralCodeRes>(
-    "https://3ec4-2405-6e00-492-6208-4899-8879-7546-8995.au.ngrok.io/v1/graphql",
+    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -74,7 +76,7 @@ const useReferralCodeByCode = (code: string) => {
   };
 
   return jsonPost<ReferralCodeByCodeBody, ReferralCodeRes>(
-    "https://3ec4-2405-6e00-492-6208-4899-8879-7546-8995.au.ngrok.io/v1/graphql",
+    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
     body,
     process.env.FLU_HASURA_SECRET
       ? {

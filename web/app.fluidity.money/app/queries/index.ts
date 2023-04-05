@@ -5,6 +5,7 @@ export * from "./useUserRewards";
 export * from "./useUserYield";
 export { default as useTokenRewardStatistics } from "./useTokenRewardStatistics";
 export * from "./useReferrals";
+export * from "./useReferralCount";
 export * from "./addReferral";
 export * from "./useReferralCode";
 export * from "./addReferralCode";

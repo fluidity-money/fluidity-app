@@ -1,6 +1,7 @@
 -- migrate:up
-DROP IF EXISTS TRIGGER trigger_lootbox_calculation;
-DROP IF EXISTS FUNCTION update_lootboxes;
+DROP TRIGGER IF EXISTS trigger_lootbox_calculation ON winning_transaction_attributes;
+
+DROP FUNCTION IF EXISTS update_lootboxes;
 
 -- migrate:down
 

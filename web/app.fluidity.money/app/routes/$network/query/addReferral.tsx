@@ -11,6 +11,12 @@ import nacl from "tweetnacl";
 import { validAddress } from "~/util";
 import { useReferralCodeByCode } from "~/queries";
 
+export type AddReferralBody = {
+  address: string;
+  referrer_code: string;
+  referee_msg: string;
+};
+
 export type AddReferralRes = {
   success: boolean;
   msg: unknown;
@@ -74,15 +80,15 @@ export const action: ActionFunction = async ({ request, params }) => {
     const { data: referralCodeByCodeData, errors } =
       await useReferralCodeByCode(referrerCode);
 
-    if (
-      errors ||
-      !referralCodeByCodeData?.lootbox_referral_codes.referral_code
-    ) {
+    const matchingReferralCode =
+      referralCodeByCodeData?.lootbox_referral_codes[0];
+
+    if (errors || !matchingReferralCode) {
       throw new Error("Code does not exist");
     }
 
     // Check referral originator is not referee
-    const referrer = referralCodeByCodeData.lootbox_referral_codes.address;
+    const referrer = matchingReferralCode.address;
 
     if (referrer === referee) {
       throw new Error("Invalid Address");

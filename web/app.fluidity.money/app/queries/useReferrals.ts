@@ -1,36 +1,69 @@
 import { gql, jsonPost } from "~/util";
 
 const queryByAddress = gql`
-  query getReferralCount($address: String!) {
-    lootbox_referrals_aggregate(where: { referrer: { _eq: $address } }) {
-      aggregate {
-        count
-      }
+  query getInactiveReferralByAddress($referrer: String!, $referee: String!) {
+    lootbox_referrals(
+      where: { referrer: { _eq: $address }, referee: { _eq: $referee } }
+    ) {
+      active
+      created_time
+      progress
+      referee
+      referrer
     }
   }
 `;
 
-type ReferralCountByAddressBody = {
+const queryInactiveByAddress = gql`
+  query getInactiveReferralByAddress($address: String!) {
+    lootbox_referrals(
+      where: { referrer: { _eq: $address }, active: { _eq: false } }
+      order_by: { created_time: desc }
+      limit: 1
+    ) {
+      active
+      created_time
+      progress
+      referee
+      referrer
+    }
+  }
+`;
+
+export type Referral = {
+  active: boolean;
+  created_time: string;
+  progress: number;
+  referee: string;
+  referrer: string;
+};
+
+type ReferralsByAddressBody = {
+  query: string;
+  variables: {
+    referrer: string;
+    referee: string;
+  };
+};
+
+type InactiveReferralsByAddressBody = {
   query: string;
   variables: {
     address: string;
   };
 };
 
-type ReferralCountRes = {
+type ReferralsRes = {
   data?: {
-    lootbox_referrals_aggregate: {
-      aggregate: {
-        count: number;
-      };
-    };
+    lootbox_referrals: Array<Referral>;
   };
   errors?: unknown;
 };
 
-const useReferralCountByAddress = (address: string) => {
+const useReferralByAddress = (referrer: string, referee: string) => {
   const variables = {
-    address,
+    referrer,
+    referee,
   };
 
   const body = {
@@ -38,8 +71,8 @@ const useReferralCountByAddress = (address: string) => {
     variables,
   };
 
-  return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
-    "https://3ec4-2405-6e00-492-6208-4899-8879-7546-8995.au.ngrok.io/v1/graphql",
+  return jsonPost<ReferralsByAddressBody, ReferralsRes>(
+    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -49,4 +82,25 @@ const useReferralCountByAddress = (address: string) => {
   );
 };
 
-export { useReferralCountByAddress };
+const useInactiveReferralByAddress = (address: string) => {
+  const variables = {
+    address,
+  };
+
+  const body = {
+    query: queryInactiveByAddress,
+    variables,
+  };
+
+  return jsonPost<InactiveReferralsByAddressBody, ReferralsRes>(
+    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
+    body,
+    process.env.FLU_HASURA_SECRET
+      ? {
+        "x-hasura-admin-secret": "admin_secret",
+      }
+      : {}
+  );
+};
+
+export { useReferralByAddress, useInactiveReferralByAddress };
