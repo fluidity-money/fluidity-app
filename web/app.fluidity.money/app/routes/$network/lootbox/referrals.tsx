@@ -8,7 +8,7 @@ import { useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useState } from "react";
 import { jsonPost } from "~/util";
-import { Text, Heading } from "@fluidity-money/surfing";
+import { Text, Heading, GeneralButton } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import ReferralModal from "~/components/ReferralModal";
@@ -77,28 +77,6 @@ const Referral = () => {
         </div>
 
         {/* Referral Section */}
-        <form>
-          <input readOnly value={referralCode} />
-
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              (async () => {
-                try {
-                  const signedReferrer = await signBuffer?.("Referrer");
-                  setReferralCode(
-                    `/${network}/lootbox/referrals?referral=${address}&referralMsg=${signedReferrer}`
-                  );
-                } catch {
-                  return;
-                }
-              })();
-            }}
-          >
-            Reveal Referral Link
-          </button>
-        </form>
-
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -116,7 +94,7 @@ const Referral = () => {
           <input readOnly name="referrer" value={referral} />
           <label htmlFor="address" />
           <input readOnly name="referee" value={address} />
-          <button type="submit">Submit</button>
+          <GeneralButton buttonType="submit">submit</GeneralButton>
         </form>
       </div>
 

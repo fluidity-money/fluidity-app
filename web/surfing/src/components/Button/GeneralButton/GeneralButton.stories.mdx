@@ -28,8 +28,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Large Primary"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "large",
         }}
     >
@@ -39,8 +38,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Medium Primary"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "medium",
         }}
     >
@@ -50,8 +48,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Small Primary"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "small",
         }}
     >
@@ -63,8 +60,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Large Secondary"
         args={{
             children: "default",
-            version: "secondary",
-            buttontype: "text",
+            type: "secondary",
             size: "large",
         }}
     >
@@ -74,8 +70,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Medium Secondary"
         args={{
             children: "default",
-            version: "secondary",
-            buttontype: "text",
+            type: "secondary",
             size: "medium",
         }}
     >
@@ -85,8 +80,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Small Secondary"
         args={{
             children: "default",
-            version: "secondary",
-            buttontype: "text",
+            type: "secondary",
             size: "small",
         }}
     >
@@ -98,8 +92,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Large Transparent"
         args={{
             children: "default",
-            version: "transparent",
-            buttontype: "text",
+            type: "transparent",
             size: "large",
         }}
     >
@@ -109,8 +102,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Medium Transparent"
         args={{
             children: "default",
-            version: "transparent",
-            buttontype: "icon",
+            type: "transparent",
             icon: <Trophy />,
             size: "medium",
         }}
@@ -121,8 +113,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Small Transparent"
         args={{
             children: "default",
-            version: "transparent",
-            buttontype: "text",
+            type: "transparent",
             size: "small",
         }}
     >
@@ -134,8 +125,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Text only"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "large",
         }}
     >
@@ -145,8 +135,8 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Icon Before Text"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "icon before",
+            type: "primary",
+            layout: "before",
             icon: <ReactSvg />,
             size: "large",
         }}
@@ -157,8 +147,8 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Icon After Text"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "icon after",
+            type: "primary",
+            layout: "after",
             icon: <ReactSvg />,
             size: "large",
         }}
@@ -169,8 +159,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Icon only"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "icon only",
+            type: "primary",
             icon: <Trophy />,
             size: "large",
         }}
@@ -184,8 +173,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             className: "hover",
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "large",
         }}
     >
@@ -196,8 +184,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             className: "focus",
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "large",
         }}
     >
@@ -207,8 +194,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Disabled Primary"
         args={{
             children: "default",
-            version: "primary",
-            buttontype: "text",
+            type: "primary",
             size: "large",
             disabled: true,
         }}
@@ -221,8 +207,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             className: "hover",
             children: "default",
-            version: "secondary",
-            buttontype: "text",
+            type: "secondary",
             size: "large",
         }}
     >
@@ -233,8 +218,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         args={{
             className: "focus",
             children: "default",
-            version: "secondary",
-            buttontype: "text",
+            type: "secondary",
             size: "large",
         }}
     >
@@ -244,8 +228,7 @@ export const Template = ({children, ...props}) => <GeneralButton {...props}>
         name="General Button Disabled Secondary"
         args={{
             children: "default",
-            version: "secondary",
-            buttontype: "text",
+            type: "secondary",
             size: "large",
             disabled: true,
         }}

@@ -99,13 +99,6 @@ main {
   margin-top: auto;
 }
 
-.fluidify-card-add {
-  height: 100%;
-  border-left: 1px solid rgba(72, 72, 72, 0.4);
-  font-size: 1em;
-  border-radius: 0 4px 0 0;
-}
-
 .fluidify-card-add:hover {
   background: rgba(72, 72, 72, 0.4);
 }
@@ -645,21 +638,6 @@ main {
   color: white;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.connected-wallet {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  border: 0.5px solid transparent;
-  padding: 0.2em;
-  border-radius: 2em;
-}
-
-.connected-wallet:hover {
-  border: 0.5px solid white;
-  padding: 0.2em;
-  border-radius: 2em;
 }
 
 .holo {

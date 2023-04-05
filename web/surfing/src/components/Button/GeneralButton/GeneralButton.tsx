@@ -6,80 +6,48 @@ import type { ButtonHTMLAttributes } from "react";
 
 import styles from "./GeneralButton.module.scss";
 
-type GeneralButtonText = {
-  buttontype: "text";
-};
+export interface IGeneralButton {
+  type?: "primary" | "secondary" | "transparent";
+  size?: "small" | "medium" | "large";
+  handleClick?: () => void;
+  children?: React.ReactNode | null;
+  icon?: React.ReactNode;
+  layout?: "before" | "after";
+  disabled?: boolean;
+  className?: string;
+  [key: string]: any;
+}
 
-type GeneralButtonLogo = {
-  icon: React.ReactNode;
-  buttontype: "icon before" | "icon after" | "icon only";
-};
-
-export type IGeneralButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  (GeneralButtonText | GeneralButtonLogo) & {
-    version: "primary" | "secondary" | "transparent";
-    size: "small" | "medium" | "large";
-    handleClick: () => void;
-  };
-
-const GeneralButton = ({
-  children,
-  version,
-  size,
+const GeneralButton: React.FC<IGeneralButton> = ({
+  children=null,
+  icon=null,
+  type="primary",
+  size="medium",
   handleClick,
-  disabled,
-  className,
+  disabled=false,
+  className="",
+  layout="before",
   ...props
-}: IGeneralButtonProps) => {
-  const classProps = className || "";
+}) => {
 
-  const { buttontype } = props as GeneralButtonText | GeneralButtonLogo;
-
-  if (buttontype == "text") {
-    return (
-      <button
-        onClick={handleClick}
-        className={`${styles[version]} ${styles[size]} ${classProps}`}
-        disabled={disabled}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
+  const classProps = `
+    ${styles.GeneralButton}
+    ${styles[layout]} 
+    ${styles[type]} 
+    ${styles[size]}
+    ${className}
+  `;
 
   return (
-    <>
-      {buttontype === "icon before" ? (
-        <button
-          onClick={handleClick}
-          className={`${styles[version]} ${styles[size]} ${classProps}`}
-          disabled={disabled}
-          {...props}
-        >
-          <div className={styles.icon}>{(props as GeneralButtonLogo).icon}</div>{" "}
-          {children}
-        </button>
-      ) : buttontype === "icon after" ? (
-        <button
-          onClick={handleClick}
-          className={`${styles[version]} ${styles[size]} ${classProps}`}
-          disabled={disabled}
-          {...props}
-        >
-          {children}{" "}
-          <div className={styles.icon}>{(props as GeneralButtonLogo).icon}</div>
-        </button>
-      ) : (
-        <button
-          onClick={handleClick}
-          className={`${styles[version]} ${styles[size]} ${styles.iconOnly} ${classProps}`}
-          {...props}
-        >
-          <div className={styles.icon}>{(props as GeneralButtonLogo).icon}</div>
-        </button>
-      )}
-    </>
+    <button
+      onClick={handleClick}
+      className={classProps}
+      disabled={disabled}
+      {...props}
+    >
+      {icon && <div className={styles.icon}>{icon}</div>}
+      {children && <div className={styles.text}>{children}</div>}
+    </button>
   );
 };
 

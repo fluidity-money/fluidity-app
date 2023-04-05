@@ -48,7 +48,9 @@ const ProjectCard = ({
       component={"button"}
       className={`${styles.project} ${styles[size]} ${expandedProp} ${classProps}`}
       rounded={true}
-      type={"gray"}
+      type={"opaque"}
+      border={"none"}
+      color={"gray"}
     >
       {/* Icon */}
       <img src={icon} />

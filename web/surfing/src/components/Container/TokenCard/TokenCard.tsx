@@ -78,7 +78,7 @@ const TokenCard = ({
           )
         }
       </div>
-      {(!isFluid && !isMobile) && <GeneralButton className={styles.fluidifyButton} version='transparent' size="small" buttontype="text" handleClick={onButtonPress}>FLUIDIFY</GeneralButton>}
+      {(!isFluid && !isMobile) && <GeneralButton className={styles.fluidifyButton} type='transparent' size="small" handleClick={onButtonPress}>FLUIDIFY</GeneralButton>}
     </div>
   );
 };

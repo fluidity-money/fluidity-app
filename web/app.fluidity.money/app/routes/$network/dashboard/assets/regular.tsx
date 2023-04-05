@@ -115,7 +115,12 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
 
   return (
     <motion.div variants={assetVariants} style={{ marginBottom: "1em" }}>
-      <CollapsibleCard expanded={false} type="box">
+      <CollapsibleCard
+        expanded={false}
+        type="transparent"
+        border="solid"
+        color="gray"
+      >
         <CollapsibleCard.Summary>
           <TokenCard
             showLabels

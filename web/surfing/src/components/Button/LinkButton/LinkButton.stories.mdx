@@ -113,4 +113,14 @@ export const Template = ({children, ...props}) => <LinkButton {...props}>
     >
         {Template.bind({})}
     </Story>
+    <Story
+        name="Link Button Info"
+        args={{
+            children: "Label",
+            size: "large",
+            type: "info",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
 </Canvas>

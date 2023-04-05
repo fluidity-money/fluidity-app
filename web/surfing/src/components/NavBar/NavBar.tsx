@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import type { IGeneralButtonProps } from "../Button/GeneralButton/GeneralButton";
+import type { IGeneralButton } from "../Button/GeneralButton/GeneralButton";
 
 import { ReactNode, useState } from "react";
 import { GeneralButton, NavBarModal } from "~/components";
@@ -18,7 +18,7 @@ interface INavLinks {
 interface INavBarProps {
   logo: string;
   text: string;
-  button: IGeneralButtonProps;
+  button: IGeneralButton;
   navLinks: INavLinks[];
 }
 
@@ -82,8 +82,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
             </div>
             {/* props */}
             <GeneralButton
-              version={button.version}
-              buttontype={"text"}
+              type={button.type}
               size={width < breakpoint ? "small" : "medium"}
               handleClick={button.handleClick}
             >

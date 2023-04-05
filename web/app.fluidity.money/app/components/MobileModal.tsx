@@ -157,8 +157,8 @@ export default function MobileModal({
               )}
               {/* Prize Money */}
               <GeneralButton
-                version={"transparent"}
-                buttontype="icon after"
+                type={"transparent"}
+                layout="after"
                 size={"small"}
                 className="trophy-button"
                 handleClick={() => {
@@ -196,10 +196,7 @@ export default function MobileModal({
                   />
                 ) : (
                   <GeneralButton
-                    version={
-                      connected || connecting ? "transparent" : "primary"
-                    }
-                    buttontype="text"
+                    type={connected || connecting ? "transparent" : "primary"}
                     size={"medium"}
                     handleClick={() =>
                       connecting ? null : setWalletModalVisibility(true)
@@ -270,8 +267,8 @@ export default function MobileModal({
             <section className="mobile-modal-bottom">
               {/* Unclaimed Winnings */}
               <GeneralButton
-                version={"secondary"}
-                buttontype="icon after"
+                type={"secondary"}
+                layout="after"
                 size={"small"}
                 handleClick={() => {
                   setTimeout(() => {
@@ -294,8 +291,7 @@ export default function MobileModal({
 
               {/* Fluidify Money */}
               <GeneralButton
-                version={"primary"}
-                buttontype="text"
+                type={"primary"}
                 size={"medium"}
                 handleClick={() => {
                   setTimeout(() => {

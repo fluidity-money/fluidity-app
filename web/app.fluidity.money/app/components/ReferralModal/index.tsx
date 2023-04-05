@@ -7,7 +7,6 @@ import {
   Card,
   GeneralButton,
   LabelledValue,
-  HoverButton,
   Twitter,
 } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
@@ -55,14 +54,14 @@ const ReferralModal = () => {
 
         <Heading as={"h4"} className="referrals-heading">
           YOU HAVE {numActiveReferrals}{" "}
-          <HoverButton
+          {/*<HoverButton
             size="xlarge"
             hoverComp={
               <>Active Referrals are Referrals that have earned 10 Lootboxes</>
             }
           >
             active referrals!
-          </HoverButton>{" "}
+          </HoverButton>{" "}*/}
           {referralsEmoji}
         </Heading>
         <Text size="l">Send more of your link to earn more rewards!</Text>

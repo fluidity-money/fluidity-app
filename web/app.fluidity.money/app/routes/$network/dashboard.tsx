@@ -354,12 +354,11 @@ export default function Dashboard() {
         <GeneralButton
           className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
             }`}
-          version={"primary"}
-          buttontype="text"
+          type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
         >
-          <Heading as="h5">
+          <Heading as="h5" color="inherit" style={{ margin: 0 }}>
             <b>Fluidify Money</b>
           </Heading>
         </GeneralButton>
@@ -418,8 +417,7 @@ export default function Dashboard() {
             />
           ) : (
             <GeneralButton
-              version={connected || connecting ? "transparent" : "primary"}
-              buttontype="text"
+              type={connected || connecting ? "transparent" : "primary"}
               size={"medium"}
               handleClick={() =>
                 connecting ? null : setWalletModalVisibility(true)
@@ -442,8 +440,7 @@ export default function Dashboard() {
           />
         ) : (
           <GeneralButton
-            version={connected || connecting ? "transparent" : "primary"}
-            buttontype="text"
+            type={connected || connecting ? "transparent" : "primary"}
             size={"medium"}
             handleClick={() =>
               connecting ? null : setWalletModalVisibility(true)
@@ -512,8 +509,7 @@ export default function Dashboard() {
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
                 className="fluidify-button-dashboard "
-                version={"primary"}
-                buttontype="text"
+                type={"secondary"}
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
@@ -529,8 +525,8 @@ export default function Dashboard() {
               onMouseEnter={() => setHoverModal(true)}
               onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
               className="trophy-button"
-              version={"transparent"}
-              buttontype="icon after"
+              type={"transparent"}
+              layout="after"
               size={"small"}
               handleClick={() =>
                 unclaimedRewards < 0.000005
@@ -538,6 +534,7 @@ export default function Dashboard() {
                   : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
+              style={{ fontSize: "1em" }}
             >
               {numberToMonetaryString(unclaimedRewards)}
             </GeneralButton>
@@ -588,15 +585,14 @@ export default function Dashboard() {
         {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
-            version={"primary"}
-            buttontype="text"
+            type={"secondary"}
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
               navigate(`/${network}/fluidify`);
             }}
           >
-            <Heading as="h5">
+            <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
             </Heading>
           </GeneralButton>

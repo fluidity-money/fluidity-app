@@ -48,7 +48,9 @@ interface ICardCarousel extends ICard {
 
 const CardCarousel: React.FC<ICardCarousel> = ({
   children,
-  type = "box",
+  type = "transparent",
+  border = "solid",
+  color = "gray",
   rounded = true,
   size = "normal",
   ...props
@@ -74,7 +76,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
   const Navigation = () => (
     <>
       <div
-        className={`${!isCompact ? styles.arrow : ""} ${styles[type]}`}
+        className={`${!isCompact ? styles.arrow : ""} ${styles[color]}`}
         onClick={() => {
           paginate(-1);
         }}
@@ -93,7 +95,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
         ))}
       </div>
       <div
-        className={`${!isCompact ? styles.arrow : ""} ${styles[type]}`}
+        className={`${!isCompact ? styles.arrow : ""} ${styles[color]}`}
         onClick={() => {
           paginate(1);
         }}
@@ -105,8 +107,10 @@ const CardCarousel: React.FC<ICardCarousel> = ({
 
   return (
     <Card
-      {...props}
       type={type}
+      color={color}
+      border={border}
+      {...props}
       rounded={rounded}
       className={`${styles.CardCarousel} ${styles[size]}`}
     >
@@ -142,7 +146,7 @@ const CardCarousel: React.FC<ICardCarousel> = ({
         </AnimatePresence>
       </div>
       {isCompact ? (
-        <div className={`${styles.bottomNavbar} ${styles[type]}`}>
+        <div className={`${styles.bottomNavbar} ${styles[color]}`}>
           <Navigation />
         </div>
       ) : (

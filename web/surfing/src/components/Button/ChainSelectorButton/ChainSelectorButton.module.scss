@@ -1,6 +1,9 @@
 @use 'common' as *;
 
 .dropdown {
+  all: unset;
+  cursor: pointer;
+  font-size: 0.8rem;
   background-color: transparent;
   border: 1px solid map-get($border, "default");
   width: 95px;
