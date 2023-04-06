@@ -39,7 +39,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2em;
+  gap: 1em;
 }
 
 #unclaimed-left > h1 {
@@ -84,15 +84,18 @@
 }
 
 #no-user-rewards {
+  box-sizing: border-box;
   display: flex;
   padding: 2em;
-  height: calc(100% - 4em);
-  width: calc(100% - 4em);
+  min-height: 100%;
+  height: auto;
+  width: 100%;
   justify-content: space-evenly;
   align-items: center;
   text-align: center;
   flex-direction: row;
   flex-wrap: wrap;
+  gap: 1em;
 }
 
 .reward-ctas {
@@ -166,6 +169,9 @@
   }
 
   #infobox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
     margin-left: 0;
     max-width: 450px;
     justify-self: center;
@@ -180,6 +186,7 @@
   #unclaimed-left {
     flex-direction: column;
     align-items: center;
+    gap: 0.5em;
   }
   #unclaimed {
     align-items: center;

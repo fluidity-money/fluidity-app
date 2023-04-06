@@ -16,9 +16,9 @@ import {
   ConnectedWalletModal,
   ChainName,
   ConnectedWallet,
+  BurgerMenu
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import BurgerButton from "./BurgerButton";
 
 type IMobileModal = {
   navigationMap: Array<{ name: string; icon: JSX.Element }>;
@@ -174,7 +174,7 @@ export default function MobileModal({
                 {numberToMonetaryString(unclaimedRewards)}
               </GeneralButton>
 
-              <BurgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
+              <BurgerMenu isOpen={isOpen} setIsOpen={setIsOpen} />
             </div>
           </nav>
 

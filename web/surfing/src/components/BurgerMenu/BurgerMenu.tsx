@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import styles from "./BurgerMenu.module.scss";
+import  GeneralButton  from "../Button/GeneralButton";
 
 interface IBurgerMenuProps {
   isOpen: boolean;
@@ -8,8 +9,8 @@ interface IBurgerMenuProps {
 
 export const BurgerMenu = ({ isOpen, setIsOpen }: IBurgerMenuProps) => {
   const diagonalVariants = {
-    rotateD: { rotate: 45, y: 4 },
-    rotateU: { rotate: -45, y: -4 },
+    rotateD: { rotate: 45, y: 5 },
+    rotateU: { rotate: -45, y: -5 },
     stop: { rotate: 0 },
   };
 
@@ -19,7 +20,12 @@ export const BurgerMenu = ({ isOpen, setIsOpen }: IBurgerMenuProps) => {
   };
 
   return (
-    <div className={styles.container} onClick={() => setIsOpen(!isOpen)}>
+    <GeneralButton 
+      type="transparent"
+      size="small" 
+      className={styles.container} 
+      onClick={() => setIsOpen(prev => !prev)}
+    >
       <div className={styles.burger}>
         <motion.span
           variants={diagonalVariants}
@@ -37,7 +43,7 @@ export const BurgerMenu = ({ isOpen, setIsOpen }: IBurgerMenuProps) => {
           animate={isOpen ? "rotateU" : "stop"}
         ></motion.span>
       </div>
-    </div>
+    </GeneralButton>
   );
 };
 
