@@ -40,7 +40,7 @@ import {
   Provider,
   ChainName,
   Token,
-  BurgerMenu
+  BurgerMenu,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import MobileModal from "~/components/MobileModal";
@@ -312,9 +312,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 

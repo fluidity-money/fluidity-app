@@ -153,9 +153,10 @@ const NoUserRewards = ({ prizePool }: INoUserRewards) => {
         ) : (
           <Heading as="h4">No Unclaimed Rewards</Heading>
         )}
-        <p style={{margin: 0}}>
-        <Text>You currently have no unclaimed rewards.</Text><br/>
-        <Text>Use, Send & Receive Fluid Assets to gain yield.</Text>
+        <p style={{ margin: 0 }}>
+          <Text>You currently have no unclaimed rewards.</Text>
+          <br />
+          <Text>Use, Send & Receive Fluid Assets to gain yield.</Text>
         </p>
       </div>
     </Card>
