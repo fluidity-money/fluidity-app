@@ -7,12 +7,15 @@ package main
 import (
 	"math"
 	"strconv"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/referrals"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -69,6 +72,8 @@ func main() {
 			int(maxUnclaimedReferrals),
 		)
 
+		currTime := time.Now()
+
 		for _, referral := range unclaimedReferrals {
 			if lootboxCount <= 0 {
 				break
@@ -84,6 +89,19 @@ func main() {
 
 			if referral.Progress >= float64(lootboxReferralAmount) {
 				referral.Active = true
+
+				// Send 10 lootboxes to referree on activation
+				referralLootbox := lootboxes.Lootbox{
+					Address:         referral.Referee,
+					Source:          lootboxes.Referral,
+					TransactionHash: "",
+					AwardedTime:     currTime,
+					Volume:          misc.BigIntFromUint64(0),
+					RewardTier:      0,
+					LootboxCount:    10,
+				}
+
+				go queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)
 			}
 
 			go referrals.UpdateReferral(referral)

@@ -5,12 +5,9 @@
 package main
 
 import (
-	"math"
-	"strconv"
-
-	lootboxes_db "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/referrals"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
@@ -53,7 +50,7 @@ func main() {
 		)
 
 		for _, referral := range activeReferrals {
-			referralLootbox := lootboxes_db.Lootbox{
+			referralLootbox := lootboxes.Lootbox{
 				// Send lootbox to referrer
 				Address:         referral.Referrer,
 				Source:          lootboxes.Referral,
@@ -64,7 +61,7 @@ func main() {
 				LootboxCount:    referralLootboxCount,
 			}
 
-			go lootboxes_db.InsertLootbox(referralLootbox)
+			go queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)
 		}
 	})
 }
