@@ -18,7 +18,7 @@ const (
 
 type Lootbox = types.Lootbox
 
-// InsertTransactionAttributes to store the attributes of a winning transaction
+// InsertLootbox inserts a Lootbox into the database
 func InsertLootbox(lootbox Lootbox) {
 	timescaleClient := timescale.Client()
 
