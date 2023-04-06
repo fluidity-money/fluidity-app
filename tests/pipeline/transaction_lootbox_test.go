@@ -62,7 +62,7 @@ func TestTransactionAttributes(t *testing.T) {
 		tokenDetails         = token_details.New("fUSDT", 6)
 		expectedVolume       = misc.BigIntFromInt64(12500000)
 		expectedRewardTier   = 1
-		expectedLootboxCount = 1.0
+		expectedLootboxCount = 1.722222
 		fusdtAddress         = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
 		topicReward          = ethTypes.HashFromString("0xe417c38cb96e748006d0ef1a56fec0de428abac103b6644bc30c745f54f54345")
 		topicWinner          = ethTypes.HashFromString("0x0000000000000000000000007a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
@@ -86,6 +86,7 @@ func TestTransactionAttributes(t *testing.T) {
 		ToWinAmount:  payouts,
 		TokenDetails: tokenDetails,
 		Application:  0,
+		RewardTier:   expectedRewardTier,
 	}}
 
 	queue.SendMessage(spoolerInputQueue, announcement)
@@ -108,7 +109,7 @@ func TestTransactionAttributes(t *testing.T) {
 	// sleep between messages to avoid ordering issues
 	time.Sleep(time.Second)
 
-	// send message from track-winners -> track-transaction-attributes -> timescale
+	// send message from track-winners -> create-transaction-lootbox -> timescale
 	queue.SendMessage(logsQueue, log)
 
 	time.Sleep(time.Second)
