@@ -47,13 +47,13 @@
 
   &.solid {
     border-width: 1px;
-    border-style: solid; 
+    border-style: solid;
   }
 
   &.dashed {
     border-width: 1px;
     border-style: dashed;
-  }  
+  }
 
   // Colors
   &.gray {
@@ -125,13 +125,19 @@
     background-color: transparent;
   }
 
+  &.dashed {
+    border-style: dashed;
+  }
+
   &.frosted {
     // background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 
     // Override border styles
-    &.dashed, &.solid, &.none {
+    &.dashed,
+    &.solid,
+    &.none {
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       border-style: solid;
       border-color: rgba(255, 255, 255, 0.102);

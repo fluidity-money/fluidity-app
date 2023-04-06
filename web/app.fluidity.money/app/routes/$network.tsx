@@ -96,14 +96,14 @@ const ProviderOutlet = () => {
   useEffect(() => {
     if (!(address && connected)) return;
 
-    if (!getDegenScore) return;
-
     (async () => {
+      if (!getDegenScore) return;
+
       const degenScore = await getDegenScore(address);
 
       client?.track("connected-user-degen-score", address, degenScore);
     })();
-  }, [address]);
+  }, [address, client]);
 
   return (
     <>

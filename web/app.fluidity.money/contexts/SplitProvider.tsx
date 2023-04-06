@@ -6,11 +6,11 @@ import type {
 import { createContext, useEffect, useState } from "react";
 import { SplitFactory } from "@splitsoftware/splitio";
 
+declare let window: SplitWindow;
+
 type SplitWindow = Window & {
   split: IBrowserSDK | null;
 };
-
-declare let window: SplitWindow;
 
 type SplitContextType = {
   showExperiment: (featName: string) => boolean;

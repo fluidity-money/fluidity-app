@@ -1,0 +1,8 @@
+DOCKER_IMAGE: microservice-lootbox-referral-distributor
+DOCKERFILE_PATH: ./cmd/microservice-lootbox-referral-distributor
+ENV_FLU_ETHEREUM_NETWORK: "ethereum"
+
+SERVICES:
+  - LOOTBOX_REFERRAL_DISTRIBUTOR:
+      SERVICE_NAME: microservice-lootbox-referral-distributor
+      ENV_FLU_WORKER_ID: ethereum-microservice-lootbox-referral-distributor

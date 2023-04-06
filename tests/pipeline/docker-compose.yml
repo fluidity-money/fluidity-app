@@ -178,6 +178,14 @@ services:
       FLU_WORKER_ID: microservice-ethereum-track-transaction-attributes
     restart: on-failure
 
+  microservice-ethereum-track-staking-emissions:
+    build:
+      context: ../../cmd/microservice-ethereum-track-staking-emissions/
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: microservice-ethereum-track-staking-emissions
+    restart: on-failure
+
   test-utility-mining:
     build:
       context: .
@@ -224,6 +232,23 @@ services:
       FLU_ETHEREUM_NETWORK: ethereum
       <<: *flu-envs
       <<: *util-mining-test-envs
+
+
+  test-staking-emissions:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - redis
+      - rabbit
+      - postgres
+      - timescale
+      - microservice-ethereum-track-staking-emissions
+    environment:
+      FLU_TEST: TestStakingEmissions
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_NETWORK: ethereum
+      <<: *flu-envs
 
   test-worker-epochs:
     build:
