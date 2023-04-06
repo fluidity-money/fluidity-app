@@ -7,7 +7,7 @@ import { json } from "@remix-run/node";
 import { useCache } from "~/hooks/useCache";
 import { useLoaderData } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { jsonPost } from "~/util";
 import { Text, Heading, GeneralButton } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
@@ -56,7 +56,7 @@ const Referral = () => {
   const { network, referralCode: clickedReferralCode } =
     useLoaderData<LoaderData>();
 
-  const { address, connected, signBuffer } = useContext(FluidityFacadeContext);
+  const { address, signBuffer } = useContext(FluidityFacadeContext);
 
   const { data: referralsData } = useCache<ReferralCountData>(
     address ? `/${network}/query/referrals?address=${address}` : ""

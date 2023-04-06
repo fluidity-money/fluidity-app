@@ -3,24 +3,17 @@ import type {
   AddReferralRes,
 } from "~/routes/$network/query/addReferral";
 
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useContext, useState } from "react";
 import { jsonPost } from "~/util";
 import {
   Text,
   Heading,
-  Display,
   Card,
   GeneralButton,
-  LabelledValue,
-  HoverButton,
-  Twitter,
   LinkButton,
-  ArrowRight,
-  LoadingDots,
 } from "@fluidity-money/surfing";
-import { SplitContext } from "contexts/SplitProvider";
 
 type IAcceptReferraModal = {
   network: string;

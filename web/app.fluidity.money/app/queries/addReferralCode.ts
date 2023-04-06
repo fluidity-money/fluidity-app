@@ -45,8 +45,8 @@ const addReferralCode = (address: string, code: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": "admin_secret",
-      }
+          "x-hasura-admin-secret": "admin_secret",
+        }
       : {}
   );
 };

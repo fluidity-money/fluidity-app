@@ -1,6 +1,5 @@
 import { useNavigate } from "@remix-run/react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import {
   Text,
   Heading,
@@ -13,7 +12,6 @@ import {
   LoadingDots,
   Hoverable,
 } from "@fluidity-money/surfing";
-import { SplitContext } from "contexts/SplitProvider";
 
 type IReferraModal = {
   referrerClaimed: number;

@@ -1,5 +1,4 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import type { ReferralCode } from "~/queries/useReferralCode";
 
 import { useSplitExperiment } from "~/util/split";
 import { json } from "@remix-run/node";
@@ -110,7 +109,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
     if (
       referralCodeByAddressErr ||
-      referralCodeByAddressData?.lootbox_referral_codes.referral_code
+      referralCodeByAddressData?.lootbox_referral_codes.length
     ) {
       throw new Error("Invalid Address");
     }
@@ -128,7 +127,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
         if (
           referralCodeByCodeErr ||
-          referralCodeByCodeData?.lootbox_referral_codes.referral_code
+          referralCodeByCodeData?.lootbox_referral_codes.length
         ) {
           counter += 1;
           continue;

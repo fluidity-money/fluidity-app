@@ -76,8 +76,8 @@ const useReferralByAddress = (referrer: string, referee: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": "admin_secret",
-      }
+          "x-hasura-admin-secret": "admin_secret",
+        }
       : {}
   );
 };
@@ -97,8 +97,8 @@ const useInactiveReferralByAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": "admin_secret",
-      }
+          "x-hasura-admin-secret": "admin_secret",
+        }
       : {}
   );
 };

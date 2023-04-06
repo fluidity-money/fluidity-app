@@ -13,12 +13,11 @@ import SolanaProvider from "contexts/SolanaProvider";
 import { Fragment } from "react";
 import { Token } from "~/util/chainUtils/tokens.js";
 import { NotificationSubscription } from "~/components/NotificationSubscription";
-import { jsonPost } from "~/util";
 
 type ProviderMap = {
   [key: string]:
-  | ((props: { children: React.ReactNode }) => JSX.Element)
-  | undefined;
+    | ((props: { children: React.ReactNode }) => JSX.Element)
+    | undefined;
 };
 
 const Provider = ({
@@ -87,7 +86,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   };
 };
 
-const ProviderOutlet = ({ network }: { network: string }) => {
+const ProviderOutlet = () => {
   const { connected, address, getDegenScore } = useContext(
     FluidityFacadeContext
   );
@@ -158,7 +157,7 @@ export default function Network() {
         tokens={tokens}
         colorMap={colors}
       />
-      <ProviderOutlet network={network} />
+      <ProviderOutlet />
     </Provider>
   );
 }
