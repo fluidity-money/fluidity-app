@@ -95,6 +95,7 @@ const MultiplierTasks = () => {
           flexDirection: "column",
           gap: "0.5em",
           alignItems: "flex-start",
+          justifyContent: "center",
           gridColumn: "1 / 2",
         }}
       >
