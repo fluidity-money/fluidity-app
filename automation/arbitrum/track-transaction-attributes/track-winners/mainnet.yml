@@ -1,0 +1,8 @@
+DOCKER_IMAGE: microservice-arbitrum-track-transaction-attributes
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-track-transaction-attributes
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
+
+SERVICES:
+  - TRACK_TRANSACTION_ATTRIBUTES:
+      SERVICE_NAME: microservice-arbitrum-track-transaction-attributes
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-track-transaction-attributes

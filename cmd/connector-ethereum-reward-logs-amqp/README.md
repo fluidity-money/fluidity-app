@@ -15,12 +15,14 @@ Watches for the following events over the Geth websocket:
 
 - `BurnFluid`
 
+- `Staked` (from the staking contract)
+
 ## Environment variables
 
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
 | `FLU_ETHEREUM_WS_URL`                      | Geth websocket address to use to receive Ethereum logs from. |
-| `FLU_ETHEREUM_TOKENS_LIST`                      | List of tokens in address:shortname:decimals form to watch for events. |
+| `FLU_ETHEREUM_TOKENS_LIST`                      | List of tokens in address:shortname:decimals form to watch for events, including the staking contract |
 
 ### `FLU_ETHEREUM_START_BLOCK`
 
