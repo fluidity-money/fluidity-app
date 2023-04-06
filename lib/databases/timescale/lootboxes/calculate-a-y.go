@@ -11,12 +11,13 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 )
 
-// InsertTransactionAttributes to store the attributes of a winning transaction
+// Calculate_A_Y to determine the liquidity multiplier of an address
 func Calculate_A_Y(address string, time time.Time) float64 {
 	timescaleClient := timescale.Client()
 
 	statementText := `
-	SELECT result 
+	SELECT 
+		COALESCE(result, 0)
 	FROM calculate_a_y(
 		$1,
 		$2
