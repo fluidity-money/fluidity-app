@@ -40,7 +40,7 @@ import {
   Provider,
   ChainName,
   Token,
-  BurgerMenu
+  BurgerMenu,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import MobileModal from "~/components/MobileModal";
