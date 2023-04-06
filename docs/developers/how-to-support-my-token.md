@@ -1,4 +1,8 @@
-# 🙋 How can I Fluid Wrap my token?
+---
+description: Want to wrap assets that aren't currently supported?
+---
+
+# 🙋 How can I Fluid Wrap my custom token?
 
 At this stage, reach out via this form:
 

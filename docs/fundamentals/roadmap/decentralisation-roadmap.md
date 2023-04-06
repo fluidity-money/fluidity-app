@@ -1,6 +1,6 @@
 # 🌤 Decentralisation roadmap
 
-(WIP)
+(WIP) 🚧🛠️
 
 1. Fluidity worker/contract architecture - centralised, little trust in the randomness generation <- **we are here**
 2. Distributed worker/contract architecture - publicly sourced randomness from a multiparty computation with leader election, competition with batching powered by members of the community

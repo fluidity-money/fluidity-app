@@ -34,12 +34,16 @@ You are free from market volatility risk when exchanging your Fluid Assets to th
 
 You can use Fluid Assets in any supported Blockchain and Protocol.
 
+We are currently live on both Ethereum and Arbitrum mainnet, and plan on releasing on Solana, Polygon as well as other chains in the near future!
+
 There are a variety of use-cases where Fluid Assets may be used, some of which include:
 
 * Sending, receiving, and swapping tokens
 * Minting, trading, and selling NFTs
 * Blockchain-based gaming
 * Performing transactions in a DEX
+
+
 
 Anything that requires a transaction of value to be made can be enhanced through the interaction within the Fluidity ecosystem. You can have a more detailed read on Fluidity utility and use-cases below:
 

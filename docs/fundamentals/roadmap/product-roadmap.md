@@ -10,18 +10,23 @@ Given the successful testnet and devnet deployments as well as the massive commu
 
 **Key Points:**
 
-1. Fluidity Mainnet Launch: A New Primitive to incentivise utility and participation
+1. Fluidity Mainnet Launch: A New Primitive to incentivise utility and participation :white\_check\_mark:
 2. Fluidity DAO
-   1. DAO Framework
-   2. Fluid Token
+   1. DAO Framework :white\_check\_mark:
+   2. Fluid Token :eyes:
 3. Utility Mining & Fluidity Wars
-   1. Utility Gauges
-   2. Governance and protocol/user participation
+   1. Utility Gauges :white\_check\_mark:
+   2. Governance and protocol/user participation 🚧🛠️
 4. The Incentive Layer: Fluidity as a chain agnostic incentive middle layer
+   1. Ethereum :white\_check\_mark:
+   2. Arbitrum :white\_check\_mark:
+   3. Solana 🚧🛠️
+   4. Polygon 🚧🛠️
+   5. ??? :eyes:
 5. Security and Decentralisation
-   1. Randomness
-   2. System Architecture
-6. Ambassador program and Fluidity Ecosystem Fund
+   1. Randomness 🚧🛠️
+   2. System Architecture 🚧🛠️
+6. Ambassador program and Fluidity Ecosystem Fund :eyes:
 7. Web2 - Web3 and retail: Bridging adoption
 8. (🌊 ,💸 ) Join The Movement
 

@@ -1,4 +1,4 @@
-# 💠 Arbitrum
+# 🅰 Arbitrum
 
 ## Mainnet
 

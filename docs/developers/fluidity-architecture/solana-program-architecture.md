@@ -4,7 +4,7 @@ Solana is built as a program that derives new accounts for its supported tokens.
 
 <figure><img src="https://fluidity.money/gitbook-content/solana-architecture.png" alt=""><figcaption><p>Solana architecture simplified</p></figcaption></figure>
 
-Each account's layout can be read at [Solana **** account structure](../solana-account-structure.md).&#x20;
+Each account's layout can be read at [Solana account structure](../solana-account-structure.md).&#x20;
 
 The program supports the following instructions:
 
