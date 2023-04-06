@@ -9,11 +9,11 @@ export interface ICard {
   style?: React.CSSProperties;
   rounded?: boolean;
   disabled?: boolean;
-
-  type?: "opaque" | "transparent" | "frosted";
+  fill?: boolean;
+  shimmer?: boolean;
+  type?: "opaque" | "transparent" | "frosted"
   border?: "solid" | "dashed" | "none";
-  color?: "gray" | "white" | "holo";
-
+  color?: "gray" | "white" | "holo"
   [_: string]: any;
 }
 
@@ -24,9 +24,11 @@ const Card = ({
   className = "",
   disabled = false,
   children,
-  type = "opaque",
-  border = "none",
-  color = "gray",
+  fill = false,
+  shimmer = false,
+  type="opaque",
+  border="none",
+  color="gray",
   ...props
 }: ICard) => {
   const Component = component;
@@ -41,22 +43,26 @@ const Card = ({
     ${styles.card} 
     ${propsClass}
     ${elementClass} 
-    ${rounded ? styles.rounded : ""} 
+    ${rounded ? styles.rounded : ''} 
+    ${fill ? styles.fill : ''}
+    ${shimmer ? styles.shimmer : ''}
     ${typeClass} 
     ${borderClass}
     ${colorClass}
   `;
 
-  return (
-    <Component
-      style={style}
-      className={allClasses}
-      disabled={disabled}
-      {...props}
-    >
+  const CardContent = (
+    <Component style={style} className={allClasses} disabled={disabled} {...props}>
       {children}
     </Component>
-  );
+  )
+
+  if (shimmer) return <div className={`${styles.shimmerWrapper} ${rounded ? styles.rounded : ''} ${fill ? styles.fill : ''}`}>
+    <div className={styles.shimmerBackground} />
+    {CardContent}
+  </div>
+
+  return CardContent
 };
 
 export default Card;

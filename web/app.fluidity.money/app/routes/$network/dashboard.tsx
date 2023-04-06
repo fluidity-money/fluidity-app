@@ -40,7 +40,7 @@ import {
   Provider,
   ChainName,
   Token,
-  BurgerMenu
+  BurgerMenu,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import MobileModal from "~/components/MobileModal";
@@ -528,7 +528,6 @@ export default function Dashboard() {
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
               onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
-              className="trophy-button"
               type={"transparent"}
               layout="after"
               size={"small"}

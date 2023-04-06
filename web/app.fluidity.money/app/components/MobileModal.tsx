@@ -16,7 +16,7 @@ import {
   ConnectedWalletModal,
   ChainName,
   ConnectedWallet,
-  BurgerMenu
+  BurgerMenu,
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 
@@ -160,7 +160,6 @@ export default function MobileModal({
                 type={"transparent"}
                 layout="after"
                 size={"small"}
-                className="trophy-button"
                 handleClick={() => {
                   setTimeout(() => {
                     setIsOpen(false);

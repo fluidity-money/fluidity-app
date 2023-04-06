@@ -8,6 +8,18 @@
   padding: 1em;
   box-sizing: border-box;
 
+  &.shimmer {
+    -webkit-mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.717),#000 60%) right/300% 100%;
+    mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.715),#000 60%) right/300% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 5s infinite;
+    background-color: black;
+  }
+
+  &.fill {
+    width: 100%;
+  }
+
   &.button {
     all: unset;
     font-size: 1em;
@@ -57,46 +69,54 @@
   &.holo {
     position: relative;
     border: none;
+    overflow: hidden;
+    background: $holo-linear;
+    background-size: 1600px;
+    animation: gradient 15s ease infinite;
 
-    &::before {
-      content: "";
-      position: absolute;
-      pointer-events: none;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 1px;
-      background: $holo;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
+    &.transparent {
+      background: none;
 
-    &.rounded {
       &::before {
-        border-radius: 12px;
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
       }
-    }
-
-    &.dashed {
-      &::before {
-        border: 1px dashed black;
-        padding: 0;
+  
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
       }
-    }
-
-    &.none {
-      &::before {
-        border: 1px solid black;
-        padding: 0;
+  
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
       }
-    }
-
-    &.frosted {
-      border: none;
+  
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
+      }
+  
+      &.frosted {
+        border: none;
+      }
     }
   }
 
@@ -122,5 +142,52 @@
       border-style: solid;
       border-color: rgba(255, 255, 255, 0.102);
     }
+  }
+}
+
+@keyframes shimmer {
+  0%, 10% {-webkit-mask-position: right/300%;}
+  90%, 100% {-webkit-mask-position: -50%;}
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0 0;
+	}
+  50% {
+    background-position: 600px 0;
+  }
+	100% {
+		background-position: 0 0;
+	}
+}
+
+.shimmerWrapper {
+  position: relative;
+  overflow: hidden;
+ 
+  &.fill {
+    width: 100%;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &.heading {
+    > * {
+      flex: 0 0;
+    }
+  }
+
+  .shimmerBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    filter: blur(100px);
+    z-index: -1;
   }
 }
