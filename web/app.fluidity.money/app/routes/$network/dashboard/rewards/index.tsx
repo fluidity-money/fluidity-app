@@ -541,6 +541,7 @@ export default function Rewards() {
         size={mobileView ? "compact" : "normal"}
         type="transparent"
         color="white"
+        fill
         border="solid"
       >
         <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
