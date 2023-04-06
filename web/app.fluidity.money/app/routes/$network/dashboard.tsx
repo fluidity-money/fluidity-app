@@ -40,8 +40,8 @@ import {
   Provider,
   ChainName,
   Token,
+  BurgerMenu
 } from "@fluidity-money/surfing";
-import BurgerButton from "~/components/BurgerButton";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
@@ -544,7 +544,7 @@ export default function Dashboard() {
             </GeneralButton>
 
             {(isTablet || isMobile) && (
-              <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
+              <BurgerMenu isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
           </div>
         </nav>
