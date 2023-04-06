@@ -72,12 +72,12 @@ const useReferralByAddress = (referrer: string, referee: string) => {
   };
 
   return jsonPost<ReferralsByAddressBody, ReferralsRes>(
-    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
+    "https://fluidity.hasura.app/v1/graphql",
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": "admin_secret",
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
@@ -93,12 +93,12 @@ const useInactiveReferralByAddress = (address: string) => {
   };
 
   return jsonPost<InactiveReferralsByAddressBody, ReferralsRes>(
-    "https://39a0-2405-6e00-2088-240d-baee-48f7-8d86-a27.au.ngrok.io/v1/graphql",
+    "https://fluidity.hasura.app/v1/graphql",
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": "admin_secret",
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
