@@ -4,7 +4,7 @@
 
 import { ButtonHTMLAttributes, useEffect } from "react";
 
-import { useState } from "react"
+import { useState } from "react";
 import { Tooltip } from "components";
 import styles from "./Hoverable.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
@@ -28,20 +28,19 @@ const Hoverable = ({
   useEffect(() => {
     if (isHovered || isFocused) {
       setShowTooltip(true);
-      return
+      return;
     }
 
     if (!isHovered) {
       const timer = setTimeout(() => {
         setShowTooltip(false);
-      }
-      , 500);
+      }, 500);
       return () => clearTimeout(timer);
     }
 
     if (!isFocused) {
       setShowTooltip(false);
-      return
+      return;
     }
   }, [isHovered, isFocused]);
 
@@ -55,24 +54,22 @@ const Hoverable = ({
       {...props}
     >
       {children}
-    <AnimatePresence>
-    {showTooltip && (
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className={styles.pseudoBridge}
-          onMouseEnter={() => setIsHovered(true)} 
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <Tooltip>
-            {tooltipContent}
-          </Tooltip>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className={styles.pseudoBridge}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <Tooltip>{tooltipContent}</Tooltip>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 

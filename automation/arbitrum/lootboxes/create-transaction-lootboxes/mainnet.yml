@@ -1,0 +1,8 @@
+DOCKER_IMAGE: microservice-arbitrum-create-transaction-lootboxes
+DOCKERFILE_PATH: ./cmd/microservice-ethereum-create-transaction-lootboxes
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
+
+SERVICES:
+  - CREATE_TRANSACTION_LOOTBOXES:
+      SERVICE_NAME: microservice-arbitrum-create-transaction-lootboxes
+      ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-create-transaction-lootboxes

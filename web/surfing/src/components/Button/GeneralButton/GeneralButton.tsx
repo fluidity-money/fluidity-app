@@ -19,17 +19,16 @@ export interface IGeneralButton {
 }
 
 const GeneralButton: React.FC<IGeneralButton> = ({
-  children=null,
-  icon=null,
-  type="primary",
-  size="medium",
+  children = null,
+  icon = null,
+  type = "primary",
+  size = "medium",
   handleClick,
-  disabled=false,
-  className="",
-  layout="before",
+  disabled = false,
+  className = "",
+  layout = "before",
   ...props
 }) => {
-
   const classProps = `
     ${styles.GeneralButton}
     ${styles[layout]} 

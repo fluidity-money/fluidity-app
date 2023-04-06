@@ -20,6 +20,14 @@
     font-weight: 700;
   }
 
+  ul {
+    text-decoration: underline;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
   &.holo {
     background: conic-gradient(
       from 209.59deg at 50% 50%,

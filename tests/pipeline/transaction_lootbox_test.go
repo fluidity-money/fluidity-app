@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
+	lootboxes_db "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/tests/pipeline/libtest"
 
-	ethApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -56,14 +56,16 @@ func TestTransactionAttributes(t *testing.T) {
 		logsQueue         = ethereum.TopicLogs
 
 		// can't be random as it's also embedded in reward data
-		senderAddress    = ethTypes.AddressFromString("0x7a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
-		recipientAddress = libtest.RandomAddress()
-		transactionHash  = libtest.RandomHash()
-		tokenDetails     = token_details.New("fUSDT", 6)
-		expectedAmount   = misc.BigIntFromInt64(12500000)
-		fusdtAddress     = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
-		topicReward      = ethTypes.HashFromString("0xe417c38cb96e748006d0ef1a56fec0de428abac103b6644bc30c745f54f54345")
-		topicWinner      = ethTypes.HashFromString("0x0000000000000000000000007a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
+		senderAddress        = ethTypes.AddressFromString("0x7a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
+		recipientAddress     = libtest.RandomAddress()
+		transactionHash      = libtest.RandomHash()
+		tokenDetails         = token_details.New("fUSDT", 6)
+		expectedVolume       = misc.BigIntFromInt64(12500000)
+		expectedRewardTier   = 1
+		expectedLootboxCount = 1.722222
+		fusdtAddress         = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
+		topicReward          = ethTypes.HashFromString("0xe417c38cb96e748006d0ef1a56fec0de428abac103b6644bc30c745f54f54345")
+		topicWinner          = ethTypes.HashFromString("0x0000000000000000000000007a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
 
 		firstBlock  = rand.Int63n(1000)
 		lastBlock   = rand.Int63n(1002 + firstBlock)
@@ -84,6 +86,7 @@ func TestTransactionAttributes(t *testing.T) {
 		ToWinAmount:  payouts,
 		TokenDetails: tokenDetails,
 		Application:  0,
+		RewardTier:   expectedRewardTier,
 	}}
 
 	queue.SendMessage(spoolerInputQueue, announcement)
@@ -106,23 +109,23 @@ func TestTransactionAttributes(t *testing.T) {
 	// sleep between messages to avoid ordering issues
 	time.Sleep(time.Second)
 
-	// send message from track-winners -> track-transaction-attributes -> timescale
+	// send message from track-winners -> create-transaction-lootbox -> timescale
 	queue.SendMessage(logsQueue, log)
 
 	time.Sleep(time.Second)
 
-	attributes := winners.GetTransactionAttributes(senderAddress)
+	allLootboxes := lootboxes_db.GetLootboxes(senderAddress, 1)
 
-	assert.Len(t, attributes, 1)
-	expectedAttributes := winners.TransactionAttributes{
-		Network:         network.NetworkEthereum,
-		Application:     ethApps.ApplicationNone,
-		AwardedTime:     time.Now(),
-		TransactionHash: transactionHash.String(),
+	assert.Len(t, allLootboxes, 1)
+	expectedLootbox := lootboxes.Lootbox{
 		Address:         senderAddress.String(),
-		Amount:          expectedAmount,
-		TokenDetails:    tokenDetails,
+		Source:          lootboxes.Transaction,
+		TransactionHash: transactionHash.String(),
+		AwardedTime:     time.Now(),
+		Volume:          expectedVolume,
+		RewardTier:      expectedRewardTier,
+		LootboxCount:    expectedLootboxCount,
 	}
 
-	assert.Equal(t, expectedAttributes, attributes[0])
+	assert.Equal(t, expectedLootbox, allLootboxes[0])
 }

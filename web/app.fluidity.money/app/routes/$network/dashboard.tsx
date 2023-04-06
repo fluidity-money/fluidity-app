@@ -43,14 +43,19 @@ import {
   BurgerMenu
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
 import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 import { getProviderDisplayName } from "~/util/provider";
 
+import dashboardStyles from "~/styles/dashboard.css";
+import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: dashboardStyles }];
+  return [
+    { rel: "stylesheet", href: dashboardStyles },
+    { rel: "stylesheet", href: referralModalStyles },
+  ];
 };
 
 export const loader: LoaderFunction = async ({ params }) => {

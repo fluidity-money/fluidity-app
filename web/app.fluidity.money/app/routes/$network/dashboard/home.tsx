@@ -263,8 +263,8 @@ export default function Home() {
   );
 
   const userHomeData = useFetcher();
-
   const userTransactionsData = useFetcher();
+
   const toolTip = useToolTip();
 
   const handleRewardTransactionClick = (
