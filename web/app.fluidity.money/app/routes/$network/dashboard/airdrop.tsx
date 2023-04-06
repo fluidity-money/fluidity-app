@@ -1,4 +1,6 @@
 import { Card, Form, Heading, TextButton, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight, Display } from "@fluidity-money/surfing";
+import { SplitContext } from "contexts/SplitProvider";
+import { useContext, useState } from "react";
 import { Table } from "~/components";
 
 const AirdropStats = () => {
@@ -66,7 +68,8 @@ const AirdropStats = () => {
 }
 
 const MultiplierTasks = () => {
-  return <Card fill type="opaque" color="holo" border="none" rounded style={{zIndex: 0, color: 'black', flexDirection: 'row', alignItems: 'center', gap: '2em'}}>
+  const [ tasks, setTasks ] = useState<'1x' | '2x'>('1x')
+  return <Card fill color="holo" rounded style={{zIndex: 0, color: 'black', flexDirection: 'row', alignItems: 'center', gap: '2em'}}>
     <div
       style={{display: 'flex', flexDirection: 'column', gap: '0.5em', alignItems: 'flex-start'}}
     >
@@ -268,6 +271,12 @@ const BottleProgress = () => {
 }
 
 const Airdrop = () => {
+  const {showExperiment} = useContext(SplitContext)
+
+  const showAirdrop = showExperiment("enable-airdrop-page");
+
+  if (!showAirdrop) return null
+
   return (
     <>
       <div className="pad-main">
