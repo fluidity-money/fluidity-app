@@ -1,4 +1,4 @@
-import { Card,  Heading, TextButton, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight, Display } from "@fluidity-money/surfing";
+import { Card, Form, Heading, TextButton, LabelledValue, LinkButton, Text, HeroCarousel, ProgressBar, GeneralButton, ArrowLeft, ArrowRight, Display } from "@fluidity-money/surfing";
 import { Table } from "~/components";
 
 const AirdropStats = () => {
@@ -73,6 +73,10 @@ const MultiplierTasks = () => {
       <Text style={{color: 'black'}} bold size="md">Multiplier Tasks</Text>
       <Text style={{color: 'black'}}>Perform displayed tasks to earn the respective multipliers.</Text>
     </div>
+    <Form.Toggle
+      color="black"
+      direction="vertical"
+    />
     <div>
       <TextButton
         style={{textDecorationThickness: '3px'}}
@@ -248,7 +252,7 @@ const BottleProgress = () => {
         >
          <img src="/images/placeholderAirdrop2.png"/>
         </Card>
-                <Card
+        <Card
           type="frosted"
           fill
           shimmer
@@ -257,6 +261,9 @@ const BottleProgress = () => {
          <img src="/images/placeholderAirdrop3.png"/>
         </Card>
     </HeroCarousel>
+    <div style={{display: 'flex', flexDirection: 'row', gap: '1em'}}>
+      <Form.Toggle /><Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
+    </div>
   </div>;
 }
 

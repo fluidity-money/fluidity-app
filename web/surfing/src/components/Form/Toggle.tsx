@@ -3,7 +3,7 @@ import styles from './Toggle.module.scss'
 import { AnimationProps, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "~/components";
 
-interface IToggle extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface IToggle extends React.InputHTMLAttributes<HTMLInputElement> {
   checked?: boolean;
   defaultChecked?: boolean;
   direction?: 'horizontal' | 'vertical';
