@@ -1,0 +1,113 @@
+.referrals-container {
+  width: 100vw;
+  max-width: 600px;
+  padding: 0;
+}
+
+.referrals-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 60px;
+  min-height: 300px;
+  gap: 2em;
+  text-align: center;
+}
+
+.referrals-header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.referrals-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.referral-hover-comp {
+  padding: 0em 2em 0em 2em;
+  min-width: 100%;
+  width: 150px;
+  align-self: center;
+}
+
+.referrals-inner-box {
+  position: relative;
+  padding: 0;
+  width: 100%;
+}
+
+.referrals-inner-switcher {
+  width: 100%;
+  position: absolute;
+  top: -32px;
+  display: flex;
+  justify-content: center;
+  gap: 4em;
+}
+
+.referrals-inner-switcher > button {
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+.spread-center {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.how-it-works-infobox {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.how-it-works-infobox > * {
+  flex: 1;
+  text-align: center;
+  align-self: center;
+}
+
+/* .how-it-works-infobox:hover { */
+/*   background-color: white; */
+/*   color: black; */
+/* } */
+
+.how-it-works-infobox > :first-child {
+  border-right: dashed white;
+}
+
+.single-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.links-clicked-stats {
+  text-align: start;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.red {
+  background-color: #c93737;
+}
+
+.dot.green {
+  background-color: #05ff00;
+}

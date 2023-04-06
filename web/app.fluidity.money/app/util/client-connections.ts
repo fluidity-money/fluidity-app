@@ -1,9 +1,9 @@
 import { PipedTransaction } from "drivers/types";
 import io from "socket.io-client";
 
-const DSSocketManager = (
-  { onCallback = (payload: PipedTransaction) => payload },
-) => {
+const DSSocketManager = ({
+  onCallback = (payload: PipedTransaction) => payload,
+}) => {
   const socket = io("wss://fanfare.fluidity.money", {
     transports: ["websocket"],
   });
