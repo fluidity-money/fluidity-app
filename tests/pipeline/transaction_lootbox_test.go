@@ -50,7 +50,7 @@ func createLogData(firstBlock, lastBlock int64) (misc.Blob, error) {
 	return data, nil
 }
 
-func TestTransactionAttributes(t *testing.T) {
+func TestTransactionLootboxes(t *testing.T) {
 	var (
 		spoolerInputQueue = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		logsQueue         = ethereum.TopicLogs
@@ -61,8 +61,8 @@ func TestTransactionAttributes(t *testing.T) {
 		transactionHash      = libtest.RandomHash()
 		tokenDetails         = token_details.New("fUSDT", 6)
 		expectedVolume       = misc.BigIntFromInt64(12500000)
+		expectedLootboxCount = 1.3888888888888888
 		expectedRewardTier   = 1
-		expectedLootboxCount = 1.722222
 		fusdtAddress         = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
 		topicReward          = ethTypes.HashFromString("0xe417c38cb96e748006d0ef1a56fec0de428abac103b6644bc30c745f54f54345")
 		topicWinner          = ethTypes.HashFromString("0x0000000000000000000000007a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
@@ -71,6 +71,7 @@ func TestTransactionAttributes(t *testing.T) {
 		lastBlock   = rand.Int63n(1002 + firstBlock)
 		blockNumInt = misc.BigIntFromInt64(firstBlock + 1)
 	)
+
 
 	payouts := make(map[applications.UtilityName]worker.Payout)
 	payouts["none"] = worker.Payout{Native: misc.BigIntFromInt64(10000000), Usd: 10}
@@ -127,5 +128,11 @@ func TestTransactionAttributes(t *testing.T) {
 		LootboxCount:    expectedLootboxCount,
 	}
 
+	// times can't be compared properly using assert.Equal
+	// so match everything within a small delta
+	awardedTime := allLootboxes[0].AwardedTime
+	allLootboxes[0].AwardedTime = expectedLootbox.AwardedTime
+
 	assert.Equal(t, expectedLootbox, allLootboxes[0])
+	assert.WithinDuration(t, expectedLootbox.AwardedTime, awardedTime, time.Second * 2)
 }
