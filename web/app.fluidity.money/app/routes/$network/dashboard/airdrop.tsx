@@ -11,9 +11,12 @@ import {
   GeneralButton,
   ArrowRight,
   Display,
+  ProviderIcon,
+  Provider,
 } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
-import { useContext } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useContext, useState } from "react";
 
 const AirdropStats = () => {
   return (
@@ -69,7 +72,9 @@ const AirdropStats = () => {
 };
 
 const MultiplierTasks = () => {
-  // const [ tasks, setTasks ] = useState<'1x' | '2x'>('1x')
+  const [ tasks, setTasks ] = useState<'1x' | '2x'>('1x')
+
+  const providers: Provider[] = ['Uniswap', 'Sushiswap', 'Camelot', 'Saddle', 'Curve']
   return (
     <Card
       fill
@@ -78,8 +83,9 @@ const MultiplierTasks = () => {
       style={{
         zIndex: 0,
         color: "black",
-        flexDirection: "row",
-        alignItems: "center",
+        display: "grid",
+        boxSizing: "border-box",
+        gridTemplateColumns: "200px auto 5fr",
         gap: "2em",
       }}
     >
@@ -89,6 +95,7 @@ const MultiplierTasks = () => {
           flexDirection: "column",
           gap: "0.5em",
           alignItems: "flex-start",
+          gridColumn: "1 / 2",
         }}
       >
         <Text style={{ color: "black" }} bold size="md">
@@ -98,21 +105,90 @@ const MultiplierTasks = () => {
           Perform displayed tasks to earn the respective multipliers.
         </Text>
       </div>
-      <Form.Toggle color="black" direction="vertical" />
-      <div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "1em",
+          alignItems: "center",
+          cursor: "pointer",
+          gridColumn: "2 / 3",
+          justifyContent: "flex-start",
+        }}
+        onClick={() => {
+          setTasks(prev => prev === '1x' ? '2x' : '1x')
+        }}
+      >
+        <Form.Toggle 
+          color="black" 
+          direction="vertical" 
+          checked={tasks === '2x'}
+        />
         <TextButton style={{ textDecorationThickness: "3px" }}>
-          <Display size="sm" style={{ color: "black", margin: 0 }}>
-            1x
-          </Display>
+          <motion.div
+            key={tasks}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.4 } }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.4 } }}
+          >
+            <Display size="sm" style={{ color: "black", margin: 0 }}>
+              {tasks}
+            </Display>
+          </motion.div>
         </TextButton>
       </div>
-      <div>
-        <Text style={{ color: "black" }}>
-          Perform any type of fAsset transactions{" "}
-          <b>in any on-chain protocol</b>, including sending{" "}
-          <b>with any wallet</b>.
-        </Text>
-      </div>
+      <div
+        style={{
+          gridColumn: "3 / 4",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+          {
+            tasks === '1x' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+                exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+              >
+                <Text style={{ color: "black" }}>
+                  Perform any type of fAsset transactions{" "}
+                  <b>in any on-chain protocol</b>, including sending{" "}
+                  <b>with any wallet</b>.
+                </Text>
+              </motion.div>
+            )
+          }
+          {
+            tasks === '2x' && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+                exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+                style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1em'}}
+              >
+                {
+                  providers.map((provider, i) => {
+                    return (
+                      <a
+                        key={`airdrop-mx-provider-` + i}
+                        style={{cursor: 'pointer', width: '32px', height: '32px', borderRadius: '32px', backgroundColor: 'black', padding: '8px'}}
+                        href="#"
+                      >
+                        <ProviderIcon
+                          provider={provider}
+                          style={{height: '100%'}}
+                        />
+                      </a>
+                    )
+                  })
+                }
+
+              </motion.div>
+            )
+          }
+      </div>      
     </Card>
   );
 };
