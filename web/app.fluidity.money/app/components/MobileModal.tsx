@@ -160,7 +160,6 @@ export default function MobileModal({
                 type={"transparent"}
                 layout="after"
                 size={"small"}
-                className="trophy-button"
                 handleClick={() => {
                   setTimeout(() => {
                     setIsOpen(false);
