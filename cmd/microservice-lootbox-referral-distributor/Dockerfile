@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-lootbox-referral-dist
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"wait-for-db", \
+	"wait-for-database.sh", \
 	"./microservice-lootbox-referral-distributor.out" \
 ]
