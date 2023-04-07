@@ -103,57 +103,64 @@ const ReferralDetailsModal = () => {
         backdropFilter: 'blur(50px)',
       }}
     >
-      <Display size="xs">My Referral Link</Display>
+      <Display size="xxxs">My Referral Link</Display>
       <div
-        style={{borderBottom: '1px solid white', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em', paddingBottom: '1em'}}
+        style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em', paddingBottom: '1em'}}
       >
         <LabelledValue
-          label="Active Referrals"
+          label={<Text size="sm">Active Referrals</Text>}
         >
           20
         </LabelledValue>
         <LabelledValue
-          label="Total Bottles earned from your link"
+          label={<Text size="sm">Total Bottles earned from your link</Text>}
         >
           1,051
         </LabelledValue>
       </div>
-      <Text size="md">Bottle Distribution</Text>
+      <Text size="sm">Bottle Distribution</Text>
       <BottleDistribution bottles={dummyBottles} />
-      <Display size="xs">Links I&apos;ve Clicked</Display>
-      <LabelledValue
-        label="Total Clicked"
-      >
-        13
-      </LabelledValue>
-      <div>
-      <LabelledValue
-        label="Claimed"
-      >
-        5
-      </LabelledValue>
-      <Text>50 BOTTLES</Text>
-      </div>
-      <div>
-      <LabelledValue
-        label="Unclaimed"
-      >
-        20
-      </LabelledValue>
-      <LinkButton handleClick={() => {return }} color="gray" size="small" type="internal">START CLAIMING</LinkButton>
-      </div>
-      <div>
-      <LabelledValue
-        label="Until Next Claim"
-      >
-        8/10
-      </LabelledValue>
-      <ProgressBar
-        value={0.6}
-        max={1}
-        size="sm"
-        color="holo"
+      <div 
+        style={{width:'100%', borderBottom: '1px solid white', margin: '1em 0'}}
       />
+      <Display size="xxxs">Links I&apos;ve Clicked</Display>
+      <div
+        style={{display: 'grid', gridTemplateColumns: 'auto auto auto auto', gap: '1em', paddingBottom: '1em'}}
+      >
+        <LabelledValue
+          label="Total Clicked"
+        >
+          13
+        </LabelledValue>  
+        <div>
+        <LabelledValue
+          label="Claimed"
+        >
+          5
+        </LabelledValue>
+        <Text>50 BOTTLES</Text>
+        </div>
+        <div>
+        <LabelledValue
+          label="Unclaimed"
+        >
+          20
+        </LabelledValue>
+        <LinkButton handleClick={() => {return }} color="gray" size="small" type="internal">START CLAIMING</LinkButton>
+        </div>
+        <div>
+        <LabelledValue
+          label="Until Next Claim"
+        >
+          8/10
+        </LabelledValue>
+        <ProgressBar
+          value={0.6}
+          max={1}
+          size="sm"
+          color="holo"
+        />
+      </div>
       </div>
     </Card>
   )
