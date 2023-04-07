@@ -1,0 +1,22 @@
+.LootBottle {
+
+  &.sm {
+    width: 24px;
+    height: 24px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &.lg {
+    width: 64px;
+    height: 64px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
