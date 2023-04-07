@@ -1,5 +1,6 @@
 import { Rarity } from "~/types/airdrop"
 import styles from './LootBottle.module.scss'
+import Text from '~/components/Text/Text'
 
 import { ReactComponent as BOTTLE_0_INACTIVE } from "~/assets/images/airdrop/0 INACTIVE.svg";
 import { ReactComponent as BOTTLE_1_COMMON } from "~/assets/images/airdrop/1 COMMON.svg";
@@ -68,7 +69,7 @@ const getTier = (rarity: Rarity, quantity: number) => {
 }
 
 const getBottleIcon = (rarity: Rarity, tier?: number) => {
-  if (!tier) {
+  if (tier === undefined) {
     switch (rarity) {
       case Rarity.Common: return BOTTLE_COMMON
       case Rarity.Uncommon: return BOTTLE_UNCOMMON
@@ -125,7 +126,7 @@ export const LootBottle = ({
   style={},
 }: ILootBottle) => {
 
-  const Component = getBottleIcon(rarity, quantity ? getTier(rarity, quantity) : undefined) as React.ElementType
+  const Component = getBottleIcon(rarity, quantity !== undefined ? getTier(rarity, quantity) : undefined) as React.ElementType
 
   const classNames = `
     ${styles.LootBottle}

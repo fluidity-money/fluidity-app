@@ -14,13 +14,80 @@ import {
   ProviderIcon,
   Provider,
   Modal,
-  InfoCircle,
-  Hoverable,
-  ManualCarousel
+  LootBottle,
+  Rarity
 } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useContext, useState } from "react";
+
+type Bottle = {
+  rarity: Rarity
+  quantity: number
+}
+
+const dummyBottles = [
+  {
+    rarity: Rarity.Common,
+    quantity: 100
+  },
+  {
+    rarity: Rarity.Uncommon,
+    quantity: 0
+  },
+  {
+    rarity: Rarity.Rare,
+    quantity: 12
+  },
+  {
+    rarity: Rarity.UltraRare,
+    quantity: 3
+  },
+  {
+    rarity: Rarity.Legendary,
+    quantity: 1
+  },
+]
+
+interface IBottleDistribution {
+  bottles: Bottle[]
+}
+
+const BottleDistribution = ({ bottles }: { bottles: Bottle[] }) => {
+  return (
+    <div
+      style={{display: 'flex', gap: '2em', justifyContent: 'space-between', alignItems: 'center'}}
+    >
+      {
+        bottles.map((bottle, index) => {
+          return (
+            <div 
+              key={index}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.2em',
+                padding: '1em 0'
+              }}
+            >
+              <LootBottle
+                size="lg"
+                rarity={bottle.rarity}
+                quantity={bottle.quantity}
+                style={{
+                  marginBottom: '0.6em'
+                }}
+              />
+              <Text>{bottle.rarity.toUpperCase()}</Text>
+              <Text prominent>{bottle.quantity}</Text>
+            </div>
+          )
+        })
+      }
+    </div>
+  )
+}
 
 const ReferralDetailsModal = () => {
   return (
@@ -52,9 +119,7 @@ const ReferralDetailsModal = () => {
         </LabelledValue>
       </div>
       <Text size="md">Bottle Distribution</Text>
-      <ManualCarousel>
-        Hello world
-      </ManualCarousel>
+      <BottleDistribution bottles={dummyBottles} />
       <Display size="xs">Links I&apos;ve Clicked</Display>
       <LabelledValue
         label="Total Clicked"
