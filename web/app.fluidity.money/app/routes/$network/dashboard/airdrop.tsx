@@ -13,10 +13,122 @@ import {
   Display,
   ProviderIcon,
   Provider,
+  Modal,
+  InfoCircle,
+  Hoverable,
+  ManualCarousel
 } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import { useContext, useState } from "react";
+
+const ReferralDetailsModal = () => {
+  return (
+    <Card
+      type="frosted"
+      border="solid"
+      style={{
+        position: 'absolute',
+        zIndex: 100,
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backdropFilter: 'blur(50px)',
+      }}
+    >
+      <Display size="xs">My Referral Link</Display>
+      <div
+        style={{borderBottom: '1px solid white', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em', paddingBottom: '1em'}}
+      >
+        <LabelledValue
+          label="Active Referrals"
+        >
+          20
+        </LabelledValue>
+        <LabelledValue
+          label="Total Bottles earned from your link"
+        >
+          1,051
+        </LabelledValue>
+      </div>
+      <Text size="md">Bottle Distribution</Text>
+      <ManualCarousel>
+        Hello world
+      </ManualCarousel>
+      <Display size="xs">Links I&apos;ve Clicked</Display>
+      <LabelledValue
+        label="Total Clicked"
+      >
+        13
+      </LabelledValue>
+      <div>
+      <LabelledValue
+        label="Claimed"
+      >
+        5
+      </LabelledValue>
+      <Text>50 BOTTLES</Text>
+      </div>
+      <div>
+      <LabelledValue
+        label="Unclaimed"
+      >
+        20
+      </LabelledValue>
+      <LinkButton handleClick={() => {return }} color="gray" size="small" type="internal">START CLAIMING</LinkButton>
+      </div>
+      <div>
+      <LabelledValue
+        label="Until Next Claim"
+      >
+        8/10
+      </LabelledValue>
+      <ProgressBar
+        value={0.6}
+        max={1}
+        size="sm"
+        color="holo"
+      />
+      </div>
+    </Card>
+  )
+}
+
+const BottlesDetailsModal = () => {
+  return (
+    <Card
+      type="frosted"
+      border="solid"
+    />  
+  )
+}
+
+const StakingStatsModal = () => {
+  return (
+    <Card
+      type="frosted"
+      border="solid"
+    />  
+  )
+}
+
+const StakeNowModal = () => {
+  return (
+    <Card
+      type="frosted"
+      border="solid"
+    />  
+  )
+}
+
+const TutorialModal = () => {
+  return (
+    <Card
+      type="frosted"
+      border="solid"
+    />  
+  )
+}
 
 const AirdropStats = () => {
   return (
@@ -360,6 +472,9 @@ const Airdrop = () => {
 
   return (
     <>
+      <Modal visible={true}>
+        <ReferralDetailsModal/>
+      </Modal>
       <div className="pad-main"></div>
       <div className="pad-main">
         <div
