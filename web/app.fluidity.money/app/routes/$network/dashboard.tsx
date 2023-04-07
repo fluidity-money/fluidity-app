@@ -340,7 +340,7 @@ export default function Dashboard() {
       </header>
 
       {/* Switch Chain Modal */}
-      <Modal visible={chainModalVisibility}>
+      <Modal id="switch-chain" visible={chainModalVisibility}>
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
@@ -353,7 +353,7 @@ export default function Dashboard() {
       </Modal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
-      <Modal visible={!otherModalOpen}>
+      <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
           className={`fluidify-button-dashboard-mobile rainbow ${
             otherModalOpen ? "z-0" : "z-1"

@@ -13,7 +13,7 @@ import {
   Display,
   ProviderIcon,
   Provider,
-  Modal,
+  CardModal,
   LootBottle,
   Rarity
 } from "@fluidity-money/surfing";
@@ -79,7 +79,7 @@ const BottleDistribution = ({ bottles }: { bottles: Bottle[] }) => {
                   marginBottom: '0.6em'
                 }}
               />
-              <Text>{bottle.rarity.toUpperCase()}</Text>
+              <Text style={{whiteSpace: 'nowrap'}}>{bottle.rarity.toUpperCase()}</Text>
               <Text prominent>{bottle.quantity}</Text>
             </div>
           )
@@ -91,18 +91,7 @@ const BottleDistribution = ({ bottles }: { bottles: Bottle[] }) => {
 
 const ReferralDetailsModal = () => {
   return (
-    <Card
-      type="frosted"
-      border="solid"
-      style={{
-        position: 'absolute',
-        zIndex: 100,
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        backdropFilter: 'blur(50px)',
-      }}
-    >
+    <>
       <Display size="xxxs">My Referral Link</Display>
       <div
         style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em', paddingBottom: '1em'}}
@@ -162,7 +151,7 @@ const ReferralDetailsModal = () => {
         />
       </div>
       </div>
-    </Card>
+    </>
   )
 }
 
@@ -542,11 +531,15 @@ const Airdrop = () => {
 
   if (!showAirdrop) return null;
 
+  const [currentModal, setCurrentModal] = useState<string | null>('referral-details');
+
   return (
     <>
-      <Modal visible={true}>
+    {(
+      <CardModal id="referral-details" visible={currentModal === 'referral-details' } closeModal={() => {setCurrentModal(null)}}>
         <ReferralDetailsModal/>
-      </Modal>
+      </CardModal>
+    )}
       <div className="pad-main"></div>
       <div className="pad-main">
         <div
