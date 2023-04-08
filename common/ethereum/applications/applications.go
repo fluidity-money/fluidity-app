@@ -19,7 +19,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
