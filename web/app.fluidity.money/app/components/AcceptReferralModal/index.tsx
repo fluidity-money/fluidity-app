@@ -16,12 +16,14 @@ import {
 } from "@fluidity-money/surfing";
 
 type IAcceptReferraModal = {
+  closeModal: () => void;
   network: string;
   referralCode: string;
   referrer: string;
 };
 
 const AcceptReferralModal = ({
+  closeModal,
   network,
   referralCode,
   referrer,
@@ -75,7 +77,7 @@ const AcceptReferralModal = ({
           </Text>
           <GeneralButton
             type={"secondary"}
-            handleClick={() => navigate("./")}
+            handleClick={closeModal}
             size={"medium"}
             border="box"
           >

@@ -14,6 +14,7 @@ import {
 } from "@fluidity-money/surfing";
 
 type IReferraModal = {
+  closeModal: () => void;
   referrerClaimed: number;
   refereeClaimed: number;
   refereeUnclaimed: number;
@@ -24,6 +25,7 @@ type IReferraModal = {
 };
 
 const ReferralModal = ({
+  closeModal,
   referrerClaimed,
   refereeClaimed,
   refereeUnclaimed,
@@ -42,7 +44,7 @@ const ReferralModal = ({
   return (
     <Card
       className="referrals-container"
-      type="frosted"
+      type="transparent"
       border="solid"
       color="holo"
       rounded
@@ -65,7 +67,7 @@ const ReferralModal = ({
           <GeneralButton
             type={"secondary"}
             buttontype={"text"}
-            handleClick={() => navigate("./")}
+            handleClick={closeModal}
             size={"medium"}
             border="box"
           >
