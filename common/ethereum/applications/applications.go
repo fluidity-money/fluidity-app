@@ -196,9 +196,6 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 	case ApplicationMeson:
 		fee, err = meson.GetMesonFees(
 			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
 			inputData,
 		)
 
@@ -221,6 +218,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
 		logAddress = transfer.Log.Address
+		contractAddress = transaction.To
 		nilAddress libEthereum.Address
 	)
 
@@ -268,6 +266,17 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+	case ApplicationMeson:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		mesonSender, err := meson.GetInitiator(transaction.Data)
+		if err != nil {
+			return libEthereum.ZeroAddress, libEthereum.ZeroAddress, err
+		}
+
+		mesonSenderAddress := libEthereum.AddressFromString(mesonSender)
+
+		return mesonSenderAddress, contractAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(

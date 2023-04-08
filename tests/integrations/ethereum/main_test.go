@@ -109,6 +109,9 @@ func init() {
 
 	saddleTests := unmarshalJsonTestOrFatal(integrationTestSaddle)
 	tests = append(tests, saddleTests...)
+
+	mesonTests := unmarshalJsonTestOrFatal(integrationTestMeson)
+	tests = append(tests, mesonTests...)
 }
 
 func TestIntegrations(t *testing.T) {
@@ -149,6 +152,7 @@ func TestIntegrations(t *testing.T) {
 			fluidAddress,
 			tokenDecimals,
 			convertedReceipt,
+			transaction.Data,
 		)
 
 		assert.NoError(t, err)
