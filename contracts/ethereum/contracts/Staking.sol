@@ -99,7 +99,7 @@ contract Staking {
         IERC20 _usdc,
         IERC20 _wEth,
         ISaddleSwap _saddleSwapFusdcUsdc,
-        ISaddleSwap _saddleSwapFusdcEth,
+        ISaddleSwap _saddleSwapFusdcWeth,
         IUniswapV2Router02 _camelotRouter,
         IUniswapV2Router02 _sushiswapRouter
     ) public {
@@ -110,13 +110,15 @@ contract Staking {
         wEth_ = _wEth;
 
         saddleSwapFusdcUsdc_ = _saddleSwapFusdcUsdc;
-        saddleSwapFusdcWeth_ = _saddleSwapFusdcEth;
+        saddleSwapFusdcWeth_ = _saddleSwapFusdcWeth;
+
+        (,,,,,,,saddleSwapFusdcUsdcLpToken_) = saddleSwapFusdcUsdc_.swapStorage();
+
+        (,,,,,,,saddleSwapFusdcWethLpToken_) = saddleSwapFusdcWeth_.swapStorage();
+
         sushiswapRouter_ = _sushiswapRouter;
+
         camelotRouter_ = _camelotRouter;
-
-        saddleSwapFusdcUsdcLpToken_ = saddleSwapFusdcUsdc_.swapStorage().lpToken;
-
-        saddleSwapFusdcWethLpToken_ = saddleSwapFusdcWeth_.swapStorage().lpToken;
 
         fUsdc_.safeApprove(address(saddleSwapFusdcUsdc_), MAX_UINT256);
         usdc_.safeApprove(address(saddleSwapFusdcUsdc_), MAX_UINT256);
@@ -145,10 +147,10 @@ contract Staking {
         amounts[0] = _token0Amount;
         amounts[1] = _token1Amount;
 
-        // saddle's lp token calculation seems to have issues, so we calculate
-        // the balance before and after, and don't do it here
+        // in our testing, saddle was incorrectly returning the lp tokens, so we
+        // trust the caller to figure this out themselves
 
-        _saddleSwap.addLiquidity(
+       _saddleSwap.addLiquidity(
             amounts,
             0,
             block.timestamp + 1
@@ -231,7 +233,7 @@ contract Staking {
         ) = calculateWeights(_token0Amount, _token1Amount);
 
         // deposit it on saddle, but ignore the return type to set with the
-        // caller
+        // caller (we don't trust saddle with the lp token return number)
 
         _depositToSaddle(
             _saddleSwap,

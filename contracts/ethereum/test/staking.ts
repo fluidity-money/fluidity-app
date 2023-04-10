@@ -133,6 +133,11 @@ describe("Staking", async () => {
       ])
     );
 
+    console.log(
+      await (await hre.ethers.getContractAt("TestSaddleSwap", saddleSwapToken0Token1.address))
+        .swapStorage()
+    );
+
     console.log(`saddle swap token 0 token 2: ${saddleSwapToken0Token2.address}`);
 
     console.log(`saddle swap token 0 token 2 impl: ${SADDLE_SWAP_IMPL}`);
