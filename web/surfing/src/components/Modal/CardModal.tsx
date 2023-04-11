@@ -41,9 +41,9 @@ export const CardModal: React.FC<ICardModal> = ({
             key="id"
             className={styles.anim}
             ref={ref}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
+            initial={{ opacity: 0, y: 'calc(-50% + 50px)', x: '-50%' }}
+            animate={{ opacity: 1, y: '-50%', x: '-50%' }}
+            exit={{ opacity: 0, y: 'calc(-50% - 50px)', x: '-50%' }}
             transition={{ duration: 0.3 }}
           >
             <Card

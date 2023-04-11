@@ -15,7 +15,9 @@ import {
   Provider,
   CardModal,
   LootBottle,
-  Rarity
+  Rarity,
+  AnchorButton,
+  TabButton
 } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
@@ -157,28 +159,69 @@ const ReferralDetailsModal = () => {
 
 const BottlesDetailsModal = () => {
   return (
-    <Card
-      type="frosted"
-      border="solid"
-    />  
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1em",
+        alignItems: "center",
+      }}
+    >
+      <BottleDistribution bottles={dummyBottles} />
+      <GeneralButton
+        icon={<ArrowRight />}
+        layout="after"
+        handleClick={() => {return}}
+        type="transparent"
+      >
+        SEE YOUR LOOTBOTTLE TX HISTORY
+      </GeneralButton>
+      <div 
+        style={{width:'100%', borderBottom: '1px solid white', margin: '1em 0'}}
+      />
+      <LabelledValue
+        label={<Text size="sm">Bottles earned since last checked</Text>}
+      >
+        <LootBottle size="lg" rarity="legendary"></LootBottle>
+      </LabelledValue>
+    </div>
   )
 }
 
 const StakingStatsModal = () => {
   return (
-    <Card
-      type="frosted"
-      border="solid"
-    />  
+    <>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto auto auto",
+          gap: '1em'
+        }}
+      >
+        <LabelledValue
+          label={<Text size="sm">Total Liquidity Multiplier</Text>}
+        >
+          <Text holo>5,230x</Text>
+        </LabelledValue>
+        <LabelledValue
+          label={<Text size="sm">My Stakes</Text>}
+        >
+          155
+        </LabelledValue>
+        <LabelledValue
+          label={<Text size="sm">Total Amount Staked</Text>}
+        >
+          $999,550
+        </LabelledValue>
+      </div>
+    </>
   )
 }
 
 const StakeNowModal = () => {
   return (
-    <Card
-      type="frosted"
-      border="solid"
-    />  
+    <>
+    </>
   )
 }
 
@@ -191,7 +234,13 @@ const TutorialModal = () => {
   )
 }
 
-const AirdropStats = () => {
+const AirdropStats = ({
+  seeReferralsDetails,
+  seeBottlesDetails,
+}: {
+  seeReferralsDetails: () => void;
+  seeBottlesDetails: () => void;
+}) => {
   return (
     <div
       style={{
@@ -220,9 +269,7 @@ const AirdropStats = () => {
           color="gray"
           size="small"
           type="internal"
-          handleClick={() => {
-            return;
-          }}
+          handleClick={seeReferralsDetails}
         >
           SEE DETAILS
         </LinkButton>
@@ -233,9 +280,7 @@ const AirdropStats = () => {
           color="gray"
           size="small"
           type="internal"
-          handleClick={() => {
-            return;
-          }}
+          handleClick={seeBottlesDetails}
         >
           SEE DETAILS
         </LinkButton>
@@ -258,7 +303,7 @@ const MultiplierTasks = () => {
         color: "black",
         display: "grid",
         boxSizing: "border-box",
-        gridTemplateColumns: "200px auto 5fr",
+        gridTemplateColumns: "2.2fr 1fr 5fr",
         gap: "2em",
       }}
     >
@@ -367,7 +412,13 @@ const MultiplierTasks = () => {
   );
 };
 
-const MyMultiplier = () => {
+const MyMultiplier = ({
+  seeMyStakingStats,
+  seeStakeNow
+}: {
+  seeMyStakingStats: () => void;
+  seeStakeNow: () => void;
+}) => {
   return (
     <div
       style={{
@@ -388,9 +439,7 @@ const MyMultiplier = () => {
         layout="after"
         size="small"
         type="secondary"
-        handleClick={() => {
-          return;
-        }}
+        handleClick={seeMyStakingStats}
         style={{
           width: "100%",
           gridArea: "2 / 1",
@@ -473,9 +522,7 @@ const MyMultiplier = () => {
         buttontype="text"
         size="medium"
         version="primary"
-        handleClick={() => {
-          return;
-        }}
+        handleClick={seeStakeNow}
         style={{
           width: "100%",
           boxSizing: "border-box",
@@ -516,6 +563,7 @@ const BottleProgress = () => {
           <img src="/images/placeholderAirdrop3.png" />
         </Card>
       </HeroCarousel>
+      <BottleDistribution bottles={dummyBottles}/>
       <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
         <Form.Toggle />
         <Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
@@ -531,16 +579,37 @@ const Airdrop = () => {
 
   if (!showAirdrop) return null;
 
-  const [currentModal, setCurrentModal] = useState<string | null>('referral-details');
+  const [currentModal, setCurrentModal] = useState<string | null>(null);
+
+  const closeModal = () => {setCurrentModal(null)}
 
   return (
     <>
-    {(
-      <CardModal id="referral-details" visible={currentModal === 'referral-details' } closeModal={() => {setCurrentModal(null)}}>
+      {/* Modals */}
+      <CardModal id="referral-details" visible={currentModal === 'referral-details' } closeModal={closeModal}>
         <ReferralDetailsModal/>
       </CardModal>
-    )}
-      <div className="pad-main"></div>
+      <CardModal id="bottles-details" visible={currentModal === 'bottles-details' } closeModal={closeModal}>
+        <BottlesDetailsModal/>
+      </CardModal>
+      <CardModal id="stake-now" visible={currentModal === 'stake-now' } closeModal={closeModal}>
+        <StakeNowModal/>
+      </CardModal>
+      <CardModal id="staking-stats" visible={currentModal === 'staking-stats' } closeModal={closeModal}>
+        <StakingStatsModal/>
+      </CardModal>
+      <CardModal id="tutorial" visible={currentModal === 'tutorial' } closeModal={closeModal}>
+        <TutorialModal/>
+      </CardModal>
+
+      {/* Page Content */}
+      <div className="pad-main" style={{display: 'flex', gap: '2em'}}>
+        <TabButton size="small">Airdrop Dashboard</TabButton>
+        <TabButton size="small">Airdrop Tutorial</TabButton>
+        <TabButton size="small">Leaderboard</TabButton>
+        <TabButton size="small">Referrals</TabButton>
+        <TabButton size="small">Stake</TabButton>
+      </div>
       <div className="pad-main">
         <div
           style={{
@@ -578,13 +647,22 @@ const Airdrop = () => {
                 </LinkButton>
               </Text>
             </div>
-            <AirdropStats />
+            <AirdropStats 
+              seeReferralsDetails={() => setCurrentModal('referral-details')}
+              seeBottlesDetails={() => setCurrentModal('bottles-details')}
+            />
             <MultiplierTasks />
-            <MyMultiplier />
+            <MyMultiplier 
+              seeMyStakingStats={() => setCurrentModal('staking-stats')}
+              seeStakeNow={() => setCurrentModal('stake-now')}
+            />
           </div>
           <BottleProgress />
         </div>
       </div>
+      <AnchorButton>
+        LEADERBOARD
+      </AnchorButton>
       <Leaderboard />
     </>
   );
