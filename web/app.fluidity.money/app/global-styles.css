@@ -23,6 +23,10 @@ a {
   text-decoration: none;
 }
 
+ul {
+  padding: 0;
+}
+
 .cover {
   position: fixed;
   top: 0;

@@ -133,12 +133,14 @@ const Referral = () => {
         progressReq={10}
         referralCode={referralCode}
         loaded={loaded}
+        closeModal={() => { }}
       />
 
       <AcceptReferralModal
         network={network}
         referralCode={clickedReferralCode}
         referrer={referralAddress}
+        closeModal={() => { }}
       />
     </>
   );

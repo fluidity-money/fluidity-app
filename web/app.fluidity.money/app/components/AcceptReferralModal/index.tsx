@@ -13,6 +13,7 @@ import {
   Card,
   GeneralButton,
   LinkButton,
+  trimAddress,
 } from "@fluidity-money/surfing";
 
 type IAcceptReferraModal = {
@@ -56,7 +57,7 @@ const AcceptReferralModal = ({
   return (
     <Card
       className="referrals-container"
-      type="frosted"
+      type="transparent"
       color="holo"
       border="solid"
       rounded
@@ -86,7 +87,7 @@ const AcceptReferralModal = ({
         </div>
 
         <Heading as={"h4"} className="referrals-heading">
-          {referrer} has just referred you!
+          {trimAddress(referrer)} has just referred you!
         </Heading>
         <Card
           rounded

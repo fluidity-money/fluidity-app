@@ -3,7 +3,7 @@ import { gql, jsonPost } from "~/util";
 const queryByAddress = gql`
   query getInactiveReferralByAddress($referrer: String!, $referee: String!) {
     lootbox_referrals(
-      where: { referrer: { _eq: $address }, referee: { _eq: $referee } }
+      where: { referrer: { _eq: $referrer }, referee: { _eq: $referee } }
     ) {
       active
       created_time

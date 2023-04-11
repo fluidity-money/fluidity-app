@@ -11,6 +11,7 @@ import {
   ArrowRight,
   LoadingDots,
   Hoverable,
+  ProgressBar,
 } from "@fluidity-money/surfing";
 
 type IReferraModal = {
@@ -87,7 +88,9 @@ const ReferralModal = ({
                 </div>
               }
             >
-              <ul>ACTIVE REFERRALS</ul>
+              <ul style={{ paddingLeft: "0.5em", paddingRight: "0.5em" }}>
+                ACTIVE REFERRALS
+              </ul>
             </Hoverable>{" "}
             {referralsEmoji}
           </Heading>
@@ -126,16 +129,14 @@ const ReferralModal = ({
         )}
 
         {/*Share Button*/}
-        <div>
-          <Text size="lg">
-            Share to:{" "}
-            <a href="https://twitter.com">
-              <Text code prominent>
-                <Twitter /> TWITTER
-              </Text>
-            </a>
-          </Text>
-        </div>
+        <Text size="lg">
+          Share to: &nbsp;
+          <a href="https://twitter.com">
+            <Text code prominent>
+              <Twitter /> TWITTER
+            </Text>
+          </a>
+        </Text>
       </div>
 
       {/* How It Works Divider / Links*/}
@@ -226,11 +227,13 @@ const HowItWorksContent = () => (
         </Text>
       </div>
     </Card>
-    <CircleInfo />
-    <Text prominent size="md">
-      They will have to earn 10 Loot Boxes for each referral in order to claim
-      their reward and activate yours
-    </Text>
+    <div className="how-it-works-warning-container">
+      <CircleInfo />
+      <Text prominent size="md" className="how-it-works-warning-text">
+        They will have to earn 10 Loot Boxes for each referral in order to claim
+        their reward and activate yours
+      </Text>
+    </div>
   </div>
 );
 
@@ -293,6 +296,7 @@ const LinksClickedContent = ({
         <Display size={"xs"} style={{ margin: 0 }}>
           {progress}/{progressReq}
         </Display>
+        <ProgressBar value={progress} max={progressReq} />
       </div>
     </div>
   </div>

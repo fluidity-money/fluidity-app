@@ -443,19 +443,6 @@ export default function Dashboard() {
         />
       </Modal>
 
-      {/* Referral Modal */}
-      <Modal visible={referralModalVisibility}>
-        <ReferralModal
-          referrerClaimed={numActiveReferrerReferrals}
-          refereeClaimed={numActiveReferreeReferrals}
-          refereeUnclaimed={numInactiveReferreeReferrals}
-          progress={inactiveReferrals[0]?.progress || 0}
-          progressReq={10}
-          referralCode={referralCode}
-          loaded={referralCountLoaded}
-        />
-      </Modal>
-
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
