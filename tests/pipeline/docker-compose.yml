@@ -13,6 +13,7 @@ x-flu-envs: &flu-envs
   FLU_ETHEREUM_WS_URL: ws://contracts:8545
 
 x-util-mining-test-envs: &util-mining-test-envs
+  <<: *flu-envs
   FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: fUSDT
   FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
   FLU_ETHEREUM_SEED_PHRASE: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump"
@@ -22,6 +23,19 @@ x-util-mining-test-envs: &util-mining-test-envs
   FLU_ETHEREUM_FLUID_TOKEN_ADDR: 0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e
   FLU_ETHEREUM_UTIL_CLIENT_ADDR: 0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab
   FLU_ETHEREUM_CONTRACT_ADDR: 0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e
+
+x-util-gauges-test-envs: &util-gauges-test-envs
+  <<: *flu-envs
+  FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: fUSDT
+  FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+  FLU_ETHEREUM_NETWORK: ethereum
+  FLU_ETHEREUM_CONTRACT_ADDR: 0xf1721fcf509c975c3ec0f474aeb58efcbf80e4d6
+  FLU_ETHEREUM_GOV_TOKEN_ENABLED: "true"
+  FLU_ETHEREUM_SEED_PHRASE: "fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid fluid jump"
+  FLU_ETHEREUM_FLUID_TOKEN_ADDR: 0xf1721fcf509c975c3ec0f474aeb58efcbf80e4d6
+  FLU_ETHEREUM_FLUID_GOV_TOKEN_ADDR: 0x3423ab1ce35dae89f5455fcd90ac4115bf41e30a
+  FLU_ETHEREUM_UTILITY_GAUGES_ADDR: 0x9391202b846ee3f574e59e4ad58ef6140e9ba4f6
+  FLU_ETHEREUM_REGISTRY_ADDR: 0x737f9dc58538b222a6159efa9cc548ab4b7a3f1e
 
 services:
   rabbit:
@@ -81,7 +95,7 @@ services:
     environment:
       <<: *util-mining-test-envs
       FLU_ETHEREUM_FORKING: true
-      FLU_FORGE_SCRIPT: "foundry-scripts/Test.s.sol:TestScript"
+      FLU_FORGE_SCRIPT: "foundry-scripts/TestUtilMiningPipeline.s.sol:TestUtilMiningPipeline"
       FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORKNET_URL_MAINNET}"
       FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
 
@@ -89,7 +103,6 @@ services:
     build:
       context: ../../cmd/connector-ethereum-block-headers-amqp/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: connector-ethereum-block-headers-amqp
     restart: on-failure
@@ -98,7 +111,6 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-block-fluid-transfers-amqp/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: microservice-ethereum-block-fluid-transfers-amqp
       FLU_ETHEREUM_BLOCK_RETRIES: 5
@@ -109,7 +121,6 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-application-server/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: microservice-ethereum-application-server
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
@@ -122,7 +133,6 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-worker-server/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: worker-server
       FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
@@ -144,7 +154,6 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-worker-sender/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: worker-sender
       FLU_ETHEREUM_AMQP_QUEUE_NAME: spooler-out
@@ -154,7 +163,6 @@ services:
     build:
       context: ../../cmd/connector-ethereum-reward-logs-amqp/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: connector-ethereum-reward-logs-amqp
       FLU_ETHEREUM_START_BLOCK: latest
@@ -165,7 +173,6 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-track-winners/
     environment:
-      <<: *flu-envs
       <<: *util-mining-test-envs
       FLU_WORKER_ID: microservice-ethereum-track-winners
     restart: on-failure
@@ -185,6 +192,48 @@ services:
       <<: *flu-envs
       FLU_WORKER_ID: microservice-ethereum-track-staking-emissions
     restart: on-failure
+
+  contracts-utilgauges:
+    hostname: contracts
+    build:
+      context: ../../contracts/ethereum
+      dockerfile: Dockerfile.foundry
+    environment:
+      <<: *util-gauges-test-envs
+      FLU_ETHEREUM_FORKING: true
+      FLU_FORGE_SCRIPT: "foundry-scripts/TestUtilMiningPipeline.s.sol:TestUtilGaugesPipeline"
+      FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORKNET_URL_MAINNET}"
+      FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
+
+  microservice-ethereum-worker-server-util-gauges:
+    build:
+      context: ../../cmd/microservice-ethereum-worker-server/
+    environment:
+      <<: *util-gauges-test-envs
+      FLU_WORKER_ID: worker-server
+      FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: util-gauges-worker-server-out
+      FLU_ETHEREUM_WORK_QUEUE: util-gauges-worker-server-in
+    restart: on-failure
+
+  test-utility-gauges:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - contracts-utilgauges
+      - microservice-ethereum-worker-server-util-gauges
+    environment:
+      FLU_TEST: TestPipelineUtilityGauges
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: util-gauges-worker-server-out
+      FLU_ETHEREUM_WORK_QUEUE: util-gauges-worker-server-in
+      <<: *util-gauges-test-envs
+    restart: "no"
 
   test-utility-mining:
     build:
@@ -208,7 +257,6 @@ services:
     environment:
       FLU_TEST: TestPipelineUtilityMining
       FLU_WORKER_ID: tests
-      <<: *flu-envs
       <<: *util-mining-test-envs
     restart: "no"
 
@@ -230,7 +278,6 @@ services:
       FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler-in
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out
       FLU_ETHEREUM_NETWORK: ethereum
-      <<: *flu-envs
       <<: *util-mining-test-envs
 
 
@@ -266,6 +313,5 @@ services:
       FLU_WORKER_ID: tests
       FLU_ETHEREUM_AMQP_QUEUE_NAME: util-mining-worker-server-out
       FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out
-      <<: *flu-envs
       <<: *util-mining-test-envs
     restart: "no"

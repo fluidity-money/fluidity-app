@@ -241,6 +241,22 @@ const registryAbiString = `[
   }
 ]`
 
+const utilityGaugesAbiString = `[
+	{
+	  "inputs": [
+		{ "internalType": "address", "name": "token", "type": "address" },
+		{ "internalType": "string", "name": "gauge", "type": "string" }
+	  ],
+	  "name": "getWeight",
+	  "outputs": [
+		{ "internalType": "uint256", "name": "", "type": "uint256" },
+		{ "internalType": "uint256", "name": "", "type": "uint256" }
+	  ],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	}
+]`
+
 const stakingAbiString = `[
 	{
 		"anonymous": false,
@@ -261,6 +277,7 @@ var (
 	FluidityContractAbi ethAbi.ABI
 	ExecutorAbi         ethAbi.ABI
 	RegistryAbi         ethAbi.ABI
+	UtilityGaugesAbi    ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
 	StakingAbi          ethAbi.ABI
 )

@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/ethclient"
+	ethCommon "github.com/ethereum/go-ethereum/common"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -40,6 +41,12 @@ const (
 
 	// EnvRegistryAddress to query to get utility info
 	EnvRegistryAddress = `FLU_ETHEREUM_REGISTRY_ADDR`
+
+	// EnvRegistryAddress to query utility gauge info from
+	EnvUtilityGaugesAddress = `FLU_ETHEREUM_UTILITY_GAUGES_ADDR`
+
+	// EnvFluidGovTokenEnabled to set gov token distribution
+	EnvFluidGovTokenEnabled = `FLU_ETHEREUM_GOV_TOKEN_ENABLED`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
@@ -77,8 +84,25 @@ func main() {
 		ethereumUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		networkId                = util.GetEnvOrFatal(EnvNetwork)
 
+		utilGaugesAddress        ethCommon.Address
+		govTokenEnabled_         = util.GetEnvOrDefault(EnvFluidGovTokenEnabled, "false")
+
 		dbNetwork network.BlockchainNetwork
 	)
+
+	govTokenEnabled := govTokenEnabled_ != "false"
+
+	if govTokenEnabled {
+		log.Debug(func(k *log.Log) {
+			k.Message = "Gov token distribution is enabled!"
+		})
+
+		utilGaugesAddress = mustEthereumAddressFromEnv(EnvUtilityGaugesAddress)
+	} else {
+		log.Debug(func(k *log.Log) {
+			k.Message = "Gov token distribution is disabled!"
+		})
+	}
 
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
@@ -426,8 +450,15 @@ func main() {
 					appEmission       = transfer.AppEmissions
 
 					// the fluid token is always included
-					fluidClients = []appTypes.UtilityName{appTypes.UtilityFluid}
+					fluidClients = []appTypes.UtilityName{ appTypes.UtilityFluid }
+
+					// default utility for utility gauges
+					utilGaugeApp = appTypes.UtilityFluid
 				)
+
+				if govTokenEnabled {
+					fluidClients = append(fluidClients, appTypes.UtilityFluidGov)
+				}
 
 				var (
 					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
@@ -450,6 +481,7 @@ func main() {
 
 					if utility != "" {
 						fluidClients = append(fluidClients, utility)
+						utilGaugeApp = utility
 					}
 				}
 
@@ -474,6 +506,55 @@ func main() {
 						k.Message = "Failed to get trf vars from chain!"
 						k.Payload = err
 					})
+				}
+
+				// get the fluid pool for gov token distribution
+
+				if govTokenEnabled {
+					govTokenFrac := new(big.Rat)
+
+					if utilGaugeApp == appTypes.UtilityFluid {
+						// no utility use means 5%
+						govTokenFrac.SetFrac64(5, 100)
+					} else {
+						// otherwise set it from utility gauges
+						govTokenFrac, err = fluidity.GetGovTokenFrac(
+							gethClient,
+							utilGaugesAddress,
+							contractAddress,
+							utilGaugeApp,
+						)
+
+						if err != nil {
+							log.Fatal(func(k *log.Log) {
+								k.Message = "Failed to get the pool for gov token distribution from utility gauges!"
+								k.Payload = err
+							})
+						}
+
+						log.Debug(func(k *log.Log) {
+							k.Format(
+								"Read frac %s for the gov token contract %s app %s",
+								govTokenFrac.String(),
+								contractAddress,
+								utilGaugeApp,
+							)
+						})
+					}
+
+					for i, pool := range pools {
+						// apply the gov token fraction
+						if pool.Name == appTypes.UtilityFluidGov {
+							log.App(func(k *log.Log) {
+								pools[i].PoolSizeNative.Mul(pool.PoolSizeNative, govTokenFrac)
+								k.Format(
+									"Gov token scaled by %s to %s from utility gauges",
+									govTokenFrac.String(),
+									pool.PoolSizeNative.String(),
+								)
+							})
+						}
+					}
 				}
 
 				for i, pool := range pools {

@@ -34,8 +34,13 @@ var applicationNames = []string{
 // Supported utilities, should map to an entry in the onchain Registry
 type UtilityName string
 
-// UtilityFluid is the special utility name for the fluid token itself
-var UtilityFluid UtilityName = "FLUID"
+var (
+	// UtilityFluid is the special utility name for the fluid token itself
+	UtilityFluid UtilityName = "FLUID"
+
+	// UtilityFluidGov is the name for the gov token, which has utility gauges applied
+	UtilityFluidGov UtilityName = "FLUIDGOV"
+)
 
 func (app Application) String() string {
 	return applicationNames[app]

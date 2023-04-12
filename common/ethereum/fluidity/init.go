@@ -46,6 +46,12 @@ func init() {
 		panic(err)
 	}
 
+	reader = strings.NewReader(utilityGaugesAbiString)
+
+	if UtilityGaugesAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
+
 	reader = strings.NewReader(rewardPoolAbiString)
 
 	if RewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
