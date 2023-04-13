@@ -326,7 +326,10 @@ export default function IndexPage() {
           </div>
 
           {/* Switch Chain Modal - Opportunity */}
-          <Modal id="switch-chain-opportunity" visible={showChainOpportunityModal}>
+          <Modal
+            id="switch-chain-opportunity"
+            visible={showChainOpportunityModal}
+          >
             <BlockchainModal
               handleModal={setShowChainOpportunityModal}
               option={{ name: "", icon: <div /> }}
