@@ -17,90 +17,82 @@ import {
   LootBottle,
   Rarity,
   AnchorButton,
-  TabButton
+  TabButton,
 } from "@fluidity-money/surfing";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState } from "react";
+import Table, { IRow } from "~/components/Table";
+import { trimAddress } from "~/util";
+import airdropStyle from "~/styles/dashboard/airdrop.css";
+
+export const links = () => {
+  return [{ rel: "stylesheet", href: airdropStyle }];
+};
 
 type Bottle = {
-  rarity: Rarity
-  quantity: number
-}
+  rarity: Rarity;
+  quantity: number;
+};
 
 const dummyBottles = [
   {
     rarity: Rarity.Common,
-    quantity: 100
+    quantity: 100,
   },
   {
     rarity: Rarity.Uncommon,
-    quantity: 0
+    quantity: 0,
   },
   {
     rarity: Rarity.Rare,
-    quantity: 12
+    quantity: 12,
   },
   {
     rarity: Rarity.UltraRare,
-    quantity: 3
+    quantity: 3,
   },
   {
     rarity: Rarity.Legendary,
-    quantity: 1
+    quantity: 1,
   },
-]
+];
 
 interface IBottleDistribution {
-  bottles: Bottle[]
+  bottles: Bottle[];
 }
 
-const BottleDistribution = ({ bottles }: { bottles: Bottle[] }) => {
+const BottleDistribution = ({ bottles }: IBottleDistribution) => {
   return (
-    <div
-      style={{display: 'flex', gap: '2em', justifyContent: 'space-between', alignItems: 'center'}}
-    >
-      {
-        bottles.map((bottle, index) => {
-          return (
-            <div 
-              key={index}
+    <div className="bottle-distribution-container">
+      {bottles.map((bottle, index) => {
+        return (
+          <div key={index} className="lootbottle-container">
+            <LootBottle
+              size="lg"
+              rarity={bottle.rarity}
+              quantity={bottle.quantity}
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '0.2em',
-                padding: '1em 0'
+                marginBottom: "0.6em",
               }}
-            >
-              <LootBottle
-                size="lg"
-                rarity={bottle.rarity}
-                quantity={bottle.quantity}
-                style={{
-                  marginBottom: '0.6em'
-                }}
-              />
-              <Text style={{whiteSpace: 'nowrap'}}>{bottle.rarity.toUpperCase()}</Text>
-              <Text prominent>{bottle.quantity}</Text>
-            </div>
-          )
-        })
-      }
+            />
+            <Text style={{ whiteSpace: "nowrap" }}>
+              {bottle.rarity.toUpperCase()}
+            </Text>
+            <Text prominent>{bottle.quantity}</Text>
+          </div>
+        );
+      })}
     </div>
-  )
-}
+  );
+};
 
 const ReferralDetailsModal = () => {
   return (
     <>
       <Display size="xxxs">My Referral Link</Display>
-      <div
-        style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em', paddingBottom: '1em'}}
-      >
-        <LabelledValue
-          label={<Text size="sm">Active Referrals</Text>}
-        >
+      <div className="referral-details-container">
+        <LabelledValue label={<Text size="sm">Active Referrals</Text>}>
           20
         </LabelledValue>
         <LabelledValue
@@ -111,51 +103,48 @@ const ReferralDetailsModal = () => {
       </div>
       <Text size="sm">Bottle Distribution</Text>
       <BottleDistribution bottles={dummyBottles} />
-      <div 
-        style={{width:'100%', borderBottom: '1px solid white', margin: '1em 0'}}
+      <div
+        style={{
+          width: "100%",
+          borderBottom: "1px solid white",
+          margin: "1em 0",
+        }}
       />
       <Display size="xxxs">Links I&apos;ve Clicked</Display>
       <div
-        style={{display: 'grid', gridTemplateColumns: 'auto auto auto auto', gap: '1em', paddingBottom: '1em'}}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto auto auto auto",
+          gap: "1em",
+          paddingBottom: "1em",
+        }}
       >
-        <LabelledValue
-          label="Total Clicked"
-        >
-          13
-        </LabelledValue>  
+        <LabelledValue label="Total Clicked">13</LabelledValue>
         <div>
-        <LabelledValue
-          label="Claimed"
-        >
-          5
-        </LabelledValue>
-        <Text>50 BOTTLES</Text>
+          <LabelledValue label="Claimed">5</LabelledValue>
+          <Text>50 BOTTLES</Text>
         </div>
         <div>
-        <LabelledValue
-          label="Unclaimed"
-        >
-          20
-        </LabelledValue>
-        <LinkButton handleClick={() => {return }} color="gray" size="small" type="internal">START CLAIMING</LinkButton>
+          <LabelledValue label="Unclaimed">20</LabelledValue>
+          <LinkButton
+            handleClick={() => {
+              return;
+            }}
+            color="gray"
+            size="small"
+            type="internal"
+          >
+            START CLAIMING
+          </LinkButton>
         </div>
         <div>
-        <LabelledValue
-          label="Until Next Claim"
-        >
-          8/10
-        </LabelledValue>
-        <ProgressBar
-          value={0.6}
-          max={1}
-          size="sm"
-          color="holo"
-        />
-      </div>
+          <LabelledValue label="Until Next Claim">8/10</LabelledValue>
+          <ProgressBar value={0.6} max={1} size="sm" color="holo" />
+        </div>
       </div>
     </>
-  )
-}
+  );
+};
 
 const BottlesDetailsModal = () => {
   return (
@@ -171,13 +160,19 @@ const BottlesDetailsModal = () => {
       <GeneralButton
         icon={<ArrowRight />}
         layout="after"
-        handleClick={() => {return}}
+        handleClick={() => {
+          return;
+        }}
         type="transparent"
       >
         SEE YOUR LOOTBOTTLE TX HISTORY
       </GeneralButton>
-      <div 
-        style={{width:'100%', borderBottom: '1px solid white', margin: '1em 0'}}
+      <div
+        style={{
+          width: "100%",
+          borderBottom: "1px solid white",
+          margin: "1em 0",
+        }}
       />
       <LabelledValue
         label={<Text size="sm">Bottles earned since last checked</Text>}
@@ -185,8 +180,8 @@ const BottlesDetailsModal = () => {
         <LootBottle size="lg" rarity="legendary"></LootBottle>
       </LabelledValue>
     </div>
-  )
-}
+  );
+};
 
 const StakingStatsModal = () => {
   return (
@@ -195,7 +190,7 @@ const StakingStatsModal = () => {
         style={{
           display: "grid",
           gridTemplateColumns: "auto auto auto",
-          gap: '1em'
+          gap: "1em",
         }}
       >
         <LabelledValue
@@ -203,36 +198,24 @@ const StakingStatsModal = () => {
         >
           <Text holo>5,230x</Text>
         </LabelledValue>
-        <LabelledValue
-          label={<Text size="sm">My Stakes</Text>}
-        >
+        <LabelledValue label={<Text size="sm">My Stakes</Text>}>
           155
         </LabelledValue>
-        <LabelledValue
-          label={<Text size="sm">Total Amount Staked</Text>}
-        >
+        <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
           $999,550
         </LabelledValue>
       </div>
     </>
-  )
-}
+  );
+};
 
 const StakeNowModal = () => {
-  return (
-    <>
-    </>
-  )
-}
+  return <></>;
+};
 
 const TutorialModal = () => {
-  return (
-    <Card
-      type="frosted"
-      border="solid"
-    />  
-  )
-}
+  return <Card type="frosted" border="solid" />;
+};
 
 const AirdropStats = ({
   seeReferralsDetails,
@@ -290,9 +273,15 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [ tasks, setTasks ] = useState<'1x' | '2x'>('1x')
+  const [tasks, setTasks] = useState<"1x" | "2x">("1x");
 
-  const providers: Provider[] = ['Uniswap', 'Sushiswap', 'Camelot', 'Saddle', 'Curve']
+  const providers: Provider[] = [
+    "Uniswap",
+    "Sushiswap",
+    "Camelot",
+    "Saddle",
+    "Curve",
+  ];
   return (
     <Card
       fill
@@ -335,13 +324,13 @@ const MultiplierTasks = () => {
           justifyContent: "flex-start",
         }}
         onClick={() => {
-          setTasks(prev => prev === '1x' ? '2x' : '1x')
+          setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
         }}
       >
-        <Form.Toggle 
-          color="black" 
-          direction="vertical" 
-          checked={tasks === '2x'}
+        <Form.Toggle
+          color="black"
+          direction="vertical"
+          checked={tasks === "2x"}
         />
         <TextButton style={{ textDecorationThickness: "3px" }}>
           <motion.div
@@ -364,57 +353,62 @@ const MultiplierTasks = () => {
           justifyContent: "center",
         }}
       >
-          {
-            tasks === '1x' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-                exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-              >
-                <Text style={{ color: "black" }}>
-                  Perform any type of fAsset transactions{" "}
-                  <b>in any on-chain protocol</b>, including sending{" "}
-                  <b>with any wallet</b>.
-                </Text>
-              </motion.div>
-            )
-          }
-          {
-            tasks === '2x' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-                exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-                style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1em'}}
-              >
-                {
-                  providers.map((provider, i) => {
-                    return (
-                      <a
-                        key={`airdrop-mx-provider-` + i}
-                        style={{cursor: 'pointer', width: '32px', height: '32px', borderRadius: '32px', backgroundColor: 'black', padding: '8px'}}
-                        href="#"
-                      >
-                        <ProviderIcon
-                          provider={provider}
-                          style={{height: '100%'}}
-                        />
-                      </a>
-                    )
-                  })
-                }
-
-              </motion.div>
-            )
-          }
-      </div>      
+        {tasks === "1x" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+          >
+            <Text style={{ color: "black" }}>
+              Perform any type of fAsset transactions{" "}
+              <b>in any on-chain protocol</b>, including sending{" "}
+              <b>with any wallet</b>.
+            </Text>
+          </motion.div>
+        )}
+        {tasks === "2x" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1em",
+            }}
+          >
+            {providers.map((provider, i) => {
+              return (
+                <a
+                  key={`airdrop-mx-provider-` + i}
+                  style={{
+                    cursor: "pointer",
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "32px",
+                    backgroundColor: "black",
+                    padding: "8px",
+                  }}
+                  href="#"
+                >
+                  <ProviderIcon
+                    provider={provider}
+                    style={{ height: "100%" }}
+                  />
+                </a>
+              );
+            })}
+          </motion.div>
+        )}
+      </div>
     </Card>
   );
 };
 
 const MyMultiplier = ({
   seeMyStakingStats,
-  seeStakeNow
+  seeStakeNow,
 }: {
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
@@ -536,8 +530,115 @@ const MyMultiplier = ({
   );
 };
 
+type AirdropRank = {
+  rank: number;
+  user: string;
+  bottles: number;
+  multiplier: number;
+  referrals: number;
+};
+
+const DUMMY_AIRDROP_LEADERBOARD_DATA = [
+  {
+    rank: 199,
+    user: "0x8Cb300ebb3028c15AB69c3E9CDFf1bE60aAa43a2",
+    bottles: 100,
+    multiplier: 5230,
+    referrals: 0,
+  },
+];
+
+const AIRDROP_TABLE_COLUMNS = [
+  { name: "RANK" },
+  { name: "USER" },
+  { name: "BOTTLES" },
+  { name: "MULTIPLIER" },
+  { name: "REFERRALS" },
+];
+
+const AirdropRankRow: IRow<AirdropRank> = ({
+  data,
+  index,
+}: {
+  data: AirdropRank;
+  index: number;
+}) => {
+  const { rank, user, bottles, multiplier, referrals } = data;
+
+  return (
+    <motion.tr
+      key={`${rank}-${index}`}
+      variants={{
+        enter: { opacity: [0, 1] },
+        ready: { opacity: 1 },
+        exit: { opacity: 0 },
+        transitioning: {
+          opacity: [0.75, 1, 0.75],
+          transition: { duration: 1.5, repeat: Infinity },
+        },
+      }}
+    >
+      {/* Rank */}
+      <td>
+        <Text>{rank}</Text>
+      </td>
+
+      {/* User */}
+      <td>
+        <Text>{trimAddress(user)}</Text>
+      </td>
+
+      {/* Bottles */}
+      <td>{bottles}</td>
+
+      {/* Multiplier */}
+      <td>
+        <Text>{multiplier}x</Text>
+      </td>
+
+      {/* Referrals */}
+      <td>
+        <Text>{referrals}</Text>
+      </td>
+    </motion.tr>
+  );
+};
+
 const Leaderboard = () => {
-  return <div className="pad-main">Leaderboard</div>;
+  return (
+    <div className="pad-main">
+      <Card
+        className="leaderboard-container"
+        type="transparent"
+        border="solid"
+        rounded
+        color="white"
+      >
+        <div>
+          <Heading as="h3">Leaderbord</Heading>
+          <Text prominent>
+            This leaderboard shows your rank among oother users per{" "}
+            <ul>24 HOURS</ul>
+          </Text>
+        </div>
+        <Table
+          itemName=""
+          headings={AIRDROP_TABLE_COLUMNS}
+          pagination={{
+            page: 1,
+            rowsPerPage: 11,
+          }}
+          count={0}
+          data={DUMMY_AIRDROP_LEADERBOARD_DATA}
+          renderRow={AirdropRankRow}
+          onFilter={() => true}
+          activeFilterIndex={0}
+          filters={[]}
+          loaded={true}
+        />
+      </Card>
+    </div>
+  );
 };
 
 const BottleProgress = () => {
@@ -563,7 +664,7 @@ const BottleProgress = () => {
           <img src="/images/placeholderAirdrop3.png" />
         </Card>
       </HeroCarousel>
-      <BottleDistribution bottles={dummyBottles}/>
+      <BottleDistribution bottles={dummyBottles} />
       <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
         <Form.Toggle />
         <Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
@@ -581,29 +682,51 @@ const Airdrop = () => {
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
 
-  const closeModal = () => {setCurrentModal(null)}
+  const closeModal = () => {
+    setCurrentModal(null);
+  };
 
   return (
     <>
       {/* Modals */}
-      <CardModal id="referral-details" visible={currentModal === 'referral-details' } closeModal={closeModal}>
-        <ReferralDetailsModal/>
+      <CardModal
+        id="referral-details"
+        visible={currentModal === "referral-details"}
+        closeModal={closeModal}
+      >
+        <ReferralDetailsModal />
       </CardModal>
-      <CardModal id="bottles-details" visible={currentModal === 'bottles-details' } closeModal={closeModal}>
-        <BottlesDetailsModal/>
+      <CardModal
+        id="bottles-details"
+        visible={currentModal === "bottles-details"}
+        closeModal={closeModal}
+      >
+        <BottlesDetailsModal />
       </CardModal>
-      <CardModal id="stake-now" visible={currentModal === 'stake-now' } closeModal={closeModal}>
-        <StakeNowModal/>
+      <CardModal
+        id="stake-now"
+        visible={currentModal === "stake-now"}
+        closeModal={closeModal}
+      >
+        <StakeNowModal />
       </CardModal>
-      <CardModal id="staking-stats" visible={currentModal === 'staking-stats' } closeModal={closeModal}>
-        <StakingStatsModal/>
+      <CardModal
+        id="staking-stats"
+        visible={currentModal === "staking-stats"}
+        closeModal={closeModal}
+      >
+        <StakingStatsModal />
       </CardModal>
-      <CardModal id="tutorial" visible={currentModal === 'tutorial' } closeModal={closeModal}>
-        <TutorialModal/>
+      <CardModal
+        id="tutorial"
+        visible={currentModal === "tutorial"}
+        closeModal={closeModal}
+      >
+        <TutorialModal />
       </CardModal>
 
       {/* Page Content */}
-      <div className="pad-main" style={{display: 'flex', gap: '2em'}}>
+      <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
         <TabButton size="small">Airdrop Dashboard</TabButton>
         <TabButton size="small">Airdrop Tutorial</TabButton>
         <TabButton size="small">Leaderboard</TabButton>
@@ -647,22 +770,20 @@ const Airdrop = () => {
                 </LinkButton>
               </Text>
             </div>
-            <AirdropStats 
-              seeReferralsDetails={() => setCurrentModal('referral-details')}
-              seeBottlesDetails={() => setCurrentModal('bottles-details')}
+            <AirdropStats
+              seeReferralsDetails={() => setCurrentModal("referral-details")}
+              seeBottlesDetails={() => setCurrentModal("bottles-details")}
             />
             <MultiplierTasks />
-            <MyMultiplier 
-              seeMyStakingStats={() => setCurrentModal('staking-stats')}
-              seeStakeNow={() => setCurrentModal('stake-now')}
+            <MyMultiplier
+              seeMyStakingStats={() => setCurrentModal("staking-stats")}
+              seeStakeNow={() => setCurrentModal("stake-now")}
             />
           </div>
           <BottleProgress />
         </div>
       </div>
-      <AnchorButton>
-        LEADERBOARD
-      </AnchorButton>
+      <AnchorButton>LEADERBOARD</AnchorButton>
       <Leaderboard />
     </>
   );
