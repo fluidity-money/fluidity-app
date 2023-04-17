@@ -287,11 +287,13 @@ export default function Dashboard() {
   };
 
   const { data: referralsCountData } = useCache<ReferralCountData>(
-    address ? `/${network}/query/referrals?address=${address}` : ""
+    showAirdrop && address
+      ? `/${network}/query/referrals?address=${address}`
+      : ""
   );
 
   const { data: referralCodeData } = useCache<ReferralCountData>(
-    clickedReferralCode && address
+    showAirdrop && clickedReferralCode && address
       ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
       : ""
   );
@@ -421,28 +423,53 @@ export default function Dashboard() {
 
       {/* Referral Modal */}
       <Modal visible={referralModalVisibility}>
-        <div style={{ position: "absolute", right: "60px", top: "30px" }}>
-          <ReferralModal
-            referrerClaimed={numActiveReferrerReferrals}
-            refereeClaimed={numActiveReferreeReferrals}
-            refereeUnclaimed={numInactiveReferreeReferrals}
-            progress={inactiveReferrals[0]?.progress || 0}
-            progressReq={10}
-            referralCode={referralCode}
-            loaded={referralCountLoaded}
-            closeModal={() => setReferralModalVisibility(false)}
-          />
+        <div
+          className="cover"
+          onClick={() => setReferralModalVisibility(false)}
+          style={{
+            background: "none",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "1em",
+              right: isTablet ? "20px" : "60px",
+            }}
+          >
+            <ReferralModal
+              referrerClaimed={numActiveReferrerReferrals}
+              refereeClaimed={numActiveReferreeReferrals}
+              refereeUnclaimed={numInactiveReferreeReferrals}
+              progress={inactiveReferrals[0]?.progress || 0}
+              progressReq={10}
+              referralCode={referralCode}
+              loaded={referralCountLoaded}
+              closeModal={() => setReferralModalVisibility(false)}
+            />
+          </div>
         </div>
       </Modal>
 
       {/* Accept Referral Modal */}
       <Modal visible={acceptReferralModalVisibility}>
-        <AcceptReferralModal
-          network={network}
-          referralCode={clickedReferralCode}
-          referrer={referralAddress}
-          closeModal={() => setAcceptReferralModalVisibility(false)}
-        />
+        <div
+          className="cover"
+          onClick={() => setAcceptReferralModalVisibility(false)}
+          style={{
+            background: isMobile ? "black" : "#030303cc",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <AcceptReferralModal
+            network={network}
+            referralCode={clickedReferralCode}
+            referrer={referralAddress}
+            closeModal={() => setAcceptReferralModalVisibility(false)}
+          />
+        </div>
       </Modal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
@@ -601,7 +628,7 @@ export default function Dashboard() {
             )}
 
             {/* Referrals Button */}
-            {
+            {showExperiment("enable-airdrop-page") && (
               <GeneralButton
                 type="transparent"
                 size="small"
@@ -615,7 +642,7 @@ export default function Dashboard() {
               >
                 Referral
               </GeneralButton>
-            }
+            )}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
@@ -709,22 +736,6 @@ export default function Dashboard() {
           </GeneralButton>
         )}
 
-        {/* Mobile Menu Modal */}
-        {openMobModal && (
-          <MobileModal
-            navigationMap={NAVIGATION_MAP.map((obj) => {
-              const { name, icon } = Object.values(obj)[0];
-              return { name, icon };
-            })}
-            activeIndex={activeIndex}
-            chains={CHAIN_NAME_MAP}
-            unclaimedFluid={userUnclaimedRewards}
-            network={network}
-            isOpen={openMobModal}
-            setIsOpen={setOpenMobModal}
-            unclaimedRewards={userUnclaimedRewards}
-          />
-        )}
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
@@ -791,6 +802,23 @@ export default function Dashboard() {
             </a>
           </section>
         </footer>
+
+        {/* Mobile Menu Modal */}
+        {openMobModal && (
+          <MobileModal
+            navigationMap={NAVIGATION_MAP.map((obj) => {
+              const { name, icon } = Object.values(obj)[0];
+              return { name, icon };
+            })}
+            activeIndex={activeIndex}
+            chains={CHAIN_NAME_MAP}
+            unclaimedFluid={userUnclaimedRewards}
+            network={network}
+            isOpen={openMobModal}
+            setIsOpen={setOpenMobModal}
+            unclaimedRewards={userUnclaimedRewards}
+          />
+        )}
       </main>
     </>
   );

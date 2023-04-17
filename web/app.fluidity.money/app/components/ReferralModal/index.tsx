@@ -45,7 +45,7 @@ const ReferralModal = ({
   return (
     <Card
       className="referrals-container"
-      type="transparent"
+      type="frosted"
       border="solid"
       color="holo"
       rounded

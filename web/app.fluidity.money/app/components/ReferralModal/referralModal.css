@@ -17,6 +17,12 @@
   text-align: center;
 }
 
+@media (max-width: 850px) {
+  .referrals-content {
+    padding: 20px;
+  }
+}
+
 .referrals-header {
   display: flex;
   width: 100%;

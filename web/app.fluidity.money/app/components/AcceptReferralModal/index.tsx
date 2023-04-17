@@ -14,6 +14,8 @@ import {
   GeneralButton,
   LinkButton,
   trimAddress,
+  trimAddressShort,
+  useViewport,
 } from "@fluidity-money/surfing";
 
 type IAcceptReferraModal = {
@@ -29,6 +31,10 @@ const AcceptReferralModal = ({
   referralCode,
   referrer,
 }: IAcceptReferraModal) => {
+  const { width } = useViewport();
+
+  const isMobile = width <= 500 && width > 0;
+
   const { address, connected, signBuffer } = useContext(FluidityFacadeContext);
 
   const navigate = useNavigate();
@@ -57,7 +63,7 @@ const AcceptReferralModal = ({
   return (
     <Card
       className="referrals-container"
-      type="transparent"
+      type="frosted"
       color="holo"
       border="solid"
       rounded
@@ -87,7 +93,8 @@ const AcceptReferralModal = ({
         </div>
 
         <Heading as={"h4"} className="referrals-heading">
-          {trimAddress(referrer)} has just referred you!
+          {isMobile ? trimAddressShort(referrer) : trimAddress(referrer)} has
+          just referred you!
         </Heading>
         <Card
           rounded
@@ -103,6 +110,8 @@ const AcceptReferralModal = ({
             </Text>
             <Text prominent size="lg">
               <strong>10 Loot Bottles</strong>
+              <br />
+              on activating their referral
             </Text>
           </div>
           {/* How it works Box Right*/}

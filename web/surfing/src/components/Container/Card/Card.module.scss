@@ -9,8 +9,15 @@
   box-sizing: border-box;
 
   &.shimmer {
-    -webkit-mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.717),#000 60%) right/300% 100%;
-    mask: linear-gradient(-60deg,#000000 40%,rgba(0, 0, 0, 0.715),#000 60%) right/300% 100%;
+    -webkit-mask: linear-gradient(
+        -60deg,
+        #000000 40%,
+        rgba(0, 0, 0, 0.717),
+        #000 60%
+      )
+      right/300% 100%;
+    mask: linear-gradient(-60deg, #000000 40%, rgba(0, 0, 0, 0.715), #000 60%)
+      right/300% 100%;
     background-repeat: no-repeat;
     animation: shimmer 5s infinite;
     background-color: black;
@@ -93,29 +100,68 @@
         -webkit-mask-composite: xor;
         mask-composite: exclude;
       }
-  
+
       &.rounded {
         &::before {
           border-radius: 12px;
         }
       }
-  
+
       &.dashed {
         &::before {
           border: 1px dashed black;
           padding: 0;
         }
       }
-  
+
       &.none {
         &::before {
           border: 1px solid black;
           padding: 0;
         }
       }
-  
-      &.frosted {
-        border: none;
+    }
+
+    &.frosted {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
+      }
+
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
+      }
+
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
       }
     }
   }
@@ -146,26 +192,32 @@
 }
 
 @keyframes shimmer {
-  0%, 10% {-webkit-mask-position: right/300%;}
-  90%, 100% {-webkit-mask-position: -50%;}
+  0%,
+  10% {
+    -webkit-mask-position: right/300%;
+  }
+  90%,
+  100% {
+    -webkit-mask-position: -50%;
+  }
 }
 
 @keyframes gradient {
-	0% {
-		background-position: 0 0;
-	}
+  0% {
+    background-position: 0 0;
+  }
   50% {
     background-position: 600px 0;
   }
-	100% {
-		background-position: 0 0;
-	}
+  100% {
+    background-position: 0 0;
+  }
 }
 
 .shimmerWrapper {
   position: relative;
   overflow: hidden;
- 
+
   &.fill {
     width: 100%;
   }
