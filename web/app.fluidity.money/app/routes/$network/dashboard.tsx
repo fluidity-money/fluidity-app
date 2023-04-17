@@ -68,7 +68,7 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ request, params }) => {
   const ethereumWallets = config.config["ethereum"].wallets ?? [];
 
-  const network = params.network ?? "";
+  const network = (params.network ?? "") as ChainName;
 
   const provider = config.liquidity_providers;
 
@@ -421,16 +421,18 @@ export default function Dashboard() {
 
       {/* Referral Modal */}
       <Modal visible={referralModalVisibility}>
-        <ReferralModal
-          referrerClaimed={numActiveReferrerReferrals}
-          refereeClaimed={numActiveReferreeReferrals}
-          refereeUnclaimed={numInactiveReferreeReferrals}
-          progress={inactiveReferrals[0]?.progress || 0}
-          progressReq={10}
-          referralCode={referralCode}
-          loaded={referralCountLoaded}
-          closeModal={() => setReferralModalVisibility(false)}
-        />
+        <div style={{ position: "absolute", right: "60px", top: "30px" }}>
+          <ReferralModal
+            referrerClaimed={numActiveReferrerReferrals}
+            refereeClaimed={numActiveReferreeReferrals}
+            refereeUnclaimed={numInactiveReferreeReferrals}
+            progress={inactiveReferrals[0]?.progress || 0}
+            progressReq={10}
+            referralCode={referralCode}
+            loaded={referralCountLoaded}
+            closeModal={() => setReferralModalVisibility(false)}
+          />
+        </div>
       </Modal>
 
       {/* Accept Referral Modal */}
@@ -603,10 +605,16 @@ export default function Dashboard() {
               <GeneralButton
                 type="transparent"
                 size="small"
-                layout="after"
-                handleClick={() => {isMobile ? navigate(`/${network}/dashboard/airdrop#referrals`) : setReferralModalVisibility(true)}}
+                layout="before"
+                handleClick={() => {
+                  isMobile
+                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                    : setReferralModalVisibility(true);
+                }}
                 icon={<Referral />}
-              >Referrals</GeneralButton>
+              >
+                Referral
+              </GeneralButton>
             }
 
             {/* Fluidify button */}
