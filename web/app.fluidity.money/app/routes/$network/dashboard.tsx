@@ -604,9 +604,9 @@ export default function Dashboard() {
                 type="transparent"
                 size="small"
                 layout="after"
-                handleClick={() => setReferralModalVisibility(true)}
+                handleClick={() => {isMobile ? navigate(`/${network}/dashboard/airdrop#referrals`) : setReferralModalVisibility(true)}}
                 icon={<Referral />}
-              />
+              >Referrals</GeneralButton>
             }
 
             {/* Fluidify button */}

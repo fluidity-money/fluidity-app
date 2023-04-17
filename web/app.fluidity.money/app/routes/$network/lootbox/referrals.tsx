@@ -14,12 +14,10 @@ import { SplitContext } from "contexts/SplitProvider";
 import ReferralModal from "~/components/ReferralModal";
 import AcceptReferralModal from "~/components/AcceptReferralModal";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
-import acceptReferralModalStyles from "~/components/AcceptReferralModal/referralModal.css";
 
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: referralModalStyles },
-    { rel: "stylesheet", href: acceptReferralModalStyles },
   ];
 };
 
