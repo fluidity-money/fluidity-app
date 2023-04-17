@@ -1,3 +1,7 @@
+import type { LoaderFunction } from "@remix-run/node";
+
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import {
   Card,
   Form,
@@ -28,6 +32,18 @@ import airdropStyle from "~/styles/dashboard/airdrop.css";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
+};
+
+export const loader: LoaderFunction = async ({ params }) => {
+  const network = params.network ?? "";
+  const epochMax = 30;
+  const epochDays = 20;
+
+  return json({
+    epochMax,
+    epochDays,
+    network,
+  });
 };
 
 type Bottle = {
@@ -220,9 +236,13 @@ const TutorialModal = () => {
 const AirdropStats = ({
   seeReferralsDetails,
   seeBottlesDetails,
+  epochDays,
+  epochMax,
 }: {
   seeReferralsDetails: () => void;
   seeBottlesDetails: () => void;
+  epochDays: number;
+  epochMax: number;
 }) => {
   return (
     <div
@@ -234,7 +254,7 @@ const AirdropStats = ({
       }}
     >
       <div>
-        <LabelledValue label="EPOCH DAYS LEFT">20</LabelledValue>
+        <LabelledValue label="EPOCH DAYS LEFT">{epochDays}</LabelledValue>
         <div
           style={{
             display: "flex",
@@ -242,8 +262,14 @@ const AirdropStats = ({
             alignItems: "center",
           }}
         >
-          <ProgressBar value={0.6} max={1} size="sm" rounded color="white" />
-          <Text>60%</Text>
+          <ProgressBar
+            value={epochDays}
+            max={epochMax}
+            size="sm"
+            rounded
+            color="white"
+          />
+          <Text>{Math.floor((epochDays / epochMax) * 100)}%</Text>
         </div>
       </div>
       <div>
@@ -549,7 +575,7 @@ const DUMMY_AIRDROP_LEADERBOARD_DATA = [
 ];
 
 const AIRDROP_TABLE_COLUMNS = [
-  { name: "RANK" },
+  { name: "RANK", prominent: "true" },
   { name: "USER" },
   { name: "BOTTLES" },
   { name: "MULTIPLIER" },
@@ -606,7 +632,7 @@ const AirdropRankRow: IRow<AirdropRank> = ({
 
 const Leaderboard = () => {
   return (
-    <div className="pad-main">
+    <div className="pad-main" id="leaderboard">
       <Card
         className="leaderboard-container"
         type="transparent"
@@ -673,7 +699,15 @@ const BottleProgress = () => {
   );
 };
 
+type LoaderData = {
+  epochMax: number;
+  epochDays: number;
+  network: string;
+};
+
 const Airdrop = () => {
+  const { network, epochMax, epochDays } = useLoaderData<LoaderData>();
+
   const { showExperiment } = useContext(SplitContext);
 
   const showAirdrop = showExperiment("enable-airdrop-page");
@@ -773,6 +807,8 @@ const Airdrop = () => {
             <AirdropStats
               seeReferralsDetails={() => setCurrentModal("referral-details")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
+              epochMax={epochMax}
+              epochDays={epochDays}
             />
             <MultiplierTasks />
             <MyMultiplier
@@ -783,7 +819,11 @@ const Airdrop = () => {
           <BottleProgress />
         </div>
       </div>
-      <AnchorButton>LEADERBOARD</AnchorButton>
+      <div
+        style={{ display: "flex", justifyContent: "center", padding: "0.5em" }}
+      >
+        <AnchorButton to="#leaderboard">LEADERBOARD</AnchorButton>
+      </div>
       <Leaderboard />
     </>
   );
