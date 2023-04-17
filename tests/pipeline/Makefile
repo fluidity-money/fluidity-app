@@ -1,4 +1,4 @@
-TESTS := $(shell docker compose config --format=json 2>/dev/null | jq '.services | keys | .[] | select(startswith("test"))' --raw-output)
+TESTS := $(shell docker compose config --format=json 2>/dev/null | jq '.services | keys | .[] | select(startswith("test-"))' --raw-output)
 
 DOCKER_COMPOSE := docker compose
 
