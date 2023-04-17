@@ -41,9 +41,7 @@ import {
   ConnectedWallet,
   Modal,
   ProvideLiquidity,
-  Provider,
   ChainName,
-  Token,
   BurgerMenu,
   Referral,
 } from "@fluidity-money/surfing";
@@ -68,7 +66,7 @@ export const links: LinksFunction = () => {
 export const loader: LoaderFunction = async ({ request, params }) => {
   const ethereumWallets = config.config["ethereum"].wallets ?? [];
 
-  const network = (params.network ?? "") as ChainName;
+  const network = params.network ?? "";
 
   const provider = config.liquidity_providers;
 
@@ -119,11 +117,11 @@ export const meta: MetaFunction = () => ({
 });
 
 type LoaderData = {
-  network: ChainName;
+  network: string;
   provider: {
     [x: string]: {
       providers: {
-        name: Provider;
+        name: string;
         link: {
           fUSDC?: string;
           fUSDT?: string;
@@ -137,7 +135,7 @@ type LoaderData = {
   tokensConfig: {
     [x: string]: {
       tokens: {
-        symbol: Token;
+        symbol: string;
         address: string;
         name: string;
         logo: string;
@@ -162,11 +160,11 @@ type LoaderData = {
 const NAVIGATION_MAP: {
   [key: string]: { name: string; icon: JSX.Element };
 }[] = [
-    { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "Rewards", icon: <Trophy /> } },
-    { assets: { name: "Assets", icon: <AssetsIcon /> } },
-    { airdrop: { name: "Airdrop", icon: <Trophy /> } },
-  ];
+  { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+  { rewards: { name: "Rewards", icon: <Trophy /> } },
+  { assets: { name: "Assets", icon: <AssetsIcon /> } },
+  { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   ethereum: {
@@ -381,9 +379,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
@@ -403,7 +401,7 @@ export default function Dashboard() {
 
         <ChainSelectorButton
           className="selector-button"
-          chain={CHAIN_NAME_MAP[network satisfies ChainName]}
+          chain={CHAIN_NAME_MAP[network]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -413,7 +411,7 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={CHAIN_NAME_MAP[network satisfies ChainName]}
+            option={CHAIN_NAME_MAP[network]}
             options={Object.values(CHAIN_NAME_MAP)}
             setOption={handleSetChain}
             mobile={isMobile}
@@ -475,8 +473,9 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -622,7 +621,7 @@ export default function Dashboard() {
             */}
             {(isTablet || isMobile) && showMobileNetworkButton && (
               <ChainSelectorButton
-                chain={CHAIN_NAME_MAP[network satisfies ChainName]}
+                chain={CHAIN_NAME_MAP[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
             )}
@@ -813,7 +812,7 @@ export default function Dashboard() {
             activeIndex={activeIndex}
             chains={CHAIN_NAME_MAP}
             unclaimedFluid={userUnclaimedRewards}
-            network={network}
+            network={network as ChainName}
             isOpen={openMobModal}
             setIsOpen={setOpenMobModal}
             unclaimedRewards={userUnclaimedRewards}
