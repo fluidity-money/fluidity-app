@@ -12,6 +12,6 @@ COPY --from=build /usr/local/src/fluidity/cmd/microservice-ethereum-create-trans
 
 ENTRYPOINT [ \
 	"wait-for-amqp", \
-	"wait-for-db", \
+	"wait-for-database.sh", \
 	"./microservice-ethereum-create-transaction-lootboxes.out" \
 ]
