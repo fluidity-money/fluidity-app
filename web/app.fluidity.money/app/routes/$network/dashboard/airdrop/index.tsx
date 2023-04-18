@@ -18,232 +18,286 @@ import {
   ProviderIcon,
   Provider,
   CardModal,
-  LootBottle,
   Rarity,
   AnchorButton,
   TabButton,
 } from "@fluidity-money/surfing";
+import {
+  BottlesDetailsModal,
+  BottleDistribution,
+  ReferralDetailsModal,
+  StakeNowModal,
+  StakingStatsModal,
+  TutorialModal,
+} from "./common";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState } from "react";
 import Table, { IRow } from "~/components/Table";
 import { trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
+import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
+import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
+import { ReferralCountLoaderData } from "../../query/referrals";
+import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
 };
 
+const EPOCH_DAYS_TOTAL = 31;
+// temp: april 19th, 2023
+const EPOCH_START_DATE = new Date(2023, 3, 20);
+
+export const dayDifference = (date1: Date, date2: Date) =>
+  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
+
 export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
-  const epochMax = 30;
-  const epochDays = 20;
+  const epochDays = dayDifference(new Date(), EPOCH_START_DATE);
 
   return json({
-    epochMax,
+    epochDaysTotal: EPOCH_DAYS_TOTAL,
     epochDays,
     network,
-  });
+  } satisfies LoaderData);
 };
 
-type Bottle = {
-  rarity: Rarity;
-  quantity: number;
+type LoaderData = {
+  epochDaysTotal: number;
+  epochDays: number;
+  network: string;
 };
 
-const dummyBottles = [
-  {
-    rarity: Rarity.Common,
-    quantity: 100,
+const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
+  referralsCount: 10,
+  bottleTiers: {
+    [Rarity.Common]: 100,
+    [Rarity.Uncommon]: 0,
+    [Rarity.Rare]: 12,
+    [Rarity.UltraRare]: 3,
+    [Rarity.Legendary]: 1,
   },
-  {
-    rarity: Rarity.Uncommon,
-    quantity: 0,
-  },
-  {
-    rarity: Rarity.Rare,
-    quantity: 12,
-  },
-  {
-    rarity: Rarity.UltraRare,
-    quantity: 3,
-  },
-  {
-    rarity: Rarity.Legendary,
-    quantity: 1,
-  },
-];
-
-interface IBottleDistribution {
-  bottles: Bottle[];
-}
-
-const BottleDistribution = ({ bottles }: IBottleDistribution) => {
-  return (
-    <div className="bottle-distribution-container">
-      {bottles.map((bottle, index) => {
-        return (
-          <div key={index} className="lootbottle-container">
-            <LootBottle
-              size="lg"
-              rarity={bottle.rarity}
-              quantity={bottle.quantity}
-              style={{
-                marginBottom: "0.6em",
-              }}
-            />
-            <Text style={{ whiteSpace: "nowrap" }}>
-              {bottle.rarity.toUpperCase()}
-            </Text>
-            <Text prominent>{bottle.quantity}</Text>
-          </div>
-        );
-      })}
-    </div>
-  );
+  bottlesCount: 116,
+  liquidityMultiplier: 5230,
+  stakes: [],
+  loaded: false,
 };
 
-const ReferralDetailsModal = () => {
+const SAFE_DEFAULT_AIRDROP_LEADERBOARD: AirdropLeaderboardLoaderData = {
+  leaderboard: [
+    {
+      rank: 199,
+      address: "0x8Cb300ebb3028c15AB69c3E9CDFf1bE60aAa43a2",
+      totalLootboxes: 100,
+      liquidityMultiplier: 5230,
+      referralCount: 0,
+      highestRewardTier: 1,
+    },
+  ],
+  loaded: true,
+};
+
+const SAFE_DEFAULT_REFERRALS: ReferralCountLoaderData = {
+  numActiveReferrerReferrals: 10,
+  numActiveReferreeReferrals: 11,
+  numInactiveReferreeReferrals: 12,
+  inactiveReferrals: [],
+  referralCode: "",
+  loaded: true,
+};
+
+const Airdrop = () => {
+  const { epochDaysTotal, epochDays } = useLoaderData<LoaderData>();
+
+  const { showExperiment } = useContext(SplitContext);
+
+  const showAirdrop = showExperiment("enable-airdrop-page");
+
+  if (!showAirdrop) return null;
+
+  const data = {
+    airdrop: {
+      ...SAFE_DEFAULT_AIRDROP,
+    },
+    airdropLeaderboard: SAFE_DEFAULT_AIRDROP_LEADERBOARD,
+    referrals: {
+      ...SAFE_DEFAULT_REFERRALS,
+    },
+  };
+
+  const {
+    airdrop: {
+      bottleTiers,
+      liquidityMultiplier,
+      stakes,
+      loaded: airdropLoaded,
+    },
+    referrals: {
+      numActiveReferreeReferrals,
+      numActiveReferrerReferrals,
+      numInactiveReferreeReferrals,
+      inactiveReferrals,
+      loaded: referralLoaded,
+    },
+    airdropLeaderboard: {
+      leaderboard: leaderboardRows,
+      loaded: leaderboardLoaded,
+    },
+  } = data;
+
+  const [currentModal, setCurrentModal] = useState<string | null>(null);
+
+  const closeModal = () => {
+    setCurrentModal(null);
+  };
+
   return (
     <>
-      <Display size="xxxs">My Referral Link</Display>
-      <div className="referral-details-container">
-        <LabelledValue label={<Text size="sm">Active Referrals</Text>}>
-          20
-        </LabelledValue>
-        <LabelledValue
-          label={<Text size="sm">Total Bottles earned from your link</Text>}
-        >
-          1,051
-        </LabelledValue>
-      </div>
-      <Text size="sm">Bottle Distribution</Text>
-      <BottleDistribution bottles={dummyBottles} />
-      <div
-        style={{
-          width: "100%",
-          borderBottom: "1px solid white",
-          margin: "1em 0",
-        }}
-      />
-      <Display size="xxxs">Links I&apos;ve Clicked</Display>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto auto auto auto",
-          gap: "1em",
-          paddingBottom: "1em",
-        }}
+      {/* Modals */}
+      <CardModal
+        id="referral-details"
+        visible={currentModal === "referral-details"}
+        closeModal={closeModal}
       >
-        <LabelledValue label="Total Clicked">13</LabelledValue>
-        <div>
-          <LabelledValue label="Claimed">5</LabelledValue>
-          <Text>50 BOTTLES</Text>
-        </div>
-        <div>
-          <LabelledValue label="Unclaimed">20</LabelledValue>
-          <LinkButton
-            handleClick={() => {
-              return;
+        <ReferralDetailsModal
+          bottles={bottleTiers}
+          activeReferrerReferralsCount={numActiveReferrerReferrals}
+          activeRefereeReferralsCount={numActiveReferreeReferrals}
+          inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
+          nextInactiveReferral={inactiveReferrals[0]}
+        />
+      </CardModal>
+      <CardModal
+        id="bottles-details"
+        visible={currentModal === "bottles-details"}
+        closeModal={closeModal}
+      >
+        <BottlesDetailsModal bottles={bottleTiers} />
+      </CardModal>
+      <CardModal
+        id="stake-now"
+        visible={currentModal === "stake-now"}
+        closeModal={closeModal}
+      >
+        <StakeNowModal />
+      </CardModal>
+      <CardModal
+        id="staking-stats"
+        visible={currentModal === "staking-stats"}
+        closeModal={closeModal}
+      >
+        <StakingStatsModal
+          liqudityMultiplier={liquidityMultiplier}
+          stakes={stakes}
+        />
+      </CardModal>
+      <CardModal
+        id="tutorial"
+        visible={currentModal === "tutorial"}
+        closeModal={closeModal}
+      >
+        <TutorialModal />
+      </CardModal>
+
+      {/* Page Content */}
+      <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("staking-stats")}
+        >
+          Airdrop Dashboard
+        </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
+          Airdrop Tutorial
+        </TabButton>
+        <TabButton size="small">Leaderboard</TabButton>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("referral-details")}
+        >
+          Referrals
+        </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
+          Stake
+        </TabButton>
+      </div>
+      <div className="pad-main">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.5fr 1fr",
+            gap: "10%",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "2em",
+              zIndex: 1,
             }}
-            color="gray"
-            size="small"
-            type="internal"
           >
-            START CLAIMING
-          </LinkButton>
-        </div>
-        <div>
-          <LabelledValue label="Until Next Claim">8/10</LabelledValue>
-          <ProgressBar value={0.6} max={1} size="sm" color="holo" />
+            <Heading className={"no-margin"}>
+              Welcome to Fluidity&apos;s Airdrop Event!
+            </Heading>
+            <div>
+              <Text>
+                Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
+                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
+                metus, ac convallis lectus porttitor et. Donec maximus gravida
+                mauris, eget tempor felis tristique sit amet. Pellentesque at
+                hendrerit nibh, eu porttitor dui.
+                <LinkButton
+                  size="medium"
+                  type="external"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Learn more
+                </LinkButton>
+              </Text>
+            </div>
+            <AirdropStats
+              seeReferralsDetails={() => setCurrentModal("referral-details")}
+              seeBottlesDetails={() => setCurrentModal("bottles-details")}
+              epochMax={epochDaysTotal}
+              epochDays={epochDays}
+            />
+            <MultiplierTasks />
+            <MyMultiplier
+              seeMyStakingStats={() => setCurrentModal("staking-stats")}
+              seeStakeNow={() => setCurrentModal("stake-now")}
+              liquidityMultiplier={liquidityMultiplier}
+            />
+          </div>
+          <BottleProgress bottles={bottleTiers} />
         </div>
       </div>
+      <div
+        style={{ display: "flex", justifyContent: "center", padding: "0.5em" }}
+      >
+        <AnchorButton>LEADERBOARD</AnchorButton>
+      </div>
+      <Leaderboard loaded={leaderboardLoaded} data={leaderboardRows} />
     </>
   );
 };
 
-const BottlesDetailsModal = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1em",
-        alignItems: "center",
-      }}
-    >
-      <BottleDistribution bottles={dummyBottles} />
-      <GeneralButton
-        icon={<ArrowRight />}
-        layout="after"
-        handleClick={() => {
-          return;
-        }}
-        type="transparent"
-      >
-        SEE YOUR LOOTBOTTLE TX HISTORY
-      </GeneralButton>
-      <div
-        style={{
-          width: "100%",
-          borderBottom: "1px solid white",
-          margin: "1em 0",
-        }}
-      />
-      <LabelledValue
-        label={<Text size="sm">Bottles earned since last checked</Text>}
-      >
-        <LootBottle size="lg" rarity="legendary"></LootBottle>
-      </LabelledValue>
-    </div>
-  );
-};
-
-const StakingStatsModal = () => {
-  return (
-    <>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto auto auto",
-          gap: "1em",
-        }}
-      >
-        <LabelledValue
-          label={<Text size="sm">Total Liquidity Multiplier</Text>}
-        >
-          <Text holo>5,230x</Text>
-        </LabelledValue>
-        <LabelledValue label={<Text size="sm">My Stakes</Text>}>
-          155
-        </LabelledValue>
-        <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
-          $999,550
-        </LabelledValue>
-      </div>
-    </>
-  );
-};
-
-const StakeNowModal = () => {
-  return <></>;
-};
-
-const TutorialModal = () => {
-  return <Card type="frosted" border="solid" />;
-};
+interface IAirdropStats {
+  seeReferralsDetails: () => void;
+  seeBottlesDetails: () => void;
+  epochDays: number;
+  epochMax: number;
+}
 
 const AirdropStats = ({
   seeReferralsDetails,
   seeBottlesDetails,
   epochDays,
   epochMax,
-}: {
-  seeReferralsDetails: () => void;
-  seeBottlesDetails: () => void;
-  epochDays: number;
-  epochMax: number;
-}) => {
+}: IAirdropStats) => {
   return (
     <div
       style={{
@@ -254,7 +308,9 @@ const AirdropStats = ({
       }}
     >
       <div>
-        <LabelledValue label="EPOCH DAYS LEFT">{epochDays}</LabelledValue>
+        <LabelledValue label="EPOCH DAYS LEFT">
+          {epochMax - epochDays}
+        </LabelledValue>
         <div
           style={{
             display: "flex",
@@ -432,13 +488,17 @@ const MultiplierTasks = () => {
   );
 };
 
+interface IMyMultiplier {
+  liquidityMultiplier: number;
+  seeMyStakingStats: () => void;
+  seeStakeNow: () => void;
+}
+
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
-}: {
-  seeMyStakingStats: () => void;
-  seeStakeNow: () => void;
-}) => {
+  liquidityMultiplier,
+}: IMyMultiplier) => {
   return (
     <div
       style={{
@@ -450,7 +510,7 @@ const MyMultiplier = ({
       <div>
         <LabelledValue label="MY TOTAL LIQUIDITY MULTIPLIER">
           <Text size="xxl" holo>
-            5,230x
+            {liquidityMultiplier.toLocaleString()}x
           </Text>
         </LabelledValue>
       </div>
@@ -556,40 +616,15 @@ const MyMultiplier = ({
   );
 };
 
-type AirdropRank = {
-  rank: number;
-  user: string;
-  bottles: number;
-  multiplier: number;
-  referrals: number;
-};
-
-const DUMMY_AIRDROP_LEADERBOARD_DATA = [
-  {
-    rank: 199,
-    user: "0x8Cb300ebb3028c15AB69c3E9CDFf1bE60aAa43a2",
-    bottles: 100,
-    multiplier: 5230,
-    referrals: 0,
-  },
-];
-
-const AIRDROP_TABLE_COLUMNS = [
-  { name: "RANK", prominent: "true" },
-  { name: "USER" },
-  { name: "BOTTLES" },
-  { name: "MULTIPLIER" },
-  { name: "REFERRALS" },
-];
-
-const AirdropRankRow: IRow<AirdropRank> = ({
+const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
   data,
   index,
 }: {
-  data: AirdropRank;
+  data: AirdropLeaderboardEntry;
   index: number;
 }) => {
-  const { rank, user, bottles, multiplier, referrals } = data;
+  const { rank, address, referralCount, liquidityMultiplier, totalLootboxes } =
+    data;
 
   return (
     <motion.tr
@@ -611,26 +646,31 @@ const AirdropRankRow: IRow<AirdropRank> = ({
 
       {/* User */}
       <td>
-        <Text>{trimAddress(user)}</Text>
+        <Text>{trimAddress(address)}</Text>
       </td>
 
       {/* Bottles */}
-      <td>{bottles}</td>
+      <td>{totalLootboxes}</td>
 
       {/* Multiplier */}
       <td>
-        <Text>{multiplier}x</Text>
+        <Text>{liquidityMultiplier.toLocaleString()}x</Text>
       </td>
 
       {/* Referrals */}
       <td>
-        <Text>{referrals}</Text>
+        <Text>{referralCount}</Text>
       </td>
     </motion.tr>
   );
 };
 
-const Leaderboard = () => {
+interface IAirdropLeaderboard {
+  loaded: boolean;
+  data: Array<AirdropLeaderboardEntry>;
+}
+
+const Leaderboard = ({ loaded, data }: IAirdropLeaderboard) => {
   return (
     <div className="pad-main" id="leaderboard">
       <Card
@@ -643,31 +683,37 @@ const Leaderboard = () => {
         <div>
           <Heading as="h3">Leaderbord</Heading>
           <Text prominent>
-            This leaderboard shows your rank among oother users per{" "}
+            This leaderboard shows your rank among other users per{" "}
             <ul>24 HOURS</ul>
           </Text>
         </div>
         <Table
           itemName=""
-          headings={AIRDROP_TABLE_COLUMNS}
+          headings={[
+            { name: "RANK" },
+            { name: "USER" },
+            { name: "BOTTLES" },
+            { name: "MULTIPLIER" },
+            { name: "REFERRALS" },
+          ]}
           pagination={{
             page: 1,
             rowsPerPage: 11,
           }}
           count={0}
-          data={DUMMY_AIRDROP_LEADERBOARD_DATA}
+          data={data}
           renderRow={AirdropRankRow}
           onFilter={() => true}
           activeFilterIndex={0}
           filters={[]}
-          loaded={true}
+          loaded={loaded}
         />
       </Card>
     </div>
   );
 };
 
-const BottleProgress = () => {
+const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
   return (
     <div>
       <HeroCarousel title="BOTTLES I'VE EARNED">
@@ -690,142 +736,12 @@ const BottleProgress = () => {
           <img src="/images/placeholderAirdrop3.png" />
         </Card>
       </HeroCarousel>
-      <BottleDistribution bottles={dummyBottles} />
+      <BottleDistribution bottles={bottles} />
       <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
         <Form.Toggle />
         <Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
       </div>
     </div>
-  );
-};
-
-type LoaderData = {
-  epochMax: number;
-  epochDays: number;
-  network: string;
-};
-
-const Airdrop = () => {
-  const { network, epochMax, epochDays } = useLoaderData<LoaderData>();
-
-  const { showExperiment } = useContext(SplitContext);
-
-  const showAirdrop = showExperiment("enable-airdrop-page");
-
-  if (!showAirdrop) return null;
-
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
-
-  const closeModal = () => {
-    setCurrentModal(null);
-  };
-
-  return (
-    <>
-      {/* Modals */}
-      <CardModal
-        id="referral-details"
-        visible={currentModal === "referral-details"}
-        closeModal={closeModal}
-      >
-        <ReferralDetailsModal />
-      </CardModal>
-      <CardModal
-        id="bottles-details"
-        visible={currentModal === "bottles-details"}
-        closeModal={closeModal}
-      >
-        <BottlesDetailsModal />
-      </CardModal>
-      <CardModal
-        id="stake-now"
-        visible={currentModal === "stake-now"}
-        closeModal={closeModal}
-      >
-        <StakeNowModal />
-      </CardModal>
-      <CardModal
-        id="staking-stats"
-        visible={currentModal === "staking-stats"}
-        closeModal={closeModal}
-      >
-        <StakingStatsModal />
-      </CardModal>
-      <CardModal
-        id="tutorial"
-        visible={currentModal === "tutorial"}
-        closeModal={closeModal}
-      >
-        <TutorialModal />
-      </CardModal>
-
-      {/* Page Content */}
-      <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
-        <TabButton size="small">Airdrop Dashboard</TabButton>
-        <TabButton size="small">Airdrop Tutorial</TabButton>
-        <TabButton size="small">Leaderboard</TabButton>
-        <TabButton size="small">Referrals</TabButton>
-        <TabButton size="small">Stake</TabButton>
-      </div>
-      <div className="pad-main">
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.5fr 1fr",
-            gap: "10%",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "2em",
-              zIndex: 1,
-            }}
-          >
-            <Heading className={"no-margin"}>
-              Welcome to Fluidity&apos;s Airdrop Event!
-            </Heading>
-            <div>
-              <Text>
-                Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                metus, ac convallis lectus porttitor et. Donec maximus gravida
-                mauris, eget tempor felis tristique sit amet. Pellentesque at
-                hendrerit nibh, eu porttitor dui.
-                <LinkButton
-                  size="medium"
-                  type="external"
-                  handleClick={() => {
-                    return;
-                  }}
-                >
-                  Learn more
-                </LinkButton>
-              </Text>
-            </div>
-            <AirdropStats
-              seeReferralsDetails={() => setCurrentModal("referral-details")}
-              seeBottlesDetails={() => setCurrentModal("bottles-details")}
-              epochMax={epochMax}
-              epochDays={epochDays}
-            />
-            <MultiplierTasks />
-            <MyMultiplier
-              seeMyStakingStats={() => setCurrentModal("staking-stats")}
-              seeStakeNow={() => setCurrentModal("stake-now")}
-            />
-          </div>
-          <BottleProgress />
-        </div>
-      </div>
-      <div
-        style={{ display: "flex", justifyContent: "center", padding: "0.5em" }}
-      >
-        <AnchorButton to="#leaderboard">LEADERBOARD</AnchorButton>
-      </div>
-      <Leaderboard />
-    </>
   );
 };
 
