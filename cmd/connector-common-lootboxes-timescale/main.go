@@ -7,6 +7,6 @@ import (
 
 func main() {
 	queue.LootboxesAll(func(lootbox lootboxes.Lootbox) {
-		lootboxes.InsertLootbox(lootbox)
+		lootboxes.InsertLootbox(lootbox) 
 	})
 }
