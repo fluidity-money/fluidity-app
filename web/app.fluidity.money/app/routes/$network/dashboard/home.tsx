@@ -40,60 +40,7 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
 
-const graphEmptyVolume = (time: number, amount = 0): Volume => ({
-  sender: "",
-  receiver: "",
-  timestamp: time,
-  amount,
-  symbol: "",
-});
-
-const binTransactions = (bins: Volume[], txs: Volume[]): Volume[] => {
-  const txMappedBins: Volume[][] = bins.map((bin) => [bin]);
-
-  let binIndex = 0;
-  txs.every((tx) => {
-    while (tx.timestamp < bins[binIndex].timestamp) {
-      binIndex++;
-
-      if (binIndex >= bins.length) return false;
-    }
-
-    txMappedBins[binIndex].push(tx);
-    return true;
-  });
-
-  const maxTxMappedBins = txMappedBins
-    .map(
-      (txs, i) =>
-        txs.find(
-          (tx) => tx.amount === Math.max(...txs.map(({ amount }) => amount))
-        ) || bins[i]
-    )
-    .reverse();
-
-  const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
-    (tx) => tx.amount
-  );
-
-  if (!txMappedBinsStart) return maxTxMappedBins;
-
-  const txMappedBinsEnd = rest.pop();
-
-  const maxTxs = maxTxMappedBins.filter(
-    (tx, i) =>
-      tx.amount ||
-      i === 0 ||
-      i === maxTxMappedBins.length - 1 ||
-      (tx.timestamp < txMappedBinsStart.timestamp &&
-        txMappedBinsEnd &&
-        tx.timestamp > txMappedBinsEnd.timestamp)
-  );
-
-  return maxTxs;
-};
-
-const graphTransformers = [
+const GRAPH_TRANSFORMERS = [
   {
     name: "D",
     transform: (vols: Volume[]) => {
@@ -154,7 +101,7 @@ const graphTransformers = [
   },
 ];
 
-const timeFilters = [
+const TIME_FILTERS = [
   {
     name: "D",
     filter: <T extends { timestamp: number }>({ timestamp }: T) =>
@@ -356,56 +303,56 @@ export default function Home() {
   const txTableColumns = isSmallMobile
     ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
     : isMobile
-    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
-    : isTablet
-    ? [
-        { name: "ACTIVITY" },
-        { name: "VALUE" },
-        { name: "REWARD" },
-        { name: "ACCOUNT" },
-      ]
-    : [
-        {
-          name: "ACTIVITY",
-        },
-        {
-          name: "VALUE",
-        },
-        {
-          name: "REWARD",
-        },
-        {
-          name: "ACCOUNT",
-        },
-        {
-          name: "TIME",
-          alignRight: true,
-        },
-      ];
+      ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+      : isTablet
+        ? [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "ACCOUNT" },
+        ]
+        : [
+          {
+            name: "ACTIVITY",
+          },
+          {
+            name: "VALUE",
+          },
+          {
+            name: "REWARD",
+          },
+          {
+            name: "ACCOUNT",
+          },
+          {
+            name: "TIME",
+            alignRight: true,
+          },
+        ];
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({
-            sender,
-            receiver,
-          }: {
-            sender: string;
-            receiver: string;
-          }) => [sender, receiver].includes(address),
-          name: "MY DASHBOARD",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({
+          sender,
+          receiver,
+        }: {
+          sender: string;
+          receiver: string;
+        }) => [sender, receiver].includes(address),
+        name: "MY DASHBOARD",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   const {
     totalPrizePool,
@@ -456,7 +403,7 @@ export default function Home() {
     })();
 
     const filteredVolume = volume.filter(
-      timeFilters[activeTransformerIndex].filter
+      TIME_FILTERS[activeTransformerIndex].filter
     );
 
     const totalVolume = filteredVolume.reduce(
@@ -464,7 +411,7 @@ export default function Home() {
       0
     );
     const graphTransformedTransactions =
-      graphTransformers[activeTransformerIndex].transform(filteredVolume);
+      GRAPH_TRANSFORMERS[activeTransformerIndex].transform(filteredVolume);
 
     return {
       count: filteredVolume.length,
@@ -613,8 +560,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
+                      ? "Weekly available rewards"
+                      : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -624,9 +571,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
+                        ({ network: rewardNetwork }) =>
+                          rewardNetwork === network
+                      )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
@@ -757,7 +704,7 @@ export default function Home() {
           style={{ width: "100%", height: "400px", mixBlendMode: "screen" }}
         >
           <div className="statistics-row pad-main">
-            {graphTransformers.map((filter, i) => (
+            {GRAPH_TRANSFORMERS.map((filter, i) => (
               <TabButton
                 key={`filter-${filter.name}`}
                 onClick={() => setActiveTransformerIndex(i)}
@@ -839,5 +786,58 @@ export default function Home() {
     </>
   );
 }
+
+const graphEmptyVolume = (time: number, amount = 0): Volume => ({
+  sender: "",
+  receiver: "",
+  timestamp: time,
+  amount,
+  symbol: "",
+});
+
+const binTransactions = (bins: Volume[], txs: Volume[]): Volume[] => {
+  const txMappedBins: Volume[][] = bins.map((bin) => [bin]);
+
+  let binIndex = 0;
+  txs.every((tx) => {
+    while (tx.timestamp < bins[binIndex].timestamp) {
+      binIndex++;
+
+      if (binIndex >= bins.length) return false;
+    }
+
+    txMappedBins[binIndex].push(tx);
+    return true;
+  });
+
+  const maxTxMappedBins = txMappedBins
+    .map(
+      (txs, i) =>
+        txs.find(
+          (tx) => tx.amount === Math.max(...txs.map(({ amount }) => amount))
+        ) || bins[i]
+    )
+    .reverse();
+
+  const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
+    (tx) => tx.amount
+  );
+
+  if (!txMappedBinsStart) return maxTxMappedBins;
+
+  const txMappedBinsEnd = rest.pop();
+
+  const maxTxs = maxTxMappedBins.filter(
+    (tx, i) =>
+      tx.amount ||
+      i === 0 ||
+      i === maxTxMappedBins.length - 1 ||
+      (tx.timestamp < txMappedBinsStart.timestamp &&
+        txMappedBinsEnd &&
+        tx.timestamp > txMappedBinsEnd.timestamp)
+  );
+
+  return maxTxs;
+};
 
 export { ErrorBoundary };

@@ -67,7 +67,7 @@ func main() {
 
 		// Calculate lootboxes earned from transaction
 		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application)
-		lootboxCount, exact := new(big.Rat).Mul(
+		lootboxCount := new(big.Rat).Mul(
 			volumeLiquidityMultiplier(
 				volume,
 				tokenDetails.TokenDecimals,
@@ -75,12 +75,18 @@ func main() {
 				awardedTime,
 			),
 			protocolMultiplier(application),
-		).Float64()
+		)
+
+		lootboxCountFloat, exact := lootboxCount.Float64()
 
 		if exact != true {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Lootbox count exceeded float!"
-				k.Payload = err
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Lootbox count for hash %v and winner %v was not an exact float, was %v",
+					transactionHash,
+					winnerAddress,
+					lootboxCount.String(),
+				)
 			})
 		}
 
@@ -91,7 +97,7 @@ func main() {
 			AwardedTime:     awardedTime,
 			Volume:          volume,
 			RewardTier:      rewardTier,
-			LootboxCount:    lootboxCount,
+			LootboxCount:    lootboxCountFloat,
 		}
 
 		queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)

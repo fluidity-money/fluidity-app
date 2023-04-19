@@ -24,10 +24,16 @@ func coerceDataToUint256(data []byte) (*big.Int, error) {
 		T: ethAbi.UintTy,
 	}
 
-	var (
-		amount       = ethAbi.ReadInteger(ethAbiType, data)
-		amountBigInt *big.Int
-	)
+	amount, err := ethAbi.ReadInteger(ethAbiType, data)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to decode a uint256 from abi data! %w",
+			err,
+		)
+	}
+
+	var amountBigInt *big.Int
 
 	switch amount.(type) {
 	case *big.Int:

@@ -85,7 +85,7 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 		FROM %s 
 		WHERE address = $1
 		LIMIT $2
-		)`,
+		`,
 
 		TableLootboxes,
 	)

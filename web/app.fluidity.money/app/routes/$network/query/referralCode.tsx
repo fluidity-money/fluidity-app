@@ -10,8 +10,9 @@ import {
 } from "~/queries";
 import { validAddress } from "~/util";
 
-export type ReferralCodeData = {
+export type ReferralCodeLoaderData = {
   referralAddress: string;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -56,7 +57,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return json({
     referralAddress,
-  } satisfies ReferralCodeData);
+    loaded: true,
+  } satisfies ReferralCodeLoaderData);
 };
 
 export type AddReferralCodeBody = {
