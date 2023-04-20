@@ -22,3 +22,5 @@ SERVICES:
       DOCKER_IMAGE: connector-common-lootboxes-timescale
       DOCKERFILE_PATH: ./cmd/connector-common-lootboxes-timescale
       ENV_FLU_WORKER_ID: ethereum-connector-common-lootboxes-timescale
+      ENV_FLU_DEBUG: true
+      ENV_FLU_SILENT: false

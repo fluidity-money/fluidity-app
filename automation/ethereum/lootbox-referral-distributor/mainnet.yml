@@ -6,3 +6,5 @@ SERVICES:
   - LOOTBOX_REFERRAL_DISTRIBUTOR:
       SERVICE_NAME: microservice-lootbox-referral-distributor
       ENV_FLU_WORKER_ID: ethereum-microservice-lootbox-referral-distributor
+      ENV_FLU_DEBUG: true
+      ENV_FLU_SILENT: false
