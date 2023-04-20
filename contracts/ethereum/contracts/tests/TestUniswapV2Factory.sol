@@ -8,12 +8,20 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../../interfaces/IUniswapV2Factory.sol";
+import "../../interfaces/IUniswapV2Pair.sol";
 
 contract TestUniswapV2Factory is IUniswapV2Factory {
     function createPair(
         address /* tokenA */,
         address /* tokenB */
-    ) external view returns (address) {
-        return msg.sender;
+    ) external returns (IUniswapV2Pair) {
+        revert("test implementation used");
+    }
+
+    function getPair(
+        address /* tokenA */,
+        address /* tokenB */
+    ) external view returns (IUniswapV2Pair) {
+        revert("test implementation used");
     }
 }

@@ -9,8 +9,7 @@ import {
   SUSHISWAP_FACTORY,
   SUSHISWAP_ROUTER,
   CAMELOT_FACTORY,
-  CAMELOT_ROUTER,
-  SADDLE_SWAP_IMPL } from "./arbitrum-constants";
+  CAMELOT_ROUTER } from "./arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
 
@@ -19,10 +18,18 @@ import { advanceTime } from "./test-utils";
 // TODO randomise for each token
 const tokenAmount = 100000;
 
+const createPair = async (
+  factory: ethers.Contract,
+  token0: ethers.Contract,
+  token1: ethers.Contract
+): Promise<ethers.Contract> => {
+  const addr = await factory.callStatic.createPair(token0.address, token1.address);
+  await factory.createPair(token0.address, token1.address);
+  return hre.ethers.getContractAt("TestUniswapV2Pair", addr);
+};
+
 describe("Staking", async () => {
   let stakingSigner: ethers.Signer;
-
-  let proxySigner: ethers.Signer;
 
   let erc20TokenFactory: ethers.ContractFactory;
 
@@ -36,20 +43,21 @@ describe("Staking", async () => {
 
   let staking: ethers.Contract;
 
-  let saddleSwapToken0Token1: ethers.Contract;
-
-  let saddleSwapToken0Token2: ethers.Contract;
-
   let camelotRouter: ethers.Contract;
+
+  let sushiswapToken1Pair: ethers.Contract;
+
+  let sushiswapToken2Pair: ethers.Contract;
+
+  let camelotToken1Pair: ethers.Contract;
+
+  let camelotToken2Pair: ethers.Contract;
 
   before(async function() {
     if (process.env.FLU_FORKNET_NETWORK != "arbitrum")
       this.skip();
 
-    ({
-      userAccount1: stakingSigner,
-      userAccount2: proxySigner
-    } = signers);
+    ({ userAccount1: stakingSigner } = signers);
 
     erc20TokenFactory = commonFactories.govToken;
 
@@ -82,66 +90,6 @@ describe("Staking", async () => {
 
     console.log(`token 2: ${token2.address}`);
 
-    const transparentUpgradeableProxyFactory = await hre.ethers.getContractFactory(
-      "TransparentUpgradeableProxy"
-    );
-
-    const saddleSwapInterface = new ethers.utils.Interface([`
-      function initialize(
-        address[] pooledTokens,
-        uint8[] decimals,
-        string lpTokenName,
-        string lpTokenSymbol,
-        uint256 a,
-        uint256 fee,
-        uint256 adminFee,
-        uint256 withdrawFee
-      )
-    `]);
-
-    const proxyAdminAddress = await proxySigner.getAddress();
-
-    saddleSwapToken0Token1 = await transparentUpgradeableProxyFactory.deploy(
-      SADDLE_SWAP_IMPL,
-      proxyAdminAddress,
-      saddleSwapInterface.encodeFunctionData("initialize", [
-        [token0.address, token1.address], // pooledTokens
-        [18, 18], // decimals
-        "swag", // lpTokenName
-        "yolo", // lpTokenSymbol
-        100, // a
-        4000000, // fee, swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
-        0, // admin fee
-        4000000 // withdrawal fee
-      ])
-    );
-
-    console.log(`saddle swap token 0 token 1: ${saddleSwapToken0Token1.address}`);
-
-    saddleSwapToken0Token2 = await transparentUpgradeableProxyFactory.deploy(
-      SADDLE_SWAP_IMPL,
-      proxyAdminAddress,
-      saddleSwapInterface.encodeFunctionData("initialize", [
-        [token0.address, token2.address], // pooledTokens
-        [18, 18], // decimals
-        "swag", // lpTokenName
-        "yolo", // lpTokenSymbol
-        100, // a
-        4000000, // fee, swap fee pulled from 0x1adf4abc3be3c6988a5cd9eb4eab1a1048c13e4d16e382a65f3327b4e904f8f9
-        0, // admin fee
-        4000000 // withdrawal fee
-      ])
-    );
-
-    console.log(
-      await (await hre.ethers.getContractAt("TestSaddleSwap", saddleSwapToken0Token1.address))
-        .swapStorage()
-    );
-
-    console.log(`saddle swap token 0 token 2: ${saddleSwapToken0Token2.address}`);
-
-    console.log(`saddle swap token 0 token 2 impl: ${SADDLE_SWAP_IMPL}`);
-
     const sushiswapFactory = await hre.ethers.getContractAt(
       "TestUniswapV2Factory",
       SUSHISWAP_FACTORY
@@ -152,9 +100,17 @@ describe("Staking", async () => {
       SUSHISWAP_ROUTER
     );
 
-    await sushiswapFactory.createPair(token0.address, token1.address);
+    console.log(`about to create sushiswap token 1 pair, factory: ${sushiswapFactory.address}`);
 
-    await sushiswapFactory.createPair(token0.address, token2.address);
+    sushiswapToken1Pair = await createPair(sushiswapFactory, token0, token1);
+
+    console.log(`sushiswap token 1 pair: ${sushiswapToken1Pair}`);
+
+    const sushiswapToken1PairAddress = sushiswapToken1Pair.address;
+
+    sushiswapToken2Pair = await createPair(sushiswapFactory, token0, token2);
+
+    const sushiswapToken2PairAddress = sushiswapToken2Pair.address;
 
     const camelotFactory = await hre.ethers.getContractAt(
       "TestUniswapV2Factory",
@@ -166,9 +122,19 @@ describe("Staking", async () => {
       CAMELOT_ROUTER
     );
 
-    await camelotFactory.createPair(token0.address, token1.address);
+    camelotToken1Pair = await createPair(camelotFactory, token0, token1);
 
-    await camelotFactory.createPair(token0.address, token2.address);
+    const camelotToken1PairAddress = camelotToken1Pair.address;
+
+    camelotToken2Pair = await createPair(camelotFactory, token0, token2);
+
+    const camelotToken2PairAddress = camelotToken2Pair.address;
+
+    console.log(`testing infra token 0 token 1 pair: ${await camelotFactory.getPair(token0.address, token1.address)}`);
+
+    console.log(`camelot token 1 pair address: ${camelotToken1PairAddress}`);
+
+    console.log(`camelot token 2 pair address: ${camelotToken2PairAddress}`);
 
     staking = await stakingFactory.connect(stakingSigner).deploy();
 
@@ -178,10 +144,10 @@ describe("Staking", async () => {
       token0.address,
       token1.address,
       token2.address,
-      saddleSwapToken0Token1.address,
-      saddleSwapToken0Token2.address,
       camelotRouter.address,
-      sushiswapRouter.address
+      sushiswapRouter.address,
+      camelotFactory.address,
+      sushiswapFactory.address
     );
 
     console.log(`staking address: ${staking.address}`);
@@ -193,7 +159,10 @@ describe("Staking", async () => {
 
   it("should lock up 100 test token 1 and test token 2", async() => {
     await staking.deposit(8640000, tokenAmount, tokenAmount, 0);
-    advanceTime(8640001);
-    await staking.redeem(0);
+    console.log(await staking.deposited());
+    console.log(`balance of staking lp token: ${await camelotToken1Pair.balanceOf(staking.address)}`);
+    await advanceTime(hre, 9640001);
+    await staking.redeem(tokenAmount, tokenAmount, 0);
+    console.log(await staking.deposited());
   });
 });

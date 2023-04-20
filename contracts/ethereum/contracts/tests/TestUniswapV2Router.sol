@@ -19,8 +19,8 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         uint /* _amountBMin */,
         address /* _to */,
         uint /* _deadline */
-    ) external pure returns (uint, uint, uint) {
-        return (0, 0, 0);
+    ) external returns (uint, uint, uint) {
+        revert("test implementation used");
     }
 
     function removeLiquidity(
@@ -31,7 +31,7 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         uint256 /* amountBMin */,
         address /* to */,
         uint /* deadline */
-    ) external pure returns (uint, uint) {
-        return (0, 0);
+    ) external returns (uint, uint) {
+        revert("test implementation used");
     }
 }

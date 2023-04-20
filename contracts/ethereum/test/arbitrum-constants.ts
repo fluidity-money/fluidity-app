@@ -21,8 +21,6 @@ export const CAMELOT_FACTORY = "0x6EcCab422D763aC031210895C81787E87B43A652";
 
 export const CAMELOT_ROUTER = "0xc873fEcbd354f5A56E00E710B90EF4201db2448d";
 
-export const SADDLE_SWAP_IMPL = "0xa5a33ab9063395a90ccbea2d86a62eccf27b5742";
-
 const tokens = {
   "usdc": {
     backend: "aaveV3",

@@ -9,9 +9,10 @@ pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
-import "../interfaces/ISaddleSwap.sol";
 import "../interfaces/IStaking.sol";
 import "../interfaces/IToken.sol";
+
+import "../interfaces/IUniswapV2Factory.sol";
 import "../interfaces/IUniswapV2Router02.sol";
 
 import "./openzeppelin/SafeERC20.sol";
@@ -19,16 +20,16 @@ import "./openzeppelin/SafeERC20.sol";
 import "hardhat/console.sol";
 
 /*
-* Network(s): Ethereum & Arbitrum
-*
-* * Supported LP Tokens for assets:
-* - fUSDC/ETH
-* - fUSDC/USDC
-*
-* * In the following protocols:
-* - Saddle
-* - Camelot
-* - SushiSwap
+ * Network(s): Ethereum & Arbitrum
+ *
+ * * Supported LP Tokens for assets:
+ * - fUSDC/ETH
+ * - fUSDC/USDC
+ *
+ * * In the following protocols:
+ * - Saddle
+ * - Camelot
+ * - SushiSwap
 */
 
 uint256 constant MAX_UINT256 = 2 ** 256 - 1;
@@ -36,6 +37,8 @@ uint256 constant MAX_UINT256 = 2 ** 256 - 1;
 uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
+
+uint256 constant UNISWAP_ACTION_MAX_TIME = 1 hours;
 
 /// @dev MIN_DEPOSIT must be divisible by 10 for allocation
 ///      weights
@@ -50,12 +53,13 @@ enum LiquidityProvided {
 struct Deposit {
     uint256 redeemTimestamp;
 
-    uint256 saddleLpMinted;
     uint256 camelotLpMinted;
-    uint256 sushiswapLpMinted;
+    uint256 camelotToken0;
+    uint256 camelotToken1;
 
-    uint256 token0Amount;
-    uint256 token1Amount;
+    uint256 sushiswapLpMinted;
+    uint256 sushiswapToken0;
+    uint256 sushiswapToken1;
 
     LiquidityProvided typ;
 }
@@ -67,26 +71,18 @@ contract Staking {
         address indexed spender,
         uint256 lockupLength,
         uint256 lockedTimestamp,
-        uint256 fUsdcAmount,
+        uint256 fusdcAmount,
         uint256 usdcAmount,
-        uint256 wEthAmount
+        uint256 wethAmount
     );
 
     uint8 private version_;
 
-    IERC20 private fUsdc_;
+    IERC20 private fusdc_;
 
-    IERC20 private wEth_;
+    IERC20 private weth_;
 
     IERC20 private usdc_;
-
-    ISaddleSwap private saddleSwapFusdcUsdc_;
-
-    ISaddleSwap private saddleSwapFusdcWeth_;
-
-    IERC20 private saddleSwapFusdcUsdcLpToken_;
-
-    IERC20 private saddleSwapFusdcWethLpToken_;
 
     IUniswapV2Router02 private camelotRouter_;
 
@@ -94,67 +90,75 @@ contract Staking {
 
     mapping (address => Deposit[]) private deposits_;
 
+    function _getPair(
+        IUniswapV2Factory _factory,
+        IERC20 _token0,
+        IERC20 _token1
+    ) internal view returns (IUniswapV2Pair) {
+        // taken straight from https://docs.uniswap.org/contracts/v2/guides/smart-contract-integration/getting-pair-addresses
+
+        console.log("factory is", address(_factory));
+
+        address tokenA = address(_token0);
+        address tokenB = address(_token1);
+
+        (address token0, address token1) =
+            tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+
+        // initially this took this approach https://docs.uniswap.org/contracts/v2/guides/smart-contract-integration/getting-pair-addresses
+        // but this is done once and we had issues with that approach
+
+        return _factory.getPair(token0, token1);
+    }
+
     function init(
-        IERC20 _fUsdc,
+        IERC20 _fusdc,
         IERC20 _usdc,
-        IERC20 _wEth,
-        ISaddleSwap _saddleSwapFusdcUsdc,
-        ISaddleSwap _saddleSwapFusdcWeth,
+        IERC20 _weth,
         IUniswapV2Router02 _camelotRouter,
-        IUniswapV2Router02 _sushiswapRouter
+        IUniswapV2Router02 _sushiswapRouter,
+        IUniswapV2Factory _camelotFactory,
+        IUniswapV2Factory _sushiswapFactory
     ) public {
         require(version_ == 0, "already initialised");
 
-        fUsdc_ = _fUsdc;
+        fusdc_ = _fusdc;
         usdc_ = _usdc;
-        wEth_ = _wEth;
-
-        saddleSwapFusdcUsdc_ = _saddleSwapFusdcUsdc;
-        saddleSwapFusdcWeth_ = _saddleSwapFusdcWeth;
-
-        (,,,,,,,saddleSwapFusdcUsdcLpToken_) = saddleSwapFusdcUsdc_.swapStorage();
-
-        (,,,,,,,saddleSwapFusdcWethLpToken_) = saddleSwapFusdcWeth_.swapStorage();
-
-        sushiswapRouter_ = _sushiswapRouter;
+        weth_ = _weth;
 
         camelotRouter_ = _camelotRouter;
 
-        fUsdc_.safeApprove(address(saddleSwapFusdcUsdc_), MAX_UINT256);
-        usdc_.safeApprove(address(saddleSwapFusdcUsdc_), MAX_UINT256);
+        sushiswapRouter_ = _sushiswapRouter;
 
-        fUsdc_.safeApprove(address(saddleSwapFusdcWeth_), MAX_UINT256);
-        wEth_.safeApprove(address(saddleSwapFusdcWeth_), MAX_UINT256);
-
-        fUsdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
-        usdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
-        wEth_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
-
-        fUsdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
+        fusdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
         usdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
-        wEth_.safeApprove(address(camelotRouter_), MAX_UINT256);
+        weth_.safeApprove(address(camelotRouter_), MAX_UINT256);
+
+        fusdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
+        usdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
+        weth_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
+
+        IUniswapV2Pair camelotFusdcUsdcPair = _getPair(_camelotFactory, fusdc_, usdc_);
+        IUniswapV2Pair camelotFusdcWethPair = _getPair(_camelotFactory, fusdc_, weth_);
+
+        console.log("camelot fusdc usdc pair is", address(camelotFusdcUsdcPair));
+        console.log("camelot fusdc weth pair is", address(camelotFusdcWethPair));
+
+        IUniswapV2Pair sushiswapFusdcUsdcPair = _getPair(_sushiswapFactory, fusdc_, usdc_);
+        IUniswapV2Pair sushiswapFusdcWethPair = _getPair(_sushiswapFactory, fusdc_, weth_);
+
+        console.log("sushiswap fusdc usdc pair is", address(sushiswapFusdcUsdcPair));
+        console.log("sushiswap fusdc weth pair is", address(sushiswapFusdcWethPair));
+
+        camelotFusdcUsdcPair.approve(address(_camelotRouter), MAX_UINT256);
+
+        camelotFusdcWethPair.approve(address(_camelotRouter),MAX_UINT256);
+
+        sushiswapFusdcUsdcPair.approve(address(_sushiswapRouter), MAX_UINT256);
+
+        sushiswapFusdcWethPair.approve(address(_sushiswapRouter),MAX_UINT256);
 
         version_ = 1;
-    }
-
-    function _depositToSaddle(
-        ISaddleSwap _saddleSwap,
-        uint256 _token0Amount,
-        uint256 _token1Amount
-    ) internal {
-        uint256[] memory amounts = new uint256[](2);
-
-        amounts[0] = _token0Amount;
-        amounts[1] = _token1Amount;
-
-        // in our testing, saddle was incorrectly returning the lp tokens, so we
-        // trust the caller to figure this out themselves
-
-       _saddleSwap.addLiquidity(
-            amounts,
-            0,
-            block.timestamp + 1
-        );
     }
 
     function _depositToUniswapV2Router(
@@ -163,54 +167,54 @@ contract Staking {
         address _token1,
         uint256 _token0Amount,
         uint256 _token1Amount
-    ) internal returns (uint256 liquidity) {
-        (,,liquidity) = _router.addLiquidity(
+    ) internal returns (
+        uint256 amountA,
+        uint256 amountB,
+        uint256 liquidity
+     ) {
+        (amountA, amountB, liquidity) = _router.addLiquidity(
             _token0,
             _token1,
             _token0Amount,
             _token1Amount,
-            _token0Amount,
-            _token1Amount,
+            0,
+            0,
             address(this),
-            block.timestamp + 1
+            block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
 
-        return liquidity;
+        require(amountA == _token0Amount, "amount A != token 0");
+        require(amountB == _token1Amount, "amount B != token 1");
+
+        return (amountA, amountB, liquidity);
     }
 
     function calculateWeights(
         uint256 _token0Amount,
         uint256 _token1Amount
     ) public pure returns (
-        uint256 saddleToken0,
         uint256 camelotToken0,
         uint256 sushiToken0,
 
-        uint256 saddleToken1,
         uint256 camelotToken1,
         uint256 sushiToken1
     ) {
-        saddleToken0 = (_token0Amount * 20) / 100;
-        camelotToken0 = (_token0Amount * 40) / 100;
-        sushiToken0 = (_token0Amount * 40) / 100;
+        camelotToken0 = (_token0Amount * 50) / 100;
+        sushiToken0 = (_token0Amount * 50) / 100;
 
-        saddleToken1 = (_token1Amount * 20) / 100;
-        camelotToken1 = (_token1Amount * 40) / 100;
-        sushiToken1 = (_token1Amount * 40) / 100;
+        camelotToken1 = (_token1Amount * 50) / 100;
+        sushiToken1 = (_token1Amount * 50) / 100;
 
         return (
-            saddleToken0,
             camelotToken0,
             sushiToken0,
 
-            saddleToken1,
             camelotToken1,
             sushiToken1
         );
     }
 
     function _depositTokens(
-        ISaddleSwap _saddleSwap,
         IERC20 _token0,
         IERC20 _token1,
         uint256 _token0Amount,
@@ -223,27 +227,20 @@ contract Staking {
         _token1.transferFrom(msg.sender, address(this), _token1Amount);
 
         (
-            uint256 saddleToken0,
             uint256 camelotToken0,
             uint256 sushiToken0,
 
-            uint256 saddleToken1,
             uint256 camelotToken1,
             uint256 sushiToken1
         ) = calculateWeights(_token0Amount, _token1Amount);
 
-        // deposit it on saddle, but ignore the return type to set with the
-        // caller (we don't trust saddle with the lp token return number)
-
-        _depositToSaddle(
-            _saddleSwap,
-            saddleToken0,
-            saddleToken1
-        );
-
         // deposit on camelot
 
-        dep.camelotLpMinted = _depositToUniswapV2Router(
+        (
+            dep.camelotToken0,
+            dep.camelotToken1,
+            dep.camelotLpMinted
+        ) = _depositToUniswapV2Router(
             camelotRouter_,
             address(_token0),
             address(_token1),
@@ -253,9 +250,13 @@ contract Staking {
 
         // deposit it on sushiswap
 
-        dep.sushiswapLpMinted = _depositToUniswapV2Router(
+        (
+            dep.sushiswapToken0,
+            dep.sushiswapToken1,
+            dep.sushiswapLpMinted
+        ) = _depositToUniswapV2Router(
             sushiswapRouter_,
-            address(fUsdc_),
+            address(fusdc_),
             address(usdc_),
             sushiToken0,
             sushiToken1
@@ -265,22 +266,15 @@ contract Staking {
     }
 
     function _depositFusdcUsdc(
-        uint256 _fUsdcAmount,
+        uint256 _fusdcAmount,
         uint256 _usdcAmount
     ) internal returns (Deposit memory dep){
-        uint256 saddleLpBefore = saddleSwapFusdcUsdcLpToken_.balanceOf(address(this));
-
         dep = _depositTokens(
-            saddleSwapFusdcUsdc_,
-            fUsdc_,
+            fusdc_,
             usdc_,
-            _fUsdcAmount,
+            _fusdcAmount,
             _usdcAmount
         );
-
-        uint256 saddleLpAfter = saddleSwapFusdcUsdcLpToken_.balanceOf(address(this));
-
-        dep.saddleLpMinted = saddleLpAfter - saddleLpBefore;
 
         dep.typ = LiquidityProvided.FUSDC_USDC;
 
@@ -288,22 +282,15 @@ contract Staking {
     }
 
     function _depositFusdcWeth(
-        uint256 _fUsdcAmount,
-        uint256 _wEthAmount
+        uint256 _fusdcAmount,
+        uint256 _wethAmount
     ) internal returns (Deposit memory dep) {
-        uint256 saddleLpBefore = saddleSwapFusdcWethLpToken_.balanceOf(address(this));
-
         dep = _depositTokens(
-            saddleSwapFusdcWeth_,
-            fUsdc_,
-            wEth_,
-            _fUsdcAmount,
-            _wEthAmount
+            fusdc_,
+            weth_,
+            _fusdcAmount,
+            _wethAmount
         );
-
-        uint256 saddleLpAfter = saddleSwapFusdcWethLpToken_.balanceOf(address(this));
-
-        dep.saddleLpMinted = saddleLpAfter - saddleLpBefore;
 
         dep.typ = LiquidityProvided.FUSDC_WETH;
 
@@ -312,28 +299,32 @@ contract Staking {
 
     function deposit(
         uint256 _lockupLength,
-        uint256 _fUsdcAmount,
-        uint256 _usdcAmount,
-        uint256 _wEthAmount
-    ) external returns (uint) {
-        // take the amounts given, and allocate 40% to camelot, 20% to saddle and
-        // 40% to sushiswap
+        uint256 _maxFusdcAmount,
+        uint256 _maxUsdcAmount,
+        uint256 _maxWethAmount
+    ) external returns (
+        uint256 fusdcDeposited,
+        uint256 usdcDeposited,
+        uint256 wethDeposited
+    ) {
+        // take the amounts given, and allocate half to camelot and half to
+        // sushiswap
 
         require(_lockupLength >= MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength <= MAX_LOCKUP_TIME, "lockup length too high");
 
-        bool fUsdcUsdcPair = _fUsdcAmount > 0 && _usdcAmount > 0;
+        bool fusdcUsdcPair = _maxFusdcAmount > 0 && _maxUsdcAmount > 0;
 
-        bool fUsdcWethPair = _fUsdcAmount > 0 && _wEthAmount > 0;
+        bool fusdcWethPair = _maxFusdcAmount > 0 && _maxWethAmount > 0;
 
-        require(!(fUsdcUsdcPair && fUsdcWethPair), "usdc or weth");
+        require(!(fusdcUsdcPair && fusdcWethPair), "usdc or weth");
 
         Deposit memory dep;
 
-        if (fUsdcUsdcPair)
-            dep = _depositFusdcUsdc(_fUsdcAmount, _usdcAmount);
+        if (fusdcUsdcPair)
+            dep = _depositFusdcUsdc(_maxFusdcAmount, _maxUsdcAmount);
         else
-            dep = _depositFusdcWeth(_fUsdcAmount, _wEthAmount);
+            dep = _depositFusdcWeth(_maxFusdcAmount, _maxWethAmount);
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
 
@@ -341,132 +332,290 @@ contract Staking {
             msg.sender,
             _lockupLength,
             block.timestamp,
-            _fUsdcAmount,
-            _usdcAmount,
-            _wEthAmount
+            _maxFusdcAmount,
+            _maxUsdcAmount,
+            _maxWethAmount
         );
-
-        uint depositId = deposits_[msg.sender].length;
 
         deposits_[msg.sender].push(dep);
 
         // the above functions should've added to the deposits so we can return
         // the latest item in the array there
 
-        return depositId;
+        fusdcDeposited = dep.camelotToken0 + dep.sushiswapToken0;
+
+        // depending on what was deposited, we return in different slots token 1
+        // added
+
+        if (fusdcUsdcPair)
+            return (fusdcDeposited, dep.camelotToken1 + dep.sushiswapToken1, 0);
+
+        else
+            return (fusdcDeposited, 0, dep.camelotToken1 + dep.sushiswapToken1);
     }
 
-    function _redeemSaddleSwap(
-        ISaddleSwap _saddleSwap,
-        uint256 _token0Amount,
-        uint256 _token1Amount,
-        uint256 _lpTokens
-    ) internal {
-        uint256[] memory amounts = new uint256[](2);
-
-        amounts[0] = _token0Amount;
-        amounts[1] = _token1Amount;
-
-        uint256[] memory burned = _saddleSwap.removeLiquidity(
-            _lpTokens,
-            amounts,
-            block.timestamp + 1
-        );
-
-        require(burned[0] == _token0Amount, "unable to redeem token0");
-        require(burned[1] == _token1Amount, "unable to redeem token1");
-    }
-
-    function _uniswapRedeem(
+    function _redeemFromUniswapV2Router(
         IUniswapV2Router02 _router,
         IERC20 _token0,
         IERC20 _token1,
+        uint256 _lpTokens,
         uint256 _token0Amount,
         uint256 _token1Amount,
-        uint256 _lpTokens,
         address _to
     ) internal {
+        console.log("token 0 amount is", _token0Amount);
+
+        console.log("token 1 amount is", _token1Amount);
+
+        console.log("lp tokens is", _lpTokens);
+
+        uint256 token0Slippage = (_token0Amount * 5) / 100;
+        uint256 token1Slippage = (_token0Amount * 5) / 100;
+
         (uint256 redeemed0, uint256 redeemed1) = _router.removeLiquidity(
             address(_token0),
             address(_token1),
             _lpTokens,
-            _token0Amount,
-            _token1Amount,
+            _token0Amount - token0Slippage,
+            _token1Amount - token1Slippage,
             _to,
-            block.timestamp + 1
+            block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
 
-        require(redeemed0 == _token0Amount, "unable to redeem token0");
-        require(redeemed1 == _token1Amount, "unable to redeem token1");
+        console.log("redeemed token 0", redeemed0);
+
+        console.log("redeemed token 1", redeemed1);
+
+        // require(redeemed0 == _token0Amount, "unable to redeem token0");
+        // require(redeemed1 == _token1Amount, "unable to redeem token1");
     }
 
     function depositFinished(address _spender, uint _depositId) public view returns (bool) {
-        return deposits_[_spender][_depositId].redeemTimestamp > block.timestamp;
+        // if the current timestamp is greater than the redemption timestamp the
+        // deposit is considered redeemable (finished)
+        return deposits_[_spender][_depositId].redeemTimestamp < block.timestamp;
     }
 
     function _disableDeposit(address _spender, uint _depositId) internal {
-        deposits_[_spender][_depositId].redeemTimestamp = 0;
+        delete deposits_[_spender][_depositId];
     }
 
-    function redeem(uint _depositId) public {
-        require(depositFinished(msg.sender, _depositId), "not finished/not exist");
+    function redeemContinue(
+        uint256 _fusdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount
+    ) internal pure returns (
+        bool,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        return (true, _fusdcAmount, _usdcAmount, _wethAmount);
+    }
+
+    /**
+     * @notice _redeem a deposit, failing to do so if the
+     *         fusdc/usdc/weth amount isn't greater than the current deposit or
+     *         equal to 0
+     */
+    function _redeem(
+        uint _depositId,
+        uint256 _fusdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount
+    ) internal returns (
+        bool cont,
+        uint256 fusdcRemaining,
+        uint256 usdcRemaining,
+        uint256 wethRemaining
+    ) {
+
+        // if the deposit we're looking at isn't finished then short circuit
+
+        if (!depositFinished(msg.sender, _depositId)) return redeemContinue(
+            _fusdcAmount,
+            _usdcAmount,
+            _wethAmount
+        );
+
+        console.log("deposit is finished");
 
         Deposit memory dep = deposits_[msg.sender][_depositId];
 
-        ISaddleSwap saddle;
-
-        IERC20 token0 = fUsdc_;
+        IERC20 token0 = fusdc_;
         IERC20 token1;
 
-        // set the saddleswap pool and token1 depending on the token pairs
+        // set token1 depending on the token pairs
+
+        // if the amount given isn't greater than token1 added together, then break
+
+        uint256 token0PastDeposit = dep.camelotToken0 + dep.sushiswapToken0;
+
+        console.log("camelot token 0 is", dep.camelotToken0, " sushiswap token 0 is ", dep.sushiswapToken0);
+
+        console.log("token 0 past deposit is", token0PastDeposit);
+
+        uint256 token1PastDeposit = dep.camelotToken1 + dep.sushiswapToken1;
+
+        console.log("token 1 past deposit is", token1PastDeposit);
+
+        console.log("camelot token 1 is", dep.camelotToken1, " sushiswap token 1 is", dep.sushiswapToken1);
+
+        console.log("should it not continue?", token1PastDeposit > _usdcAmount);
 
         if (dep.typ == LiquidityProvided.FUSDC_USDC) {
-            saddle = saddleSwapFusdcUsdc_;
             token1 = usdc_;
-        } else if (dep.typ == LiquidityProvided.FUSDC_WETH) {
-            saddle = saddleSwapFusdcWeth_;
-            token1 = wEth_;
-        } else {
-            revert("incorrect liquidity provided");
+
+            // if the deposited usdc isn't greater or equal than camelot/sushiswap
+            // usdc, we won't partially reduce the liquidity here, so return
+
+            if (token1PastDeposit > _usdcAmount) return redeemContinue(
+                _fusdcAmount,
+                _usdcAmount,
+                _wethAmount
+            );
         }
 
-        (
-            uint256 saddleToken0,
-            uint256 camelotToken0,
-            uint256 sushiToken0,
+        else if (dep.typ == LiquidityProvided.FUSDC_WETH) {
+            token1 = weth_;
 
-            uint256 saddleToken1,
-            uint256 camelotToken1,
-            uint256 sushiToken1
-        ) = calculateWeights(dep.token0Amount, dep.token1Amount);
+            // if the deposited weth isn't greater or equal than camelot/sushiswap
+            // weth, we won't partially reduce the liquidity here, so break
 
-        _redeemSaddleSwap(
-            saddle,
-            saddleToken0,
-            saddleToken1,
-            dep.saddleLpMinted
+            if (token1PastDeposit > _wethAmount) return redeemContinue(
+                _fusdcAmount,
+                _usdcAmount,
+                _wethAmount
+            );
+        }
+
+        else {
+            revert("weird state!");
+        }
+
+        // check that the fusdc requested to pull out is equal to or
+        // greater than the amount in this deposit
+
+        if (token0PastDeposit > _fusdcAmount) return redeemContinue(
+            _fusdcAmount,
+            _usdcAmount,
+            _wethAmount
         );
 
-        _uniswapRedeem(
+        console.log("draining camelot with the lp", dep.camelotLpMinted, "the amount of token 0", dep.camelotToken0);
+
+        console.log("draining camelot the amount of token 1", dep.camelotToken1);
+
+        _redeemFromUniswapV2Router(
             camelotRouter_,
             token0,
             token1,
-            camelotToken0,
-            camelotToken1,
             dep.camelotLpMinted,
+            dep.camelotToken0,
+            dep.camelotToken1,
             msg.sender
         );
 
-        _uniswapRedeem(
+        console.log("draining sushiswap");
+
+        _redeemFromUniswapV2Router(
             sushiswapRouter_,
             token0,
             token1,
-            sushiToken0,
-            sushiToken1,
             dep.sushiswapLpMinted,
+            dep.sushiswapToken0,
+            dep.sushiswapToken1,
             msg.sender
         );
 
+        // disable deposit uses delete to delete the deposit
+
         _disableDeposit(msg.sender, _depositId);
+
+        uint256 token0Remaining = _fusdcAmount - token0PastDeposit;
+
+        uint256 token1Remaining = _usdcAmount - token1PastDeposit;
+
+        if (dep.typ == LiquidityProvided.FUSDC_USDC) {
+            return (
+                true,
+                token0Remaining,
+                token1Remaining,
+                0
+            );
+        }
+
+        else {
+            return (
+                true,
+                token0PastDeposit,
+                0,
+                token1Remaining
+            );
+        }
+    }
+
+    function deposited() public view returns (
+        uint256 fusdcAmount,
+        uint256 usdcAmount,
+        uint256 wethAmount
+    ) {
+        for (uint i = 0; i < deposits_[msg.sender].length; i++) {
+            Deposit memory dep = deposits_[msg.sender][i];
+
+            fusdcAmount += dep.camelotToken0 + dep.sushiswapToken0;
+
+            uint256 token1Added = dep.camelotToken1 + dep.sushiswapToken1;
+
+            if (dep.typ == LiquidityProvided.FUSDC_USDC)
+                usdcAmount += token1Added;
+
+            else if (dep.typ == LiquidityProvided.FUSDC_WETH)
+                wethAmount += token1Added;
+        }
+
+        return (fusdcAmount, usdcAmount, wethAmount);
+    }
+
+    function redeem(
+        uint256 _fusdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount
+    ) public returns (
+        uint256 fusdcRemaining,
+        uint256 usdcRemaining,
+        uint256 wethRemaining
+    ) {
+        require(deposits_[msg.sender].length > 0, "no deposits");
+
+        fusdcRemaining = _fusdcAmount;
+        usdcRemaining = _usdcAmount;
+        wethRemaining = _wethAmount;
+
+        bool cont;
+
+        for (uint i = 0; i < deposits_[msg.sender].length; i++) {
+            console.log("testing");
+            console.log(i);
+
+            console.log("fusdc remaining", fusdcRemaining);
+
+            (
+                cont,
+                fusdcRemaining,
+                usdcRemaining,
+                wethRemaining
+            ) = _redeem(i, fusdcRemaining, usdcRemaining, wethRemaining);
+
+            console.log("fusdc remaining after", fusdcRemaining);
+
+            if (!cont) break;
+
+            if (fusdcRemaining == 0) break;
+
+            if (usdcRemaining == 0 && wethRemaining == 0) break;
+        }
+
+        return (fusdcRemaining, usdcRemaining, wethRemaining);
     }
 }
