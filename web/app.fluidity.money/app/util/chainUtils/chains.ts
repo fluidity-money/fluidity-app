@@ -24,6 +24,20 @@ const getChainId = (network: Chain): number => {
   }
 };
 
+const getNetworkFromChainId = (
+  chainId_: string | number
+): Chain | undefined => {
+  const chainId =
+    typeof chainId_ === "string" ? parseInt(chainId_, 16) : chainId_;
+
+  switch (chainId) {
+    case 1:
+      return "ethereum";
+    case 42161:
+      return "arbitrum";
+  }
+};
+
 const getChainNativeToken = (network: string): string => {
   switch (network) {
     case "ethereum":
@@ -36,4 +50,4 @@ const getChainNativeToken = (network: string): string => {
   }
 };
 
-export { chainType, getChainId, getChainNativeToken };
+export { chainType, getChainId, getChainNativeToken, getNetworkFromChainId };
