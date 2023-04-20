@@ -12,8 +12,8 @@ import "../interfaces/IERC20.sol";
 import "../interfaces/IStaking.sol";
 import "../interfaces/IToken.sol";
 
-import "../interfaces/IUniswapV2Factory.sol";
 import "../interfaces/IUniswapV2Router02.sol";
+import "../interfaces/IUniswapV2Pair.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
@@ -92,35 +92,16 @@ contract Staking {
 
     mapping (address => Deposit[]) private deposits_;
 
-    function _getPair(
-        IUniswapV2Factory _factory,
-        IERC20 _token0,
-        IERC20 _token1
-    ) internal view returns (IUniswapV2Pair) {
-        // taken straight from https://docs.uniswap.org/contracts/v2/guides/smart-contract-integration/getting-pair-addresses
-
-        console.log("factory is", address(_factory));
-
-        address tokenA = address(_token0);
-        address tokenB = address(_token1);
-
-        (address token0, address token1) =
-            tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-
-        // initially this took this approach https://docs.uniswap.org/contracts/v2/guides/smart-contract-integration/getting-pair-addresses
-        // but this is done once and we had issues with that approach
-
-        return _factory.getPair(token0, token1);
-    }
-
     function init(
         IERC20 _fusdc,
         IERC20 _usdc,
         IERC20 _weth,
         IUniswapV2Router02 _camelotRouter,
         IUniswapV2Router02 _sushiswapRouter,
-        IUniswapV2Factory _camelotFactory,
-        IUniswapV2Factory _sushiswapFactory
+        IUniswapV2Pair _camelotFusdcUsdcPair,
+        IUniswapV2Pair _camelotFusdcWethPair,
+        IUniswapV2Pair _sushiswapFusdcUsdcPair,
+        IUniswapV2Pair _sushiswapFusdcWethPair
     ) public {
         require(version_ == 0, "already initialised");
 
@@ -140,25 +121,13 @@ contract Staking {
         usdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
         weth_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
 
-        IUniswapV2Pair camelotFusdcUsdcPair = _getPair(_camelotFactory, fusdc_, usdc_);
-        IUniswapV2Pair camelotFusdcWethPair = _getPair(_camelotFactory, fusdc_, weth_);
+        _camelotFusdcUsdcPair.approve(address(_camelotRouter), MAX_UINT256);
 
-        console.log("camelot fusdc usdc pair is", address(camelotFusdcUsdcPair));
-        console.log("camelot fusdc weth pair is", address(camelotFusdcWethPair));
+        _camelotFusdcWethPair.approve(address(_camelotRouter),MAX_UINT256);
 
-        IUniswapV2Pair sushiswapFusdcUsdcPair = _getPair(_sushiswapFactory, fusdc_, usdc_);
-        IUniswapV2Pair sushiswapFusdcWethPair = _getPair(_sushiswapFactory, fusdc_, weth_);
+        _sushiswapFusdcUsdcPair.approve(address(_sushiswapRouter), MAX_UINT256);
 
-        console.log("sushiswap fusdc usdc pair is", address(sushiswapFusdcUsdcPair));
-        console.log("sushiswap fusdc weth pair is", address(sushiswapFusdcWethPair));
-
-        camelotFusdcUsdcPair.approve(address(_camelotRouter), MAX_UINT256);
-
-        camelotFusdcWethPair.approve(address(_camelotRouter),MAX_UINT256);
-
-        sushiswapFusdcUsdcPair.approve(address(_sushiswapRouter), MAX_UINT256);
-
-        sushiswapFusdcWethPair.approve(address(_sushiswapRouter),MAX_UINT256);
+        _sushiswapFusdcWethPair.approve(address(_sushiswapRouter),MAX_UINT256);
 
         version_ = 1;
     }

@@ -146,8 +146,10 @@ describe("Staking", async () => {
       token2.address,
       camelotRouter.address,
       sushiswapRouter.address,
-      camelotFactory.address,
-      sushiswapFactory.address
+      camelotToken1PairAddress,
+      camelotToken2PairAddress,
+      sushiswapToken1PairAddress,
+      sushiswapToken2PairAddress,
     );
 
     console.log(`staking address: ${staking.address}`);
