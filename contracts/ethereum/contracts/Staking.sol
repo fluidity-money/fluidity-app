@@ -40,6 +40,8 @@ uint256 constant MAX_LOCKUP_TIME = 365 days;
 
 uint256 constant UNISWAP_ACTION_MAX_TIME = 1 hours;
 
+uint256 constant SLIPPAGE_TOLERANCE = 5;
+
 /// @dev MIN_DEPOSIT must be divisible by 10 for allocation
 ///      weights
 uint256 constant MIN_DEPOSIT = 10;
@@ -369,15 +371,18 @@ contract Staking {
 
         console.log("lp tokens is", _lpTokens);
 
-        uint256 token0Slippage = (_token0Amount * 5) / 100;
-        uint256 token1Slippage = (_token0Amount * 5) / 100;
+        uint256 token0Slippage = (_token0Amount * SLIPPAGE_TOLERANCE) / 100;
+        uint256 token1Slippage = (_token0Amount * SLIPPAGE_TOLERANCE) / 100;
+
+        uint256 token0WithSlippage = _token0Amount - token0Slippage;
+        uint256 token1WithSlippage = _token1Amount - token1Slippage;
 
         (uint256 redeemed0, uint256 redeemed1) = _router.removeLiquidity(
             address(_token0),
             address(_token1),
             _lpTokens,
-            _token0Amount - token0Slippage,
-            _token1Amount - token1Slippage,
+            token0WithSlippage,
+            token1WithSlippage,
             _to,
             block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
@@ -386,8 +391,9 @@ contract Staking {
 
         console.log("redeemed token 1", redeemed1);
 
-        // require(redeemed0 == _token0Amount, "unable to redeem token0");
-        // require(redeemed1 == _token1Amount, "unable to redeem token1");
+        require(redeemed0 >= token0WithSlippage, "unable to redeem token0");
+
+        require(redeemed1 >= token1WithSlippage, "unable to redeem token1");
     }
 
     function depositFinished(address _spender, uint _depositId) public view returns (bool) {
