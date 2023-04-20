@@ -30,7 +30,12 @@ import makeContractSwap, {
 } from "~/util/chainUtils/ethereum/transaction";
 import { Buffer } from "buffer";
 import useWindow from "~/hooks/useWindow";
-import { Chain, chainType, getChainId } from "~/util/chainUtils/chains";
+import {
+  Chain,
+  chainType,
+  getChainId,
+  getNetworkFromChainId,
+} from "~/util/chainUtils/chains";
 
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import { useToolTip } from "~/components";
@@ -90,10 +95,19 @@ const EthereumFacade = ({
                 ) {
                   const { code } = error as MetamaskError;
                   if (code === 4001) {
-                    deactivate();
                     toolTip.open("#010A16", <NetworkTooltip />);
+                    const currPath = window.location.pathname;
+                    const currNetwork = getNetworkFromChainId(connectedChainId);
+
+                    if (currNetwork) {
+                      window.location.pathname = currPath.replaceAll(
+                        network,
+                        currNetwork
+                      );
+                    }
                   }
                 }
+                return false;
               });
           }
         })
@@ -271,9 +285,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
       : undefined;
   };
 
