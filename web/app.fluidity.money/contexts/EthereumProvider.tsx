@@ -96,7 +96,7 @@ const EthereumFacade = ({
                   const { code } = error as MetamaskError;
                   if (code === 4001) {
                     toolTip.open("#010A16", <NetworkTooltip />);
-                    const currPath = window.location.pathname;
+                    const currPath = window.location.pathname.toLowerCase();
                     const currNetwork = getNetworkFromChainId(connectedChainId);
 
                     if (currNetwork) {
