@@ -38,8 +38,6 @@ uint256 constant MAX_LOCKUP_TIME = 365 days;
 
 uint256 constant UNISWAP_ACTION_MAX_TIME = 1 hours;
 
-uint256 constant SLIPPAGE_TOLERANCE = 10;
-
 // @notice MIN_LIQUIDITY since we split it up in half and there's a
 //         minimum liquidity of 10k
 uint256 constant MIN_LIQUIDITY = 20 ** 3;
