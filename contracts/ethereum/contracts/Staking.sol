@@ -40,7 +40,11 @@ uint256 constant MAX_LOCKUP_TIME = 365 days;
 
 uint256 constant UNISWAP_ACTION_MAX_TIME = 1 hours;
 
-uint256 constant SLIPPAGE_TOLERANCE = 5;
+uint256 constant SLIPPAGE_TOLERANCE = 10;
+
+// @notice MIN_LIQUIDITY since we split it up in half and there's a
+//         minimum liquidity of 10k
+uint256 constant MIN_LIQUIDITY = 20 ** 3;
 
 /// @dev MIN_DEPOSIT must be divisible by 10 for allocation
 ///      weights
@@ -123,11 +127,11 @@ contract Staking {
 
         _camelotFusdcUsdcPair.approve(address(_camelotRouter), MAX_UINT256);
 
-        _camelotFusdcWethPair.approve(address(_camelotRouter),MAX_UINT256);
+        _camelotFusdcWethPair.approve(address(_camelotRouter), MAX_UINT256);
 
         _sushiswapFusdcUsdcPair.approve(address(_sushiswapRouter), MAX_UINT256);
 
-        _sushiswapFusdcWethPair.approve(address(_sushiswapRouter),MAX_UINT256);
+        _sushiswapFusdcWethPair.approve(address(_sushiswapRouter), MAX_UINT256);
 
         version_ = 1;
     }
@@ -137,25 +141,31 @@ contract Staking {
         address _token0,
         address _token1,
         uint256 _token0Amount,
-        uint256 _token1Amount
+        uint256 _token1Amount,
+        uint256 _token0AmountMin,
+        uint256 _token1AmountMin
     ) internal returns (
         uint256 amountA,
         uint256 amountB,
         uint256 liquidity
      ) {
+        console.log("adding token 0 amount", _token0Amount);
+        console.log("adding token 1 amount", _token1Amount);
+
         (amountA, amountB, liquidity) = _router.addLiquidity(
             _token0,
             _token1,
             _token0Amount,
             _token1Amount,
-            0,
-            0,
+            _token0AmountMin,
+            _token1AmountMin,
             address(this),
             block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
 
-        require(amountA == _token0Amount, "amount A != token 0");
-        require(amountB == _token1Amount, "amount B != token 1");
+        console.log("liquidity added to amount A", amountA);
+
+        console.log("liquidity added to amount B", amountB);
 
         return (amountA, amountB, liquidity);
     }
@@ -185,11 +195,19 @@ contract Staking {
         );
     }
 
+    function _reduceBySlippage(
+        uint256 _x,
+        uint256 _slippage
+    ) internal pure returns (uint256) {
+        return _x - ((_x * _slippage) / 100);
+    }
+
     function _depositTokens(
         IERC20 _token0,
         IERC20 _token1,
         uint256 _token0Amount,
-        uint256 _token1Amount
+        uint256 _token1Amount,
+        uint256 _slippage
     ) internal returns (Deposit memory dep) {
         require(_token0Amount > MIN_DEPOSIT, "base too small");
         require(_token1Amount > MIN_DEPOSIT, "float too small");
@@ -205,6 +223,12 @@ contract Staking {
             uint256 sushiToken1
         ) = calculateWeights(_token0Amount, _token1Amount);
 
+        uint256 camelotToken0Min = _reduceBySlippage(camelotToken0, _slippage);
+        uint256 camelotToken1Min = _reduceBySlippage(camelotToken1, _slippage);
+
+        uint256 sushiToken0Min = _reduceBySlippage(sushiToken0, _slippage);
+        uint256 sushiToken1Min = _reduceBySlippage(sushiToken1, _slippage);
+
         // deposit on camelot
 
         (
@@ -216,10 +240,14 @@ contract Staking {
             address(_token0),
             address(_token1),
             camelotToken0,
-            camelotToken1
+            camelotToken1,
+            camelotToken0Min,
+            camelotToken1Min
         );
 
         // deposit it on sushiswap
+
+        console.log("depositing on sushiswap");
 
         (
             dep.sushiswapToken0,
@@ -230,7 +258,9 @@ contract Staking {
             address(fusdc_),
             address(usdc_),
             sushiToken0,
-            sushiToken1
+            sushiToken1,
+            sushiToken0Min,
+            sushiToken1Min
         );
 
         return dep;
@@ -238,13 +268,15 @@ contract Staking {
 
     function _depositFusdcUsdc(
         uint256 _fusdcAmount,
-        uint256 _usdcAmount
-    ) internal returns (Deposit memory dep){
+        uint256 _usdcAmount,
+        uint256 _slippage
+    ) internal returns (Deposit memory dep) {
         dep = _depositTokens(
             fusdc_,
             usdc_,
             _fusdcAmount,
-            _usdcAmount
+            _usdcAmount,
+            _slippage
         );
 
         dep.typ = LiquidityProvided.FUSDC_USDC;
@@ -254,13 +286,15 @@ contract Staking {
 
     function _depositFusdcWeth(
         uint256 _fusdcAmount,
-        uint256 _wethAmount
+        uint256 _wethAmount,
+        uint256 _slippage
     ) internal returns (Deposit memory dep) {
         dep = _depositTokens(
             fusdc_,
             weth_,
             _fusdcAmount,
-            _wethAmount
+            _wethAmount,
+            _slippage
         );
 
         dep.typ = LiquidityProvided.FUSDC_WETH;
@@ -270,9 +304,10 @@ contract Staking {
 
     function deposit(
         uint256 _lockupLength,
-        uint256 _maxFusdcAmount,
-        uint256 _maxUsdcAmount,
-        uint256 _maxWethAmount
+        uint256 _fusdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount,
+        uint256 _slippage
     ) external returns (
         uint256 fusdcDeposited,
         uint256 usdcDeposited,
@@ -284,18 +319,22 @@ contract Staking {
         require(_lockupLength >= MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength <= MAX_LOCKUP_TIME, "lockup length too high");
 
-        bool fusdcUsdcPair = _maxFusdcAmount > 0 && _maxUsdcAmount > 0;
+        // the ui should restrict the deposits to more than 100
 
-        bool fusdcWethPair = _maxFusdcAmount > 0 && _maxWethAmount > 0;
+        bool fusdcUsdcPair =
+            _fusdcAmount > MIN_LIQUIDITY && _usdcAmount > MIN_LIQUIDITY;
+
+        bool fusdcWethPair =
+            _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY;
 
         require(!(fusdcUsdcPair && fusdcWethPair), "usdc or weth");
 
         Deposit memory dep;
 
         if (fusdcUsdcPair)
-            dep = _depositFusdcUsdc(_maxFusdcAmount, _maxUsdcAmount);
+            dep = _depositFusdcUsdc(_fusdcAmount, _usdcAmount, _slippage);
         else
-            dep = _depositFusdcWeth(_maxFusdcAmount, _maxWethAmount);
+            dep = _depositFusdcWeth(_fusdcAmount, _wethAmount, _slippage);
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
 
@@ -303,9 +342,9 @@ contract Staking {
             msg.sender,
             _lockupLength,
             block.timestamp,
-            _maxFusdcAmount,
-            _maxUsdcAmount,
-            _maxWethAmount
+            _fusdcAmount,
+            _usdcAmount,
+            _wethAmount
         );
 
         deposits_[msg.sender].push(dep);
@@ -327,27 +366,18 @@ contract Staking {
 
     function _redeemFromUniswapV2Router(
         IUniswapV2Router02 _router,
-        IERC20 _token0,
         IERC20 _token1,
         uint256 _lpTokens,
         uint256 _token0Amount,
         uint256 _token1Amount,
+        uint256 _slippage,
         address _to
     ) internal {
-        console.log("token 0 amount is", _token0Amount);
-
-        console.log("token 1 amount is", _token1Amount);
-
-        console.log("lp tokens is", _lpTokens);
-
-        uint256 token0Slippage = (_token0Amount * SLIPPAGE_TOLERANCE) / 100;
-        uint256 token1Slippage = (_token0Amount * SLIPPAGE_TOLERANCE) / 100;
-
-        uint256 token0WithSlippage = _token0Amount - token0Slippage;
-        uint256 token1WithSlippage = _token1Amount - token1Slippage;
+        uint256 token0WithSlippage = _reduceBySlippage(_token0Amount, _slippage);
+        uint256 token1WithSlippage = _reduceBySlippage(_token1Amount, _slippage);
 
         (uint256 redeemed0, uint256 redeemed1) = _router.removeLiquidity(
-            address(_token0),
+            address(fusdc_),
             address(_token1),
             _lpTokens,
             token0WithSlippage,
@@ -355,10 +385,6 @@ contract Staking {
             _to,
             block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
-
-        console.log("redeemed token 0", redeemed0);
-
-        console.log("redeemed token 1", redeemed1);
 
         require(redeemed0 >= token0WithSlippage, "unable to redeem token0");
 
@@ -388,6 +414,32 @@ contract Staking {
         return (true, _fusdcAmount, _usdcAmount, _wethAmount);
     }
 
+    function _redeemCamelotSushiswap(
+        Deposit memory dep,
+        IERC20 _token1,
+        uint256 _slippage
+    ) internal {
+        _redeemFromUniswapV2Router(
+            camelotRouter_,
+            _token1,
+            dep.camelotLpMinted,
+            dep.camelotToken0,
+            dep.camelotToken1,
+            _slippage,
+            msg.sender
+        );
+
+        _redeemFromUniswapV2Router(
+            sushiswapRouter_,
+            _token1,
+            dep.sushiswapLpMinted,
+            dep.sushiswapToken0,
+            dep.sushiswapToken1,
+            _slippage,
+            msg.sender
+        );
+    }
+
     /**
      * @notice _redeem a deposit, failing to do so if the
      *         fusdc/usdc/weth amount isn't greater than the current deposit or
@@ -397,7 +449,8 @@ contract Staking {
         uint _depositId,
         uint256 _fusdcAmount,
         uint256 _usdcAmount,
-        uint256 _wethAmount
+        uint256 _wethAmount,
+        uint256 _slippage
     ) internal returns (
         bool cont,
         uint256 fusdcRemaining,
@@ -413,12 +466,7 @@ contract Staking {
             _wethAmount
         );
 
-        console.log("deposit is finished");
-
         Deposit memory dep = deposits_[msg.sender][_depositId];
-
-        IERC20 token0 = fusdc_;
-        IERC20 token1;
 
         // set token1 depending on the token pairs
 
@@ -426,47 +474,11 @@ contract Staking {
 
         uint256 token0PastDeposit = dep.camelotToken0 + dep.sushiswapToken0;
 
-        console.log("camelot token 0 is", dep.camelotToken0, " sushiswap token 0 is ", dep.sushiswapToken0);
-
-        console.log("token 0 past deposit is", token0PastDeposit);
-
         uint256 token1PastDeposit = dep.camelotToken1 + dep.sushiswapToken1;
 
-        console.log("token 1 past deposit is", token1PastDeposit);
+        uint256 token0Remaining = _fusdcAmount - token0PastDeposit;
 
-        console.log("camelot token 1 is", dep.camelotToken1, " sushiswap token 1 is", dep.sushiswapToken1);
-
-        console.log("should it not continue?", token1PastDeposit > _usdcAmount);
-
-        if (dep.typ == LiquidityProvided.FUSDC_USDC) {
-            token1 = usdc_;
-
-            // if the deposited usdc isn't greater or equal than camelot/sushiswap
-            // usdc, we won't partially reduce the liquidity here, so return
-
-            if (token1PastDeposit > _usdcAmount) return redeemContinue(
-                _fusdcAmount,
-                _usdcAmount,
-                _wethAmount
-            );
-        }
-
-        else if (dep.typ == LiquidityProvided.FUSDC_WETH) {
-            token1 = weth_;
-
-            // if the deposited weth isn't greater or equal than camelot/sushiswap
-            // weth, we won't partially reduce the liquidity here, so break
-
-            if (token1PastDeposit > _wethAmount) return redeemContinue(
-                _fusdcAmount,
-                _usdcAmount,
-                _wethAmount
-            );
-        }
-
-        else {
-            revert("weird state!");
-        }
+        uint256 token1Remaining = _usdcAmount - token1PastDeposit;
 
         // check that the fusdc requested to pull out is equal to or
         // greater than the amount in this deposit
@@ -477,39 +489,39 @@ contract Staking {
             _wethAmount
         );
 
-        console.log("draining camelot with the lp", dep.camelotLpMinted, "the amount of token 0", dep.camelotToken0);
+        // pick the token and make sure that there's enough liquidity
 
-        console.log("draining camelot the amount of token 1", dep.camelotToken1);
+        if (dep.typ == LiquidityProvided.FUSDC_USDC) {
+            // if the deposited usdc isn't greater or equal than camelot/sushiswap
+            // usdc, we won't partially reduce the liquidity here, so return
 
-        _redeemFromUniswapV2Router(
-            camelotRouter_,
-            token0,
-            token1,
-            dep.camelotLpMinted,
-            dep.camelotToken0,
-            dep.camelotToken1,
-            msg.sender
-        );
+            if (token1PastDeposit > _usdcAmount) return redeemContinue(
+                _fusdcAmount,
+                _usdcAmount,
+                _wethAmount
+            );
 
-        console.log("draining sushiswap");
+            _redeemCamelotSushiswap(dep, usdc_, _slippage);
+        }
 
-        _redeemFromUniswapV2Router(
-            sushiswapRouter_,
-            token0,
-            token1,
-            dep.sushiswapLpMinted,
-            dep.sushiswapToken0,
-            dep.sushiswapToken1,
-            msg.sender
-        );
+        else if (dep.typ == LiquidityProvided.FUSDC_WETH) {
+            // if the deposited weth isn't greater or equal than camelot/sushiswap
+            // weth, we won't partially reduce the liquidity here, so break
+
+            if (token1PastDeposit > _wethAmount) return redeemContinue(
+                _fusdcAmount,
+                _usdcAmount,
+                _wethAmount
+            );
+
+            _redeemCamelotSushiswap(dep, weth_, _slippage);
+        }
+
+        else revert("unusual liquidity provided");
 
         // disable deposit uses delete to delete the deposit
 
         _disableDeposit(msg.sender, _depositId);
-
-        uint256 token0Remaining = _fusdcAmount - token0PastDeposit;
-
-        uint256 token1Remaining = _usdcAmount - token1PastDeposit;
 
         if (dep.typ == LiquidityProvided.FUSDC_USDC) {
             return (
@@ -555,7 +567,8 @@ contract Staking {
     function redeem(
         uint256 _fusdcAmount,
         uint256 _usdcAmount,
-        uint256 _wethAmount
+        uint256 _wethAmount,
+        uint256 _slippage
     ) public returns (
         uint256 fusdcRemaining,
         uint256 usdcRemaining,
@@ -563,34 +576,29 @@ contract Staking {
     ) {
         require(deposits_[msg.sender].length > 0, "no deposits");
 
-        fusdcRemaining = _fusdcAmount;
-        usdcRemaining = _usdcAmount;
-        wethRemaining = _wethAmount;
-
         bool cont;
 
-        for (uint i = 0; i < deposits_[msg.sender].length; i++) {
-            console.log("testing");
-            console.log(i);
-
-            console.log("fusdc remaining", fusdcRemaining);
-
+        for (uint depositId = 0; depositId < deposits_[msg.sender].length; depositId++) {
             (
                 cont,
-                fusdcRemaining,
-                usdcRemaining,
-                wethRemaining
-            ) = _redeem(i, fusdcRemaining, usdcRemaining, wethRemaining);
-
-            console.log("fusdc remaining after", fusdcRemaining);
+                _fusdcAmount,
+                _usdcAmount,
+                _wethAmount
+            ) = _redeem(
+                depositId,
+                _fusdcAmount,
+                _usdcAmount,
+                _wethAmount,
+                _slippage
+            );
 
             if (!cont) break;
 
-            if (fusdcRemaining == 0) break;
+            if (_fusdcAmount == 0) break;
 
-            if (usdcRemaining == 0 && wethRemaining == 0) break;
+            if (_usdcAmount == 0 && _wethAmount == 0) break;
         }
 
-        return (fusdcRemaining, usdcRemaining, wethRemaining);
+        return (_fusdcAmount, _usdcAmount, _wethAmount);
     }
 }

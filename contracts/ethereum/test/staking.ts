@@ -15,8 +15,9 @@ import { signers, commonFactories } from "./setup-common";
 
 import { advanceTime } from "./test-utils";
 
-// TODO randomise for each token
 const tokenAmount = 100000;
+
+const slippage = 10;
 
 const createPair = async (
   factory: ethers.Contract,
@@ -26,6 +27,34 @@ const createPair = async (
   const addr = await factory.callStatic.createPair(token0.address, token1.address);
   await factory.createPair(token0.address, token1.address);
   return hre.ethers.getContractAt("TestUniswapV2Pair", addr);
+};
+
+const deposit = async (
+  contract: ethers.Contract,
+  lockupLength: number,
+  maxFusdcAmount: number,
+  maxUsdcAmount: number,
+  maxWethAmount: number,
+  slippageTolerance: number
+): Promise<[number, number, number]> => {
+  const { fusdcDeposited, usdcDeposited, wethDeposited } =
+    await contract.callStatic.deposit(
+      lockupLength,
+      maxFusdcAmount,
+      maxUsdcAmount,
+      maxWethAmount,
+      slippageTolerance
+    );
+
+  await contract.deposit(
+    lockupLength,
+    maxFusdcAmount,
+    maxUsdcAmount,
+    maxWethAmount,
+    slippageTolerance
+  );
+
+  return [ fusdcDeposited, usdcDeposited, wethDeposited ];
 };
 
 describe("Staking", async () => {
@@ -154,17 +183,29 @@ describe("Staking", async () => {
 
     console.log(`staking address: ${staking.address}`);
 
-    await token0.approve(staking.address, tokenAmount);
-    await token1.approve(staking.address, tokenAmount);
-    await token2.approve(staking.address, tokenAmount);
+    const maxUint256 = ethers.constants.Two.pow(256).sub(1);
+
+    await token0.approve(staking.address, maxUint256);
+    await token1.approve(staking.address, maxUint256);
+    await token2.approve(staking.address, maxUint256);
   });
 
-  it("should lock up 100 test token 1 and test token 2", async() => {
-    await staking.deposit(8640000, tokenAmount, tokenAmount, 0);
-    console.log(await staking.deposited());
-    console.log(`balance of staking lp token: ${await camelotToken1Pair.balanceOf(staking.address)}`);
-    await advanceTime(hre, 9640001);
-    await staking.redeem(tokenAmount, tokenAmount, 0);
-    console.log(await staking.deposited());
+  it("should lock up 300 test token 1 and 300 test token 2", async() => {
+    const [ fusdc, usdc, _ ] = await deposit(
+      staking,
+      8640000,
+      20000,
+      20000,
+      0,
+      slippage
+    );
+
+    console.log(`deposited fusdc amount ${fusdc}`);
+
+    console.log(`deposited usdc amount ${usdc}`);
+
+    await advanceTime(hre, 8640001);
+
+    await staking.redeem(fusdc, usdc, 0, slippage);
   });
 });
