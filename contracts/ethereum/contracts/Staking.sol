@@ -305,8 +305,8 @@ contract Staking {
         // take the amounts given, and allocate half to camelot and half to
         // sushiswap
 
-        require(_lockupLength >= MIN_LOCKUP_TIME, "lockup length too low");
-        require(_lockupLength <= MAX_LOCKUP_TIME, "lockup length too high");
+        require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
+        require(_lockupLength - 1 < MAX_LOCKUP_TIME, "lockup length too high");
 
         // the ui should restrict the deposits to more than 100
 
@@ -375,9 +375,9 @@ contract Staking {
             block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
 
-        require(redeemed0 >= token0WithSlippage, "unable to redeem token0");
+        require(redeemed0 + 1 > token0WithSlippage, "unable to redeem token0");
 
-        require(redeemed1 >= token1WithSlippage, "unable to redeem token1");
+        require(redeemed1 + 1 > token1WithSlippage, "unable to redeem token1");
     }
 
     function depositFinished(address _spender, uint _depositId) public view returns (bool) {
@@ -539,7 +539,7 @@ contract Staking {
         uint256 usdcAmount,
         uint256 wethAmount
     ) {
-        for (uint i = 0; i < deposits_[msg.sender].length; i++) {
+        for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
             Deposit memory dep = deposits_[msg.sender][i];
 
             fusdcAmount += dep.camelotToken0 + dep.sushiswapToken0;
@@ -570,7 +570,7 @@ contract Staking {
 
         bool cont;
 
-        for (uint depositId = 0; depositId < deposits_[msg.sender].length; depositId++) {
+        for (uint depositId = 0; depositId < deposits_[msg.sender].length; ++depositId) {
             (
                 cont,
                 _fusdcAmount,
