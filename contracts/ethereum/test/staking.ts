@@ -256,8 +256,6 @@ describe("Staking", async () => {
       slippage
     );
 
-    console.log(`fusdc remaining: ${fusdcRemaining} `);
-
     expect(fusdcRemaining).to.be.equal(fusdc + fusdc1);
 
     expect(usdcRemaining).to.be.equal(usdc + usdc1);
