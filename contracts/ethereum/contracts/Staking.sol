@@ -17,8 +17,6 @@ import "../interfaces/IUniswapV2Pair.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -149,9 +147,6 @@ contract Staking {
         uint256 amountB,
         uint256 liquidity
      ) {
-        console.log("adding token 0 amount", _token0Amount);
-        console.log("adding token 1 amount", _token1Amount);
-
         (amountA, amountB, liquidity) = _router.addLiquidity(
             _token0,
             _token1,
@@ -162,10 +157,6 @@ contract Staking {
             address(this),
             block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
-
-        console.log("liquidity added to amount A", amountA);
-
-        console.log("liquidity added to amount B", amountB);
 
         return (amountA, amountB, liquidity);
     }
@@ -246,8 +237,6 @@ contract Staking {
         );
 
         // deposit it on sushiswap
-
-        console.log("depositing on sushiswap");
 
         (
             dep.sushiswapToken0,
@@ -394,7 +383,10 @@ contract Staking {
     function depositFinished(address _spender, uint _depositId) public view returns (bool) {
         // if the current timestamp is greater than the redemption timestamp the
         // deposit is considered redeemable (finished)
-        return deposits_[_spender][_depositId].redeemTimestamp < block.timestamp;
+
+        uint256 redemption = deposits_[_spender][_depositId].redeemTimestamp;
+
+        return redemption > 0 && redemption < block.timestamp;
     }
 
     function _disableDeposit(address _spender, uint _depositId) internal {

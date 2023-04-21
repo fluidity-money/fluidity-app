@@ -15,7 +15,9 @@ import { signers, commonFactories } from "./setup-common";
 
 import { advanceTime } from "./test-utils";
 
-const tokenAmount = 100000;
+import { expect, assert } from "chai";
+
+const MaxUint256 = ethers.constants.MaxUint256;
 
 const slippage = 10;
 
@@ -28,6 +30,12 @@ const createPair = async (
   await factory.createPair(token0.address, token1.address);
   return hre.ethers.getContractAt("TestUniswapV2Pair", addr);
 };
+
+const expectWithinSlippage = (base: number, test: number, slippage: number) =>
+  assert(
+    base - (base * slippage / 100) <= test,
+    `${base} - (${base} * ${slippage} / 100) >= ${test} not true!`
+  );
 
 const deposit = async (
   contract: ethers.Contract,
@@ -56,6 +64,21 @@ const deposit = async (
 
   return [ fusdcDeposited, usdcDeposited, wethDeposited ];
 };
+
+const redeem = async (
+  contract: ethers.Contract,
+  fusdcAmount: number,
+  usdcAmount: number,
+  wethAmount: number,
+  slippage: number
+): Promise<[ number, number, number ]> => {
+  const { fusdcRemaining, usdcRemaining, wethRemaining } =
+    await contract.callStatic.redeem(fusdcAmount, usdcAmount, wethAmount, slippage);
+
+  await contract.redeem(fusdcAmount, usdcAmount, wethAmount, slippage);
+
+  return [ fusdcRemaining, usdcRemaining, wethRemaining ];
+}
 
 describe("Staking", async () => {
   let stakingSigner: ethers.Signer;
@@ -96,28 +119,22 @@ describe("Staking", async () => {
       "Staking test token",
       "token 0",
       18,
-      tokenAmount
+      MaxUint256
     );
-
-    console.log(`token 0: ${token0.address}`);
 
     token1 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
       "token 1",
       18,
-      tokenAmount
+      MaxUint256
     );
-
-    console.log(`token 1: ${token1.address}`);
 
     token2 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
       "token 2",
       18,
-      tokenAmount
+      MaxUint256
     );
-
-    console.log(`token 2: ${token2.address}`);
 
     const sushiswapFactory = await hre.ethers.getContractAt(
       "TestUniswapV2Factory",
@@ -129,11 +146,7 @@ describe("Staking", async () => {
       SUSHISWAP_ROUTER
     );
 
-    console.log(`about to create sushiswap token 1 pair, factory: ${sushiswapFactory.address}`);
-
     sushiswapToken1Pair = await createPair(sushiswapFactory, token0, token1);
-
-    console.log(`sushiswap token 1 pair: ${sushiswapToken1Pair}`);
 
     const sushiswapToken1PairAddress = sushiswapToken1Pair.address;
 
@@ -159,15 +172,7 @@ describe("Staking", async () => {
 
     const camelotToken2PairAddress = camelotToken2Pair.address;
 
-    console.log(`testing infra token 0 token 1 pair: ${await camelotFactory.getPair(token0.address, token1.address)}`);
-
-    console.log(`camelot token 1 pair address: ${camelotToken1PairAddress}`);
-
-    console.log(`camelot token 2 pair address: ${camelotToken2PairAddress}`);
-
     staking = await stakingFactory.connect(stakingSigner).deploy();
-
-    console.log(`staking signer: ${await stakingSigner.getAddress()}`);
 
     await staking.connect(stakingSigner).init(
       token0.address,
@@ -181,31 +186,80 @@ describe("Staking", async () => {
       sushiswapToken2PairAddress,
     );
 
-    console.log(`staking address: ${staking.address}`);
-
-    const maxUint256 = ethers.constants.Two.pow(256).sub(1);
-
-    await token0.approve(staking.address, maxUint256);
-    await token1.approve(staking.address, maxUint256);
-    await token2.approve(staking.address, maxUint256);
+    await token0.approve(staking.address, MaxUint256);
+    await token1.approve(staking.address, MaxUint256);
+    await token2.approve(staking.address, MaxUint256);
   });
 
-  it("should lock up 300 test token 1 and 300 test token 2", async() => {
-    const [ fusdc, usdc, _ ] = await deposit(
+  it("should lock up 20000 test token 1 and 20000 test token 2", async() => {
+    const depositToken = 20000;
+
+    const [ fusdc, usdc, _weth ] = await deposit(
       staking,
       8640000,
-      20000,
-      20000,
+      depositToken,
+      depositToken,
       0,
       slippage
     );
 
-    console.log(`deposited fusdc amount ${fusdc}`);
+    expectWithinSlippage(depositToken, fusdc, slippage);
 
-    console.log(`deposited usdc amount ${usdc}`);
+    expectWithinSlippage(depositToken, usdc, slippage);
+
+    const [ expectedFusdc, expectedUsdc ] = await staking.deposited();
+
+    expect(expectedFusdc + expectedUsdc).to.be.equal(fusdc + usdc);
 
     await advanceTime(hre, 8640001);
 
-    await staking.redeem(fusdc, usdc, 0, slippage);
+    await redeem(staking, fusdc, usdc, 0, slippage);
+  });
+
+  it("should lock up two amounts then redeem them", async() => {
+    const depositFusdc = 25000;
+    const depositUsdc = 27000;
+
+    const [ fusdc, usdc ] = await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    expectWithinSlippage(depositFusdc, fusdc, slippage);
+
+    expectWithinSlippage(depositUsdc, usdc, slippage);
+
+    const [ fusdc1, usdc1 ] = await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    expectWithinSlippage(depositFusdc, fusdc1, slippage);
+
+    expectWithinSlippage(depositUsdc, usdc1, slippage);
+
+    await advanceTime(hre, 8640004);
+
+    const [ fusdcRemaining, usdcRemaining ] = await redeem(
+      staking,
+      fusdc + fusdc1,
+      usdc + usdc1,
+      0,
+      slippage
+    );
+
+    console.log(`fusdc remaining: ${fusdcRemaining} `);
+
+    expect(fusdcRemaining).to.be.equal(fusdc + fusdc1);
+
+    expect(usdcRemaining).to.be.equal(usdc + usdc1);
   });
 });
