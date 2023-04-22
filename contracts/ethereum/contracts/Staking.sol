@@ -17,8 +17,6 @@ import "../interfaces/IUniswapV2Pair.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -301,8 +299,6 @@ contract Staking {
 
         uint256 token0Before = fusdc_.balanceOf(address(this));
 
-        console.log("fusdc before", token0Before);
-
         uint256 token1Before;
 
         token1Before = _token.balanceOf(address(this));
@@ -332,17 +328,19 @@ contract Staking {
         // the above functions should've added to the deposits so we can return
         // the latest item in the array there
 
-        token0Deposited = dep.camelotToken0 + dep.sushiswapToken0;
-
-        token1Deposited = dep.camelotToken1 + dep.sushiswapToken1;
-
-        // return to the user any amounts not used
+        // refund the user any amounts not used
 
         if (token0After > token0Before)
             fusdc_.transfer(msg.sender, token0After - token0Before);
 
         if (token1After > token1Before)
             _token.transfer(msg.sender, token1After - token1Before);
+
+        // return the amount that we deposited
+
+        token0Deposited = dep.camelotToken0 + dep.sushiswapToken0;
+
+        token1Deposited = dep.camelotToken1 + dep.sushiswapToken1;
 
         return (token0Deposited, token1Deposited);
     }
@@ -396,8 +394,6 @@ contract Staking {
             _wethAmount = token1Spent;
             _usdcAmount = 0;
         }
-
-        console.log("emitting staking event");
 
         emit Staked(
             msg.sender,
