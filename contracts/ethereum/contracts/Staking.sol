@@ -17,6 +17,8 @@ import "../interfaces/IUniswapV2Pair.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -198,12 +200,6 @@ contract Staking {
         uint256 _token1Amount,
         uint256 _slippage
     ) internal returns (Deposit memory dep) {
-        require(_token0Amount > MIN_DEPOSIT, "base too small");
-        require(_token1Amount > MIN_DEPOSIT, "float too small");
-
-        _token0.transferFrom(msg.sender, address(this), _token0Amount);
-        _token1.transferFrom(msg.sender, address(this), _token1Amount);
-
         (
             uint256 camelotToken0,
             uint256 sushiToken0,
@@ -289,6 +285,68 @@ contract Staking {
         return dep;
     }
 
+    function _deposit(
+        uint256 _lockupLength,
+        uint256 _fusdc,
+        uint256 _token1,
+        uint256 _slippage,
+        IERC20 _token,
+        bool _fusdcUsdcPair
+    ) internal returns (
+        uint256 token0Deposited,
+        uint256 token1Deposited
+    ) {
+        require(_fusdc > MIN_DEPOSIT, "fusdc too small");
+        require(_token1 > MIN_DEPOSIT, "float too small");
+
+        uint256 token0Before = fusdc_.balanceOf(address(this));
+
+        console.log("fusdc before", token0Before);
+
+        uint256 token1Before;
+
+        token1Before = _token.balanceOf(address(this));
+
+        fusdc_.transferFrom(msg.sender, address(this), _fusdc);
+
+        _token.transferFrom(msg.sender, address(this), _token1);
+
+        Deposit memory dep;
+
+        uint256 token1After;
+
+        if (_fusdcUsdcPair)
+            dep = _depositFusdcUsdc(_fusdc, _token1, _slippage);
+
+        else
+            dep = _depositFusdcWeth(_fusdc, _token1, _slippage);
+
+        token1After = _token.balanceOf(address(this));
+
+        uint256 token0After = fusdc_.balanceOf(address(this));
+
+        dep.redeemTimestamp = _lockupLength + block.timestamp;
+
+        deposits_[msg.sender].push(dep);
+
+        // the above functions should've added to the deposits so we can return
+        // the latest item in the array there
+
+        token0Deposited = dep.camelotToken0 + dep.sushiswapToken0;
+
+        token1Deposited = dep.camelotToken1 + dep.sushiswapToken1;
+
+        // return to the user any amounts not used
+
+        if (token0After > token0Before)
+            fusdc_.transfer(msg.sender, token0After - token0Before);
+
+        if (token1After > token1Before)
+            _token.transfer(msg.sender, token1After - token1Before);
+
+        return (token0Deposited, token1Deposited);
+    }
+
     function deposit(
         uint256 _lockupLength,
         uint256 _fusdcAmount,
@@ -300,9 +358,6 @@ contract Staking {
         uint256 usdcDeposited,
         uint256 wethDeposited
     ) {
-        // take the amounts given, and allocate half to camelot and half to
-        // sushiswap
-
         require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength - 1 < MAX_LOCKUP_TIME, "lockup length too high");
 
@@ -314,16 +369,35 @@ contract Staking {
         bool fusdcWethPair =
             _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY;
 
+        // take the amounts given, and allocate half to camelot and half to
+        // sushiswap
+
         require(!(fusdcUsdcPair && fusdcWethPair), "usdc or weth");
 
-        Deposit memory dep;
+        uint256 token1 = fusdcUsdcPair ? _usdcAmount : _wethAmount;
 
-        if (fusdcUsdcPair)
-            dep = _depositFusdcUsdc(_fusdcAmount, _usdcAmount, _slippage);
-        else
-            dep = _depositFusdcWeth(_fusdcAmount, _wethAmount, _slippage);
+        (uint256 token0Spent, uint256 token1Spent) = _deposit(
+            _lockupLength,
+            _fusdcAmount,
+            token1,
+            _slippage,
+            fusdcUsdcPair ? usdc_ : weth_,
+            fusdcUsdcPair
+        );
 
-        dep.redeemTimestamp = _lockupLength + block.timestamp;
+        // override the values from before to save stack frames
+
+        _fusdcAmount = token0Spent;
+
+        if (fusdcUsdcPair) {
+            _usdcAmount = token1Spent;
+            _wethAmount = 0;
+        } else {
+            _wethAmount = token1Spent;
+            _usdcAmount = 0;
+        }
+
+        console.log("emitting staking event");
 
         emit Staked(
             msg.sender,
@@ -334,21 +408,7 @@ contract Staking {
             _wethAmount
         );
 
-        deposits_[msg.sender].push(dep);
-
-        // the above functions should've added to the deposits so we can return
-        // the latest item in the array there
-
-        fusdcDeposited = dep.camelotToken0 + dep.sushiswapToken0;
-
-        // depending on what was deposited, we return in different slots token 1
-        // added
-
-        if (fusdcUsdcPair)
-            return (fusdcDeposited, dep.camelotToken1 + dep.sushiswapToken1, 0);
-
-        else
-            return (fusdcDeposited, 0, dep.camelotToken1 + dep.sushiswapToken1);
+        return (_fusdcAmount, _usdcAmount, _wethAmount);
     }
 
     function _redeemFromUniswapV2Router(
