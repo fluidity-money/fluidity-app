@@ -66,7 +66,7 @@ struct Deposit {
     LiquidityProvided typ;
 }
 
-contract Staking {
+contract Staking is IStaking {
     using SafeERC20 for IERC20;
 
     event Staked(
@@ -289,6 +289,7 @@ contract Staking {
         uint256 _token1,
         uint256 _slippage,
         IERC20 _token,
+        address _sender,
         bool _fusdcUsdcPair
     ) internal returns (
         uint256 token0Deposited,
@@ -303,9 +304,9 @@ contract Staking {
 
         token1Before = _token.balanceOf(address(this));
 
-        fusdc_.transferFrom(msg.sender, address(this), _fusdc);
+        fusdc_.transferFrom(_sender, address(this), _fusdc);
 
-        _token.transferFrom(msg.sender, address(this), _token1);
+        _token.transferFrom(_sender, address(this), _token1);
 
         Deposit memory dep;
 
@@ -323,7 +324,7 @@ contract Staking {
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
 
-        deposits_[msg.sender].push(dep);
+        deposits_[_sender].push(dep);
 
         // the above functions should've added to the deposits so we can return
         // the latest item in the array there
@@ -331,10 +332,10 @@ contract Staking {
         // refund the user any amounts not used
 
         if (token0After > token0Before)
-            fusdc_.transfer(msg.sender, token0After - token0Before);
+            fusdc_.transfer(_sender, token0After - token0Before);
 
         if (token1After > token1Before)
-            _token.transfer(msg.sender, token1After - token1Before);
+            _token.transfer(_sender, token1After - token1Before);
 
         // return the amount that we deposited
 
@@ -345,6 +346,7 @@ contract Staking {
         return (token0Deposited, token1Deposited);
     }
 
+    /// @inheritdoc IStaking
     function deposit(
         uint256 _lockupLength,
         uint256 _fusdcAmount,
@@ -380,6 +382,7 @@ contract Staking {
             token1,
             _slippage,
             fusdcUsdcPair ? usdc_ : weth_,
+            msg.sender,
             fusdcUsdcPair
         );
 
@@ -588,13 +591,14 @@ contract Staking {
         }
     }
 
-    function deposited() public view returns (
+    /// @inheritdoc IStaking
+    function deposited(address _spender) public view returns (
         uint256 fusdcAmount,
         uint256 usdcAmount,
         uint256 wethAmount
     ) {
         for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
-            Deposit memory dep = deposits_[msg.sender][i];
+            Deposit memory dep = deposits_[_spender][i];
 
             fusdcAmount += dep.camelotToken0 + dep.sushiswapToken0;
 
@@ -610,6 +614,7 @@ contract Staking {
         return (fusdcAmount, usdcAmount, wethAmount);
     }
 
+    /// @inheritdoc IStaking
     function redeem(
         uint256 _fusdcAmount,
         uint256 _usdcAmount,

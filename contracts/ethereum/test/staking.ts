@@ -83,6 +83,8 @@ const redeem = async (
 describe("Staking", async () => {
   let stakingSigner: ethers.Signer;
 
+  let stakingSignerAddress: string;
+
   let erc20TokenFactory: ethers.ContractFactory;
 
   let token0: ethers.Contract;
@@ -110,6 +112,8 @@ describe("Staking", async () => {
       this.skip();
 
     ({ userAccount1: stakingSigner } = signers);
+
+    stakingSignerAddress = await stakingSigner.getAddress();
 
     erc20TokenFactory = commonFactories.govToken;
 
@@ -207,7 +211,7 @@ describe("Staking", async () => {
 
     expectWithinSlippage(depositToken, usdc, slippage);
 
-    const [ expectedFusdc, expectedUsdc ] = await staking.deposited();
+    const [ expectedFusdc, expectedUsdc ] = await staking.deposited(stakingSignerAddress);
 
     expect(expectedFusdc + expectedUsdc).to.be.equal(fusdc + usdc);
 
