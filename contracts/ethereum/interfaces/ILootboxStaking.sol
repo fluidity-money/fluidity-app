@@ -7,7 +7,7 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-interface IStaking {
+interface ILootboxStaking {
     event Staked(
         address indexed spender,
         uint256 lockupLength,
@@ -20,6 +20,7 @@ interface IStaking {
     /**
      * @notice deposit a token pair (only usdc or weth is used!)
      * @param _lockupLength to use as the amount of time until redemption is possible
+     * @param _fusdcAmount to use as the amount of fusdc to deposit
      * @param _usdcAmount to use as the amount of usdc to deposit
      * @param _wethAmount to use as the amount of weth to deposit
      * @param _slippage to use to reduce the minimum deposit per platform

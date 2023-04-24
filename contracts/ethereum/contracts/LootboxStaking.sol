@@ -9,7 +9,7 @@ pragma abicoder v2;
 
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
-import "../interfaces/IStaking.sol";
+import "../interfaces/ILootboxStaking.sol";
 import "../interfaces/IToken.sol";
 
 import "../interfaces/IUniswapV2Router02.sol";
@@ -25,9 +25,10 @@ import "./openzeppelin/SafeERC20.sol";
  * - fUSDC/USDC
  *
  * * In the following protocols:
- * - Saddle
  * - Camelot
  * - SushiSwap
+ *
+ * Divided 50/50
 */
 
 uint256 constant MAX_UINT256 = type(uint256).max;
@@ -36,10 +37,15 @@ uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
 
-uint256 constant UNISWAP_ACTION_MAX_TIME = 1 hours;
+/**
+ * @dev UNISWAP_ACTION_MAX_TIME to max the action by
+ */
+uint256 constant UNISWAP_ACTION_MAX_TIME = 10 minutes;
 
-// @notice MIN_LIQUIDITY since we split it up in half and there's a
-//         minimum liquidity of 10k
+/**
+ * @dev MIN_LIQUIDITY since we split it up in half and there's a
+ *      minimum liquidity of 10k
+ */
 uint256 constant MIN_LIQUIDITY = 20 ** 3;
 
 enum LiquidityProvided {
@@ -47,7 +53,10 @@ enum LiquidityProvided {
     FUSDC_WETH
 }
 
-/// @notice Deposit made by a user
+/**
+ * @notice Deposit made by a user that's tracked internally
+ * @dev tokenA is always fusdc in this code
+ */
 struct Deposit {
     uint256 redeemTimestamp;
 
@@ -62,16 +71,16 @@ struct Deposit {
     LiquidityProvided typ;
 }
 
-contract Staking is IStaking {
+contract Staking is ILootboxStaking {
     using SafeERC20 for IERC20;
 
     uint8 private version_;
 
-    IERC20 private fusdc_;
+    IERC20 public fusdc_;
 
-    IERC20 private weth_;
+    IERC20 public weth_;
 
-    IERC20 private usdc_;
+    IERC20 public usdc_;
 
     IUniswapV2Router02 private camelotRouter_;
 
@@ -323,7 +332,7 @@ contract Staking is IStaking {
         return (tokenADeposited, tokenBDeposited);
     }
 
-    /// @inheritdoc IStaking
+    /// @inheritdoc ILootboxStaking
     function deposit(
         uint256 _lockupLength,
         uint256 _fusdcAmount,
@@ -411,11 +420,11 @@ contract Staking is IStaking {
         require(redeemed1 + 1 > tokenBWithSlippage, "unable to redeem tokenB");
     }
 
-    function _deleteDeposit(address _spender, uint _depositId) internal {
-        deposits_[_spender][_depositId] =
-            deposits_[_spender][deposits_[_spender].length - 1];
+    function _deleteDeposit(address _sender, uint _depositId) internal {
+        deposits_[_sender][_depositId] =
+            deposits_[_sender][deposits_[_sender].length - 1];
 
-        deposits_[_spender].pop();
+        deposits_[_sender].pop();
     }
 
     function _redeemContinue(
@@ -432,7 +441,7 @@ contract Staking is IStaking {
     function _redeemCamelotSushiswap(
         Deposit memory dep,
         IERC20 _tokenB,
-        address _spender,
+        address _sender,
         uint256 _slippage
     ) internal {
         _redeemFromUniswapV2Router(
@@ -442,7 +451,7 @@ contract Staking is IStaking {
             dep.camelotTokenA,
             dep.camelotTokenB,
             _slippage,
-            _spender
+            _sender
         );
 
         _redeemFromUniswapV2Router(
@@ -452,7 +461,7 @@ contract Staking is IStaking {
             dep.sushiswapTokenA,
             dep.sushiswapTokenB,
             _slippage,
-            _spender
+            _sender
         );
     }
 
@@ -464,12 +473,12 @@ contract Staking is IStaking {
     function _redeem(
         uint256 _slippage,
         Deposit memory _dep,
-        address _spender,
+        address _sender,
         bool _fusdcUsdcPair
     ) internal {
     }
 
-    /// @inheritdoc IStaking
+    /// @inheritdoc ILootboxStaking
     function redeem(
         uint256 _fusdcAmount,
         uint256 _usdcAmount,
@@ -532,12 +541,10 @@ contract Staking is IStaking {
 
             else wethRemaining = tokenBRemaining;
 
-            // iterating in reverse, then deleting the deposit and incrementing the
-            // count will let us remove stuff from the array
+            // iterating in reverse, then deleting the deposit will let us remove
+            // unneeded deposits in memory
 
             _deleteDeposit(msg.sender, i);
-
-            ++i;
 
             if (fusdcRemaining == 0 || tokenBRemaining == 0) break;
         }
@@ -545,14 +552,14 @@ contract Staking is IStaking {
         return (fusdcRemaining, usdcRemaining, wethRemaining);
     }
 
-    /// @inheritdoc IStaking
-    function deposited(address _spender) public view returns (
+    /// @inheritdoc ILootboxStaking
+    function deposited(address _sender) public view returns (
         uint256 fusdcAmount,
         uint256 usdcAmount,
         uint256 wethAmount
     ) {
         for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
-            Deposit memory dep = deposits_[_spender][i];
+            Deposit memory dep = deposits_[_sender][i];
 
             fusdcAmount += dep.camelotTokenA + dep.sushiswapTokenA;
 
