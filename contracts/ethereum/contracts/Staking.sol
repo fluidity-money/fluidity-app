@@ -146,10 +146,10 @@ contract Staking is IStaking {
         return (amountA, amountB, liquidity);
     }
 
-    function calculateWeights(
+    function _calculateWeights(
         uint256 _tokenAAmount,
         uint256 _tokenBAmount
-    ) public pure returns (
+    ) internal pure returns (
         uint256 camelotTokenA,
         uint256 sushiTokenA,
 
@@ -159,12 +159,14 @@ contract Staking is IStaking {
         camelotTokenA = _tokenAAmount / 2;
         camelotTokenB = _tokenBAmount / 2;
 
+        // we take from the original amount so we don't end up with dust
+
         return (
             camelotTokenA,
-            camelotTokenA,
+            _tokenAAmount - camelotTokenA, // sushiswap
 
             camelotTokenB,
-            camelotTokenB
+            _tokenBAmount - camelotTokenB // sushiswap
         );
     }
 
@@ -188,7 +190,7 @@ contract Staking is IStaking {
 
             uint256 camelotTokenB,
             uint256 sushiTokenB
-        ) = calculateWeights(_tokenAAmount, _tokenBAmount);
+        ) = _calculateWeights(_tokenAAmount, _tokenBAmount);
 
         uint256 camelotTokenAMin = _reduceBySlippage(camelotTokenA, _slippage);
         uint256 camelotTokenBMin = _reduceBySlippage(camelotTokenB, _slippage);
@@ -278,13 +280,11 @@ contract Staking is IStaking {
         uint256 tokenADeposited,
         uint256 tokenBDeposited
     ) {
-        uint256 tokenABefore = fusdc_.balanceOf(address(this));
-
-        uint256 tokenBBefore;
-
         IERC20 token = _fusdcUsdcPair ? usdc_ : weth_;
 
-        tokenBBefore = token.balanceOf(address(this));
+        uint256 tokenABefore = fusdc_.balanceOf(address(this));
+
+        uint256 tokenBBefore = token.balanceOf(address(this));
 
         fusdc_.transferFrom(_sender, address(this), _fusdc);
 
@@ -292,24 +292,19 @@ contract Staking is IStaking {
 
         Deposit memory dep;
 
-        uint256 tokenBAfter;
-
         if (_fusdcUsdcPair)
             dep = _depositFusdcUsdc(_fusdc, _tokenB, _slippage);
 
         else
             dep = _depositFusdcWeth(_fusdc, _tokenB, _slippage);
 
-        tokenBAfter = token.balanceOf(address(this));
-
         uint256 tokenAAfter = fusdc_.balanceOf(address(this));
+
+        uint256 tokenBAfter = token.balanceOf(address(this));
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
 
         deposits_[_sender].push(dep);
-
-        // the above functions should've added to the deposits so we can return
-        // the latest item in the array there
 
         // refund the user any amounts not used
 
@@ -417,7 +412,10 @@ contract Staking is IStaking {
     }
 
     function _disableDeposit(address _spender, uint _depositId) internal {
-        delete deposits_[_spender][_depositId];
+        deposits_[_spender][_depositId] =
+            deposits_[_spender][deposits_[_spender].length - 1];
+
+        deposits_[_spender].pop();
     }
 
     function _redeemContinue(
@@ -486,8 +484,6 @@ contract Staking is IStaking {
         uint256 usdcRemaining,
         uint256 wethRemaining
     ) {
-        require(deposits_[msg.sender].length > 0, "no deposits");
-
         Deposit memory dep;
 
         uint256 tokenBRemaining;
@@ -501,7 +497,7 @@ contract Staking is IStaking {
 
             // if the deposit we're looking at isn't finished then short circuit
 
-            if (dep.redeemTimestamp == 0 || dep.redeemTimestamp + 1 > block.timestamp)
+            if (dep.redeemTimestamp + 1 > block.timestamp)
                 continue;
 
             bool fusdcUsdcPair = dep.typ == LiquidityProvided.FUSDC_USDC;
