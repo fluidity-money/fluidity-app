@@ -11,3 +11,5 @@ SELECT LEAST(1, (((396.0 / 11315) - ((396.0 / 4129975) * staking_row.lockup_leng
 $$;
 
 --migrate:down
+
+DROP FUNCTION staking_liquidity_multiplier;
