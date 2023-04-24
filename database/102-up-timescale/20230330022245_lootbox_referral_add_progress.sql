@@ -7,9 +7,7 @@ ALTER TABLE lootbox_referrals
 
 -- migrate:down
 ALTER TABLE lootbox_referrals
-DROP COLUMN (
-  created_time
-  active
-  progress
-);
+  DROP COLUMN created_time,
+  DROP COLUMN active,
+  DROP COLUMN progress;
 

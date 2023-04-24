@@ -2,18 +2,18 @@ import { AirdropLeaderboardEntry } from "~/routes/$network/query/airdrop";
 import { jsonPost, gql } from "~/util";
 
 const queryAirdropLeaderboard = gql`
-  query AirdropLeaderboard() {
+  query AirdropLeaderboard {
     airdrop_leaderboard(
       limit: 16
     ) {
-      address: user
+      user: address
       rank
-      referral_count: referralCount
-      total_lootboxes: bottles
-      highest_reward_tier: highestRewardTier
-      liquidity_multiplier: liquidityMultiplier
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
     }
-  } 
+  }
 `;
 
 export const useAirdropLeaderboard = async () => {
