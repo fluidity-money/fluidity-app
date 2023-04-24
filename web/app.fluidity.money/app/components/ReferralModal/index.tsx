@@ -44,6 +44,9 @@ const ReferralModal = ({
 
   return (
     <Card
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
       className="referrals-container"
       type="frosted"
       border="solid"
