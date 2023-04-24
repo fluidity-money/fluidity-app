@@ -40,8 +40,6 @@ export const getFactories = async (
 
   const utilityGaugesFactory = await hre.ethers.getContractFactory("UtilityGauges");
 
-  console.log(`gov token factory: ${govTokenFactory}`);
-
   return {
     upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
