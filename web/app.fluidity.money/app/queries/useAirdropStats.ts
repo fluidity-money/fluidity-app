@@ -57,8 +57,8 @@ type ExpectedAirdropStatsByAddressBody = {
 
 type ExpectedAirdropStatsByAddressResponse = {
   data?: {
-    lootboxCounts: BottleCounts;
-    liquidityMultiplier: { result: number };
+    lootboxCounts: [BottleCounts];
+    liquidityMultiplier: [{ result: number | null }];
     referralsCount: { aggregate: { count: number } };
   };
   errors?: unknown;
