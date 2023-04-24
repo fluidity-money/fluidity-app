@@ -56,21 +56,23 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   if (!address || !network) throw new Error("Invalid Request");
 
+  const daysElapsed = EPOCH_DAYS_TOTAL - EpochDaysRemaining();
+
   try {
     const { data: airdropStatsData, errors: airdropStatsErrors } =
       await useAirdropStatsByAddress(address);
     const { data: leaderboardData, errors: leaderboardErrors } =
       await useAirdropLeaderboard();
     const { data: stakingData, errors: stakingErrors } =
-      await useStakingDataByAddress(network, address);
+      await useStakingDataByAddress(address, daysElapsed);
 
     if (!stakingData) throw stakingErrors;
     if (!airdropStatsData) throw airdropStatsErrors;
     if (!leaderboardData) throw leaderboardErrors;
 
     const {
-      lootboxCounts: bottleCounts,
-      liquidityMultiplier: { result: liquidityMultiplier },
+      lootboxCounts: [bottleCounts],
+      liquidityMultiplier: [{ result: liquidityMultiplier }],
       referralsCount: {
         aggregate: { count: referralsCount },
       },
@@ -81,9 +83,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     return json({
       epochDaysTotal: EPOCH_DAYS_TOTAL,
       epochDaysRemaining: EpochDaysRemaining(),
-      liquidityMultiplier,
+      liquidityMultiplier: liquidityMultiplier || 1,
       referralsCount,
-      bottleCounts,
+      bottleCounts: bottleCounts,
       stakes,
       leaderboard,
     } satisfies AirdropLoaderData);
