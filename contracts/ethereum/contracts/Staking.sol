@@ -411,7 +411,7 @@ contract Staking is IStaking {
         require(redeemed1 + 1 > tokenBWithSlippage, "unable to redeem tokenB");
     }
 
-    function _disableDeposit(address _spender, uint _depositId) internal {
+    function _deleteDeposit(address _spender, uint _depositId) internal {
         deposits_[_spender][_depositId] =
             deposits_[_spender][deposits_[_spender].length - 1];
 
@@ -467,10 +467,6 @@ contract Staking is IStaking {
         address _spender,
         bool _fusdcUsdcPair
     ) internal {
-        if (_fusdcUsdcPair)
-            _redeemCamelotSushiswap(_dep, usdc_, _spender, _slippage);
-        else
-            _redeemCamelotSushiswap(_dep, weth_, _spender, _slippage);
     }
 
     /// @inheritdoc IStaking
@@ -492,7 +488,7 @@ contract Staking is IStaking {
         usdcRemaining = _usdcAmount;
         wethRemaining = _wethAmount;
 
-        for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
+        for (uint i = deposits_[msg.sender].length - 1; i > 0 ; --i) {
             dep = deposits_[msg.sender][i];
 
             // if the deposit we're looking at isn't finished then short circuit
@@ -519,9 +515,14 @@ contract Staking is IStaking {
 
             if (fusdcUsdcPair && tokenBPastDeposit > usdcRemaining) continue;
 
-            else if (tokenBPastDeposit > wethRemaining) break;
+            else if (tokenBPastDeposit > wethRemaining) continue;
 
-            _redeem(_slippage, dep, msg.sender, fusdcUsdcPair);
+            _redeemCamelotSushiswap(
+                dep,
+                fusdcUsdcPair ? usdc_ : weth_,
+                msg.sender,
+                _slippage
+            );
 
             fusdcRemaining -= tokenAPastDeposit;
 
@@ -531,7 +532,12 @@ contract Staking is IStaking {
 
             else wethRemaining = tokenBRemaining;
 
-            _disableDeposit(msg.sender, i);
+            // iterating in reverse, then deleting the deposit and incrementing the
+            // count will let us remove stuff from the array
+
+            _deleteDeposit(msg.sender, i);
+
+            ++i;
 
             if (fusdcRemaining == 0 || tokenBRemaining == 0) break;
         }
