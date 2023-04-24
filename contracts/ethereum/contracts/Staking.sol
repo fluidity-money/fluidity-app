@@ -272,7 +272,6 @@ contract Staking is IStaking {
         uint256 _fusdc,
         uint256 _tokenB,
         uint256 _slippage,
-        IERC20 _token,
         address _sender,
         bool _fusdcUsdcPair
     ) internal returns (
@@ -283,11 +282,13 @@ contract Staking is IStaking {
 
         uint256 tokenBBefore;
 
-        tokenBBefore = _token.balanceOf(address(this));
+        IERC20 token = _fusdcUsdcPair ? usdc_ : weth_;
+
+        tokenBBefore = token.balanceOf(address(this));
 
         fusdc_.transferFrom(_sender, address(this), _fusdc);
 
-        _token.transferFrom(_sender, address(this), _tokenB);
+        token.transferFrom(_sender, address(this), _tokenB);
 
         Deposit memory dep;
 
@@ -299,7 +300,7 @@ contract Staking is IStaking {
         else
             dep = _depositFusdcWeth(_fusdc, _tokenB, _slippage);
 
-        tokenBAfter = _token.balanceOf(address(this));
+        tokenBAfter = token.balanceOf(address(this));
 
         uint256 tokenAAfter = fusdc_.balanceOf(address(this));
 
@@ -316,7 +317,7 @@ contract Staking is IStaking {
             fusdc_.transfer(_sender, tokenAAfter - tokenABefore);
 
         if (tokenBAfter > tokenBBefore)
-            _token.transfer(_sender, tokenBAfter - tokenBBefore);
+            token.transfer(_sender, tokenBAfter - tokenBBefore);
 
         // return the amount that we deposited
 
@@ -362,10 +363,11 @@ contract Staking is IStaking {
             _fusdcAmount,
             tokenB,
             _slippage,
-            fusdcUsdcPair ? usdc_ : weth_,
             msg.sender,
             fusdcUsdcPair
         );
+
+        // reuse the arguments to save on stack space
 
         if (fusdcUsdcPair) {
             _usdcAmount = tokenBSpent;
