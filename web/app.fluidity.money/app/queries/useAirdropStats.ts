@@ -12,7 +12,7 @@ const queryAirdropStatsByAddress = gql`
       tier5
     }
     liquidityMultiplier: calculate_a_y(
-      args: { address: $address, instant: $now }
+      args: { address_: $address, instant: $now }
     ) {
       result
     }

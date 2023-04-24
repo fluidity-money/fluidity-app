@@ -58,5 +58,6 @@ $$;
 --migrate:down
 
 DROP FUNCTION calculate_liquidity_multiplier;
-DROP TABLE liquidity_result;
+DROP FUNCTION calculate_a_y;
 DROP FUNCTION protocol_multiplier;
+DROP TABLE liquidity_result;

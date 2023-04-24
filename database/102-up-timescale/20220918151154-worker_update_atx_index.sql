@@ -10,4 +10,4 @@ CREATE INDEX atx_blocks_by_token ON worker_buffered_atx (network, token_short_na
 
 CREATE INDEX atx_blocknum ON worker_buffered_atx (block_number DESC);
 
-DROP INDEX atx_blocks_by_token;
+DROP INDEX worker_buffered_atx__network_token_short_name_block_number_idx;

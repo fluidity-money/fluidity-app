@@ -6,4 +6,4 @@ ALTER TABLE worker_buffered_atx
 -- migrate:down
 
 ALTER TABLE worker_buffered_atx
-	DROP COLUMN network_blockchain;
+	DROP COLUMN network;
