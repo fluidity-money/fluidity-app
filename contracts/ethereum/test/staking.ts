@@ -71,7 +71,7 @@ const redeem = async (
   usdcAmount: number,
   wethAmount: number,
   slippage: number
-): Promise<[ number, number, number ]> => {
+): Promise<[ ethers.BigNumber, ethers.BigNumber, ethers.BigNumber ]> => {
   const { fusdcRemaining, usdcRemaining, wethRemaining } =
     await contract.callStatic.redeem(fusdcAmount, usdcAmount, wethAmount, slippage);
 
@@ -252,16 +252,76 @@ describe("Staking", async () => {
 
     await advanceTime(hre, 8640004);
 
+    console.log(`fusdc: ${fusdc.add(fusdc1)}`);
+
     const [ fusdcRemaining, usdcRemaining ] = await redeem(
       staking,
-      fusdc + fusdc1,
-      usdc + usdc1,
+      fusdc.add(fusdc1),
+      usdc.add(usdc1),
       0,
       slippage
     );
 
-    expect(fusdcRemaining).to.be.equal(fusdc + fusdc1);
+    expect(fusdcRemaining, "fusdc").to.be.equal(0);
 
-    expect(usdcRemaining).to.be.equal(usdc + usdc1);
+    expect(usdcRemaining, "usdc").to.be.equal(0);
+  });
+
+  it("should lock up three amounts and redeem only two", async() => {
+    const depositFusdc = 25000;
+    const depositUsdc = 27000;
+
+    const [ fusdc, usdc ] = await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    expectWithinSlippage(depositFusdc, fusdc, slippage);
+
+    expectWithinSlippage(depositUsdc, usdc, slippage);
+
+    const [ fusdc1, usdc1 ] = await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    expectWithinSlippage(depositFusdc, fusdc1, slippage);
+
+    expectWithinSlippage(depositUsdc, usdc1, slippage);
+
+    const [ fusdc2, usdc2 ] = await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    expectWithinSlippage(depositFusdc, fusdc2, slippage);
+
+    expectWithinSlippage(depositUsdc, usdc2, slippage);
+
+    await advanceTime(hre, 8640004);
+
+    const [ fusdcRemaining, usdcRemaining ] = await redeem(
+      staking,
+      fusdc.add(fusdc1),
+      usdc.add(usdc1),
+      0,
+      slippage
+    );
+
+    expect(fusdcRemaining).to.be.equal(0);
+
+    expect(usdcRemaining).to.be.equal(0);
   });
 });

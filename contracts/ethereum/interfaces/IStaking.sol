@@ -8,6 +8,15 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 interface IStaking {
+    event Staked(
+        address indexed spender,
+        uint256 lockupLength,
+        uint256 lockedTimestamp,
+        uint256 fusdcAmount,
+        uint256 usdcAmount,
+        uint256 wethAmount
+    );
+
     /**
      * @notice deposit a token pair (only usdc or weth is used!)
      * @param _lockupLength to use as the amount of time until redemption is possible
