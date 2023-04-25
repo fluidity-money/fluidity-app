@@ -40,6 +40,24 @@ func BigIntFromHex(s string) (*misc.BigInt, error) {
 	return &bigInt, nil
 }
 
+func CoerceContractResultToInt(result interface{}) (*big.Int, error) {
+	switch result.(type) {
+	case *big.Int:
+		result = result.(*big.Int)
+
+	default:
+		return nil, fmt.Errorf(
+			"failed to coerce result value to a *big.Int!",
+		)
+	}
+
+	if result == nil {
+		return nil, fmt.Errorf("*big.Int returned was empty!")
+	}
+
+	return result.(*big.Int), nil
+}
+
 func CoerceBoundContractResultsToRat(results []interface{}) (*big.Rat, error) {
 	var result *big.Int
 
