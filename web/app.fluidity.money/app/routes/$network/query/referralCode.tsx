@@ -12,6 +12,7 @@ import { validAddress } from "~/util";
 
 export type ReferralCodeData = {
   referralAddress: string;
+  loaded: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -56,6 +57,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return json({
     referralAddress,
+    loaded: true,
   } satisfies ReferralCodeData);
 };
 

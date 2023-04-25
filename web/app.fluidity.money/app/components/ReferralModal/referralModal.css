@@ -1,4 +1,7 @@
 .referrals-container {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   max-width: 600px;
   padding: 0;
@@ -8,10 +11,16 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 60px;
+  padding: 50px;
   min-height: 300px;
   gap: 2em;
   text-align: center;
+}
+
+@media (max-width: 850px) {
+  .referrals-content {
+    padding: 20px;
+  }
 }
 
 .referrals-header {
@@ -26,7 +35,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .referral-hover-comp {
@@ -88,7 +97,17 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 0.5em;
+}
+
+.how-it-works-warning-container {
+  display: flex;
+  align-items: center;
+}
+
+.how-it-works-warning-text {
+  text-align: left;
 }
 
 .links-clicked-stats {

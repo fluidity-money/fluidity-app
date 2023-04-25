@@ -11,9 +11,9 @@ export interface ICard {
   disabled?: boolean;
   fill?: boolean;
   shimmer?: boolean;
-  type?: "opaque" | "transparent" | "frosted"
+  type?: "opaque" | "transparent" | "frosted";
   border?: "solid" | "dashed" | "none";
-  color?: "gray" | "white" | "holo"
+  color?: "gray" | "white" | "holo";
   [_: string]: any;
 }
 
@@ -26,9 +26,9 @@ const Card = ({
   children,
   fill = false,
   shimmer = false,
-  type="opaque",
-  border="none",
-  color="gray",
+  type = "opaque",
+  border = "none",
+  color = "gray",
   ...props
 }: ICard) => {
   const Component = component;
@@ -41,28 +41,39 @@ const Card = ({
 
   const allClasses = `
     ${styles.card} 
-    ${propsClass}
     ${elementClass} 
-    ${rounded ? styles.rounded : ''} 
-    ${fill ? styles.fill : ''}
-    ${shimmer ? styles.shimmer : ''}
-    ${typeClass} 
-    ${borderClass}
     ${colorClass}
+    ${rounded ? styles.rounded : ""} 
+    ${fill ? styles.fill : ""}
+    ${shimmer ? styles.shimmer : ""}
+    ${borderClass}
+    ${typeClass} 
+    ${propsClass}
   `;
 
   const CardContent = (
-    <Component style={style} className={allClasses} disabled={disabled} {...props}>
+    <Component
+      style={style}
+      className={allClasses}
+      disabled={disabled}
+      {...props}
+    >
       {children}
     </Component>
-  )
+  );
 
-  if (shimmer) return <div className={`${styles.shimmerWrapper} ${rounded ? styles.rounded : ''} ${fill ? styles.fill : ''}`}>
-    <div className={styles.shimmerBackground} />
-    {CardContent}
-  </div>
+  if (shimmer)
+    return (
+      <div
+        className={`${styles.shimmerWrapper} ${rounded ? styles.rounded : ""} ${fill ? styles.fill : ""
+          }`}
+      >
+        <div className={styles.shimmerBackground} />
+        {CardContent}
+      </div>
+    );
 
-  return CardContent
+  return CardContent;
 };
 
 export default Card;

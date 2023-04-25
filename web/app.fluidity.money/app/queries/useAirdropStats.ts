@@ -12,7 +12,7 @@ const queryAirdropStatsByAddress = gql`
       tier5
     }
     liquidityMultiplier: calculate_a_y(
-      args: { address: $address, instant: $now }
+      args: { address_: $address, instant: $now }
     ) {
       result
     }
@@ -57,8 +57,8 @@ type ExpectedAirdropStatsByAddressBody = {
 
 type ExpectedAirdropStatsByAddressResponse = {
   data?: {
-    lootboxCounts: BottleCounts;
-    liquidityMultiplier: { result: number };
+    lootboxCounts: [BottleCounts];
+    liquidityMultiplier: [{ result: number | null }];
     referralsCount: { aggregate: { count: number } };
   };
   errors?: unknown;
