@@ -4,11 +4,11 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 contract TestLoopingBehaviour {
-    uint8[] public items;
+    uint8[] private items;
 
     constructor(uint8[] memory _items) {
         for (uint i = 0; i < _items.length; ++i)
-            items[i] = _items[i];
+            items.push(_items[i]);
     }
 
     function _popItem(uint _i) internal {
@@ -16,8 +16,14 @@ contract TestLoopingBehaviour {
         items.pop();
     }
 
+    function getItems() public view returns (uint8[] memory) {
+    	return items;
+    }
+
     function test() public {
-        for (uint i = items.length - 1; i > 0; --i) {
+        for (uint i = items.length; i > 0;) {
+            --i;
+
             if (items[i] == 1) {
                 _popItem(i);
             }

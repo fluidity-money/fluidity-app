@@ -15,6 +15,6 @@ describe("test misc behaviour", async () => {
     const factory = await hre.ethers.getContractFactory("TestLoopingBehaviour");
     const contract = await factory.deploy([ 0, 0, 1, 0, 1, 1, 1, 1 ]);
     await contract.test();
-    expect(await contract.items()).to.be.equal([0, 0, 0]);
+    expect(await contract.getItems()).to.have.same.members([0, 0, 0]);
   });
 });

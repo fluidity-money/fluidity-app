@@ -3,7 +3,7 @@
 
 import * as hre from "hardhat";
 
-import { ethers } from "ethers";
+import { ethers, BigNumber, BigNumberish } from "ethers";
 
 import {
   SUSHISWAP_FACTORY,
@@ -13,7 +13,7 @@ import {
 
 import { signers, commonFactories } from "./setup-common";
 
-import { advanceTime } from "./test-utils";
+import { advanceTime, sendEmptyTransaction } from "./test-utils";
 
 import { expect, assert } from "chai";
 
@@ -31,20 +31,24 @@ const createPair = async (
   return hre.ethers.getContractAt("TestUniswapV2Pair", addr);
 };
 
-const expectWithinSlippage = (base: number, test: number, slippage: number) =>
+const expectWithinSlippage = (
+  base: BigNumberish,
+  test: BigNumberish,
+  slippage: BigNumberish
+) =>
   assert(
-    base - (base * slippage / 100) <= test,
+    BigNumber.from(base).sub(BigNumber.from(base)).mul(slippage).div(100).lte(test),
     `${base} - (${base} * ${slippage} / 100) >= ${test} not true!`
   );
 
 const deposit = async (
   contract: ethers.Contract,
   lockupLength: number,
-  maxFusdcAmount: number,
-  maxUsdcAmount: number,
-  maxWethAmount: number,
-  slippageTolerance: number
-): Promise<[number, number, number]> => {
+  maxFusdcAmount: BigNumberish,
+  maxUsdcAmount: BigNumberish,
+  maxWethAmount: BigNumberish,
+  slippageTolerance: BigNumberish
+): Promise<[BigNumber, BigNumber, BigNumber]> => {
   const { fusdcDeposited, usdcDeposited, wethDeposited } =
     await contract.callStatic.deposit(
       lockupLength,
@@ -67,23 +71,36 @@ const deposit = async (
 
 const redeem = async (
   contract: ethers.Contract,
-  fusdcAmount: number,
-  usdcAmount: number,
-  wethAmount: number,
+  fusdcAmount: BigNumberish,
+  usdcAmount: BigNumberish,
+  wethAmount: BigNumberish,
   slippage: number
-): Promise<[ ethers.BigNumber, ethers.BigNumber, ethers.BigNumber ]> => {
+): Promise<[ BigNumber, BigNumber, BigNumber ]> => {
   const { fusdcRemaining, usdcRemaining, wethRemaining } =
     await contract.callStatic.redeem(fusdcAmount, usdcAmount, wethAmount, slippage);
 
   await contract.redeem(fusdcAmount, usdcAmount, wethAmount, slippage);
 
   return [ fusdcRemaining, usdcRemaining, wethRemaining ];
-}
+};
 
-describe("Staking", async () => {
+const expectDeposited = async (
+  contract: ethers.Contract,
+  fusdc: BigNumberish,
+  usdc: BigNumberish,
+  weth: BigNumberish
+): Promise<void> => {
+  const [ fusdcDeposited, usdcDeposited, wethDeposited ] = await contract.deposited(
+    await contract.signer.getAddress()
+  );
+
+  expect(fusdcDeposited, "deposited fusdc").to.be.equal(fusdc);
+  expect(usdcDeposited, "deposited usdc").to.be.equal(usdc);
+  expect(wethDeposited, "deposited weth").to.be.equal(weth);
+};
+
+describe("LootboxStaking", async () => {
   let stakingSigner: ethers.Signer;
-
-  let stakingSignerAddress: string;
 
   let erc20TokenFactory: ethers.ContractFactory;
 
@@ -112,8 +129,6 @@ describe("Staking", async () => {
       this.skip();
 
     ({ userAccount1: stakingSigner } = signers);
-
-    stakingSignerAddress = await stakingSigner.getAddress();
 
     erc20TokenFactory = commonFactories.govToken;
 
@@ -198,7 +213,7 @@ describe("Staking", async () => {
   it("should lock up 20000 test token 1 and 20000 test token 2", async() => {
     const depositToken = 20000;
 
-    const [ fusdc, usdc, _weth ] = await deposit(
+    const [ fusdc, usdc, weth ] = await deposit(
       staking,
       8640000,
       depositToken,
@@ -211,20 +226,34 @@ describe("Staking", async () => {
 
     expectWithinSlippage(depositToken, usdc, slippage);
 
-    const [ expectedFusdc, expectedUsdc ] = await staking.deposited(stakingSignerAddress);
+    expectWithinSlippage(depositToken, weth, slippage);
 
-    expect(expectedFusdc + expectedUsdc).to.be.equal(fusdc + usdc);
+    await expectDeposited(staking, fusdc, usdc, weth);
 
-    await advanceTime(hre, 8640001);
+    await advanceTime(hre, 8640005);
 
-    await redeem(staking, fusdc, usdc, 0, slippage);
+    await sendEmptyTransaction(stakingSigner);
+
+    const [ fusdcRemaining, usdcRemaining, wethRemaining ] = await redeem(
+      staking,
+      fusdc,
+      usdc,
+      weth,
+      slippage
+    );
+
+    expect(fusdcRemaining, "fusdc").to.be.equal(0);
+
+    expect(usdcRemaining, "usdc").to.be.equal(0);
+
+    expect(wethRemaining, "weth").to.be.equal(0);
   });
 
   it("should lock up two amounts then redeem them", async() => {
     const depositFusdc = 25000;
     const depositUsdc = 27000;
 
-    const [ fusdc, usdc ] = await deposit(
+    const [ fusdc, usdc, weth ] = await deposit(
       staking,
       8640000,
       depositFusdc,
@@ -236,6 +265,8 @@ describe("Staking", async () => {
     expectWithinSlippage(depositFusdc, fusdc, slippage);
 
     expectWithinSlippage(depositUsdc, usdc, slippage);
+
+    await expectDeposited(staking, fusdc, usdc, weth);
 
     const [ fusdc1, usdc1 ] = await deposit(
       staking,
@@ -250,11 +281,13 @@ describe("Staking", async () => {
 
     expectWithinSlippage(depositUsdc, usdc1, slippage);
 
+    await expectDeposited(staking, fusdc.add(fusdc1), usdc.add(usdc1), 0);
+
     await advanceTime(hre, 8640004);
 
-    console.log(`fusdc: ${fusdc.add(fusdc1)}`);
+    await sendEmptyTransaction(stakingSigner);
 
-    const [ fusdcRemaining, usdcRemaining ] = await redeem(
+    const r = await redeem(
       staking,
       fusdc.add(fusdc1),
       usdc.add(usdc1),
@@ -262,16 +295,20 @@ describe("Staking", async () => {
       slippage
     );
 
-    expect(fusdcRemaining, "fusdc").to.be.equal(0);
+    const [ fusdcRemaining, usdcRemaining, wethRemaining ] = r;
 
-    expect(usdcRemaining, "usdc").to.be.equal(0);
+    expect(fusdcRemaining, "fusdc remaining after redeem").to.be.equal(0);
+
+    expect(usdcRemaining, "usdc redeeming after redeem").to.be.equal(0);
+
+    expect(wethRemaining, "weth redeeming after redeem").to.be.equal(0);
   });
 
-  it("should lock up three amounts and redeem only two", async() => {
+  it("should lock up three amounts and redeem only two, then test the deposit at the end", async() => {
     const depositFusdc = 25000;
     const depositUsdc = 27000;
 
-    const [ fusdc, usdc ] = await deposit(
+    const [ fusdc, usdc, weth ] = await deposit(
       staking,
       8640000,
       depositFusdc,
@@ -283,6 +320,8 @@ describe("Staking", async () => {
     expectWithinSlippage(depositFusdc, fusdc, slippage);
 
     expectWithinSlippage(depositUsdc, usdc, slippage);
+
+    await expectDeposited(staking, fusdc, usdc, weth);
 
     const [ fusdc1, usdc1 ] = await deposit(
       staking,
@@ -312,6 +351,8 @@ describe("Staking", async () => {
 
     await advanceTime(hre, 8640004);
 
+    await sendEmptyTransaction(stakingSigner);
+
     const [ fusdcRemaining, usdcRemaining ] = await redeem(
       staking,
       fusdc.add(fusdc1),
@@ -323,5 +364,7 @@ describe("Staking", async () => {
     expect(fusdcRemaining).to.be.equal(0);
 
     expect(usdcRemaining).to.be.equal(0);
+
+    await expectDeposited(staking, fusdc2, usdc2, 0);
   });
 });

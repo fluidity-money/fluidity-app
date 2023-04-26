@@ -371,26 +371,22 @@ contract Staking is ILootboxStaking {
             fusdcUsdcPair
         );
 
-        // reuse the arguments to save on stack space
+        if (fusdcUsdcPair)
+            usdcDeposited = tokenBSpent;
 
-        if (fusdcUsdcPair) {
-            _usdcAmount = tokenBSpent;
-            _wethAmount = 0;
-        } else {
-            _wethAmount = tokenBSpent;
-            _usdcAmount = 0;
-        }
+        else
+            wethDeposited = tokenBSpent;
 
         emit Staked(
             msg.sender,
             _lockupLength,
             block.timestamp,
             tokenASpent,
-            _usdcAmount,
-            _wethAmount
+            usdcDeposited,
+            wethDeposited
         );
 
-        return (_fusdcAmount, _usdcAmount, _wethAmount);
+        return (tokenASpent, usdcDeposited, wethDeposited);
     }
 
     function _redeemFromUniswapV2Router(
@@ -497,7 +493,9 @@ contract Staking is ILootboxStaking {
         usdcRemaining = _usdcAmount;
         wethRemaining = _wethAmount;
 
-        for (uint i = deposits_[msg.sender].length - 1; i > 0 ; --i) {
+        for (uint i = deposits_[msg.sender].length; i > 0;) {
+            --i;
+
             dep = deposits_[msg.sender][i];
 
             // if the deposit we're looking at isn't finished then short circuit
@@ -524,7 +522,7 @@ contract Staking is ILootboxStaking {
 
             if (fusdcUsdcPair && tokenBPastDeposit > usdcRemaining) continue;
 
-            else if (tokenBPastDeposit > wethRemaining) continue;
+            if (!fusdcUsdcPair && tokenBPastDeposit > wethRemaining) continue;
 
             _redeemCamelotSushiswap(
                 dep,

@@ -7,13 +7,13 @@ if [ -z "$FLU_ETHEREUM_FORKNET_URL_GOERLI" ] || [ -z "FLU_ETHEREUM_FORKNET_URL_M
 	exit 1
 fi
 
->&2 echo "testing mainnet..."
-
-FLU_FORKNET_NETWORK=mainnet $HARDHAT test
-
 >&2 echo "testing arbitrum..."
 
 FLU_FORKNET_NETWORK=arbitrum $HARDHAT test
+
+>&2 echo "testing mainnet..."
+
+FLU_FORKNET_NETWORK=mainnet $HARDHAT test
 
 >&2 echo "testing goerli..."
 
