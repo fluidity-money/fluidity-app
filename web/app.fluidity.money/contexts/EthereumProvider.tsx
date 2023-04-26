@@ -18,14 +18,11 @@ import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
-  getUserMintLimit,
-  userMintLimitEnabled,
   manualRewardToken,
   getUserDegenScore,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
-  getAmountMinted,
   getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
 import { Buffer } from "buffer";
@@ -202,38 +199,22 @@ const EthereumFacade = ({
     }
   };
 
-  // the per-user mint limit for the contract
+  /**
+   *
+   * @deprecated mint limits no longer enabled
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const limit = async (contractAddress: string): Promise<BN | undefined> => {
-    const signer = provider?.getSigner();
-    if (!signer) {
-      return;
-    }
-
-    const isEnabled = await userMintLimitEnabled(
-      signer.provider,
-      contractAddress,
-      tokenAbi
-    );
-
-    if (!isEnabled) return;
-
-    return await getUserMintLimit(signer.provider, contractAddress, tokenAbi);
+    return undefined;
   };
 
-  // the user's minted amount towards the per-user total
-  // call with a fluid token
+  /**
+   *
+   * @deprecated mint limits no longer enabled
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const amountMinted = async (contractAddress: string): Promise<BN> => {
-    const signer = provider?.getSigner();
-    if (!signer) {
-      return new BN(0);
-    }
-
-    return await getAmountMinted(
-      signer.provider,
-      contractAddress,
-      tokenAbi,
-      await signer.getAddress()
-    );
+    return new BN(0);
   };
 
   // swap <symbol> to its counterpart, with amount in its own units

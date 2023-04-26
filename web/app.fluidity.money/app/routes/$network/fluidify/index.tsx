@@ -101,7 +101,6 @@ export default function FluidifyToken() {
     connecting,
     disconnect,
     balance,
-    limit,
     addToken,
   } = useContext(FluidityFacadeContext);
 
@@ -212,13 +211,10 @@ export default function FluidifyToken() {
         switch (network) {
           case "ethereum":
           case "arbitrum": {
-            const [tokensMinted, userTokenBalance, mintLimit] =
+            const [tokensMinted, userTokenBalance] =
               await Promise.all([
                 Promise.all(
                   tokens.map(async (token) => {
-                    // no mint limits on arbitrum
-                    if (network === "arbitrum") return undefined;
-
                     if (token.isFluidOf) return undefined;
 
                     const fluidToken = tokens.find(
@@ -236,27 +232,6 @@ export default function FluidifyToken() {
                       (await balance?.(address)) || new BN(0)
                   )
                 ),
-                Promise.all(
-                  tokens.map(async (token) => {
-                    const { isFluidOf, address } = token;
-
-                    // Reverting has no mint limits
-                    if (isFluidOf) {
-                      return;
-                    }
-
-                    const fluidPair = tokens.find(
-                      ({ isFluidOf }) => isFluidOf === address
-                    );
-
-                    if (!fluidPair)
-                      throw new Error(
-                        `Could not find fluid Pair of ${token.name}`
-                      );
-
-                    return await limit?.(fluidPair.address);
-                  })
-                ),
               ]);
 
             return setTokens(
@@ -264,7 +239,6 @@ export default function FluidifyToken() {
                 ...token,
                 userMintedAmt: tokensMinted[i],
                 userTokenBalance: userTokenBalance[i],
-                userMintLimit: mintLimit[i],
               }))
             );
           }
