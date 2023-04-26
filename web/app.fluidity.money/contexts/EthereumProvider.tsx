@@ -203,6 +203,7 @@ const EthereumFacade = ({
    *
    * @deprecated mint limits no longer enabled
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const limit = async (contractAddress: string): Promise<BN | undefined> => {
     return undefined;
   };
@@ -211,6 +212,7 @@ const EthereumFacade = ({
    *
    * @deprecated mint limits no longer enabled
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const amountMinted = async (contractAddress: string): Promise<BN> => {
     return new BN(0);
   };
