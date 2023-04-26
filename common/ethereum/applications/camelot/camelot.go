@@ -362,8 +362,6 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		)
 	}
 
-	fmt.Println("SMEXX!!", fluidTransferAmount)
-
 	feeMultiplier = new(big.Rat).SetFrac(big.NewInt(int64(feeNumerator)), feeDenominator)
 
 	// if the out amount is fluid, then we have to recover the amount from before the fee was taken
@@ -374,21 +372,13 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1,1),feeMultiplier))
 	}
 
-	fmt.Println("SMEXX!!", fluidTransferAmount, feeMultiplier)
-
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
-
-	fmt.Println(fee)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
-	fmt.Println(decimalsRat)
-
 	fee.Quo(fee, decimalsRat)
-
-	fmt.Println(fee)
 
 	return fee, nil
 }
