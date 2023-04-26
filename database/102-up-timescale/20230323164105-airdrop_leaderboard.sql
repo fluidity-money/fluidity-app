@@ -28,4 +28,8 @@ FROM lootbox
     LATERAL calculate_a_y(address, now()::TIMESTAMP) AS liquidity 
 GROUP BY address, liquidity_multiplier
 $$;
+
 --migrate:down
+
+DROP FUNCTION airdrop_leaderboard;
+DROP TABLE airdrop_leaderboard_return;

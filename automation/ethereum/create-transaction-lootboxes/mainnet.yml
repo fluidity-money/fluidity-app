@@ -1,8 +1,0 @@
-DOCKER_IMAGE: microservice-ethereum-create-transaction-lootboxes
-DOCKERFILE_PATH: ./cmd/microservice-ethereum-create-transaction-lootboxes
-ENV_FLU_ETHEREUM_NETWORK: "ethereum"
-
-SERVICES:
-  - CREATE_TRANSACTION_LOOTBOXES:
-      SERVICE_NAME: microservice-ethereum-create-transaction-lootboxes
-      ENV_FLU_WORKER_ID: ethereum-microservice-ethereum-create-transaction-lootboxes

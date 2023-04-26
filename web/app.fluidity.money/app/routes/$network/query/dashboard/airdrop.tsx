@@ -28,6 +28,13 @@ export type AirdropLoaderData = {
   loaded: boolean;
 };
 
+const EPOCH_DAYS_TOTAL = 31;
+// temp: april 19th, 2023
+const EPOCH_START_DATE = new Date(2023, 3, 20);
+
+const dayDifference = (date1: Date, date2: Date) =>
+  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
+
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
@@ -36,18 +43,21 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   if (!address || !network) throw new Error("Invalid Request");
 
+  const daysElapsed =
+    dayDifference(new Date(), EPOCH_START_DATE) % EPOCH_DAYS_TOTAL;
+
   try {
     const { data: airdropStatsData, errors: airdropStatsErrors } =
       await useAirdropStatsByAddress(address);
     const { data: stakingData, errors: stakingErrors } =
-      await useStakingDataByAddress(network, address);
+      await useStakingDataByAddress(address, daysElapsed);
 
     if (airdropStatsErrors || !airdropStatsData) throw airdropStatsErrors;
     if (stakingErrors || !stakingData) throw stakingErrors;
 
     const {
-      lootboxCounts: bottleTiers,
-      liquidityMultiplier: { result: liquidityMultiplier },
+      lootboxCounts: [bottleTiers],
+      liquidityMultiplier: [liquidityMultiplierRes],
       referralsCount: {
         aggregate: { count: referralsCount },
       },
@@ -55,7 +65,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const { stakes } = stakingData;
 
     return json({
-      liquidityMultiplier,
+      liquidityMultiplier: liquidityMultiplierRes?.result || 0,
       referralsCount,
       bottleTiers,
       bottlesCount: Object.values(bottleTiers).reduce(

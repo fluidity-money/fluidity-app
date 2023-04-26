@@ -6,6 +6,6 @@ ALTER TABLE ethereum_pending_reward_type
 
 -- migrate:down
 
-ALTER TABLE ethereum_pending_reward_type,
+ALTER TABLE ethereum_pending_reward_type
 	ALTER COLUMN reward_tier DROP DEFAULT,
 	ALTER COLUMN reward_tier DROP NOT NULL;

@@ -16,9 +16,3 @@ SERVICES:
       DOCKER_IMAGE: connector-common-user-actions-timescale
       DOCKERFILE_PATH: ./cmd/connector-common-user-actions-timescale
       ENV_FLU_WORKER_ID: ethereum-connector-common-user-actions-timescale
-
-  - CONNECTORS_COMMON_LOOTBOXES_TIMESCALE:
-      SERVICE_NAME: connector-common-lootboxes-timescale-ethereum
-      DOCKER_IMAGE: connector-common-lootboxes-timescale
-      DOCKERFILE_PATH: ./cmd/connector-common-lootboxes-timescale
-      ENV_FLU_WORKER_ID: ethereum-connector-common-lootboxes-timescale

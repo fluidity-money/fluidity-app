@@ -1,9 +1,9 @@
 DOCKER_IMAGE: microservice-lootbox-referral-activator
 DOCKERFILE_PATH: ./cmd/microservice-lootbox-referral-activator
-ENV_FLU_ETHEREUM_NETWORK: "ethereum"
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
 
 SERVICES:
   - LOOTBOX_REFERRAL_ACTIVATOR:
       SERVICE_NAME: microservice-lootbox-referral-activator
-      ENV_FLU_WORKER_ID: ethereum-microservice-lootbox-referral-activator
+      ENV_FLU_WORKER_ID: arbitrum-microservice-lootbox-referral-activator
       ENV_FLU_LOOTBOX_REFERRAL_AMOUNT: 10

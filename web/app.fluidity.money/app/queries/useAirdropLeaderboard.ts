@@ -3,12 +3,12 @@ import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 const queryByUser = gql`
   query AirdropLeaderboard($address: String!) {
     airdrop_leaderboard(where: { address: { _eq: $address } }, limit: 1) {
-      address
+      user: address
       rank
-      referral_count: referralCount
-      total_lootboxes: totalLootboxes
-      highest_reward_tier: highestRewardTier
-      liquidity_multiplier: liquidityMultiplier
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
     }
   }
 `;
@@ -18,14 +18,14 @@ const queryAllTime = gql`
     airdrop_leaderboard(
       limit: 16
     ) {
-      address
+      user: address
       rank
-      referral_count: referralCount
-      total_lootboxes: totalLootboxes
-      highest_reward_tier: highestRewardTier
-      liquidity_multiplier: liquidityMultiplier
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
     }
-  } 
+  }
 `;
 
 type AirdropLeaderboardBody = {
@@ -39,7 +39,7 @@ type AirdropLeaderboardByUserBody = AirdropLeaderboardBody & {
 };
 
 export type AirdropLeaderboardEntry = {
-  address: string;
+  user: string;
   rank: number;
   referralCount: number;
   totalLootboxes: number;

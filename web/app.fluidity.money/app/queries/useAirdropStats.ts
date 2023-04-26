@@ -6,14 +6,14 @@ const queryAirdropStatsByAddress = gql`
   query AirdropStats($address: String!, $now: timestamp!) {
     lootboxCounts: lootbox_counts(where: { address: { _eq: $address } }) {
       address
-      tier1: ${Rarity.Common}
-      tier2: ${Rarity.Uncommon}
-      tier3: ${Rarity.Rare}
-      tier4: ${Rarity.UltraRare}
-      tier5: ${Rarity.Legendary}
+      ${Rarity.Common}: tier1
+      ${Rarity.Uncommon}: tier2
+      ${Rarity.Rare}: tier3
+      ${Rarity.UltraRare}: tier4
+      ${Rarity.Legendary}: tier5
     }
     liquidityMultiplier: calculate_a_y(
-      args: { address: $address, instant: $now }
+      args: { address_: $address, instant: $now }
     ) {
       result
     }
@@ -51,8 +51,8 @@ type ExpectedAirdropStatsByAddressBody = {
 
 type ExpectedAirdropStatsByAddressResponse = {
   data?: {
-    lootboxCounts: BottleTiers;
-    liquidityMultiplier: { result: number };
+    lootboxCounts: [BottleTiers];
+    liquidityMultiplier: [{ result: number }];
     referralsCount: { aggregate: { count: number } };
   };
   errors?: unknown;

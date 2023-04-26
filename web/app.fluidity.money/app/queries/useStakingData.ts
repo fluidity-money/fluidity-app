@@ -2,29 +2,30 @@ import { StakingEvent } from "~/routes/$network/query/airdrop";
 import { gql, jsonPost } from "~/util";
 
 const queryStakingDataByAddress = gql`
-  query StakingData($network: network_blockchain!, $address: String!, $days_elapsed: Int!) {
+  query StakingData($address: String!, $days_elapsed: Int!) {
     stakes: staking_events(
       where: {
-        network: { _eq: $network }
         address: { _eq: $address }
       }
     ) {
       amount: usd_amount
       durationDays: lockup_length
       insertedDate: inserted_date
-      // use a computed field
+      # use a computed field
       multiplier: staking_liquidity_multiplier(
-        {args: {$days_elapsed}}
-      )
+        args: {days_elapsed: $days_elapsed}
+      ) {
+        result
+      }
     }
   }
 `;
 
 export const useStakingDataByAddress = async (
-  network: string,
-  address: string
+  address: string,
+  daysElapsed: number
 ) => {
-  const variables = { network, address };
+  const variables = { address, days_elapsed: daysElapsed };
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
@@ -47,8 +48,8 @@ export const useStakingDataByAddress = async (
 
 type ExpectedStakingDataByAddressBody = {
   variables: {
-    network: string;
     address: string;
+    days_elapsed: number;
   };
   query: string;
 };
