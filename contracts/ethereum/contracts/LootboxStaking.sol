@@ -141,6 +141,8 @@ contract Staking is ILootboxStaking {
         uint256 amountB,
         uint256 liquidity
      ) {
+        // IERC20(_tokenB).transfer(address(this), _tokenBAmount);
+
         (amountA, amountB, liquidity) = _router.addLiquidity(
             _tokenA,
             _tokenB,
@@ -231,8 +233,8 @@ contract Staking is ILootboxStaking {
             dep.sushiswapLpMinted
         ) = _depositToUniswapV2Router(
             sushiswapRouter_,
-            address(fusdc_),
-            address(usdc_),
+            address(_tokenA),
+            address(_tokenB),
             sushiTokenA,
             sushiTokenB,
             sushiTokenAMin,
@@ -352,13 +354,14 @@ contract Staking is ILootboxStaking {
         bool fusdcUsdcPair =
             _fusdcAmount > MIN_LIQUIDITY && _usdcAmount > MIN_LIQUIDITY;
 
-        bool fusdcWethPair =
-            _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY;
-
         // take the amounts given, and allocate half to camelot and half to
         // sushiswap
 
-        require(!(fusdcUsdcPair && fusdcWethPair), "usdc or weth");
+        require(
+            fusdcUsdcPair ||
+            _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY,
+            "not enough liquidity"
+        );
 
         uint256 tokenB = fusdcUsdcPair ? _usdcAmount : _wethAmount;
 
