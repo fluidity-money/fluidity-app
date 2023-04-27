@@ -437,10 +437,6 @@ contract Token is
 
     /* ~~~~~~~~~~ EXTRA FUNCTIONS ~~~~~~~~~~ */
 
-    function userAmountMinted(address /* account */) public pure returns (uint) {
-        return 0;
-    }
-
     function updateOracle(address _newOracle) public {
         require(msg.sender == operator_, "only operator");
 
