@@ -396,27 +396,17 @@ contract Staking is ILootboxStaking {
         IUniswapV2Router02 _router,
         IERC20 _tokenB,
         uint256 _lpTokens,
-        uint256 _tokenAAmount,
-        uint256 _tokenBAmount,
-        uint256 _slippage,
         address _to
     ) internal {
-        uint256 tokenAWithSlippage = _reduceBySlippage(_tokenAAmount, _slippage);
-        uint256 tokenBWithSlippage = _reduceBySlippage(_tokenBAmount, _slippage);
-
-        (uint256 redeemed0, uint256 redeemed1) = _router.removeLiquidity(
+        _router.removeLiquidity(
             address(fusdc_),
             address(_tokenB),
             _lpTokens,
-            tokenAWithSlippage,
-            tokenBWithSlippage,
+            0,
+            0,
             _to,
             block.timestamp + UNISWAP_ACTION_MAX_TIME
         );
-
-        require(redeemed0 + 1 > tokenAWithSlippage, "unable to redeem tokenA");
-
-        require(redeemed1 + 1 > tokenBWithSlippage, "unable to redeem tokenB");
     }
 
     function _deleteDeposit(address _sender, uint _depositId) internal {
@@ -426,30 +416,15 @@ contract Staking is ILootboxStaking {
         deposits_[_sender].pop();
     }
 
-    function _redeemContinue(
-        uint256 _fusdcAmount,
-        uint256 _tokenBAmount
-    ) internal pure returns (
-        bool,
-        uint256,
-        uint256
-    ) {
-        return (false, _fusdcAmount, _tokenBAmount);
-    }
-
     function _redeemCamelotSushiswap(
         Deposit memory dep,
         IERC20 _tokenB,
-        address _sender,
-        uint256 _slippage
+        address _sender
     ) internal {
         _redeemFromUniswapV2Router(
             camelotRouter_,
             _tokenB,
             dep.camelotLpMinted,
-            dep.camelotTokenA,
-            dep.camelotTokenB,
-            _slippage,
             _sender
         );
 
@@ -457,32 +432,15 @@ contract Staking is ILootboxStaking {
             sushiswapRouter_,
             _tokenB,
             dep.sushiswapLpMinted,
-            dep.sushiswapTokenA,
-            dep.sushiswapTokenB,
-            _slippage,
             _sender
         );
-    }
-
-    /**
-     * @notice _redeem a deposit, failing to do so if the
-     *         fusdc/usdc/weth amount isn't greater than the current deposit or
-     *         equal to 0
-     */
-    function _redeem(
-        uint256 _slippage,
-        Deposit memory _dep,
-        address _sender,
-        bool _fusdcUsdcPair
-    ) internal {
     }
 
     /// @inheritdoc ILootboxStaking
     function redeem(
         uint256 _fusdcAmount,
         uint256 _usdcAmount,
-        uint256 _wethAmount,
-        uint256 _slippage
+        uint256 _wethAmount
     ) public returns (
         uint256 fusdcRemaining,
         uint256 usdcRemaining,
@@ -530,8 +488,7 @@ contract Staking is ILootboxStaking {
             _redeemCamelotSushiswap(
                 dep,
                 fusdcUsdcPair ? usdc_ : weth_,
-                msg.sender,
-                _slippage
+                msg.sender
             );
 
             fusdcRemaining -= tokenAPastDeposit;

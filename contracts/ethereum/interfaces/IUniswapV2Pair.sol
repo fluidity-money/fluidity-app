@@ -10,4 +10,10 @@ pragma abicoder v2;
 interface IUniswapV2Pair {
     function balanceOf(address _spender) external view returns (uint256);
     function approve(address _spender, uint256 _amount) external returns (bool);
+
+    function getReserves() external view returns (
+        uint112 reserve0,
+        uint112 reserve1,
+        uint32 blockTimestampLast
+    );
 }
