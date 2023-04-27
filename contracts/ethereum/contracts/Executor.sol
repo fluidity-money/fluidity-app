@@ -87,6 +87,10 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         return emergencyCouncil_;
     }
 
+    function oracle(address token) public view returns (address) {
+        return oracles_[token];
+    }
+
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "no zero operator");
