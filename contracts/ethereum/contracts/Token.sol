@@ -494,6 +494,19 @@ contract Token is
         return emergencyCouncil_;
     }
 
+    /**
+     * @notice updates the emergency council address
+     * @notice (operator only)
+     * @param newCouncil the new council address
+     */
+    function updateEmergencyCouncil(address newCouncil) external {
+        require(msg.sender == operator_, "operator only");
+
+        emit IEmergencyMode.NewCouncil(emergencyCouncil_, newCouncil);
+
+        emergencyCouncil_ = newCouncil;
+    }
+
     /* ~~~~~~~~~~ IMPLEMENTS IToken ~~~~~~~~~~ */
 
     /// @inheritdoc IToken

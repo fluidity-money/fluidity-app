@@ -100,6 +100,19 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         operator_ = _newOperator;
     }
 
+    /**
+     * @notice updates the emergency council address
+     * @notice (operator only)
+     * @param newCouncil the new council address
+     */
+    function updateEmergencyCouncil(address newCouncil) external {
+        require(msg.sender == operator_, "operator only");
+
+        emit IEmergencyMode.NewCouncil(emergencyCouncil_, newCouncil);
+
+        emergencyCouncil_ = newCouncil;
+    }
+
     function noEmergencyMode() public view returns (bool) {
         return noEmergencyMode_;
     }
