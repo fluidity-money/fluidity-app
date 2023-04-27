@@ -64,6 +64,10 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         require(version_ == 0, "contract is already initialised");
         version_ = 1;
 
+        require(_operator != address(0), "no zero operator");
+        require(_emergencyCouncil != address(0), "no zero council");
+        require(address(_registry) != address(0), "no zero registry");
+
         operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
         registry_ = _registry;
