@@ -309,6 +309,7 @@ contract Token is
      * @dev rewards two users from the reward pool
      * @dev mints tokens and emits the reward event
      *
+     * @param firstBlock the first block in the range being rewarded for
      * @param lastBlock the last block in the range being rewarded for
      * @param winner the address being rewarded
      * @param amount the amount being rewarded
