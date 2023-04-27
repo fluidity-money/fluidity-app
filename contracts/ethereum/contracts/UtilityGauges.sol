@@ -247,6 +247,10 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         GaugeWeight storage data = weights_[token][gauge];
         require(data.lastReset != 0, "utility gauge doesn't exist");
 
+        // remove the gauge from the total weight
+        uint gaugeWeight = _getWeightStale(token, gauge);
+        totalWeight_ -= gaugeWeight;
+
         delete weights_[token][gauge];
 
         // for string comparison
