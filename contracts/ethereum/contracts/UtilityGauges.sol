@@ -93,6 +93,10 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         return operator_;
     }
 
+    function lockupSource() public view returns (address) {
+        return address(lockupSource_);
+    }
+
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator(), "only operator");
         require(_newOperator != address(0), "zero operator");
