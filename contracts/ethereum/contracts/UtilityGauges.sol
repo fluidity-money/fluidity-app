@@ -101,7 +101,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         require(msg.sender == operator(), "only operator");
         require(_newOperator != address(0), "zero operator");
 
-        emit IOperatorOwned.NewOperator(operator_, _newOperator);
+        emit NewOperator(operator_, _newOperator);
 
         operator_ = _newOperator;
     }

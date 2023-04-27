@@ -451,7 +451,7 @@ contract Token is
         require(msg.sender == operator_, "operator only");
         require(_newOperator != address(0), "new operator zero");
 
-        emit IOperatorOwned.NewOperator(operator_, _newOperator);
+        emit NewOperator(operator_, _newOperator);
 
         operator_ = _newOperator;
     }
@@ -502,7 +502,7 @@ contract Token is
     function updateEmergencyCouncil(address newCouncil) external {
         require(msg.sender == operator_, "operator only");
 
-        emit IEmergencyMode.NewCouncil(emergencyCouncil_, newCouncil);
+        emit NewCouncil(emergencyCouncil_, newCouncil);
 
         emergencyCouncil_ = newCouncil;
     }

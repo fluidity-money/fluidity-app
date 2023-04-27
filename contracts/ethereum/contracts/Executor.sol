@@ -95,7 +95,7 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "no zero operator");
 
-        emit IOperatorOwned.NewOperator(operator_, _newOperator);
+        emit NewOperator(operator_, _newOperator);
 
         operator_ = _newOperator;
     }
@@ -108,7 +108,7 @@ contract Executor is IEmergencyMode, IOperatorOwned {
     function updateEmergencyCouncil(address newCouncil) external {
         require(msg.sender == operator_, "operator only");
 
-        emit IEmergencyMode.NewCouncil(emergencyCouncil_, newCouncil);
+        emit NewCouncil(emergencyCouncil_, newCouncil);
 
         emergencyCouncil_ = newCouncil;
     }
