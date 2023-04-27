@@ -17,7 +17,7 @@ export { FilterCriteria } from "./Filter";
 export { Tab, TabBar } from "./Tab";
 export * from "./Container";
 export * from "./Button";
-export { BlockchainModal, Modal } from "./Modal";
+export * from "./Modal";
 export { MobileNavBar } from "./MobileNavBar";
 export { MobileNavModal } from "./MobileNavModal";
 export { LabelledValue } from "./LabelledValue";
@@ -37,3 +37,4 @@ export { ProviderCard } from './ProviderCard'
 export { ProgressBar } from './ProgressBar'
 export { default as Hoverable } from './Hoverable'
 export { default as Form } from './Form'
+export { LootBottle } from './LootBottle'

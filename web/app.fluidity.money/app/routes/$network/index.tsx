@@ -162,7 +162,7 @@ const NetworkPage = () => {
               )}
 
               {/* Switch Chain Modal */}
-              <Modal visible={connectedWalletModalVisibility}>
+              <Modal id="switch-chain" visible={connectedWalletModalVisibility}>
                 <ConnectedWalletModal
                   visible={connectedWalletModalVisibility}
                   address={rawAddress ?? ""}
@@ -177,7 +177,7 @@ const NetworkPage = () => {
               </Modal>
 
               {/* Switch Chain Modal */}
-              <Modal visible={chainModalVisibility}>
+              <Modal id="switch-chain" visible={chainModalVisibility}>
                 <BlockchainModal
                   handleModal={setChainModalVisibility}
                   option={chainNameMap[network as "ethereum" | "solana"]}
@@ -202,7 +202,7 @@ const NetworkPage = () => {
               )}
 
               {/* Connect Wallet Modal */}
-              <Modal visible={walletModalVisibility}>
+              <Modal id="connect-wallet" visible={walletModalVisibility}>
                 <div className="cover">
                   <ConnectWalletModal
                     visible={walletModalVisibility}

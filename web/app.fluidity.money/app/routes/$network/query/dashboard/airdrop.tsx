@@ -1,6 +1,6 @@
+import { Rarity } from "@fluidity-money/surfing";
 import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
-import { useAirdropLeaderboard } from "~/queries/useAirdropLeaderboard";
 import { useAirdropStatsByAddress } from "~/queries/useAirdropStats";
 import { useStakingDataByAddress } from "~/queries/useStakingData";
 
@@ -11,42 +11,29 @@ export type StakingEvent = {
   insertedDate: string;
 };
 
-export type AirdropLeaderboardEntry = {
-  rank: number;
-  user: string;
-  bottles: number;
-  liquidityMultiplier: number;
-  highestRewardTier: number;
-  referralCount: number;
+export type BottleTiers = {
+  [Rarity.Common]: number;
+  [Rarity.Uncommon]: number;
+  [Rarity.Rare]: number;
+  [Rarity.UltraRare]: number;
+  [Rarity.Legendary]: number;
 };
 
-export type BottleCounts = {
-  tier1: number;
-  tier2: number;
-  tier3: number;
-  tier4: number;
-  tier5: number;
-  totalBottles: number;
-};
-
-type AirdropLoaderData = {
-  epochDaysTotal: number;
-  epochDaysRemaining: number;
+export type AirdropLoaderData = {
   referralsCount: number;
-  bottleCounts: BottleCounts;
+  bottleTiers: BottleTiers;
+  bottlesCount: number;
   liquidityMultiplier: number;
   stakes: Array<StakingEvent>;
-  leaderboard: Array<AirdropLeaderboardEntry>;
+  loaded: boolean;
 };
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: april 19th, 2023
 const EPOCH_START_DATE = new Date(2023, 3, 20);
-export const dayDifference = (date1: Date, date2: Date) =>
+
+const dayDifference = (date1: Date, date2: Date) =>
   Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
-// total - (now - start)
-const EpochDaysRemaining = () =>
-  EPOCH_DAYS_TOTAL - dayDifference(new Date(), EPOCH_START_DATE);
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
@@ -56,38 +43,37 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   if (!address || !network) throw new Error("Invalid Request");
 
-  const daysElapsed = EPOCH_DAYS_TOTAL - EpochDaysRemaining();
+  const daysElapsed =
+    dayDifference(new Date(), EPOCH_START_DATE) % EPOCH_DAYS_TOTAL;
 
   try {
     const { data: airdropStatsData, errors: airdropStatsErrors } =
       await useAirdropStatsByAddress(address);
-    const { data: leaderboardData, errors: leaderboardErrors } =
-      await useAirdropLeaderboard();
     const { data: stakingData, errors: stakingErrors } =
       await useStakingDataByAddress(address, daysElapsed);
 
-    if (!stakingData) throw stakingErrors;
-    if (!airdropStatsData) throw airdropStatsErrors;
-    if (!leaderboardData) throw leaderboardErrors;
+    if (airdropStatsErrors || !airdropStatsData) throw airdropStatsErrors;
+    if (stakingErrors || !stakingData) throw stakingErrors;
 
     const {
-      lootboxCounts: [bottleCounts],
-      liquidityMultiplier: [{ result: liquidityMultiplier }],
+      lootboxCounts: [bottleTiers],
+      liquidityMultiplier: [liquidityMultiplierRes],
       referralsCount: {
         aggregate: { count: referralsCount },
       },
     } = airdropStatsData;
     const { stakes } = stakingData;
-    const { leaderboard } = leaderboardData;
 
     return json({
-      epochDaysTotal: EPOCH_DAYS_TOTAL,
-      epochDaysRemaining: EpochDaysRemaining(),
-      liquidityMultiplier: liquidityMultiplier || 1,
+      liquidityMultiplier: liquidityMultiplierRes?.result || 0,
       referralsCount,
-      bottleCounts: bottleCounts,
+      bottleTiers,
+      bottlesCount: Object.values(bottleTiers).reduce(
+        (sum: number, quantity: number) => sum + quantity,
+        0
+      ),
       stakes,
-      leaderboard,
+      loaded: true,
     } satisfies AirdropLoaderData);
   } catch (err) {
     captureException(new Error(`Could not fetch airdrop data: ${err}`), {
