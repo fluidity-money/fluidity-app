@@ -33,6 +33,10 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         address indexed newOracle
     );
 
+    event NewRegistry(
+        address indexed registry_,
+        address indexed _newRegistry
+    );
     /// @dev if false, emergency mode is active!
     bool private noEmergencyMode_;
 
@@ -86,6 +90,8 @@ contract Executor is IEmergencyMode, IOperatorOwned {
     function updateOperator(address _newOperator) public {
         require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "no zero operator");
+
+        emit IOperatorOwned.NewOperator(operator_, _newOperator);
 
         operator_ = _newOperator;
     }
@@ -146,6 +152,8 @@ contract Executor is IEmergencyMode, IOperatorOwned {
 
     function updateRegistry(IRegistry _newRegistry) public {
         require(msg.sender == operator_, "only operator");
+
+        emit NewRegistry(address(registry_), address(_newRegistry));
 
         registry_ = _newRegistry;
     }

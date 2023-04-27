@@ -454,9 +454,9 @@ contract Token is
         require(msg.sender == operator_, "operator only");
         require(_newOperator != address(0), "new operator zero");
 
-        operator_ = _newOperator;
+        emit IOperatorOwned.NewOperator(operator_, _newOperator);
 
-        emit OperatorChanged(operator_, _newOperator);
+        operator_ = _newOperator;
     }
 
     /* ~~~~~~~~~~ IMPLEMENTS IOperatorOwned ~~~~~~~~~~ */
