@@ -303,56 +303,56 @@ export default function Home() {
   const txTableColumns = isSmallMobile
     ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
     : isMobile
-      ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
-      : isTablet
-        ? [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "ACCOUNT" },
-        ]
-        : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "ACCOUNT",
-          },
-          {
-            name: "TIME",
-            alignRight: true,
-          },
-        ];
+    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
+    : isTablet
+    ? [
+        { name: "ACTIVITY" },
+        { name: "VALUE" },
+        { name: "REWARD" },
+        { name: "ACCOUNT" },
+      ]
+    : [
+        {
+          name: "ACTIVITY",
+        },
+        {
+          name: "VALUE",
+        },
+        {
+          name: "REWARD",
+        },
+        {
+          name: "ACCOUNT",
+        },
+        {
+          name: "TIME",
+          alignRight: true,
+        },
+      ];
 
   const txTableFilters = address
     ? [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-      {
-        filter: ({
-          sender,
-          receiver,
-        }: {
-          sender: string;
-          receiver: string;
-        }) => [sender, receiver].includes(address),
-        name: "MY DASHBOARD",
-      },
-    ]
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+        {
+          filter: ({
+            sender,
+            receiver,
+          }: {
+            sender: string;
+            receiver: string;
+          }) => [sender, receiver].includes(address),
+          name: "MY DASHBOARD",
+        },
+      ]
     : [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-    ];
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+      ];
 
   const {
     totalPrizePool,
@@ -560,8 +560,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                      ? "Weekly available rewards"
-                      : "Total yield"}
+                    ? "Weekly available rewards"
+                    : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -571,9 +571,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                        ({ network: rewardNetwork }) =>
-                          rewardNetwork === network
-                      )?.total_reward || 0
+                          ({ network: rewardNetwork }) =>
+                            rewardNetwork === network
+                        )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>

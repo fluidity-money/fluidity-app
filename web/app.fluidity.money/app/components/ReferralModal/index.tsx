@@ -44,7 +44,7 @@ const ReferralModal = ({
 
   return (
     <Card
-      onClick={(e) => {
+      onClick={(e: MouseEvent) => {
         e.stopPropagation();
       }}
       className="referrals-container"

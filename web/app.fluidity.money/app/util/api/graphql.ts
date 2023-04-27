@@ -34,8 +34,8 @@ export const fetchInternalEndpoint = (): GqlEndpoint => ({
   headers:
     typeof process.env.FLU_HASURA_SECRET === "string"
       ? {
-        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-      }
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
       : {},
 });
 

@@ -8,7 +8,6 @@ import {
   ArrowRight,
   Display,
   LootBottle,
-  Rarity,
   numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import { Referral } from "~/queries";

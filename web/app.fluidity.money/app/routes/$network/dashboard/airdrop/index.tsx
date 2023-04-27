@@ -85,16 +85,7 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
 };
 
 const SAFE_DEFAULT_AIRDROP_LEADERBOARD: AirdropLeaderboardLoaderData = {
-  leaderboard: [
-    {
-      rank: 199,
-      address: "0x8Cb300ebb3028c15AB69c3E9CDFf1bE60aAa43a2",
-      totalLootboxes: 100,
-      liquidityMultiplier: 5230,
-      referralCount: 0,
-      highestRewardTier: 1,
-    },
-  ],
+  leaderboard: [],
   loaded: true,
 };
 
@@ -127,18 +118,12 @@ const Airdrop = () => {
   };
 
   const {
-    airdrop: {
-      bottleTiers,
-      liquidityMultiplier,
-      stakes,
-      loaded: airdropLoaded,
-    },
+    airdrop: { bottleTiers, liquidityMultiplier, stakes },
     referrals: {
       numActiveReferreeReferrals,
       numActiveReferrerReferrals,
       numInactiveReferreeReferrals,
       inactiveReferrals,
-      loaded: referralLoaded,
     },
     airdropLeaderboard: {
       leaderboard: leaderboardRows,
@@ -623,7 +608,7 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
   data: AirdropLeaderboardEntry;
   index: number;
 }) => {
-  const { rank, address, referralCount, liquidityMultiplier, totalLootboxes } =
+  const { user, rank, referralCount, liquidityMultiplier, totalLootboxes } =
     data;
 
   return (
@@ -646,7 +631,7 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
 
       {/* User */}
       <td>
-        <Text>{trimAddress(address)}</Text>
+        <Text>{trimAddress(user)}</Text>
       </td>
 
       {/* Bottles */}
