@@ -105,7 +105,6 @@ const Airdrop = () => {
 
   const showAirdrop = showExperiment("enable-airdrop-page");
 
-  if (!showAirdrop) return null;
 
   const data = {
     airdrop: {
@@ -136,6 +135,8 @@ const Airdrop = () => {
   const closeModal = () => {
     setCurrentModal(null);
   };
+
+  if (!showAirdrop) return null;
 
   return (
     <>
