@@ -38,7 +38,7 @@ interface ILootboxStaking {
     );
 
     /**
-     * @notice deposited amount for the spender given according to their historical amounts supplied
+     * @notice deposited amount for the spender given of their original deposit
      * @param _spender to get the spending amounts for
      */
     function deposited(address _spender) external returns (
@@ -48,18 +48,21 @@ interface ILootboxStaking {
     );
 
     /**
-     * @notice redeem a token investment, redeeming up to the amount, if possible
-     * @param _fusdcAmount to redeem
-     * @param _usdcAmount to redeem
-     * @param _wethAmount to redeem
+     * @notice redeem any deposits completed
      */
-    function redeem(
-        uint256 _fusdcAmount,
-        uint256 _usdcAmount,
-        uint256 _wethAmount
-    ) external returns (
-        uint256 fusdcRemaining,
-        uint256 usdcRemaining,
-        uint256 wethRemaining
+    function redeem() external returns (
+        uint256 fusdcRedeemed,
+        uint256 usdcRedeemed,
+        uint256 wethRedeemed
+    );
+
+    /**
+     * @notice redeemable amount that the user could get back
+     * @param _spender that's checked
+     */
+    function redeemable(address _spender) external view returns (
+        uint256 fusdcRedeemable,
+        uint256 usdcRedeemable,
+        uint256 wethRedeemable
     );
 }

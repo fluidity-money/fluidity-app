@@ -86,6 +86,14 @@ contract Staking is ILootboxStaking {
 
     IUniswapV2Router02 private sushiswapRouter_;
 
+    IUniswapV2Pair private camelotFusdcUsdcPair_;
+
+    IUniswapV2Pair private camelotFusdcWethPair_;
+
+    IUniswapV2Pair private sushiswapFusdcUsdcPair_;
+
+    IUniswapV2Pair private sushiswapFusdcWethPair_;
+
     mapping (address => Deposit[]) private deposits_;
 
     function init(
@@ -117,13 +125,21 @@ contract Staking is ILootboxStaking {
         usdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
         weth_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
 
-        _camelotFusdcUsdcPair.approve(address(_camelotRouter), MAX_UINT256);
+        camelotFusdcUsdcPair_ = _camelotFusdcUsdcPair;
 
-        _camelotFusdcWethPair.approve(address(_camelotRouter), MAX_UINT256);
+        camelotFusdcWethPair_ = _camelotFusdcWethPair;
 
-        _sushiswapFusdcUsdcPair.approve(address(_sushiswapRouter), MAX_UINT256);
+        sushiswapFusdcUsdcPair_ = _sushiswapFusdcUsdcPair;
 
-        _sushiswapFusdcWethPair.approve(address(_sushiswapRouter), MAX_UINT256);
+        sushiswapFusdcWethPair_ = _sushiswapFusdcWethPair;
+
+        camelotFusdcUsdcPair_.approve(address(_camelotRouter), MAX_UINT256);
+
+        camelotFusdcWethPair_.approve(address(_camelotRouter), MAX_UINT256);
+
+        sushiswapFusdcUsdcPair_.approve(address(_sushiswapRouter), MAX_UINT256);
+
+        sushiswapFusdcWethPair_.approve(address(_sushiswapRouter), MAX_UINT256);
 
         version_ = 1;
     }
@@ -397,8 +413,11 @@ contract Staking is ILootboxStaking {
         IERC20 _tokenB,
         uint256 _lpTokens,
         address _to
-    ) internal {
-        _router.removeLiquidity(
+    ) internal returns (
+        uint256 amountA,
+        uint256 amountB
+    ) {
+        return _router.removeLiquidity(
             address(fusdc_),
             address(_tokenB),
             _lpTokens,
@@ -420,39 +439,39 @@ contract Staking is ILootboxStaking {
         Deposit memory dep,
         IERC20 _tokenB,
         address _sender
-    ) internal {
-        _redeemFromUniswapV2Router(
-            camelotRouter_,
-            _tokenB,
-            dep.camelotLpMinted,
-            _sender
-        );
+    ) internal returns (
+        uint256 tokenARedeemed,
+        uint256 tokenBRedeemed
+    ) {
+        (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
+            _redeemFromUniswapV2Router(
+                camelotRouter_,
+                _tokenB,
+                dep.camelotLpMinted,
+                _sender
+            );
 
-        _redeemFromUniswapV2Router(
-            sushiswapRouter_,
-            _tokenB,
-            dep.sushiswapLpMinted,
-            _sender
+        (uint256 sushiswapARedeemed, uint256 sushiswapBRedeemed) =
+            _redeemFromUniswapV2Router(
+                sushiswapRouter_,
+                _tokenB,
+                dep.sushiswapLpMinted,
+                _sender
+            );
+
+        return (
+            camelotARedeemed + sushiswapARedeemed,
+            camelotBRedeemed + sushiswapBRedeemed
         );
     }
 
     /// @inheritdoc ILootboxStaking
-    function redeem(
-        uint256 _fusdcAmount,
-        uint256 _usdcAmount,
-        uint256 _wethAmount
-    ) public returns (
-        uint256 fusdcRemaining,
-        uint256 usdcRemaining,
-        uint256 wethRemaining
+    function redeem() public returns (
+        uint256 fusdcRedeemed,
+        uint256 usdcRedeemed,
+        uint256 wethRedeemed
     ) {
         Deposit memory dep;
-
-        uint256 tokenBRemaining;
-
-        fusdcRemaining = _fusdcAmount;
-        usdcRemaining = _usdcAmount;
-        wethRemaining = _wethAmount;
 
         for (uint i = deposits_[msg.sender].length; i > 0;) {
             --i;
@@ -466,48 +485,47 @@ contract Staking is ILootboxStaking {
 
             bool fusdcUsdcPair = dep.typ == LiquidityProvided.FUSDC_USDC;
 
-            tokenBRemaining = fusdcUsdcPair ? usdcRemaining : wethRemaining;
+            (uint256 tokenARedeemed, uint256 tokenBRedeemed) =
+                _redeemCamelotSushiswap(
+                    dep,
+                    fusdcUsdcPair ? usdc_ : weth_,
+                    msg.sender
+                );
 
-            uint256 tokenAPastDeposit = dep.camelotTokenA + dep.sushiswapTokenA;
+            fusdcRedeemed += tokenARedeemed;
 
-            uint256 tokenBPastDeposit = dep.camelotTokenB + dep.sushiswapTokenB;
+            if (fusdcUsdcPair) usdcRedeemed += tokenBRedeemed;
 
-            // check that the fusdc requested to pull out is equal to or
-            // greater than the amount in this deposit
-
-            if (tokenAPastDeposit > fusdcRemaining) continue;
-
-            // if the amount deposited for the second token is greater than what we
-            // can redeem, then we stop so the user can try again with a separate
-            // transaction that's larger
-
-            if (fusdcUsdcPair && tokenBPastDeposit > usdcRemaining) continue;
-
-            if (!fusdcUsdcPair && tokenBPastDeposit > wethRemaining) continue;
-
-            _redeemCamelotSushiswap(
-                dep,
-                fusdcUsdcPair ? usdc_ : weth_,
-                msg.sender
-            );
-
-            fusdcRemaining -= tokenAPastDeposit;
-
-            tokenBRemaining -= tokenBPastDeposit;
-
-            if (fusdcUsdcPair) usdcRemaining = tokenBRemaining;
-
-            else wethRemaining = tokenBRemaining;
+            else wethRedeemed += tokenBRedeemed;
 
             // iterating in reverse, then deleting the deposit will let us remove
             // unneeded deposits in memory
 
             _deleteDeposit(msg.sender, i);
-
-            if (fusdcRemaining == 0 || tokenBRemaining == 0) break;
         }
 
-        return (fusdcRemaining, usdcRemaining, wethRemaining);
+        return (fusdcRedeemed, fusdcRedeemed, fusdcRedeemed);
+    }
+
+    function _uniswapPairReserves(
+        IUniswapV2Pair _pair,
+        IERC20 _tokenB
+    ) internal view returns (
+        uint256 reserveA,
+        uint256 reserveB
+    ) {
+        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
+
+        uint256 reserve0 = uint256(reserve0_);
+
+        uint256 reserve1 = uint256(reserve1_);
+
+        (reserveA, reserveB) =
+          address(fusdc_) < address(_tokenB)
+              ? (reserve0, reserve1)
+              : (reserve1, reserve0);
+
+        return (reserveA, reserveB);
     }
 
     /// @inheritdoc ILootboxStaking
@@ -531,5 +549,89 @@ contract Staking is ILootboxStaking {
         }
 
         return (fusdcAmount, usdcAmount, wethAmount);
+    }
+
+    function _redeemable(
+        uint256 _tokenASupply,
+        uint256 _tokenBSupply,
+        uint256 _camelotLpMinted,
+        uint256 _sushiswapLpMinted,
+        bool _fusdcUsdcPair
+    ) internal view returns (
+        uint256 tokenARedeemable,
+        uint256 tokenBRedeemable
+    ) {
+        IERC20 token = _fusdcUsdcPair ? usdc_ : weth_;
+
+        (
+            uint256 camelotTokenARedeemable,
+            uint256 camelotTokenBRedeemable
+        ) = _uniswapPairReserves(
+            _fusdcUsdcPair ? camelotFusdcUsdcPair_ : camelotFusdcWethPair_,
+            token
+        );
+
+        camelotTokenARedeemable =
+            (camelotTokenARedeemable * _camelotLpMinted) / _tokenASupply;
+
+        camelotTokenBRedeemable =
+            (camelotTokenBRedeemable * _camelotLpMinted) / _tokenBSupply;
+
+        (
+            uint256 sushiswapTokenARedeemable,
+            uint256 sushiswapTokenBRedeemable
+        ) = _uniswapPairReserves(
+            _fusdcUsdcPair ? sushiswapFusdcUsdcPair_ : sushiswapFusdcWethPair_,
+            token
+        );
+
+        sushiswapTokenARedeemable =
+            (sushiswapTokenARedeemable * _sushiswapLpMinted) / _tokenASupply;
+
+        sushiswapTokenBRedeemable =
+            (sushiswapTokenBRedeemable * _sushiswapLpMinted) / _tokenBSupply;
+
+        return (
+            camelotTokenARedeemable + sushiswapTokenARedeemable,
+            camelotTokenBRedeemable + sushiswapTokenBRedeemable
+        );
+    }
+
+    function redeemable(address _spender) public view returns (
+        uint256 fusdcRedeemable,
+        uint256 usdcRedeemable,
+        uint256 wethRedeemable
+    ) {
+        uint256 fusdcSupply = fusdc_.totalSupply();
+        uint256 usdcSupply = usdc_.totalSupply();
+        uint256 wethSupply = weth_.totalSupply();
+
+        for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
+            Deposit memory dep = deposits_[_spender][i];
+
+            if (dep.redeemTimestamp + 1 > block.timestamp) continue;
+
+            bool fusdcUsdcPair = dep.typ == LiquidityProvided.FUSDC_USDC;
+
+            (uint256 tokenARedeemable, uint256 tokenBRedeemable) = _redeemable(
+                fusdcSupply,
+                fusdcUsdcPair ? usdcSupply : wethSupply,
+                dep.camelotLpMinted,
+                dep.sushiswapLpMinted,
+                fusdcUsdcPair
+            );
+
+            fusdcRedeemable += tokenARedeemable;
+
+            if (fusdcUsdcPair) usdcRedeemable += tokenBRedeemable;
+
+            else wethRedeemable += tokenBRedeemable;
+        }
+
+        return (
+            fusdcRedeemable,
+            usdcRedeemable,
+            wethRedeemable
+        );
     }
 }
