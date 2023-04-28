@@ -1,19 +1,15 @@
-import { StakingEvent } from "~/routes/$network/query/airdrop";
+import { StakingEvent } from "~/routes/$network/query/dashboard/airdrop";
 import { gql, jsonPost } from "~/util";
 
 const queryStakingDataByAddress = gql`
   query StakingData($address: String!, $days_elapsed: Int!) {
-    stakes: staking_events(
-      where: {
-        address: { _eq: $address }
-      }
-    ) {
+    stakes: staking_events(where: { address: { _eq: $address } }) {
       amount: usd_amount
       durationDays: lockup_length
       insertedDate: inserted_date
       # use a computed field
       multiplier: staking_liquidity_multiplier(
-        args: {days_elapsed: $days_elapsed}
+        args: { days_elapsed: $days_elapsed }
       ) {
         result
       }

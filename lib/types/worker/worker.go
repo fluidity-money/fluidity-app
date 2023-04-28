@@ -221,6 +221,7 @@ type (
 		Apeswap          float64 `json:"apeswap"`
 		Saddle           float64 `json:"saddle"`
 		GTradeV6_1       float64 `json:"gtrade_v6_1"`
+		Meson            float64 `json:"meson"`
 		Camelot          float64 `json:"camelot"`
 	}
 

@@ -256,7 +256,7 @@ export default function IndexPage() {
           </LinkButton>
 
           {/* Switch Chain Modal - Dashboard */}
-          <Modal visible={showChainDashboardModal}>
+          <Modal id="switch-chain-dashboard" visible={showChainDashboardModal}>
             <BlockchainModal
               handleModal={setShowChainDashboardModal}
               option={{ name: "", icon: <div /> }}
@@ -326,7 +326,10 @@ export default function IndexPage() {
           </div>
 
           {/* Switch Chain Modal - Opportunity */}
-          <Modal visible={showChainOpportunityModal}>
+          <Modal
+            id="switch-chain-opportunity"
+            visible={showChainOpportunityModal}
+          >
             <BlockchainModal
               handleModal={setShowChainOpportunityModal}
               option={{ name: "", icon: <div /> }}
