@@ -267,6 +267,7 @@ func main() {
 					contractAddress,
 					tokenDecimals,
 					*convertedReceipt,
+					transaction.Data,
 				)
 
 				if err != nil {
