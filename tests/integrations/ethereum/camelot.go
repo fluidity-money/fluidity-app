@@ -18,7 +18,7 @@ const integrationTestCamelot = `
           "0x000000000000000000000001c31fb3359357f6436565ccb3e982bc6bf4189ae"
         ]
       },
-      "application": 15
+      "application": 16
     },
     "transaction": {
       "to": "0xc873fecbd354f5a56e00e710b90ef4201db2448d",
@@ -65,7 +65,7 @@ const integrationTestCamelot = `
           "0x000000000000000000000001c31fb3359357f6436565ccb3e982bc6bf4189ae"
         ]
       },
-      "application": 15
+      "application": 16
     },
     "transaction": {
       "to": "0xc873fecbd354f5a56e00e710b90ef4201db2448d",
@@ -112,7 +112,7 @@ const integrationTestCamelot = `
           "0x000000000000000000000001c31fb3359357f6436565ccb3e982bc6bf4189ae"
         ]
       },
-      "application": 15
+      "application": 16
     },
     "transaction": {
       "to": "0xc873fecbd354f5a56e00e710b90ef4201db2448d",
@@ -159,7 +159,7 @@ const integrationTestCamelot = `
           "0x000000000000000000000001c31fb3359357f6436565ccb3e982bc6bf4189ae"
         ]
       },
-      "application": 15
+      "application": 16
     },
     "transaction": {
       "to": "0xc873fecbd354f5a56e00e710b90ef4201db2448d",
