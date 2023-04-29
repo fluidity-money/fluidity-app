@@ -7,10 +7,9 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-interface IUniswapV2Pair {
-    function balanceOf(address _spender) external view returns (uint256);
-    function approve(address _spender, uint256 _amount) external returns (bool);
+import "./IERC20.sol";
 
+interface IUniswapV2Pair is IERC20 {
     function getReserves() external view returns (
         uint112 reserve0,
         uint112 reserve1,

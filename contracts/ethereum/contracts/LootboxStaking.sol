@@ -10,12 +10,15 @@ pragma abicoder v2;
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
 import "../interfaces/ILootboxStaking.sol";
+import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IToken.sol";
 
 import "../interfaces/IUniswapV2Router02.sol";
 import "../interfaces/IUniswapV2Pair.sol";
 
 import "./openzeppelin/SafeERC20.sol";
+
+import "hardhat/console.sol";
 
 /*
  * Network(s): Ethereum & Arbitrum
@@ -71,10 +74,16 @@ struct Deposit {
     LiquidityProvided typ;
 }
 
-contract Staking is ILootboxStaking {
+contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
 
     uint8 private version_;
+
+    address private operator_;
+
+    address private emergencyCouncil_;
+
+    bool private noEmergencyMode_;
 
     IERC20 public fusdc_;
 
@@ -96,7 +105,19 @@ contract Staking is ILootboxStaking {
 
     mapping (address => Deposit[]) private deposits_;
 
+    // lp tokens provided by users that we don't touch
+
+    uint256 private camelotFusdcUsdcDepositedLpTokens_;
+
+    uint256 private camelotFusdcWethDepositedLpTokens_;
+
+    uint256 private sushiswapFusdcUsdcDepositedLpTokens_;
+
+    uint256 private sushiswapFusdcWethDepositedLpTokens_;
+
     function init(
+        address _operator,
+        address _emergencyCouncil,
         IERC20 _fusdc,
         IERC20 _usdc,
         IERC20 _weth,
@@ -108,6 +129,11 @@ contract Staking is ILootboxStaking {
         IUniswapV2Pair _sushiswapFusdcWethPair
     ) public {
         require(version_ == 0, "already initialised");
+
+        operator_ = _operator;
+        emergencyCouncil_ = _emergencyCouncil;
+
+        noEmergencyMode_ = true;
 
         fusdc_ = _fusdc;
         usdc_ = _usdc;
@@ -331,6 +357,14 @@ contract Staking is ILootboxStaking {
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
 
+        if (_fusdcUsdcPair) {
+            camelotFusdcUsdcDepositedLpTokens_ += dep.camelotLpMinted;
+            sushiswapFusdcUsdcDepositedLpTokens_ += dep.sushiswapLpMinted;
+        } else {
+            camelotFusdcWethDepositedLpTokens_ += dep.camelotLpMinted;
+            sushiswapFusdcWethDepositedLpTokens_ += dep.sushiswapLpMinted;
+        }
+
         deposits_[_sender].push(dep);
 
         // refund the user any amounts not used
@@ -362,6 +396,8 @@ contract Staking is ILootboxStaking {
         uint256 usdcDeposited,
         uint256 wethDeposited
     ) {
+        require(noEmergencyMode_, "emergency mode");
+
         require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
 
@@ -471,6 +507,8 @@ contract Staking is ILootboxStaking {
         uint256 usdcRedeemed,
         uint256 wethRedeemed
     ) {
+        require(noEmergencyMode_, "emergency mode");
+
         Deposit memory dep;
 
         for (uint i = deposits_[msg.sender].length; i > 0;) {
@@ -552,8 +590,8 @@ contract Staking is ILootboxStaking {
     }
 
     function _redeemable(
-        uint256 _tokenASupply,
-        uint256 _tokenBSupply,
+        uint256 _camelotSupply,
+        uint256 _sushiswapSupply,
         uint256 _camelotLpMinted,
         uint256 _sushiswapLpMinted,
         bool _fusdcUsdcPair
@@ -571,11 +609,17 @@ contract Staking is ILootboxStaking {
             token
         );
 
+        console.log("camelot token a redeemable before", camelotTokenARedeemable);
+
         camelotTokenARedeemable =
-            (camelotTokenARedeemable * _camelotLpMinted) / _tokenASupply;
+            _camelotLpMinted * camelotTokenARedeemable / _camelotSupply;
+
+        console.log("camelot lp minted", _camelotLpMinted);
+
+        console.log("camelot token a redeemable after", camelotTokenARedeemable);
 
         camelotTokenBRedeemable =
-            (camelotTokenBRedeemable * _camelotLpMinted) / _tokenBSupply;
+            _camelotLpMinted * camelotTokenBRedeemable / _camelotSupply;
 
         (
             uint256 sushiswapTokenARedeemable,
@@ -585,11 +629,15 @@ contract Staking is ILootboxStaking {
             token
         );
 
+        console.log("sushiswap token a redeemable before", sushiswapTokenARedeemable);
+
         sushiswapTokenARedeemable =
-            (sushiswapTokenARedeemable * _sushiswapLpMinted) / _tokenASupply;
+            sushiswapTokenARedeemable * _sushiswapLpMinted / _sushiswapSupply;
+
+        console.log("sushiswap token b redeemable after", sushiswapTokenARedeemable);
 
         sushiswapTokenBRedeemable =
-            (sushiswapTokenBRedeemable * _sushiswapLpMinted) / _tokenBSupply;
+            sushiswapTokenBRedeemable * _sushiswapLpMinted / _sushiswapSupply;
 
         return (
             camelotTokenARedeemable + sushiswapTokenARedeemable,
@@ -602,9 +650,13 @@ contract Staking is ILootboxStaking {
         uint256 usdcRedeemable,
         uint256 wethRedeemable
     ) {
-        uint256 fusdcSupply = fusdc_.totalSupply();
-        uint256 usdcSupply = usdc_.totalSupply();
-        uint256 wethSupply = weth_.totalSupply();
+        uint256 camelotFusdcUsdcSupply = camelotFusdcUsdcPair_.totalSupply();
+
+        uint256 camelotFusdcWethSupply = camelotFusdcUsdcPair_.totalSupply();
+
+        uint256 sushiswapFusdcUsdcSupply = camelotFusdcUsdcPair_.totalSupply();
+
+        uint256 sushiswapFusdcWethSupply = camelotFusdcUsdcPair_.totalSupply();
 
         for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
             Deposit memory dep = deposits_[_spender][i];
@@ -614,18 +666,24 @@ contract Staking is ILootboxStaking {
             bool fusdcUsdcPair = dep.typ == LiquidityProvided.FUSDC_USDC;
 
             (uint256 tokenARedeemable, uint256 tokenBRedeemable) = _redeemable(
-                fusdcSupply,
-                fusdcUsdcPair ? usdcSupply : wethSupply,
+                fusdcUsdcPair ? camelotFusdcUsdcSupply : camelotFusdcWethSupply,
+                fusdcUsdcPair ? sushiswapFusdcUsdcSupply : sushiswapFusdcWethSupply,
                 dep.camelotLpMinted,
                 dep.sushiswapLpMinted,
                 fusdcUsdcPair
             );
+
+            console.log("token a redeemable", tokenARedeemable);
 
             fusdcRedeemable += tokenARedeemable;
 
             if (fusdcUsdcPair) usdcRedeemable += tokenBRedeemable;
 
             else wethRedeemable += tokenBRedeemable;
+
+            console.log("token a redeemable", tokenARedeemable);
+
+            console.log("token b redeemable", tokenARedeemable);
         }
 
         return (
@@ -633,5 +691,90 @@ contract Staking is ILootboxStaking {
             usdcRedeemable,
             wethRedeemable
         );
+    }
+
+    function drainExcessLpTokens(address _recipient) public {
+        require(msg.sender == operator_, "only operator");
+        require(noEmergencyMode_, "emergency mode");
+
+        uint256 camelotFusdcUsdcLpTokens =
+            camelotFusdcUsdcPair_.balanceOf(address(this));
+
+        uint256 camelotFusdcWethLpTokens =
+            camelotFusdcWethPair_.balanceOf(address(this));
+
+        uint256 sushiswapFusdcUsdcLpTokens =
+            sushiswapFusdcUsdcPair_.balanceOf(address(this));
+
+        uint256 sushiswapFusdcWethLpTokens =
+            sushiswapFusdcWethPair_.balanceOf(address(this));
+
+        uint256 spendableCamelotFusdcUsdcLpTokens =
+            camelotFusdcUsdcLpTokens - camelotFusdcUsdcDepositedLpTokens_;
+
+        uint256 spendableCamelotFusdcWethLpTokens =
+            camelotFusdcWethLpTokens - camelotFusdcWethDepositedLpTokens_;
+
+        uint256 spendableSushiswapFusdcUsdcLpTokens =
+            sushiswapFusdcUsdcLpTokens - sushiswapFusdcUsdcDepositedLpTokens_;
+
+        uint256 spendableSushiswapFusdcWethLpTokens =
+            sushiswapFusdcWethLpTokens - sushiswapFusdcWethDepositedLpTokens_;
+
+        camelotFusdcUsdcPair_.transfer(
+            _recipient,
+            spendableCamelotFusdcUsdcLpTokens
+        );
+
+        camelotFusdcWethPair_.transfer(
+            _recipient,
+            spendableCamelotFusdcWethLpTokens
+        );
+
+        sushiswapFusdcUsdcPair_.transfer(
+            _recipient,
+            spendableSushiswapFusdcUsdcLpTokens
+        );
+
+        sushiswapFusdcWethPair_.transfer(
+            _recipient,
+            spendableSushiswapFusdcWethLpTokens
+        );
+    }
+
+    /* ~~~~~~~~~~ EMERGENCY MODE ~~~~~~~~~~ */
+
+    function disableEmergencyMode() public {
+        require(msg.sender == operator_, "only operator");
+        noEmergencyMode_ = true;
+    }
+
+    function noEmergencyMode() public view returns (bool) {
+        return noEmergencyMode_;
+    }
+
+    function emergencyCouncil() public view returns (address) {
+        return emergencyCouncil_;
+    }
+
+    function enableEmergencyMode() public {
+        require(
+            msg.sender == operator_ ||
+            msg.sender == emergencyCouncil_,
+            "emergency only"
+        );
+
+        noEmergencyMode_ = false;
+    }
+
+    /* ~~~~~~~~~~ OPERATOR ~~~~~~~~~~ */
+
+    function operator() public view returns (address) {
+        return operator_;
+    }
+
+    function updateOperator(address _newOperator) public {
+        require(msg.sender == operator_, "only operator");
+        operator_ = _newOperator;
     }
 }
