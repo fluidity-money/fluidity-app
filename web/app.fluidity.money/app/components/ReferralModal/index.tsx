@@ -15,6 +15,8 @@ import {
 } from "@fluidity-money/surfing";
 
 type IReferraModal = {
+  connected: boolean;
+  connectWallet: () => void;
   closeModal: () => void;
   referrerClaimed: number;
   refereeClaimed: number;
@@ -26,6 +28,8 @@ type IReferraModal = {
 };
 
 const ReferralModal = ({
+  connected,
+  connectWallet,
   closeModal,
   referrerClaimed,
   refereeClaimed,
@@ -100,7 +104,15 @@ const ReferralModal = ({
           <Text size="lg">Send more of your link to earn more rewards!</Text>
         </div>
 
-        {loaded ? (
+        {!connected ? (
+          <GeneralButton
+            type={"primary"}
+            size={"medium"}
+            handleClick={connectWallet}
+          >
+            Connect Wallet
+          </GeneralButton>
+        ) : loaded ? (
           <>
             <Card
               component="button"
