@@ -26,6 +26,7 @@ type (
 	}
 )
 
+// TODO support calc type
 // GetUtilityVars from a list of utilities, returning if any failed
 func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethCommon.Address, fluidityClients []applications.UtilityName) ([]worker.UtilityVars, error) {
 	boundContract := ethAbiBind.NewBoundContract(

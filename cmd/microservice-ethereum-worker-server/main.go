@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
+	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -23,6 +24,7 @@ import (
 	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
@@ -64,6 +66,91 @@ const (
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
+
+type (
+	PayoutDetails struct {
+		randomSource []uint32
+		randomPayouts map[appTypes.UtilityName][]workerTypes.Payout
+	}
+)
+
+func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool workerTypes.UtilityVars, transferFeeNormal, currentAtx, payoutFreq *big.Rat, winningClasses, btx int, epochTime uint64, emission *worker.Emission) PayoutDetails {
+	calculationType := pool.CalculationType
+
+	switch calculationType {
+		case workerTypes.CalculationTypeWorkerOverrides:
+			var (
+				// defaults
+				winningClasses = winningClasses
+				payoutFreq     = payoutFreq
+
+				zeroRat = big.NewRat(0, 0)
+			)
+
+			// get overrides
+			details, found := workerDb.GetSpecialPoolOverrides(dbNetwork, pool.Name)
+
+			if found {
+				if details.WinningClassesOverride != 0 {
+					winningClasses = details.WinningClassesOverride
+				}
+				if details.PayoutFreqOverride.Cmp(zeroRat) != 0 {
+					payoutFreq.Set(details.PayoutFreqOverride)
+				}
+			}
+
+			// calculate this one in its own pool
+			specialPayout := calculatePayoutDetails(
+				workerTypes.TrfModeNoOptimisticSolution,
+				transferFeeNormal,
+				currentAtx,
+				payoutFreq,
+				[]workerTypes.UtilityVars{ pool },
+				winningClasses,
+				btx,
+				epochTime,
+				emission,
+			)
+
+			return specialPayout
+
+		default:
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Unhandled calculation type '%s'!",
+					calculationType,
+				)
+			})
+
+			return PayoutDetails{}
+	}
+}
+// calculatePayoutDetails takes everything relevant to the trf and returns a list of payouts and balls
+func calculatePayoutDetails(trfMode workerTypes.TrfMode, transferFeeNormal, currentAtx, payoutFreq *big.Rat, pools []workerTypes.UtilityVars, winningClasses, btx int, epochTime uint64, emission *worker.Emission) (PayoutDetails) {
+	randomN, randomPayouts, _ := probability.WinningChances(
+		transferFeeNormal,
+		currentAtx,
+		payoutFreq,
+		pools,
+		winningClasses,
+		btx,
+		epochTime,
+		emission,
+	)
+
+	randomSource := util.RandomIntegers(
+		winningClasses,
+		1,
+		uint32(randomN),
+	)
+
+	payoutDetails := PayoutDetails{
+		randomSource:  randomSource,
+		randomPayouts: randomPayouts,
+	}
+
+	return payoutDetails
+}
 
 func main() {
 	var (
@@ -453,6 +540,8 @@ func main() {
 					}
 				}
 
+				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
+
 				// fetch the token amount, exchange rate, etc from chain
 
 				log.Debugf(
@@ -494,68 +583,100 @@ func main() {
 					pools[i].DeltaWeight = new(big.Rat).SetInt64(31536000)
 				}
 
-				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
-
 				var (
-					winningClasses  = fluidity.WinningClasses
-					payoutFreqNum   = fluidity.PayoutFreqNum
-					payoutFreqDenom = fluidity.PayoutFreqDenom
+					normalPools  []workerTypes.UtilityVars
+					specialPools []workerTypes.UtilityVars
+
+					payouts []PayoutDetails
 				)
 
-				payoutFreq := big.NewRat(payoutFreqNum, payoutFreqDenom)
+				for _, pool := range pools {
+					calculationType := pool.CalculationType
 
-				randomN, randomPayouts, _ := probability.WinningChances(
+					if calculationType == workerTypes.CalculationTypeNormal {
+						specialPools = append(specialPools, pool)
+					} else {
+						normalPools = append(normalPools, pool)
+					}
+				}
+
+				// normal payouts!
+
+				var (
+					normalWinningClasses  = fluidity.WinningClasses
+					normalPayoutFreqNum   = fluidity.PayoutFreqNum
+					normalPayoutFreqDenom = fluidity.PayoutFreqDenom
+				)
+
+				normalPayoutFreq := big.NewRat(normalPayoutFreqNum, normalPayoutFreqDenom)
+
+				normalPayout := calculatePayoutDetails(
+					workerTypes.TrfModeNormal,
 					transferFeeNormal,
 					currentAtx,
-					payoutFreq,
+					normalPayoutFreq,
 					pools,
-					winningClasses,
+					normalWinningClasses,
 					btx,
 					secondsSinceLastEpoch,
 					emission,
 				)
 
-				// create announcement and container
+				payouts = append(payouts, normalPayout)
 
-				randomSource := util.RandomIntegers(
-					fluidity.WinningClasses,
-					1,
-					uint32(randomN),
+				// special payouts!
+				for _, specialPool := range specialPools {
+					specialPayout := calculateSpecialPayoutDetails(
+						dbNetwork,
+						specialPool,
+						transferFeeNormal,
+						currentAtx,
+						normalPayoutFreq,
+						normalWinningClasses,
+						btx,
+						secondsSinceLastEpoch,
+						emission,
+					)
+					payouts = append(payouts, specialPayout)
+				}
+
+				tokenDetails := token_details.New(
+					tokenName,
+					underlyingTokenDecimals,
 				)
 
-				tokenDetails := token_details.TokenDetails{
-					TokenShortName: tokenName,
-					TokenDecimals:  underlyingTokenDecimals,
+				for _, payoutDetails := range payouts {
+					// create announcement and container
+
+					announcement := worker.EthereumAnnouncement{
+						TransactionHash: transactionHash,
+						BlockNumber:     &blockNumber,
+						FromAddress:     senderAddress,
+						ToAddress:       recipientAddress,
+						RandomSource:    payoutDetails.randomSource,
+						RandomPayouts:   payoutDetails.randomPayouts,
+						TokenDetails:    tokenDetails,
+						Application:     application,
+					}
+
+					// Fill in emission.NaiveIsWinning
+
+					_ = probability.NaiveIsWinning(announcement.RandomSource, emission)
+
+					log.Debug(func(k *log.Log) {
+						k.Format("Source payouts: %v", payoutDetails.randomSource)
+					})
+
+					emission.TransactionHash = transactionHash.String()
+					emission.RecipientAddress = recipientAddress.String()
+					emission.SenderAddress = senderAddress.String()
+
+					emission.EthereumAppFees = appEmission
+
+					blockAnnouncements = append(blockAnnouncements, announcement)
+
+					sendEmission(emission)
 				}
-
-				announcement := worker.EthereumAnnouncement{
-					TransactionHash: transactionHash,
-					BlockNumber:     &blockNumber,
-					FromAddress:     senderAddress,
-					ToAddress:       recipientAddress,
-					RandomSource:    randomSource,
-					RandomPayouts:   randomPayouts,
-					TokenDetails:    tokenDetails,
-					Application:     application,
-				}
-
-				// Fill in emission.NaiveIsWinning
-
-				_ = probability.NaiveIsWinning(announcement.RandomSource, emission)
-
-				log.Debug(func(k *log.Log) {
-					k.Format("Source payouts: %v", randomSource)
-				})
-
-				emission.TransactionHash = transactionHash.String()
-				emission.RecipientAddress = recipientAddress.String()
-				emission.SenderAddress = senderAddress.String()
-
-				emission.EthereumAppFees = appEmission
-
-				blockAnnouncements = append(blockAnnouncements, announcement)
-
-				sendEmission(emission)
 			}
 		}
 
