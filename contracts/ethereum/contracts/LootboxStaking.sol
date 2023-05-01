@@ -16,6 +16,8 @@ import "../interfaces/IToken.sol";
 import "../interfaces/IUniswapV2Router02.sol";
 import "../interfaces/IUniswapV2Pair.sol";
 
+import "../interfaces/ISushiswapBentoBox.sol";
+
 import "./openzeppelin/SafeERC20.sol";
 
 import "hardhat/console.sol";
@@ -67,7 +69,8 @@ struct Deposit {
     uint256 camelotTokenA;
     uint256 camelotTokenB;
 
-    uint256 sushiswapLpMinted;
+    uint256 sushiswapLpMintedA;
+    uint256 sushiswapLpMintedB;
     uint256 sushiswapTokenA;
     uint256 sushiswapTokenB;
 
@@ -93,7 +96,7 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     IUniswapV2Router02 private camelotRouter_;
 
-    IUniswapV2Router02 private sushiswapRouter_;
+    ISushiswapBentoBox private sushiswapBentoBox_;
 
     IUniswapV2Pair private camelotFusdcUsdcPair_;
 
@@ -122,11 +125,9 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IERC20 _usdc,
         IERC20 _weth,
         IUniswapV2Router02 _camelotRouter,
-        IUniswapV2Router02 _sushiswapRouter,
+        ISushiswapBentoBox _sushiswapBentoBox,
         IUniswapV2Pair _camelotFusdcUsdcPair,
-        IUniswapV2Pair _camelotFusdcWethPair,
-        IUniswapV2Pair _sushiswapFusdcUsdcPair,
-        IUniswapV2Pair _sushiswapFusdcWethPair
+        IUniswapV2Pair _camelotFusdcWethPair
     ) public {
         require(version_ == 0, "already initialised");
 
@@ -141,31 +142,25 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         camelotRouter_ = _camelotRouter;
 
-        sushiswapRouter_ = _sushiswapRouter;
+        sushiswapBentoBox_ = _sushiswapBentoBox;
 
         fusdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
         usdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
         weth_.safeApprove(address(camelotRouter_), MAX_UINT256);
 
-        fusdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
-        usdc_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
-        weth_.safeApprove(address(sushiswapRouter_), MAX_UINT256);
-
         camelotFusdcUsdcPair_ = _camelotFusdcUsdcPair;
 
         camelotFusdcWethPair_ = _camelotFusdcWethPair;
-
-        sushiswapFusdcUsdcPair_ = _sushiswapFusdcUsdcPair;
-
-        sushiswapFusdcWethPair_ = _sushiswapFusdcWethPair;
 
         camelotFusdcUsdcPair_.approve(address(_camelotRouter), MAX_UINT256);
 
         camelotFusdcWethPair_.approve(address(_camelotRouter), MAX_UINT256);
 
-        sushiswapFusdcUsdcPair_.approve(address(_sushiswapRouter), MAX_UINT256);
+        // given the history here...
 
-        sushiswapFusdcWethPair_.approve(address(_sushiswapRouter), MAX_UINT256);
+        fusdc_.approve(address(_sushiswapBentoBox), MAX_UINT256);
+        usdc_.approve(address(_sushiswapBentoBox), MAX_UINT256);
+        weth_.approve(address(_sushiswapBentoBox), MAX_UINT256);
 
         version_ = 1;
     }
@@ -197,6 +192,63 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
 
         return (amountA, amountB, liquidity);
+    }
+
+    /// @dev _depositToSushsiwapBentoBox the two tokens given (separately)
+    function _depositToSushiswapBentoBox(
+        ISushiswapBentoBox _bentobox,
+        IERC20 _tokenA,
+        IERC20 _tokenB,
+        uint256 _tokenAAmount,
+        uint256 _tokenBAmount
+    ) internal returns (
+        uint256 amountA,
+        uint256 amountB,
+        uint256 liquidityA,
+        uint256 liquidityB
+    ) {
+        console.log("depositing to sushi token a", _tokenAAmount);
+
+        console.log("depositing to sushi token b", _tokenBAmount);
+
+        console.log("swag balance of token a bento", _bentobox.balanceOf(_tokenA, address(this)));
+
+        console.log("swag balance of token b bento", _bentobox.balanceOf(_tokenB, address(this)));
+
+        (amountA, liquidityA) = _bentobox.deposit(
+            _tokenA,
+            address(this),
+            address(this),
+            _tokenAAmount,
+            0
+        );
+
+        console.log("deposit electric boogaloo", liquidityA);
+
+        console.log("pep balance of token a bento", _bentobox.balanceOf(_tokenA, address(this)));
+
+        console.log("pep balance of token b bento", _bentobox.balanceOf(_tokenB, address(this)));
+
+        (amountB, liquidityB) = _bentobox.deposit(
+            _tokenB,
+            address(this),
+            address(this),
+            _tokenBAmount,
+            0
+        );
+
+        console.log("wew lad", liquidityB);
+
+        console.log("after balance of token a bento", _bentobox.balanceOf(_tokenA, address(this)));
+
+        console.log("after balance of token b bento", _bentobox.balanceOf(_tokenB, address(this)));
+
+        return (
+            amountA,
+            amountB,
+            liquidityA,
+            liquidityB
+        );
     }
 
     function _calculateWeights(
@@ -248,9 +300,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 camelotTokenAMin = _reduceBySlippage(camelotTokenA, _slippage);
         uint256 camelotTokenBMin = _reduceBySlippage(camelotTokenB, _slippage);
 
-        uint256 sushiTokenAMin = _reduceBySlippage(sushiTokenA, _slippage);
-        uint256 sushiTokenBMin = _reduceBySlippage(sushiTokenB, _slippage);
-
         // deposit on camelot
 
         (
@@ -272,15 +321,14 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         (
             dep.sushiswapTokenA,
             dep.sushiswapTokenB,
-            dep.sushiswapLpMinted
-        ) = _depositToUniswapV2Router(
-            sushiswapRouter_,
-            address(_tokenA),
-            address(_tokenB),
+            dep.sushiswapLpMintedA,
+            dep.sushiswapLpMintedB
+        ) = _depositToSushiswapBentoBox(
+            sushiswapBentoBox_,
+            _tokenA,
+            _tokenB,
             sushiTokenA,
-            sushiTokenB,
-            sushiTokenAMin,
-            sushiTokenBMin
+            sushiTokenB
         );
 
         return dep;
@@ -359,10 +407,14 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         if (_fusdcUsdcPair) {
             camelotFusdcUsdcDepositedLpTokens_ += dep.camelotLpMinted;
-            sushiswapFusdcUsdcDepositedLpTokens_ += dep.sushiswapLpMinted;
+
+            sushiswapFusdcUsdcDepositedLpTokens_ +=
+                dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
         } else {
             camelotFusdcWethDepositedLpTokens_ += dep.camelotLpMinted;
-            sushiswapFusdcWethDepositedLpTokens_ += dep.sushiswapLpMinted;
+
+            sushiswapFusdcWethDepositedLpTokens_ +=
+                dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
         }
 
         deposits_[_sender].push(dep);
@@ -426,11 +478,9 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             fusdcUsdcPair
         );
 
-        if (fusdcUsdcPair)
-            usdcDeposited = tokenBSpent;
+        if (fusdcUsdcPair) usdcDeposited = tokenBSpent;
 
-        else
-            wethDeposited = tokenBSpent;
+        else wethDeposited = tokenBSpent;
 
         emit Staked(
             msg.sender,
@@ -464,6 +514,45 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
     }
 
+    function _redeemFromSushiswapBentoBox(
+        ISushiswapBentoBox _sushiswapBentoBox,
+        IERC20 _tokenB,
+        uint256 _lpTokensA,
+        uint256 _lpTokensB,
+        address _recipient
+    ) internal returns (
+        uint256 sushiswapARedeemed,
+        uint256 sushiswapBRedeemed
+    ) {
+        console.log("withdrawing 1", _lpTokensA);
+
+        console.log("ssss balance of token a bento", _sushiswapBentoBox.balanceOf(fusdc_, address(this)));
+
+        (sushiswapARedeemed,) = _sushiswapBentoBox.withdraw(
+            fusdc_,
+            address(this),
+            _recipient,
+            0,
+            _lpTokensA
+        );
+
+        console.log("done withdrawing", _lpTokensB);
+
+        console.log("ssss balance of token b bento", _sushiswapBentoBox.balanceOf(_tokenB, address(this)));
+
+        (sushiswapBRedeemed,) = _sushiswapBentoBox.withdraw(
+            _tokenB,
+            address(this),
+            _recipient,
+            0,
+            _lpTokensB
+        );
+
+        console.log("withdrawing electric boogaloo complete");
+
+        return (sushiswapARedeemed, sushiswapBRedeemed);
+    }
+
     function _deleteDeposit(address _sender, uint _depositId) internal {
         deposits_[_sender][_depositId] =
             deposits_[_sender][deposits_[_sender].length - 1];
@@ -488,10 +577,11 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             );
 
         (uint256 sushiswapARedeemed, uint256 sushiswapBRedeemed) =
-            _redeemFromUniswapV2Router(
-                sushiswapRouter_,
+            _redeemFromSushiswapBentoBox(
+                sushiswapBentoBox_,
                 _tokenB,
-                dep.sushiswapLpMinted,
+                dep.sushiswapLpMintedA,
+                dep.sushiswapLpMintedB,
                 _sender
             );
 
@@ -516,6 +606,10 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             dep = deposits_[msg.sender][i];
 
+            console.log("processing deposit", i);
+
+            console.log("timestamp", block.timestamp);
+
             // if the deposit we're looking at isn't finished then short circuit
 
             if (dep.redeemTimestamp + 1 > block.timestamp)
@@ -530,6 +624,22 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                     msg.sender
                 );
 
+            console.log("wtf done withdrawing");
+
+            if (fusdcUsdcPair) {
+                camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
+
+                sushiswapFusdcUsdcDepositedLpTokens_ -=
+                    dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
+            } else {
+                camelotFusdcWethDepositedLpTokens_ -= dep.camelotLpMinted;
+
+                sushiswapFusdcWethDepositedLpTokens_ -=
+                    dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
+            }
+
+            console.log("123123");
+
             fusdcRedeemed += tokenARedeemed;
 
             if (fusdcUsdcPair) usdcRedeemed += tokenBRedeemed;
@@ -539,8 +649,12 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             // iterating in reverse, then deleting the deposit will let us remove
             // unneeded deposits in memory
 
+            console.log("456567");
+
             _deleteDeposit(msg.sender, i);
         }
+
+        console.log("returning redeemed", fusdcRedeemed);
 
         return (fusdcRedeemed, fusdcRedeemed, fusdcRedeemed);
     }
@@ -591,9 +705,7 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     function _redeemable(
         uint256 _camelotSupply,
-        uint256 _sushiswapSupply,
         uint256 _camelotLpMinted,
-        uint256 _sushiswapLpMinted,
         bool _fusdcUsdcPair
     ) internal view returns (
         uint256 tokenARedeemable,
@@ -609,39 +721,32 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             token
         );
 
-        console.log("camelot token a redeemable before", camelotTokenARedeemable);
-
         camelotTokenARedeemable =
             _camelotLpMinted * camelotTokenARedeemable / _camelotSupply;
 
-        console.log("camelot lp minted", _camelotLpMinted);
-
-        console.log("camelot token a redeemable after", camelotTokenARedeemable);
-
         camelotTokenBRedeemable =
             _camelotLpMinted * camelotTokenBRedeemable / _camelotSupply;
+//
+	// (
+	    // uint256 sushiswapTokenARedeemable, uint256
+	    // sushiswapTokenBRedeemable
+	// ) = _uniswapPairReserves(
+	    // _fusdcUsdcPair ? sushiswapFusdcUsdcPair_ :
+	    // sushiswapFusdcWethPair_, token
+	// );
 
-        (
-            uint256 sushiswapTokenARedeemable,
-            uint256 sushiswapTokenBRedeemable
-        ) = _uniswapPairReserves(
-            _fusdcUsdcPair ? sushiswapFusdcUsdcPair_ : sushiswapFusdcWethPair_,
-            token
-        );
-
-        console.log("sushiswap token a redeemable before", sushiswapTokenARedeemable);
-
-        sushiswapTokenARedeemable =
-            sushiswapTokenARedeemable * _sushiswapLpMinted / _sushiswapSupply;
-
-        console.log("sushiswap token b redeemable after", sushiswapTokenARedeemable);
-
-        sushiswapTokenBRedeemable =
-            sushiswapTokenBRedeemable * _sushiswapLpMinted / _sushiswapSupply;
+//
+	// sushiswapTokenARedeemable =
+	    // sushiswapTokenARedeemable * _sushiswapLpMinted /
+	    // _sushiswapSupply;
+//
+	// sushiswapTokenBRedeemable =
+	    // sushiswapTokenBRedeemable * _sushiswapLpMinted /
+	    // _sushiswapSupply;
 
         return (
-            camelotTokenARedeemable + sushiswapTokenARedeemable,
-            camelotTokenBRedeemable + sushiswapTokenBRedeemable
+            camelotTokenARedeemable + 0,
+            camelotTokenBRedeemable + 0
         );
     }
 
@@ -654,10 +759,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         uint256 camelotFusdcWethSupply = camelotFusdcUsdcPair_.totalSupply();
 
-        uint256 sushiswapFusdcUsdcSupply = camelotFusdcUsdcPair_.totalSupply();
-
-        uint256 sushiswapFusdcWethSupply = camelotFusdcUsdcPair_.totalSupply();
-
         for (uint i = 0; i < deposits_[msg.sender].length; ++i) {
             Deposit memory dep = deposits_[_spender][i];
 
@@ -667,23 +768,15 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             (uint256 tokenARedeemable, uint256 tokenBRedeemable) = _redeemable(
                 fusdcUsdcPair ? camelotFusdcUsdcSupply : camelotFusdcWethSupply,
-                fusdcUsdcPair ? sushiswapFusdcUsdcSupply : sushiswapFusdcWethSupply,
                 dep.camelotLpMinted,
-                dep.sushiswapLpMinted,
                 fusdcUsdcPair
             );
-
-            console.log("token a redeemable", tokenARedeemable);
 
             fusdcRedeemable += tokenARedeemable;
 
             if (fusdcUsdcPair) usdcRedeemable += tokenBRedeemable;
 
             else wethRedeemable += tokenBRedeemable;
-
-            console.log("token a redeemable", tokenARedeemable);
-
-            console.log("token b redeemable", tokenARedeemable);
         }
 
         return (

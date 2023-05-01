@@ -28,4 +28,12 @@ interface IUniswapV2Router02 {
         address _to,
         uint _deadline
     ) external returns (uint amountA, uint amountB);
+
+    function swapExactTokensForTokens(
+        uint _amountIn,
+        uint _amountOutMin,
+        address[] calldata _path,
+        address _to,
+        uint _deadline
+    ) external returns (uint[] memory amounts);
 }

@@ -10,6 +10,8 @@ pragma abicoder v2;
 import "../../interfaces/IUniswapV2Router02.sol";
 
 contract TestUniswapV2Router is IUniswapV2Router02 {
+    uint x;
+
     function addLiquidity(
         address /* _tokenA */,
         address /* _tokenB */,
@@ -20,7 +22,8 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         address /* _to */,
         uint /* _deadline */
     ) external returns (uint, uint, uint) {
-        revert("test implementation used");
+        ++x;
+        return (x, x, x);
     }
 
     function removeLiquidity(
@@ -32,6 +35,18 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         address /* to */,
         uint /* deadline */
     ) external returns (uint, uint) {
-        revert("test implementation used");
+        ++x;
+        return (x, x);
+    }
+
+    function swapExactTokensForTokens(
+        uint /* _amountIn */,
+        uint /* _amountOutMin */,
+        address[] calldata /* _path */,
+        address /* _to */,
+        uint /* _deadline */
+    ) external returns (uint[] memory amounts) {
+        ++x;
+        return new uint[](x);
     }
 }

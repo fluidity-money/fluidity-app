@@ -1,6 +1,4 @@
 import hre from "hardhat";
-import { mustEnv } from "../script-utils";
-import type { ethers } from "ethers";
 import { BigNumber} from "ethers";
 
 const name = "Fluidity Money";

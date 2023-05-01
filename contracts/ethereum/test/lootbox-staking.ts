@@ -6,14 +6,15 @@ import * as hre from "hardhat";
 import { ethers, BigNumber, BigNumberish } from "ethers";
 
 import {
-  SUSHISWAP_FACTORY,
-  SUSHISWAP_ROUTER,
   CAMELOT_FACTORY,
-  CAMELOT_ROUTER } from "./arbitrum-constants";
+  CAMELOT_ROUTER,
+  SUSHISWAP_BENTO_BOX } from "./arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
 
 import { advanceTime, sendEmptyTransaction } from "./test-utils";
+
+import { getLatestTimestamp } from "../script-utils";
 
 import { expect, assert } from "chai";
 
@@ -119,15 +120,11 @@ describe("LootboxStaking", async () => {
 
   let token2: ethers.Contract;
 
-  let sushiswapRouter: ethers.Contract;
+  let sushiswapBentoBox: ethers.Contract;
 
   let staking: ethers.Contract;
 
   let camelotRouter: ethers.Contract;
-
-  let sushiswapToken1Pair: ethers.Contract;
-
-  let sushiswapToken2Pair: ethers.Contract;
 
   let camelotToken1Pair: ethers.Contract;
 
@@ -164,23 +161,10 @@ describe("LootboxStaking", async () => {
       MaxUint256
     );
 
-    const sushiswapFactory = await hre.ethers.getContractAt(
-      "TestUniswapV2Factory",
-      SUSHISWAP_FACTORY
+    sushiswapBentoBox = await hre.ethers.getContractAt(
+      "TestSushiswapBentoBox",
+      SUSHISWAP_BENTO_BOX
     );
-
-    sushiswapRouter = await hre.ethers.getContractAt(
-      "TestUniswapV2Router",
-      SUSHISWAP_ROUTER
-    );
-
-    sushiswapToken1Pair = await createPair(sushiswapFactory, token0, token1);
-
-    const sushiswapToken1PairAddress = sushiswapToken1Pair.address;
-
-    sushiswapToken2Pair = await createPair(sushiswapFactory, token0, token2);
-
-    const sushiswapToken2PairAddress = sushiswapToken2Pair.address;
 
     const camelotFactory = await hre.ethers.getContractAt(
       "TestUniswapV2Factory",
@@ -211,11 +195,9 @@ describe("LootboxStaking", async () => {
       token1.address,
       token2.address,
       camelotRouter.address,
-      sushiswapRouter.address,
+      sushiswapBentoBox.address,
       camelotToken1PairAddress,
-      camelotToken2PairAddress,
-      sushiswapToken1PairAddress,
-      sushiswapToken2PairAddress,
+      camelotToken2PairAddress
     );
 
     await token0.approve(staking.address, MaxUint256);
@@ -247,7 +229,11 @@ describe("LootboxStaking", async () => {
 
     await sendEmptyTransaction(stakingSigner);
 
+    console.log("about to redeem inside the troubled function");
+
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+
+    console.log("done redeem inside the troubled function");
 
     expectWithinSlippage(fusdcRedeemed, fusdc, 10);
 
@@ -277,8 +263,6 @@ describe("LootboxStaking", async () => {
 
     expectWithinSlippage(depositUsdc, usdc, slippage);
 
-    console.log(`deposited before: ${fusdc}`);
-
     await expectDeposited(staking, fusdc, usdc, weth);
 
     const [ fusdc1, usdc1, weth1 ] = await deposit(
@@ -299,8 +283,6 @@ describe("LootboxStaking", async () => {
     await advanceTime(hre, 8640004);
 
     await sendEmptyTransaction(stakingSigner);
-
-    console.log(`redeemable in the two: ${await staking.redeemable(stakingSigner.getAddress())}`);
 
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
 
@@ -382,13 +364,7 @@ describe("LootboxStaking", async () => {
         slippage
       );
 
-      console.log(`fuck you ${fusdc}`);
-
-      console.log(`swag ${await staking.deposited(stakingSigner.getAddress())}`);
-
       expectWithinSlippage(depositFusdc, fusdc, slippage);
-
-      console.log("slippage test for fusdc correct");
 
       expectWithinSlippage(depositWeth, weth, slippage);
 
@@ -402,8 +378,6 @@ describe("LootboxStaking", async () => {
         0,
         slippage
       );
-
-      console.log(`deposited ${await staking.deposited(stakingSigner.getAddress())}`);
 
       expectWithinSlippage(depositFusdc, fusdc1, slippage);
 
@@ -424,6 +398,21 @@ describe("LootboxStaking", async () => {
       expectWithinSlippage(wethRedeemed, weth, 10);
 
       await expectDeposited(staking, 0, 0, 0);
+    }
+  );
+
+  it(
+    "should support camelot people making trades with the pool and collecting their fees",
+    async () => {
+      const timestamp = await getLatestTimestamp(hre);
+
+      await camelotRouter.swapExactTokensForTokens(
+        500,
+        0,
+        [ token0.address, token1.address ],
+        await camelotRouter.signer.getAddress(),
+        timestamp + 10000
+      );
     }
   );
 });
