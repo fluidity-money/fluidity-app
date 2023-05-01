@@ -21,9 +21,12 @@ struct UtilityVars {
     uint256 exchangeRateDenom;
     uint256 deltaWeightNum;
     uint256 deltaWeightDenom;
+    string customCalculationType;
 }
 
 interface IFluidClient {
+    string constant DEFAULT_CALCULATION_TYPE = "";
+
     /// @notice MUST be emitted when any reward is paid out
     event Reward(
         address indexed winner,

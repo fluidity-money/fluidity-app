@@ -244,7 +244,7 @@ type CalculationType string
 const (
 	// CalculationTypeNormal to indicate the calculation type that the
 	// fluid token and tokens like it use (normal trf operation)
-	CalculationTypeNormal CalculationType = "fluid"
+	CalculationTypeNormal CalculationType = ""
 
 	// CalculationTypeWorkerOverrides to indicate the calculation type used for
 	// tokens that don't use the optimistic solution and may have workerconfig overrides

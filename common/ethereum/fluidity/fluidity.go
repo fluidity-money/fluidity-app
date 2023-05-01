@@ -223,7 +223,8 @@ const registryAbiString = `[
 			  { "internalType": "uint256", "name": "exchangeRateNum", "type": "uint256" },
 			  { "internalType": "uint256", "name": "exchangeRateDenom", "type": "uint256" },
 			  { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
-			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
+			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" },
+			  { "internalType": "string", "name": "customCalculationType", "type": "string" }
 			  ],
 			  "internalType": "struct UtilityVars",
 			  "name": "vars",

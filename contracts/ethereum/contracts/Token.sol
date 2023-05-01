@@ -653,7 +653,8 @@ contract Token is
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
             deltaWeightNum: 31536000,
-            deltaWeightDenom: 1
+            deltaWeightDenom: 1,
+            customCalculationType: IFluidClient.DEFAULT_CALCULATION_TYPE
         });
     }
 

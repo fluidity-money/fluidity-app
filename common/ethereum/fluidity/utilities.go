@@ -19,6 +19,7 @@ type (
 		ExchangeRateDenom *big.Int `abi:"exchangeRateDenom"`
 		DeltaWeightNum    *big.Int `abi:"deltaWeightNum"`
 		DeltaWeightDenom  *big.Int `abi:"deltaWeightDenom"`
+		CalculationType   string   `abi:"customCalculationType"`
 	}
 	scannedUtilityVar struct {
 		Vars  utilityVars `abi:"vars"`
@@ -26,7 +27,6 @@ type (
 	}
 )
 
-// TODO support calc type
 // GetUtilityVars from a list of utilities, returning if any failed
 func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethCommon.Address, fluidityClients []applications.UtilityName) ([]worker.UtilityVars, error) {
 	boundContract := ethAbiBind.NewBoundContract(
@@ -73,6 +73,7 @@ func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethC
 			exchangeRateDenom = scannedVars.ExchangeRateDenom
 			deltaWeightNum    = scannedVars.DeltaWeightNum
 			deltaWeightDenom  = scannedVars.DeltaWeightDenom
+			calculationType   = worker.CalculationType(scannedVars.CalculationType)
 		)
 
 		poolSizeNativeRat := new(big.Rat).SetInt(poolSizeNative)
@@ -93,6 +94,7 @@ func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethC
 			TokenDecimalsScale: tokenDecimalScaleRat,
 			ExchangeRate:       exchangeRateRat,
 			DeltaWeight:        deltaWeightRat,
+			CalculationType:    calculationType,
 		}
 
 		vars = append(vars, utilityVar)

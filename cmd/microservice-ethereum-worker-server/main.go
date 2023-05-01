@@ -125,9 +125,11 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 			return PayoutDetails{}
 	}
 }
+
 // calculatePayoutDetails takes everything relevant to the trf and returns a list of payouts and balls
 func calculatePayoutDetails(trfMode workerTypes.TrfMode, transferFeeNormal, currentAtx, payoutFreq *big.Rat, pools []workerTypes.UtilityVars, winningClasses, btx int, epochTime uint64, emission *worker.Emission) (PayoutDetails) {
 	randomN, randomPayouts, _ := probability.WinningChances(
+		trfMode,
 		transferFeeNormal,
 		currentAtx,
 		payoutFreq,
