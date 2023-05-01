@@ -20,8 +20,6 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -207,14 +205,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 liquidityA,
         uint256 liquidityB
     ) {
-        console.log("depositing to sushi token a", _tokenAAmount);
-
-        console.log("depositing to sushi token b", _tokenBAmount);
-
-        console.log("swag balance of token a bento", _bentobox.balanceOf(_tokenA, address(this)));
-
-        console.log("swag balance of token b bento", _bentobox.balanceOf(_tokenB, address(this)));
-
         (amountA, liquidityA) = _bentobox.deposit(
             _tokenA,
             address(this),
@@ -223,12 +213,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             0
         );
 
-        console.log("deposit electric boogaloo", liquidityA);
-
-        console.log("pep balance of token a bento", _bentobox.balanceOf(_tokenA, address(this)));
-
-        console.log("pep balance of token b bento", _bentobox.balanceOf(_tokenB, address(this)));
-
         (amountB, liquidityB) = _bentobox.deposit(
             _tokenB,
             address(this),
@@ -236,12 +220,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _tokenBAmount,
             0
         );
-
-        console.log("wew lad", liquidityB);
-
-        console.log("after balance of token a bento", _bentobox.balanceOf(_tokenA, address(this)));
-
-        console.log("after balance of token b bento", _bentobox.balanceOf(_tokenB, address(this)));
 
         return (
             amountA,
@@ -524,10 +502,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 sushiswapARedeemed,
         uint256 sushiswapBRedeemed
     ) {
-        console.log("withdrawing 1", _lpTokensA);
-
-        console.log("ssss balance of token a bento", _sushiswapBentoBox.balanceOf(fusdc_, address(this)));
-
         (sushiswapARedeemed,) = _sushiswapBentoBox.withdraw(
             fusdc_,
             address(this),
@@ -536,10 +510,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _lpTokensA
         );
 
-        console.log("done withdrawing", _lpTokensB);
-
-        console.log("ssss balance of token b bento", _sushiswapBentoBox.balanceOf(_tokenB, address(this)));
-
         (sushiswapBRedeemed,) = _sushiswapBentoBox.withdraw(
             _tokenB,
             address(this),
@@ -547,8 +517,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             0,
             _lpTokensB
         );
-
-        console.log("withdrawing electric boogaloo complete");
 
         return (sushiswapARedeemed, sushiswapBRedeemed);
     }
@@ -606,10 +574,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             dep = deposits_[msg.sender][i];
 
-            console.log("processing deposit", i);
-
-            console.log("timestamp", block.timestamp);
-
             // if the deposit we're looking at isn't finished then short circuit
 
             if (dep.redeemTimestamp + 1 > block.timestamp)
@@ -624,8 +588,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                     msg.sender
                 );
 
-            console.log("wtf done withdrawing");
-
             if (fusdcUsdcPair) {
                 camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
 
@@ -638,8 +600,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                     dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
             }
 
-            console.log("123123");
-
             fusdcRedeemed += tokenARedeemed;
 
             if (fusdcUsdcPair) usdcRedeemed += tokenBRedeemed;
@@ -649,12 +609,8 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             // iterating in reverse, then deleting the deposit will let us remove
             // unneeded deposits in memory
 
-            console.log("456567");
-
             _deleteDeposit(msg.sender, i);
         }
-
-        console.log("returning redeemed", fusdcRedeemed);
 
         return (fusdcRedeemed, fusdcRedeemed, fusdcRedeemed);
     }
