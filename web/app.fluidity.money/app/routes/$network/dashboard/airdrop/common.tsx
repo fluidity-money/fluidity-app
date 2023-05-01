@@ -1,3 +1,4 @@
+import { useState } from "react"
 import {
   Card,
   LabelledValue,
@@ -9,6 +10,9 @@ import {
   Display,
   LootBottle,
   numberToMonetaryString,
+  ArrowLeft,
+  InfoCircle,
+  TokenCard,
 } from "@fluidity-money/surfing";
 import { Referral } from "~/queries";
 import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
@@ -198,8 +202,100 @@ const StakingStatsModal = ({
   );
 };
 
-const StakeNowModal = () => {
-  return <></>;
+const StakeNowModal = (stakingDate: Date, fluidTokens: Token[], baseTokens: Token[]) => {
+  const [ fluidTokenAmount, setFluidTokenAmount ] = useState(0);
+  const [ baseTokenAmount, setBaseTokenAmount ] = useState(0);
+  const [stakingDuration, setStakingDuration] = useState(31);
+
+  // Staking Multiplier Equation
+  // Reference: https://www.notion.so/fluidity/Fluidity-Airdrops-Loot-bottles-5d1bcf986d5a45a7a29bfc200fbfbb20?pvs=4#f47a040e934a41bbbb1793a7349146b6
+  const stakingLiquidityMultiplierEq = (stakedDays: number, totalStakedDays: number) => 
+    (396 / 11315 - 396 * totalStakedDays / 4129975) * stakedDays +
+    396 * totalStakedDays / 133225 -
+    31 / 365
+
+  const canStake = () => false
+  
+  return (
+    <>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto auto auto",
+          gap: "1em",
+        }}
+      >
+        <Card type="opaque" rounded color="holo" fill>
+          TIP: Stake over <strong>31</strong> days for more rewards in future epochs and events!
+        </Card>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "0.4 0.2 0.4",
+            gap: "1em",
+          }}
+        >
+          {/* Staking Amount */}
+          <div>
+            <div>
+              <Text>STAKE AMOUNT <InfoCircle /></Text>
+              <GeneralButton size="small">Max</GeneralButton>
+            </div>
+            <div>
+              <TokenCard />
+            </div>
+            <div>
+              <TokenCard />
+            </div>
+          </div>
+          {/* Arrow */}
+          <div>
+            <ArrowLeft />
+          </div>
+          {/* Duration */}
+          <div>
+            <div>
+              <Text> Duration
+                <InfoCircle />
+              </Text>
+            </div>
+            <div>
+              {stakingDuration}{" "}D
+              {/* Scrollbar */}
+            </div>
+            <div>
+              <Text>END: <Text>{Date.now() + stakingDuration}</Text> <InfoCircle /></Text>
+            </div>
+          </div>
+        </div>
+        <div style={{ border: "1em white dashed" }} />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "0.4 0.2 0.4",
+            gap: "1em",
+          }}
+        >
+          <div>
+            <Text>Day 1 Power <InfoCircle /></Text>
+            {stakingLiquidityMultiplierEq(1, stakingDuration)}
+            <Text>@ MULTIPLIER {stakingLiquidityMultiplierEq(1, stakingDuration)}X</Text>
+          </div>
+          <div>
+            <ArrowRight />
+          </div>
+          <div>
+            <Text>Day 31 Power <InfoCircle /></Text>
+            {stakingLiquidityMultiplierEq(31, stakingDuration)}
+            <Card rounded type="opaque" color="holo">@ MULTIPLIER {stakingLiquidityMultiplierEq(31, stakingDuration)}X</Card>
+          </div>
+        </div>
+        <GeneralButton disabled={!canStake()}>
+          Stake
+        </GeneralButton>
+      </div>
+    </>
+  );
 };
 
 const TutorialModal = () => {
