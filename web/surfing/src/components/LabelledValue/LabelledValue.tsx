@@ -5,7 +5,7 @@ import styles from "./LabelledValue.module.scss";
 type ILabelledValue = {
   children: React.ReactNode;
   className?: string;
-  label: string;
+  label: string | React.ReactNode;
   icon?: string | React.ReactNode;
 };
 

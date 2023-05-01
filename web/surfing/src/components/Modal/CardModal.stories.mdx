@@ -1,0 +1,36 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+import { useState } from "react";
+
+import { CardModal } from "./";
+
+<Meta title="Modal/CardModal" component={CardModal} />
+
+export const Template = (props) => {
+  const [showModal, setShowModal] = useState(false);
+  return (
+    <div>
+      <button onClick={() => setShowModal(true)}>Show Modal</button>
+      <CardModal
+        visible={showModal}
+        closeModal={() => {
+          setShowModal(false);
+        }}
+        {...props}
+      />
+    </div>
+  );
+};
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Card</Title>
+    <Subtitle>Generic Modal Component</Subtitle>
+  
+    <Story
+        name="Card Modal"
+        args={{
+          children: "Hello world!"
+        }}
+    >
+      {Template.bind({})}
+    </Story>
+</Canvas>

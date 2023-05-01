@@ -1,18 +1,19 @@
-import { BottleCounts } from "~/routes/$network/query/airdrop";
-import { jsonPost, gql } from "~/util";
+import { Rarity } from "@fluidity-money/surfing";
+import { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
+import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryAirdropStatsByAddress = gql`
   query AirdropStats($address: String!, $now: timestamp!) {
     lootboxCounts: lootbox_counts(where: { address: { _eq: $address } }) {
       address
-      tier1
-      tier2
-      tier3
-      tier4
-      tier5
+      ${Rarity.Common}: tier1
+      ${Rarity.Uncommon}: tier2
+      ${Rarity.Rare}: tier3
+      ${Rarity.UltraRare}: tier4
+      ${Rarity.Legendary}: tier5
     }
     liquidityMultiplier: calculate_a_y(
-      args: { address: $address, instant: $now }
+      args: { address_: $address, instant: $now }
     ) {
       result
     }
@@ -27,8 +28,9 @@ const queryAirdropStatsByAddress = gql`
 `;
 
 export const useAirdropStatsByAddress = async (address: string) => {
+  const { url, headers } = fetchInternalEndpoint();
+
   const variables = { address, now: new Date().toISOString() };
-  const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
     query: queryAirdropStatsByAddress,
@@ -37,15 +39,7 @@ export const useAirdropStatsByAddress = async (address: string) => {
   return await jsonPost<
     ExpectedAirdropStatsByAddressBody,
     ExpectedAirdropStatsByAddressResponse
-  >(
-    url,
-    body,
-    process.env.FLU_HASURA_SECRET
-      ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
-      : {}
-  );
+  >(url, body, headers);
 };
 
 type ExpectedAirdropStatsByAddressBody = {
@@ -57,8 +51,8 @@ type ExpectedAirdropStatsByAddressBody = {
 
 type ExpectedAirdropStatsByAddressResponse = {
   data?: {
-    lootboxCounts: BottleCounts;
-    liquidityMultiplier: { result: number };
+    lootboxCounts: [BottleTiers];
+    liquidityMultiplier: [{ result: number }];
     referralsCount: { aggregate: { count: number } };
   };
   errors?: unknown;

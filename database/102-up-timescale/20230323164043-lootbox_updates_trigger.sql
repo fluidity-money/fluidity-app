@@ -36,4 +36,4 @@ EXECUTE PROCEDURE update_lootboxes();
 --migrate:down
 
 DROP TRIGGER IF EXISTS trigger_lootbox_calculation ON winning_transaction_attributes;
-DROP IF EXISTS FUNCTION update_lootboxes;
+DROP FUNCTION IF EXISTS update_lootboxes;

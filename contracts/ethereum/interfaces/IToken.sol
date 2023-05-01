@@ -36,9 +36,6 @@ interface IToken is IERC20 {
     /// @notice emitted when a fluid token is unwrapped to its underlying asset
     event BurnFluid(address indexed addr, uint256 amount);
 
-    /// @notice emitted when a new operator takes over the contract management
-    event OperatorChanged(address indexed oldOperator, address indexed newOperator);
-
     /// @notice emitted when restrictions
     event MaxUncheckedRewardLimitChanged(uint256 amount);
 

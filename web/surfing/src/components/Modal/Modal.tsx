@@ -4,16 +4,17 @@ import { useState, useEffect } from "react";
 type IModal = {
   visible: boolean;
   children: React.ReactNode;
+  id: string;
 };
 
-const Modal = ({ visible, children }: IModal) => {
+const Modal = ({ visible, children, id }: IModal) => {
   const [modalElement, setModalElement] = useState<HTMLElement>();
 
   useEffect(() => {
     const modalRoot = document.body;
     const el = document.createElement("div");
 
-    el.id = "wallet-modal";
+    el.id = id;
 
     modalRoot.appendChild(el);
     setModalElement(el);
