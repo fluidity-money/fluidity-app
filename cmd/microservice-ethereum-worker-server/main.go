@@ -596,9 +596,9 @@ func main() {
 					calculationType := pool.CalculationType
 
 					if calculationType == workerTypes.CalculationTypeNormal {
-						specialPools = append(specialPools, pool)
-					} else {
 						normalPools = append(normalPools, pool)
+					} else {
+						specialPools = append(specialPools, pool)
 					}
 				}
 
