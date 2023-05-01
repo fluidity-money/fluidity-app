@@ -131,6 +131,9 @@ const ReferralModal = ({
               type={"secondary"}
               buttontype={"icon before"}
               handleClick={() => {
+                navigator.clipboard.writeText(
+                  `https://airdrop.fluidity.money/${referralCode}`
+                );
                 setLinkCopied(true);
               }}
               size={"large"}
