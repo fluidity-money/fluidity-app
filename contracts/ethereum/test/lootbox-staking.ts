@@ -56,7 +56,8 @@ const deposit = async (
       maxFusdcAmount,
       maxUsdcAmount,
       maxWethAmount,
-      slippageTolerance
+      slippageTolerance,
+      0
     );
 
   await contract.deposit(
@@ -64,7 +65,8 @@ const deposit = async (
     maxFusdcAmount,
     maxUsdcAmount,
     maxWethAmount,
-    slippageTolerance
+    slippageTolerance,
+    0
   );
 
   return [ fusdcDeposited, usdcDeposited, wethDeposited ];
@@ -74,9 +76,9 @@ const redeem = async (
   contract: ethers.Contract,
 ): Promise<[ BigNumber, BigNumber, BigNumber ]> => {
   const { fusdcRedeemed, usdcRedeemed, wethRedeemed } =
-    await contract.callStatic.redeem();
+    await contract.callStatic.redeem(0);
 
-  await contract.redeem();
+  await contract.redeem(0);
 
   return [ fusdcRedeemed, usdcRedeemed, wethRedeemed ];
 };
@@ -229,11 +231,7 @@ describe("LootboxStaking", async () => {
 
     await sendEmptyTransaction(stakingSigner);
 
-    console.log("about to redeem inside the troubled function");
-
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
-
-    console.log("done redeem inside the troubled function");
 
     expectWithinSlippage(fusdcRedeemed, fusdc, 10);
 
@@ -330,11 +328,9 @@ describe("LootboxStaking", async () => {
 
     await sendEmptyTransaction(stakingSigner);
 
-    expect(redeem(staking)).to.be.revertedWith("staking");
+    expect(redeem(staking)).to.be.revertedWith("swag");
 
     await advanceTime(hre, 99999999);
-
-    console.log(await staking.redeemable(stakingSigner.getAddress()));
 
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
 

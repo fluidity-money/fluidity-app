@@ -41,20 +41,10 @@ uint256 constant MIN_LOCKUP_TIME = 31 days;
 uint256 constant MAX_LOCKUP_TIME = 365 days;
 
 /**
- * @dev UNISWAP_ACTION_MAX_TIME to max the action by
- */
-uint256 constant UNISWAP_ACTION_MAX_TIME = 10 minutes;
-
-/**
  * @dev MIN_LIQUIDITY since we split it up in half and there's a
  *      minimum liquidity of 10k
  */
-uint256 constant MIN_LIQUIDITY = 20 ** 3;
-
-enum LiquidityProvided {
-    FUSDC_USDC,
-    FUSDC_WETH
-}
+uint256 constant MIN_LIQUIDITY = 10 ** 3 * 2;
 
 /**
  * @notice Deposit made by a user that's tracked internally
@@ -72,7 +62,7 @@ struct Deposit {
     uint256 sushiswapTokenA;
     uint256 sushiswapTokenB;
 
-    LiquidityProvided typ;
+    bool fusdcUsdcPair;
 }
 
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
@@ -108,9 +98,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     uint256 private camelotFusdcWethDepositedLpTokens_;
 
-    uint256 private sushiswapFusdcUsdcDepositedLpTokens_;
+    uint256 private sushiswapFusdcDepositedLpTokens_;
 
-    uint256 private sushiswapFusdcWethDepositedLpTokens_;
+    uint256 private sushiswapUsdcDepositedLpTokens_;
+
+    uint256 private sushiswapWethDepositedLpTokens_;
 
     function init(
         address _operator,
@@ -124,6 +116,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IUniswapV2Pair _camelotFusdcWethPair
     ) public {
         require(version_ == 0, "already initialised");
+
+        version_ = 1;
 
         operator_ = _operator;
         emergencyCouncil_ = _emergencyCouncil;
@@ -142,21 +136,19 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         usdc_.safeApprove(address(camelotRouter_), MAX_UINT256);
         weth_.safeApprove(address(camelotRouter_), MAX_UINT256);
 
+        fusdc_.safeApprove(address(_sushiswapBentoBox), MAX_UINT256);
+        usdc_.safeApprove(address(_sushiswapBentoBox), MAX_UINT256);
+        weth_.safeApprove(address(_sushiswapBentoBox), MAX_UINT256);
+
         camelotFusdcUsdcPair_ = _camelotFusdcUsdcPair;
 
         camelotFusdcWethPair_ = _camelotFusdcWethPair;
 
+        // can't use safe approve for the pairs
+
         camelotFusdcUsdcPair_.approve(address(_camelotRouter), MAX_UINT256);
 
         camelotFusdcWethPair_.approve(address(_camelotRouter), MAX_UINT256);
-
-        // given the history here...
-
-        fusdc_.approve(address(_sushiswapBentoBox), MAX_UINT256);
-        usdc_.approve(address(_sushiswapBentoBox), MAX_UINT256);
-        weth_.approve(address(_sushiswapBentoBox), MAX_UINT256);
-
-        version_ = 1;
     }
 
     /* ~~~~~~~~~~ INTERNAL DEPOSIT FUNCTIONS ~~~~~~~~~~ */
@@ -168,7 +160,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 _tokenAAmount,
         uint256 _tokenBAmount,
         uint256 _tokenAAmountMin,
-        uint256 _tokenBAmountMin
+        uint256 _tokenBAmountMin,
+        uint256 _timestamp
     ) internal returns (
         uint256 amountA,
         uint256 amountB,
@@ -184,7 +177,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _tokenAAmountMin,
             _tokenBAmountMin,
             address(this),
-            block.timestamp + UNISWAP_ACTION_MAX_TIME
+            _timestamp
         );
 
         return (amountA, amountB, liquidity);
@@ -258,12 +251,20 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return _x - ((_x * _slippage) / 100);
     }
 
+    function _hasEnoughWethLiquidity(
+        uint256 _fusdcAmount,
+        uint256 _wethAmount
+    ) internal pure returns (bool) {
+        return _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY;
+    }
+
     function _depositTokens(
         IERC20 _tokenA,
         IERC20 _tokenB,
         uint256 _tokenAAmount,
         uint256 _tokenBAmount,
-        uint256 _slippage
+        uint256 _slippage,
+        uint256 _timestamp
     ) internal returns (Deposit memory dep) {
         (
             uint256 camelotTokenA,
@@ -289,7 +290,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             camelotTokenA,
             camelotTokenB,
             camelotTokenAMin,
-            camelotTokenBMin
+            camelotTokenBMin,
+            _timestamp
         );
 
         // deposit it on sushiswap
@@ -310,87 +312,54 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return dep;
     }
 
-    function _depositFusdcUsdc(
-        uint256 _fusdcAmount,
-        uint256 _usdcAmount,
-        uint256 _slippage
-    ) internal returns (Deposit memory dep) {
-        dep = _depositTokens(
-            fusdc_,
-            usdc_,
-            _fusdcAmount,
-            _usdcAmount,
-            _slippage
-        );
-
-        dep.typ = LiquidityProvided.FUSDC_USDC;
-
-        return dep;
-    }
-
-    function _depositFusdcWeth(
-        uint256 _fusdcAmount,
-        uint256 _wethAmount,
-        uint256 _slippage
-    ) internal returns (Deposit memory dep) {
-        dep = _depositTokens(
-            fusdc_,
-            weth_,
-            _fusdcAmount,
-            _wethAmount,
-            _slippage
-        );
-
-        dep.typ = LiquidityProvided.FUSDC_WETH;
-
-        return dep;
-    }
-
     function _deposit(
         uint256 _lockupLength,
-        uint256 _fusdc,
-        uint256 _tokenB,
+        uint256 _fusdcAmount,
+        uint256 _tokenBAmount,
         uint256 _slippage,
+        uint256 _timestamp,
         address _sender,
+        IERC20 _tokenB,
         bool _fusdcUsdcPair
     ) internal returns (
         uint256 tokenADeposited,
         uint256 tokenBDeposited
     ) {
-        IERC20 token = _fusdcUsdcPair ? usdc_ : weth_;
-
         uint256 tokenABefore = fusdc_.balanceOf(address(this));
 
-        uint256 tokenBBefore = token.balanceOf(address(this));
+        uint256 tokenBBefore = _tokenB.balanceOf(address(this));
 
-        fusdc_.transferFrom(_sender, address(this), _fusdc);
+        fusdc_.transferFrom(_sender, address(this), _fusdcAmount);
 
-        token.transferFrom(_sender, address(this), _tokenB);
+        _tokenB.transferFrom(_sender, address(this), _tokenBAmount);
 
         Deposit memory dep;
 
-        if (_fusdcUsdcPair)
-            dep = _depositFusdcUsdc(_fusdc, _tokenB, _slippage);
+        dep = _depositTokens(
+            fusdc_,
+            _fusdcUsdcPair ? usdc_ : weth_,
+            _fusdcAmount,
+            _tokenBAmount,
+            _slippage,
+            _timestamp
+        );
 
-        else
-            dep = _depositFusdcWeth(_fusdc, _tokenB, _slippage);
+        dep.fusdcUsdcPair = _fusdcUsdcPair;
 
         uint256 tokenAAfter = fusdc_.balanceOf(address(this));
 
-        uint256 tokenBAfter = token.balanceOf(address(this));
+        uint256 tokenBAfter = _tokenB.balanceOf(address(this));
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
 
         if (_fusdcUsdcPair) {
             camelotFusdcUsdcDepositedLpTokens_ += dep.camelotLpMinted;
-
-            sushiswapFusdcUsdcDepositedLpTokens_ +=
-                dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
+            sushiswapFusdcDepositedLpTokens_ += dep.sushiswapLpMintedA;
+            sushiswapUsdcDepositedLpTokens_ += dep.sushiswapLpMintedB;
         } else {
             camelotFusdcWethDepositedLpTokens_ += dep.camelotLpMinted;
-
-            sushiswapFusdcWethDepositedLpTokens_ +=
-                dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
+            sushiswapFusdcDepositedLpTokens_ += dep.sushiswapLpMintedA;
+            sushiswapWethDepositedLpTokens_ += dep.sushiswapLpMintedB;
         }
 
         deposits_[_sender].push(dep);
@@ -401,7 +370,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             fusdc_.transfer(_sender, tokenAAfter - tokenABefore);
 
         if (tokenBAfter > tokenBBefore)
-            token.transfer(_sender, tokenBAfter - tokenBBefore);
+            _tokenB.transfer(_sender, tokenBAfter - tokenBBefore);
 
         // return the amount that we deposited
 
@@ -418,6 +387,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IUniswapV2Router02 _router,
         IERC20 _tokenB,
         uint256 _lpTokens,
+        uint256 _timestamp,
         address _to
     ) internal returns (
         uint256 amountA,
@@ -430,7 +400,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             0,
             0,
             _to,
-            block.timestamp + UNISWAP_ACTION_MAX_TIME
+            _timestamp
         );
     }
 
@@ -473,6 +443,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     function _redeemCamelotSushiswap(
         Deposit memory dep,
         IERC20 _tokenB,
+        uint256 _timestamp,
         address _sender
     ) internal returns (
         uint256 tokenARedeemed,
@@ -483,6 +454,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 camelotRouter_,
                 _tokenB,
                 dep.camelotLpMinted,
+                _timestamp,
                 _sender
             );
 
@@ -581,13 +553,18 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 _fusdcAmount,
         uint256 _usdcAmount,
         uint256 _wethAmount,
-        uint256 _slippage
+        uint256 _slippage,
+        uint256 _maxTimestamp
     ) external returns (
         uint256 fusdcDeposited,
         uint256 usdcDeposited,
         uint256 wethDeposited
     ) {
         require(noEmergencyMode_, "emergency mode");
+
+        if (_maxTimestamp == 0) _maxTimestamp = block.timestamp;
+
+        require(block.timestamp < _maxTimestamp + 1, "exceeded time");
 
         require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
@@ -601,19 +578,22 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         // sushiswap
 
         require(
-            fusdcUsdcPair ||
-            _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY,
+            fusdcUsdcPair || _hasEnoughWethLiquidity(_fusdcAmount, _wethAmount),
             "not enough liquidity"
         );
 
-        uint256 tokenB = fusdcUsdcPair ? _usdcAmount : _wethAmount;
+        uint256 tokenBAmount = fusdcUsdcPair ? _usdcAmount : _wethAmount;
+
+        IERC20 tokenB = fusdcUsdcPair ? usdc_ : weth_;
 
         (uint256 tokenASpent, uint256 tokenBSpent) = _deposit(
             _lockupLength,
             _fusdcAmount,
-            tokenB,
+            tokenBAmount,
             _slippage,
+            _maxTimestamp,
             msg.sender,
+            tokenB,
             fusdcUsdcPair
         );
 
@@ -634,12 +614,16 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     }
 
     /// @inheritdoc ILootboxStaking
-    function redeem() public returns (
+    function redeem(uint256 _maxTimestamp) public returns (
         uint256 fusdcRedeemed,
         uint256 usdcRedeemed,
         uint256 wethRedeemed
     ) {
         require(noEmergencyMode_, "emergency mode");
+
+        if (_maxTimestamp == 0) _maxTimestamp = block.timestamp;
+
+        require(block.timestamp < _maxTimestamp + 1, "exceeded time");
 
         Deposit memory dep;
 
@@ -653,25 +637,24 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             if (dep.redeemTimestamp + 1 > block.timestamp)
                 continue;
 
-            bool fusdcUsdcPair = dep.typ == LiquidityProvided.FUSDC_USDC;
+            bool fusdcUsdcPair = dep.fusdcUsdcPair;
 
             (uint256 tokenARedeemed, uint256 tokenBRedeemed) =
                 _redeemCamelotSushiswap(
                     dep,
                     fusdcUsdcPair ? usdc_ : weth_,
+                    _maxTimestamp,
                     msg.sender
                 );
 
             if (fusdcUsdcPair) {
                 camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
-
-                sushiswapFusdcUsdcDepositedLpTokens_ -=
-                    dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
+                sushiswapFusdcDepositedLpTokens_ -= dep.sushiswapLpMintedA;
+                sushiswapUsdcDepositedLpTokens_ -= dep.sushiswapLpMintedB;
             } else {
                 camelotFusdcWethDepositedLpTokens_ -= dep.camelotLpMinted;
-
-                sushiswapFusdcWethDepositedLpTokens_ -=
-                    dep.sushiswapLpMintedA + dep.sushiswapLpMintedB;
+                sushiswapFusdcDepositedLpTokens_ -= dep.sushiswapLpMintedA;
+                sushiswapWethDepositedLpTokens_ -= dep.sushiswapLpMintedB;
             }
 
             fusdcRedeemed += tokenARedeemed;
@@ -702,11 +685,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             uint256 tokenBAdded = dep.camelotTokenB + dep.sushiswapTokenB;
 
-            if (dep.typ == LiquidityProvided.FUSDC_USDC)
-                usdcAmount += tokenBAdded;
-
-            else if (dep.typ == LiquidityProvided.FUSDC_WETH)
-                wethAmount += tokenBAdded;
+            if (dep.fusdcUsdcPair) usdcAmount += tokenBAdded;
+            else wethAmount += tokenBAdded;
         }
 
         return (fusdcAmount, usdcAmount, wethAmount);
@@ -726,7 +706,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             if (dep.redeemTimestamp + 1 > block.timestamp) continue;
 
-            bool fusdcUsdcPair = dep.typ == LiquidityProvided.FUSDC_USDC;
+            bool fusdcUsdcPair = dep.fusdcUsdcPair;
 
             (uint256 tokenARedeemable, uint256 tokenBRedeemable) = _redeemable(
                 fusdcUsdcPair ? camelotFusdcUsdcSupply : camelotFusdcWethSupply,

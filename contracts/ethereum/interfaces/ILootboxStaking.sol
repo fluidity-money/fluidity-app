@@ -18,19 +18,21 @@ interface ILootboxStaking {
     );
 
     /**
-     * @notice deposit a token pair (only usdc or weth is used!)
+     * @notice deposit a token pair (only usdc or weth)
      * @param _lockupLength to use as the amount of time until redemption is possible
      * @param _fusdcAmount to use as the amount of fusdc to deposit
      * @param _usdcAmount to use as the amount of usdc to deposit
      * @param _wethAmount to use as the amount of weth to deposit
      * @param _slippage to use to reduce the minimum deposit per platform
+     * @param _maxTimestamp as the max amount of time in a timestamp
      */
     function deposit(
         uint256 _lockupLength,
         uint256 _fusdcAmount,
         uint256 _usdcAmount,
         uint256 _wethAmount,
-        uint256 _slippage
+        uint256 _slippage,
+        uint256 _maxTimestamp
     ) external returns (
         uint256 fusdcDeposited,
         uint256 usdcDeposited,
@@ -49,8 +51,9 @@ interface ILootboxStaking {
 
     /**
      * @notice redeem any deposits completed
+     * @param _maxTimestamp to execute the redemption by
      */
-    function redeem() external returns (
+    function redeem(uint256 _maxTimestamp) external returns (
         uint256 fusdcRedeemed,
         uint256 usdcRedeemed,
         uint256 wethRedeemed
