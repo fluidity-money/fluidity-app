@@ -13,12 +13,12 @@ const baseDocument = () => {
                 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
                 })(window,document,'script','dataLayer','${GTM_ID}');`,
-            }} 
+            }}
             />
             <script
               async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`} 
-            /> 
+              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
+            />
             <script
               dangerouslySetInnerHTML={{
                 __html: `
@@ -44,6 +44,10 @@ const baseDocument = () => {
                   })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
                 `,
               }}
+            />
+            <script
+              async
+              src="https://code.tidio.co/mzx3sr1svkbpcfoqnetpug2cik4dwubn.js"
             />
           </>
         )}
