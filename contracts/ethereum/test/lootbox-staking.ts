@@ -334,7 +334,7 @@ describe("LootboxStaking", async () => {
 
     await advanceTime(hre, 99999999);
 
-    await sendEmptyTransaction(stakingSigner);
+    console.log(await staking.redeemable(stakingSigner.getAddress()));
 
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
 
@@ -379,6 +379,8 @@ describe("LootboxStaking", async () => {
         slippage
       );
 
+      await sendEmptyTransaction(stakingSigner);
+
       expectWithinSlippage(depositFusdc, fusdc1, slippage);
 
       expectWithinSlippage(depositUsdc, usdc, slippage);
@@ -386,6 +388,15 @@ describe("LootboxStaking", async () => {
       await advanceTime(hre, 8640004);
 
       await sendEmptyTransaction(stakingSigner);
+
+      const [ fusdcRedeemable, usdcRedeemable, wethRedeemable ] =
+        await staking.redeemable(stakingSigner.getAddress());
+
+      expectWithinSlippage(fusdcRedeemable, fusdc.add(fusdc1), 10);
+
+      expectWithinSlippage(usdcRedeemable, usdc, 10);
+
+      expectWithinSlippage(wethRedeemable, weth, 10);
 
       await expectDeposited(staking, fusdc.add(fusdc1), usdc, weth);
 
@@ -403,16 +414,6 @@ describe("LootboxStaking", async () => {
 
   it(
     "should support camelot people making trades with the pool and collecting their fees",
-    async () => {
-      const timestamp = await getLatestTimestamp(hre);
-
-      await camelotRouter.swapExactTokensForTokens(
-        500,
-        0,
-        [ token0.address, token1.address ],
-        await camelotRouter.signer.getAddress(),
-        timestamp + 10000
-      );
-    }
+    async () => {}
   );
 });

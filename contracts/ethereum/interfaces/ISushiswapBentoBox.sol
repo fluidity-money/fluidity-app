@@ -25,5 +25,14 @@ interface ISushiswapBentoBox {
         uint256 shareOut
     );
 
-    function balanceOf(IERC20 _token, address _spender) external view returns (uint256);
+    function balanceOf(
+        IERC20 _token,
+        address _spender
+    ) external view returns (uint256);
+
+    function toAmount(
+        IERC20 _token,
+        uint256 _share,
+        bool _roundUp
+    ) external view returns (uint256 amount);
 }

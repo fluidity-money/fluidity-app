@@ -41,4 +41,12 @@ contract TestSushiswapBentoBox is ISushiswapBentoBox {
     ) public view returns (uint256) {
         return x;
     }
+
+    function toAmount(
+        IERC20 /* _token */,
+        uint256 /* _share */,
+        bool /* _roundUp */
+    ) public view returns (uint256) {
+        return x;
+    }
 }

@@ -20,6 +20,8 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -75,7 +77,7 @@ struct Deposit {
     LiquidityProvided typ;
 }
 
-contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
+contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
 
     uint8 private version_;
@@ -99,10 +101,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     IUniswapV2Pair private camelotFusdcUsdcPair_;
 
     IUniswapV2Pair private camelotFusdcWethPair_;
-
-    IUniswapV2Pair private sushiswapFusdcUsdcPair_;
-
-    IUniswapV2Pair private sushiswapFusdcWethPair_;
 
     mapping (address => Deposit[]) private deposits_;
 
@@ -162,6 +160,8 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         version_ = 1;
     }
+
+    /* ~~~~~~~~~~ INTERNAL DEPOSIT FUNCTIONS ~~~~~~~~~~ */
 
     function _depositToUniswapV2Router(
         IUniswapV2Router02 _router,
@@ -414,63 +414,7 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return (tokenADeposited, tokenBDeposited);
     }
 
-    /// @inheritdoc ILootboxStaking
-    function deposit(
-        uint256 _lockupLength,
-        uint256 _fusdcAmount,
-        uint256 _usdcAmount,
-        uint256 _wethAmount,
-        uint256 _slippage
-    ) external returns (
-        uint256 fusdcDeposited,
-        uint256 usdcDeposited,
-        uint256 wethDeposited
-    ) {
-        require(noEmergencyMode_, "emergency mode");
-
-        require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
-        require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
-
-        // the ui should restrict the deposits to more than 100
-
-        bool fusdcUsdcPair =
-            _fusdcAmount > MIN_LIQUIDITY && _usdcAmount > MIN_LIQUIDITY;
-
-        // take the amounts given, and allocate half to camelot and half to
-        // sushiswap
-
-        require(
-            fusdcUsdcPair ||
-            _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY,
-            "not enough liquidity"
-        );
-
-        uint256 tokenB = fusdcUsdcPair ? _usdcAmount : _wethAmount;
-
-        (uint256 tokenASpent, uint256 tokenBSpent) = _deposit(
-            _lockupLength,
-            _fusdcAmount,
-            tokenB,
-            _slippage,
-            msg.sender,
-            fusdcUsdcPair
-        );
-
-        if (fusdcUsdcPair) usdcDeposited = tokenBSpent;
-
-        else wethDeposited = tokenBSpent;
-
-        emit Staked(
-            msg.sender,
-            _lockupLength,
-            block.timestamp,
-            tokenASpent,
-            usdcDeposited,
-            wethDeposited
-        );
-
-        return (tokenASpent, usdcDeposited, wethDeposited);
-    }
+    /* ~~~~~~~~~~ INTERNAL REDEEM FUNCTIONS ~~~~~~~~~~ */
 
     function _redeemFromUniswapV2Router(
         IUniswapV2Router02 _router,
@@ -559,6 +503,138 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
     }
 
+    /* ~~~~~~~~~~ INTERNAL REDEEMABLE FUNCTIONS ~~~~~~~~~~ */
+
+    function _uniswapPairReserves(
+        IUniswapV2Pair _pair,
+        IERC20 _tokenB
+    ) internal view returns (
+        uint256 reserveA,
+        uint256 reserveB
+    ) {
+        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
+
+        uint256 reserve0 = uint256(reserve0_);
+
+        uint256 reserve1 = uint256(reserve1_);
+
+        (reserveA, reserveB) =
+          address(fusdc_) < address(_tokenB)
+              ? (reserve0, reserve1)
+              : (reserve1, reserve0);
+
+        return (reserveA, reserveB);
+    }
+
+    function _sushiswapBentoBoxToAmount(
+        IERC20 _token,
+        uint256 _share
+    ) internal view returns (uint256) {
+        return sushiswapBentoBox_.toAmount(_token, _share, false);
+    }
+
+    function _redeemable(
+        uint256 _camelotSupply,
+        uint256 _camelotLpMinted,
+        uint256 _sushiswapLpMintedA,
+        uint256 _sushiswapLpMintedB,
+        bool _fusdcUsdcPair
+    ) internal view returns (
+        uint256 tokenARedeemable,
+        uint256 tokenBRedeemable
+    ) {
+        IERC20 token = _fusdcUsdcPair ? usdc_ : weth_;
+
+        (
+            uint256 camelotTokenARedeemable,
+            uint256 camelotTokenBRedeemable
+        ) = _uniswapPairReserves(
+            _fusdcUsdcPair ? camelotFusdcUsdcPair_ : camelotFusdcWethPair_,
+            token
+        );
+
+        camelotTokenARedeemable =
+            _camelotLpMinted * camelotTokenARedeemable / _camelotSupply;
+
+        camelotTokenBRedeemable =
+            _camelotLpMinted * camelotTokenBRedeemable / _camelotSupply;
+
+        uint256 sushiswapTokenARedeemable = _sushiswapBentoBoxToAmount(
+            fusdc_,
+            _sushiswapLpMintedA
+        );
+
+        uint256 sushiswapTokenBRedeemable = _sushiswapBentoBoxToAmount(
+            _fusdcUsdcPair ? usdc_ : weth_,
+            _sushiswapLpMintedB
+        );
+
+        return (
+            camelotTokenARedeemable + sushiswapTokenARedeemable,
+            camelotTokenBRedeemable + sushiswapTokenBRedeemable
+        );
+    }
+
+    /* ~~~~~~~~~~ EXTERNAL FUNCTIONS ~~~~~~~~~~ */
+
+    /// @inheritdoc ILootboxStaking
+    function deposit(
+        uint256 _lockupLength,
+        uint256 _fusdcAmount,
+        uint256 _usdcAmount,
+        uint256 _wethAmount,
+        uint256 _slippage
+    ) external returns (
+        uint256 fusdcDeposited,
+        uint256 usdcDeposited,
+        uint256 wethDeposited
+    ) {
+        require(noEmergencyMode_, "emergency mode");
+
+        require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
+        require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
+
+        // the ui should restrict the deposits to more than 100
+
+        bool fusdcUsdcPair =
+            _fusdcAmount > MIN_LIQUIDITY && _usdcAmount > MIN_LIQUIDITY;
+
+        // take the amounts given, and allocate half to camelot and half to
+        // sushiswap
+
+        require(
+            fusdcUsdcPair ||
+            _fusdcAmount > MIN_LIQUIDITY && _wethAmount > MIN_LIQUIDITY,
+            "not enough liquidity"
+        );
+
+        uint256 tokenB = fusdcUsdcPair ? _usdcAmount : _wethAmount;
+
+        (uint256 tokenASpent, uint256 tokenBSpent) = _deposit(
+            _lockupLength,
+            _fusdcAmount,
+            tokenB,
+            _slippage,
+            msg.sender,
+            fusdcUsdcPair
+        );
+
+        if (fusdcUsdcPair) usdcDeposited = tokenBSpent;
+
+        else wethDeposited = tokenBSpent;
+
+        emit Staked(
+            msg.sender,
+            _lockupLength,
+            block.timestamp,
+            tokenASpent,
+            usdcDeposited,
+            wethDeposited
+        );
+
+        return (tokenASpent, usdcDeposited, wethDeposited);
+    }
+
     /// @inheritdoc ILootboxStaking
     function redeem() public returns (
         uint256 fusdcRedeemed,
@@ -615,27 +691,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return (fusdcRedeemed, fusdcRedeemed, fusdcRedeemed);
     }
 
-    function _uniswapPairReserves(
-        IUniswapV2Pair _pair,
-        IERC20 _tokenB
-    ) internal view returns (
-        uint256 reserveA,
-        uint256 reserveB
-    ) {
-        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
-
-        uint256 reserve0 = uint256(reserve0_);
-
-        uint256 reserve1 = uint256(reserve1_);
-
-        (reserveA, reserveB) =
-          address(fusdc_) < address(_tokenB)
-              ? (reserve0, reserve1)
-              : (reserve1, reserve0);
-
-        return (reserveA, reserveB);
-    }
-
     /// @inheritdoc ILootboxStaking
     function deposited(address _sender) public view returns (
         uint256 fusdcAmount,
@@ -659,53 +714,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return (fusdcAmount, usdcAmount, wethAmount);
     }
 
-    function _redeemable(
-        uint256 _camelotSupply,
-        uint256 _camelotLpMinted,
-        bool _fusdcUsdcPair
-    ) internal view returns (
-        uint256 tokenARedeemable,
-        uint256 tokenBRedeemable
-    ) {
-        IERC20 token = _fusdcUsdcPair ? usdc_ : weth_;
-
-        (
-            uint256 camelotTokenARedeemable,
-            uint256 camelotTokenBRedeemable
-        ) = _uniswapPairReserves(
-            _fusdcUsdcPair ? camelotFusdcUsdcPair_ : camelotFusdcWethPair_,
-            token
-        );
-
-        camelotTokenARedeemable =
-            _camelotLpMinted * camelotTokenARedeemable / _camelotSupply;
-
-        camelotTokenBRedeemable =
-            _camelotLpMinted * camelotTokenBRedeemable / _camelotSupply;
-//
-	// (
-	    // uint256 sushiswapTokenARedeemable, uint256
-	    // sushiswapTokenBRedeemable
-	// ) = _uniswapPairReserves(
-	    // _fusdcUsdcPair ? sushiswapFusdcUsdcPair_ :
-	    // sushiswapFusdcWethPair_, token
-	// );
-
-//
-	// sushiswapTokenARedeemable =
-	    // sushiswapTokenARedeemable * _sushiswapLpMinted /
-	    // _sushiswapSupply;
-//
-	// sushiswapTokenBRedeemable =
-	    // sushiswapTokenBRedeemable * _sushiswapLpMinted /
-	    // _sushiswapSupply;
-
-        return (
-            camelotTokenARedeemable + 0,
-            camelotTokenBRedeemable + 0
-        );
-    }
-
     function redeemable(address _spender) public view returns (
         uint256 fusdcRedeemable,
         uint256 usdcRedeemable,
@@ -725,6 +733,8 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             (uint256 tokenARedeemable, uint256 tokenBRedeemable) = _redeemable(
                 fusdcUsdcPair ? camelotFusdcUsdcSupply : camelotFusdcWethSupply,
                 dep.camelotLpMinted,
+                dep.sushiswapLpMintedA,
+                dep.sushiswapLpMintedB,
                 fusdcUsdcPair
             );
 
@@ -739,55 +749,6 @@ contract Staking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             fusdcRedeemable,
             usdcRedeemable,
             wethRedeemable
-        );
-    }
-
-    function drainExcessLpTokens(address _recipient) public {
-        require(msg.sender == operator_, "only operator");
-        require(noEmergencyMode_, "emergency mode");
-
-        uint256 camelotFusdcUsdcLpTokens =
-            camelotFusdcUsdcPair_.balanceOf(address(this));
-
-        uint256 camelotFusdcWethLpTokens =
-            camelotFusdcWethPair_.balanceOf(address(this));
-
-        uint256 sushiswapFusdcUsdcLpTokens =
-            sushiswapFusdcUsdcPair_.balanceOf(address(this));
-
-        uint256 sushiswapFusdcWethLpTokens =
-            sushiswapFusdcWethPair_.balanceOf(address(this));
-
-        uint256 spendableCamelotFusdcUsdcLpTokens =
-            camelotFusdcUsdcLpTokens - camelotFusdcUsdcDepositedLpTokens_;
-
-        uint256 spendableCamelotFusdcWethLpTokens =
-            camelotFusdcWethLpTokens - camelotFusdcWethDepositedLpTokens_;
-
-        uint256 spendableSushiswapFusdcUsdcLpTokens =
-            sushiswapFusdcUsdcLpTokens - sushiswapFusdcUsdcDepositedLpTokens_;
-
-        uint256 spendableSushiswapFusdcWethLpTokens =
-            sushiswapFusdcWethLpTokens - sushiswapFusdcWethDepositedLpTokens_;
-
-        camelotFusdcUsdcPair_.transfer(
-            _recipient,
-            spendableCamelotFusdcUsdcLpTokens
-        );
-
-        camelotFusdcWethPair_.transfer(
-            _recipient,
-            spendableCamelotFusdcWethLpTokens
-        );
-
-        sushiswapFusdcUsdcPair_.transfer(
-            _recipient,
-            spendableSushiswapFusdcUsdcLpTokens
-        );
-
-        sushiswapFusdcWethPair_.transfer(
-            _recipient,
-            spendableSushiswapFusdcWethLpTokens
         );
     }
 
