@@ -180,8 +180,8 @@ contract VEGovLockup is IVEGovLockup {
     function createLock(uint256 _amount, uint256 _lockTime) public {
         require(_amount > 0, "amount = 0");
 
-        require(_lockTime >= MIN_LOCK_TIME, "lock time too small");
-        require(_lockTime <= MAX_LOCK_TIME, "lock time too great");
+        require(_lockTime + 1 > MIN_LOCK_TIME, "lock time too small");
+        require(_lockTime - 1 < MAX_LOCK_TIME, "lock time too great");
 
         require(!getLockExists(msg.sender), "lock exists");
 
