@@ -33,7 +33,7 @@ var websocketUpgrader = websocket.Upgrader{
 // Endpoint handles a HTTP request and upgrades it, giving the user a
 // channel to receive messages down and a reply channel to send messages
 // to the websocket.
-func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, chan<- []byte, chan error, <-chan bool)) {
+func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, chan<- []byte, chan<- error, <-chan bool)) {
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		ipAddress := r.Header.Get(web.HeaderIpAddress)
 
