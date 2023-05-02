@@ -445,6 +445,8 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 		&userAction.Time,
 		&userAction.TokenDetails.TokenShortName,
 		&userAction.TokenDetails.TokenDecimals,
+		&userAction.SolanaSenderOwnerAddress,
+		&userAction.SolanaRecipientOwnerAddress,
 	)
 
 	if err != nil {
