@@ -72,7 +72,7 @@ const SwapCompleteModal = ({
   }, []);
 
   return (
-    <Modal visible={visible}>
+    <Modal id="swap=complete" visible={visible}>
       <div className="cover" style={{ padding: 0 }}>
         <motion.div
           variants={variants}

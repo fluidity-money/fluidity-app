@@ -398,7 +398,7 @@ contract DAOStable {
         require(getProposalVoteable(_proposalId), "proposal not voteable");
 
         require(
-          getAmountAvailable(_proposalId, msg.sender) >= _amount,
+          getAmountAvailable(_proposalId, msg.sender) + 1 > _amount,
           "not enough available"
         );
 
@@ -417,7 +417,7 @@ contract DAOStable {
         require(getProposalVoteable(_proposalId), "proposal not voteable");
 
         require(
-          getAmountAvailable(_proposalId, msg.sender) >= _amount,
+          getAmountAvailable(_proposalId, msg.sender) + 1 > _amount,
           "not enough available"
         );
 

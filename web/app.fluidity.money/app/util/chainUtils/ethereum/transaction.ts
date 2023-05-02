@@ -44,62 +44,6 @@ export const usdBalanceOfERC20 = async (
   return Number(utils.formatUnits(balance, decimals));
 };
 
-// whether the per-user mint limit is enabled for the contract
-export const userMintLimitEnabled = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface
-): Promise<boolean> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return false;
-
-  try {
-    return await contract.mintLimitsEnabled();
-  } catch (e) {
-    console.error(e);
-  }
-  return false;
-};
-
-// the user mint limit for the contract, regardless of whether it's enabled
-export const getUserMintLimit = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface
-): Promise<BN> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return new BN(0);
-  return new BN((await contract.userMintLimit()).toString());
-};
-
-// the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
-export const getUsdUserMintLimit = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface
-): Promise<number> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return 0;
-
-  const limit = (await contract.userMintLimit()).toString();
-  const decimals = (await contract.decimals()).toString();
-
-  return Number(utils.formatUnits(limit, decimals));
-};
-
-// the amount towards the mint limit the given user has currently minted
-export const getAmountMinted = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface,
-  userAddress: string
-): Promise<BN> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return new BN(0);
-
-  return new BN((await contract.userAmountMinted(userAddress)).toString());
-};
-
 // the amount towards the mint limit the given user has currently minted scaled by decimals
 export const getUsdAmountMinted = async (
   provider: JsonRpcProvider,
