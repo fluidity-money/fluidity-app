@@ -14,10 +14,8 @@ const queryByUser = gql`
 `;
 
 const queryAllTime = gql`
-  query AirdropLeaderboard() {
-    airdrop_leaderboard(
-      limit: 16
-    ) {
+  query AirdropLeaderboard {
+    airdrop_leaderboard(limit: 16, order_by: { total_lootboxes: desc }) {
       user: address
       rank
       referralCount: referral_count
@@ -42,14 +40,14 @@ export type AirdropLeaderboardEntry = {
   user: string;
   rank: number;
   referralCount: number;
-  totalLootboxes: number;
+  bottles: number;
   highestRewardTier: number;
   liquidityMultiplier: number;
 };
 
 type AirdropLeaderboardResponse = {
   data?: {
-    leaderboard: Array<AirdropLeaderboardEntry>;
+    airdrop_leaderboard: Array<AirdropLeaderboardEntry>;
   };
   errors?: unknown;
 };
