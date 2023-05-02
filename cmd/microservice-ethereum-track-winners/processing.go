@@ -8,7 +8,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	winnersQueue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
@@ -60,7 +59,7 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 	sendRewards(winnersQueue.TopicWinnersEthereum, convertedWinners)
 }
 
-func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork, logIndex misc.BigInt) {
+func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
 	var (
 		rewardData   = data.RewardData
 		winnerString = rewardData.Winner.String()
