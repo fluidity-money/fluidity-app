@@ -15,7 +15,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
+	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
+
+// EnvNetwork to match the endpoint for
+const EnvNetwork = `FLU_ETHEREUM_NETWORK`
 
 const (
 	NotificationTypeOnchain = iota + 1
@@ -42,6 +47,26 @@ type registration struct {
 }
 
 func main() {
+	network__ := util.GetEnvOrFatal(EnvNetwork)
+
+	network_, err := network.ParseEthereumNetwork(network__)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to parse the Ethereum network!"
+			k.Payload = err
+		})
+	}
+
+	endpoint, err := url.JoinPath("/", string(network_))
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to join the network to create an endpoint!"
+			k.Payload = err
+		})
+	}
+
 	var (
 		registrations       = make(chan registration)
 		incomingWinners     = make(chan winners.Winner)
@@ -170,7 +195,7 @@ func main() {
 		}
 	}()
 
-	websocket.Endpoint("/", func(ipAddress string, query url.Values, incoming <-chan []byte, outgoing chan<- []byte, requestShutdown chan<- error, shutdown <-chan bool) {
+	websocket.Endpoint(endpoint, func(ipAddress string, query url.Values, incoming <-chan []byte, outgoing chan<- []byte, requestShutdown chan<- error, shutdown <-chan bool) {
 		var (
 			broadcast         *websocket.Broadcast
 			broadcastMessages chan []byte
