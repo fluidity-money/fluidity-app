@@ -64,3 +64,12 @@ Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
 Twitter: [https://twitter.com/fluiditymoney](https://twitter.com/fluiditymoney)
 
 Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)
+
+#### Coingecko
+
+| Asset | URL                                                                                            |
+| ----- | ---------------------------------------------------------------------------------------------- |
+| fUSDC | [https://www.coingecko.com/en/coins/fluid-usdc](https://www.coingecko.com/en/coins/fluid-usdc) |
+| fUSDT | [https://www.coingecko.com/en/coins/fluid-usdt](https://www.coingecko.com/en/coins/fluid-usdt) |
+| fDAI  | [https://www.coingecko.com/en/coins/fluid-dai](https://www.coingecko.com/en/coins/fluid-dai)   |
+
