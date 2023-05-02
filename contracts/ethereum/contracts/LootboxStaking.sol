@@ -20,8 +20,6 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
