@@ -26,7 +26,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const url = new URL(request.url);
 
-  const address = url.searchParams.get("address");
+  const address_ = url.searchParams.get("address") ?? "";
+
+  const address = address_.toLocaleLowerCase();
 
   if (!address) {
     throw new Error("Invalid Request");
