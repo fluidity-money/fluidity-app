@@ -80,6 +80,7 @@ func main() {
 			logTopics       = ethLog.Topics
 			logData         = ethLog.Data
 			logAddress      = ethLog.Address
+			logIndex        = ethLog.Index
 		)
 
 		log.Debugf(
@@ -141,6 +142,7 @@ func main() {
 				time,
 				tokenShortName,
 				tokenDecimals,
+				logIndex,
 			)
 
 		case microservice_user_actions.EventMintFluid:
