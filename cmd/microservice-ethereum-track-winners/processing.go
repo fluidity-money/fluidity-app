@@ -8,6 +8,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	winnersQueue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
@@ -59,7 +60,7 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 	sendRewards(winnersQueue.TopicWinnersEthereum, convertedWinners)
 }
 
-func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
+func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork, logIndex misc.BigInt) {
 	var (
 		rewardData   = data.RewardData
 		winnerString = rewardData.Winner.String()
@@ -115,22 +116,24 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			rewardType     = pendingReward.RewardType
 			winAmount      = pendingReward.WinAmount
 			rewardTier     = pendingReward.RewardTier
+			logIndex       = pendingReward.LogIndex
 		)
 
 		winners[i] = winnersDb.Winner{
-			Application:         appString,
-			Network:             network,
-			TransactionHash:     hashString,
-			SendTransactionHash: sendHashString,
-			WinnerAddress:       addressString,
-			WinningAmount:       winAmount,
-			AwardedTime:         when,
-			RewardType:          rewardType,
-			BatchFirstBlock:     startBlock,
-			BatchLastBlock:      endBlock,
-			RewardTier:          rewardTier,
-			TokenDetails:        details,
-			Utility:             utility,
+			Application:             appString,
+			Network:                 network,
+			TransactionHash:         hashString,
+			SendTransactionHash:     sendHashString,
+			WinnerAddress:           addressString,
+			WinningAmount:           winAmount,
+			AwardedTime:             when,
+			RewardType:              rewardType,
+			BatchFirstBlock:         startBlock,
+			BatchLastBlock:          endBlock,
+			RewardTier:              rewardTier,
+			TokenDetails:            details,
+			Utility:                 utility,
+			SendTransactionLogIndex: logIndex,
 		}
 	}
 
