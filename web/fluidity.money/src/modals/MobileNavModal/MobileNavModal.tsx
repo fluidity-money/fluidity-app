@@ -112,9 +112,9 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
       </a>
       <a
         className={`${styles.button} ${styles.smaller}`}
-        href="mailto:contact@fluidity.money"
+        href="https://discord.gg/fluidity"
       >
-        <Heading as="h3">LET'S CHAT</Heading>
+        <Heading as="h3">DISCORD</Heading>
       </a>
     </div>
   );
