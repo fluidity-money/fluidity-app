@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
@@ -381,4 +382,78 @@ func GetUserActions(f func(userAction UserAction)) {
 
 		f(userAction)
 	}
+}
+
+// GetUserActionByLogIndex to find a user action in a transaction that has the given log index
+func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash string, logIndex misc.BigInt) user_actions.UserAction {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT
+			event_number,
+			type,
+			transaction_hash,
+			log_index,
+			swap_in,
+			sender_address,
+			recipient_address,
+			amount,
+			time,
+			token_short_name,
+			token_decimals,
+			solana_sender_owner_address,
+			solana_recipient_owner_address
+
+		FROM %v
+		WHERE network = $1
+		AND transaction_hash = $2
+		AND log_index = $3`,
+
+		TableUserActions,
+	)
+
+	row, err := timescaleClient.Query(
+		statementText,
+		network,
+		transactionHash,
+		logIndex,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to get user actions with a log index!"
+			k.Payload = err
+		})
+	}
+
+	defer row.Close()
+
+	userAction := UserAction{
+		Network: network,
+	}
+
+	err = row.Scan(
+		&userAction.EventNumber,
+		&userAction.Type,
+		&userAction.TransactionHash,
+		&userAction.LogIndex,
+		&userAction.SwapIn,
+		&userAction.SenderAddress,
+		&userAction.RecipientAddress,
+		&userAction.Amount,
+		&userAction.Time,
+		&userAction.TokenDetails.TokenShortName,
+		&userAction.TokenDetails.TokenDecimals,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to scan a user action row filtered by log index!"
+			k.Payload = err
+		})
+	}
+
+	return userAction
 }
