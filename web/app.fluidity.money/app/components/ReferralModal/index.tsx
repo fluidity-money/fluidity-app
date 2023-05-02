@@ -84,7 +84,7 @@ const ReferralModal = ({
         </div>
 
         <div>
-          <Heading as={"h4"} className="referrals-heading">
+          <Heading as={"h5"} className="referrals-heading">
             YOU HAVE {referrerClaimed}
             <Hoverable
               tooltipContent={
