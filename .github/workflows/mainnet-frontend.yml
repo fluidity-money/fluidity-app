@@ -15,12 +15,19 @@ env:
   ENVIRONMENT: mainnet
 
 jobs:
+  codecov:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
   get-diff:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: mainnet
     outputs:
-      file_exists: ${{ steps.deployment_list.outputs.exist }} 
+      file_exists: ${{ steps.deployment_list.outputs.exist }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -85,7 +92,7 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
