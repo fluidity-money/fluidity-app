@@ -2,6 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 import { Suspense, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useChainContext } from "hooks/ChainContext";
 import {
   BlockchainModal,
@@ -120,19 +121,21 @@ const RewardsInfoBox = ({
             </motion.div>
           )}
         </Heading>
-        {showModal && (
-          <BlockchainModal
-            handleModal={setShowModal}
-            option={{
-              name: chain,
-              icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
-            }}
-            className={styles.overlap}
-            options={chainOptions}
-            setOption={setChain}
-            mobile={width <= mobileBreakpoint && width > 0}
-          />
-        )}
+        {showModal &&
+          createPortal(
+            <BlockchainModal
+              handleModal={setShowModal}
+              option={{
+                name: chain,
+                icon: <img src={imgLink(chain)} alt={`${chain}-selected`} />,
+              }}
+              className={styles.overlap}
+              options={chainOptions}
+              setOption={setChain}
+              mobile={width <= mobileBreakpoint && width > 0}
+            />,
+            document.body
+          )}
         {/* <LinkButton size={"medium"} type={"internal"} handleClick={() => {}}>
           FLUID STATS
         </LinkButton> */}
