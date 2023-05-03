@@ -1,7 +1,7 @@
 -- migrate:up
 
 ALTER TABLE user_actions
-	ADD COLUMN log_index BIGINT;
+	ADD COLUMN log_index BIGINT NOT NULL DEFAULT 0;
 
 -- migrate:down
 
