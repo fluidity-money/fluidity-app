@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-package connector_common_twitter_fluidity_hashtag_amqp
+package twitter
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	twitter "github.com/fluidity-money/fluidity-app/lib/types/twitter"
 )
@@ -291,6 +292,7 @@ func handleStreaming(stream io.Reader, chanTweets chan twitter.Tweet) error {
 		switch err {
 		case io.EOF:
 			log.Fatal(func(k *log.Log) {
+				k.Context = Context
 				k.Message = "Twitter connector connection closed!"
 			})
 
@@ -298,6 +300,7 @@ func handleStreaming(stream io.Reader, chanTweets chan twitter.Tweet) error {
 
 		default:
 			log.Fatal(func(k *log.Log) {
+				k.Context = Context
 				k.Message = "Failed to decode a tweet off the Twitter queue!"
 				k.Payload = err
 			})
@@ -333,8 +336,8 @@ func handleStreaming(stream io.Reader, chanTweets chan twitter.Tweet) error {
 	}
 }
 
-// RunStreamTweets with a seperate goroutine following a hashtag
-func RunStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Tweet, <-chan error, error) {
+// runStreamTweets with a seperate goroutine following a hashtag
+func runStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Tweet, <-chan error, error) {
 	twitterTransport := twitterBearerTransport{
 		bearerToken: bearerToken,
 	}
@@ -353,6 +356,7 @@ func RunStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Twe
 	}
 
 	log.App(func(k *log.Log) {
+		k.Context = Context
 		k.Message = "Deleting the following stream rules: "
 		k.Payload = streamRulesIds
 	})
@@ -365,6 +369,7 @@ func RunStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Twe
 	}
 
 	log.App(func(k *log.Log) {
+		k.Context = Context
 		k.Message = "Setting the stream rules to include"
 		k.Payload = hashtags
 	})
@@ -377,6 +382,7 @@ func RunStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Twe
 	}
 
 	log.App(func(k *log.Log) {
+		k.Context = Context
 		k.Message = "Set the stream rules! Streaming!"
 	})
 
@@ -422,4 +428,45 @@ func RunStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Twe
 	}()
 
 	return chanTweets, chanErrors, nil
+}
+
+// runStreamTweets with a seperate goroutine following a hashtag
+func StreamTweets() <-chan twitter.Tweet {
+	var (
+		twitterBearerToken = util.GetEnvOrFatal(EnvTwitterBearerToken)
+		hashtags_          = util.GetEnvOrFatal(EnvHashtags)
+	)
+
+	hashtags := splitHashtags(hashtags_)
+
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+
+		k.Format(
+			"Starting to stream for the hashtags %#v!",
+			hashtags,
+		)
+	})
+
+	tweets, errors, err := runStreamTweets(twitterBearerToken, hashtags...,)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to start streaming tweets!"
+			k.Payload = err
+		})
+	}
+
+	go func() {
+		for err := range errors {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "Error streaming tweets!"
+				k.Payload = err
+			})
+		}
+	}()
+
+	return tweets
 }
