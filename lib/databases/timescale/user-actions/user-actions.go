@@ -412,28 +412,18 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 		TableUserActions,
 	)
 
-	row, err := timescaleClient.Query(
+	row := timescaleClient.QueryRow(
 		statementText,
 		network,
 		transactionHash,
 		logIndex,
 	)
 
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Failed to get user actions with a log index!"
-			k.Payload = err
-		})
-	}
-
-	defer row.Close()
-
 	userAction := UserAction{
 		Network: network,
 	}
 
-	err = row.Scan(
+	err := row.Scan(
 		&userAction.EventNumber,
 		&userAction.Type,
 		&userAction.TransactionHash,
