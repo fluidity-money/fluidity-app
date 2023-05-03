@@ -60,7 +60,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 	)
 }
 
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) UserAction {
 	return user_actions.NewSendEthereum(
 		network_,
 		senderAddress,
@@ -69,6 +69,7 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 		amount,
 		tokenShortName,
 		tokenDecimals,
+		logIndex,
 	)
 }
 
