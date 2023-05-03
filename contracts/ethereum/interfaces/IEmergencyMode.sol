@@ -11,6 +11,10 @@ interface IEmergencyMode {
     /// @notice emitted when the contract enters emergency mode!
     event Emergency(bool indexed status);
 
+    /// @notice should be emitted when the emergency council changes
+    ///         if this implementation supports that
+    event NewCouncil(address indexed oldCouncil, address indexed newCouncil);
+
     /**
      * @notice enables emergency mode preventing the swapping in of tokens,
      * @notice and setting the rng oracle address to null

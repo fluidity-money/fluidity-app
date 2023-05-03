@@ -309,6 +309,7 @@ contract Token is
      * @dev rewards two users from the reward pool
      * @dev mints tokens and emits the reward event
      *
+     * @param firstBlock the first block in the range being rewarded for
      * @param lastBlock the last block in the range being rewarded for
      * @param winner the address being rewarded
      * @param amount the amount being rewarded
@@ -436,10 +437,6 @@ contract Token is
 
     /* ~~~~~~~~~~ EXTRA FUNCTIONS ~~~~~~~~~~ */
 
-    function userAmountMinted(address /* account */) public pure returns (uint) {
-        return 0;
-    }
-
     function updateOracle(address _newOracle) public {
         require(msg.sender == operator_, "only operator");
 
@@ -454,9 +451,9 @@ contract Token is
         require(msg.sender == operator_, "operator only");
         require(_newOperator != address(0), "new operator zero");
 
-        operator_ = _newOperator;
+        emit NewOperator(operator_, _newOperator);
 
-        emit OperatorChanged(operator_, _newOperator);
+        operator_ = _newOperator;
     }
 
     /* ~~~~~~~~~~ IMPLEMENTS IOperatorOwned ~~~~~~~~~~ */
@@ -495,6 +492,19 @@ contract Token is
 
     function emergencyCouncil() public view returns (address) {
         return emergencyCouncil_;
+    }
+
+    /**
+     * @notice updates the emergency council address
+     * @notice (operator only)
+     * @param newCouncil the new council address
+     */
+    function updateEmergencyCouncil(address newCouncil) external {
+        require(msg.sender == operator_, "operator only");
+
+        emit NewCouncil(emergencyCouncil_, newCouncil);
+
+        emergencyCouncil_ = newCouncil;
     }
 
     /* ~~~~~~~~~~ IMPLEMENTS IToken ~~~~~~~~~~ */

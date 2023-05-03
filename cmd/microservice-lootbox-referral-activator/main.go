@@ -53,6 +53,7 @@ func main() {
 					"Lootbox was not derived from transaction - SKIPPING!",
 				)
 			})
+			return
 		}
 
 		// log error if event is missing transactionHash or address

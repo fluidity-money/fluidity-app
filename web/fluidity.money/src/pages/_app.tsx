@@ -76,9 +76,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     };
   }, [width, breakpoint]);
 
-  const splitUser = 
+  const splitUser =
     process.env.NODE_ENV === "development" ||
-    (!!location && location.hostname.includes('staging')) 
+    (!!location && location.hostname.includes('staging'))
       ? "dev"
       : "user";
 
