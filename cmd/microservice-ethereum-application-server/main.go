@@ -237,7 +237,7 @@ func main() {
 
 			if !exists {
 				log.Fatal(func(k *log.Log) {
-				    k.Format(
+					k.Format(
 						"Transaction %s in block %s is unreferenced!",
 						transactionHash.String(),
 						blockLog.BlockHash,
@@ -248,14 +248,14 @@ func main() {
 			convertedReceipt, err := getReceipt(gethClient, transactionHash)
 
 			if err != nil {
-			    log.Fatal(func(k *log.Log) {
-			        k.Format(
+				log.Fatal(func(k *log.Log) {
+					k.Format(
 						"Failed to fetch receipt for transaction %s!",
 						transactionHash.String(),
 					)
 
-			        k.Payload = err
-			    })
+					k.Payload = err
+				})
 			}
 
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
@@ -360,14 +360,14 @@ func main() {
 				receipt, err := getReceipt(gethClient, transactionHash)
 
 				if err != nil {
-				    log.Fatal(func(k *log.Log) {
-				        k.Format(
+					log.Fatal(func(k *log.Log) {
+						k.Format(
 							"Failed to fetch receipt for transaction %s!",
 							transactionHash.String(),
 						)
 
-				        k.Payload = err
-				    })
+						k.Payload = err
+					})
 				}
 
 				decoratedTransaction.Receipt = *receipt

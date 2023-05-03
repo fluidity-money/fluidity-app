@@ -33,11 +33,10 @@ type SwapInstruction struct {
 // this is the first 8 bytes of sha256('global:swap')
 var LifinitySwapInstructionVariant = []byte{248, 198, 158, 145, 225, 117, 135, 200}
 
-
 // FeeData is the fee for a Lifinity swap transaction
 type FeeData struct {
 	Fee     uint64  `json:"fee"`
-	Percent float32	`json:"percent"`
+	Percent float32 `json:"percent"`
 }
 
 func GetLogFees(logs []string, lifinityProgramID string, transactionSignature string) (logFees []uint64, err error) {
@@ -48,7 +47,6 @@ func GetLogFees(logs []string, lifinityProgramID string, transactionSignature st
 		searchString = "Program log: TotalFee: "
 		inSwapLogs   = false
 	)
-
 
 	for i, logString := range logs {
 
@@ -91,11 +89,11 @@ func GetLogFees(logs []string, lifinityProgramID string, transactionSignature st
 }
 
 func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionResult, lifinityProgramID string, fluidTokens map[string]string) (feesPaid *big.Rat, err error) {
-	
+
 	var (
 		transactionSignature = transaction.Transaction.Signatures[0]
 		accountKeys          = transaction.Transaction.Message.AccountKeys
-		adjustedPrices         []*big.Rat
+		adjustedPrices       []*big.Rat
 	)
 
 	allInstructions := solLib.GetAllInstructions(transaction)
@@ -121,9 +119,9 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 			instructionNumber,
 			transactionSignature,
 		)
-		
-		instructionByteData := base58.Decode(instruction.Data)	
-		
+
+		instructionByteData := base58.Decode(instruction.Data)
+
 		enoughInstructionBytes := len(instructionByteData) >= LifinitySwapInstructionSize
 
 		if !enoughInstructionBytes {
@@ -161,10 +159,9 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 			transactionSignature,
 		)
 
-
 		var (
 			// get user source & destination accounts
-			instructionAccounts = instruction.Accounts
+			instructionAccounts       = instruction.Accounts
 			userSourceSplAccount      = accountKeys[instructionAccounts[5]]
 			userDestinationSplAccount = accountKeys[instructionAccounts[6]]
 		)
@@ -227,7 +224,6 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 				err,
 			)
 		}
-
 
 		// get the mint of the destination account
 
@@ -315,7 +311,7 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 			transactionSignature,
 			price,
 		)
-		
+
 		// Adjust token price by decimals
 		decimalScalingFactor := math.Pow10(int(decimals))
 		decimalRat := new(big.Rat).SetFloat64(decimalScalingFactor)
@@ -355,7 +351,7 @@ func GetLifinityFees(solanaClient *rpc.Provider, transaction types.TransactionRe
 		feeAmount = feeAmount.Mul(feeAmount, price)
 
 		feesPaid.Add(feesPaid, feeAmount)
-	}	
+	}
 
 	return feesPaid, nil
 }

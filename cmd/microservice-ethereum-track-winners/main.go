@@ -61,7 +61,7 @@ func main() {
 	network_, err := network.ParseEthereumNetwork(net_)
 
 	if err != nil {
-		logging.Fatal(func (k *logging.Log) {
+		logging.Fatal(func(k *logging.Log) {
 			k.Message = "Failed to read an ethereum network from env!"
 			k.Payload = err
 		})

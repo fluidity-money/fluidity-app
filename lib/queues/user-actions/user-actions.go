@@ -8,9 +8,9 @@ package user_actions
 
 import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 

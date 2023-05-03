@@ -10,7 +10,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
-
 // Context used in logging the signature for the desired events
 const Context = "MICROSERVICE_USER_ACTIONS"
 

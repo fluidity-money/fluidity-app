@@ -11,18 +11,18 @@ import (
 
 func convertBlockedPayout(winner *winners.Winner) winners.BlockedWinner {
 	var (
-		tokenDetails = winner.TokenDetails
+		tokenDetails    = winner.TokenDetails
 		transactionHash = winner.TransactionHash
-		winnerAddress = winner.WinnerAddress
-		winningAmount = winner.WinningAmount
+		winnerAddress   = winner.WinnerAddress
+		winningAmount   = winner.WinningAmount
 	)
 
 	blockedWinner := winners.BlockedWinner{
-		Network:                 network.NetworkSolana,
-		Token:                   tokenDetails,
-		RewardTransactionHash:   transactionHash,
-		WinnerAddress:           winnerAddress,
-		WinningAmount:           winningAmount,
+		Network:               network.NetworkSolana,
+		Token:                 tokenDetails,
+		RewardTransactionHash: transactionHash,
+		WinnerAddress:         winnerAddress,
+		WinningAmount:         winningAmount,
 	}
 
 	return blockedWinner

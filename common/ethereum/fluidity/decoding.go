@@ -43,7 +43,7 @@ func TryDecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Re
 
 	var (
 		eventSignatureString = logTopics[0].String()
-		eventSignature = ethCommon.HexToHash(eventSignatureString)
+		eventSignature       = ethCommon.HexToHash(eventSignatureString)
 
 		blocked bool
 	)
@@ -87,7 +87,7 @@ func TryDecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Re
 	}
 
 	var (
-		winnerString  = logTopics[1].String()
+		winnerString = logTopics[1].String()
 
 		amountInt     = decodedData[0].(*big.Int)
 		startBlockInt = decodedData[1].(*big.Int)
@@ -95,7 +95,7 @@ func TryDecodeRewardData(log typesEth.Log, token token_details.TokenDetails) (Re
 	)
 
 	var (
-		winner     = ethCommon.HexToAddress(winnerString)
+		winner = ethCommon.HexToAddress(winnerString)
 
 		amount     = misc.NewBigIntFromInt(*amountInt)
 		startBlock = misc.NewBigIntFromInt(*startBlockInt)
@@ -124,7 +124,7 @@ func TryDecodeUnblockedRewardData(log typesEth.Log, token token_details.TokenDet
 
 	var (
 		eventSignatureString = logTopics[0].String()
-		eventSignature = ethCommon.HexToHash(eventSignatureString)
+		eventSignature       = ethCommon.HexToHash(eventSignatureString)
 	)
 
 	if eventSignature != FluidityContractAbi.Events["UnblockReward"].ID {
@@ -189,72 +189,72 @@ func TryDecodeUnblockedRewardData(log typesEth.Log, token token_details.TokenDet
 }
 
 func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
-    var (
-        logTopics = l.Topics
-        logData   = l.Data
+	var (
+		logTopics = l.Topics
+		logData   = l.Data
 
-        stakingEvent ethereum.StakingEvent
-    )
+		stakingEvent ethereum.StakingEvent
+	)
 
-    var (
-        eventSignatureString = logTopics[0].String()
-        eventSignature       = ethCommon.HexToHash(eventSignatureString)
-    )
+	var (
+		eventSignatureString = logTopics[0].String()
+		eventSignature       = ethCommon.HexToHash(eventSignatureString)
+	)
 
-    switch eventSignature {
-    case StakingAbi.Events["Staked"].ID:
+	switch eventSignature {
+	case StakingAbi.Events["Staked"].ID:
 
-        decodedData, err := StakingAbi.Unpack("Staked", logData)
+		decodedData, err := StakingAbi.Unpack("Staked", logData)
 
-        if err != nil {
-            return stakingEvent, fmt.Errorf(
-                "failed to unpack Staked event data! %v",
-                err,
-            )
-        }
-
-        // lockupLength, lockedTimestamp, fusdcAmount, usdAmount, wethAmount
-        if dataLen := len(decodedData); dataLen != 5 {
-            return stakingEvent, fmt.Errorf(
-                "Unexpected number of log data! expected %d, got %d!",
-                5,
-                dataLen,
-            )
-        }
-
-        // event, sender address
-        if topicsLen := len(logTopics); topicsLen != 2 {
-            return stakingEvent, fmt.Errorf(
-                "Unexpected number of log topics! expected %d, got %d!",
-                2,
-                topicsLen,
-            )
-        }
-
-        var (
-            addressString      = logTopics[1].String()
-            lockupLengthInt    = decodedData[0].(*big.Int)
-            lockedTimestampInt = decodedData[1].(*big.Int)
-            usdAmountInt       = decodedData[3].(*big.Int)
-        )
-
-        if !lockedTimestampInt.IsInt64() {
+		if err != nil {
 			return stakingEvent, fmt.Errorf(
-				"Decoded a timestamp that was larger than int64! %v", 
+				"failed to unpack Staked event data! %v",
+				err,
+			)
+		}
+
+		// lockupLength, lockedTimestamp, fusdcAmount, usdAmount, wethAmount
+		if dataLen := len(decodedData); dataLen != 5 {
+			return stakingEvent, fmt.Errorf(
+				"Unexpected number of log data! expected %d, got %d!",
+				5,
+				dataLen,
+			)
+		}
+
+		// event, sender address
+		if topicsLen := len(logTopics); topicsLen != 2 {
+			return stakingEvent, fmt.Errorf(
+				"Unexpected number of log topics! expected %d, got %d!",
+				2,
+				topicsLen,
+			)
+		}
+
+		var (
+			addressString      = logTopics[1].String()
+			lockupLengthInt    = decodedData[0].(*big.Int)
+			lockedTimestampInt = decodedData[1].(*big.Int)
+			usdAmountInt       = decodedData[3].(*big.Int)
+		)
+
+		if !lockedTimestampInt.IsInt64() {
+			return stakingEvent, fmt.Errorf(
+				"Decoded a timestamp that was larger than int64! %v",
 				lockedTimestampInt.String(),
 			)
-        }
+		}
 
-        lockedTimestampInt64 := lockedTimestampInt.Int64()
-        lockedTimestamp := time.Unix(lockedTimestampInt64, 0)
+		lockedTimestampInt64 := lockedTimestampInt.Int64()
+		lockedTimestamp := time.Unix(lockedTimestampInt64, 0)
 
-        stakingEvent.Address = ethereum.AddressFromString(addressString)
-        stakingEvent.InsertedDate = lockedTimestamp
-        stakingEvent.UsdAmount = misc.NewBigIntFromInt(*usdAmountInt)
-        stakingEvent.LockupLength = int(lockupLengthInt.Int64())
+		stakingEvent.Address = ethereum.AddressFromString(addressString)
+		stakingEvent.InsertedDate = lockedTimestamp
+		stakingEvent.UsdAmount = misc.NewBigIntFromInt(*usdAmountInt)
+		stakingEvent.LockupLength = int(lockupLengthInt.Int64())
 
-        return stakingEvent, nil
-    default:
-        return stakingEvent, ErrWrongEvent
-    }
+		return stakingEvent, nil
+	default:
+		return stakingEvent, ErrWrongEvent
+	}
 }

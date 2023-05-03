@@ -21,8 +21,8 @@ type (
 		DeltaWeightDenom  *big.Int `abi:"deltaWeightDenom"`
 	}
 	scannedUtilityVar struct {
-		Vars  utilityVars `abi:"vars"`
-		Name  string      `abi:"name"`
+		Vars utilityVars `abi:"vars"`
+		Name string      `abi:"name"`
 	}
 )
 
@@ -42,7 +42,7 @@ func GetUtilityVars(client *ethclient.Client, registryAddress, tokenAddress ethC
 	}
 
 	var utilityVar []scannedUtilityVar
-	results := []interface{} { &utilityVar }
+	results := []interface{}{&utilityVar}
 
 	err := boundContract.Call(
 		&opts,

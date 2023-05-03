@@ -180,7 +180,6 @@ func main() {
 					bufferedUserActions = append(bufferedUserActions, *transfer2)
 				}
 
-
 				if winner1 != nil {
 					log.App(func(k *log.Log) {
 						k.Message = "Found a winner!"

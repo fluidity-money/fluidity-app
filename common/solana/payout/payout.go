@@ -22,21 +22,21 @@ type (
 	// PayoutArgs to use for the payout instruction functions -
 	// some don't need to be set for CreatePayoutInstruction
 	PayoutArgs struct {
-		FluidityProgramPubkey    solana.PublicKey
-		DataAccountPubkey solana.PublicKey
-		MetaSplPubkey     solana.PublicKey
-		TokenMintPubkey   solana.PublicKey
-		FluidMintPubkey   solana.PublicKey
-		PdaPubkey         solana.PublicKey
-		ObligationPubkey  solana.PublicKey
-		ReservePubkey     solana.PublicKey
-		AccountAPubkey    solana.PublicKey
-		AccountBPubkey    solana.PublicKey
-		PayerPubkey       solana.PublicKey
-		WinningAmount     uint64
-		TokenName         string
-		BumpSeed          uint8
-		RecentBlockHash   solana.Hash
+		FluidityProgramPubkey solana.PublicKey
+		DataAccountPubkey     solana.PublicKey
+		MetaSplPubkey         solana.PublicKey
+		TokenMintPubkey       solana.PublicKey
+		FluidMintPubkey       solana.PublicKey
+		PdaPubkey             solana.PublicKey
+		ObligationPubkey      solana.PublicKey
+		ReservePubkey         solana.PublicKey
+		AccountAPubkey        solana.PublicKey
+		AccountBPubkey        solana.PublicKey
+		PayerPubkey           solana.PublicKey
+		WinningAmount         uint64
+		TokenName             string
+		BumpSeed              uint8
+		RecentBlockHash       solana.Hash
 	}
 )
 

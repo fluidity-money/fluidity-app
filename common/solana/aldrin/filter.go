@@ -353,7 +353,7 @@ func isAldrinStableSwap(solanaClient *rpc.Provider, instructions []types.Transac
 		// get the second and third inner instructions originating from this instruction
 		var innerInstruction types.TransactionInnerInstruction
 
-		for _, inner := range(innerInstructions) {
+		for _, inner := range innerInstructions {
 			if inner.Index == instructionNumber {
 				innerInstruction = inner
 			}

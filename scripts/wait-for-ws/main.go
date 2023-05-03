@@ -52,9 +52,8 @@ func main() {
 
 	var (
 		ticker = time.Tick(time.Second)
-		err error
+		err    error
 	)
-
 
 	for attempt := 0; attempt < attemptCount; attempt++ {
 		_ = <-ticker

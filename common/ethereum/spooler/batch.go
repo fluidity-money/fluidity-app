@@ -26,7 +26,7 @@ func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details
 		firstRewardBlock = winnings[0].BlockNumber
 
 		firstBlockInt = new(big.Int).Set(&firstRewardBlock.Int)
-		lastBlockInt = new(big.Int).Set(&firstRewardBlock.Int)
+		lastBlockInt  = new(big.Int).Set(&firstRewardBlock.Int)
 	)
 
 	for _, reward := range winnings {
@@ -75,9 +75,8 @@ func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details
 
 	var (
 		firstBlock = misc.NewBigIntFromInt(*firstBlockInt)
-		lastBlock = misc.NewBigIntFromInt(*lastBlockInt)
+		lastBlock  = misc.NewBigIntFromInt(*lastBlockInt)
 	)
 
 	return firstBlock, lastBlock, rewards, nil
 }
-

@@ -20,14 +20,15 @@ func intFromEnvOrFatal(env string) int {
 	num, err := strconv.Atoi(numString)
 
 	if err != nil {
-	    log.Fatal(func(k *log.Log) {
-	        k.Format("Failed to read an int from environment variable %s!", env)
-	        k.Payload = err
-	    })
+		log.Fatal(func(k *log.Log) {
+			k.Format("Failed to read an int from environment variable %s!", env)
+			k.Payload = err
+		})
 	}
 
 	return num
 }
+
 // parseApplications takes a list of name:address,name:address and returns
 // a mapping of address:application
 func parseApplications(list string) map[string]applications.Application {
