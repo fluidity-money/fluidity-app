@@ -73,6 +73,7 @@ func main() {
 				toWinAmount      = announcement.ToWinAmount
 				application      = announcement.Application
 				rewardTier       = announcement.RewardTier
+				logIndex         = announcement.LogIndex
 
 				blockNumber = uint64(blockNumberInt.Int64())
 			)
@@ -89,6 +90,7 @@ func main() {
 				toWinAmount,
 				application,
 				rewardTier,
+				*logIndex,
 			)
 
 			var totalWinAmount float64

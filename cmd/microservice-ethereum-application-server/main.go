@@ -319,6 +319,7 @@ func main() {
 				decoratedTransfer := worker.EthereumDecoratedTransfer{
 					TransactionHash:  transactionHash,
 					SenderAddress:    sender,
+					LogIndex:         &transfer.Log.Index,
 					RecipientAddress: recipient,
 					Decorator:        decorator,
 					AppEmissions:     emission,
@@ -377,12 +378,14 @@ func main() {
 				from      = fluidTransfer.SenderAddress
 				to        = fluidTransfer.RecipientAddress
 				decorator = fluidTransfer.Decorator
+				logIndex  = fluidTransfer.LogIndex
 			)
 
 			transfer := worker.EthereumDecoratedTransfer{
 				TransactionHash:  transactionHash,
 				SenderAddress:    from,
 				RecipientAddress: to,
+				LogIndex:         logIndex,
 				Decorator:        decorator,
 				AppEmissions:     worker.EthereumAppFees{},
 			}

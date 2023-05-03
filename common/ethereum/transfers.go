@@ -46,6 +46,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 		var (
 			transferContractAddress_ = transferLog.Address.String()
 			topics                   = transferLog.Topics
+			logIndex                 = transferLog.Index
 		)
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
@@ -120,6 +121,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			SenderAddress:    fromAddress,
 			RecipientAddress: toAddress,
 			TransactionHash:  transactionHash,
+			LogIndex:         &logIndex,
 			Decorator:        decorator,
 		}
 
