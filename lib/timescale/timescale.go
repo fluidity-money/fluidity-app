@@ -34,15 +34,15 @@ var (
 // Client should be used to get a handle on the database client
 func Client() *sql.DB {
 	pc, file, linenum, ok := runtime.Caller(1)
-	if (!ok) {
-		log.Debug(func (k *log.Log) {
+	if !ok {
+		log.Debug(func(k *log.Log) {
 			k.Context = Context
 			k.Message = "Timescale client being acquired by an unknown caller..."
 		})
 	} else {
 		details := runtime.FuncForPC(pc)
 
-		log.Debug(func (k *log.Log) {
+		log.Debug(func(k *log.Log) {
 			k.Context = Context
 			k.Format(
 				"Timescale client being acquired by %s, %s:%d",
@@ -54,7 +54,6 @@ func Client() *sql.DB {
 	}
 
 	<-readyChan
-
 
 	log.Debug(func(k *log.Log) {
 		k.Context = Context

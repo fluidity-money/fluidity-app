@@ -45,7 +45,9 @@ func responseErr(response serverResponse, err interface{}) serverResponse {
 // marshal then unescape json.Marshal's string encoding, so rpc responses aren't invalid
 func marshalResponse(response serverResponse, rw http.ResponseWriter) {
 	bytes, err := json.Marshal(response)
-	if err != nil {panic(err)}
+	if err != nil {
+		panic(err)
+	}
 	resp_ := string(bytes)
 	resp := strings.ReplaceAll(resp_, "\\", "")
 	resp = strings.ReplaceAll(resp, "\"{", "{")

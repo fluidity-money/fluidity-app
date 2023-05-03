@@ -161,5 +161,5 @@ func (r *RMQManagementClient) getVhosts() (vhostsResponse, error) {
 }
 
 func isDeadLetterQueue(queueName string) bool {
-	return strings.HasSuffix(queueName, ".dead")	
+	return strings.HasSuffix(queueName, ".dead")
 }

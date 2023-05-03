@@ -134,9 +134,9 @@ type (
 	}
 
 	TransactionAddressTableLookups struct {
-		AccountKey string `json:"accountKey"`
-		ReadonlyIndexes []int `json:"readonlyIndexes"`
-		WritableIndexes []int `json:"writableIndexes"`
+		AccountKey      string `json:"accountKey"`
+		ReadonlyIndexes []int  `json:"readonlyIndexes"`
+		WritableIndexes []int  `json:"writableIndexes"`
 	}
 
 	TransactionInnerInstruction struct {

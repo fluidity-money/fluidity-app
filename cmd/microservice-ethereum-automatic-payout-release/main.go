@@ -16,78 +16,77 @@ import (
 )
 
 const (
-    // EnvPublishAmqpQueueName is the queue to post batched winners down
-    EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
+	// EnvPublishAmqpQueueName is the queue to post batched winners down
+	EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
-    // EnvTokenName to fetch winnings with
-    EnvTokenName = `FLU_ETHEREUM_TOKEN_NAME`
+	// EnvTokenName to fetch winnings with
+	EnvTokenName = `FLU_ETHEREUM_TOKEN_NAME`
 
-    // EnvTokenDecimals to fetch winnings with
-    EnvTokenDecimals = `FLU_ETHEREUM_TOKEN_DECIMALS`
+	// EnvTokenDecimals to fetch winnings with
+	EnvTokenDecimals = `FLU_ETHEREUM_TOKEN_DECIMALS`
 
-    // EnvNetwork to differentiate between eth, arbitrum, etc
-    EnvNetwork = `FLU_ETHEREUM_NETWORK`
+	// EnvNetwork to differentiate between eth, arbitrum, etc
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
 func main() {
-    var (
-        senderQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-        shortName       = util.GetEnvOrFatal(EnvTokenName)
-        decimals_       = util.GetEnvOrFatal(EnvTokenDecimals)
-        network_        = util.GetEnvOrFatal(EnvNetwork)
-    )
+	var (
+		senderQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		shortName       = util.GetEnvOrFatal(EnvTokenName)
+		decimals_       = util.GetEnvOrFatal(EnvTokenDecimals)
+		network_        = util.GetEnvOrFatal(EnvNetwork)
+	)
 
-    decimals, err := strconv.ParseInt(decimals_, 10, 32)
+	decimals, err := strconv.ParseInt(decimals_, 10, 32)
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Message = "Failed to parse token decimals from env!"
-            k.Payload = err
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to parse token decimals from env!"
+			k.Payload = err
+		})
+	}
 
-    token := token_details.New(shortName, int(decimals))
+	token := token_details.New(shortName, int(decimals))
 
-    net, err := network.ParseEthereumNetwork(network_)
+	net, err := network.ParseEthereumNetwork(network_)
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Format(
-                "Failed to parse db network %s from env! %+v",
-                net,
-                err,
-            )
-        })
-    }
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to parse db network %s from env! %+v",
+				net,
+				err,
+			)
+		})
+	}
 
+	rewards, foundRewards, err := spooler.GetRewards(net, token)
 
-    rewards, foundRewards, err := spooler.GetRewards(net, token)
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to get rewards for token %s! %+v",
+				shortName,
+				err,
+			)
+		})
+	}
 
-    if err != nil {
-        log.Fatal(func(k *log.Log) {
-            k.Format(
-                "Failed to get rewards for token %s! %+v",
-                shortName,
-                err,
-            )
-        })
-    }
+	if foundRewards {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Sending rewards for token %s",
+				shortName,
+			)
+		})
 
-    if foundRewards {
-        log.App(func(k *log.Log) {
-            k.Format(
-                "Sending rewards for token %s",
-                shortName,
-            )
-        })
-
-        queue.SendMessage(senderQueueName, rewards)
-    } else {
-        log.App(func(k *log.Log) {
-            k.Format(
-                "No rewards for token %s found!",
-                shortName,
-            )
-        })
-    }
+		queue.SendMessage(senderQueueName, rewards)
+	} else {
+		log.App(func(k *log.Log) {
+			k.Format(
+				"No rewards for token %s found!",
+				shortName,
+			)
+		})
+	}
 }

@@ -35,6 +35,7 @@ var (
 	// version 0 transactions, including account lookup tables
 	TransactionVersion0 = []byte(`0`)
 )
+
 type (
 	Block struct {
 		Blockhash    string                    `json:"blockhash"`
@@ -51,7 +52,7 @@ type (
 
 	// rpc return type for the getTransaction endpoint using jsonParsed encoding
 	rpcParsedJsonTransaction struct {
-		Error *RpcError `json:"error"`
+		Error  *RpcError `json:"error"`
 		Result struct {
 			Transaction struct {
 				Message struct {
@@ -157,7 +158,7 @@ func fetchSolanaAccountList(rpcUrl string, block *Block) error {
 	for i, txn := range block.Transactions {
 		var (
 			versionLegacyUnset = bytes.Equal(txn.Version, TransactionVersionLegacyUnset)
-			versionLegacy = bytes.Equal(txn.Version, TransactionVersionLegacy)
+			versionLegacy      = bytes.Equal(txn.Version, TransactionVersionLegacy)
 		)
 
 		if versionLegacyUnset || versionLegacy {
@@ -229,7 +230,7 @@ func fetchSolanaAccountList(rpcUrl string, block *Block) error {
 		}
 
 		var (
-			accounts = transactionRes.Result.Transaction.Message.AccountKeys
+			accounts    = transactionRes.Result.Transaction.Message.AccountKeys
 			accountKeys = make([]string, len(accounts))
 		)
 

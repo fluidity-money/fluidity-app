@@ -216,9 +216,9 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
 func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
-		logAddress = transfer.Log.Address
+		logAddress      = transfer.Log.Address
 		contractAddress = transaction.To
-		nilAddress libEthereum.Address
+		nilAddress      libEthereum.Address
 	)
 
 	switch transfer.Application {

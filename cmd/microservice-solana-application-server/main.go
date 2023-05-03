@@ -42,21 +42,20 @@ const (
 
 	//  EnvMercurialProgramId is the program ID of the Mercurial swap program
 	EnvMercurialProgramId = `FLU_SOLANA_MERCURIAL_PROGRAM_ID`
-
 )
 
 func main() {
 	var (
 		solanaRpcUrl = util.PickEnvOrFatal(EnvSolanaRpcUrl)
 
-		saberRpcUrl         = util.GetEnvOrFatal(EnvSaberRpcUrl)
-		saberSwapProgramId  = util.GetEnvOrFatal(EnvSaberSwapProgramId)
-		orcaProgramId       = util.GetEnvOrFatal(EnvOrcaProgramId)
-		raydiumProgramId    = util.GetEnvOrFatal(EnvRaydiumProgramId)
-		aldrinProgramIdV1   = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
-		aldrinProgramIdV2   = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
-		lifinityProgramId   = util.GetEnvOrFatal(EnvLifinityProgramId)
-		mercurialProgramId  = util.GetEnvOrFatal(EnvMercurialProgramId)
+		saberRpcUrl        = util.GetEnvOrFatal(EnvSaberRpcUrl)
+		saberSwapProgramId = util.GetEnvOrFatal(EnvSaberSwapProgramId)
+		orcaProgramId      = util.GetEnvOrFatal(EnvOrcaProgramId)
+		raydiumProgramId   = util.GetEnvOrFatal(EnvRaydiumProgramId)
+		aldrinProgramIdV1  = util.GetEnvOrFatal(EnvAldrinV1ProgramId)
+		aldrinProgramIdV2  = util.GetEnvOrFatal(EnvAldrinV2ProgramId)
+		lifinityProgramId  = util.GetEnvOrFatal(EnvLifinityProgramId)
+		mercurialProgramId = util.GetEnvOrFatal(EnvMercurialProgramId)
 
 		fluidTokens = tokenListFromEnv(EnvSolanaTokenLookups)
 	)
@@ -120,7 +119,7 @@ func main() {
 
 		if len(transfers) > 0 {
 			bufferedTransfers := worker.SolanaBufferedTransfers{
-				Transfers:       transfers,
+				Transfers: transfers,
 			}
 
 			queue.SendMessage(

@@ -72,7 +72,6 @@ func TestTransactionLootboxes(t *testing.T) {
 		blockNumInt = misc.BigIntFromInt64(firstBlock + 1)
 	)
 
-
 	payouts := make(map[applications.UtilityName]worker.Payout)
 	payouts["none"] = worker.Payout{Native: misc.BigIntFromInt64(10000000), Usd: 10}
 
@@ -134,5 +133,5 @@ func TestTransactionLootboxes(t *testing.T) {
 	allLootboxes[0].AwardedTime = expectedLootbox.AwardedTime
 
 	assert.Equal(t, expectedLootbox, allLootboxes[0])
-	assert.WithinDuration(t, expectedLootbox.AwardedTime, awardedTime, time.Second * 2)
+	assert.WithinDuration(t, expectedLootbox.AwardedTime, awardedTime, time.Second*2)
 }

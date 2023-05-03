@@ -106,7 +106,7 @@ func GetPrice(client *ethclient.Client, priceFeedAddress ethCommon.Address) (*bi
 	decimals, err := getFeedDecimals(client, priceFeedAddress)
 
 	if err != nil {
-	    return nil, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"Failed to get feed decimals! %w",
 			err,
 		)
@@ -120,7 +120,7 @@ func GetPrice(client *ethclient.Client, priceFeedAddress ethCommon.Address) (*bi
 	)
 
 	if err != nil {
-	    return nil, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"Failed to get latestRoundData! %w",
 			err,
 		)

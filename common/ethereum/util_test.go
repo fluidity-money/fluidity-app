@@ -9,9 +9,9 @@ import (
 
 func TestBigIntFromUint64(t *testing.T) {
 	var (
-		x = uint64(105)
+		x        = uint64(105)
 		expected = big.NewInt(105)
-		empty uint64
+		empty    uint64
 	)
 
 	result := BigIntFromUint64(x)
@@ -161,7 +161,7 @@ func TestCoerceBoundContractResultsToRat(t *testing.T) {
 func TestCoerceBoundContractResultsToRats(t *testing.T) {
 	var (
 		testValues = make([]interface{}, 0)
-		expected = []*big.Rat{big.NewRat(1,1), big.NewRat(5,1)}
+		expected   = []*big.Rat{big.NewRat(1, 1), big.NewRat(5, 1)}
 	)
 
 	// length 0
@@ -226,7 +226,7 @@ func TestCalculateEffectiveGasPrice(t *testing.T) {
 	gasPrice := CalculateEffectiveGasPrice(
 		new(big.Rat).SetInt64(22_083_465_824), // base fee per gas
 		new(big.Rat).SetInt64(40_335_372_944), // max fee per gas
-		new(big.Rat).SetInt64(269_305_772), // max priority fee per gas
+		new(big.Rat).SetInt64(269_305_772),    // max priority fee per gas
 	)
 
 	testGasPrice := new(big.Rat).SetInt64(22_352_771_596)
@@ -236,7 +236,7 @@ func TestCalculateEffectiveGasPrice(t *testing.T) {
 	gasPriceArbitrum := CalculateEffectiveGasPrice(
 		new(big.Rat).SetInt64(1_000_000_000), // base fee per gas
 		new(big.Rat).SetInt64(1_350_000_000), // max fee per gas
-		new(big.Rat).SetInt64(0), // max priority fee per gas
+		new(big.Rat).SetInt64(0),             // max priority fee per gas
 	)
 
 	testGasPriceArbitrum := new(big.Rat).SetInt64(1_000_000_000)

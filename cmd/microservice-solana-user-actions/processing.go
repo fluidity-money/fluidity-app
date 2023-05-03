@@ -167,7 +167,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 	if fluidityTransaction.Unwrap != nil {
 		var (
 			unwrapIndex        = instruction.Accounts[5]
-			senderAddress      = accounts[unwrapIndex] // solana address
+			senderAddress      = accounts[unwrapIndex]   // solana address
 			senderOwnerIndex   = instruction.Accounts[7] // spl address
 			senderOwnerAddress = fluidityOwners[senderOwnerIndex]
 			swapAmount_        = fluidityTransaction.Unwrap.Value

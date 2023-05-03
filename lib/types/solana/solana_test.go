@@ -12,11 +12,11 @@ import (
 
 func TestGetBinary(t *testing.T) {
 	account := Account{
-		Lamports: 1461600,
-		Owner: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-		Data: []string{"AQAAAGoZ0VWnJlJ10jlZkMLDW3BYdruTGDwWKc7zDoWRCRbJmNyBLOMdAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==", "base64"},
+		Lamports:   1461600,
+		Owner:      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+		Data:       []string{"AQAAAGoZ0VWnJlJ10jlZkMLDW3BYdruTGDwWKc7zDoWRCRbJmNyBLOMdAAAGAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==", "base64"},
 		Executable: false,
-		RentEpoch: 371,
+		RentEpoch:  371,
 	}
 
 	// valid

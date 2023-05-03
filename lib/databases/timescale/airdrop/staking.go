@@ -22,7 +22,6 @@ const (
 	TableStakingEvents = `staking_events`
 )
 
-
 func InsertStakingEvent(stakingEvent ethereum.StakingEvent) {
 	timescaleClient := timescale.Client()
 
@@ -35,8 +34,8 @@ func InsertStakingEvent(stakingEvent ethereum.StakingEvent) {
 		statementText string
 	)
 
-    statementText = fmt.Sprintf(
-        `INSERT INTO %s (
+	statementText = fmt.Sprintf(
+		`INSERT INTO %s (
             address,
             usd_amount,
             lockup_length,
@@ -47,15 +46,15 @@ func InsertStakingEvent(stakingEvent ethereum.StakingEvent) {
 			$3,
 			$4
 		);`,
-        TableStakingEvents,
-    )
+		TableStakingEvents,
+	)
 
 	_, err := timescaleClient.Exec(
 		statementText,
-        address,
-        usdAmount,
-        lockupLength,
-        insertedDate,
+		address,
+		usdAmount,
+		lockupLength,
+		insertedDate,
 	)
 
 	if err != nil {
@@ -122,5 +121,5 @@ func GetCurrentStakingEvents() []ethereum.StakingEvent {
 		stakingEvents = append(stakingEvents, stakingEvent)
 	}
 
-	return stakingEvents 
+	return stakingEvents
 }

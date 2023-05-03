@@ -20,8 +20,8 @@ import (
 // by Go Ethereum.
 type (
 	// these are unexported to force users to go through our normalisation methods
-	Address    struct { address string }
-	Hash       struct { hash string }
+	Address    struct{ address string }
+	Hash       struct{ hash string }
 	BlockNonce []byte
 )
 
@@ -114,8 +114,8 @@ type (
 
 	// Transaction made on Ethereum, may be forked
 	Transaction struct {
-		BlockHash Hash        `json:"block_hash"`
-		Data      misc.Blob   `json:"data"`
+		BlockHash Hash      `json:"block_hash"`
+		Data      misc.Blob `json:"data"`
 
 		// GasFeeCap is the maxFeePerGas
 		GasFeeCap misc.BigInt `json:"gas_fee_cap"`
@@ -123,11 +123,11 @@ type (
 		// GasTipCap is the maxPriorityFeePerGas
 		GasTipCap misc.BigInt `json:"gas_tip_cap"`
 
-		GasPrice  misc.BigInt `json:"gas_price"`
-		Hash      Hash        `json:"hash"`
-		To        Address     `json:"to"`
-		From      Address     `json:"from"`
-		Type      uint8       `json:"type"`
+		GasPrice misc.BigInt `json:"gas_price"`
+		Hash     Hash        `json:"hash"`
+		To       Address     `json:"to"`
+		From     Address     `json:"from"`
+		Type     uint8       `json:"type"`
 	}
 
 	// Log represents a contract event log that we have confirmed isn't removed
@@ -182,7 +182,7 @@ type (
 func HashFromString(str string) Hash {
 	hash := strings.ToLower(str)
 
-	return Hash{ hash }
+	return Hash{hash}
 }
 
 // AddressFromString, taking the string and making it lowercase then
@@ -190,7 +190,7 @@ func HashFromString(str string) Hash {
 func AddressFromString(str string) Address {
 	address := strings.ToLower(str)
 
-	return Address{ address }
+	return Address{address}
 }
 
 func (hash Hash) String() string {

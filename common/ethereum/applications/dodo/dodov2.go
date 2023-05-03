@@ -16,8 +16,8 @@ import (
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
-	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/ethereum/go-ethereum/ethclient"
+	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 const dodoV2DODOSwapLogTopic = "0xc2c0245e056d5fb095f04cd6373bc770802ebd1e6c918eb78fdef843cdb37b0f"

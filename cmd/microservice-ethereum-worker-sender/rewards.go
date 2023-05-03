@@ -97,4 +97,3 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 
 	return transaction, nil
 }
-

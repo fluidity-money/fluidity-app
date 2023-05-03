@@ -215,7 +215,7 @@ func GetOrcaFees(solanaClient *rpc.Provider, transaction types.TransactionResult
 
 		var (
 			sourceMint solana.PublicKey
-			decimals uint8
+			decimals   uint8
 		)
 
 		sourceMint, err = spl_token.GetMintFromPda(

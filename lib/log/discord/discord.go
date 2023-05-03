@@ -7,11 +7,11 @@ package discord
 // notify channels in our Discord using a single function
 
 import (
-	"io"
 	"bytes"
 	"encoding/json"
-	"mime/multipart"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
