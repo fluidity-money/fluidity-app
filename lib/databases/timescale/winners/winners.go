@@ -43,6 +43,7 @@ type PendingRewardData struct {
 	SendHash    ethereum.Hash
 	RewardType  winners.RewardType
 	Application ethApps.Application
+	LogIndex    misc.BigInt
 	WinAmount   misc.BigInt
 	Utility     ethApps.UtilityName
 	RewardTier  int
@@ -285,7 +286,8 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			send_transaction_hash,
 			win_amount,
 			utility_name,
-			reward_tier
+			reward_tier,
+			log_index
 		;`,
 
 		TablePendingRewardType,
@@ -325,6 +327,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			winAmount    misc.BigInt
 			utilityName_ string
 			rewardTier   int
+			logIndex     misc.BigInt
 		)
 
 		err := rows.Scan(
@@ -334,6 +337,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			&winAmount,
 			&utilityName_,
 			&rewardTier,
+			&logIndex,
 		)
 
 		if err != nil {
@@ -383,6 +387,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 			WinAmount:   winAmount,
 			Utility:     utilityName,
 			RewardTier:  rewardTier,
+			LogIndex:    logIndex,
 		}
 
 		rewards = append(rewards, reward)
@@ -393,7 +398,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 
 // Ethereum Specific
 // InsertPendingRewardType to store the reward type and application of a pending win
-func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.UtilityName]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.UtilityName]worker.Payout, application Application, rewardTier int) {
+func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.UtilityName]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.UtilityName]worker.Payout, application Application, rewardTier int, logIndex misc.BigInt) {
 
 	timescaleClient := timescale.Client()
 
@@ -408,7 +413,8 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			block_number,
 			win_amount,
 			utility_name,
-			reward_tier
+			reward_tier,
+			log_index
 		)
 
 		VALUES (
@@ -421,7 +427,8 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			$7,
 			$8,
 			$9,
-			$10
+			$10,
+			$11
 		);`,
 
 		TablePendingRewardType,
@@ -445,6 +452,7 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			winAmountNative,
 			utility,
 			rewardTier,
+			logIndex,
 		)
 
 		if err != nil {
@@ -479,6 +487,7 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			winAmountNative,
 			utility,
 			rewardTier,
+			logIndex,
 		)
 
 		if err != nil {

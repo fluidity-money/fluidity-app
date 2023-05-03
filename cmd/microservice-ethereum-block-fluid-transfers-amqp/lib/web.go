@@ -194,19 +194,19 @@ func GetBlockFromHash(gethHttpApi, blockHash string, retries int, delay int) (*B
 		if string(blockResponseResult) == "null" {
 			// block isn't available
 			if remainingRetries > 0 {
-					log.Debug(func(k *log.Log) {
-						k.Format(
-							"Block %s not available yet! sleeping for %d seconds before retrying",
-							blockHash,
-							delay,
-						)
-					})
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Block %s not available yet! sleeping for %d seconds before retrying",
+						blockHash,
+						delay,
+					)
+				})
 
-					duration := time.Duration(delay) * time.Second
-					time.Sleep(duration)
+				duration := time.Duration(delay) * time.Second
+				time.Sleep(duration)
 
-					remainingRetries--
-					continue
+				remainingRetries--
+				continue
 			}
 
 			return nil, fmt.Errorf(

@@ -3,4 +3,3 @@
 // LICENSE.md file.
 
 package erc20
-

@@ -30,7 +30,6 @@ func factorial(n int64) *big.Rat {
 	return r.SetInt(int)
 }
 
-
 // Calculates the probabilities for the different reward tiers
 func probability(m, n, b int64) *big.Rat {
 	mulLeftSide := new(big.Int).Binomial(m, b)
@@ -236,11 +235,16 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 		// to be sent to the blockchain
 
 		switch i {
-		case 0: emission.WinningChances.Payout1, _ = payout.Float64()
-		case 1: emission.WinningChances.Payout2, _ = payout.Float64()
-		case 2: emission.WinningChances.Payout3, _ = payout.Float64()
-		case 3: emission.WinningChances.Payout4, _ = payout.Float64()
-		case 4: emission.WinningChances.Payout5, _ = payout.Float64()
+		case 0:
+			emission.WinningChances.Payout1, _ = payout.Float64()
+		case 1:
+			emission.WinningChances.Payout2, _ = payout.Float64()
+		case 2:
+			emission.WinningChances.Payout3, _ = payout.Float64()
+		case 3:
+			emission.WinningChances.Payout4, _ = payout.Float64()
+		case 4:
+			emission.WinningChances.Payout5, _ = payout.Float64()
 		}
 
 		probabilities[i] = probability
@@ -248,10 +252,10 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 		// figure out the payout for each token we're distributing
 		for poolIdx, pool := range distributionPools {
 			var (
-				poolName = pool.Name
+				poolName      = pool.Name
 				tokenDecimals = pool.TokenDecimalsScale
-				exchangeRate = pool.ExchangeRate
-				bpy = poolBpys[poolIdx]
+				exchangeRate  = pool.ExchangeRate
+				bpy           = poolBpys[poolIdx]
 			)
 
 			frac := calculatePayoutFrac(bpy, totalBpy)
@@ -263,7 +267,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 			tokenPayout.Mul(tokenPayout, frac)
 
 			// store the usd value
-			usdPayout, _ := tokenPayout.Float64();
+			usdPayout, _ := tokenPayout.Float64()
 
 			// amount of the total payout in amount of the token
 			tokenPayout.Quo(tokenPayout, exchangeRate)
@@ -278,7 +282,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 
 			payouts[poolName][i] = worker.Payout{
 				Native: payoutBigInt,
-				Usd: usdPayout,
+				Usd:    usdPayout,
 			}
 		}
 	}

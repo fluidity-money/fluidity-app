@@ -115,22 +115,24 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			rewardType     = pendingReward.RewardType
 			winAmount      = pendingReward.WinAmount
 			rewardTier     = pendingReward.RewardTier
+			logIndex       = pendingReward.LogIndex
 		)
 
 		winners[i] = winnersDb.Winner{
-			Application:         appString,
-			Network:             network,
-			TransactionHash:     hashString,
-			SendTransactionHash: sendHashString,
-			WinnerAddress:       addressString,
-			WinningAmount:       winAmount,
-			AwardedTime:         when,
-			RewardType:          rewardType,
-			BatchFirstBlock:     startBlock,
-			BatchLastBlock:      endBlock,
-			RewardTier:          rewardTier,
-			TokenDetails:        details,
-			Utility:             utility,
+			Application:             appString,
+			Network:                 network,
+			TransactionHash:         hashString,
+			SendTransactionHash:     sendHashString,
+			WinnerAddress:           addressString,
+			WinningAmount:           winAmount,
+			AwardedTime:             when,
+			RewardType:              rewardType,
+			BatchFirstBlock:         startBlock,
+			BatchLastBlock:          endBlock,
+			RewardTier:              rewardTier,
+			TokenDetails:            details,
+			Utility:                 utility,
+			SendTransactionLogIndex: logIndex,
 		}
 	}
 

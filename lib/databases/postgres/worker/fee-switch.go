@@ -5,12 +5,12 @@
 package worker
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 

@@ -15,11 +15,11 @@ import (
 )
 
 type StructTest struct {
-	HashKey Hash
+	HashKey    Hash
 	AddressKey Address
-	HashMap map[Hash]Hash
+	HashMap    map[Hash]Hash
 	AddressMap map[Address]Address
-	HashArr []Hash
+	HashArr    []Hash
 	AddressArr []Address
 }
 
@@ -28,7 +28,7 @@ type MarshalTestSuite struct {
 	testHeader  BlockHeader
 	testTx      Transaction
 	testReceipt Receipt
-	testStruct     StructTest
+	testStruct  StructTest
 }
 
 func (suite *MarshalTestSuite) SetupTest() {
@@ -99,7 +99,7 @@ func (suite *MarshalTestSuite) SetupTest() {
 	testStruct := StructTest{
 		HashKey:    HashFromString("0xhash"),
 		AddressKey: AddressFromString("0xaddress"),
-		HashMap:    map[Hash]Hash{
+		HashMap: map[Hash]Hash{
 			HashFromString("0xhash1"): HashFromString("0xvalue1"),
 			HashFromString("0xhash2"): HashFromString("0xvalue2"),
 		},
@@ -107,7 +107,7 @@ func (suite *MarshalTestSuite) SetupTest() {
 			AddressFromString("0xaddress1"): AddressFromString("0xvalue1"),
 			AddressFromString("0xaddress2"): AddressFromString("0xvalue2"),
 		},
-		HashArr:    []Hash{
+		HashArr: []Hash{
 			HashFromString("0xhash0"),
 			HashFromString("0xhash1"),
 		},

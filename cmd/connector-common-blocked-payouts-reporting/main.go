@@ -13,25 +13,25 @@ import (
 )
 
 func main() {
-    winners.BlockedWinnersAll(func (blockedWinner winners.BlockedWinner) {
-        log.App(func(k *log.Log) {
-            k.Message = "Received a blocked winner message!"
-            k.Payload = blockedWinner
-        })
+	winners.BlockedWinnersAll(func(blockedWinner winners.BlockedWinner) {
+		log.App(func(k *log.Log) {
+			k.Message = "Received a blocked winner message!"
+			k.Payload = blockedWinner
+		})
 
-        jsonBlockedWinner, err := json.Marshal(blockedWinner)
+		jsonBlockedWinner, err := json.Marshal(blockedWinner)
 
-        if err != nil {
-            log.Fatal(func(k *log.Log) {
-                k.Message = "Failed to marshal a blocked winner to json!"
-                k.Payload = err
-            })
-        }
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to marshal a blocked winner to json!"
+				k.Payload = err
+			})
+		}
 
-        discord.Notify(
-            discord.SeverityNotice,
-            "Saw a blocked payout! %s",
-            jsonBlockedWinner,
-        )
-    })
+		discord.Notify(
+			discord.SeverityNotice,
+			"Saw a blocked payout! %s",
+			jsonBlockedWinner,
+		)
+	})
 }

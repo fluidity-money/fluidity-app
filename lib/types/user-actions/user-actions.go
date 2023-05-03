@@ -37,6 +37,9 @@ type (
 		// TransactionHash to find the transaction that generated this user action
 		TransactionHash string `json:"transaction_hash"`
 
+		// LogIndex for the index of the log in the block
+		LogIndex misc.BigInt `json:"log_index"`
+
 		// SwapIn or swap out from a Fluid Asset. If true, then that would indicate
 		// that the transfer went from USDT to fUSDT for example.
 		SwapIn bool `json:"swap_in"`
@@ -109,10 +112,11 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 // NewSendEthereum of a Fluid Asset, from the sender to the recipient
 // with the transaction hash with the amount. The current time is set
 // within the function.
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) UserAction {
 	return UserAction{
 		Network:          network_,
 		TransactionHash:  transactionHash.String(),
+		LogIndex:         logIndex,
 		Type:             UserActionSend,
 		SenderAddress:    senderAddress.String(),
 		RecipientAddress: recipientAddress.String(),

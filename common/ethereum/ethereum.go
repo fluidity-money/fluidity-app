@@ -103,11 +103,11 @@ func UpdateGasAmounts(ctx context.Context, client *ethclient.Client, options *et
 
 func EstimateGas(client *ethclient.Client, contractAbi *abi.ABI, opts *ethAbiBind.TransactOpts, contractAddress *common.Address, method string, args ...interface{}) (uint64, error) {
 	var (
-		from = opts.From
+		from     = opts.From
 		gasPrice = opts.GasPrice
-		feeCap = opts.GasFeeCap
-		tipCap = opts.GasTipCap
-		value = opts.Value
+		feeCap   = opts.GasFeeCap
+		tipCap   = opts.GasTipCap
+		value    = opts.Value
 	)
 
 	data, err := contractAbi.Pack(method, args...)

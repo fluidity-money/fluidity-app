@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	TopicEthereumAnnouncements     = "worker.ethereum.announcements"
-	TopicEthereumBlockLogs         = "worker.ethereum.blocks" // into apps server
-	TopicEthereumServerWork        = "worker.server.work" // into worker
+	TopicEthereumAnnouncements = "worker.ethereum.announcements"
+	TopicEthereumBlockLogs     = "worker.ethereum.blocks" // into apps server
+	TopicEthereumServerWork    = "worker.server.work"     // into worker
 
 	TopicSolanaParsedTransactions = "worker.solana.parsed_transactions"
 	TopicSolanaBufferedTransfers  = "worker.solana.buffered_transfers"

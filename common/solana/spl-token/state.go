@@ -114,7 +114,7 @@ func GetDecimalsFromPda(solanaClient *rpc.Provider, account solana.PublicKey, co
 	resp, err := solanaClient.GetTokenAccountBalance(account, commitment)
 
 	if err != nil {
-	    return 0, fmt.Errorf(
+		return 0, fmt.Errorf(
 			"failed to get token balance for pda %s! %w",
 			account.String(),
 			err,

@@ -124,14 +124,14 @@ func ConvertGethHeader(oldHeader *ethTypes.Header) ethereum.BlockHeader {
 
 func ConvertGethReceipt(receipt ethTypes.Receipt) ethereum.Receipt {
 	var (
-		postState_ = receipt.PostState
-		bloom_ = receipt.Bloom
-		logs_ = receipt.Logs
-		txHash_ = receipt.TxHash
+		postState_       = receipt.PostState
+		bloom_           = receipt.Bloom
+		logs_            = receipt.Logs
+		txHash_          = receipt.TxHash
 		contractAddress_ = receipt.ContractAddress
-		gasUsed_ = receipt.GasUsed
-		blockHash_ = receipt.BlockHash
-		blockNumber_ = receipt.BlockNumber
+		gasUsed_         = receipt.GasUsed
+		blockHash_       = receipt.BlockHash
+		blockNumber_     = receipt.BlockNumber
 	)
 
 	return ethereum.Receipt{

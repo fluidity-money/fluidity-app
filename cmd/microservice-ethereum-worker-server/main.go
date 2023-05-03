@@ -423,6 +423,7 @@ func main() {
 
 					senderAddress_    = transfer.SenderAddress
 					recipientAddress_ = transfer.RecipientAddress
+					logIndex          = transfer.LogIndex
 					appEmission       = transfer.AppEmissions
 
 					// the fluid token is always included
@@ -531,6 +532,7 @@ func main() {
 				announcement := worker.EthereumAnnouncement{
 					TransactionHash: transactionHash,
 					BlockNumber:     &blockNumber,
+					LogIndex:        logIndex,
 					FromAddress:     senderAddress,
 					ToAddress:       recipientAddress,
 					RandomSource:    randomSource,

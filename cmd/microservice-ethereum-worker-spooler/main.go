@@ -5,9 +5,9 @@
 package main
 
 import (
+	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
-	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -73,6 +73,7 @@ func main() {
 				toWinAmount      = announcement.ToWinAmount
 				application      = announcement.Application
 				rewardTier       = announcement.RewardTier
+				logIndex         = announcement.LogIndex
 
 				blockNumber = uint64(blockNumberInt.Int64())
 			)
@@ -89,6 +90,7 @@ func main() {
 				toWinAmount,
 				application,
 				rewardTier,
+				*logIndex,
 			)
 
 			var totalWinAmount float64

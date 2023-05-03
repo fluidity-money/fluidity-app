@@ -2,7 +2,10 @@ import type { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
-import { useAirdropLeaderboardAllTime } from "~/queries/useAirdropLeaderboard";
+import {
+  useAirdropLeaderboardAllTime,
+  useAirdropLeaderboardByUser,
+} from "~/queries/useAirdropLeaderboard";
 
 export type AirdropLeaderboardLoaderData = {
   leaderboard: Array<AirdropLeaderboardEntry>;
@@ -15,15 +18,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
 
-  if (!address || !network) throw new Error("Invalid Request");
+  if (!network) throw new Error("Invalid Request");
 
   try {
-    const { data: leaderboardData, errors: leaderboardErrors } =
-      await useAirdropLeaderboardAllTime();
+    const { data: leaderboardData, errors: leaderboardErrors } = await (address
+      ? useAirdropLeaderboardByUser(address)
+      : useAirdropLeaderboardAllTime());
 
     if (!leaderboardData) throw leaderboardErrors;
 
-    const { leaderboard } = leaderboardData;
+    const { airdrop_leaderboard: leaderboard } = leaderboardData;
 
     return json({
       leaderboard,
