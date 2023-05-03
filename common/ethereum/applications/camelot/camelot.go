@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-package uniswap
+package camelot
 
 import (
 	"fmt"
@@ -17,9 +17,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const uniswapV2SwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
+const camelotSwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 
-const uniswapV2PairAbiString = `[
+const camelotPairAbiString = `[
   {
     "anonymous": false,
     "inputs": [
@@ -63,7 +63,22 @@ const uniswapV2PairAbiString = `[
     "name": "Swap",
     "type": "event"
   },
-	{
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "FEE_DENOMINATOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [],
     "name": "token0",
@@ -79,7 +94,22 @@ const uniswapV2PairAbiString = `[
     "type": "function"
   },
   {
-		"constant": true,
+    "constant": true,
+    "inputs": [],
+    "name": "token0FeePercent",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
     "inputs": [],
     "name": "token1",
     "outputs": [
@@ -92,16 +122,31 @@ const uniswapV2PairAbiString = `[
     "payable": false,
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "token1FeePercent",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
   }
 ]`
 
-// uniswapV2PairAbi set by init.go to generate the ABI code
-var uniswapV2PairAbi ethAbi.ABI
+// camelotPairAbi set by init.go to generate the ABI code
+var camelotPairAbi ethAbi.ABI
 
-// GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
+// GetCamelotFees returns Camelot V2's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
@@ -110,11 +155,11 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	logTopic := transfer.Log.Topics[0].String()
 
-	if logTopic != uniswapV2SwapLogTopic {
+	if logTopic != camelotSwapLogTopic {
 		return nil, nil
 	}
 
-	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
+	unpacked, err := camelotPairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -143,7 +188,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	contractAddr := ethereum.ConvertInternalAddress(transfer.Log.Address)
 
 	// figure out which token is which in the pair contract
-	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token0")
+	token0addr_, err := ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token0")
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -161,7 +206,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	token1addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token1")
+	token1addr_, err := ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token1")
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -194,7 +239,6 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 		// whether the token being swapped from is the fluid token
 		inTokenIsFluid = false
-		zeroRat        = big.NewRat(0, 1)
 	)
 
 	// fluid index 0  0, x, y, 0 = swapping x token for y fluid
@@ -208,14 +252,18 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		// Whether swap contains any fluid tokens
 		swapContainsFluid = fluidIndex0 || (token1addr == fluidTokenContract)
 		// Whether amount0 is equal to zero
-		amount0IsZero = amount0in.Cmp(zeroRat) == 0
+		amount0IsZero = amount0in.Sign() == 0
+
+		// numerator of the fee (must be a call to the pair contract with the token in)
+		feeNumerator_ []interface{}
 	)
+
 
 	switch true {
 	case !swapContainsFluid:
 		log.App(func(k *log.Log) {
 			k.Format(
-				"Received a UniswapV2 swap in transaction %#v not involving the fluid token - skipping!",
+				"Received a Camelot swap in transaction %#v not involving the fluid token - skipping!",
 				transfer.TransactionHash.String(),
 			)
 		})
@@ -226,27 +274,100 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		inTokenIsFluid = false
 		fluidTransferAmount = amount0out
 
+		// get token1 fee numerator
+		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token1FeePercent")
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Failed to get token1 fee percent! %v",
+				err,
+			)
+		}
+
 	case fluidIndex0 && !amount0IsZero:
 		inTokenIsFluid = true
 		fluidTransferAmount = amount0in
+
+		// get token0 fee numerator
+		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token0FeePercent")
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Failed to get token0 fee percent! %v",
+				err,
+			)
+		}
 
 	case !fluidIndex0 && amount0IsZero:
 		inTokenIsFluid = true
 		fluidTransferAmount = amount1in
 
+		// get token1 fee numerator
+		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token1FeePercent")
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Failed to get token1 fee percent! %v",
+				err,
+			)
+		}
+
 	case !fluidIndex0 && !amount0IsZero:
 		inTokenIsFluid = false
 		fluidTransferAmount = amount1out
+
+		// get token0 fee numerator
+		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token0FeePercent")
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"Failed to get token0 fee percent! %v",
+				err,
+			)
+		}
 	}
 
-	// if trading x fUSDC -> y Token B
-	// the fee is x * 0.003 (100% input -> 99.7%)
-	// if trading y Token B -> x fUSDC
-	// the fee is x * 0.003009027 (99.7% input -> 100%)
-	if inTokenIsFluid {
-		feeMultiplier = big.NewRat(3, 1000)
-	} else {
-		feeMultiplier = big.NewRat(3, 997)
+	feeNumerator, err := ethereum.CoerceBoundContractResultsToUInt16(feeNumerator_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce fee numerator! %v",
+			err,
+		)
+	}
+
+	feeDenominator_, err := ethereum.StaticCall(client, contractAddr, camelotPairAbi, "FEE_DENOMINATOR")
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get fee denominator! %v",
+			err,
+		)
+	}
+
+	feeDenominator, err := ethereum.CoerceBoundContractResultsToInt(feeDenominator_)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to coerce fee denominator! %v",
+			err,
+		)
+	}
+
+	if feeDenominator.Sign() == 0 {
+		return nil, fmt.Errorf(
+			"Got a fee denominator of 0!",
+		)
+	}
+
+	feeMultiplier = new(big.Rat).SetFrac(big.NewInt(int64(feeNumerator)), feeDenominator)
+
+	// if the out amount is fluid, then we have to recover the amount from before the fee was taken
+	// amount - fee*amount = loggedAmount
+	// amount*(1-fee) = loggedAmount
+	// amount = loggedAmount/(1-fee)
+	if !inTokenIsFluid {
+		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1,1),feeMultiplier))
 	}
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)

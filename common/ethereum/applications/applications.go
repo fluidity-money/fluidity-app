@@ -17,6 +17,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/camelot"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -48,6 +49,7 @@ const (
 	ApplicationSaddle
 	ApplicationGTradeV6_1
 	ApplicationMeson
+	ApplicationCamelot
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -199,6 +201,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Meson += util.MaybeRatToFloat(fee)
+	case ApplicationCamelot:
+		fee, err = camelot.GetCamelotFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Camelot += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -276,6 +287,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		mesonSenderAddress := libEthereum.AddressFromString(mesonSender)
 
 		return mesonSenderAddress, contractAddress, nil
+	case ApplicationCamelot:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
