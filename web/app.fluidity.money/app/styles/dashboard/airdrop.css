@@ -24,3 +24,23 @@
 .leaderboard-container {
   width: 100%;
 }
+
+.staking-modal-input-container {
+  border: 1px solid gray;
+  display: flex;
+  padding: 5px;
+  border-radius: 5em 14px 14px 5em;
+}
+
+.staking-modal-token-icon {
+  width: 64px;
+}
+
+.staking-modal-token-input {
+  background: none;
+  border: none;
+  width: 100%;
+  color: white;
+  font-size: 2em;
+  outline: none;
+}

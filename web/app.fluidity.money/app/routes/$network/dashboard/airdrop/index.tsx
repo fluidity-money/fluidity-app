@@ -89,32 +89,32 @@ type LoaderData = {
 };
 
 const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
-  referralsCount: 10,
+  referralsCount: 0,
   bottleTiers: {
-    [Rarity.Common]: 100,
+    [Rarity.Common]: 0,
     [Rarity.Uncommon]: 0,
-    [Rarity.Rare]: 12,
-    [Rarity.UltraRare]: 3,
-    [Rarity.Legendary]: 1,
+    [Rarity.Rare]: 0,
+    [Rarity.UltraRare]: 0,
+    [Rarity.Legendary]: 0,
   },
-  bottlesCount: 116,
-  liquidityMultiplier: 5230,
+  bottlesCount: 0,
+  liquidityMultiplier: 0,
   stakes: [],
   loaded: false,
 };
 
 const SAFE_DEFAULT_AIRDROP_LEADERBOARD: AirdropLeaderboardLoaderData = {
   leaderboard: [],
-  loaded: true,
+  loaded: false,
 };
 
 const SAFE_DEFAULT_REFERRALS: ReferralCountLoaderData = {
-  numActiveReferrerReferrals: 10,
-  numActiveReferreeReferrals: 11,
-  numInactiveReferreeReferrals: 12,
+  numActiveReferrerReferrals: 0,
+  numActiveReferreeReferrals: 0,
+  numInactiveReferreeReferrals: 0,
   inactiveReferrals: [],
   referralCode: "",
-  loaded: true,
+  loaded: false,
 };
 
 const Airdrop = () => {
@@ -795,7 +795,7 @@ const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
   const [showBottleNumbers, setShowBottleNumbers] = useState(false);
   return (
     <div>
-      <HeroCarousel title="BOTTLES I'VE EARNED">
+      <HeroCarousel title="BOTTLES I'VE EARNED" setImgIndex={setImgIndex}>
         <Card type="frosted" fill shimmer rounded>
           <img src="/images/placeholderAirdrop1.png" />
         </Card>

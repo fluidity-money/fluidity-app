@@ -55,12 +55,12 @@ const BottleDistribution = ({
               ...(showBottleNumbers
                 ? highlightBottleNumberIndex === index
                   ? {
-                    fontSize: "2em",
-                  }
+                      fontSize: "2em",
+                    }
                   : {}
                 : highlightBottleNumberIndex === index
-                  ? { fontSize: "2em" }
-                  : { display: "none" }),
+                ? { fontSize: "2em" }
+                : { display: "none" }),
             }}
           >
             {toSignificantDecimals(quantity)}
@@ -252,7 +252,6 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
   const [stakingDuration, setStakingDuration] = useState(31);
 
   // Staking Multiplier Equation
-  // Reference: https://www.notion.so/fluidity/Fluidity-Airdrops-Loot-bottles-5d1bcf986d5a45a7a29bfc200fbfbb20?pvs=4#f47a040e934a41bbbb1793a7349146b6
   const stakingLiquidityMultiplierEq = (
     stakedDays: number,
     totalStakedDays: number
@@ -295,27 +294,27 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-        if (dec === undefined) {
-          return setInput({
-            ...token,
-            amount: `${unpaddedWhole}`,
-          });
-        }
-
-        const limitedDecimals = dec.slice(0 - token.decimals);
-
+      if (dec === undefined) {
         return setInput({
           ...token,
-          amount: [whole, limitedDecimals].join("."),
+          amount: `${unpaddedWhole}`,
         });
-      };
+      }
+
+      const limitedDecimals = dec.slice(0 - token.decimals);
+
+      return setInput({
+        ...token,
+        amount: [whole, limitedDecimals].join("."),
+      });
+    };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -384,29 +383,21 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
             <Text prominent code>
               STAKE AMOUNT <InfoCircle />
             </Text>
-            <GeneralButton type="secondary" size="small">
+            <GeneralButton
+              type="secondary"
+              size="small"
+              handleClick={() => inputMaxBalance()}
+            >
               Max
             </GeneralButton>
           </div>
-          <div
-            style={{
-              border: "1px solid gray",
-              display: "flex",
-              padding: "5px",
-              borderRadius: "5em 14px 14px 5em",
-            }}
-          >
-            <TokenIcon style={{ width: "64px" }} token={fluidToken.symbol} />
+          <div className={"staking-modal-input-container"}>
+            <TokenIcon
+              className={"staking-modal-token-icon"}
+              token={fluidToken.symbol}
+            />
             <input
-              style={{
-                background: "none",
-                border: "none",
-                width: "100%",
-                color: "white",
-                fontSize: "2em",
-                outline: "none",
-              }}
-              className={"staking-input"}
+              className={"staking-modal-token-input"}
               min={""}
               value={fluidToken.amount}
               onBlur={(e) =>
@@ -423,24 +414,13 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
               step="any"
             />
           </div>
-          <div
-            style={{
-              border: "1px solid gray",
-              display: "flex",
-              padding: "5px",
-              borderRadius: "5em 14px 14px 5em",
-            }}
-          >
-            <TokenIcon style={{ width: "64px" }} token={baseToken.symbol} />
+          <div className={"staking-modal-input-container"}>
+            <TokenIcon
+              className={"staking-modal-token-icon"}
+              token={baseToken.symbol}
+            />
             <input
-              style={{
-                background: "none",
-                border: "none",
-                color: "white",
-                fontSize: "2em",
-                outline: "none",
-              }}
-              className={"staking-input"}
+              className={"staking-modal-token-input"}
               min={""}
               value={baseToken.amount}
               onBlur={(e) =>
