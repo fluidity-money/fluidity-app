@@ -120,6 +120,7 @@ func protocolMultiplier(application applications.Application) *big.Rat {
 	case "uniswap_v3":
 	case "saddle":
 	case "curve":
+	case "camelot":
 		return big.NewRat(2, 100)
 	}
 
