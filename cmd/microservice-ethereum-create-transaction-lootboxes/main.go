@@ -61,7 +61,7 @@ func main() {
 		volume := sendTransaction.Amount
 
 		// Calculate lootboxes earned from transaction
-		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application)
+		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
 		lootboxCount := new(big.Rat).Mul(
 			volumeLiquidityMultiplier(
 				volume,
@@ -120,8 +120,8 @@ func protocolMultiplier(application applications.Application) *big.Rat {
 	case "uniswap_v3":
 	case "saddle":
 	case "curve":
-		return big.NewRat(2, 1)
+		return big.NewRat(2, 100)
 	}
 
-	return big.NewRat(1, 3)
+	return big.NewRat(1, 300)
 }
