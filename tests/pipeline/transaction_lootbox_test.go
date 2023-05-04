@@ -19,6 +19,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	commonApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -63,6 +64,7 @@ func TestTransactionLootboxes(t *testing.T) {
 		expectedVolume       = misc.BigIntFromInt64(12500000)
 		expectedLootboxCount = 1.3888888888888888
 		expectedRewardTier   = 1
+		expectedApplication  = commonApps.ApplicationCurve
 		fusdtAddress         = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
 		topicReward          = ethTypes.HashFromString("0xe417c38cb96e748006d0ef1a56fec0de428abac103b6644bc30c745f54f54345")
 		topicWinner          = ethTypes.HashFromString("0x0000000000000000000000007a08eaa93c05abd6b86bb09b0f565d6fc499ee35")
@@ -85,7 +87,7 @@ func TestTransactionLootboxes(t *testing.T) {
 		// ignored
 		ToWinAmount:  payouts,
 		TokenDetails: tokenDetails,
-		Application:  0,
+		Application:  commonApps.ApplicationCurve,
 		RewardTier:   expectedRewardTier,
 	}}
 
@@ -125,6 +127,7 @@ func TestTransactionLootboxes(t *testing.T) {
 		Volume:          expectedVolume,
 		RewardTier:      expectedRewardTier,
 		LootboxCount:    expectedLootboxCount,
+		Application:     expectedApplication,
 	}
 
 	// times can't be compared properly using assert.Equal
