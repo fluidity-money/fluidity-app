@@ -42,6 +42,7 @@ func main() {
 					transactionHash,
 				)
 			})
+			return
 		}
 
 		// all applications qualify, including a regular send (ApplicationNone)
