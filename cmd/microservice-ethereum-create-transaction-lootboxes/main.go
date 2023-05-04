@@ -57,20 +57,7 @@ func main() {
 		// fetch volume of sending transaction
 		// transaction hash and log index guarantee uniqueness
 		sendTransaction := user_actions.GetUserActionByLogIndex(network, transactionHash, logIndex)
-
-		// sender payouts are 80%, so multiply by 1.25 to get the full volume
-		var (
-			amountInt = &sendTransaction.Amount.Int
-			four      = big.NewInt(4)
-
-			quarter = new(big.Int)
-			volume_ = new(big.Int)
-		)
-
-		// a + (a / 4)
-		quarter = quarter.Div(amountInt, four)
-		volume_ = volume_.Add(amountInt, quarter)
-		volume := misc.NewBigIntFromInt(*volume_)
+		volume := sendTransaction.Amount
 
 		// Calculate lootboxes earned from transaction
 		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application)
