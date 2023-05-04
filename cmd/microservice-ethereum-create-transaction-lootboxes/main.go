@@ -93,6 +93,7 @@ func main() {
 			Volume:          volume,
 			RewardTier:      rewardTier,
 			LootboxCount:    lootboxCountFloat,
+			Application:     application,
 		}
 
 		queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)
