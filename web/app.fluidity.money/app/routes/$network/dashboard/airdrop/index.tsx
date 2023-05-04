@@ -23,6 +23,7 @@ import {
   AnchorButton,
   TabButton,
   toSignificantDecimals,
+  useViewport,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -151,6 +152,12 @@ const Airdrop = () => {
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
 
+  const { width } = useViewport();
+
+  const mobileBreakpoint = 768;
+
+  const isMobile = width < mobileBreakpoint;
+
   const data = {
     airdrop: {
       ...SAFE_DEFAULT_AIRDROP,
@@ -213,7 +220,37 @@ const Airdrop = () => {
     })();
   }, [address]);
 
+  const Header = () => {
+    return <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
+    <TabButton
+      size="small"
+      onClick={() => setCurrentModal("staking-stats")}
+    >
+      Airdrop Dashboard
+    </TabButton>
+    <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
+      Airdrop Tutorial
+    </TabButton>
+    <TabButton size="small">Leaderboard</TabButton>
+    <TabButton
+      size="small"
+      onClick={() => setCurrentModal("referral-details")}
+    >
+      Referrals
+    </TabButton>
+    <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
+      Stake
+    </TabButton>
+  </div>
+  }
+
   if (!showAirdrop) return null;
+
+  if (isMobile) return (
+    <>
+    
+    </>
+  )
 
   return (
     <>
@@ -271,27 +308,7 @@ const Airdrop = () => {
       </CardModal>
 
       {/* Page Content */}
-      <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("staking-stats")}
-        >
-          Airdrop Dashboard
-        </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
-          Airdrop Tutorial
-        </TabButton>
-        <TabButton size="small">Leaderboard</TabButton>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("referral-details")}
-        >
-          Referrals
-        </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
-          Stake
-        </TabButton>
-      </div>
+      <Header />
       <div className="pad-main">
         <div
           style={{

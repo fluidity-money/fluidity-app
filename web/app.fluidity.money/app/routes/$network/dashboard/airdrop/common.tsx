@@ -14,14 +14,17 @@ import {
   InfoCircle,
   TokenIcon,
   toSignificantDecimals,
+  ArrowLeft,
 } from "@fluidity-money/surfing";
-import { Referral } from "~/queries";
-import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
 } from "~/util/chainUtils/tokens";
+
+import { Referral } from "~/queries";
+import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface IBottleDistribution {
   bottles: BottleTiers;
@@ -552,9 +555,104 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
   );
 };
 
+type TutorialSlide = {
+  title: string;
+  desc: React.ReactNode;
+  image: string;
+}
+
+const tutorialContent: {
+  [key: number]: TutorialSlide
+} = {
+  "0": {
+    title: 'What are Loot Bottles?',
+    desc: '',
+    image: '/images/placeholderAirdrop1.png',
+  },
+  "1": {
+    title: 'How to earn Loot Bottles',
+    desc: '',
+    image: '/images/placeholderAirdrop2.png',
+  },
+  "2": {
+    title: 'Multipliers',
+    desc: '',
+    image: '/images/placeholderAirdrop3.png',
+  },
+  "3": {
+    title: 'Referrals',
+    desc: '',
+    image: '/images/placeholderAirdrop1.png',
+  },
+  "4": {
+    title: 'Learn More',
+    desc: '',
+    image: '/images/placeholderAirdrop2.png',
+  },
+}
+
 const TutorialModal = () => {
-  return <Card type="frosted" border="solid" />;
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+
+  return <>
+  <AnimatePresence
+    mode="wait"
+  >
+    <motion.div
+      key={`tutorial-slide-${currentSlide}`}
+      initial={{ opacity: 0 }}
+      animate={{opacity: 1}}
+      exit={{opacity: 0}}
+      transition={{duration: 0.1}}
+
+      className={'tutorial-slide-container'}
+    >
+      <img src={tutorialContent[currentSlide].image} className='tutorial-image'/>
+      { tutorialContent[currentSlide].title }
+      { tutorialContent[currentSlide].desc }
+    </motion.div>
+    </AnimatePresence>
+
+    <div style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    }}>
+      <GeneralButton
+        icon={<ArrowLeft />}
+        layout="before"
+        handleClick={() => {
+          setCurrentSlide(currentSlide - 1)
+        }}
+        type="transparent"
+        disabled={currentSlide === 0}
+      >
+        PREV
+      </GeneralButton>
+      { currentSlide + 1 } / 5
+      <GeneralButton
+        icon={<ArrowRight />}
+        layout="after"
+        handleClick={() => {
+          setCurrentSlide(currentSlide + 1)
+        }}
+        type="secondary"
+        disabled={currentSlide === 4}
+      >
+        Next
+      </GeneralButton>
+    </div>
+  </>;
 };
+
+
+
+const TutorialContent = () => {
+  return <motion.div>
+    
+  </motion.div>
+}
 
 export {
   BottleDistribution,
