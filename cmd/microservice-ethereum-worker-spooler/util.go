@@ -44,4 +44,3 @@ func bigExp10(val int64) *big.Int {
 
 	return res
 }
-

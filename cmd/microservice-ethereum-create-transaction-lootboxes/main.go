@@ -10,6 +10,7 @@ import (
 	"time"
 
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
@@ -22,13 +23,14 @@ import (
 func main() {
 	winners_queue.WinnersEthereum(func(winner winners_queue.Winner) {
 		var (
+			network           = winner.Network
 			transactionHash   = winner.SendTransactionHash
 			winnerAddress     = winner.WinnerAddress
 			awardedTime       = winner.AwardedTime
-			amount            = winner.WinningAmount
 			tokenDetails      = winner.TokenDetails
 			rewardTier        = winner.RewardTier
 			applicationString = winner.Application
+			logIndex          = winner.SendTransactionLogIndex
 		)
 
 		// don't track fluidification
@@ -52,18 +54,10 @@ func main() {
 			})
 		}
 
-		// sender payouts are 80%, so multiply by 1.25 to get the full volume
-		var (
-			amountInt = &amount.Int
-			four      = big.NewInt(4)
-
-			quarter = new(big.Int)
-		)
-
-		// a + (a / 4)
-		quarter = quarter.Div(amountInt, four)
-		volume_ := amount.Add(amountInt, quarter)
-		volume := misc.NewBigIntFromInt(*volume_)
+		// fetch volume of sending transaction
+		// transaction hash and log index guarantee uniqueness
+		sendTransaction := user_actions.GetUserActionByLogIndex(network, transactionHash, logIndex)
+		volume := sendTransaction.Amount
 
 		// Calculate lootboxes earned from transaction
 		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application)

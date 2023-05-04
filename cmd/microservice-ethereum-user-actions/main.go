@@ -32,7 +32,7 @@ const (
 	EnvTokenDecimals = `FLU_ETHEREUM_TOKEN_DECIMALS`
 
 	// EnvNetwork to track (ethereum or arbitrum) in this microservice
-	EnvNetwork  = `FLU_ETHEREUM_NETWORK`
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 
 	topicUserActions = user_actions.TopicUserActionsEthereum
 )
@@ -42,7 +42,7 @@ func main() {
 		filterAddress_ = util.GetEnvOrFatal(EnvFilterAddress)
 		tokenShortName = util.GetEnvOrFatal(EnvTokenShortName)
 		tokenDecimals_ = util.GetEnvOrFatal(EnvTokenDecimals)
-		network__ = util.GetEnvOrFatal(EnvNetwork)
+		network__      = util.GetEnvOrFatal(EnvNetwork)
 	)
 
 	filterAddress := ethereumTypes.AddressFromString(filterAddress_)
@@ -80,6 +80,7 @@ func main() {
 			logTopics       = ethLog.Topics
 			logData         = ethLog.Data
 			logAddress      = ethLog.Address
+			logIndex        = ethLog.Index
 		)
 
 		log.Debugf(
@@ -141,6 +142,7 @@ func main() {
 				time,
 				tokenShortName,
 				tokenDecimals,
+				logIndex,
 			)
 
 		case microservice_user_actions.EventMintFluid:

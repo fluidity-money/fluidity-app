@@ -34,7 +34,7 @@ const (
 )
 
 func shouldIgnoreTransaction(typ uint8) (bool, error) {
-	switch (typ) {
+	switch typ {
 	case txArbDeposit, txArbSubmitRetryable, txArbInternal:
 		return true, nil
 	case txLegacy, txAccessList, txDynamicFee, txArbUnsigned, txArbContract, txArbRetry, txArbLegacy:
@@ -93,7 +93,7 @@ func ConvertTransactions(blockHash string, oldTransactions []lib.Transaction) ([
 
 		if ignore {
 			log.Debug(func(k *log.Log) {
-			    k.Format("Skipping transaction %s with irrelevant type %d", txn.Hash, typ)
+				k.Format("Skipping transaction %s with irrelevant type %d", txn.Hash, typ)
 			})
 
 			continue

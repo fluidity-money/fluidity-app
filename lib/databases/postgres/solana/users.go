@@ -52,7 +52,7 @@ func GetUserMintLimit(tokenName string) float64 {
 
 	// no mint limit for today, return 0
 	if err == sql.ErrNoRows {
-		return 0	
+		return 0
 	}
 
 	if err != nil {

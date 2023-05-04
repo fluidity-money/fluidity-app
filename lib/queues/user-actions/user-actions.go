@@ -8,9 +8,9 @@ package user_actions
 
 import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
@@ -60,7 +60,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 	)
 }
 
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) UserAction {
 	return user_actions.NewSendEthereum(
 		network_,
 		senderAddress,
@@ -69,6 +69,7 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 		amount,
 		tokenShortName,
 		tokenDecimals,
+		logIndex,
 	)
 }
 

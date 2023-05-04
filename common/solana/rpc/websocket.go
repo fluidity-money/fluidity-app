@@ -44,7 +44,7 @@ type (
 		JsonRpc string                  `json:"jsonrpc"`
 		Params  websocketResponseParams `json:"params"`
 		// TODO where is this actually located? is it on params? does it exist at all?
-		Err     *rpcError               `json:"error"`
+		Err *rpcError `json:"error"`
 	}
 
 	// WebsocketOutgoing to send messages down with and to receive

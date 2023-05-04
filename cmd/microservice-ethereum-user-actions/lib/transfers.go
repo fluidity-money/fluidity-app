@@ -50,7 +50,7 @@ func coerceDataToUint256(data []byte) (*big.Int, error) {
 }
 
 // DecodeTransfer, making a new UserAction that contains a transfer
-func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum.Hash, fromAddressPadded, toAddressPadded string, data []byte, when time.Time, tokenShortName string, tokenDecimals int) (*user_actions.UserAction, error) {
+func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum.Hash, fromAddressPadded, toAddressPadded string, data []byte, when time.Time, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) (*user_actions.UserAction, error) {
 	var (
 		fromAddress = ethCommon.HexToAddress(fromAddressPadded)
 		toAddress   = ethCommon.HexToAddress(toAddressPadded)
@@ -82,6 +82,7 @@ func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum
 		amount,
 		tokenShortName,
 		tokenDecimals,
+		logIndex,
 	)
 
 	return &send, nil

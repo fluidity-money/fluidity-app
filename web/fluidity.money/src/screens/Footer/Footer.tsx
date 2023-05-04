@@ -69,7 +69,7 @@ const Footer = () => {
             </LaunchButton>
             <GeneralButton
               handleClick={() => {
-                window.location.href = "mailto:contact@fluidity.money";
+                window.location.href = "https://discord.gg/fluidity";
               }}
               type={"secondary"}
               size={
@@ -80,7 +80,7 @@ const Footer = () => {
                   : "small"
               }
             >
-              LET'S CHAT
+              DISCORD
             </GeneralButton>
           </div>
           <div className={styles.legal}>

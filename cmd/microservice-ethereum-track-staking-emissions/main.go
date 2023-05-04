@@ -12,28 +12,28 @@ import (
 )
 
 func main() {
-    ethLogs.Logs(func(l ethLogs.Log) {
-        stakingEvent, err := fluidity.TryDecodeStakingEventData(l)
+	ethLogs.Logs(func(l ethLogs.Log) {
+		stakingEvent, err := fluidity.TryDecodeStakingEventData(l)
 
-        switch err {
-        case fluidity.ErrWrongEvent:
-            log.Debug(func(k *log.Log) {
-                k.Format(
-                    "Event for log %v of transaction %v was not a staking event!",
-                    l.Index,
-                    l.TxHash,
-                )
-            })
-            return
+		switch err {
+		case fluidity.ErrWrongEvent:
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Event for log %v of transaction %v was not a staking event!",
+					l.Index,
+					l.TxHash,
+				)
+			})
+			return
 
-        case nil:
-            airdrop.InsertStakingEvent(stakingEvent)
+		case nil:
+			airdrop.InsertStakingEvent(stakingEvent)
 
-        default:
-            log.Fatal(func(k *log.Log) {
-                k.Message = "Failed to classify a staking event!"
-                k.Payload = err
-            })
-        }
-    })
+		default:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to classify a staking event!"
+				k.Payload = err
+			})
+		}
+	})
 }

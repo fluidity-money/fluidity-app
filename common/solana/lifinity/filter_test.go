@@ -77,4 +77,3 @@ func TestGetLogFees(t *testing.T) {
 	assert.Equal(t, expectedFees, logFees)
 
 }
-

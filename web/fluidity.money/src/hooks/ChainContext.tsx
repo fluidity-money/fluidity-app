@@ -46,7 +46,7 @@ export type Network = "STAGING" | "MAINNET";
 
 const initChainState = (): ChainState => {
   return {
-    chain: "ETH",
+    chain: "ARB",
     network: "MAINNET",
     setChain: () => { },
     apiState: {
@@ -64,7 +64,7 @@ const ChainContextProvider = ({
 }: {
   children: JSX.Element | JSX.Element[];
 }) => {
-  const [chain, setChain] = useState<SupportedChainsList>("ETH");
+  const [chain, setChain] = useState<SupportedChainsList>("ARB");
 
   const network: Network = "MAINNET";
 

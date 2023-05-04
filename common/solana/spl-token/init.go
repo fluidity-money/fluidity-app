@@ -5,8 +5,8 @@
 package spl_token
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/common/solana"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
 func init() {

@@ -17,7 +17,7 @@ func formatPayouts(payouts map[applications.UtilityName]worker.Payout) string {
 	for utility, payout := range payouts {
 		var (
 			native = payout.Native
-			usd = payout.Usd
+			usd    = payout.Usd
 		)
 
 		payoutsStrings[i] = fmt.Sprintf("%s: %s tokens, %f USD", utility, native.String(), usd)

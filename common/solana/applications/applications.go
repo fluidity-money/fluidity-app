@@ -39,15 +39,15 @@ func (app Application) String() string {
 
 // ParseApplication based on the name given
 func ParseApplicationName(name string) (*Application, error) {
-    for i, app := range applicationNames {
-        if app == name {
+	for i, app := range applicationNames {
+		if app == name {
 			application_ := Application(i)
 			return &application_, nil
-        }
-    }
+		}
+	}
 
-    return nil, fmt.Errorf(
-        "unknown app name %s",
-        name,
-    )
+	return nil, fmt.Errorf(
+		"unknown app name %s",
+		name,
+	)
 }

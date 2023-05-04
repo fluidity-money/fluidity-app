@@ -10,11 +10,11 @@ import (
 
 func TestMaybeRatToFloat(t *testing.T) {
 	var (
-		half   = big.NewRat(1, 2)
+		half         = big.NewRat(1, 2)
 		halfExpected = 0.5
 
-		none   *big.Rat = nil
-		noneExpected = float64(0)
+		none         *big.Rat = nil
+		noneExpected          = float64(0)
 	)
 
 	halfResult := MaybeRatToFloat(half)

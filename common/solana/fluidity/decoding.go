@@ -76,9 +76,9 @@ func DecodeFluidityInstruction(data string) (FluidityInstruction, error) {
 		instruction.Payout = &payout
 
 	case VariantInitSolendObligation, VariantLogTvl, VariantInitData,
-	     VariantDrain, VariantUpdateMintLimits, VariantUpdatePayoutLimits,
-		 VariantUpdatePayoutAuthority, VariantUpdateOperator,
-		 VariantConfirmUpdatePayoutAuthority, VariantEmergency:
+		VariantDrain, VariantUpdateMintLimits, VariantUpdatePayoutLimits,
+		VariantUpdatePayoutAuthority, VariantUpdateOperator,
+		VariantConfirmUpdatePayoutAuthority, VariantEmergency:
 		// don't care, do nothing
 
 	default:

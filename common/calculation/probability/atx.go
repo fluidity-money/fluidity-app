@@ -25,7 +25,6 @@ func CalculateAtx(secondsSinceLastBlock *big.Rat, fluidTransfers int) *big.Rat {
 		return zeroRat
 	}
 
-
 	tSFTimesTF := new(big.Rat).Mul(big.NewRat(365, 1), big.NewRat(24, 1))
 
 	tSFTimesTFTimesS := new(big.Rat).Mul(tSFTimesTF, big.NewRat(60, 1))
