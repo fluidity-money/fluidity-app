@@ -214,6 +214,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
             IFluidClient utility = fluidityClients_[_token][name];
 
             // reverts if utility == 0 !
+            if (address(utility) == address(0)) revert("zero utility");
             vars[i].vars = utility.getUtilityVars();
         }
 

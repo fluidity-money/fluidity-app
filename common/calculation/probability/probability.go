@@ -295,11 +295,22 @@ func WinningChances(trfMode worker.TrfMode, gasFee, atx, payoutFreq *big.Rat, di
 
 	// set the emissions data for logging after the fact
 
-	emission.WinningChances.Probability1, _ = probabilities[0].Float64()
-	emission.WinningChances.Probability2, _ = probabilities[1].Float64()
-	emission.WinningChances.Probability3, _ = probabilities[2].Float64()
-	emission.WinningChances.Probability4, _ = probabilities[3].Float64()
-	emission.WinningChances.Probability5, _ = probabilities[4].Float64()
+	switch len(probabilities) {
+	case 5:
+		emission.WinningChances.Probability5, _ = probabilities[4].Float64()
+		fallthrough
+	case 4:
+		emission.WinningChances.Probability4, _ = probabilities[3].Float64()
+		fallthrough
+	case 3:
+		emission.WinningChances.Probability3, _ = probabilities[2].Float64()
+		fallthrough
+	case 2:
+		emission.WinningChances.Probability2, _ = probabilities[1].Float64()
+		fallthrough
+	case 1:
+		emission.WinningChances.Probability1, _ = probabilities[0].Float64()
+	}
 
 	emission.WinningChances.AtxAtEnd, _ = atx.Float64()
 

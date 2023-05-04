@@ -27,14 +27,9 @@ contract FakeFluidToken is IFluidClient {
     function getUtilityVars() external returns (UtilityVars memory) {
         return vars;
     }
-
-    // emits a transfer event
-    function transfer(address from, address to, uint value) public {
-        emit Transfer(from, to, value);
-    }
 }
 
-contract TestScript is Script {
+contract TestSpecialUtilityMining is Script {
     function getPrivateKey(string memory key, uint32 index) public returns (uint) {
         return vm.deriveKey(key, index);
     }
@@ -74,13 +69,13 @@ contract TestScript is Script {
         require(address(fluidToken) == vm.envAddress("FLU_ETHEREUM_FLUID_TOKEN_ADDR"), "fluid token address env is set incorrectly!");
 
         IFluidClient utilityClient1 = new FakeFluidToken(UtilityVars({
-            poolSizeNative: 500_000 * 10**18,
-            tokenDecimalScale: 10**18,
-            exchangeRateNum: 10,
+            poolSizeNative: 10_000_000 * 10**decimals,
+            tokenDecimalScale: 10**decimals,
+            exchangeRateNum: 1,
             exchangeRateDenom: 1,
             deltaWeightNum: 1,
             deltaWeightDenom: 31536000,
-            customCalculationType: ""
+            customCalculationType: "worker config overrides"
         }));
         require(address(utilityClient1) == vm.envAddress("FLU_ETHEREUM_UTIL_CLIENT_ADDR"), "util client address env is set incorrectly!");
 
@@ -101,7 +96,7 @@ contract TestScript is Script {
         fluidClientChanges[0] = fluidChange1;
 
         FluidityClientChange memory fluidChange2 = FluidityClientChange({
-            name: "testClient",
+            name: "test special utility",
             overwrite: false,
             token: address(fluidToken),
             client: utilityClient1

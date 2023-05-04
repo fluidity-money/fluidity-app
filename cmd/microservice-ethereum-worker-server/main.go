@@ -84,7 +84,7 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 				winningClasses = winningClasses
 				payoutFreq     = payoutFreq
 
-				zeroRat = big.NewRat(0, 0)
+				zeroRat = big.NewRat(0, 1)
 			)
 
 			// get overrides
@@ -617,7 +617,7 @@ func main() {
 					transferFeeNormal,
 					currentAtx,
 					normalPayoutFreq,
-					pools,
+					normalPools,
 					normalWinningClasses,
 					btx,
 					secondsSinceLastEpoch,

@@ -85,6 +85,20 @@ services:
       FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORKNET_URL_MAINNET}"
       FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
 
+  contracts-special-utilmining:
+    hostname: contracts
+    ports:
+      - "8545:8545"
+    build:
+      context: ../../contracts/ethereum
+      dockerfile: Dockerfile.foundry
+    environment:
+      <<: *util-mining-test-envs
+      FLU_ETHEREUM_FORKING: true
+      FLU_FORGE_SCRIPT: "foundry-scripts/TestSpecialUtilityMining.s.sol:TestSpecialUtilityMining"
+      FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORKNET_URL_MAINNET}"
+      FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
+
   connector-ethereum-block-headers-amqp:
     build:
       context: ../../cmd/connector-ethereum-block-headers-amqp/
@@ -168,7 +182,7 @@ services:
     environment:
       <<: *flu-envs
       FLU_WORKER_ID: microservice-ethereum-create-transaction-lootboxes
-    restart: on-failure   
+    restart: on-failure
 
   connector-common-lootboxes-timescale:
     build:
@@ -262,6 +276,25 @@ services:
       - microservice-ethereum-worker-server-util-mining
     environment:
       FLU_TEST: TestWorkerEpochs
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: util-mining-worker-server-out
+      FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out
+      <<: [*flu-envs, *util-mining-test-envs]
+    restart: "no"
+
+  test-special-utilitymining:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - contracts-special-utilmining
+      - microservice-ethereum-worker-server-util-mining
+    environment:
+      FLU_TEST: TestSpecialUtilityMining
       FLU_WORKER_ID: tests
       FLU_ETHEREUM_AMQP_QUEUE_NAME: util-mining-worker-server-out
       FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out

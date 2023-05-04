@@ -24,8 +24,9 @@ struct UtilityVars {
     string customCalculationType;
 }
 
+string constant DEFAULT_CALCULATION_TYPE = "";
+
 interface IFluidClient {
-    string constant DEFAULT_CALCULATION_TYPE = "";
 
     /// @notice MUST be emitted when any reward is paid out
     event Reward(
