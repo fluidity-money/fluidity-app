@@ -87,8 +87,6 @@ services:
 
   contracts-special-utilmining:
     hostname: contracts
-    ports:
-      - "8545:8545"
     build:
       context: ../../contracts/ethereum
       dockerfile: Dockerfile.foundry
