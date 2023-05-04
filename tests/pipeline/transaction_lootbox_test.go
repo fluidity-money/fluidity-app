@@ -127,7 +127,7 @@ func TestTransactionLootboxes(t *testing.T) {
 		Volume:          expectedVolume,
 		RewardTier:      expectedRewardTier,
 		LootboxCount:    expectedLootboxCount,
-		Application:     expectedApplication.String(),
+		Application:     expectedApplication,
 	}
 
 	// times can't be compared properly using assert.Equal
