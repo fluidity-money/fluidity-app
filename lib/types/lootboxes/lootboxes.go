@@ -7,6 +7,7 @@ package lootboxes
 import (
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
@@ -34,4 +35,7 @@ type Lootbox struct {
 
 	// LootboxCount is the amount of earned lootboxes from event
 	LootboxCount float64 `json:"lootbox_count"`
+
+	// Application is the application involved in the source transfer
+	Application applications.Application `json:"application"`
 }
