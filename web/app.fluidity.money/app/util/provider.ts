@@ -10,6 +10,8 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Aldrin";
     case "camelot":
       return "Camelot";
+    case "chronos":
+      return "Chronos";
     case "circle":
       return "Circle";
     case "compound":
