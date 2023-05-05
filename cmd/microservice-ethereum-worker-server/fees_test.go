@@ -7,7 +7,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -57,9 +56,13 @@ func TestCalculateLegacyFeeTransactionFee1(t *testing.T) {
 }
 
 func TestCalculateLegacyFeeTransactionFee2(t *testing.T) {
+	// https://arbiscan.io/tx/0x084b62cfa931606ec8d769c40f438d556ea8720fcfe373fa32d5d0d4459a2b18
+
 	var (
-		testGasUsed, _ = misc.BigIntFromString("8000000")
-		testGasPrice, _ = misc.BigIntFromString("400000000")
+		// l1 gas used (1,400,295) + l2 gas used (668,172)
+		testGasUsed, _ = misc.BigIntFromString("2068467")
+
+		testGasPrice, _ = misc.BigIntFromString("100000000")
 	)
 
 	receipt := ethereum.Receipt{
@@ -83,10 +86,6 @@ func TestCalculateLegacyFeeTransactionFee2(t *testing.T) {
 	expectedFee.Mul(expectedFee, ethPriceUsd)
 
 	expectedFee.Quo(expectedFee, ethereumDecimalsRat)
-
-	log.App(func(k *log.Log) {
-		k.Format("%v", expectedFee.FloatString(2))
-	})
 
 	legacyTransactionFee := calculateLegacyFeeTransactionFee(
 		emission,
