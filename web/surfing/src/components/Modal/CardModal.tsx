@@ -26,8 +26,8 @@ export const CardModal: React.FC<ICardModal> = ({
   const ref = useRef(null);
 
   useClickOutside(ref, () => { 
-    console.log('clicked outside')
-    closeModal() });
+    closeModal() 
+  });
 
   return (
     <AnimatePresence>
