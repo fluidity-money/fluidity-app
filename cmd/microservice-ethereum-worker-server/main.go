@@ -319,12 +319,12 @@ func main() {
 				receipt = transaction.Receipt
 
 				transactionHash = transaction.Transaction.Hash
-				transferType    = transaction.Transaction.Type
+				transactionType    = transaction.Transaction.Type
 			)
 
 			var transactionFeeNormal *big.Rat
 
-			switch transferType {
+			switch transactionType {
 			case goEthTypes.LegacyTxType, goEthTypes.AccessListTxType:
 				transactionFeeNormal = calculateLegacyFeeTransactionFee(
 					emission,

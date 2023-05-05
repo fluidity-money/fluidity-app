@@ -9,6 +9,8 @@ import (
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 )
 
+// calculateLegacyFeeTransactionFee using the transaction given with the
+// eth price in usd (ie $2123) and the ethereum decimals (ie 1e18)
 func calculateLegacyFeeTransactionFee(emission *worker.Emission, transaction ethereum.Transaction, ethPriceUsd, ethereumDecimalsRat *big.Rat) *big.Rat {
 	// Gas units (limit) * Gas price per unit i.e 21,000 * 200 = 4,200,000 gwei or 0.0042
 	var (
