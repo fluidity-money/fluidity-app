@@ -11,20 +11,20 @@ import (
 
 // calculateLegacyFeeTransactionFee using the transaction given with the
 // eth price in usd (ie $2123) and the ethereum decimals (ie 1e18)
-func calculateLegacyFeeTransactionFee(emission *worker.Emission, transaction ethereum.Transaction, ethPriceUsd, ethereumDecimalsRat *big.Rat) *big.Rat {
+func calculateLegacyFeeTransactionFee(emission *worker.Emission, transaction ethereum.Transaction, receipt ethereum.Receipt, ethPriceUsd, ethereumDecimalsRat *big.Rat) *big.Rat {
 	// Gas units (limit) * Gas price per unit i.e 21,000 * 200 = 4,200,000 gwei or 0.0042
 	var (
-		gasLimit = transaction.GasLimit
+		gasUsed = receipt.GasUsed
 		gasPrice = transaction.GasPrice
 	)
 
 	// not likely that the gas limit will go past uint64
 
-	emission.GasLimit = gasLimit
+	emission.GasUsed = gasUsed
 
 	emission.GasPrice = gasPrice
 
-	gasPaid := bigIntToRat(gasLimit)
+	gasPaid := bigIntToRat(gasUsed)
 
 	gasPaid.Mul(gasPaid, bigIntToRat(gasPrice))
 
@@ -55,7 +55,7 @@ func calculateDynamicFeeTransactionFee(emission *worker.Emission, transaction et
 	// remember the inputs to the gas actually used
 	// in usd calculation
 
-	emission.GasUsed = gasUsed.Uint64()
+	emission.GasUsed = gasUsed
 
 	emission.BlockBaseFee = blockBaseFee
 

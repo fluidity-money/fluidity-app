@@ -41,7 +41,7 @@ type Emission struct {
 	GasLimitNormal  float64 `json:"gas_limit_normal"`
 	GasTipCapNormal float64 `json:"gas_tip_cap_normal"`
 
-	GasUsed       uint64  `json:"gas_used"`
+	GasUsed       misc.BigInt  `json:"gas_used"`
 	GasUsedNormal float64 `json:"gas_used_normal"`
 
 	TransferFeeNormal float64 `json:"transfer_fee_normal"`

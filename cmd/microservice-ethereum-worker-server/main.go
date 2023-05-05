@@ -329,6 +329,7 @@ func main() {
 				transactionFeeNormal = calculateLegacyFeeTransactionFee(
 					emission,
 					transaction.Transaction,
+					receipt,
 					ethPriceUsd,
 					ethereumDecimalsRat,
 				)
