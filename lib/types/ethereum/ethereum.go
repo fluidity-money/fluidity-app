@@ -117,6 +117,9 @@ type (
 		BlockHash Hash      `json:"block_hash"`
 		Data      misc.Blob `json:"data"`
 
+		// GasLimit could be set by transactions prior to London
+		GasLimit misc.BigInt `json:"gas"`
+
 		// GasFeeCap is the maxFeePerGas
 		GasFeeCap misc.BigInt `json:"gas_fee_cap"`
 
