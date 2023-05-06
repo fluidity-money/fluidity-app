@@ -51,6 +51,7 @@ func (suite *UserActionsTestSuite) SetupTest() {
 		misc.BigIntFromInt64(123456789),
 		"fTEST",
 		6,
+		misc.BigIntFromInt64(1),
 	)
 
 	suite.solSend = NewSendSolana(

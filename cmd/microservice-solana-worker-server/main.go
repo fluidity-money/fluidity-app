@@ -237,7 +237,6 @@ func main() {
 				continue
 			}
 
-
 			payouts := probability.CalculatePayoutsCombined(randomPayouts, matchedBalls)
 			payout, exists := payouts[applications.UtilityFluid]
 

@@ -13,10 +13,10 @@ func TestBatchReward(t *testing.T) {
 	testRewardBatch := []abiFluidityReward{
 		{
 			ClientName: string(applications.UtilityFluid),
-			Winners:    []abiWinner{
+			Winners: []abiWinner{
 				{
-					Winner:     common.HexToAddress("0x6221A9c005F6e47EB398fD867784CacfDcFFF4E7"),
-					WinAmount:  big.NewInt(100),
+					Winner:    common.HexToAddress("0x6221A9c005F6e47EB398fD867784CacfDcFFF4E7"),
+					WinAmount: big.NewInt(100),
 				},
 			},
 		},

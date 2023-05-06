@@ -56,13 +56,21 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     if (stakingErrors || !stakingData) throw stakingErrors;
 
     const {
-      lootboxCounts: [bottleTiers],
+      lootboxCounts: [bottleTiers_],
       liquidityMultiplier: [liquidityMultiplierRes],
       referralsCount: {
         aggregate: { count: referralsCount },
       },
     } = airdropStatsData;
     const { stakes } = stakingData;
+
+    const bottleTiers = bottleTiers_ || {
+      [Rarity.Common]: 0,
+      [Rarity.Uncommon]: 0,
+      [Rarity.Rare]: 0,
+      [Rarity.UltraRare]: 0,
+      [Rarity.Legendary]: 0,
+    };
 
     return json({
       liquidityMultiplier: liquidityMultiplierRes?.result || 0,

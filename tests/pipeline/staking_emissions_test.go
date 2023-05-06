@@ -48,18 +48,18 @@ func createLogData(lockupLength, usdAmount int32, lockedTimestamp int64) (misc.B
 }
 
 func TestStakingEmissions(t *testing.T) {
-    var (
+	var (
 		logsQueue    = ethQueue.TopicLogs
 		fusdtAddress = ethTypes.AddressFromString("0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e")
 
-		address	= libtest.RandomHash()
+		address = libtest.RandomHash()
 		// 30 - 365 days
 		lockupLength        = rand.Int31n(334) + 31
 		lockedTimestamp     = time.Now().UTC()
 		lockedTimestampUnix = lockedTimestamp.Unix()
 		// $10 - $2000
 		usdAmount = rand.Int31n(2000) + 10
-    )
+	)
 
 	logData, err := createLogData(lockupLength, usdAmount, lockedTimestampUnix)
 	require.NoError(t, err)
@@ -67,9 +67,9 @@ func TestStakingEmissions(t *testing.T) {
 	topicEmission := ethTypes.HashFromString("0x6381ea17a5324d29cc015352644672ead5185c1c61a0d3a521eda97e35cec97e")
 
 	log := ethTypes.Log{
-		Address:     fusdtAddress,
-		Topics:      []ethTypes.Hash{topicEmission, address},
-		Data:        logData,
+		Address: fusdtAddress,
+		Topics:  []ethTypes.Hash{topicEmission, address},
+		Data:    logData,
 	}
 
 	// sleep between messages to avoid ordering issues
@@ -85,8 +85,8 @@ func TestStakingEmissions(t *testing.T) {
 
 	assert.Len(t, stakingEvents, 1)
 	expectedEvent := ethTypes.StakingEvent{
-		Address: ethTypes.AddressFromString(address.String()),
-		UsdAmount: misc.BigIntFromInt64(int64(usdAmount)),
+		Address:      ethTypes.AddressFromString(address.String()),
+		UsdAmount:    misc.BigIntFromInt64(int64(usdAmount)),
 		LockupLength: int(lockupLength),
 		InsertedDate: lockedTimestamp,
 	}

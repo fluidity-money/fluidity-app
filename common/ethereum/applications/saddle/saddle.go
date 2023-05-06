@@ -206,7 +206,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		idBought_   = data[3]
 
 		// this is a uint8 in the contract, it's just returned as a uint256
-		idSold__,   _ = idSold_.Float64()
+		idSold__, _   = idSold_.Float64()
 		idBought__, _ = idBought_.Float64()
 
 		idSold   = uint8(idSold__)
@@ -259,7 +259,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	tokenInIsFluid := addresses[0] == fluidTokenContract
 	tokenOutIsFluid := addresses[1] == fluidTokenContract
 
-	if !( tokenInIsFluid || tokenOutIsFluid) {
+	if !(tokenInIsFluid || tokenOutIsFluid) {
 		log.App(func(k *log.Log) {
 			k.Format(
 				"Received a Saddle swap in transaction %#v involving the tokens %s %s instead of the fluid token %s - skipping!",
@@ -353,7 +353,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 
 	numerator := new(big.Rat).Mul(tokenBought, swapFeeAdjusted)
 
-	denom_ := new(big.Rat).Sub(big.NewRat(1,1), swapFeeAdjusted)
+	denom_ := new(big.Rat).Sub(big.NewRat(1, 1), swapFeeAdjusted)
 	denominator := new(big.Rat).Mul(mult, denom_)
 
 	fee := new(big.Rat).Quo(numerator, denominator)

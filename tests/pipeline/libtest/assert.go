@@ -9,11 +9,10 @@ import (
 )
 
 var (
-    zeroInt = big.NewInt(0)
+	zeroInt = big.NewInt(0)
 )
 
 func AssertNotZero(t *testing.T, num misc.BigInt, msg ...interface{}) {
-    cmp := num.Cmp(zeroInt)
-    assert.NotEqual(t, 0, cmp, msg...)
+	cmp := num.Cmp(zeroInt)
+	assert.NotEqual(t, 0, cmp, msg...)
 }
-

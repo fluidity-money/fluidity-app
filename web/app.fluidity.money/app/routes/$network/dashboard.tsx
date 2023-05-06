@@ -435,6 +435,11 @@ export default function Dashboard() {
             }}
           >
             <ReferralModal
+              connected={!!connected}
+              connectWallet={() => {
+                setReferralModalVisibility(false);
+                setWalletModalVisibility(true);
+              }}
               referrerClaimed={numActiveReferrerReferrals}
               refereeClaimed={numActiveReferreeReferrals}
               refereeUnclaimed={numInactiveReferreeReferrals}

@@ -323,6 +323,12 @@ name= "Saddle"
 [liquidity_providers.arbitrum.providers.link]
 fUSDC = "https://saddle.exchange/#/pools/fUSDC-USDC%20pool/deposit"
 
+[[liquidity_providers.arbitrum.providers]]
+name= "Chronos"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.chronos.exchange/liquidity"
+
 [[config.ethereum.wallets]]
 name = "Browser"
 id = "metamask"

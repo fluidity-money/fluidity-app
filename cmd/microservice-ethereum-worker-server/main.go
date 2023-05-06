@@ -516,6 +516,7 @@ func main() {
 
 					senderAddress_    = transfer.SenderAddress
 					recipientAddress_ = transfer.RecipientAddress
+					logIndex          = transfer.LogIndex
 					appEmission       = transfer.AppEmissions
 
 					// the fluid token is always included
@@ -653,17 +654,17 @@ func main() {
 
 				for _, payoutDetails := range payouts {
 					// create announcement and container
-
-					announcement := worker.EthereumAnnouncement{
-						TransactionHash: transactionHash,
-						BlockNumber:     &blockNumber,
-						FromAddress:     senderAddress,
-						ToAddress:       recipientAddress,
-						RandomSource:    payoutDetails.randomSource,
+          announcement := worker.EthereumAnnouncement{
+            TransactionHash: transactionHash,
+            BlockNumber:     &blockNumber,
+            LogIndex:        logIndex,
+            FromAddress:     senderAddress,
+            ToAddress:       recipientAddress,
+            RandomSource:    payoutDetails.randomSource,
 						RandomPayouts:   payoutDetails.randomPayouts,
-						TokenDetails:    tokenDetails,
-						Application:     application,
-					}
+            TokenDetails:    tokenDetails,
+            Application:     application,
+          }
 
 					// Fill in emission.NaiveIsWinning
 

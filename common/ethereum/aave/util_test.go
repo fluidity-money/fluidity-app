@@ -1,8 +1,8 @@
 package aave
 
 import (
-	"testing"
 	"math/big"
+	"testing"
 )
 
 func TestSafeQuo1(t *testing.T) {

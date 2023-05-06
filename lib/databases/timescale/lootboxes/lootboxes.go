@@ -5,6 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	types "github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 )
@@ -32,7 +33,8 @@ func InsertLootbox(lootbox Lootbox) {
 			awarded_time,
 			volume,
 			reward_tier,
-			lootbox_count
+			lootbox_count,
+			application
 		)
 
 		VALUES (
@@ -42,7 +44,8 @@ func InsertLootbox(lootbox Lootbox) {
 			$4,
 			$5,
 			$6,
-			$7
+			$7,
+			$8
 		)`,
 
 		TableLootboxes,
@@ -57,6 +60,7 @@ func InsertLootbox(lootbox Lootbox) {
 		lootbox.Volume,
 		lootbox.RewardTier,
 		lootbox.LootboxCount,
+		lootbox.Application.String(),
 	)
 
 	if err != nil {
@@ -80,7 +84,8 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 			awarded_time,
 			volume,
 			reward_tier,
-			lootbox_count
+			lootbox_count,
+			application
 
 		FROM %s 
 		WHERE address = $1
@@ -116,6 +121,7 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 	for rows.Next() {
 		var (
 			lootbox Lootbox
+			application_ string
 		)
 
 		err := rows.Scan(
@@ -126,6 +132,7 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 			&lootbox.Volume,
 			&lootbox.RewardTier,
 			&lootbox.LootboxCount,
+			&application_,
 		)
 
 		if err != nil {
@@ -135,6 +142,23 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 				k.Payload = err
 			})
 		}
+
+		application, err := applications.ParseApplicationName(application_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+
+				k.Format(
+					"Fetched invalid application name %v!",
+					application_,
+				)
+
+				k.Payload = err
+			})
+		}
+
+		lootbox.Application = application
 
 		lootboxes = append(lootboxes, lootbox)
 	}

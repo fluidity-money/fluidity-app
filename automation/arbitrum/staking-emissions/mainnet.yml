@@ -1,6 +1,8 @@
 DOCKER_IMAGE: microservice-arbitrum-track-staking-emissions
 DOCKERFILE_PATH: ./cmd/microservice-ethereum-track-staking-emissions
 ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
+ENV_FLU_DEBUG: true
+ENV_FLU_SILENT: false
 
 SERVICES:
   - TRACK_STAKING_EMISSIONS:

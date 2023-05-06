@@ -9,23 +9,23 @@ import (
 )
 
 func RandomGethAddress() ethCommon.Address {
-    address := ethCommon.Address{}
+	address := ethCommon.Address{}
 
-    rand.Read(address[:])
+	rand.Read(address[:])
 
-    return address
+	return address
 }
 
 func RandomHash() typesEth.Hash {
-    hash := ethCommon.Hash{}
+	hash := ethCommon.Hash{}
 
-    rand.Read(hash[:])
+	rand.Read(hash[:])
 
-    return ethereum.ConvertGethHash(hash)
+	return ethereum.ConvertGethHash(hash)
 }
 
 func RandomAddress() typesEth.Address {
-    address := RandomGethAddress()
+	address := RandomGethAddress()
 
-    return ethereum.ConvertGethAddress(address)
+	return ethereum.ConvertGethAddress(address)
 }
