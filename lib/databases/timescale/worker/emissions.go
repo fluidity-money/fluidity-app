@@ -181,7 +181,7 @@ func InsertEmissions(emission Emission) {
 			effective_gas_price_normal,
 
 			winning_chances_total_bpy,
-			winning_chances_distribution_pools
+			winning_chances_distribution_pools,
 
 			gas_price
 		)
