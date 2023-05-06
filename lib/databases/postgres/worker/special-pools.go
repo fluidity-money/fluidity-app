@@ -17,7 +17,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const TablePoolOverrides = `custom_pool_overrides`
+const TablePoolOverrides = `worker_custom_pool_overrides`
 
 func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applications.UtilityName) (worker.SpecialPoolOptions, bool) {
 	postgresClient := postgres.Client()

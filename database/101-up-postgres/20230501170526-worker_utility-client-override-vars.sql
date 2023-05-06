@@ -1,6 +1,6 @@
 -- migrate:up
 
-CREATE TABLE custom_pool_overrides (
+CREATE TABLE worker_custom_pool_overrides (
 	network network_blockchain NOT NULL,
 	utility_name VARCHAR NOT NULL,
 	payout_freq_num NUMERIC NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE custom_pool_overrides (
 
 -- migrate:down
 
-DROP TABLE custom_pool_overrides;
+DROP TABLE worker_custom_pool_overrides;
 

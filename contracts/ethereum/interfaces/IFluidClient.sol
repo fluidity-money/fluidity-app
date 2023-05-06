@@ -24,6 +24,8 @@ struct UtilityVars {
     string customCalculationType;
 }
 
+// DEFAULT_CALCULATION_TYPE to use as the value for customCalculationType if
+// your utility doesn't have a worker override
 string constant DEFAULT_CALCULATION_TYPE = "";
 
 interface IFluidClient {

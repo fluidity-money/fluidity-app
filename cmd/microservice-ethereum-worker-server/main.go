@@ -69,8 +69,9 @@ const (
 
 type (
 	PayoutDetails struct {
-		randomSource []uint32
-		randomPayouts map[appTypes.UtilityName][]workerTypes.Payout
+		randomSource     []uint32
+		randomPayouts    map[appTypes.UtilityName][]workerTypes.Payout
+		customPayoutType workerTypes.CalculationType
 	}
 )
 
@@ -112,6 +113,8 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 				emission,
 			)
 
+			specialPayout.customPayoutType = calculationType
+
 			return specialPayout
 
 		default:
@@ -122,6 +125,7 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 				)
 			})
 
+			// unreachable
 			return PayoutDetails{}
 	}
 }
@@ -665,9 +669,19 @@ func main() {
 
 					_ = probability.NaiveIsWinning(announcement.RandomSource, emission)
 
-					log.Debug(func(k *log.Log) {
-						k.Format("Source payouts: %v", payoutDetails.randomSource)
-					})
+					if payoutDetails.customPayoutType == "" {
+						log.Debug(func(k *log.Log) {
+							k.Format("Source payouts for normal payout: %v", payoutDetails.randomSource)
+						})
+					} else {
+						log.Debug(func(k *log.Log) {
+							k.Format(
+								"Source payouts for special payout type %s: %v",
+								payoutDetails.customPayoutType,
+								payoutDetails.randomSource,
+							)
+						})
+					}
 
 					emission.TransactionHash = transactionHash.String()
 					emission.RecipientAddress = recipientAddress.String()
