@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCalculateLegacyFeeTransactionFee1(t *testing.T) {
 	var (
-		testGasUsed, _ = misc.BigIntFromString("6962458")
+		testGasUsed, _  = misc.BigIntFromString("6962458")
 		testGasPrice, _ = misc.BigIntFromString("132635586583")
 	)
 

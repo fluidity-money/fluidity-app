@@ -8,8 +8,8 @@ import (
 	"math/big"
 	"strconv"
 
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	goEthTypes "github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -319,13 +319,13 @@ func main() {
 				receipt = transaction.Receipt
 
 				transactionHash = transaction.Transaction.Hash
-				transactionType    = transaction.Transaction.Type
+				transactionType = transaction.Transaction.Type
 			)
 
 			var transactionFeeNormal *big.Rat
 
 			switch transactionType {
-			case goEthTypes.LegacyTxType, goEthTypes.AccessListTxType:
+			case ethTypes.LegacyTxType, ethTypes.AccessListTxType:
 				transactionFeeNormal = calculateLegacyFeeTransactionFee(
 					emission,
 					transaction.Transaction,
@@ -334,7 +334,7 @@ func main() {
 					ethereumDecimalsRat,
 				)
 
-			case goEthTypes.DynamicFeeTxType:
+			case ethTypes.DynamicFeeTxType:
 				transactionFeeNormal = calculateDynamicFeeTransactionFee(
 					emission,
 					transaction.Transaction,

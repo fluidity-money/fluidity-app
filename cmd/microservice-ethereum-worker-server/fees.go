@@ -3,10 +3,10 @@ package main
 import (
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 // calculateLegacyFeeTransactionFee using the transaction given with the
@@ -14,7 +14,7 @@ import (
 func calculateLegacyFeeTransactionFee(emission *worker.Emission, transaction ethereum.Transaction, receipt ethereum.Receipt, ethPriceUsd, ethereumDecimalsRat *big.Rat) *big.Rat {
 	// Gas units (limit) * Gas price per unit i.e 21,000 * 200 = 4,200,000 gwei or 0.0042
 	var (
-		gasUsed = receipt.GasUsed
+		gasUsed  = receipt.GasUsed
 		gasPrice = transaction.GasPrice
 	)
 
