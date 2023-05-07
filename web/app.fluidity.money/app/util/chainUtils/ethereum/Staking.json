@@ -1,24 +1,72 @@
 [
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lockupLength",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lockedTimestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fusdcAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "usdcAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "wethAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Staked",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "secondsUntilUnlockable",
+        "name": "_lockupLength",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "maxFUsdcAmount",
+        "name": "_fusdcAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "maxUsdcAmount",
+        "name": "_usdcAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "maxWethAmount",
+        "name": "_wethAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_slippage",
         "type": "uint256"
       }
     ],
@@ -26,7 +74,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "fUsdcDeposited",
+        "name": "fusdcDeposited",
         "type": "uint256"
       },
       {
@@ -46,6 +94,14 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_spender",
+        "type": "address"
+      }
+    ],
+    "name": "deposited",
+    "outputs": [
+      {
         "internalType": "uint256",
         "name": "fusdcAmount",
         "type": "uint256"
@@ -59,50 +115,61 @@
         "internalType": "uint256",
         "name": "wethAmount",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "redeem",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "fusdcRedeemed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "usdcRedeemed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "wethRedeemed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_spender",
+        "type": "address"
       }
     ],
     "name": "redeemable",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "fUsdcDeposited",
+        "name": "fusdcRedeemable",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "usdcDeposited",
+        "name": "usdcRedeemable",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "wethDeposited",
+        "name": "wethRedeemable",
         "type": "uint256"
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "fusdcAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usdcAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "wethAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "redeem",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
