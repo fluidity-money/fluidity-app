@@ -18,6 +18,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/camelot"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/chronos"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -50,6 +51,7 @@ const (
 	ApplicationGTradeV6_1
 	ApplicationMeson
 	ApplicationCamelot
+	ApplicationChronos
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -210,6 +212,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Camelot += util.MaybeRatToFloat(fee)
+	case ApplicationChronos:
+		fee, err = chronos.GetChronosFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Chronos += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -288,6 +299,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 
 		return mesonSenderAddress, contractAddress, nil
 	case ApplicationCamelot:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationChronos:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
