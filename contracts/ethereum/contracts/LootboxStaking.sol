@@ -47,24 +47,6 @@ uint256 constant MAX_LOCKUP_TIME = 365 days;
  */
 uint256 constant MIN_LIQUIDITY = 1e18 * 2;
 
-/**
- * @notice Deposit made by a user that's tracked internally
- * @dev tokenA is always fusdc in this code
- */
-struct Deposit {
-    uint256 redeemTimestamp;
-
-    uint256 camelotLpMinted;
-    uint256 camelotTokenA;
-    uint256 camelotTokenB;
-
-    uint256 sushiswapLpMinted;
-    uint256 sushiswapTokenA;
-    uint256 sushiswapTokenB;
-
-    bool fusdcUsdcPair;
-}
-
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
 
@@ -82,31 +64,31 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     IERC20 public usdc_;
 
-    IUniswapV2Router02 private camelotRouter_;
+    IUniswapV2Router02 public camelotRouter_;
 
-    ISushiswapBentoBox private sushiswapBentoBox_;
+    ISushiswapBentoBox public sushiswapBentoBox_;
 
     // we don't use a sushiswap router since it doesn't do much aside from check amounts
 
-    ISushiswapStablePool private sushiswapFusdcUsdcPool_;
+    ISushiswapStablePool public sushiswapFusdcUsdcPool_;
 
-    ISushiswapStablePool private sushiswapFusdcWethPool_;
+    ISushiswapStablePool public sushiswapFusdcWethPool_;
 
-    IUniswapV2Pair private camelotFusdcUsdcPair_;
+    IUniswapV2Pair public camelotFusdcUsdcPair_;
 
-    IUniswapV2Pair private camelotFusdcWethPair_;
+    IUniswapV2Pair public camelotFusdcWethPair_;
 
     mapping (address => Deposit[]) private deposits_;
 
     // lp tokens provided by users that we don't touch
 
-    uint256 private camelotFusdcUsdcDepositedLpTokens_;
+    uint256 public camelotFusdcUsdcDepositedLpTokens_;
 
-    uint256 private camelotFusdcWethDepositedLpTokens_;
+    uint256 public camelotFusdcWethDepositedLpTokens_;
 
-    uint256 private sushiswapFusdcUsdcDepositedLpTokens_;
+    uint256 public sushiswapFusdcUsdcDepositedLpTokens_;
 
-    uint256 private sushiswapFusdcWethDepositedLpTokens_;
+    uint256 public sushiswapFusdcWethDepositedLpTokens_;
 
     function init(
         address _operator,
@@ -186,8 +168,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 _tokenAAmount,
         uint256 _tokenBAmount
     ) internal returns (uint256 liquidity) {
-        console.log("stake token b amount", _tokenBAmount);
-
         // we don't track the liquidity from the bentobox since it's transferred
         // to the pool which then returns it's liquidity
 
@@ -208,7 +188,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
 
         liquidity = _pool.mint(abi.encode(address(this)));
-
 
         return liquidity;
     }
@@ -297,6 +276,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             sushiTokenA,
             sushiTokenB
         );
+
+        dep.sushiswapTokenA = sushiTokenA;
+        dep.sushiswapTokenB = sushiTokenB;
 
         return dep;
     }
@@ -582,7 +564,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         require(_slippage < 101, "slippage too high");
 
-        // the ui should restrict the deposits to more than 100
+        // the ui should restrict the deposits to more than 1e18
 
         bool fusdcUsdcPair =
             _fusdcAmount + 1 > MIN_LIQUIDITY && _usdcAmount + 1 > MIN_LIQUIDITY;
@@ -617,7 +599,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         else wethDeposited = tokenBSpent;
 
-        emit Staked(
+        emit Deposited(
             msg.sender,
             _lockupLength,
             block.timestamp,
@@ -680,6 +662,15 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             // iterating in reverse, then deleting the deposit will let us remove
             // unneeded deposits in memory
+
+            emit Deposited(
+                msg.sender,
+                dep.redeemTimestamp,
+                block.timestamp,
+                tokenARedeemed,
+                fusdcUsdcPair ? tokenBRedeemed : 0,
+                fusdcUsdcPair ? 0 : tokenBRedeemed
+            );
 
             _deleteDeposit(msg.sender, i);
         }
@@ -745,6 +736,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             usdcRedeemable,
             wethRedeemable
         );
+    }
+
+    function deposits(address _spender) public view returns (Deposit[] memory) {
+        return deposits_[_spender];
     }
 
     /* ~~~~~~~~~~ INTERNAL APPROVAL FUNCTIONS ~~~~~~~~~~ */

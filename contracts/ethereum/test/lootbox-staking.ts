@@ -143,6 +143,8 @@ const deployPool = async (
 describe("LootboxStaking", async () => {
   let stakingSigner: ethers.Signer;
 
+  let stakingSignerAddress: string;
+
   let erc20TokenFactory: ethers.ContractFactory;
 
   let token0: ethers.Contract;
@@ -238,7 +240,7 @@ describe("LootboxStaking", async () => {
 
     staking = await stakingFactory.connect(stakingSigner).deploy();
 
-    const stakingSignerAddress = await stakingSigner.getAddress();
+    stakingSignerAddress = await stakingSigner.getAddress();
 
     await staking.connect(stakingSigner).init(
       stakingSignerAddress,
@@ -300,6 +302,10 @@ describe("LootboxStaking", async () => {
 
     expectDeposited(staking, 0, 0, 0);
 
+    const token0BeforeDeposit = await token0.balanceOf(stakingSignerAddress);
+    const token1BeforeDeposit = await token1.balanceOf(stakingSignerAddress);
+    const token2BeforeDeposit = await token2.balanceOf(stakingSignerAddress);
+
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
       8640000,
@@ -308,6 +314,15 @@ describe("LootboxStaking", async () => {
       0,
       slippage
     );
+
+    expect(await token0.balanceOf(stakingSignerAddress))
+      .to.be.equal(token0BeforeDeposit.sub(fusdc));
+
+    expect(await token1.balanceOf(stakingSignerAddress))
+      .to.be.equal(token1BeforeDeposit.sub(usdc));
+
+    expect(await token2.balanceOf(stakingSignerAddress))
+      .to.be.equal(token2BeforeDeposit.sub(weth));
 
     expectWithinSlippage(depositFusdc, fusdc, slippage);
 
@@ -324,6 +339,15 @@ describe("LootboxStaking", async () => {
       slippage
     );
 
+    expect(await token0.balanceOf(stakingSignerAddress))
+      .to.be.equal(token0BeforeDeposit.sub(fusdc).sub(fusdc1));
+
+    expect(await token1.balanceOf(stakingSignerAddress))
+      .to.be.equal(token1BeforeDeposit.sub(usdc).sub(usdc1));
+
+    expect(await token2.balanceOf(stakingSignerAddress))
+      .to.be.equal(token2BeforeDeposit.sub(weth).sub(weth1));
+
     expectWithinSlippage(depositFusdc, fusdc1, slippage);
 
     expectWithinSlippage(depositUsdc, usdc1, slippage);
@@ -334,7 +358,22 @@ describe("LootboxStaking", async () => {
 
     await sendEmptyTransaction(stakingSigner);
 
+    const token0BeforeRedeem = await token0.balanceOf(stakingSignerAddress);
+    const token1BeforeRedeem = await token1.balanceOf(stakingSignerAddress);
+    const token2BeforeRedeem = await token2.balanceOf(stakingSignerAddress);
+
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+
+    console.log(`fusdc redeemed: ${fusdcRedeemed}`);
+
+    expect(token0BeforeRedeem)
+      .to.be.equal(token0BeforeRedeem.add(fusdcRedeemed));
+
+    expect(token1BeforeRedeem)
+      .to.be.equal(token1BeforeRedeem.add(usdcRedeemed));
+
+    expect(token2BeforeRedeem)
+      .to.be.equal(token2BeforeRedeem.add(wethRedeemed));
 
     expectWithinSlippage(fusdcRedeemed, fusdc.add(fusdc1), 10);
 

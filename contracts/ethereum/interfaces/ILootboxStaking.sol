@@ -8,7 +8,34 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 interface ILootboxStaking {
-    event Staked(
+    /**
+     * @notice Deposit made by a user that's tracked internally
+     * @dev tokenA is always fusdc in this code
+     */
+    struct Deposit {
+        uint256 redeemTimestamp;
+
+        uint256 camelotLpMinted;
+        uint256 camelotTokenA;
+        uint256 camelotTokenB;
+
+        uint256 sushiswapLpMinted;
+        uint256 sushiswapTokenA;
+        uint256 sushiswapTokenB;
+
+        bool fusdcUsdcPair;
+    }
+
+    event Deposited(
+        address indexed spender,
+        uint256 lockupLength,
+        uint256 lockedTimestamp,
+        uint256 fusdcAmount,
+        uint256 usdcAmount,
+        uint256 wethAmount
+    );
+
+    event Redeemed(
         address indexed spender,
         uint256 lockupLength,
         uint256 lockedTimestamp,
@@ -68,4 +95,6 @@ interface ILootboxStaking {
         uint256 usdcRedeemable,
         uint256 wethRedeemable
     );
+
+    function deposits(address _spender) external view returns (Deposit[] memory);
 }
