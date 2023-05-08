@@ -15,13 +15,13 @@ contract TestUniswapV2Factory is IUniswapV2Factory {
         address /* tokenA */,
         address /* tokenB */
     ) external returns (IUniswapV2Pair) {
-        revert("test implementation used");
+        revert("test client");
     }
 
     function getPair(
         address /* tokenA */,
         address /* tokenB */
     ) external view returns (IUniswapV2Pair) {
-        revert("test implementation used");
+        revert("test client");
     }
 }

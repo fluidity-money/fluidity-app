@@ -8,17 +8,19 @@ import { ethers, BigNumber, BigNumberish } from "ethers";
 import {
   CAMELOT_FACTORY,
   CAMELOT_ROUTER,
+  SUSHISWAP_STABLE_POOL_FACTORY,
+  SUSHISWAP_MASTER_DEPLOYER,
   SUSHISWAP_BENTO_BOX } from "./arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
 
 import { advanceTime, sendEmptyTransaction } from "./test-utils";
 
-import { getLatestTimestamp } from "../script-utils";
-
 import { expect, assert } from "chai";
 
 const MaxUint256 = ethers.constants.MaxUint256;
+
+const MINIMUM_DEPOSIT = BigNumber.from("10").pow(18).mul(2);
 
 const slippage = 10;
 
@@ -111,6 +113,33 @@ const expectRedeemableWithDrift = async (
   expectWithinSlippage(wethRedeemable, weth, 10);
 };
 
+const deployPool = async (
+  masterDeployer: ethers.Contract,
+  tokenAAddress: string,
+  tokenBAddress: string,
+  fee: number
+): Promise<ethers.Contract> => {
+  const enc = ethers.utils.defaultAbiCoder.encode(
+    [ "address", "address", "uint256" ],
+    [ tokenAAddress, tokenBAddress, fee ]
+  );
+
+  const addr = await masterDeployer.callStatic.deployPool(
+    SUSHISWAP_STABLE_POOL_FACTORY,
+    enc
+  );
+
+  await masterDeployer.deployPool(
+    SUSHISWAP_STABLE_POOL_FACTORY,
+    enc
+  );
+
+  return await hre.ethers.getContractAt(
+    "TestSushiswapStablePool",
+    addr
+  );
+};
+
 describe("LootboxStaking", async () => {
   let stakingSigner: ethers.Signer;
 
@@ -122,7 +151,9 @@ describe("LootboxStaking", async () => {
 
   let token2: ethers.Contract;
 
-  let sushiswapBentoBox: ethers.Contract;
+  let sushiswapToken1Pool: ethers.Contract;
+
+  let sushiswapToken2Pool: ethers.Contract;
 
   let staking: ethers.Contract;
 
@@ -163,10 +194,6 @@ describe("LootboxStaking", async () => {
       MaxUint256
     );
 
-    sushiswapBentoBox = await hre.ethers.getContractAt(
-      "TestSushiswapBentoBox",
-      SUSHISWAP_BENTO_BOX
-    );
 
     const camelotFactory = await hre.ethers.getContractAt(
       "TestUniswapV2Factory",
@@ -186,6 +213,29 @@ describe("LootboxStaking", async () => {
 
     const camelotToken2PairAddress = camelotToken2Pair.address;
 
+    const sushiswapMasterDeployer = await hre.ethers.getContractAt(
+      "TestSushiswapMasterDeployer",
+      SUSHISWAP_MASTER_DEPLOYER
+    );
+
+    sushiswapToken1Pool = await deployPool(
+      sushiswapMasterDeployer,
+      token0.address,
+      token1.address,
+      30 // 0.3%
+    );
+
+    sushiswapToken2Pool = await deployPool(
+      sushiswapMasterDeployer,
+      token0.address,
+      token2.address,
+      30 // 0.3%
+    );
+
+    const sushiswapToken1PoolAddress = sushiswapToken1Pool.address;
+
+    const sushiswapToken2PoolAddress = sushiswapToken2Pool.address;
+
     staking = await stakingFactory.connect(stakingSigner).deploy();
 
     const stakingSignerAddress = await stakingSigner.getAddress();
@@ -197,9 +247,11 @@ describe("LootboxStaking", async () => {
       token1.address,
       token2.address,
       camelotRouter.address,
-      sushiswapBentoBox.address,
+      SUSHISWAP_BENTO_BOX,
       camelotToken1PairAddress,
-      camelotToken2PairAddress
+      camelotToken2PairAddress,
+      sushiswapToken1PoolAddress,
+      sushiswapToken2PoolAddress
     );
 
     await token0.approve(staking.address, MaxUint256);
@@ -207,8 +259,8 @@ describe("LootboxStaking", async () => {
     await token2.approve(staking.address, MaxUint256);
   });
 
-  it("should lock up 20000 test token 1 and 20000 test token 2", async() => {
-    const depositToken = 20000;
+  it("should lock up 2000000 test token 1 and 2000000 test token 2", async() => {
+    const depositToken = MINIMUM_DEPOSIT;
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
@@ -243,8 +295,8 @@ describe("LootboxStaking", async () => {
   });
 
   it("should lock up two amounts then redeem them", async() => {
-    const depositFusdc = 25000;
-    const depositUsdc = 27000;
+    const depositFusdc = MINIMUM_DEPOSIT;
+    const depositUsdc = MINIMUM_DEPOSIT;
 
     expectDeposited(staking, 0, 0, 0);
 
@@ -318,9 +370,9 @@ describe("LootboxStaking", async () => {
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
       9999999,
-      20000,
+      MINIMUM_DEPOSIT,
       0,
-      20000,
+      MINIMUM_DEPOSIT,
       slippage
     );
 
@@ -348,8 +400,8 @@ describe("LootboxStaking", async () => {
     async () => {
       await expectDeposited(staking, 0, 0, 0);
 
-      const depositFusdc = 20000;
-      const depositWeth = 20020;
+      const depositFusdc = MINIMUM_DEPOSIT;
+      const depositWeth = MINIMUM_DEPOSIT;
 
       const [ fusdc, _usdc, weth ] = await deposit(
         staking,
@@ -364,7 +416,7 @@ describe("LootboxStaking", async () => {
 
       expectWithinSlippage(depositWeth, weth, slippage);
 
-      const depositUsdc = 20490;
+      const depositUsdc = MINIMUM_DEPOSIT;
 
       const [ fusdc1, usdc ] = await deposit(
         staking,

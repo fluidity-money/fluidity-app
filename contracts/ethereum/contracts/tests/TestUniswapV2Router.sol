@@ -23,7 +23,7 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         uint /* _deadline */
     ) external returns (uint, uint, uint) {
         ++x;
-        return (x, x, x);
+        revert("test client");
     }
 
     function removeLiquidity(
@@ -36,7 +36,7 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         uint /* deadline */
     ) external returns (uint, uint) {
         ++x;
-        return (x, x);
+        revert("test client");
     }
 
     function swapExactTokensForTokens(
@@ -47,6 +47,6 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         uint /* _deadline */
     ) external returns (uint[] memory amounts) {
         ++x;
-        return new uint[](x);
+        revert("test client");
     }
 }

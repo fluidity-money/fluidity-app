@@ -7,10 +7,6 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../../interfaces/IUniswapV2Pair.sol";
+contract LootboxTestnetRewards {
 
-contract TestUniswapV2Pair {
-    function balanceOf(address /* _spender */) public pure returns (uint256) {
-        revert("test client");
-    }
 }
