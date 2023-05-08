@@ -56,7 +56,8 @@ const BottleDistribution = ({
             prominent
             style={{
               position: "absolute",
-              bottom: "112px",
+              bottom: "120px",
+              zIndex: '5',
               ...(showBottleNumbers
                 ? highlightBottleNumberIndex === index
                   ? {
@@ -748,18 +749,63 @@ const tutorialContent: {
   [key: number]: TutorialSlide
 } = {
   "0": {
-    title: 'What are Loot Bottles?',
-    desc: '',
+    title: 'WHAT ARE LOOT BOTTLES?',
+    desc: 'Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ',
     image: '/images/placeholderAirdrop1.png',
   },
   "1": {
-    title: 'How to earn Loot Bottles',
-    desc: '',
+    title: 'HOW TO EARN LOOT BOTTLES?',
+    desc: 'To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ',
     image: '/images/placeholderAirdrop2.png',
   },
   "2": {
-    title: 'Multipliers',
-    desc: '',
+    title: 'MULTIPLIERS',
+    desc: <>
+      <Text size="md">You can increase your chances of receiving Loot Bottles by doing the following:</Text>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto 1fr",
+          columnGap: "2em",
+          rowGap: "1em",
+          alignItems: "center",
+        }}
+      >
+        <Text prominent code holo>
+          <Display style={{margin:0, textAlign: 'right'}} size="xs">2x</Display> 
+        </Text>
+        <Text size="md" holo>
+          Transacting fAssets using our supported DEXs
+        </Text>
+        <LootBottle
+          size="sm"
+          style={{width: 40, height: 40}}
+          rarity="rare"
+          quantity={100}
+        />
+        <Text prominent size="md">
+          Staking liquidity for the maximum time
+        </Text>
+        <LootBottle
+          size="sm"
+          style={{width: 40, height: 40}}
+          rarity="legendary"
+          quantity={10}
+        />
+        <Text size="md" prominent>
+          Contributing volume
+        </Text>
+        <LootBottle
+          size="sm"
+          style={{width: 40, height: 40}}
+          rarity="ultra_rare"
+          quantity={10}
+        />
+        <Text size="md" prominent>
+          Participating in the Testnet
+        </Text>
+      </div>
+    </>,
     image: '/images/placeholderAirdrop3.png',
   },
   "3": {
@@ -777,7 +823,6 @@ const tutorialContent: {
 const TutorialModal = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
 
-
   return <>
   <AnimatePresence
     mode="wait"
@@ -790,9 +835,18 @@ const TutorialModal = () => {
       transition={{duration: 0.1}}
 
       className={'tutorial-slide-container'}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%',
+        gap: '1em',
+      }}
     >
       <img src={tutorialContent[currentSlide].image} className='tutorial-image'/>
-      { tutorialContent[currentSlide].title }
+      <Display size="xxs" style={{margin: 0}}>{ tutorialContent[currentSlide].title }</Display>
       { tutorialContent[currentSlide].desc }
     </motion.div>
     </AnimatePresence>
@@ -801,6 +855,7 @@ const TutorialModal = () => {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+      marginTop: '1em'
     }}>
       <GeneralButton
         icon={<ArrowLeft />}
@@ -820,7 +875,7 @@ const TutorialModal = () => {
         handleClick={() => {
           setCurrentSlide(currentSlide + 1)
         }}
-        type="secondary"
+        type="transparent"
         disabled={currentSlide === 4}
       >
         Next
@@ -828,14 +883,6 @@ const TutorialModal = () => {
     </div>
   </>;
 };
-
-
-
-const TutorialContent = () => {
-  return <motion.div>
-    
-  </motion.div>
-}
 
 export {
   BottleDistribution,

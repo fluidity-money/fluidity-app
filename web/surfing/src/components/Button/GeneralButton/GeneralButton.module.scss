@@ -164,7 +164,7 @@
 
   &:disabled {
     color: map-get($text, "disabled");
-    background-color: map-get($bg, default);
+    background-color: none;
     border: 0.5px solid map-get($border, "disabled");
 
     .icon, * {

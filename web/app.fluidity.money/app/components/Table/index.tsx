@@ -45,6 +45,8 @@ type ITable<T> = {
   loaded: boolean;
 
   showLoadingAnimation?: boolean;
+
+  style?: 'dashboard' | 'airdrop'
 };
 
 const Table = <T,>(props: ITable<T>) => {

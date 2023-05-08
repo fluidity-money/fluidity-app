@@ -39,7 +39,6 @@ import {
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect } from "react";
-import Table, { IRow } from "~/components/Table";
 import { Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
@@ -50,6 +49,7 @@ import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
+import Table, { IRow } from "~/components/Table";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: april 19th, 2023
@@ -243,7 +243,7 @@ const Airdrop = () => {
   }, [address]);
 
   const Header = () => {
-    return <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
+    return <div className="pad-main" style={{ display: "flex", gap: "2em", marginBottom: '2em' }}>
     <TabButton
       size="small"
       onClick={() => setCurrentModal("staking-stats")}
@@ -265,6 +265,8 @@ const Airdrop = () => {
     </TabButton>
   </div>
   }
+
+
 
   if (!showAirdrop) return null;
 
@@ -432,6 +434,7 @@ const AirdropStats = ({
         justifyContent: "space-between",
         alignItems: "center",
         flexWrap: "wrap",
+        gap: '1em'
       }}
     >
       <div>
@@ -498,24 +501,10 @@ const MultiplierTasks = () => {
       fill
       color="holo"
       rounded
-      style={{
-        zIndex: 0,
-        color: "black",
-        display: "grid",
-        boxSizing: "border-box",
-        gridTemplateColumns: "2.2fr 1fr 5fr",
-        gap: "2em",
-      }}
+      className="multiplier-tasks"
     >
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.5em",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          gridColumn: "1 / 2",
-        }}
+        className="multiplier-tasks-header"
       >
         <Text style={{ color: "black" }} bold size="md">
           Multiplier Tasks
@@ -525,15 +514,7 @@ const MultiplierTasks = () => {
         </Text>
       </div>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: "1em",
-          alignItems: "center",
-          cursor: "pointer",
-          gridColumn: "2 / 3",
-          justifyContent: "flex-start",
-        }}
+        className="multiplier-tasks-multiplier"
         onClick={() => {
           setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
         }}
@@ -557,12 +538,7 @@ const MultiplierTasks = () => {
         </TextButton>
       </div>
       <div
-        style={{
-          gridColumn: "3 / 4",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        className="multiplier-tasks-tasks"
       >
         {tasks === "1x" && (
           <motion.div
@@ -732,6 +708,7 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
 
   return (
     <motion.tr
+      className="airdrop-row"
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -745,25 +722,25 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
     >
       {/* Rank */}
       <td>
-        <Text>{rank}</Text>
+        <Text prominent>{rank}</Text>
       </td>
 
       {/* User */}
       <td>
-        <Text>{trimAddress(user)}</Text>
+        <Text prominent>{trimAddress(user)}</Text>
       </td>
 
       {/* Bottles */}
-      <td>{toSignificantDecimals(bottles, 2)}</td>
+      <td><Text prominent>{toSignificantDecimals(bottles, 2)}</Text></td>
 
       {/* Multiplier */}
       <td>
-        <Text>{liquidityMultiplier.toLocaleString()}x</Text>
+        <Text prominent>{liquidityMultiplier.toLocaleString()}x</Text>
       </td>
 
       {/* Referrals */}
       <td>
-        <Text>{referralCount}</Text>
+        <Text prominent>{referralCount}</Text>
       </td>
     </motion.tr>
   );
@@ -792,7 +769,7 @@ const Leaderboard = ({
         rounded
         color="white"
       >
-        <div style={{ marginBottom: "1em" }}>
+        <div className="leaderboard-header">
           <Heading as="h3">Leaderboard</Heading>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
@@ -846,29 +823,35 @@ const Leaderboard = ({
   );
 };
 
+
 const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
   const [imgIndex, setImgIndex] = useState(0);
   const [showBottleNumbers, setShowBottleNumbers] = useState(false);
+  
+  const handleHeroPageChange = (index: number) => {
+    setImgIndex(index)
+  }
+  
   return (
     <div>
-      <HeroCarousel title="BOTTLES I'VE EARNED">
+      <HeroCarousel 
+        title="BOTTLES I'VE EARNED"
+        onSlideChange={handleHeroPageChange}
+      >
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop1.png" />
+          <img src="/images/hero/common.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop2.png" />
+          <img src="/images/hero/uncommon.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop3.png" />
+          <img src="/images/hero/rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop1.png" />
+          <img src="/images/hero/ultra_rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop2.png" />
-        </Card>
-        <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop3.png" />
+          <img src="/images/hero/legendary.png" />
         </Card>
       </HeroCarousel>
       <BottleDistribution
