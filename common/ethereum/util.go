@@ -186,6 +186,25 @@ func CoerceBoundContractResultsToAddresses(results []interface{}) ([]ethCommon.A
 	return addresses, nil
 }
 
+func CoerceBoundContractResultsToBool(results []interface{}) (bool, error) {
+	var result bool
+
+	if resultsLen := len(results); resultsLen != 1 {
+		return result, fmt.Errorf(
+			"returned results did not have length of 1! was %v",
+			resultsLen,
+		)
+	}
+
+	result, ok := results[0].(bool)
+
+	if !ok {
+		return result, fmt.Errorf("results did not contain an uint8!")
+	}
+
+	return result, nil
+}
+
 func CoerceBoundContractResultsToUint8(results []interface{}) (uint8, error) {
 	var result uint8
 

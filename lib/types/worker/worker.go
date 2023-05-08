@@ -95,6 +95,7 @@ type (
 		GTradeV6_1       float64 `json:"gtrade_v6_1"`
 		Meson            float64 `json:"meson"`
 		Camelot          float64 `json:"camelot"`
+		Chronos          float64 `json:"chronos"`
 	}
 
 	FeeSwitch struct {
