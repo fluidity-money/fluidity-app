@@ -776,7 +776,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     function disableEmergencyMode() public {
         require(msg.sender == operator_, "only operator");
+
         _enableApprovals();
+
+        emit Emergency(false);
+
         noEmergencyMode_ = true;
     }
 
@@ -796,6 +800,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
 
         _disableApprovals();
+
+        emit Emergency(true);
 
         noEmergencyMode_ = false;
     }
