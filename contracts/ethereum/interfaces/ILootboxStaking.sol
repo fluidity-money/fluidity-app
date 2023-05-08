@@ -70,7 +70,7 @@ interface ILootboxStaking {
      * @notice deposited amount for the spender given of their original deposit
      * @param _spender to get the spending amounts for
      */
-    function deposited(address _spender) external returns (
+    function deposited(address _spender) external view returns (
         uint256 fusdcAmount,
         uint256 usdcAmount,
         uint256 wethAmount
