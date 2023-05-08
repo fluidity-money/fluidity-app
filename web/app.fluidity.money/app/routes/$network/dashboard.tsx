@@ -702,7 +702,10 @@ export default function Dashboard() {
         />
         <Outlet />
         {/* Provide Liquidity*/}
-        <div className="pad-main" style={{ marginBottom: "2em" }}>
+        <div
+          className="pad-main"
+          style={{ marginBottom: "2em", marginTop: "2em" }}
+        >
           {!openMobModal && (
             <ProvideLiquidity
               provider={provider}

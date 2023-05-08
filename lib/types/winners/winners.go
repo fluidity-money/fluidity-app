@@ -26,17 +26,18 @@ type Winner struct {
 	Network                  network.BlockchainNetwork `json:"network"`
 	TransactionHash          string                    `json:"transaction_hash"`
 	SendTransactionHash      string                    `json:"send_transaction_hash"`
+	SendTransactionLogIndex  misc.BigInt               `json:"log_index"`
 	WinnerAddress            string                    `json:"winner_address"`
 	SolanaWinnerOwnerAddress string                    `json:"solana_winner_owner_address"`
 	WinningAmount            misc.BigInt               `json:"winning_amount"`
 	AwardedTime              time.Time                 `json:"awarded_time"`
 	RewardType               RewardType                `json:"reward_type"`
 	// this is the stringified result of either an ethereum.Application or solana.Application
-	Application              string                    `json:"application"`
-	Utility                  applications.UtilityName  `json:"utility"`
-	BatchFirstBlock          misc.BigInt               `json:"first_block"`
-	BatchLastBlock           misc.BigInt               `json:"last_block"`
-	RewardTier			     int					   `json:"reward_tier"`
+	Application     string                   `json:"application"`
+	Utility         applications.UtilityName `json:"utility"`
+	BatchFirstBlock misc.BigInt              `json:"first_block"`
+	BatchLastBlock  misc.BigInt              `json:"last_block"`
+	RewardTier      int                      `json:"reward_tier"`
 
 	TokenDetails token_details.TokenDetails `json:"token_details"`
 }

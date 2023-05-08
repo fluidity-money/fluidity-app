@@ -51,7 +51,7 @@ const (
 )
 
 // details needed to update the reward type database
-type win = struct{
+type win = struct {
 	rewardTransactionHash typesEth.Hash
 	sendTransactionHash   typesEth.Hash
 	winnerAddress         typesEth.Address
@@ -66,7 +66,7 @@ func main() {
 		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 
 		useHardhatFix     bool
-		useLegacyContract = os.Getenv(EnvUseLegacyContract) == "true"
+		useLegacyContract        = os.Getenv(EnvUseLegacyContract) == "true"
 		gasLimit          uint64 = 0
 	)
 
@@ -175,7 +175,7 @@ func main() {
 		receipt, err := bind.WaitMined(context.Background(), ethClient, transactionHash)
 
 		if err != nil {
-			log.Fatal(func (k *log.Log) {
+			log.Fatal(func(k *log.Log) {
 				k.Message = "Error waiting for reward transaction to be mined!"
 				k.Payload = err
 			})

@@ -24,7 +24,7 @@ import (
 type TestStructure struct {
 	Transfer struct {
 		Transaction ethTypes.Hash `json:"transaction"`
-		Log struct {
+		Log         struct {
 			Data    string           `json:"data"`
 			Address ethTypes.Address `json:"address"`
 			Topics  []ethTypes.Hash  `json:"topics"`

@@ -1,7 +1,8 @@
 import type { LoaderFunction } from "@remix-run/node";
+import type { StakingEvent } from "../../query/dashboard/airdrop";
 
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -24,6 +25,7 @@ import {
   TabButton,
   toSignificantDecimals,
   useViewport,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -32,6 +34,7 @@ import {
   StakeNowModal,
   StakingStatsModal,
   TutorialModal,
+  stakingLiquidityMultiplierEq,
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
@@ -59,16 +62,11 @@ export const links = () => {
 export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
 
-  const dayDifference = (date1: Date, date2: Date) =>
-    Math.ceil(
-      Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24
-    );
-
   const epochDays = dayDifference(new Date(), EPOCH_START_DATE);
 
   // Staking Tokens
   const allowedTokenSymbols = new Set(["fUSDC", "USDC", "wETH"]);
-  const { tokens } = config.config["ethereum"];
+  const { tokens } = config.config[network];
 
   const allowedTokens = tokens.filter(({ symbol }) =>
     allowedTokenSymbols.has(symbol)
@@ -90,32 +88,32 @@ type LoaderData = {
 };
 
 const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
-  referralsCount: 10,
+  referralsCount: 0,
   bottleTiers: {
-    [Rarity.Common]: 100,
+    [Rarity.Common]: 0,
     [Rarity.Uncommon]: 0,
-    [Rarity.Rare]: 12,
-    [Rarity.UltraRare]: 3,
-    [Rarity.Legendary]: 1,
+    [Rarity.Rare]: 0,
+    [Rarity.UltraRare]: 0,
+    [Rarity.Legendary]: 0,
   },
-  bottlesCount: 116,
-  liquidityMultiplier: 5230,
+  bottlesCount: 0,
+  liquidityMultiplier: 0,
   stakes: [],
   loaded: false,
 };
 
 const SAFE_DEFAULT_AIRDROP_LEADERBOARD: AirdropLeaderboardLoaderData = {
   leaderboard: [],
-  loaded: true,
+  loaded: false,
 };
 
 const SAFE_DEFAULT_REFERRALS: ReferralCountLoaderData = {
-  numActiveReferrerReferrals: 10,
-  numActiveReferreeReferrals: 11,
-  numInactiveReferreeReferrals: 12,
+  numActiveReferrerReferrals: 0,
+  numActiveReferreeReferrals: 0,
+  numInactiveReferreeReferrals: 0,
   inactiveReferrals: [],
   referralCode: "",
-  loaded: true,
+  loaded: false,
 };
 
 const Airdrop = () => {
@@ -134,20 +132,30 @@ const Airdrop = () => {
 
   const showAirdrop = showExperiment("enable-airdrop-page");
 
-  const { address, balance } = useContext(FluidityFacadeContext);
+  const navigate = useNavigate();
+
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+
+  const { address, balance, getStakingDeposits, stakeTokens } = useContext(
+    FluidityFacadeContext
+  );
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
   const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard`
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    }`
   );
 
-  // const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-  //   address ? `/${network}/query/dashboard/airdropLeaderboard` : ""
-  // );
-  //
+  const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
+    address
+      ? `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+      }&address=${address}`
+      : ""
+  );
+
   const { data: referralData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
@@ -167,6 +175,10 @@ const Airdrop = () => {
       ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
       ...globalAirdropLeaderboardData,
     },
+    userAirdropLeaderboard: {
+      ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
+      ...userAirdropLeaderboardData,
+    },
     referrals: {
       ...SAFE_DEFAULT_REFERRALS,
       ...referralData,
@@ -182,16 +194,26 @@ const Airdrop = () => {
       inactiveReferrals,
     },
     airdropLeaderboard: {
-      leaderboard: leaderboardRows,
-      loaded: leaderboardLoaded,
+      leaderboard: globalLeaderboardRows,
+      loaded: globalLeaderboardLoaded,
+    },
+    userAirdropLeaderboard: {
+      leaderboard: userLeaderboardRows,
+      loaded: userLeaderboardLoaded,
     },
   } = data;
+
+  const leaderboardRows = userLeaderboardLoaded
+    ? userLeaderboardRows.concat(globalLeaderboardRows)
+    : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
 
   const closeModal = () => {
     setCurrentModal(null);
   };
+
+  // const [ stakes, setStakes ] = useState<Array<>>([])
 
   // get token data once user is connected
   useEffect(() => {
@@ -231,7 +253,7 @@ const Airdrop = () => {
     <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
       Airdrop Tutorial
     </TabButton>
-    <TabButton size="small">Leaderboard</TabButton>
+    <TabButton size="small" onClick={() => navigate("#leaderboard")}>Leaderboard</TabButton>
     <TabButton
       size="small"
       onClick={() => setCurrentModal("referral-details")}
@@ -287,6 +309,7 @@ const Airdrop = () => {
           baseTokens={tokens.filter(
             (tok) => !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
           )}
+          stakeToken={stakeTokens}
         />
       </CardModal>
       <CardModal
@@ -322,7 +345,6 @@ const Airdrop = () => {
               display: "flex",
               flexDirection: "column",
               gap: "2em",
-              zIndex: 1,
             }}
           >
             <Heading className={"no-margin"}>
@@ -359,17 +381,29 @@ const Airdrop = () => {
               seeMyStakingStats={() => setCurrentModal("staking-stats")}
               seeStakeNow={() => setCurrentModal("stake-now")}
               liquidityMultiplier={liquidityMultiplier}
+              stakes={stakes}
             />
           </div>
           <BottleProgress bottles={bottleTiers} />
         </div>
       </div>
       <div
-        style={{ display: "flex", justifyContent: "center", padding: "0.5em" }}
+        style={{ display: "flex", justifyContent: "center", padding: "1em" }}
       >
-        <AnchorButton>LEADERBOARD</AnchorButton>
+        <AnchorButton
+          onClick={() => {
+            navigate("#leaderboard");
+          }}
+        >
+          LEADERBOARD
+        </AnchorButton>
       </div>
-      <Leaderboard loaded={leaderboardLoaded} data={leaderboardRows} />
+      <Leaderboard
+        loaded={globalLeaderboardLoaded}
+        data={leaderboardRows}
+        filterIndex={leaderboardFilterIndex}
+        setFilterIndex={setLeaderboardFilterIndex}
+      />
     </>
   );
 };
@@ -585,6 +619,7 @@ const MultiplierTasks = () => {
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
+  stakes: Array<StakingEvent>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
 }
@@ -593,6 +628,7 @@ const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
   liquidityMultiplier,
+  stakes,
 }: IMyMultiplier) => {
   return (
     <div
@@ -634,64 +670,38 @@ const MyMultiplier = ({
           gridRow: "1 / 3",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$5,000 FOR 365 DAYS</Text>
-          <ProgressBar value={1} max={1} rounded color="holo" size="sm" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text holo bold prominent>
-            1X
-          </Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$500 FOR 150 DAYS</Text>
-          <ProgressBar value={0.5} max={1} rounded size="sm" color="gray" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text>0.5X</Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$500 FOR 31 DAYS</Text>
-          <ProgressBar value={0.05} max={1} rounded size="sm" color="gray" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text>0.05X</Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$250 FOR 100 DAYS</Text>
-          <ProgressBar value={0.05} max={1} rounded size="sm" color="gray" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text>0.5X</Text>
-        </div>
+        {stakes.map(({ amount, durationDays, multiplier, insertedDate }) => {
+          const stakedDays = dayDifference(new Date(), new Date(insertedDate));
+
+          return (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: "0.5em",
+                }}
+              >
+                <Text>
+                  {numberToMonetaryString(amount)} FOR {durationDays} DAYS
+                </Text>
+                <ProgressBar
+                  value={stakedDays}
+                  max={durationDays}
+                  rounded
+                  color={durationDays === stakedDays ? "holo" : "gray"}
+                  size="sm"
+                />
+              </div>
+              <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
+                <Text holo bold prominent>
+                  {multiplier}X
+                </Text>
+              </div>
+            </>
+          );
+        })}
       </div>
       <GeneralButton
         buttontype="text"
@@ -762,9 +772,17 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
 interface IAirdropLeaderboard {
   loaded: boolean;
   data: Array<AirdropLeaderboardEntry>;
+  filterIndex: number;
+  setFilterIndex: (index: number) => void;
 }
 
-const Leaderboard = ({ loaded, data }: IAirdropLeaderboard) => {
+const Leaderboard = ({
+  loaded,
+  data,
+  filterIndex,
+  setFilterIndex,
+}: IAirdropLeaderboard) => {
+  console.log("HELOOOOOOOO", filterIndex);
   return (
     <div className="pad-main" id="leaderboard">
       <Card
@@ -774,12 +792,33 @@ const Leaderboard = ({ loaded, data }: IAirdropLeaderboard) => {
         rounded
         color="white"
       >
-        <div>
+        <div style={{ marginBottom: "1em" }}>
           <Heading as="h3">Leaderboard</Heading>
-          <Text prominent>
-            This leaderboard shows your rank among other users per{" "}
-            <ul>24 HOURS</ul>
-          </Text>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
+              This leaderboard shows your rank among other users{" "}
+              {filterIndex === 0 ? " per " : " for "}
+              {filterIndex === 0 ? (
+                <ul style={{ margin: 0 }}> 24 HOURS</ul>
+              ) : (
+                <ul style={{ margin: 0 }}> ALL TIME</ul>
+              )}
+            </Text>
+            <div style={{ display: "flex", gap: "1em" }}>
+              <GeneralButton
+                type={filterIndex === 0 ? "primary" : "secondary"}
+                handleClick={() => setFilterIndex(0)}
+              >
+                24 HOURS
+              </GeneralButton>
+              <GeneralButton
+                type={filterIndex === 1 ? "primary" : "secondary"}
+                handleClick={() => setFilterIndex(1)}
+              >
+                ALL TIME
+              </GeneralButton>
+            </div>
+          </div>
         </div>
         <Table
           itemName=""
@@ -849,5 +888,8 @@ const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
     </div>
   );
 };
+
+export const dayDifference = (date1: Date, date2: Date) =>
+  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
 
 export default Airdrop;

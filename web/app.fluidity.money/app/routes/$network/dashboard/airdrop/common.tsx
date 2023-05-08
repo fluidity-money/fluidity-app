@@ -15,12 +15,14 @@ import {
   TokenIcon,
   toSignificantDecimals,
   ArrowLeft,
+  Heading,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
 } from "~/util/chainUtils/tokens";
+import { dayDifference } from ".";
 
 import { Referral } from "~/queries";
 import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
@@ -230,6 +232,105 @@ const StakingStatsModal = ({
           )}
         </LabelledValue>
       </div>
+      <div style={{ position: "relative", border: "1px gray" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "-24px",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <GeneralButton> Select All</GeneralButton>
+          <GeneralButton> Withdraw</GeneralButton>
+        </div>
+        <div>
+          {stakes.map(
+            (
+              {
+                amount,
+                durationDays,
+                multiplier,
+                insertedDate: insertedDateStr,
+              },
+              i
+            ) => {
+              const insertedDate = new Date(insertedDateStr);
+              const stakedDays = dayDifference(new Date(), insertedDate);
+
+              const endDate = new Date(insertedDate);
+              endDate.setDate(endDate.getDate() + durationDays);
+
+              return (
+                <div
+                  key={`stake-${i}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "0.2 0.6 0.1 0.1",
+                  }}
+                >
+                  {/* Dates */}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.5em",
+                    }}
+                  >
+                    <Text>Start Date</Text>
+                    <Text prominent>
+                      {insertedDate.toLocaleDateString("en-US")}
+                    </Text>
+
+                    <Text>End Date</Text>
+                    <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.5em",
+                    }}
+                  >
+                    <Heading as="h3">{numberToMonetaryString(amount)}</Heading>
+                    <ProgressBar
+                      value={stakedDays}
+                      max={durationDays}
+                      rounded
+                      color={durationDays === stakedDays ? "holo" : "gray"}
+                      size="sm"
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text prominent>{multiplier}x Multiplier</Text>
+                      <Text prominent>
+                        {durationDays - stakedDays} Days Left
+                      </Text>
+                    </div>
+                  </div>
+                  <div
+                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
+                  >
+                    <Text>Staked For</Text>
+                    <Heading as="h2">{durationDays}</Heading>
+                    <Text>Days</Text>
+                  </div>
+                  <div>
+                    <input type="checkbox" />
+                  </div>
+                </div>
+              );
+            }
+          )}
+        </div>
+      </div>
     </>
   );
 };
@@ -237,13 +338,33 @@ const StakingStatsModal = ({
 interface IStakingNowModal {
   fluidTokens: Array<AugmentedToken>;
   baseTokens: Array<AugmentedToken>;
+  stakeToken?: (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdc: BN,
+    wethAmt: BN,
+    slippage: BN
+  ) => void;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
   amount: string;
 };
 
-const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
+// Staking Multiplier Equation
+export const stakingLiquidityMultiplierEq = (
+  stakedDays: number,
+  totalStakedDays: number
+) =>
+  (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
+  (396 * totalStakedDays) / 133225 -
+  31 / 365;
+
+const StakeNowModal = ({
+  fluidTokens,
+  baseTokens,
+  stakeToken,
+}: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
     amount: "",
@@ -252,17 +373,11 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
     ...baseTokens[0],
     amount: "",
   });
+
   const [stakingDuration, setStakingDuration] = useState(31);
 
-  // Staking Multiplier Equation
-  // Reference: https://www.notion.so/fluidity/Fluidity-Airdrops-Loot-bottles-5d1bcf986d5a45a7a29bfc200fbfbb20?pvs=4#f47a040e934a41bbbb1793a7349146b6
-  const stakingLiquidityMultiplierEq = (
-    stakedDays: number,
-    totalStakedDays: number
-  ) =>
-    (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-    (396 * totalStakedDays) / 133225 -
-    31 / 365;
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + stakingDuration);
 
   const parseSwapInputToTokenAmount = (
     input: string,
@@ -340,6 +455,23 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
 
   const canStake = () => false;
 
+  const handleStake = async () => {
+    if (!stakeToken) return;
+    if (!canStake()) return;
+
+    try {
+      // await stakeToken();
+    } catch (e) {
+      // Expect error on fail
+      console.log(e);
+      return;
+    }
+  };
+
+  const [showTokenSelector, setShowTokenSelector] = useState<
+    "fluid" | "base" | ""
+  >("base");
+
   return (
     <div
       style={{
@@ -387,79 +519,128 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
             <Text prominent code>
               STAKE AMOUNT <InfoCircle />
             </Text>
-            <GeneralButton type="secondary" size="small">
+            <GeneralButton
+              type="secondary"
+              size="small"
+              handleClick={() => inputMaxBalance()}
+            >
               Max
             </GeneralButton>
           </div>
-          <div
-            style={{
-              border: "1px solid gray",
-              display: "flex",
-              padding: "5px",
-              borderRadius: "5em 14px 14px 5em",
-            }}
-          >
-            <TokenIcon style={{ width: "64px" }} token={fluidToken.symbol} />
-            <input
+          {showTokenSelector === "fluid" ? (
+            <div
               style={{
-                background: "none",
-                border: "none",
-                width: "100%",
-                color: "white",
-                fontSize: "2em",
-                outline: "none",
+                display: "flex",
+                flexDirection: "row",
+                gap: "1em",
+                background: "black",
               }}
-              className={"staking-input"}
-              min={""}
-              value={fluidToken.amount}
-              onBlur={(e) =>
-                setFluidToken({
-                  ...fluidToken,
-                  amount: addDecimalToBn(
-                    snapToValidValue(e.target.value, fluidToken),
-                    fluidToken.decimals
-                  ),
-                })
-              }
-              onChange={handleChangeStakingInput(fluidToken, setFluidToken)}
-              placeholder="0"
-              step="any"
-            />
-          </div>
-          <div
-            style={{
-              border: "1px solid gray",
-              display: "flex",
-              padding: "5px",
-              borderRadius: "5em 14px 14px 5em",
-            }}
-          >
-            <TokenIcon style={{ width: "64px" }} token={baseToken.symbol} />
-            <input
+            >
+              {fluidTokens.map((token) => (
+                <div
+                  key={`${token.symbol}`}
+                  onClick={() => {
+                    if (fluidToken.symbol != token.symbol) {
+                      setFluidToken({
+                        ...token,
+                        amount: "",
+                      });
+                    }
+                    setShowTokenSelector("");
+                  }}
+                >
+                  <TokenIcon
+                    key={token.symbol}
+                    token={token.symbol}
+                    className={"staking-modal-token-icon"}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={"staking-modal-input-container"}>
+              <div onClick={() => setShowTokenSelector("fluid")}>
+                <TokenIcon
+                  className={"staking-modal-token-icon"}
+                  token={fluidToken.symbol}
+                />
+              </div>
+              <input
+                className={"staking-modal-token-input"}
+                min={""}
+                value={fluidToken.amount}
+                onBlur={(e) =>
+                  setFluidToken({
+                    ...fluidToken,
+                    amount: addDecimalToBn(
+                      snapToValidValue(e.target.value, fluidToken),
+                      fluidToken.decimals
+                    ),
+                  })
+                }
+                onChange={handleChangeStakingInput(fluidToken, setFluidToken)}
+                placeholder="0"
+                step="any"
+              />
+            </div>
+          )}
+          {showTokenSelector === "base" ? (
+            <div
               style={{
-                background: "none",
-                border: "none",
-                color: "white",
-                fontSize: "2em",
-                outline: "none",
+                display: "flex",
+                flexDirection: "row",
+                gap: "1em",
+                background: "black",
               }}
-              className={"staking-input"}
-              min={""}
-              value={baseToken.amount}
-              onBlur={(e) =>
-                setBaseToken({
-                  ...baseToken,
-                  amount: addDecimalToBn(
-                    snapToValidValue(e.target.value, baseToken),
-                    baseToken.decimals
-                  ),
-                })
-              }
-              onChange={handleChangeStakingInput(baseToken, setBaseToken)}
-              placeholder="0"
-              step="any"
-            />
-          </div>
+            >
+              {baseTokens.map((token) => (
+                <div
+                  key={`${token.symbol}`}
+                  onClick={() => {
+                    if (baseToken.symbol != token.symbol) {
+                      setBaseToken({
+                        ...token,
+                        amount: "",
+                      });
+                    }
+                    setShowTokenSelector("");
+                  }}
+                >
+                  <TokenIcon
+                    className={"staking-modal-token-icon"}
+                    key={token.symbol}
+                    token={token.symbol}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={"staking-modal-input-container"}>
+              <div onClick={() => setShowTokenSelector("base")}>
+                <TokenIcon
+                  className={"staking-modal-token-icon"}
+                  token={baseToken.symbol}
+                />
+              </div>
+              <input
+                className={"staking-modal-token-input"}
+                min={""}
+                value={baseToken.amount}
+                onBlur={(e) =>
+                  setBaseToken({
+                    ...baseToken,
+                    amount: addDecimalToBn(
+                      snapToValidValue(e.target.value, baseToken),
+                      baseToken.decimals
+                    ),
+                  })
+                }
+                onChange={handleChangeStakingInput(baseToken, setBaseToken)}
+                placeholder="0"
+                step="any"
+              />
+            </div>
+          )}
         </div>
         {/* Arrow */}
         <div>
@@ -483,7 +664,8 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
           />
           <div>
             <Text>
-              END: <Text>{Date.now() + stakingDuration}</Text> <InfoCircle />
+              END: <Text>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+              <InfoCircle />
             </Text>
           </div>
         </div>
@@ -548,6 +730,7 @@ const StakeNowModal = ({ fluidTokens, baseTokens }: IStakingNowModal) => {
         type="secondary"
         disabled={!canStake()}
         style={{ width: "95%" }}
+        handleClick={() => handleStake()}
       >
         Stake
       </GeneralButton>

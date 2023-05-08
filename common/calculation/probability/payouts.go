@@ -36,7 +36,7 @@ func CalculatePayoutsCombined(sourcePayouts map[applications.UtilityName][]worke
 func CalculatePayoutsSplit(sourcePayouts map[applications.UtilityName][]worker.Payout, winningBalls int) (map[applications.UtilityName]worker.Payout, map[applications.UtilityName]worker.Payout) {
 	var (
 		fromAmounts = make(map[applications.UtilityName]worker.Payout)
-		toAmounts = make(map[applications.UtilityName]worker.Payout)
+		toAmounts   = make(map[applications.UtilityName]worker.Payout)
 	)
 
 	for utility, payout := range sourcePayouts {

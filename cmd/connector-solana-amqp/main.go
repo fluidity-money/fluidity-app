@@ -159,7 +159,7 @@ func main() {
 	})
 
 	solanaWebsocket.SubscribeSlots(func(slot types.Slot) {
-		nextBlock := latestBlockSeen+1
+		nextBlock := latestBlockSeen + 1
 
 		log.Debug(func(k *log.Log) {
 			k.Format(

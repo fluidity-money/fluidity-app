@@ -237,7 +237,7 @@ func main() {
 
 			if !exists {
 				log.Fatal(func(k *log.Log) {
-				    k.Format(
+					k.Format(
 						"Transaction %s in block %s is unreferenced!",
 						transactionHash.String(),
 						blockLog.BlockHash,
@@ -248,14 +248,14 @@ func main() {
 			convertedReceipt, err := getReceipt(gethClient, transactionHash)
 
 			if err != nil {
-			    log.Fatal(func(k *log.Log) {
-			        k.Format(
+				log.Fatal(func(k *log.Log) {
+					k.Format(
 						"Failed to fetch receipt for transaction %s!",
 						transactionHash.String(),
 					)
 
-			        k.Payload = err
-			    })
+					k.Payload = err
+				})
 			}
 
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
@@ -267,6 +267,7 @@ func main() {
 					contractAddress,
 					tokenDecimals,
 					*convertedReceipt,
+					transaction.Data,
 				)
 
 				if err != nil {
@@ -318,6 +319,7 @@ func main() {
 				decoratedTransfer := worker.EthereumDecoratedTransfer{
 					TransactionHash:  transactionHash,
 					SenderAddress:    sender,
+					LogIndex:         &transfer.Log.Index,
 					RecipientAddress: recipient,
 					Decorator:        decorator,
 					AppEmissions:     emission,
@@ -359,14 +361,14 @@ func main() {
 				receipt, err := getReceipt(gethClient, transactionHash)
 
 				if err != nil {
-				    log.Fatal(func(k *log.Log) {
-				        k.Format(
+					log.Fatal(func(k *log.Log) {
+						k.Format(
 							"Failed to fetch receipt for transaction %s!",
 							transactionHash.String(),
 						)
 
-				        k.Payload = err
-				    })
+						k.Payload = err
+					})
 				}
 
 				decoratedTransaction.Receipt = *receipt
@@ -376,12 +378,14 @@ func main() {
 				from      = fluidTransfer.SenderAddress
 				to        = fluidTransfer.RecipientAddress
 				decorator = fluidTransfer.Decorator
+				logIndex  = fluidTransfer.LogIndex
 			)
 
 			transfer := worker.EthereumDecoratedTransfer{
 				TransactionHash:  transactionHash,
 				SenderAddress:    from,
 				RecipientAddress: to,
+				LogIndex:         logIndex,
 				Decorator:        decorator,
 				AppEmissions:     worker.EthereumAppFees{},
 			}

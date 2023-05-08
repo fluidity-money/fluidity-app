@@ -22,20 +22,20 @@ func main() {
 }
 
 type RequestUserMintLimit struct {
-    TokenName string `json:"token_short_name"`
+	TokenName string `json:"token_short_name"`
 }
 
 type ResponseUserMintLimit struct {
-    MintLimit float64 `json:"mint_limit"`
+	MintLimit float64 `json:"mint_limit"`
 }
 
 type RequestUserAmountMinted struct {
-    Address   string `json:"address"`
-    TokenName string `json:"token_short_name"`
+	Address   string `json:"address"`
+	TokenName string `json:"token_short_name"`
 }
 
 type ResponseUserAmountMinted struct {
-    AmountMinted float64 `json:"amount_minted"`
+	AmountMinted float64 `json:"amount_minted"`
 }
 
 func HandleHealthCheck(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +46,7 @@ func HandleHealthCheck(w http.ResponseWriter, r *http.Request) {
 func HandleUserAmountMinted(w http.ResponseWriter, r *http.Request) interface{} {
 	var (
 		ipAddress = web.GetIpAddress(r)
-		request RequestUserAmountMinted
+		request   RequestUserAmountMinted
 	)
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -65,20 +65,20 @@ func HandleUserAmountMinted(w http.ResponseWriter, r *http.Request) interface{} 
 		return nil
 	}
 
-    amountMinted := solana.GetUserAmountMinted(request.Address)
+	amountMinted := solana.GetUserAmountMinted(request.Address)
 
-    response := ResponseUserAmountMinted{
-        AmountMinted: amountMinted,
-    } 
+	response := ResponseUserAmountMinted{
+		AmountMinted: amountMinted,
+	}
 
-    return response
+	return response
 }
 
 // HandleUserMintLimit for the per-user mint limit for the token
 func HandleUserMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 	var (
 		ipAddress = web.GetIpAddress(r)
-		request RequestUserMintLimit
+		request   RequestUserMintLimit
 	)
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -93,15 +93,15 @@ func HandleUserMintLimit(w http.ResponseWriter, r *http.Request) interface{} {
 			k.Payload = err
 		})
 
-        w.WriteHeader(http.StatusForbidden)
-        return nil
+		w.WriteHeader(http.StatusForbidden)
+		return nil
 	}
 
-    mintLimit := solana.GetUserMintLimit(request.TokenName)
+	mintLimit := solana.GetUserMintLimit(request.TokenName)
 
-    response := ResponseUserMintLimit{
-        MintLimit: mintLimit,
-    } 
+	response := ResponseUserMintLimit{
+		MintLimit: mintLimit,
+	}
 
-    return response
+	return response
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,51 +24,52 @@ func TestGetApplicationFee(t *testing.T) {
 		client             *ethclient.Client
 		fluidTokenContract common.Address
 		tokenDecimals      int
+		inputData          misc.Blob
 	)
 
-	fee, emission, err := GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err := GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationUniswapV2
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationBalancerV2
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationOneInchLPV1
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationMooniswap
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationOneInchFixedRateSwap
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationCurve
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationMultichain
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt)
+	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
 	assert.Nil(t, fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)

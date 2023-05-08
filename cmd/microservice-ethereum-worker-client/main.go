@@ -67,6 +67,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		var (
 			announcementTransactionHash = announcement.TransactionHash
 			blockNumber                 = announcement.BlockNumber
+			logIndex                    = announcement.LogIndex
 			fromAddress                 = announcement.FromAddress
 			toAddress                   = announcement.ToAddress
 			sourceRandom                = announcement.RandomSource
@@ -135,6 +136,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		winAnnouncement := worker.EthereumWinnerAnnouncement{
 			Network:         network_,
 			TransactionHash: announcementTransactionHash,
+			LogIndex:        logIndex,
 			BlockNumber:     blockNumber,
 			FromAddress:     fromAddress,
 			FromWinAmount:   fromWinAmounts,

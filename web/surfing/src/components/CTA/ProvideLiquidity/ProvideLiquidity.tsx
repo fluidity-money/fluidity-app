@@ -1,4 +1,3 @@
-
 import {
   Card,
   Heading,
@@ -57,18 +56,18 @@ interface IProvideLiquidity {
   network: string;
   tokensConfig: {
     [x: string]: {
-        tokens: {
-            symbol: Token;
-            address: string;
-            name: string;
-            logo: string;
-            colour: string;
-            isFluidOf?: string;
-            obligationAccount?: string;
-            dataAccount?: string;
-            decimals: number;
-            userMintLimit?: number;
-        }[];
+      tokens: {
+        symbol: Token;
+        address: string;
+        name: string;
+        logo: string;
+        colour: string;
+        isFluidOf?: string;
+        obligationAccount?: string;
+        dataAccount?: string;
+        decimals: number;
+        userMintLimit?: number;
+      }[];
     };
   };
 }
@@ -162,7 +161,13 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
   };
 
   return (
-    <Card className={styles.ProvideLiquidity} rounded type={"transparent"} color="holo" border="solid">
+    <Card
+      className={styles.ProvideLiquidity}
+      rounded
+      type={"transparent"}
+      color="holo"
+      border="solid"
+    >
       <section className={styles["provide-liquidity-left"]}>
         <Heading as="h2" className={styles["provide-heading"]}>
           Provide Liquidity for{" "}

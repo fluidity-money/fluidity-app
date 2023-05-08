@@ -185,11 +185,11 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
-	feePercent := big.NewRat(2,1000)
+	feePercent := big.NewRat(2, 1000)
 
 	var fluidTokens *big.Rat
 
-		// get the amount of fluid tokens in this swap
+	// get the amount of fluid tokens in this swap
 	if token0 == fluidContractAddress {
 		// amount0In | amount0Out
 
