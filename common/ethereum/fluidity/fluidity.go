@@ -30,6 +30,24 @@ const tokenContractAbiString = `[
 },
 {
 	"inputs": [
+		{
+			"components": [
+				{ "internalType": "address", "name": "winner", "type": "address" },
+				{ "internalType": "uint256", "name": "winAmount", "type": "uint256" }
+			],
+			"internalType": "struct Winner[]",
+			"name": "rewards",
+			"type": "tuple[]"
+		},
+		{ "internalType": "uint256", "name": "firstBlock", "type": "uint256" },
+		{ "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
+	],
+	"name": "batchReward",
+	"outputs": [],
+	"type": "function"
+},
+{
+	"inputs": [
 		{ "internalType": "address", "name": "to", "type": "address" },
 		{ "internalType": "uint256", "name": "amount", "type": "uint256" }
 	],
@@ -71,6 +89,29 @@ const tokenContractAbiString = `[
 	],
 	"name": "UnblockReward",
 	"type": "event"
+},
+{
+	"inputs": [
+		{ "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
+		{ "internalType": "address", "name": "from", "type": "address" },
+		{ "internalType": "address", "name": "to", "type": "address" },
+		{ "internalType": "uint256[]", "name": "balls", "type": "uint256[]" },
+		{ "internalType": "uint256[]", "name": "payouts", "type": "uint256[]" }
+	],
+	"name": "reward",
+	"outputs": [],
+	"stateMutability": "nonpayable",
+	"type": "function"
+},
+{
+	"inputs": [
+		{ "internalType": "uint256", "name": "global", "type": "uint256" },
+		{ "internalType": "uint256", "name": "user", "type": "uint256" }
+	],
+	"name": "updateMintLimits",
+	"outputs": [],
+	"stateMutability": "nonpayable",
+	"type": "function"
 },
 {
 	"inputs": [
@@ -200,11 +241,28 @@ const registryAbiString = `[
   }
 ]`
 
+const stakingAbiString = `[
+	{
+		"anonymous": false,
+		"inputs": [
+			{ "indexed": true, "internalType": "address", "name": "spender", "type": "address" },
+			{ "indexed": false, "internalType": "uint256", "name": "lockupLength", "type": "uint256" },
+			{ "indexed": false, "internalType": "uint256", "name": "lockedTimestamp", "type": "uint256" },
+			{ "indexed": false, "internalType": "uint256", "name": "fusdcAmount", "type": "uint256" },
+			{ "indexed": false, "internalType": "uint256", "name": "usdcAmount", "type": "uint256" },
+			{ "indexed": false, "internalType": "uint256", "name": "wethAmount", "type": "uint256" }
+		],
+		"name": "Staked",
+		"type": "event"
+	}
+]`
+
 var (
 	FluidityContractAbi ethAbi.ABI
-	OperatorAbi         ethAbi.ABI
+	ExecutorAbi         ethAbi.ABI
 	RegistryAbi         ethAbi.ABI
 	RewardPoolAbi       ethAbi.ABI
+	StakingAbi          ethAbi.ABI
 )
 
 // the OracleUpdate struct from solidity, to be passed to updateOracles
@@ -268,10 +326,10 @@ func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) 
 	return amountRat, nil
 }
 
-func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
+func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledRewards) (*ethTypes.Transaction, error) {
 	boundContract := ethAbiBind.NewBoundContract(
-		operatorAddress,
-		OperatorAbi,
+		executorAddress,
+		ExecutorAbi,
 		client,
 		client,
 		client,
@@ -292,7 +350,8 @@ func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress
 		for winnerAddress, winAmount := range reward {
 			winner := abiWinner{
 				Winner:    ethereum.ConvertInternalAddress(winnerAddress),
-				WinAmount: &winAmount.Int,
+				// this references a loop variable, so we need to explicitly clone it
+				WinAmount: new(big.Int).Set(&winAmount.Int),
 			}
 
 			winners[i] = winner
@@ -309,9 +368,9 @@ func TransactBatchReward(client *ethclient.Client, operatorAddress, tokenAddress
 
 	gas, err := ethereum.EstimateGas(
 		client,
-		&OperatorAbi,
+		&ExecutorAbi,
 		transactionOptions,
-		&operatorAddress,
+		&executorAddress,
 		"reward",
 		tokenAddress,
 		rewards,

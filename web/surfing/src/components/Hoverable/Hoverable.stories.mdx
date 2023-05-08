@@ -1,0 +1,46 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import Hoverable from "./";
+import Text from "../Text";
+import { LinkButton } from "../Button";
+
+<Meta
+    title="Util/Hoverable"
+    component={Hoverable}
+    parameters={{
+        pseudo: {
+            hover: ".hover",
+            focus: ".focus",
+        }
+    }}
+/>
+
+export const Template = ({children, ...props}) => <Hoverable {...props}>
+    {children}
+</Hoverable>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Hoverable</Title>
+    <Subtitle>Opens a tooltip on hover/focus.</Subtitle>
+    
+    <h2>Regular Text</h2>
+    <Story
+        name="Regular Text"
+        args={{
+            children: <Text>Label</Text>,
+            tooltipContent: <Text>Hello world</Text>,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <h2>Info Button</h2>
+    <Story
+        name="Info Button"
+        args={{
+            children: <LinkButton size="medium" type="info" handleClick={() => {return}}>Label</LinkButton>,
+            tooltipContent: <Text>Hello world</Text>,
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

@@ -11,7 +11,12 @@ import { WarningIcon } from "./WarningIcon";
 import { DaoIcon } from "./Dao";
 import { AssetsIcon } from "./Assets";
 import { ProviderIcon } from "./ProviderIcon";
-import { Token } from "./Token";
+import { WalletIcon } from "./WalletIcon";
+import { TokenIcon } from "./TokenIcon";
+import { InfoCircle } from "./InfoCircle";
+import { CaretLeft } from "./CaretLeft";
+import { CaretRight } from "./CaretRight";
+import { Referral } from "./Referral";
 
 export {
   ArrowRight,
@@ -27,5 +32,10 @@ export {
   DaoIcon,
   AssetsIcon,
   ProviderIcon,
-  Token,
+  WalletIcon,
+  TokenIcon,
+  InfoCircle,
+  CaretLeft,
+  CaretRight,
+  Referral,
 };

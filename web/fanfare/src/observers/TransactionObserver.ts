@@ -1,7 +1,7 @@
-import { Observable } from "rxjs";
 import { manager } from "../core/manager";
-import { Transaction } from "../types/OutputMessage";
 import { TransactionProvider } from "../types/Transaction";
+import { FanfareConfig } from "../types/Config";
+import { ObserverConstructor } from "../types/Observer";
 
 type TransactionObserverProps = {
     connector: TransactionProvider 
@@ -9,6 +9,6 @@ type TransactionObserverProps = {
 
 export const TransactionObserver = ({
     connector
-}: TransactionObserverProps): Observable<Transaction> => {
-    return manager(connector).observable;
+}: TransactionObserverProps): ObserverConstructor => {
+    return (config: FanfareConfig) =>  manager(connector, config).observable;
 }

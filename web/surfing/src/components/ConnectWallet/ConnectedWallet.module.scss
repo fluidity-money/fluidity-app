@@ -1,0 +1,17 @@
+.ConnectedWallet {
+  all: unset;
+  cursor: pointer;
+  font-size: 0.8em;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 0.5px solid transparent;
+  padding: 0.2em;
+  border-radius: 2em;
+
+  &:hover {
+    border: 0.5px solid white;
+    padding: 0.2em;
+    border-radius: 2em;
+  }
+}

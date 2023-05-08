@@ -1,4 +1,4 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 import type { Volume } from "../volumeStats";
 import type { TimeSepUserYield } from "~/queries/useUserYield";
 
@@ -6,8 +6,12 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { LoaderFunction, json } from "@remix-run/node";
 import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
+import {
+  aggregatePrizePools,
+  getTotalRewardPool,
+} from "~/util/chainUtils/ethereum/transaction";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
 import config from "~/webapp.config.server";
 
 export type HomeLoaderData = {
@@ -31,11 +35,41 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const timestamp = new Date().getTime();
 
   const mainnetId = 0;
-  const infuraRpc = config.drivers[network][mainnetId].rpc.http;
 
-  const provider = new JsonRpcProvider(infuraRpc);
+  const prizePoolPromise: Promise<number> = (() => {
+    switch (chainType(network)) {
+      case "evm": {
+        return Promise.resolve(
+          Promise.all(
+            [
+              {
+                network: "ethereum",
+                abi: RewardAbi,
+                getPrizePool: aggregatePrizePools,
+              },
+              {
+                network: "arbitrum",
+                abi: TotalRewardPoolAbi,
+                getPrizePool: getTotalRewardPool,
+              },
+            ].map(({ network, abi, getPrizePool }) => {
+              const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+              const provider = new JsonRpcProvider(infuraRpc);
 
-  const rewardPoolAddr = config.contract.prize_pool[network] ?? "";
+              const rewardPoolAddr =
+                config.contract.prize_pool[network as Chain];
+
+              return getPrizePool(provider, rewardPoolAddr, abi);
+            })
+          ).then((prizePools) =>
+            prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
+          )
+        );
+      }
+      default:
+        return Promise.resolve(0);
+    }
+  })();
 
   try {
     const [
@@ -43,17 +77,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       { volume },
       { data: rewardsData, errors: rewardsErr },
     ] = await Promise.all([
-      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      prizePoolPromise,
       address
         ? jsonGet<{ address: string }, { volume: Volume[] }>(
-          `${url.origin}/${network}/query/volumeStats`,
-          {
-            address,
-          }
-        )
+            `${url.origin}/${network}/query/volumeStats`,
+            {
+              address,
+            }
+          )
         : jsonGet<Record<string, never>, { volume: Volume[] }>(
-          `${url.origin}/${network}/query/volumeStats`
-        ),
+            `${url.origin}/${network}/query/volumeStats`
+          ),
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),

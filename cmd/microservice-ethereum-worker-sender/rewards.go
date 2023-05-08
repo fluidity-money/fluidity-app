@@ -22,7 +22,7 @@ import (
 type callRewardArguments struct {
 	transactionOptions    *ethAbiBind.TransactOpts
 	containerAnnouncement worker.EthereumSpooledRewards
-	operatorAddress       ethCommon.Address
+	executorAddress       ethCommon.Address
 	contractAddress       ethCommon.Address
 	client                *ethclient.Client
 	useHardhatFix         bool
@@ -33,7 +33,7 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 	var (
 		transactionOptions    = arguments.transactionOptions
 		containerAnnouncement = arguments.containerAnnouncement
-		operatorAddress       = arguments.operatorAddress
+		executorAddress       = arguments.executorAddress
 		contractAddress       = arguments.contractAddress
 		client                = arguments.client
 		useHardhatFix         = arguments.useHardhatFix
@@ -75,7 +75,7 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 
 	transaction, err := fluidity.TransactBatchReward(
 		client,
-		operatorAddress,
+		executorAddress,
 		contractAddress,
 		transactionOptions,
 		containerAnnouncement,

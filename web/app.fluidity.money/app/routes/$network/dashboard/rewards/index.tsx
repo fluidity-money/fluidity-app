@@ -2,7 +2,7 @@ import type { Chain } from "~/util/chainUtils/chains";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
-import type { TransactionsLoaderData } from "../../query/winningUserTransactions";
+import type { TransactionsLoaderData } from "../../query/userTransactions";
 import type { RewardsLoaderData } from "../../query/dashboard/rewards";
 import type { UnclaimedRewardsLoaderData } from "../../query/dashboard/unclaimedRewards";
 
@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { UserRewards } from "./common";
+import { UserRewards, NoUserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { MintAddress } from "~/types/MintAddress";
 import {
@@ -29,6 +29,14 @@ import {
   LabelledValue,
   ProviderIcon,
   ProviderCard,
+  Hoverable,
+  TokenIcon,
+  Provider,
+  Token,
+  CardCarousel,
+  Display,
+  WalletIcon,
+  TabButton,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -66,7 +74,8 @@ type LoaderData = {
   };
 };
 
-function ErrorBoundary() {
+function ErrorBoundary(error: Error) {
+  console.error(error);
   return (
     <div
       className="pad-main"
@@ -115,6 +124,12 @@ const SAFE_DEFAULT_REWARDS: RewardsLoaderData = {
     year: [],
     all: [],
   },
+  tokenPerformance: {
+    week: [],
+    month: [],
+    year: [],
+    all: [],
+  },
 };
 
 const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
@@ -143,7 +158,9 @@ export default function Rewards() {
     `/${network}/query/winningUserTransactions?page=${page}`
   );
 
-  const { connected, address, tokens } = useContext(FluidityFacadeContext);
+  const { connected, address, tokens, addToken } = useContext(
+    FluidityFacadeContext
+  );
 
   const userRewardsData = useFetcher();
 
@@ -295,17 +312,15 @@ export default function Rewards() {
     count,
     hasRewarders,
     fluidPairs,
-    networkFee,
-    gasFee,
     transactions,
     rewarders,
     activeYield,
     totalPrizePool,
     timestamp,
     userUnclaimedRewards,
-    unclaimedTokenAddrs,
-    weeklyRewards,
     txLoaded,
+    hasTokenPerformance,
+    activeTokenPerformance,
   } = useMemo(() => {
     const {
       rewards: rewardsData,
@@ -322,6 +337,7 @@ export default function Rewards() {
       rewarders,
       loaded: rewardsLoaded,
       rewards,
+      tokenPerformance,
     } = rewardsData;
 
     const { transactions, loaded: txLoaded } = txData;
@@ -346,21 +362,29 @@ export default function Rewards() {
       all: allRewards,
     } = rewarders;
 
-    const [activeRewards, activeYield] = (() => {
+    const {
+      week: weeklyTokenPerformance,
+      month: monthlyTokenPerformance,
+      year: yearlyTokenPerformance,
+      all: allTokenPerformance,
+    } = tokenPerformance;
+
+    const [activeRewards, activeYield, activeTokenPerformance] = (() => {
       switch (activeRewardFilterIndex) {
         case 1:
-          return [weeklyRewards, weeklyYield];
+          return [weeklyRewards, weeklyYield, weeklyTokenPerformance];
         case 2:
-          return [monthlyRewards, monthlyYield];
+          return [monthlyRewards, monthlyYield, monthlyTokenPerformance];
         case 3:
-          return [yearlyRewards, yearlyYield];
+          return [yearlyRewards, yearlyYield, yearlyTokenPerformance];
         case 0:
         default:
-          return [allRewards, allYield];
+          return [allRewards, allYield, allTokenPerformance];
       }
     })();
 
     const hasRewarders = !!activeRewards.length;
+    const hasTokenPerformance = !!activeTokenPerformance.length;
 
     return {
       count: allYield.length ? allYield[0].count : 0,
@@ -379,6 +403,8 @@ export default function Rewards() {
       rewardsLoaded,
       txLoaded,
       unclaimedLoaded,
+      activeTokenPerformance,
+      hasTokenPerformance,
     };
   }, [
     activeTableFilterIndex,
@@ -509,46 +535,103 @@ export default function Rewards() {
       );
     };
 
+  const SpendToEarnCTA = () => {
+    return (
+      <CardCarousel
+        size={mobileView ? "compact" : "normal"}
+        type="transparent"
+        color="white"
+        fill
+        border="solid"
+      >
+        <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
+          <div
+            className={`rewards-cta-providers ${mobileView ? "compact" : ""}`}
+          >
+            <a
+              onClick={(e) => {
+                e?.stopPropagation();
+                if (!connected || !addToken) return;
+
+                addToken("fUSDC");
+              }}
+            >
+              {/*<BloomEffect type="static" color={"#cf661d"} width={100} />*/}
+              <WalletIcon wallet="metamask" />
+            </a>
+            <a href="https://app.1inch.io/#/1/simple/swap/ETH/0x9d1089802eE608BA84C5c98211afE5f37F96B36C/import-token">
+              {/*<BloomEffect type="static" color={"red"} width={100} />*/}
+              <ProviderIcon provider="Oneinch" />
+            </a>
+            <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+              {/*<BloomEffect type="static" color={"#e65da9"} width={100} />*/}
+              <ProviderIcon provider="Sushiswap" />
+            </a>
+            <a href="https://app.balancer.fi/#/ethereum/pool/0xfee6da6ce300197b7d613de22cb00e86a8537f06000200000000000000000393/invest">
+              {/*<BloomEffect type="static" color={"#825902"} width={100} />*/}
+              <ProviderIcon provider="Balancer" />
+            </a>
+          </div>
+          <Display size="xxxs">Spend To Earn</Display>
+          {!mobileView && <Text>Use Fluid Assets to generate yield.</Text>}
+        </CardCarousel.Slide>
+        <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
+          <div
+            className={`rewards-cta-providers ${mobileView ? "compact" : ""}`}
+          >
+            <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+              <ProviderIcon provider="Sushiswap" />
+            </a>
+            <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
+              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+              <ProviderIcon provider="Uniswap" />
+            </a>
+            <a href="#">
+              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+              <ProviderIcon provider="Multichain" />
+            </a>
+            <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
+              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
+              <ProviderIcon provider="Dodo" />
+            </a>
+          </div>
+          <Display size="xxxs">Swap To Earn</Display>
+          {!mobileView && <Text>Swap Fluid Assets to generate yield.</Text>}
+        </CardCarousel.Slide>
+      </CardCarousel>
+    );
+  };
+
   return (
     <div className="pad-main">
-      {/* Info Cards */}
-      {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
-        <UserRewards
-          claimNow={mobileView}
-          unclaimedRewards={userUnclaimedRewards}
-          claimedRewards={activeYield}
-          network={network}
-          networkFee={networkFee}
-          gasFee={gasFee}
-          tokenAddrs={unclaimedTokenAddrs}
-        />
-      ) : (
-        <div className="no-user-rewards">
-          <section id="spend-to-earn">
-            <Heading className="spendToEarnHeading" as="h2">
-              Spend to earn
-            </Heading>
-            <Text size="lg">
-              Use, send and receive fluid assets <br />
-              to generate yield.
-            </Text>
-          </section>
-          <section>
-            {weeklyRewards?.length > 0 && (
-              <>
-                <Text size="md">Highest reward distribution this week</Text>
+      {/* Loading State */}
+      <div style={{ marginBottom: "18px" }}>
+        <Text>
+          {isFirstLoad || !timestamp
+            ? "Loading data..."
+            : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
+        </Text>
+      </div>
 
-                <ProviderCard
-                  name={weeklyRewards[0].name}
-                  prize={weeklyRewards[0].prize}
-                  avgPrize={weeklyRewards[0].avgPrize}
-                  size="lg"
-                />
-              </>
-            )}
-          </section>
-        </div>
-      )}
+      {/* Info Cards */}
+      <div className="reward-ctas">
+        {!!userUnclaimedRewards && userUnclaimedRewards > 0.000005 ? (
+          <UserRewards
+            claimNow={false}
+            unclaimedRewards={userUnclaimedRewards}
+            claimedRewards={activeYield}
+            network={network}
+          />
+        ) : (
+          <>
+            <NoUserRewards prizePool={totalPrizePool} />
+            <SpendToEarnCTA />
+          </>
+        )}
+      </div>
+
+      {/* Heading & Filters */}
       <div className="reward-ceiling">
         <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
           {activeTableFilterIndex ? "My" : "Global"} Reward Performance
@@ -556,31 +639,24 @@ export default function Rewards() {
 
         <div className="filter-row">
           {rewardFilters.map((filter, i) => (
-            <button
+            <TabButton
+              size="default"
               key={`filter-${filter.name}`}
               onClick={() => setActiveRewardFilterIndex(i)}
             >
               <Text
-                size="xl"
                 prominent={activeRewardFilterIndex === i}
                 className={activeRewardFilterIndex === i ? "active-filter" : ""}
               >
                 {filter.name}
               </Text>
-            </button>
+            </TabButton>
           ))}
         </div>
       </div>
 
       {/* Reward Performance */}
       <section id="performance">
-        <div style={{ marginBottom: "12px" }}>
-          <Text>
-            {isFirstLoad || !timestamp
-              ? "Loading data..."
-              : `Last updated: ${format(timestamp, "dd-MM-yyyy HH:mm:ss")}`}
-          </Text>
-        </div>
         <div className="statistics-row">
           <div className="statistics-set">
             <LabelledValue
@@ -590,24 +666,20 @@ export default function Rewards() {
             </LabelledValue>
           </div>
 
-          {hasRewarders && (
+          {hasTokenPerformance && (
             <div className="statistics-set">
-              <LabelledValue label={"Highest performer"}>
-                <div className="highest-performer-child">
-                  <ProviderIcon provider={rewarders[0]?.name} />
-                  {rewarders[0]?.name === "Fluidity"
-                    ? "Transacting ƒAssets"
-                    : rewarders[0]?.name}
-                </div>
+              <LabelledValue
+                label={"Highest performer"}
+                icon={
+                  <TokenIcon
+                    token={`f${activeTokenPerformance[0].token}` as Token}
+                  />
+                }
+              >
+                {`f${activeTokenPerformance[0].token}` as Token}
               </LabelledValue>
             </div>
           )}
-
-          <div className="statistics-set">
-            <LabelledValue label={"Total prize pool"}>
-              {numberToMonetaryString(totalPrizePool)}
-            </LabelledValue>
-          </div>
 
           <div className="statistics-set">
             <LabelledValue label={"Fluid Pairs"}>{fluidPairs}</LabelledValue>
@@ -623,6 +695,67 @@ export default function Rewards() {
               </LinkButton>
             </Link>
           </div>
+
+          {hasRewarders && (
+            <div className="statistics-set">
+              <LabelledValue
+                label={"Highest Reward Distribution"}
+                icon={
+                  <ProviderIcon provider={rewarders[0]?.name as Provider} />
+                }
+              >
+                {rewarders[0]?.name === "Fluidity"
+                  ? "Transacting ƒAssets"
+                  : rewarders[0]?.name}
+              </LabelledValue>
+              <Hoverable
+                tooltipContent={
+                  <>
+                    <ProviderIcon
+                      provider={rewarders[0]?.name}
+                      className="hover-provider-icon"
+                    />
+                    <Display
+                      size="xxxs"
+                      style={{ whiteSpace: "nowrap", marginBottom: 12 }}
+                    >
+                      {rewarders[0]?.name === "Fluidity"
+                        ? "Transacting ƒAssets"
+                        : rewarders[0]?.name}
+                    </Display>
+                    <Text>
+                      Fluidity wraps assets into fluid assets and generates
+                      yield every time fluid assets are used.
+                    </Text>
+                    <div className="hover-prizes" style={{ marginTop: 12 }}>
+                      <div className="hover-prize-value">
+                        <Text prominent>
+                          {numberToMonetaryString(rewarders[0].avgPrize)}
+                        </Text>
+                        <Text>Avg prize/trans</Text>
+                      </div>
+                      <div className="hover-prize-value">
+                        <Text prominent>
+                          {numberToMonetaryString(rewarders[0].prize)}
+                        </Text>
+                        <Text>Top prize</Text>
+                      </div>
+                    </div>
+                  </>
+                }
+              >
+                <LinkButton
+                  size="medium"
+                  type="info"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Hover for Details
+                </LinkButton>
+              </Hoverable>
+            </div>
+          )}
         </div>
       </section>
 

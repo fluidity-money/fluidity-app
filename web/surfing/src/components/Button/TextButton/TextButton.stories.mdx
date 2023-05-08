@@ -1,0 +1,32 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import { TextButton } from "./TextButton";
+import { Text } from './../../'
+
+<Meta
+    title="Button/Text Button"
+    component={TextButton}
+/>
+
+export const Template = ( {...props}) => <p>
+  <Text>
+  Lorem ipsum{" "}
+    <TextButton {...props}>
+        dolor sit amet.
+    </TextButton>
+  </Text>
+</p>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Text Button</Title>
+    <Subtitle>Button to toggle filters</Subtitle>
+    <h2>Text Button</h2>
+    <Story
+        name="Text Button"
+        args={{
+            onClick: () => alert('Hello world!'),
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

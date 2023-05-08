@@ -105,6 +105,23 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     /// @inheritdoc ITotalRewardPool
+    function getTVL() public returns (uint256 cumulative) {
+        for (uint i = 0; i < tokens_.length; i++) {
+            IToken token = tokens_[i];
+
+            uint256 amount = token.underlyingLp().totalPoolAmount();
+
+            uint8 decimals = token.decimals();
+
+            require(18 >= decimals, "decimals too high");
+
+            cumulative += amount * (10 ** (18 - decimals));
+        }
+
+        return cumulative;
+    }
+
+    /// @inheritdoc ITotalRewardPool
     function getTotalRewardPool() public returns (uint256 cumulative) {
         for (uint i = 0; i < tokens_.length; i++) {
             IToken token = tokens_[i];
@@ -126,7 +143,7 @@ contract Registry is IRegistry, ITotalRewardPool, IOperatorOwned {
     }
 
     function updateOperator(address _newOperator) public {
-        require(msg.sender == operator(), "only operator");
+        require(msg.sender == operator_, "only operator");
         require(_newOperator != address(0), "zero operator");
 
         operator_ = _newOperator;

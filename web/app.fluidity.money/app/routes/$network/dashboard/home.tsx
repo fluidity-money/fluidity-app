@@ -19,6 +19,7 @@ import {
   numberToMonetaryString,
   useViewport,
   Tooltip,
+  TabButton,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -262,8 +263,8 @@ export default function Home() {
   );
 
   const userHomeData = useFetcher();
-
   const userTransactionsData = useFetcher();
+
   const toolTip = useToolTip();
 
   const handleRewardTransactionClick = (
@@ -757,12 +758,13 @@ export default function Home() {
         >
           <div className="statistics-row pad-main">
             {graphTransformers.map((filter, i) => (
-              <button
+              <TabButton
                 key={`filter-${filter.name}`}
                 onClick={() => setActiveTransformerIndex(i)}
+                size="default"
               >
                 <Text
-                  size="lg"
+                  size="sm"
                   prominent={activeTransformerIndex === i}
                   className={
                     activeTransformerIndex === i ? "active-filter" : ""
@@ -770,7 +772,7 @@ export default function Home() {
                 >
                   {filter.name}
                 </Text>
-              </button>
+              </TabButton>
             ))}
           </div>
           <LineChart

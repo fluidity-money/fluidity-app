@@ -2,13 +2,15 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+import { HTMLAttributes, HTMLProps } from "react";
 import styles from "./Heading.module.scss";
 
-type Props = {
+interface IHeading {
   children: React.ReactNode;
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   className?: string;
-  color?: "white" | "gray" | "black" | "hollow";
+  color?: "white" | "gray" | "black" | "hollow" | "inherit";
+  style?: React.CSSProperties;
 };
 
 const Heading = ({
@@ -16,14 +18,15 @@ const Heading = ({
   as = "h1",
   className,
   color = "white",
+  style={},
   ...props
-}: Props & unknown) => {
+}: IHeading & unknown) => {
   const Component = as || "h1";
 
   const _className = `${styles[as]} ${styles[color]} ${className || ""}`;
 
   return (
-    <Component {...props} className={_className}>
+    <Component style={style} {...props} className={_className}>
       {children}
     </Component>
   );

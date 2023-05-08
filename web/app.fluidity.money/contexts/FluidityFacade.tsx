@@ -12,7 +12,6 @@ export interface IFluidityFacade {
   amountMinted: (tokenAddr: string) => Promise<BN | undefined>;
   balance: (tokenAddr: string) => Promise<BN | undefined>;
   disconnect: () => Promise<void>;
-  prizePool: () => Promise<number>;
   tokens: () => Promise<string[]>;
   signBuffer?: (buffer: string) => Promise<string | undefined>;
 

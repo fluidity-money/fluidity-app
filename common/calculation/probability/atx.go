@@ -12,18 +12,19 @@ import (
 
 // CalculateAtx using the duration since the last block and the number of
 // fluid transfers
-func CalculateAtx(secondsSinceLastBlock uint64, fluidTransfers int) *big.Rat {
-
-	// set to zero if negative, or either value is zero
-	if fluidTransfers <= 0 || secondsSinceLastBlock == 0 {
-		// zero type here is zero
-		return new(big.Rat)
-	}
+func CalculateAtx(secondsSinceLastBlock *big.Rat, fluidTransfers int) *big.Rat {
 
 	var (
-		fluidTransfers_        = intToRat(fluidTransfers)
-		secondsSinceLastBlock_ = uint64ToRat(secondsSinceLastBlock)
+		fluidTransfers_ = intToRat(fluidTransfers)
+		zeroRat         = new(big.Rat)
 	)
+
+	// set to zero if negative, or either value is zero
+	if fluidTransfers <= 0 || secondsSinceLastBlock.Cmp(zeroRat) == 0 {
+		// zero type here is zero
+		return zeroRat
+	}
+
 
 	tSFTimesTF := new(big.Rat).Mul(big.NewRat(365, 1), big.NewRat(24, 1))
 
@@ -33,7 +34,7 @@ func CalculateAtx(secondsSinceLastBlock uint64, fluidTransfers int) *big.Rat {
 
 	fluidTransfersTimes := new(big.Rat).Mul(STimesS, fluidTransfers_)
 
-	fluidTransfersMulSeconds := new(big.Rat).Quo(fluidTransfersTimes, secondsSinceLastBlock_)
+	fluidTransfersMulSeconds := new(big.Rat).Quo(fluidTransfersTimes, secondsSinceLastBlock)
 
 	return fluidTransfersMulSeconds
 }

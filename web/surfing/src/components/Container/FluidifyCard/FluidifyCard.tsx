@@ -1,3 +1,5 @@
+import styles from './FluidifyCard.module.scss'
+
 interface IFluidifyCard {
   fluid: boolean;
   symbol: string;
@@ -25,7 +27,7 @@ const FluidifyCard = (props: IFluidifyCard) => {
   } = props;
 
   return (
-    <div key={symbol} className={`fluidify-card`}>
+    <div key={symbol} className={`${styles.FluidifyCard} fluidify-card`}>
       <div className="fluidify-card--container">
         {/* Logo & Name */}
         <div className="fluidify-card-left">

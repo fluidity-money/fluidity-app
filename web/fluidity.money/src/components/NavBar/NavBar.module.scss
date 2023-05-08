@@ -55,6 +55,8 @@
             color: $textGrey;
           }
           button {
+            all: unset;
+            cursor: pointer;
             margin: 0px 8px 0px 8px;
           }
 

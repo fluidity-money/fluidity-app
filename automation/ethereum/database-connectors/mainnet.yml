@@ -16,4 +16,3 @@ SERVICES:
       DOCKER_IMAGE: connector-common-user-actions-timescale
       DOCKERFILE_PATH: ./cmd/connector-common-user-actions-timescale
       ENV_FLU_WORKER_ID: ethereum-connector-common-user-actions-timescale
-

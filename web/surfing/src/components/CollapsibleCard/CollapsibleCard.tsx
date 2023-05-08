@@ -5,9 +5,10 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ReactElement, useState } from "react";
 
-import { Card, TokenCard, ArrowUp, TokenDetails, TriangleDown } from "~/components";
+import { Card, TriangleDown } from "~/components";
 
 import styles from "./CollapsibleCard.module.scss";
+import { ICard } from "../Container/Card/Card";
 
 export type Token = {
   symbol: string;
@@ -21,28 +22,6 @@ export type Token = {
   colour: string;
 };
 
-type asset = {
-  token: Token
-  fluidAmt: string
-  regAmt: string
-  value: number
-  topPrize: { 
-    winning_amount: number
-    transaction_hash: string
-  }
-  avgPrize: number
-  topAssetPrize: { 
-    winning_amount: number
-    transaction_hash: string
-  }
-  activity: {
-    desc: string
-    value: number
-    reward: number
-    transaction: string
-  }[]
-}
-
 interface ISummary {
   children: React.ReactNode
   onClick?: () => void
@@ -54,10 +33,9 @@ interface IDetails {
   children: React.ReactNode
 }
 
-interface ICollapsibleCard {
+interface ICollapsibleCard extends ICard {
   children: ReactElement<ISummary> | (ReactElement<ISummary> | ReactElement<IDetails>)[]
   expanded: boolean
-  type?: 'gray' | 'box' | 'holobox' | 'transparent'
 }
 
 const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive }) => {
@@ -86,7 +64,7 @@ const Details: React.FC<IDetails> = ({ children }) => {
 const CollapsibleCard: React.FC<ICollapsibleCard> = ({
   children,
   expanded = false,
-  type = 'gray',
+  ...props
 }: ICollapsibleCard) => {
 
   const [isOpen, setIsOpen] = useState(expanded)
@@ -98,7 +76,7 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
 
   if (isHeaderOnly) {
     return (
-      <Card component="div" rounded={true} type={type} className={styles.CollapsibleCard} >
+      <Card component="div" rounded={true} className={styles.CollapsibleCard} {...props}>
         <Summary>
           {summary.props.children}
         </Summary>
@@ -109,7 +87,7 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
   if (!details) return null
 
   return (
-    <Card component="div" rounded={true} type={type} className={styles.CollapsibleCard} >
+    <Card component="div" rounded={true} className={styles.CollapsibleCard} {...props}>
       <Summary canExpand onClick={() => {setIsOpen(prev => !prev)}} isActive={isOpen}>
         {summary.props.children}
       </Summary>

@@ -1,12 +1,4 @@
-@use 'common' as *;
-
-button {
-  cursor: pointer;
-  
-  &:disabled {
-    cursor: default;
-  }
-}
+@use "common" as *;
 
 .card {
   display: flex;
@@ -14,67 +6,240 @@ button {
   width: fit-content;
   height: fit-content;
   padding: 1em;
-  
-  &.heading {
-    > * {
-      flex: 0 0;
-    }
+  box-sizing: border-box;
+
+  &.shimmer {
+    -webkit-mask: linear-gradient(
+        -60deg,
+        #000000 40%,
+        rgba(0, 0, 0, 0.717),
+        #000 60%
+      )
+      right/300% 100%;
+    mask: linear-gradient(-60deg, #000000 40%, rgba(0, 0, 0, 0.715), #000 60%)
+      right/300% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 5s infinite;
+    background-color: black;
   }
 
-  &.gray {
-    background-color: $white-a5;
+  &.fill {
+    width: 100%;
   }
 
-  &.transparent {
-    background-color: $white-a5;
-  }
-
-  &.box {
-    border: 1px solid map-get($border, "default");
-  }
-
-  &.holobox {
-    position: relative;
-
-    &::before {
-      content: "";
-      position: absolute;
-      pointer-events: none;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 2px;
-      background: $holo;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
-
-    &.rounded {
-      &::before {
-        border-radius: 12px;
-      }
-    }
+  &.button {
+    all: unset;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    padding: 1em;
   }
 
   &.rounded {
     border-radius: 12px;
   }
 
-  &.frosted {
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.102);
-
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur( 10px );
-  }
-  
-  &.disabled {
-    cursor: disabled;
+  &[disabled] {
+    cursor: not-allowed;
     border-color: map-get($border, "disabled");
     filter: grayscale(100%);
+  }
+
+  // Borders
+  border-width: 0;
+  border-style: none;
+
+  &.solid {
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  &.dashed {
+    border-width: 1px;
+    border-style: dashed;
+  }
+
+  // Colors
+  &.gray {
+    background-color: $white-a5;
+    border-color: map-get($border, "default");
+  }
+
+  &.white {
+    background-color: $white;
+    border-color: $white;
+  }
+
+  &.holo {
+    position: relative;
+    border: none;
+    overflow: hidden;
+    background: $holo-linear;
+    background-size: 1600px;
+    animation: gradient 15s ease infinite;
+
+    &.transparent {
+      background: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
+      }
+
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
+      }
+
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
+      }
+    }
+
+    &.frosted {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
+      }
+
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
+      }
+
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  // Backgrounds
+  &.transparent {
+    background-color: transparent;
+  }
+
+  &.dashed {
+    border-style: dashed;
+  }
+
+  &.frosted {
+    // background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    // Override border styles
+    &.dashed,
+    &.solid,
+    &.none {
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.102);
+    }
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  10% {
+    -webkit-mask-position: right/300%;
+  }
+  90%,
+  100% {
+    -webkit-mask-position: -50%;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 600px 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.shimmerWrapper {
+  position: relative;
+  overflow: hidden;
+
+  &.fill {
+    width: 100%;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &.heading {
+    > * {
+      flex: 0 0;
+    }
+  }
+
+  .shimmerBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    filter: blur(100px);
+    z-index: -1;
   }
 }

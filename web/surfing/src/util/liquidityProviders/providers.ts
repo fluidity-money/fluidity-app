@@ -21,6 +21,7 @@ const providerImgNames: { [K in Provider]: string } = {
   Orca: "Orca.svg",
   Polygon: "Polygon.svg",
   Saber: "Saber.svg",
+  Saddle: "Saddle.svg",
   Solana: "Solana.svg",
   Solend: "solend.png",
   Uniswap: "Uniswap.svg",

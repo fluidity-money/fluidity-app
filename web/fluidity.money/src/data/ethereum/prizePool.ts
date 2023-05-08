@@ -4,6 +4,7 @@ import { Contract } from "ethers";
 import BN from "big.js";
 
 import PrizePoolABI from "./prizePoolABI.json";
+import TotalPrizePoolABI from "./getTotalRewardPool.json";
 
 type ErrorType = {
   data: { message: string };
@@ -60,20 +61,14 @@ const prizePoolConfig = {
     rpc: process.env.FLU_ETH_RPC_HTTP,
   },
   arbitrum: {
-    address: "0x3cc6115Cd787dC6A3C9440D7e3B0d76c15C82Bb4",
+    address: "0x9e48603b87930eD3EC6eB599413C4d423D92C822",
     rpc: process.env.FLU_ARB_RPC_HTTP,
   },
 };
 
-export const getEthTotalPrizePool = () => getEvmTotalPrizePool("ethereum");
-
-export const getArbTotalPrizePool = () => getEvmTotalPrizePool("arbitrum");
-
-// Returns total prize pool from aggregated contract
-const getEvmTotalPrizePool = async (
-  chain: "ethereum" | "arbitrum"
-): Promise<number> => {
-  const { address, rpc } = prizePoolConfig[chain];
+// Returns total prize pool from aggregated pools
+export const getEthTotalPrizePool = async (): Promise<number> => {
+  const { address, rpc } = prizePoolConfig.ethereum;
 
   const provider = new JsonRpcProvider(rpc);
 
@@ -95,6 +90,38 @@ const getEvmTotalPrizePool = async (
     }, new BN(0));
 
     return totalPrizePool.toNumber();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
+  }
+};
+
+// Returns total prize pool from aggregated contract
+export const getArbTotalPrizePool = async (): Promise<number> => {
+  const { address, rpc } = prizePoolConfig.arbitrum;
+
+  const provider = new JsonRpcProvider(rpc);
+
+  try {
+    const rewardPoolContract = new Contract(
+      address,
+      TotalPrizePoolABI,
+      provider
+    );
+
+    if (!rewardPoolContract)
+      throw new Error(`Could not instantiate Reward Pool at ${address}`);
+
+    const totalPrizePool_ =
+      await rewardPoolContract.callStatic.getTotalRewardPool();
+
+    const totalPrizePool = new BN(totalPrizePool_.toString());
+
+    const DECIMALS = 18;
+
+    const decimalsBn = new BN(10).pow(DECIMALS);
+
+    return totalPrizePool.div(decimalsBn).toNumber();
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return 0;

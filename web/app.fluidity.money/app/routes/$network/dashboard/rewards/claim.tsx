@@ -121,8 +121,7 @@ const ClaimedRewards = () => {
         {/* Fluidify Button */}
         <GeneralButton
           className="spread"
-          version={"primary"}
-          buttontype={"text"}
+          type={"primary"}
           size={"large"}
           handleClick={() => {
             navigate(`/${network}/dashboard/fluidify`);
@@ -135,8 +134,8 @@ const ClaimedRewards = () => {
         <GeneralButton
           className="spread"
           size="large"
-          version="transparent"
-          buttontype="icon before"
+          type="transparent"
+          layout="before"
           icon={<Twitter />}
           handleClick={() => {
             window.open(generateTweet(reward, "claim"));

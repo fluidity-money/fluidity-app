@@ -89,8 +89,7 @@ services:
     build:
       context: ../../cmd/connector-ethereum-block-headers-amqp/
     environment:
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
       FLU_WORKER_ID: connector-ethereum-block-headers-amqp
     restart: on-failure
 
@@ -98,8 +97,7 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-block-fluid-transfers-amqp/
     environment:
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
       FLU_WORKER_ID: microservice-ethereum-block-fluid-transfers-amqp
       FLU_ETHEREUM_BLOCK_RETRIES: 5
       FLU_ETHEREUM_BLOCK_RETRY_DELAY: 1
@@ -109,8 +107,7 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-application-server/
     environment:
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
       FLU_WORKER_ID: microservice-ethereum-application-server
       FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
       FLU_ETHEREUM_APPLICATION_CONTRACTS: "uniswap_v2:0x0"
@@ -122,8 +119,7 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-worker-server/
     environment:
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
       FLU_WORKER_ID: worker-server
       FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR: "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
       FLU_ETHEREUM_AMQP_QUEUE_NAME: util-mining-worker-server-out
@@ -144,8 +140,7 @@ services:
     build:
       context: ../../cmd/microservice-ethereum-worker-sender/
     environment:
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
       FLU_WORKER_ID: worker-sender
       FLU_ETHEREUM_AMQP_QUEUE_NAME: spooler-out
     restart: on-failure
@@ -154,20 +149,41 @@ services:
     build:
       context: ../../cmd/connector-ethereum-reward-logs-amqp/
     environment:
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
       FLU_WORKER_ID: connector-ethereum-reward-logs-amqp
       FLU_ETHEREUM_START_BLOCK: latest
       FLU_ETHEREUM_TOKENS_LIST: "0x737f9DC58538B222a6159EfA9CC548AB4b7a3F1e:fUSDT:6,0xdDd63f96e78dCed5B6ef17Ee285F2cDbDF8972Ab:testClient:18"
     restart: on-failure
 
-  microservice-ethereum-track-winners-util-mining:
+  microservice-ethereum-track-winners:
     build:
       context: ../../cmd/microservice-ethereum-track-winners/
     environment:
+      <<: [*flu-envs, *util-mining-test-envs]
+      FLU_WORKER_ID: microservice-ethereum-track-winners
+
+  microservice-ethereum-create-transaction-lootboxes:
+    build:
+      context: ../../cmd/microservice-ethereum-create-transaction-lootboxes/
+    environment:
       <<: *flu-envs
-      <<: *util-mining-test-envs
-      FLU_WORKER_ID: microservice-etheruem-track-winners
+      FLU_WORKER_ID: microservice-ethereum-create-transaction-lootboxes
+    restart: on-failure   
+
+  connector-common-lootboxes-timescale:
+    build:
+      context: ../../cmd/connector-common-lootboxes-timescale
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: connector-common-lootboxes-timescale
+    restart: on-failure
+
+  microservice-ethereum-track-staking-emissions:
+    build:
+      context: ../../cmd/microservice-ethereum-track-staking-emissions/
+    environment:
+      <<: *flu-envs
+      FLU_WORKER_ID: microservice-ethereum-track-staking-emissions
     restart: on-failure
 
   test-utility-mining:
@@ -188,11 +204,66 @@ services:
       - spooler
       - microservice-ethereum-worker-sender-util-mining
       - connector-ethereum-reward-logs-amqp-util-mining
-      - microservice-ethereum-track-winners-util-mining
+      - microservice-ethereum-track-winners
     environment:
       FLU_TEST: TestPipelineUtilityMining
       FLU_WORKER_ID: tests
-      <<: *flu-envs
-      <<: *util-mining-test-envs
+      <<: [*flu-envs, *util-mining-test-envs]
     restart: "no"
 
+  test-transaction-lootboxes:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - spooler
+      - microservice-ethereum-track-winners
+      - microservice-ethereum-create-transaction-lootboxes
+      - connector-common-lootboxes-timescale
+    environment:
+      FLU_TEST: TestTransactionLootboxes
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: spooler-in
+      FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out
+      FLU_ETHEREUM_NETWORK: ethereum
+      <<: [*flu-envs, *util-mining-test-envs]
+
+
+  test-staking-emissions:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - redis
+      - rabbit
+      - postgres
+      - timescale
+      - microservice-ethereum-track-staking-emissions
+    environment:
+      FLU_TEST: TestStakingEmissions
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_NETWORK: ethereum
+      <<: *flu-envs
+
+  test-worker-epochs:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - rabbit
+      - redis
+      - postgres
+      - timescale
+      - contracts-utilmining
+      - microservice-ethereum-worker-server-util-mining
+    environment:
+      FLU_TEST: TestWorkerEpochs
+      FLU_WORKER_ID: tests
+      FLU_ETHEREUM_AMQP_QUEUE_NAME: util-mining-worker-server-out
+      FLU_ETHEREUM_WORK_QUEUE: util-mining-apps-out
+      <<: [*flu-envs, *util-mining-test-envs]
+    restart: "no"

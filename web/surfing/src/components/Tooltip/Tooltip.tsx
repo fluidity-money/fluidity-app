@@ -2,6 +2,8 @@ interface ITooltip {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 import { Card } from '../Container';
@@ -11,10 +13,21 @@ const Tooltip = ({
   children,
   className,
   style = {},
+  onMouseEnter,
+  onMouseLeave,
   ...props
 }: ITooltip) => {
   return (
-    <Card style={style} type="frosted" rounded>
+    <Card 
+      style={style} 
+      type="frosted" 
+      color="gray"
+      border="solid"
+      rounded 
+      onMouseEnter={onMouseEnter} 
+      onMouseLeave={onMouseLeave} 
+      className={styles.Tooltip}
+    >
       {children}
     </Card>
   );

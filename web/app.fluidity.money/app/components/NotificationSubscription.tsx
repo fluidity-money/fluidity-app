@@ -151,19 +151,9 @@ export const NotificationSubscription = ({
 
   useEffect(() => {
     if (rawAddress) {
-      const { emitEvent } = DSSocketManager(
-        {
-          onCallback: handleClientListener,
-        },
-        window.location.protocol === "https:"
-          ? {
-              host: "https://fanfare.fluidity.money",
-              path: "/socket.io",
-              transports: ["websocket"],
-              secure: true,
-            }
-          : undefined
-      );
+      const { emitEvent } = DSSocketManager({
+        onCallback: handleClientListener,
+      });
 
       emitEvent(network, rawAddress.toLowerCase() as unknown as string);
     }

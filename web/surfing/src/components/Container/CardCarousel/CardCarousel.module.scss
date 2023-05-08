@@ -1,0 +1,139 @@
+@use "common" as *;
+
+.CardCarousel {
+  position: relative;
+  align-items: center;
+
+  .content {
+    position: relative;
+    overflow: hidden;
+    min-width: 350px;
+    width: 100%;
+    height: 200px;
+
+    .slide {
+      cursor: grab;
+      position: absolute;
+      max-width: 100%;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .arrow {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    border-radius: 100px;
+    width: 2em;
+    height: 2em;
+    border: 1px solid map-get($border, "default");
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: -1em;
+    bottom: -1em;
+    
+    &.white {
+      border: 1px solid map-get($border, "prominent");
+
+      path {
+        fill: map-get($border, "prominent");
+      }
+
+      &:hover {
+        background-color: map-get($border, "prominent");
+
+        path {
+          fill: map-get($bg, "default");
+        }
+      }
+    }
+
+    &:last-child {
+      left: auto;
+      right: -1em;
+    }
+
+    svg {
+      width: 0.7em;
+      height: 0.7em;
+
+      path {
+        fill: map-get($border, "default");
+      }
+    }
+
+    &:hover {
+      border: 1px solid white;
+      path {
+        fill: white;
+      }
+    }
+  }
+
+  .navbar {
+    margin-top: 1em;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1em;
+
+    .dot {
+      width: 0.5em;
+      height: 0.5em;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      background-color: map-get($border, "default");
+
+      &.active {
+        background-color: white;
+      }
+    }
+  }
+
+  &.compact {
+    .content {
+      width: 350px;
+      height: 130px;
+    }
+
+    .bottomNavbar {
+      background: black;
+      position: absolute;
+      bottom: -1.3em;
+      display: flex;
+      flex-direction: row;
+      border: 1px solid map-get($border, "default");
+      border-radius: 100px;
+      height: 2.6em;
+      backdrop-filter: blur(10px);
+      gap: 2em;
+      align-items: center;
+
+      &.white {
+        border: 1px solid map-get($border, "prominent");
+      }
+
+      .navbar {
+        align-items: center;
+        margin: 0;
+      }
+
+      svg {
+        height: 0.8em;
+      }
+    }
+  }
+}
+
+.SlideContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

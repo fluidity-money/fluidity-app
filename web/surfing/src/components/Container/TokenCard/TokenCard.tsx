@@ -2,9 +2,9 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import type { Tokens } from "~/components/Images/Token/Token";
+import type { Token as Tokens } from "~/types";
 
-import { Display, Text, Token as TokenSymbol, GeneralButton, LinkButton } from "~/components";
+import { Display, Text, TokenIcon as TokenSymbol, GeneralButton, LinkButton } from "~/components";
 import { numberToMonetaryString, numberToCommaSeparated, useViewport } from "~/util";
 import styles from "./TokenCard.module.scss";
 import { Token } from "~/components/CollapsibleCard/CollapsibleCard";
@@ -78,7 +78,7 @@ const TokenCard = ({
           )
         }
       </div>
-      {(!isFluid && !isMobile) && <GeneralButton className={styles.fluidifyButton} version='transparent' size="small" buttontype="text" handleClick={onButtonPress}>FLUIDIFY</GeneralButton>}
+      {(!isFluid && !isMobile) && <GeneralButton className={styles.fluidifyButton} type='transparent' size="small" handleClick={onButtonPress}>FLUIDIFY</GeneralButton>}
     </div>
   );
 };

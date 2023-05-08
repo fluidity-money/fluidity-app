@@ -18,8 +18,8 @@ const Roadmap = () => {
 
   const button = (
     <GeneralButton
-      buttontype={"icon after"}
-      version={"secondary"}
+      layout={"after"}
+      type={"secondary"}
       size={"large"}
       handleClick={() => {
         window.location.href =

@@ -36,7 +36,7 @@ func init() {
 
 	reader = strings.NewReader(operatorAbiString)
 
-	if OperatorAbi, err = ethAbi.JSON(reader); err != nil {
+	if ExecutorAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 
@@ -49,6 +49,12 @@ func init() {
 	reader = strings.NewReader(rewardPoolAbiString)
 
 	if RewardPoolAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
+
+	reader = strings.NewReader(stakingAbiString)
+
+	if StakingAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }

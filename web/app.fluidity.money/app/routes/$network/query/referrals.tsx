@@ -1,14 +1,29 @@
 import type { LoaderFunction } from "@remix-run/node";
+import type { Referral } from "~/queries/useReferrals";
 
 import { json } from "@remix-run/node";
-import { useReferralCountByAddress } from "~/queries";
+import {
+  useReferralCodeByAddress,
+  useInactiveReferralByAddress,
+  useActiveReferralCountByRefereeAddress,
+  useActiveReferralCountByReferrerAddress,
+  useInactiveReferralCountByRefereeAddress,
+} from "~/queries";
+import { jsonPost } from "~/util";
+import { AddReferralCodeBody, AddReferralCodeData } from "./referralCode";
 
 export type ReferralCountData = {
-  numReferrals: number;
+  numActiveReferrerReferrals: number;
+  numActiveReferreeReferrals: number;
+  numInactiveReferreeReferrals: number;
+  inactiveReferrals: Array<Referral>;
+  referralCode: string;
   loaded: boolean;
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const network = params.network ?? "";
+
   const url = new URL(request.url);
 
   const address = url.searchParams.get("address");
@@ -17,22 +32,98 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error("Invalid Request");
   }
 
-  const { data: referralData, errors } = await useReferralCountByAddress(
-    address
-  );
+  const [
+    {
+      data: activeReferrerReferralCountData,
+      errors: activeReferrerReferralCountErr,
+    },
+    {
+      data: activeRefereeReferralCountData,
+      errors: activeRefereeReferralCountErr,
+    },
+    {
+      data: inactiveRefereeReferralCountData,
+      errors: inactiveRefereeReferralCountErr,
+    },
+    { data: inactiveReferralData, errors: inactiveReferralErr },
+    { data: referralCodeData, errors: referralCodeErr },
+  ] = await Promise.all([
+    useActiveReferralCountByReferrerAddress(address),
+    useActiveReferralCountByRefereeAddress(address),
+    useInactiveReferralCountByRefereeAddress(address),
+    useInactiveReferralByAddress(address),
+    useReferralCodeByAddress(address),
+  ]);
 
-  if (errors || !referralData) {
+  if (activeReferrerReferralCountErr || !activeReferrerReferralCountData) {
     throw new Error("Could not fetch Referrals");
   }
 
   const {
     lootbox_referrals_aggregate: {
-      aggregate: { count: numReferrals },
+      aggregate: { count: numActiveReferrerReferrals },
     },
-  } = referralData;
+  } = activeReferrerReferralCountData;
+
+  if (activeRefereeReferralCountErr || !activeRefereeReferralCountData) {
+    throw new Error("Could not fetch Referrals");
+  }
+
+  const {
+    lootbox_referrals_aggregate: {
+      aggregate: { count: numActiveReferreeReferrals },
+    },
+  } = activeRefereeReferralCountData;
+
+  if (inactiveRefereeReferralCountErr || !inactiveRefereeReferralCountData) {
+    throw new Error("Could not fetch Referrals");
+  }
+
+  const {
+    lootbox_referrals_aggregate: {
+      aggregate: { count: numInactiveReferreeReferrals },
+    },
+  } = inactiveRefereeReferralCountData;
+
+  if (inactiveReferralErr || !inactiveReferralData) {
+    throw new Error("Could not fetch Referrals");
+  }
+
+  const { lootbox_referrals: inactiveReferrals } = inactiveReferralData;
+
+  if (referralCodeErr || !referralCodeData) {
+    throw new Error("Could not fetch Referral Code");
+  }
+
+  const { lootbox_referral_codes: userReferralCodeArr } = referralCodeData;
+
+  if (userReferralCodeArr.length) {
+    return json({
+      numActiveReferrerReferrals,
+      numActiveReferreeReferrals,
+      numInactiveReferreeReferrals,
+      inactiveReferrals,
+      referralCode: userReferralCodeArr[0].referral_code,
+      loaded: true,
+    } satisfies ReferralCountData);
+  }
+
+  // Create new referral code
+  const { success, msg } = await jsonPost<
+    AddReferralCodeBody,
+    AddReferralCodeData
+  >(`${url.origin}/${network}/query/referralCode`, {
+    address,
+  });
+
+  const newReferralCode = success ? msg.referralCode : "";
 
   return json({
-    numReferrals,
+    numActiveReferrerReferrals,
+    numActiveReferreeReferrals,
+    numInactiveReferreeReferrals,
+    inactiveReferrals,
+    referralCode: newReferralCode,
     loaded: true,
   } satisfies ReferralCountData);
 };

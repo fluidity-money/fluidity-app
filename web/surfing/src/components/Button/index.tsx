@@ -9,6 +9,7 @@ import GeneralButton from "./GeneralButton/GeneralButton";
 import LinkButton from "./LinkButton";
 import TabButton from "./TabButton";
 import AttentionButton from "./AttentionButton";
+import TextButton from "./TextButton";
 
 export {
   AnchorButton,
@@ -18,4 +19,5 @@ export {
   LinkButton,
   TabButton,
   AttentionButton,
+  TextButton,
 };

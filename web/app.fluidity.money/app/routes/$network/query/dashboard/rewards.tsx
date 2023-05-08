@@ -1,19 +1,26 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 import type { LoaderFunction } from "@remix-run/node";
 import type { Rewarders } from "~/util/rewardAggregates";
+import type { TokenPerformance } from "~/util/tokenAggregate";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { getTotalPrizePool } from "~/util/chainUtils/ethereum/transaction";
+import {
+  aggregatePrizePools,
+  getTotalRewardPool,
+} from "~/util/chainUtils/ethereum/transaction";
 import { json } from "@remix-run/node";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";
+import { aggregateTokens } from "~/util/tokenAggregate";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
+import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
 import config from "~/webapp.config.server";
 import {
   TimeSepUserYield,
   useUserYieldAll,
   useUserYieldByAddress,
 } from "~/queries/useUserYield";
+import { useTokenRewardStatistics } from "~/queries";
 
 export type RewardsLoaderData = {
   network: Chain;
@@ -22,6 +29,7 @@ export type RewardsLoaderData = {
   fluidTokenMap: { [symbol: string]: string };
   fluidPairs: number;
   totalPrizePool: number;
+  tokenPerformance: TokenPerformance;
   networkFee: number;
   gasFee: number;
   timestamp: number;
@@ -40,11 +48,40 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     const mainnetId = 0;
-    const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+    const prizePoolPromise: Promise<number> = (() => {
+      switch (chainType(network)) {
+        case "evm": {
+          return Promise.resolve(
+            Promise.all(
+              [
+                {
+                  network: "ethereum",
+                  abi: RewardAbi,
+                  getPrizePool: aggregatePrizePools,
+                },
+                {
+                  network: "arbitrum",
+                  abi: TotalRewardPoolAbi,
+                  getPrizePool: getTotalRewardPool,
+                },
+              ].map(({ network, abi, getPrizePool }) => {
+                const infuraRpc = config.drivers[network][mainnetId].rpc.http;
+                const provider = new JsonRpcProvider(infuraRpc);
 
-    const provider = new JsonRpcProvider(infuraRpc);
+                const rewardPoolAddr =
+                  config.contract.prize_pool[network as Chain];
 
-    const rewardPoolAddr = config.contract.prize_pool[network];
+                return getPrizePool(provider, rewardPoolAddr, abi);
+              })
+            ).then((prizePools) =>
+              prizePools.reduce((sum, prizePool) => sum + prizePool, 0)
+            )
+          );
+        }
+        default:
+          return Promise.resolve(0);
+      }
+    })();
 
     const { tokens } = config.config[network];
 
@@ -52,28 +89,33 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       (map, token) =>
         token.isFluidOf
           ? {
-            ...map,
-            [token.symbol]: token.address,
-            [token.symbol.slice(1)]: token.address,
-          }
+              ...map,
+              [token.symbol]: token.address,
+              [token.symbol.slice(1)]: token.address,
+            }
           : map,
       {}
     );
-
     const [
       totalPrizePool,
       { data: rewardsData, errors: rewardsErr },
       { data: appRewardData, errors: appRewardErrors },
+      { data: tokenRewardData, errors: tokenRewardErrors },
     ] = await Promise.all([
-      getTotalPrizePool(provider, rewardPoolAddr, RewardAbi),
+      prizePoolPromise,
       address
         ? useUserYieldByAddress(network, address)
         : useUserYieldAll(network),
       useApplicationRewardStatistics(network ?? ""),
+      useTokenRewardStatistics(network ?? ""),
     ]);
 
     if (rewardsErr || !rewardsData) {
       throw rewardsErr;
+    }
+
+    if (tokenRewardErrors || !tokenRewardData) {
+      throw tokenRewardErrors;
     }
 
     if (appRewardErrors || !appRewardData) {
@@ -81,6 +123,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     const rewarders = aggregateRewards(appRewardData);
+
+    const tokenPerformance = aggregateTokens(tokenRewardData);
 
     return json({
       network,
@@ -91,6 +135,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       totalPrizePool,
       networkFee,
       gasFee,
+      tokenPerformance,
       timestamp: new Date().getTime(),
       loaded: true,
     } satisfies RewardsLoaderData);

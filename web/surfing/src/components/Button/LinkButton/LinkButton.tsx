@@ -4,14 +4,14 @@
 
 import type { ButtonHTMLAttributes } from "react";
 
-import { ArrowLeft, ArrowRight, ArrowTopRight } from "components";
+import { ArrowLeft, ArrowRight, ArrowTopRight, InfoCircle } from "components";
 import styles from "./LinkButton.module.scss";
 
 interface ILinkButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
   children: string;
   size: "small" | "medium" | "large";
-  type: "internal" | "external";
+  type: "internal" | "external" | "info";
   color?: "white" | "gray";
   left?: boolean;
   handleClick: () => void;
@@ -44,6 +44,8 @@ const LinkButton = ({
         <ArrowRight className={`${styles.icon} ${classProps}`} />
       ) : type === "internal" && left === true ? (
         <ArrowLeft className={`${styles.icon} ${classProps}`} />
+      ) : type === "info" ? (
+        <InfoCircle className={`${styles.icon} ${classProps}`} />
       ) : (
         <ArrowTopRight className={`${styles.icon} ${classProps}`} />
       )}

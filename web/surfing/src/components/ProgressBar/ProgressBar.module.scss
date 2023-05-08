@@ -1,0 +1,58 @@
+@use "common" as *;
+
+.ProgressBar {
+  position: relative;
+  height: 24px;
+  overflow: hidden;
+  padding: 0;
+
+  &.sm {
+    height: 8px;
+  }
+
+  &.md {
+    height: 16px;
+  }
+
+  &.lg {
+    height: 24px;
+  }
+
+  .barContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: transparent;
+    overflow: hidden;
+
+    &.round {
+      border-radius: 0 100px 100px 0;
+    }
+
+    &.white {
+      background-color: white;
+    }
+
+    .bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      &.holo {
+        background: $holo-linear;
+      }
+
+      &.gray {
+        background: map-get($border, "default");
+      }
+
+      &.white {
+        background: map-get($border, "prominent");
+      }
+      
+    }
+  }
+}

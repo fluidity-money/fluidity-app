@@ -1,0 +1,73 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import HeroCarousel from "./HeroCarousel";
+import { Text, Card } from './../../'
+
+<Meta
+    title="Container/HeroCarousel"
+    component={HeroCarousel}
+/>
+
+export const Template = (props) => <div style={{width: 500, marginLeft: 'auto', marginRight: 'auto'}}>
+    <HeroCarousel {...props} title="BOTTLES I'VE EARNED">
+        <Card
+          type="frosted"
+          fill
+          shimmer
+          rounded
+        >
+          <img src="/src/assets/images/img1.png"/>
+        </Card>
+        <Card
+          type="frosted"
+          fill
+          shimmer
+          rounded
+        >
+          <img src="/src/assets/images/img2.png"/>
+        </Card>
+                <Card
+          type="frosted"
+          fill
+          shimmer
+          rounded
+        >
+          <img src="/src/assets/images/img3.png"/>
+        </Card>
+                <Card
+          type="frosted"
+          fill
+          shimmer
+          rounded
+        >
+          <img src="/src/assets/images/img1.png"/>
+        </Card>
+        <Card
+          type="frosted"
+          fill
+          shimmer
+          rounded
+        >
+          <img src="/src/assets/images/img2.png"/>
+        </Card>
+                <Card
+          type="frosted"
+          fill
+          shimmer
+          rounded
+        >
+          <img src="/src/assets/images/img3.png"/>
+        </Card>
+    </HeroCarousel>
+    <div style={{height:50,width:50,background:'red'}}/>
+</div>;
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Hero Carousel</Title>
+    <Subtitle>For highlighting extremely cool things.</Subtitle>
+    <Story
+        name="Hero Carousel"
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

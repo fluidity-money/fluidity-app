@@ -23,7 +23,7 @@ export const Template = ({children, ...props}) => <Card {...props}>
             component: "div",
             children: <>
                 <ReactSvg />
-                <div>
+                <div style={{width: '1200px'}}>
                     <h2 style={{color:"white"}}>Solana</h2>
                     <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
                 </div>
@@ -37,55 +37,35 @@ export const Template = ({children, ...props}) => <Card {...props}>
         {Template.bind({})}
     </Story>
     <Story
-        name="Border Card"
-        args={{
-            component: "button",
-            disabled: true,
-            type: "box",
-            children: <>
-                <ReactSvg />
-                <div>
-                    <h2 style={{color:"white"}}>Solana</h2>
-                    <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
-                </div>
-                <div>
-                    <h3 style={{color:"white"}}>$351,879</h3>
-                    <h4 style={{color:"white"}}>Top prize</h4>
-                </div>
-            </>
-        }}
-    >
-        {Template.bind({})}
-    </Story>
-    <Story
-        name="Frosted Card"
-        args={{
-            component: "button",
-            rounded: true,
-            type: "frosted",
-            children: <>
-                <ReactSvg />
-                <div>
-                    <h2 style={{color:"white"}}>Solana</h2>
-                    <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
-                </div>
-                <div>
-                    <h3 style={{color:"white"}}>$351,879</h3>
-                    <h4 style={{color:"white"}}>Top prize</h4>
-                </div>
-            </>
-        }}
-    >
-        {Template.bind({})}
-    </Story>
-    <Story
-        name="Rounded Card"
+        name="Frosted Holo Card"
         args={{
             component: "div",
-            rounded: true,
+            type: "frosted",
+            color: "holo",
             children: <>
                 <ReactSvg />
+                <div style={{width: '1200px'}}>
+                    <h2 style={{color:"white"}}>Solana</h2>
+                    <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
+                </div>
                 <div>
+                    <h3 style={{color:"white"}}>$351,879</h3>
+                    <h4 style={{color:"white"}}>Top prize</h4>
+                </div>
+            </>
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+    <Story
+        name="Transparent Holo Card"
+        args={{
+            component: "div",
+            type: "transparent",
+            color: "holo",
+            children: <>
+                <ReactSvg />
+                <div style={{width: '1200px'}}>
                     <h2 style={{color:"white"}}>Solana</h2>
                     <h4 style={{color:"white"}}>$12.34 Avg prize/trans</h4>
                 </div>

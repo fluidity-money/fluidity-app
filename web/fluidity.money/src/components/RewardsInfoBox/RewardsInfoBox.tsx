@@ -13,7 +13,6 @@ import {
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { useSplitContext } from "hooks/SplitContext";
 
 interface IRewardBoxProps {
   totalTransactions: number;
@@ -35,16 +34,20 @@ const RewardsInfoBox = ({
   loading,
 }: IRewardBoxProps) => {
   const { chain, setChain } = useChainContext();
-  const { showExperiment } = useSplitContext();
 
   const showRewardPool = type === "black";
 
-  const imgLink = (opt: string) =>
-    opt === "ETH"
-      ? "/assets/images/chainIcons/ethIcon.svg"
-    : opt === "SOL"
-    ? "/assets/images/chainIcons/solanaIcon.svg"
-    : "/assets/images/chainIcons/arbIcon.svg";
+  const imgLink = (opt: string) => {
+    switch (opt) {
+      case "SOL":
+        return "/assets/images/chainIcons/solanaIcon.svg";
+      case "ARB":
+        return "/assets/images/chainIcons/arbIcon.svg";
+      case "ETH":
+      default:
+        return "/assets/images/chainIcons/ethIcon.svg";
+    }
+  };
 
   const [showModal, setShowModal] = useState(false);
 
@@ -54,7 +57,7 @@ const RewardsInfoBox = ({
   const chainOptions = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-  }))
+  }));
 
   const [prizePool, setPrizePool] = useState<number>(0);
 
@@ -64,11 +67,10 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={`${
-        type === "black"
+      className={`${type === "black"
           ? styles.infoBoxContainer
           : styles.infoBoxContainerStats
-      }`}
+        }`}
     >
       <div
         className={
@@ -82,7 +84,7 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={!loading ? changeScreen : () => {}}>
+        <div onClick={!loading ? changeScreen : () => { }}>
           <Heading as="h1">
             {showRewardPool ? (
               <Suspense>

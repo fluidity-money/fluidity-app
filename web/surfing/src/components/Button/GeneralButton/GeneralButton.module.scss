@@ -1,53 +1,64 @@
-@use 'common' as *;
+@use "common" as *;
 
-button {
+.GeneralButton {
   all: unset;
   border-radius: 20px;
-  font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
   text-align: center;
-}
-
-.small {
-  padding: 12px;
-  gap: 8px;
   border-radius: 50px;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 12px;
   line-height: 100%;
+  font-style: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 1em;
+  width: fit-content;
+  height: fit-content;
+  text-transform: uppercase;
 
-  .icon > * {
-    height: 12px;
+  .icon {
+    display: inline-block;
   }
-}
 
-.medium {
-  padding: 16px;
-  gap: 8px;
-  border-radius: 50px;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 100%;
-
-  .icon > * {
-    height: 14px;
+  &.after {
+    flex-direction: row-reverse;
   }
-}
 
-.large {
-  padding: 24px;
-  gap: 8px;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 100%;
-  border-radius: 50px;
+  &:disabled {
+    cursor: default;
+  }
 
-  .icon > * {
-    height: 16px;
+  // Sizing
+  &.small {
+    padding: 12px;
+    gap: 8px;
+    font-size: 12px;
+
+    .icon > * {
+      height: 12px;
+    }
+  }
+
+  &.medium {
+    font-size: 14px;
+    padding: 16px;
+    gap: 8px;
+
+    .icon > * {
+      height: 14px;
+    }
+  }
+
+  &.large {
+    padding: 24px;
+    gap: 8px;
+    font-size: 16px;
+
+    .icon > * {
+      height: 16px;
+    }
   }
 }
 
@@ -55,12 +66,8 @@ button {
   background-color: map-get($bg, "alternate");
   border: 0.5px solid map-get($border, "prominent");
   color: $black;
-  width: fit-content;
-  height: fit-content;
-  text-transform: uppercase;
-  gap: 100px;
+
   .icon {
-    display: inline-block;
     stroke: map-get($text, "secondary");
     fill: map-get($text, "secondary");
   }
@@ -81,10 +88,10 @@ button {
   }
 
   &:disabled {
-    cursor: default;
     color: $black;
     background-color: map-get($bg, "disabled");
     border: 0.5px solid map-get($bg, "disabled");
+
     .icon {
       stroke: map-get($text, "disabled");
       fill: map-get($text, "disabled");
@@ -95,12 +102,9 @@ button {
 .secondary {
   background-color: map-get($bg, default);
   border: 0.5px solid $white-a80;
-  width: fit-content;
-  height: fit-content;
-  text-transform: uppercase;
   color: map-get($text, "prominent");
+
   .icon {
-    display: inline-block;
     stroke: map-get($text, "prominent");
     fill: map-get($text, "prominent");
   }
@@ -121,10 +125,10 @@ button {
   }
 
   &:disabled {
-    cursor: default;
     color: map-get($text, "disabled");
     background-color: map-get($bg, default);
     border: 0.5px solid map-get($border, "disabled");
+
     .icon {
       stroke: map-get($text, "disabled");
       fill: map-get($text, "disabled");
@@ -135,12 +139,9 @@ button {
 .transparent {
   background-color: none;
   border: 0.5px solid $white-a80;
-  width: fit-content;
-  height: fit-content;
-  text-transform: uppercase;
   color: map-get($text, "prominent");
+
   .icon {
-    display: inline-block;
     stroke: map-get($text, "prominent");
     fill: map-get($text, "prominent");
   }
@@ -154,6 +155,7 @@ button {
     background-color: map-get($bg, "alternate");
     border: 0.5px solid map-get($border, "prominent");
     color: map-get($text, "secondary");
+
     .icon {
       stroke: map-get($text, "secondary");
       fill: map-get($text, "secondary");
@@ -161,14 +163,13 @@ button {
   }
 
   &:disabled {
-    cursor: default;
     color: map-get($text, "disabled");
     background-color: map-get($bg, default);
     border: 0.5px solid map-get($border, "disabled");
+
     .icon {
       stroke: map-get($text, "disabled");
       fill: map-get($text, "disabled");
     }
   }
 }
-

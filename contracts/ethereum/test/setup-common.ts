@@ -49,7 +49,7 @@ before(async function () {
     govTokenExtraSigner2,
     fwEthAccountSigner,
     veGovSigner,
-    registrySigner
+    registrySigner,
   ] = await hre.ethers.getSigners();
 
   const councilAddress = await operatorCouncilSigner.getAddress();
@@ -77,7 +77,7 @@ before(async function () {
     aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProviderFactory,
     registryFactory,
-    operatorFactory
+    operatorFactory,
   );
 
   const [
@@ -86,7 +86,7 @@ before(async function () {
     aaveV2LiquidityProviderBeacon,
     aaveV3LiquidityProviderBeacon,
     registryBeacon,
-    operatorBeacon
+    operatorBeacon,
   ] = beacons;
 
   commonBeaconAddresses = {

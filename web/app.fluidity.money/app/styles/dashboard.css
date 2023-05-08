@@ -26,7 +26,7 @@ main {
   grid-area: main;
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   overflow-y: scroll;
-  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .pad-main {
@@ -155,14 +155,6 @@ main > footer > section {
   width: 60vw;
 }
 
-.fluidify-button-dashboard-mobile > h5 {
-  margin: 0;
-}
-
-.fluidify-button-dashboard-mobile:hover > h5 {
-  color: black;
-}
-
 @media only screen and (max-width: 850px) {
   .fluidify-button-dashboard-mobile {
     bottom: 3vh;
@@ -251,10 +243,6 @@ main > footer > section {
 
 .selector-button {
   padding: 1px 2px;
-}
-
-.trophy-button {
-  font-size: 1em;
 }
 
 main > footer > section > a {
@@ -415,7 +403,6 @@ main > footer > section > a {
   position: fixed;
   top: 0;
   left: 0;
-  padding: 40px;
   background: black;
   height: 100%;
   width: 100%;
@@ -426,6 +413,7 @@ main > footer > section > a {
   height: 100vh;
   background-color: transparent;
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
 }
@@ -519,26 +507,6 @@ main > footer > section > a {
   position: absolute;
   margin: 0 0 0 40px;
   top: 90%;
-}
-
-.burger-btn {
-  height: 1em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-}
-
-.burger-span {
-  height: 1px;
-  width: 12px;
-  background-color: white;
-  border-radius: 40%;
-}
-
-.burger-btn:hover > .burger-span {
-  background-color: black;
 }
 
 .dashboard-navbar-default {
@@ -667,21 +635,6 @@ main > footer > section > a {
   padding-left: 0.8em;
 }
 
-.connected-wallet {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  border: 0.5px solid transparent;
-  padding: 0.2em;
-  border-radius: 2em;
-}
-
-.connected-wallet:hover {
-  border: 0.5px solid white;
-  padding: 0.2em;
-  border-radius: 2em;
-}
-
 .holo {
   background: conic-gradient(
     from 209.59deg at 50% 50%,
@@ -707,6 +660,7 @@ main > footer > section > a {
 
 .connected-wallet-modal-container {
   position: absolute;
+  z-index: 1;
   width: 100%;
   height: 100%;
   top: 50%;
@@ -997,4 +951,8 @@ main > footer > section > a {
   main > nav > div {
     gap: 0.5em;
   }
+}
+
+.no-margin {
+  margin: 0;
 }

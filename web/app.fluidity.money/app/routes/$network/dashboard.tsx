@@ -1,3 +1,7 @@
+import type { ReferralCountData } from "./query/referrals";
+import type { ReferralCodeData } from "./query/referralCode";
+import type { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
+
 import {
   json,
   LinksFunction,
@@ -14,8 +18,8 @@ import {
   useMatches,
   useTransition,
   useLocation,
-  useFetcher,
 } from "@remix-run/react";
+import { useCache } from "~/hooks/useCache";
 import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
@@ -37,24 +41,30 @@ import {
   ConnectedWallet,
   Modal,
   ProvideLiquidity,
-  Provider,
   ChainName,
+  BurgerMenu,
+  Referral,
 } from "@fluidity-money/surfing";
-import BurgerButton from "~/components/BurgerButton";
+import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import dashboardStyles from "~/styles/dashboard.css";
 import MobileModal from "~/components/MobileModal";
 import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
-import { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-import { Tokens } from "@fluidity-money/surfing/dist/types/components/Images/Token/Token";
+import ReferralModal from "~/components/ReferralModal";
+import AcceptReferralModal from "~/components/AcceptReferralModal";
 import { getProviderDisplayName } from "~/util/provider";
 
+import dashboardStyles from "~/styles/dashboard.css";
+import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: dashboardStyles }];
+  return [
+    { rel: "stylesheet", href: dashboardStyles },
+    { rel: "stylesheet", href: referralModalStyles },
+  ];
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
-  const ethereumWallets = config.config["ethereum"].wallets;
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const ethereumWallets = config.config["ethereum"].wallets ?? [];
 
   const network = params.network ?? "";
 
@@ -69,12 +79,17 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const tokensConfig = config.config;
 
+  // Get referral code, if any
+  const url = new URL(request.url);
+  const referralCode = url.searchParams.get("referral_code") ?? "";
+
   return json({
     network,
     provider,
     tokensConfig,
     ethereumWallets,
-  });
+    referralCode,
+  } satisfies LoaderData);
 };
 
 function ErrorBoundary() {
@@ -101,32 +116,12 @@ export const meta: MetaFunction = () => ({
   title: "Fluidity - Dashboard",
 });
 
-const routeMapper = (route: string) => {
-  switch (route.toLowerCase()) {
-    case "/":
-    case "/home":
-      return "DASHBOARD";
-    case "/rewards":
-      return "REWARDS";
-    case "/unclaimed":
-      return "CLAIM";
-    case "/assets":
-    case "/assets/regular":
-      return "ASSETS";
-    case "/dao":
-      return "DAO";
-    default:
-      return "DASHBOARD";
-  }
-};
-
 type LoaderData = {
-  fromRedirect: boolean;
-  network: ChainName;
+  network: string;
   provider: {
     [x: string]: {
       providers: {
-        name: Provider;
+        name: string;
         link: {
           fUSDC?: string;
           fUSDT?: string;
@@ -140,7 +135,7 @@ type LoaderData = {
   tokensConfig: {
     [x: string]: {
       tokens: {
-        symbol: Tokens;
+        symbol: string;
         address: string;
         name: string;
         logo: string;
@@ -153,10 +148,67 @@ type LoaderData = {
       }[];
     };
   };
+  ethereumWallets: {
+    name: string;
+    id: string;
+    description?: string;
+    logo: string;
+  }[];
+  referralCode: string;
+};
+
+const NAVIGATION_MAP: {
+  [key: string]: { name: string; icon: JSX.Element };
+}[] = [
+  { home: { name: "Dashboard", icon: <DashboardIcon /> } },
+  { rewards: { name: "Rewards", icon: <Trophy /> } },
+  { assets: { name: "Assets", icon: <AssetsIcon /> } },
+  { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+];
+
+const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
+  ethereum: {
+    name: "ETH",
+    icon: <img src="/assets/chains/ethIcon.svg" />,
+  },
+  arbitrum: {
+    name: "ARB",
+    icon: <img src="/assets/chains/arbIcon.svg" />,
+  },
+  solana: {
+    name: "SOL",
+    icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
+};
+
+const SAFE_DEFAULTS: Omit<
+  ReferralCountData & ReferralCodeData & UnclaimedRewardsLoaderData,
+  "loaded"
+> & {
+  referralCountLoaded: boolean;
+  referralCodeLoaded: boolean;
+  unclaimedRewardsLoaded: boolean;
+} = {
+  numActiveReferrerReferrals: 0,
+  numActiveReferreeReferrals: 0,
+  numInactiveReferreeReferrals: 0,
+  inactiveReferrals: [],
+  referralCode: "",
+  referralCountLoaded: false,
+  referralAddress: "",
+  referralCodeLoaded: false,
+  userUnclaimedRewards: 0,
+  unclaimedTokenAddrs: [],
+  unclaimedRewardsLoaded: false,
 };
 
 export default function Dashboard() {
-  const { network, provider, tokensConfig } = useLoaderData<LoaderData>();
+  const {
+    network,
+    provider,
+    tokensConfig,
+    referralCode: clickedReferralCode,
+  } = useLoaderData<LoaderData>();
 
   const navigate = useNavigate();
 
@@ -165,8 +217,9 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showArbitrum = showExperiment("enable-arbitrum");
   const showAssets = showExperiment("enable-assets-page");
+  const showAirdrop = showExperiment("enable-airdrop-page");
+  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -189,6 +242,14 @@ export default function Dashboard() {
   const [chainModalVisibility, setChainModalVisibility] =
     useState<boolean>(false);
 
+  // Toggle Referral Modal
+  const [referralModalVisibility, setReferralModalVisibility] =
+    useState<boolean>(false);
+
+  // Toggle Accept Referral Modal
+  const [acceptReferralModalVisibility, setAcceptReferralModalVisibility] =
+    useState<boolean>(false);
+
   useEffect(() => {
     if (connected || connecting) setWalletModalVisibility(false);
   }, [connected, connecting]);
@@ -204,40 +265,17 @@ export default function Dashboard() {
     !closeMobileModal && setOpenMobModal(false);
   }, [closeMobileModal]);
 
-  const navigationMap: {
-    [key: string]: { name: string; icon: JSX.Element };
-  }[] = [
-      { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-      { rewards: { name: "Rewards", icon: <Trophy /> } },
-      { assets: { name: "Assets", icon: <AssetsIcon /> } },
-    ];
-
-  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    arbitrum: {
-      name: "ARB",
-      icon: <img src="/assets/chains/arbIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
-
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
   const currentPath = transitionPath || matches[matches.length - 1].pathname;
-  const resolvedPaths = navigationMap.map((obj) =>
+  const resolvedPaths = NAVIGATION_MAP.map((obj) =>
     useResolvedPath(Object.keys(obj)[0])
   );
   const activeIndex = resolvedPaths.findIndex((path) =>
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: string) => {
+  const handleSetChain = (network: ChainName) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -246,21 +284,52 @@ export default function Dashboard() {
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
   };
 
+  const { data: referralsCountData } = useCache<ReferralCountData>(
+    showAirdrop && address
+      ? `/${network}/query/referrals?address=${address}`
+      : ""
+  );
+
+  const { data: referralCodeData } = useCache<ReferralCountData>(
+    showAirdrop && clickedReferralCode && address
+      ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
+      : ""
+  );
+
   // Rewards User has yet to claim - Ethereum feature
+  const { data: userUnclaimedData } = useCache<UnclaimedRewardsLoaderData>(
+    address && chainType(network) === "evm"
+      ? `/${network}/query/dashboard/unclaimedRewards?address=${address}`
+      : ""
+  );
 
-  const userUnclaimedData = useFetcher<UnclaimedRewardsLoaderData>();
+  const data = {
+    ...SAFE_DEFAULTS,
+    ...{
+      ...referralsCountData,
+      referralCountLoaded: referralsCountData?.loaded || false,
+    },
+    ...{
+      ...referralCodeData,
+      referralCodeLoaded: referralCodeData?.loaded || false,
+    },
+    ...{
+      ...userUnclaimedData,
+      userUnclaimedLoaded: userUnclaimedData?.loaded || false,
+    },
+  };
 
-  const unclaimedRewards = userUnclaimedData.data
-    ? userUnclaimedData.data.userUnclaimedRewards
-    : 0;
-
-  useEffect(() => {
-    if (!address) return;
-
-    userUnclaimedData.load(
-      `/${network}/query/dashboard/unclaimedRewards?address=${address}`
-    );
-  }, [address]);
+  const {
+    numActiveReferrerReferrals,
+    numActiveReferreeReferrals,
+    numInactiveReferreeReferrals,
+    inactiveReferrals,
+    referralCode,
+    referralCountLoaded,
+    referralAddress,
+    referralCodeLoaded,
+    userUnclaimedRewards,
+  } = data;
 
   const handleScroll = () => {
     if (!openMobModal) {
@@ -288,6 +357,13 @@ export default function Dashboard() {
   }, [openMobModal]);
 
   useEffect(() => {
+    // Only show acceptReferralModal if referral code is valid
+    if (referralCodeLoaded && referralAddress) {
+      setAcceptReferralModalVisibility(true);
+    }
+  }, [referralCodeLoaded]);
+
+  useEffect(() => {
     // Resets background when navigating away
     document.body.style.overflow = "unset";
     document.body.style.position = "static";
@@ -303,9 +379,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
@@ -325,7 +401,7 @@ export default function Dashboard() {
 
         <ChainSelectorButton
           className="selector-button"
-          chain={chainNameMap[network as "ethereum" | "solana"]}
+          chain={CHAIN_NAME_MAP[network]}
           onClick={() => setChainModalVisibility(true)}
         />
       </header>
@@ -335,12 +411,61 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={chainNameMap[network as "ethereum" | "solana"]}
-            options={Object.values(chainNameMap).filter(({ name }) =>
-              showArbitrum ? true : name !== "ARB"
-            )}
+            option={CHAIN_NAME_MAP[network]}
+            options={Object.values(CHAIN_NAME_MAP)}
             setOption={handleSetChain}
             mobile={isMobile}
+          />
+        </div>
+      </Modal>
+
+      {/* Referral Modal */}
+      <Modal visible={referralModalVisibility}>
+        <div
+          className="cover"
+          onClick={() => setReferralModalVisibility(false)}
+          style={{
+            background: "none",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: "1em",
+              right: isTablet ? "20px" : "60px",
+            }}
+          >
+            <ReferralModal
+              referrerClaimed={numActiveReferrerReferrals}
+              refereeClaimed={numActiveReferreeReferrals}
+              refereeUnclaimed={numInactiveReferreeReferrals}
+              progress={inactiveReferrals[0]?.progress || 0}
+              progressReq={10}
+              referralCode={referralCode}
+              loaded={referralCountLoaded}
+              closeModal={() => setReferralModalVisibility(false)}
+            />
+          </div>
+        </div>
+      </Modal>
+
+      {/* Accept Referral Modal */}
+      <Modal visible={acceptReferralModalVisibility}>
+        <div
+          className="cover"
+          onClick={() => setAcceptReferralModalVisibility(false)}
+          style={{
+            background: isMobile ? "black" : "#030303cc",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <AcceptReferralModal
+            network={network}
+            referralCode={clickedReferralCode}
+            referrer={referralAddress}
+            closeModal={() => setAcceptReferralModalVisibility(false)}
           />
         </div>
       </Modal>
@@ -348,14 +473,14 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
-          version={"primary"}
-          buttontype="text"
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
+          type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
         >
-          <Heading as="h5">
+          <Heading as="h5" color="inherit" style={{ margin: 0 }}>
             <b>Fluidify Money</b>
           </Heading>
         </GeneralButton>
@@ -364,9 +489,11 @@ export default function Dashboard() {
       <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
         {/* Nav Bar */}
         <ul>
-          {navigationMap
+          {NAVIGATION_MAP.filter((obj) =>
+            showAssets ? true : Object.keys(obj)[0] !== "assets"
+          )
             .filter((obj) =>
-              showAssets ? true : Object.keys(obj)[0] !== "assets"
+              showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
             )
             .map((obj, index) => {
               const key = Object.keys(obj)[0];
@@ -411,8 +538,7 @@ export default function Dashboard() {
             />
           ) : (
             <GeneralButton
-              version={connected || connecting ? "transparent" : "primary"}
-              buttontype="text"
+              type={connected || connecting ? "transparent" : "primary"}
               size={"medium"}
               handleClick={() =>
                 connecting ? null : setWalletModalVisibility(true)
@@ -435,8 +561,7 @@ export default function Dashboard() {
           />
         ) : (
           <GeneralButton
-            version={connected || connecting ? "transparent" : "primary"}
-            buttontype="text"
+            type={connected || connecting ? "transparent" : "primary"}
             size={"medium"}
             handleClick={() =>
               connecting ? null : setWalletModalVisibility(true)
@@ -494,13 +619,35 @@ export default function Dashboard() {
               Recieve
             </GeneralButton>
             */}
+            {(isTablet || isMobile) && showMobileNetworkButton && (
+              <ChainSelectorButton
+                chain={CHAIN_NAME_MAP[network]}
+                onClick={() => setChainModalVisibility(true)}
+              />
+            )}
+
+            {/* Referrals Button */}
+            {showExperiment("enable-airdrop-page") && (
+              <GeneralButton
+                type="transparent"
+                size="small"
+                layout="before"
+                handleClick={() => {
+                  isMobile
+                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                    : setReferralModalVisibility(true);
+                }}
+                icon={<Referral />}
+              >
+                Referral
+              </GeneralButton>
+            )}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
               <GeneralButton
                 className="fluidify-button-dashboard "
-                version={"primary"}
-                buttontype="text"
+                type={"secondary"}
                 size={"small"}
                 handleClick={() => {
                   client?.track("user", "click_fluidify");
@@ -515,22 +662,22 @@ export default function Dashboard() {
             <GeneralButton
               onMouseEnter={() => setHoverModal(true)}
               onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
-              className="trophy-button"
-              version={"transparent"}
-              buttontype="icon after"
+              type={"transparent"}
+              layout="after"
               size={"small"}
               handleClick={() =>
-                unclaimedRewards < 0.000005
+                userUnclaimedRewards < 0.000005
                   ? navigate(`/${network}/dashboard/rewards`)
                   : navigate(`/${network}/dashboard/rewards/unclaimed`)
               }
               icon={<Trophy />}
+              style={{ fontSize: "1em" }}
             >
-              {numberToMonetaryString(unclaimedRewards)}
+              {numberToMonetaryString(userUnclaimedRewards)}
             </GeneralButton>
 
             {(isTablet || isMobile) && (
-              <BurgerButton isOpen={openMobModal} setIsOpen={setOpenMobModal} />
+              <BurgerMenu isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
           </div>
         </nav>
@@ -551,7 +698,6 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <Outlet />
-
         {/* Provide Liquidity*/}
         <div className="pad-main" style={{ marginBottom: "2em" }}>
           {!openMobModal && (
@@ -563,11 +709,11 @@ export default function Dashboard() {
           )}
         </div>
         {/* Modal on hover */}
-        {unclaimedRewards >= 0.000005 &&
+        {userUnclaimedRewards >= 0.000005 &&
           (hoverModal || showModal) &&
           !isMobile && (
             <UnclaimedRewardsHoverModal
-              unclaimedRewards={unclaimedRewards}
+              unclaimedRewards={userUnclaimedRewards}
               setShowModal={setShowModal}
             />
           )}
@@ -576,36 +722,19 @@ export default function Dashboard() {
         {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
-            version={"primary"}
-            buttontype="text"
+            type={"secondary"}
             size={"medium"}
             handleClick={() => {
               client?.track("user", "click_fluidify");
               navigate(`/${network}/fluidify`);
             }}
           >
-            <Heading as="h5">
+            <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
             </Heading>
           </GeneralButton>
         )}
 
-        {/* Mobile Menu Modal */}
-        {openMobModal && (
-          <MobileModal
-            navigationMap={navigationMap.map((obj) => {
-              const { name, icon } = Object.values(obj)[0];
-              return { name, icon };
-            })}
-            activeIndex={activeIndex}
-            chains={chainNameMap}
-            unclaimedFluid={unclaimedRewards}
-            network={network}
-            isOpen={openMobModal}
-            setIsOpen={setOpenMobModal}
-            unclaimedRewards={unclaimedRewards}
-          />
-        )}
         <footer id="flu-socials" className="hide-on-mobile pad-main">
           {/* Links */}
           <section>
@@ -672,9 +801,47 @@ export default function Dashboard() {
             </a>
           </section>
         </footer>
+
+        {/* Mobile Menu Modal */}
+        {openMobModal && (
+          <MobileModal
+            navigationMap={NAVIGATION_MAP.map((obj) => {
+              const { name, icon } = Object.values(obj)[0];
+              return { name, icon };
+            })}
+            activeIndex={activeIndex}
+            chains={CHAIN_NAME_MAP}
+            unclaimedFluid={userUnclaimedRewards}
+            network={network as ChainName}
+            isOpen={openMobModal}
+            setIsOpen={setOpenMobModal}
+            unclaimedRewards={userUnclaimedRewards}
+          />
+        )}
       </main>
     </>
   );
 }
+
+const routeMapper = (route: string) => {
+  switch (route.toLowerCase()) {
+    case "/":
+    case "/home":
+      return "DASHBOARD";
+    case "/rewards":
+      return "REWARDS";
+    case "/unclaimed":
+      return "CLAIM";
+    case "/assets":
+    case "/assets/regular":
+      return "ASSETS";
+    case "/dao":
+      return "DAO";
+    case "/airdrop":
+      return "AIRDROP";
+    default:
+      return "DASHBOARD";
+  }
+};
 
 export { ErrorBoundary };

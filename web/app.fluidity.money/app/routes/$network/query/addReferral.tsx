@@ -3,27 +3,23 @@ import type { ActionFunction } from "@remix-run/node";
 import { useSplitExperiment } from "~/util/split";
 import { addReferral } from "~/queries/addReferral";
 import { json } from "@remix-run/node";
-import { isAddress } from "web3-utils";
 import { chainType } from "~/util/chainUtils/chains";
 import { PublicKey } from "@solana/web3.js";
 import { recoverAddress } from "ethers/lib/utils";
 import { hashMessage } from "@ethersproject/hash";
 import nacl from "tweetnacl";
-import { ethers } from "ethers";
+import { validAddress } from "~/util";
+import { useReferralCodeByCode } from "~/queries";
+
+export type AddReferralBody = {
+  address: string;
+  referrer_code: string;
+  referee_msg: string;
+};
 
 export type AddReferralRes = {
   success: boolean;
   msg: unknown;
-};
-
-const validAddress = (input: string, network: string): boolean => {
-  try {
-    return chainType(network) === "evm"
-      ? isAddress(input)
-      : PublicKey.isOnCurve(new PublicKey(input));
-  } catch {
-    return false;
-  }
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -32,33 +28,20 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   try {
     // Update DB with secret to write
-    const referrer_ = body["referrer"] ?? "";
-    const referee_ = body["referee"] ?? "";
-    const referrerMsg = body["referrer_msg"] ?? "";
+    const referee_ = body["address"] ?? "";
+    const referrerCode = body["referrer_code"] ?? "";
     const refereeMsg = body["referee_msg"] ?? "";
 
     // Normalise addresses
-    const referrer = referrer_.toLocaleLowerCase(),
-      referee = referee_.toLocaleLowerCase();
+    const referee = referee_.toLocaleLowerCase();
 
     // Limit for internal testing
-    if (
-      !(
-        useSplitExperiment("lootbox-referrals", true, { user: referrer }) &&
-        useSplitExperiment("lootbox-referrals", true, { user: referee })
-      )
-    ) {
+    if (!useSplitExperiment("lootbox-referrals", true, { user: referee })) {
       throw new Error("Unauthorised");
     }
 
     // Check valid addresses
-    if (
-      !(
-        referrer != referee &&
-        validAddress(referrer, network) &&
-        validAddress(referee, network)
-      )
-    ) {
+    if (!validAddress(referee, network)) {
       throw new Error("Invalid Addresses");
     }
 
@@ -66,38 +49,23 @@ export const action: ActionFunction = async ({ request, params }) => {
     const signaturesVerified = (() => {
       switch (chainType(network)) {
         case "evm": {
-          const referrerVerified =
-            ethers.utils
-              .recoverAddress(hashMessage("Referrer"), referrerMsg)
-              .toLocaleLowerCase() === referrer;
-
-          const refereeVerified =
+          return (
             recoverAddress(
-              hashMessage("Referee"),
+              hashMessage(`${referrerCode} 🌊 ${referee}`),
               refereeMsg
-            ).toLocaleLowerCase() === referee;
-
-          return referrerVerified && refereeVerified;
+            ).toLocaleLowerCase() === referee
+          );
         }
         case "solana": {
           const enc = new TextEncoder();
 
-          const referrerPubkey = new PublicKey(referrer),
-            refereePubkey = new PublicKey(referee);
+          const refereePubkey = new PublicKey(referee);
 
-          const referrerVerified = nacl.sign.detached.verify(
-            enc.encode("Referrer"),
-            enc.encode(referrerMsg),
-            referrerPubkey.toBytes()
-          );
-
-          const refereeVerified = nacl.sign.detached.verify(
+          return nacl.sign.detached.verify(
             enc.encode("Referee"),
             enc.encode(refereeMsg),
             refereePubkey.toBytes()
           );
-
-          return referrerVerified && refereeVerified;
         }
         default:
           throw new Error("Could not parse network");
@@ -106,6 +74,24 @@ export const action: ActionFunction = async ({ request, params }) => {
 
     if (!signaturesVerified) {
       throw new Error("Could not verify signatures");
+    }
+
+    // Check ReferralCode exists
+    const { data: referralCodeByCodeData, errors } =
+      await useReferralCodeByCode(referrerCode);
+
+    const matchingReferralCode =
+      referralCodeByCodeData?.lootbox_referral_codes[0];
+
+    if (errors || !matchingReferralCode) {
+      throw new Error("Code does not exist");
+    }
+
+    // Check referral originator is not referee
+    const referrer = matchingReferralCode.address;
+
+    if (referrer === referee) {
+      throw new Error("Invalid Address");
     }
 
     const res = await addReferral(referrer, referee);

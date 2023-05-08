@@ -136,7 +136,7 @@ func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethcl
 
 func main() {
 	var (
-		ethereumWsUrl = util.GetEnvOrFatal(EnvEthereumWsUrl)
+		ethereumWsUrl = util.PickEnvOrFatal(EnvEthereumWsUrl)
 		tokenList_    = util.GetEnvOrFatal(EnvTokenList)
 	)
 
@@ -156,6 +156,7 @@ func main() {
 			fluidity.FluidityContractAbi.Events["Transfer"].ID,
 			fluidity.FluidityContractAbi.Events["MintFluid"].ID,
 			fluidity.FluidityContractAbi.Events["BurnFluid"].ID,
+			fluidity.StakingAbi.Events["Staked"].ID,
 		},
 	}
 

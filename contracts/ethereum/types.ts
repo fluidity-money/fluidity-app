@@ -49,6 +49,7 @@ export type FluidityFactories = {
   aaveV3LiquidityProvider: ethers.ContractFactory,
   dao: ethers.ContractFactory,
   staking: ethers.ContractFactory
+  utilityGauges: ethers.ContractFactory
 };
 
 export type FluiditySigners = {
