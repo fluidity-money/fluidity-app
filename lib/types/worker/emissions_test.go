@@ -96,7 +96,7 @@ func TestString(t *testing.T) {
 		"saddle":0,
 		"gtrade_v6_1":0,
         "meson":0,
-		"camelot":0
+		"camelot":0,
 		"chronos":0
 	},
 	"calculate_n":{
