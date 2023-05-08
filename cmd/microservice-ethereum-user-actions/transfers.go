@@ -7,6 +7,7 @@ package main
 import (
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -59,6 +60,19 @@ func handleTransfer(network_ network.BlockchainNetwork, transactionHash ethereum
 	if transfer.SenderAddress == ZeroAddress || transfer.RecipientAddress == ZeroAddress {
 		return
 	}
+
+	// use fee switched addresses to align with tracked wins
+	var (
+		network           = transfer.Network
+		senderAddress_    = ethereum.AddressFromString(transfer.SenderAddress)
+		recipientAddress_ = ethereum.AddressFromString(transfer.RecipientAddress)
+
+		senderAddress    = worker.LookupFeeSwitch(senderAddress_, network)
+		recipientAddress = worker.LookupFeeSwitch(recipientAddress_, network)
+	)
+
+	transfer.SenderAddress = senderAddress.String()
+	transfer.RecipientAddress = recipientAddress.String()
 
 	queue.SendMessage(
 		user_actions.TopicUserActionsEthereum,

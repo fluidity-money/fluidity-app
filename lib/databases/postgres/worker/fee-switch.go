@@ -78,3 +78,14 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 
 	return &feeSwitch
 }
+
+// LookupFeeSwitch to get the fee switch for the given address, or the address if no switch is found
+func LookupFeeSwitch(addr ethereum.Address, network_ network.BlockchainNetwork) ethereum.Address {
+	feeSwitch := GetFeeSwitch(addr, network_)
+
+	if feeSwitch == nil {
+		return addr
+	}
+
+	return feeSwitch.NewAddress
+}
