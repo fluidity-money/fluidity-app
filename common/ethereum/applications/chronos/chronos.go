@@ -137,7 +137,7 @@ var (
     chronosPairFactoryAbi ethAbi.ABI
 )
 
-// GetChronosFees returns Chronos V2's fee of 0.3% of the amount swapped.
+// GetChronosFees returns Chronos' fee based on fees given by Chronos' pair factory
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
 func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
@@ -305,7 +305,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 
 	if err != nil {
 		return nil, fmt.Errorf(
-			"Failed to get pair fee! %v",
+			"Failed to get pair fee numerator! %v",
 			err,
 		)
 	}
