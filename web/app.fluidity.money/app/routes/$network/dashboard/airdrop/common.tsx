@@ -16,6 +16,7 @@ import {
   toSignificantDecimals,
   ArrowLeft,
   Heading,
+  Video,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -32,14 +33,22 @@ interface IBottleDistribution {
   bottles: BottleTiers;
   showBottleNumbers?: boolean;
   highlightBottleNumberIndex?: number;
+  isMobile?: boolean;
 }
 
 const BottleDistribution = ({
   bottles,
   showBottleNumbers = true,
   highlightBottleNumberIndex,
+  isMobile = false
 }: IBottleDistribution) => (
-  <div className="bottle-distribution-container">
+  <div className="bottle-distribution-container"
+    style={isMobile ? {
+      maxWidth: '100%',
+      overflowX: 'scroll',
+      height: 160,
+    } : {}}
+  >
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
         <div key={index} className="lootbottle-container">
@@ -751,12 +760,12 @@ const tutorialContent: {
   "0": {
     title: 'WHAT ARE LOOT BOTTLES?',
     desc: 'Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ',
-    image: '/images/placeholderAirdrop1.png',
+    image: 'REFERRALS',
   },
   "1": {
     title: 'HOW TO EARN LOOT BOTTLES?',
     desc: 'To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ',
-    image: '/images/placeholderAirdrop2.png',
+    image: 'REFERRALS',
   },
   "2": {
     title: 'MULTIPLIERS',
@@ -806,21 +815,21 @@ const tutorialContent: {
         </Text>
       </div>
     </>,
-    image: '/images/placeholderAirdrop3.png',
+    image: 'MULTIPLIER',
   },
   "3": {
-    title: 'Referrals',
-    desc: '',
-    image: '/images/placeholderAirdrop1.png',
+    title: 'REFERRALS',
+    desc: 'You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions. ',
+    image: 'REFERRALS',
   },
   "4": {
-    title: 'Learn More',
-    desc: '',
-    image: '/images/placeholderAirdrop2.png',
+    title: 'LEARN MORE',
+    desc: 'To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.',
+    image: 'AIRDROP_DEEP_DIVE',
   },
 }
 
-const TutorialModal = () => {
+const TutorialModal = ({ isMobile }: {isMobile?: boolean}) => {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   return <>
@@ -845,7 +854,14 @@ const TutorialModal = () => {
         gap: '1em',
       }}
     >
-      <img src={tutorialContent[currentSlide].image} className='tutorial-image'/>
+      <Video 
+        type="cover"
+        width={isMobile ? 550 : (1270/2)}
+        height={isMobile ? 550 : (460/2)}
+        loop
+        src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image}.mp4`} 
+        className='tutorial-image'
+      />
       <Display size="xxs" style={{margin: 0}}>{ tutorialContent[currentSlide].title }</Display>
       { tutorialContent[currentSlide].desc }
     </motion.div>

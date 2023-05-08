@@ -253,7 +253,11 @@ const Airdrop = () => {
     <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
       Airdrop Tutorial
     </TabButton>
-    <TabButton size="small" onClick={() => navigate("#leaderboard")}>Leaderboard</TabButton>
+    <TabButton size="small" onClick={() => {
+      if(!isMobile) navigate("#leaderboard")
+      setCurrentModal('leaderboard')
+    }
+    }>Leaderboard</TabButton>
     <TabButton
       size="small"
       onClick={() => setCurrentModal("referral-details")}
@@ -266,13 +270,108 @@ const Airdrop = () => {
   </div>
   }
 
-
-
   if (!showAirdrop) return null;
 
   if (isMobile) return (
     <>
-    
+      <Header />
+      <div className="pad-main"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '2em'
+        }}
+      >
+      {
+        currentModal === null &&
+        (
+          <>
+            <Heading as="h3" className={"no-margin"}>
+              Welcome to Fluidity&apos;s Airdrop Event!
+            </Heading>
+            <div>
+              <Text>
+                Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
+                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
+                metus, ac convallis lectus porttitor et. Donec maximus gravida
+                mauris, eget tempor felis tristique sit amet. Pellentesque at
+                hendrerit nibh, eu porttitor dui.
+                <LinkButton
+                  size="medium"
+                  type="external"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Learn more
+                </LinkButton>
+              </Text>
+            </div>
+            <BottleProgress bottles={bottleTiers} isMobile/>
+            <AirdropStats
+              seeReferralsDetails={() => setCurrentModal("referral-details")}
+              seeBottlesDetails={() => setCurrentModal("bottles-details")}
+              epochMax={epochDaysTotal}
+              epochDays={epochDays}
+              activatedReferrals={numActiveReferrerReferrals}
+              totalBottles={bottlesCount}
+            />
+            <MultiplierTasks />
+            <MyMultiplier
+              seeMyStakingStats={() => setCurrentModal("staking-stats")}
+              seeStakeNow={() => setCurrentModal("stake-now")}
+              liquidityMultiplier={liquidityMultiplier}
+              stakes={stakes}
+            />
+          </>
+        )
+      }
+      {
+        currentModal === 'tutorial' &&
+        (
+          <>
+            <TutorialModal isMobile/>
+          </>
+        )
+      }
+      {
+        currentModal === 'leaderboard' &&
+        (
+          <>
+            <Leaderboard
+              loaded={globalLeaderboardLoaded}
+              data={leaderboardRows}
+              filterIndex={leaderboardFilterIndex}
+              setFilterIndex={setLeaderboardFilterIndex}
+            />
+          </>
+        )
+      }
+      {
+        currentModal === "stake-now" &&
+        (
+          <>
+        <Heading as="h3">Stake Now</Heading>
+
+                <StakeNowModal
+          fluidTokens={tokens.filter((tok) =>
+            Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
+          )}
+          baseTokens={tokens.filter(
+            (tok) => !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
+          )}
+          stakeToken={stakeTokens}
+        />
+        <Heading as="h3">My Staking Stats</Heading>
+        <StakingStatsModal  
+          liqudityMultiplier={liquidityMultiplier}
+          stakes={stakes}
+        />
+        </>
+        )
+      }
+
+      </div>
     </>
   )
 
@@ -400,12 +499,22 @@ const Airdrop = () => {
           LEADERBOARD
         </AnchorButton>
       </div>
-      <Leaderboard
-        loaded={globalLeaderboardLoaded}
-        data={leaderboardRows}
-        filterIndex={leaderboardFilterIndex}
-        setFilterIndex={setLeaderboardFilterIndex}
-      />
+      <div className="pad-main" id="#leaderboard">
+        <Card
+          className="leaderboard-container"
+          type="transparent"
+          border="solid"
+          rounded
+          color="white"
+        >
+          <Leaderboard
+            loaded={globalLeaderboardLoaded}
+            data={leaderboardRows}
+            filterIndex={leaderboardFilterIndex}
+            setFilterIndex={setLeaderboardFilterIndex}
+          />
+        </Card>
+      </div>
     </>
   );
 };
@@ -761,14 +870,7 @@ const Leaderboard = ({
 }: IAirdropLeaderboard) => {
   console.log("HELOOOOOOOO", filterIndex);
   return (
-    <div className="pad-main" id="leaderboard">
-      <Card
-        className="leaderboard-container"
-        type="transparent"
-        border="solid"
-        rounded
-        color="white"
-      >
+    <>
         <div className="leaderboard-header">
           <Heading as="h3">Leaderboard</Heading>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -818,13 +920,12 @@ const Leaderboard = ({
           filters={[]}
           loaded={loaded}
         />
-      </Card>
-    </div>
+    </>
   );
 };
 
 
-const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
+const BottleProgress = ({ bottles, isMobile }: { bottles: BottleTiers, isMobile?: boolean }) => {
   const [imgIndex, setImgIndex] = useState(0);
   const [showBottleNumbers, setShowBottleNumbers] = useState(false);
   
@@ -856,6 +957,7 @@ const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
       </HeroCarousel>
       <BottleDistribution
         bottles={bottles}
+        isMobile={isMobile}
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />

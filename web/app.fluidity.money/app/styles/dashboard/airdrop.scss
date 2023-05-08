@@ -2,7 +2,7 @@
   display: flex;
   gap: 2em;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .lootbottle-container {
@@ -35,8 +35,6 @@
 
   .tutorial-image {
     margin-top: 1em;
-    width: calc(1270px / 2);
-    height: calc(460px / 2);
     object-fit: cover;
     object-position: center;
     border-radius: 5px;
