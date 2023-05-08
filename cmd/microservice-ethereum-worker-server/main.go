@@ -378,8 +378,8 @@ func main() {
 				)
 
 				var (
-					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
-					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
+					senderAddress    = worker_config.LookupFeeSwitch(senderAddress_, dbNetwork)
+					recipientAddress = worker_config.LookupFeeSwitch(recipientAddress_, dbNetwork)
 				)
 
 				application := applications.ApplicationNone
