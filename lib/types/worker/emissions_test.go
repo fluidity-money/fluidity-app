@@ -97,6 +97,7 @@ func TestString(t *testing.T) {
 		"gtrade_v6_1":0,
         "meson":0,
 		"camelot":0
+		"chronos":0
 	},
 	"calculate_n":{
 		"probability_m":0,
