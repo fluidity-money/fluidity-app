@@ -5,23 +5,34 @@
 package main
 
 import (
-	"math/big"
-	"math"
+	"github.com/ethereum/go-ethereum/ethclient"
 
+	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 )
 
-func pow10(x int) *big.Rat {
-	return new(big.Rat).SetFloat64(math.Pow10(x))
-}
+// EnvEthereumHttpUrl is the url to use to connect to the HTTP geth endpoint
+const EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 
 func main() {
+	ethereumHttpAddress := util.PickEnvOrFatal(EnvEthereumHttpUrl)
+
+	ethClient, err := ethclient.Dial(ethereumHttpAddress)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to dial into Geth!"
+			k.Payload = err
+		})
+	}
+
 	winners.WinnersEthereum(func(winner winners.Winner) {
 		var (
-			transactionHash = winner.TransactionHash
-			sendTransationHash = winner.SendTransactionHash
+			transactionHash         = winner.TransactionHash
+			winnerAddress = winner.WinnerAddress
+			sendTransationHash      = winner.SendTransactionHash
 			sendTransactionLogIndex = winner.SendTransactionLogIndex
 		)
 
@@ -46,6 +57,6 @@ func main() {
 
 		amountUsed.Quo(amount, pow10(userAction.tokenDecimals))
 
-
+		// test if the sender is a contract, and if they are
 	})
 }

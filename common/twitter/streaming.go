@@ -13,16 +13,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	twitter "github.com/fluidity-money/fluidity-app/lib/types/twitter"
 )
 
 type (
-	twitterBearerTransport struct {
-		bearerToken string
-	}
-
 	twitterStreamRulesList struct {
 		Data []struct {
 			Id    string `json:"id"`
@@ -68,15 +63,6 @@ type (
 		MatchingRules []twitterTweetMatchingRule `json:"matching_rules"`
 	}
 )
-
-func (transport *twitterBearerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-
-	bearerToken := fmt.Sprintf("Bearer %v", transport.bearerToken)
-
-	req.Header.Add("Authorization", bearerToken)
-
-	return http.DefaultTransport.RoundTrip(req)
-}
 
 // getStreamRules currently in place, returning IDs
 func getStreamRules(client *http.Client) ([]string, error) {
@@ -432,12 +418,7 @@ func runStreamTweets(bearerToken string, hashtags ...string) (<-chan twitter.Twe
 
 // runStreamTweets with a seperate goroutine following a hashtag
 func StreamTweets() <-chan twitter.Tweet {
-	var (
-		twitterBearerToken = util.GetEnvOrFatal(EnvTwitterBearerToken)
-		hashtags_          = util.GetEnvOrFatal(EnvHashtags)
-	)
-
-	hashtags := splitHashtags(hashtags_)
+	twitterBearerToken, hashtags := getTwitterEnvs()
 
 	log.Debug(func(k *log.Log) {
 		k.Context = Context
