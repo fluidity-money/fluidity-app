@@ -364,14 +364,26 @@ describe("LootboxStaking", async () => {
 
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
 
-    expect(token0BeforeRedeem)
-      .to.be.equal(token0BeforeRedeem.add(fusdcRedeemed));
+    // test if the amount added to the account is within the range of 10%,
+    // assuming some fees were paid
 
-    expect(token1BeforeRedeem)
-      .to.be.equal(token1BeforeRedeem.add(usdcRedeemed));
+    expectWithinSlippage(
+      token0BeforeRedeem,
+      token0BeforeRedeem.add(fusdcRedeemed),
+      10
+    );
 
-    expect(token2BeforeRedeem)
-      .to.be.equal(token2BeforeRedeem.add(wethRedeemed));
+    expectWithinSlippage(
+      token1BeforeRedeem,
+      token1BeforeRedeem.add(usdcRedeemed),
+      10
+    );
+
+    expectWithinSlippage(
+      token2BeforeRedeem,
+      token2BeforeRedeem.add(wethRedeemed),
+      10
+    );
 
     expectWithinSlippage(fusdcRedeemed, fusdc.add(fusdc1), 10);
 

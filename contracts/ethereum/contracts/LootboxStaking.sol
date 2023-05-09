@@ -849,7 +849,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
 
-        fusdcUsdcRatio = 1e12 * camelotFusdcUsdcReserveA / fusdcUsdcLiq;
+        fusdcUsdcRatio = camelotFusdcUsdcReserveA * fusdcUsdcLiq / 100;
 
         (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
             _uniswapPairReserves(
@@ -859,7 +859,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         fusdcWethLiq = camelotFusdcWethReserveA + camelotFusdcWethReserveB;
 
-        fusdcWethRatio = 1e12 * camelotFusdcWethReserveA / fusdcWethLiq;
+        fusdcWethRatio = camelotFusdcWethReserveA * fusdcWethLiq / 100;
 
         return (
             fusdcUsdcRatio,
@@ -883,7 +883,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         fusdcUsdcLiq = sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB;
 
-        fusdcUsdcRatio = 1e12 * sushiswapFusdcUsdcReserveA / fusdcUsdcLiq;
+        fusdcUsdcRatio = sushiswapFusdcUsdcReserveA * fusdcUsdcLiq / 100;
 
         (uint256 sushiswapFusdcWethReserveA, uint256 sushiswapFusdcWethReserveB) =
             _sushiswapPoolReserves(
@@ -893,7 +893,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         fusdcWethLiq = sushiswapFusdcWethReserveA + sushiswapFusdcWethReserveB;
 
-        fusdcWethRatio = 1e12 * sushiswapFusdcWethReserveA / fusdcWethLiq;
+        fusdcWethRatio = sushiswapFusdcWethReserveA * fusdcWethLiq / 100;
 
         return (
             fusdcUsdcRatio,
