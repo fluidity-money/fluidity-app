@@ -66,7 +66,7 @@ type (
 
 // getStreamRules currently in place, returning IDs
 func getStreamRules(client *http.Client) ([]string, error) {
-	resp, err := client.Get("https://api.twitter.com/2/tweets/search/stream/rules")
+	resp, err := client.Get(UrlStreamRules)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -135,7 +135,7 @@ func deleteStreamRules(client *http.Client, ids ...string) error {
 	}
 
 	resp, err := client.Post(
-		"https://api.twitter.com/2/tweets/search/stream/rules",
+		UrlStreamRules,
 		"application/json",
 		&buf,
 	)
@@ -194,7 +194,7 @@ func setStreamRules(client *http.Client, tags ...string) error {
 	}
 
 	resp, err := client.Post(
-		"https://api.twitter.com/2/tweets/search/stream/rules",
+		UrlStreamRules,
 		"application/json",
 		&buf,
 	)

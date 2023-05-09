@@ -14,3 +14,11 @@ const (
 	// EnvHashtags to pass to Twitter streams to start to stream
 	EnvHashtags = `FLU_TWITTER_HASHTAGS`
 )
+
+const (
+	// UrlStreamRules used for getting the stream list
+	UrlStreamRules = "https://api.twitter.com/2/tweets/search/stream/rules"
+
+	// UrlPostTweets used to make a tweet
+	UrlPostTweets = "https://api.twitter.com/2/tweets"
+)

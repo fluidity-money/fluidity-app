@@ -44,7 +44,7 @@ func SendTweet(text, replyToTweetId string) (tweetId string, err error) {
 		})
 	}
 
-	resp, err := httpClient.Post("/2/tweets", "application/json", &buf)
+	resp, err := httpClient.Post(UrlPostTweets, "application/json", &buf)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
