@@ -713,12 +713,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcUsdcSpread,
         uint256 fusdcWethSpread
     ) {
-        console.log("about to get camelot ratios");
-
         (uint256 camelotFusdcUsdcRatio, uint256 camelotFusdcWethRatio) =
             _camelotRatios();
-
-        console.log("about to get sushiswap ratios");
 
         (uint256 sushiswapFusdcUsdcRatio, uint256 sushiswapFusdcWethRatio) =
             _sushiswapRatios();
@@ -729,37 +725,17 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         fusdcWethRatio = (camelotFusdcWethRatio / 2) + (sushiswapFusdcWethRatio / 2);
 
-        console.log("figuring out the spread for usdc");
-
         if (camelotFusdcUsdcRatio > sushiswapFusdcUsdcRatio) {
             fusdcUsdcSpread = camelotFusdcUsdcRatio - sushiswapFusdcUsdcRatio;
         } else {
             fusdcUsdcSpread = sushiswapFusdcUsdcRatio - camelotFusdcUsdcRatio;
         }
 
-        console.log("figuring out the spread for weth");
-
         if (camelotFusdcWethRatio > sushiswapFusdcWethRatio) {
             fusdcWethSpread = camelotFusdcWethRatio - sushiswapFusdcWethRatio;
         } else {
             fusdcWethSpread = sushiswapFusdcWethRatio - camelotFusdcWethRatio;
         }
-
-        console.log("fusdc usdc spread", fusdcUsdcSpread);
-
-        console.log("fusdc weth spread", fusdcWethSpread);
-
-        console.log("fusdc usdc spread / 2", fusdcUsdcSpread / 2);
-
-        console.log("fusdc weth spread / 2", fusdcWethSpread / 2);
-
-        console.log("fusdc weth spread result", fusdcWethSpread / 2);
-
-        console.log("fusdc usdc ratio", fusdcUsdcRatio);
-
-        console.log("fusdc usdc ratio reduced", fusdcUsdcRatio - (fusdcUsdcRatio / 2));
-
-        console.log("fusdc weth ratio reduced", fusdcWethRatio - (fusdcWethSpread / 2));
 
         return (
             fusdcUsdcRatio,
@@ -877,12 +853,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 fusdc_
             );
 
-        console.log("fusdc usdc reserve a", sushiswapFusdcUsdcReserveA, "reserve b", sushiswapFusdcUsdcReserveB);
-
         uint256 sushiswapFusdcUsdcRatio =
             1e12 * sushiswapFusdcUsdcReserveA / (sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB);
-
-        console.log("sushiswap fusdc usdc ratio", sushiswapFusdcUsdcRatio);
 
         (uint256 sushiswapFusdcWethReserveA, uint256 sushiswapFusdcWethReserveB) =
             _sushiswapPoolReserves(

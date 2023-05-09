@@ -364,8 +364,6 @@ describe("LootboxStaking", async () => {
 
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
 
-    console.log(`fusdc redeemed: ${fusdcRedeemed}`);
-
     expect(token0BeforeRedeem)
       .to.be.equal(token0BeforeRedeem.add(fusdcRedeemed));
 
@@ -539,7 +537,5 @@ describe("LootboxStaking", async () => {
       await token1.approve(testSupplier.address, usdcOutOfWhackAmount);
 
       await testSupplier.deposit(fusdcOutOfWhackAmount, usdcOutOfWhackAmount);
-
-      console.log(`everything ratios: ${await staking.ratios()}`);
   });
 });
