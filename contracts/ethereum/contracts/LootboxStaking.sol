@@ -45,7 +45,7 @@ uint256 constant MAX_LOCKUP_TIME = 365 days;
 
 /**
  * @dev MIN_LIQUIDITY since we split it up in half and there's a
- *      minimum liquidity of 10k
+ *      minimum liquidity on each platform (the token decimals on Sushi)
  */
 uint256 constant MIN_LIQUIDITY = 1e18 * 2;
 
