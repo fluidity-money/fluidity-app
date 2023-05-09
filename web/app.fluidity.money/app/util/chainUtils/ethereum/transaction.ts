@@ -381,7 +381,7 @@ export const makeStakingDeposit = async (
   fusdcAmt: BN,
   wethAmt: BN,
   slippage: BN
-): Promise<unknown> => {
+): Promise<StakingDepositsRes | undefined> => {
   try {
     const stakingContract = getContract(stakingAbi, stakingAddr, signer);
 
@@ -449,7 +449,7 @@ export const makeStakingDeposit = async (
     );
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
-    return 0;
+    return undefined;
   }
 };
 

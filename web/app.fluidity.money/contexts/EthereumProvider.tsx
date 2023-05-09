@@ -1,4 +1,5 @@
-import { ReactNode, useContext } from "react";
+import type { ReactNode } from "react";
+import type { StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -6,7 +7,7 @@ import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useContext } from "react";
 import {
   useWeb3React,
   Web3ReactProvider,
@@ -269,9 +270,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -378,11 +379,13 @@ const EthereumFacade = ({
   /**
    * getStakingDeposits returns total tokens staked by a user.
    */
-  const getStakingDeposits = async (address: string): Promise<unknown> => {
+  const getStakingDeposits = async (
+    address: string
+  ): Promise<StakingDepositsRes | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return 0;
+      return undefined;
     }
 
     const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
@@ -404,7 +407,7 @@ const EthereumFacade = ({
     fusdcAmt: BN,
     wethAmt: BN,
     slippage: BN
-  ) => {
+  ): Promise<StakingDepositsRes | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {

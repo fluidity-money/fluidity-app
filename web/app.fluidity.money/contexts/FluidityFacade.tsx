@@ -50,7 +50,7 @@ export interface IFluidityFacade {
     fusdcAmt: BN,
     wethAmt: BN,
     slippage: BN
-  ) => Promise<TransactionResponse | undefined>;
+  ) => Promise<StakingDepositsRes | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

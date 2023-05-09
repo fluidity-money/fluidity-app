@@ -40,14 +40,19 @@ const BottleDistribution = ({
   bottles,
   showBottleNumbers = true,
   highlightBottleNumberIndex,
-  isMobile = false
+  isMobile = false,
 }: IBottleDistribution) => (
-  <div className="bottle-distribution-container"
-    style={isMobile ? {
-      maxWidth: '100%',
-      overflowX: 'scroll',
-      height: 160,
-    } : {}}
+  <div
+    className="bottle-distribution-container"
+    style={
+      isMobile
+        ? {
+            maxWidth: "100%",
+            overflowX: "scroll",
+            height: 160,
+          }
+        : {}
+    }
   >
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
@@ -66,16 +71,16 @@ const BottleDistribution = ({
             style={{
               position: "absolute",
               bottom: "120px",
-              zIndex: '5',
+              zIndex: "5",
               ...(showBottleNumbers
                 ? highlightBottleNumberIndex === index
                   ? {
-                    fontSize: "2em",
-                  }
+                      fontSize: "2em",
+                    }
                   : {}
                 : highlightBottleNumberIndex === index
-                  ? { fontSize: "2em" }
-                  : { display: "none" }),
+                ? { fontSize: "2em" }
+                : { display: "none" }),
             }}
           >
             {toSignificantDecimals(quantity)}
@@ -423,27 +428,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-        if (dec === undefined) {
-          return setInput({
-            ...token,
-            amount: `${unpaddedWhole}`,
-          });
-        }
-
-        const limitedDecimals = dec.slice(0 - token.decimals);
-
+      if (dec === undefined) {
         return setInput({
           ...token,
-          amount: [whole, limitedDecimals].join("."),
+          amount: `${unpaddedWhole}`,
         });
-      };
+      }
+
+      const limitedDecimals = dec.slice(0 - token.decimals);
+
+      return setInput({
+        ...token,
+        amount: [whole, limitedDecimals].join("."),
+      });
+    };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -752,152 +757,164 @@ type TutorialSlide = {
   title: string;
   desc: React.ReactNode;
   image: string;
-}
+};
 
 const tutorialContent: {
-  [key: number]: TutorialSlide
+  [key: number]: TutorialSlide;
 } = {
   "0": {
-    title: 'WHAT ARE LOOT BOTTLES?',
-    desc: 'Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ',
-    image: 'REFERRALS',
+    title: "WHAT ARE LOOT BOTTLES?",
+    desc: "Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ",
+    image: "REFERRALS",
   },
   "1": {
-    title: 'HOW TO EARN LOOT BOTTLES?',
-    desc: 'To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ',
-    image: 'REFERRALS',
+    title: "HOW TO EARN LOOT BOTTLES?",
+    desc: "To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ",
+    image: "REFERRALS",
   },
   "2": {
-    title: 'MULTIPLIERS',
-    desc: <>
-      <Text size="md">You can increase your chances of receiving Loot Bottles by doing the following:</Text>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto 1fr",
-          columnGap: "2em",
-          rowGap: "1em",
-          alignItems: "center",
-        }}
-      >
-        <Text prominent code holo>
-          <Display style={{margin:0, textAlign: 'right'}} size="xs">2x</Display> 
+    title: "MULTIPLIERS",
+    desc: (
+      <>
+        <Text size="md">
+          You can increase your chances of receiving Loot Bottles by doing the
+          following:
         </Text>
-        <Text size="md" holo>
-          Transacting fAssets using our supported DEXs
-        </Text>
-        <LootBottle
-          size="sm"
-          style={{width: 40, height: 40}}
-          rarity="rare"
-          quantity={100}
-        />
-        <Text prominent size="md">
-          Staking liquidity for the maximum time
-        </Text>
-        <LootBottle
-          size="sm"
-          style={{width: 40, height: 40}}
-          rarity="legendary"
-          quantity={10}
-        />
-        <Text size="md" prominent>
-          Contributing volume
-        </Text>
-        <LootBottle
-          size="sm"
-          style={{width: 40, height: 40}}
-          rarity="ultra_rare"
-          quantity={10}
-        />
-        <Text size="md" prominent>
-          Participating in the Testnet
-        </Text>
-      </div>
-    </>,
-    image: 'MULTIPLIER',
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "auto 1fr",
+            columnGap: "2em",
+            rowGap: "1em",
+            alignItems: "center",
+          }}
+        >
+          <Text prominent code holo>
+            <Display style={{ margin: 0, textAlign: "right" }} size="xs">
+              2x
+            </Display>
+          </Text>
+          <Text size="md" holo>
+            Transacting fAssets using our supported DEXs
+          </Text>
+          <LootBottle
+            size="sm"
+            style={{ width: 40, height: 40 }}
+            rarity="rare"
+            quantity={100}
+          />
+          <Text prominent size="md">
+            Staking liquidity for the maximum time
+          </Text>
+          <LootBottle
+            size="sm"
+            style={{ width: 40, height: 40 }}
+            rarity="legendary"
+            quantity={10}
+          />
+          <Text size="md" prominent>
+            Contributing volume
+          </Text>
+          <LootBottle
+            size="sm"
+            style={{ width: 40, height: 40 }}
+            rarity="ultra_rare"
+            quantity={10}
+          />
+          <Text size="md" prominent>
+            Participating in the Testnet
+          </Text>
+        </div>
+      </>
+    ),
+    image: "MULTIPLIER",
   },
   "3": {
-    title: 'REFERRALS',
-    desc: 'You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions. ',
-    image: 'REFERRALS',
+    title: "REFERRALS",
+    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions. ",
+    image: "REFERRALS",
   },
   "4": {
-    title: 'LEARN MORE',
-    desc: 'To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.',
-    image: 'AIRDROP_DEEP_DIVE',
+    title: "LEARN MORE",
+    desc: "To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.",
+    image: "AIRDROP_DEEP_DIVE",
   },
-}
+};
 
-const TutorialModal = ({ isMobile }: {isMobile?: boolean}) => {
-  const [currentSlide, setCurrentSlide] = useState(0)
+const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  return <>
-  <AnimatePresence
-    mode="wait"
-  >
-    <motion.div
-      key={`tutorial-slide-${currentSlide}`}
-      initial={{ opacity: 0 }}
-      animate={{opacity: 1}}
-      exit={{opacity: 0}}
-      transition={{duration: 0.1}}
+  return (
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`tutorial-slide-${currentSlide}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.1 }}
+          className={"tutorial-slide-container"}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            width: "100%",
+            gap: "1em",
+          }}
+        >
+          <Video
+            type="cover"
+            width={isMobile ? 550 : 1270 / 2}
+            height={isMobile ? 550 : 460 / 2}
+            loop
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
+            className="tutorial-image"
+          />
+          <Display size="xxs" style={{ margin: 0 }}>
+            {tutorialContent[currentSlide].title}
+          </Display>
+          {tutorialContent[currentSlide].desc}
+        </motion.div>
+      </AnimatePresence>
 
-      className={'tutorial-slide-container'}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%',
-        gap: '1em',
-      }}
-    >
-      <Video 
-        type="cover"
-        width={isMobile ? 550 : (1270/2)}
-        height={isMobile ? 550 : (460/2)}
-        loop
-        src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image}.mp4`} 
-        className='tutorial-image'
-      />
-      <Display size="xxs" style={{margin: 0}}>{ tutorialContent[currentSlide].title }</Display>
-      { tutorialContent[currentSlide].desc }
-    </motion.div>
-    </AnimatePresence>
-
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginTop: '1em'
-    }}>
-      <GeneralButton
-        icon={<ArrowLeft />}
-        layout="before"
-        handleClick={() => {
-          setCurrentSlide(currentSlide - 1)
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: "1em",
         }}
-        type="transparent"
-        disabled={currentSlide === 0}
       >
-        PREV
-      </GeneralButton>
-      { currentSlide + 1 } / 5
-      <GeneralButton
-        icon={<ArrowRight />}
-        layout="after"
-        handleClick={() => {
-          setCurrentSlide(currentSlide + 1)
-        }}
-        type="transparent"
-        disabled={currentSlide === 4}
-      >
-        Next
-      </GeneralButton>
-    </div>
-  </>;
+        <GeneralButton
+          icon={<ArrowLeft />}
+          layout="before"
+          handleClick={() => {
+            setCurrentSlide(currentSlide - 1);
+          }}
+          type="transparent"
+          disabled={currentSlide === 0}
+        >
+          PREV
+        </GeneralButton>
+        {currentSlide + 1} / 5
+        <GeneralButton
+          icon={<ArrowRight />}
+          layout="after"
+          handleClick={() => {
+            setCurrentSlide(currentSlide + 1);
+          }}
+          type="transparent"
+          disabled={currentSlide === 4}
+        >
+          Next
+        </GeneralButton>
+      </div>
+    </>
+  );
 };
 
 export {
