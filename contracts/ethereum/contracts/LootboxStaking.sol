@@ -21,6 +21,8 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -454,44 +456,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL REDEEMABLE FUNCTIONS ~~~~~~~~~~ */
 
-    function _uniswapPairReserves(
-        IUniswapV2Pair _pair,
-        IERC20 _tokenB
-    ) internal view returns (
-        uint256 reserveA,
-        uint256 reserveB
-    ) {
-        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
-
-        uint256 reserve0 = uint256(reserve0_);
-
-        uint256 reserve1 = uint256(reserve1_);
-
-        (reserveA, reserveB) =
-          address(fusdc_) < address(_tokenB)
-              ? (reserve0, reserve1)
-              : (reserve1, reserve0);
-
-        return (reserveA, reserveB);
-    }
-
-    function _sushiswapPoolReserves(
-        ISushiswapStablePool _pool,
-        IERC20 _tokenB
-    ) internal view returns (
-        uint256 reserveA,
-        uint256 reserveB
-    ) {
-        (uint256 reserve0, uint256 reserve1) = _pool.getReserves();
-
-        (reserveA, reserveB) =
-          address(fusdc_) < address(_tokenB)
-              ? (reserve0, reserve1)
-              : (reserve1, reserve0);
-
-        return (reserveA, reserveB);
-    }
-
     function _redeemable(
         uint256 _camelotSupply,
         uint256 _camelotLpMinted,
@@ -742,6 +706,69 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return deposits_[_spender];
     }
 
+    /// @inheritdoc ILootboxStaking
+    function ratios() public view returns (
+        uint256 fusdcUsdcRatio,
+        uint256 fusdcWethRatio,
+        uint256 fusdcUsdcSpread,
+        uint256 fusdcWethSpread
+    ) {
+        console.log("about to get camelot ratios");
+
+        (uint256 camelotFusdcUsdcRatio, uint256 camelotFusdcWethRatio) =
+            _camelotRatios();
+
+        console.log("about to get sushiswap ratios");
+
+        (uint256 sushiswapFusdcUsdcRatio, uint256 sushiswapFusdcWethRatio) =
+            _sushiswapRatios();
+
+        // assume that the weights are constant regardless of the underlying liquidity (for now)
+
+        fusdcUsdcRatio = (camelotFusdcUsdcRatio / 2) + (sushiswapFusdcUsdcRatio / 2);
+
+        fusdcWethRatio = (camelotFusdcWethRatio / 2) + (sushiswapFusdcWethRatio / 2);
+
+        console.log("figuring out the spread for usdc");
+
+        if (camelotFusdcUsdcRatio > sushiswapFusdcUsdcRatio) {
+            fusdcUsdcSpread = camelotFusdcUsdcRatio - sushiswapFusdcUsdcRatio;
+        } else {
+            fusdcUsdcSpread = sushiswapFusdcUsdcRatio - camelotFusdcUsdcRatio;
+        }
+
+        console.log("figuring out the spread for weth");
+
+        if (camelotFusdcWethRatio > sushiswapFusdcWethRatio) {
+            fusdcWethSpread = camelotFusdcWethRatio - sushiswapFusdcWethRatio;
+        } else {
+            fusdcWethSpread = sushiswapFusdcWethRatio - camelotFusdcWethRatio;
+        }
+
+        console.log("fusdc usdc spread", fusdcUsdcSpread);
+
+        console.log("fusdc weth spread", fusdcWethSpread);
+
+        console.log("fusdc usdc spread / 2", fusdcUsdcSpread / 2);
+
+        console.log("fusdc weth spread / 2", fusdcWethSpread / 2);
+
+        console.log("fusdc weth spread result", fusdcWethSpread / 2);
+
+        console.log("fusdc usdc ratio", fusdcUsdcRatio);
+
+        console.log("fusdc usdc ratio reduced", fusdcUsdcRatio - (fusdcUsdcRatio / 2));
+
+        console.log("fusdc weth ratio reduced", fusdcWethRatio - (fusdcWethSpread / 2));
+
+        return (
+            fusdcUsdcRatio,
+            fusdcWethRatio,
+            fusdcUsdcSpread,
+            fusdcWethSpread
+        );
+    }
+
     /* ~~~~~~~~~~ INTERNAL APPROVAL FUNCTIONS ~~~~~~~~~~ */
 
     function _enableApprovals() internal {
@@ -770,6 +797,106 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         fusdc_.safeApprove(address(sushiswapBentoBox_), 0);
         usdc_.safeApprove(address(sushiswapBentoBox_), 0);
         weth_.safeApprove(address(sushiswapBentoBox_), 0);
+    }
+
+    /* ~~~~~~~~~~ INTERNAL MISC FUNCTIONS ~~~~~~~~~~ */
+
+    function _uniswapPairReserves(
+        IUniswapV2Pair _pair,
+        IERC20 _tokenB
+    ) internal view returns (
+        uint256 reserveA,
+        uint256 reserveB
+    ) {
+        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
+
+        uint256 reserve0 = uint256(reserve0_);
+
+        uint256 reserve1 = uint256(reserve1_);
+
+        (reserveA, reserveB) =
+          address(fusdc_) < address(_tokenB)
+              ? (reserve0, reserve1)
+              : (reserve1, reserve0);
+
+        return (reserveA, reserveB);
+    }
+
+    function _sushiswapPoolReserves(
+        ISushiswapStablePool _pool,
+        IERC20 _tokenB
+    ) internal view returns (
+        uint256 reserveA,
+        uint256 reserveB
+    ) {
+        (uint256 reserve0, uint256 reserve1) = _pool.getReserves();
+
+        (reserveA, reserveB) =
+          address(fusdc_) < address(_tokenB)
+              ? (reserve0, reserve1)
+              : (reserve1, reserve0);
+
+        return (reserveA, reserveB);
+    }
+
+    function _camelotRatios() public view returns (
+        uint256 fusdcUsdcRatio,
+        uint256 fusdcWethRatio
+    ) {
+        (uint256 camelotFusdcUsdcReserveA, uint256 camelotFusdcUsdcReserveB) =
+            _uniswapPairReserves(
+                camelotFusdcUsdcPair_,
+                fusdc_
+            );
+
+        uint256 camelotFusdcUsdcRatio =
+            1e12 * camelotFusdcUsdcReserveA / (camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB);
+
+        (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
+            _uniswapPairReserves(
+                camelotFusdcWethPair_,
+                weth_
+            );
+
+        uint256 camelotFusdcWethRatio =
+            1e12 * camelotFusdcWethReserveA / (camelotFusdcWethReserveA + camelotFusdcWethReserveB);
+
+        return (
+            camelotFusdcUsdcRatio,
+            camelotFusdcWethRatio
+        );
+    }
+
+    function _sushiswapRatios() public view returns (
+        uint256 fusdcUsdcRatio,
+        uint256 fusdcWethRatio
+    ) {
+        (uint256 sushiswapFusdcUsdcReserveA, uint256 sushiswapFusdcUsdcReserveB) =
+            _sushiswapPoolReserves(
+                sushiswapFusdcUsdcPool_,
+                fusdc_
+            );
+
+        console.log("fusdc usdc reserve a", sushiswapFusdcUsdcReserveA, "reserve b", sushiswapFusdcUsdcReserveB);
+
+        uint256 sushiswapFusdcUsdcRatio =
+            1e12 * sushiswapFusdcUsdcReserveA / (sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB);
+
+        console.log("sushiswap fusdc usdc ratio", sushiswapFusdcUsdcRatio);
+
+        (uint256 sushiswapFusdcWethReserveA, uint256 sushiswapFusdcWethReserveB) =
+            _sushiswapPoolReserves(
+                sushiswapFusdcWethPool_,
+                weth_
+            );
+
+        uint256 sushiswapFusdcWethRatio =
+            1e12 * sushiswapFusdcWethReserveA / (sushiswapFusdcWethReserveA + sushiswapFusdcWethReserveB);
+
+        return (
+            sushiswapFusdcUsdcRatio,
+            sushiswapFusdcWethRatio
+        );
     }
 
     /* ~~~~~~~~~~ EMERGENCY MODE ~~~~~~~~~~ */

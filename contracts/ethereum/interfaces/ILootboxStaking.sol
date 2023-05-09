@@ -67,6 +67,18 @@ interface ILootboxStaking {
     );
 
     /**
+     * @notice ratios is used by the frontend to get the ratio of the
+     *         underlying assets in the liquidity pools as a suggestion for the
+     *         frontend
+     */
+    function ratios() external view returns (
+        uint256 fusdcUsdcRatio,
+        uint256 fusdcWethRatio,
+        uint256 fusdcUsdcSpread,
+        uint256 fusdcWethSpread
+    );
+
+    /**
      * @notice deposited amount for the spender given of their original deposit
      * @param _spender to get the spending amounts for
      */

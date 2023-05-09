@@ -503,4 +503,43 @@ describe("LootboxStaking", async () => {
     "should support camelot people making trades with the pool and collecting their fees",
     async () => {}
   );
+
+  it("should support tracking ratios correctly", async () => {
+      await expectDeposited(staking, 0, 0, 0);
+
+      const depositFusdc = MINIMUM_DEPOSIT;
+      const depositWeth = MINIMUM_DEPOSIT;
+
+      const [ fusdc, _usdc, weth ] = await deposit(
+        staking,
+        8640000,
+        depositFusdc,
+        0,
+        depositWeth,
+        slippage
+      );
+
+      const testSupplierFactory = await hre.ethers.getContractFactory(
+        "TestSushiswapSupplyToken"
+      );
+
+      const testSupplier = await testSupplierFactory.deploy(
+        token0.address,
+        token1.address,
+        SUSHISWAP_BENTO_BOX,
+        sushiswapToken1Pool.address
+      );
+
+      const fusdcOutOfWhackAmount = MINIMUM_DEPOSIT;
+
+      const usdcOutOfWhackAmount = MINIMUM_DEPOSIT.mul(2);
+
+      await token0.approve(testSupplier.address, fusdcOutOfWhackAmount);
+
+      await token1.approve(testSupplier.address, usdcOutOfWhackAmount);
+
+      await testSupplier.deposit(fusdcOutOfWhackAmount, usdcOutOfWhackAmount);
+
+      console.log(`everything ratios: ${await staking.ratios()}`);
+  });
 });
