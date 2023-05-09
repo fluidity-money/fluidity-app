@@ -57,6 +57,10 @@ Fluidity Money is licensed mostly as GPL ([https://github.com/fluidity-money/flu
 
 Website and whitepapers: [https://www.fluidity.money/](https://www.fluidity.money/)
 
+Arbitrum Dune: [https://dune.com/neogeo/fluidity-arbitrum](https://dune.com/neogeo/fluidity-arbitrum)
+
+Ethereum Dune: [https://dune.com/optimus/fluidity](https://dune.com/optimus/fluidity)
+
 Medium: [https://blog.fluidity.money/](https://blog.fluidity.money/)
 
 Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
