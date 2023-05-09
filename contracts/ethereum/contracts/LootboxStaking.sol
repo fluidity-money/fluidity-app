@@ -835,7 +835,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return (reserveA, reserveB);
     }
 
-    function _camelotRatios() public view returns (
+    function _camelotRatios() internal view returns (
         uint256 fusdcUsdcRatio,
         uint256 fusdcWethRatio,
         uint256 fusdcUsdcLiq,
@@ -869,7 +869,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
     }
 
-    function _sushiswapRatios() public view returns (
+    function _sushiswapRatios() internal view returns (
         uint256 fusdcUsdcRatio,
         uint256 fusdcWethRatio,
         uint256 fusdcUsdcLiq,
