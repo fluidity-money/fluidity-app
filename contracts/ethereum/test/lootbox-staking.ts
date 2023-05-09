@@ -537,5 +537,7 @@ describe("LootboxStaking", async () => {
       await token1.approve(testSupplier.address, usdcOutOfWhackAmount);
 
       await testSupplier.deposit(fusdcOutOfWhackAmount, usdcOutOfWhackAmount);
+
+      console.log(`ratios: ${await staking.ratios()}`);
   });
 });
