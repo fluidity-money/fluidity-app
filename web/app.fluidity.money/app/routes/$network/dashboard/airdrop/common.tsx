@@ -60,7 +60,7 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
             }}
           />
-          <Text style={{ whiteSpace: "nowrap" }}>{rarity.toUpperCase()}</Text>
+          <Text style={{ whiteSpace: "nowrap" }}>{rarity.replace('_', ' ').toUpperCase()}</Text>
           <Text
             prominent
             style={{
