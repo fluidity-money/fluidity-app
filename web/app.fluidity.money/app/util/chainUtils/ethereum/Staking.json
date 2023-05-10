@@ -1,180 +1,684 @@
 [
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "lockupLength",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "lockedTimestamp",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "fusdcAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "usdcAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "wethAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "Staked",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_lockupLength",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_fusdcAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_usdcAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_wethAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_slippage",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_maxTimestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "deposit",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "fusdcDeposited",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usdcDeposited",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "wethDeposited",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_spender",
-        "type": "address"
-      }
-    ],
-    "name": "deposited",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "fusdcAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usdcAmount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "wethAmount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "redeem",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "fusdcRedeemed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usdcRedeemed",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "wethRedeemed",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_spender",
-        "type": "address"
-      }
-    ],
-    "name": "redeemable",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "fusdcRedeemable",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "usdcRedeemable",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "wethRedeemable",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-]
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lockupLength",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lockedTimestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "fusdcAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "usdcAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "wethAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Deposited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "name": "Emergency",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "old",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "new_",
+          "type": "address"
+        }
+      ],
+      "name": "NewOperator",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lockupLength",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lockedTimestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "fusdcAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "usdcAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "wethAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Redeemed",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "_camelotRatios",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcUsdcRatio",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fusdcWethRatio",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_sushiswapRatios",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcUsdcRatio",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fusdcWethRatio",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "camelotFusdcUsdcDepositedLpTokens_",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "camelotFusdcUsdcPair_",
+      "outputs": [
+        {
+          "internalType": "contract IUniswapV2Pair",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "camelotFusdcWethDepositedLpTokens_",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "camelotFusdcWethPair_",
+      "outputs": [
+        {
+          "internalType": "contract IUniswapV2Pair",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "camelotRouter_",
+      "outputs": [
+        {
+          "internalType": "contract IUniswapV2Router02",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_lockupLength",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fusdcAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_usdcAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_wethAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_slippage",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxTimestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcDeposited",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "usdcDeposited",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wethDeposited",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "deposited",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "usdcAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wethAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_spender",
+          "type": "address"
+        }
+      ],
+      "name": "deposits",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "redeemTimestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "camelotLpMinted",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "camelotTokenA",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "camelotTokenB",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "sushiswapLpMinted",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "sushiswapTokenA",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "sushiswapTokenB",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "fusdcUsdcPair",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ILootboxStaking.Deposit[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "disableEmergencyMode",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "emergencyCouncil",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "enableEmergencyMode",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "fusdc_",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_operator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_emergencyCouncil",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "_fusdc",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "_usdc",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "_weth",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IUniswapV2Router02",
+          "name": "_camelotRouter",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ISushiswapBentoBox",
+          "name": "_sushiswapBentoBox",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IUniswapV2Pair",
+          "name": "_camelotFusdcUsdcPair",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IUniswapV2Pair",
+          "name": "_camelotFusdcWethPair",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ISushiswapStablePool",
+          "name": "_sushiswapFusdcUsdcPool",
+          "type": "address"
+        },
+        {
+          "internalType": "contract ISushiswapStablePool",
+          "name": "_sushiswapFusdcWethPool",
+          "type": "address"
+        }
+      ],
+      "name": "init",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "noEmergencyMode",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "operator",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ratios",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcUsdcRatio",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fusdcWethRatio",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fusdcUsdcSpread",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fusdcWethSpread",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_maxTimestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "redeem",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcRedeemed",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "usdcRedeemed",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wethRedeemed",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_spender",
+          "type": "address"
+        }
+      ],
+      "name": "redeemable",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fusdcRedeemable",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "usdcRedeemable",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "wethRedeemable",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sushiswapBentoBox_",
+      "outputs": [
+        {
+          "internalType": "contract ISushiswapBentoBox",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sushiswapFusdcUsdcDepositedLpTokens_",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sushiswapFusdcUsdcPool_",
+      "outputs": [
+        {
+          "internalType": "contract ISushiswapStablePool",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sushiswapFusdcWethDepositedLpTokens_",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sushiswapFusdcWethPool_",
+      "outputs": [
+        {
+          "internalType": "contract ISushiswapStablePool",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_newOperator",
+          "type": "address"
+        }
+      ],
+      "name": "updateOperator",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "usdc_",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "weth_",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
