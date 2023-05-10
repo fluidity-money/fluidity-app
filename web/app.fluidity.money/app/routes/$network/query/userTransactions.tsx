@@ -25,6 +25,7 @@ type UserTransaction = {
   timestamp: number;
   value: number;
   currency: string;
+  sendTransactionLogIndex: number;
 };
 
 export type TransactionsLoaderData = {
@@ -77,14 +78,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const winnersMap = winnersData.winners.reduce(
       (map, winner) => ({
         ...map,
-        [winner.send_transaction_hash]: {
+        // tx hash is not a unique identifier - the same tx hash can have multiple user actions
+        // create an array where each entry has a unique log index
+        [winner.send_transaction_hash]: [...map[winner.send_transaction_hash], {
           ...winner,
           win_amount:
             winner.winning_amount +
-            (map[winner.transaction_hash]?.winning_amount || 0),
-        },
+            (map[winner.transaction_hash]
+              .find(tx => 
+                tx.send_transaction_log_index === winner.send_transaction_log_index
+            )?.winning_amount || 0),
+        }],
       }),
-      {} as { [key: string]: Winner }
+      {} as { [key: string]: Array<Winner> }
     );
 
     // winnersMap looks up if a transaction was the send that caused a win
@@ -92,14 +98,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       pendingWinnersData.ethereum_pending_winners.reduce(
         (map, winner) => ({
           ...map,
-          [winner.transaction_hash]: {
+        // tx hash is not a unique identifier - the same tx hash can have multiple user actions
+        // create an array where each entry has a unique log index
+          [winner.transaction_hash]: [...map[winner.transaction_hash], {
             ...winner,
             win_amount:
               winner.win_amount +
-              (map[winner.transaction_hash]?.win_amount || 0),
-          },
+              (map[winner.transaction_hash]
+                .find(tx => 
+                  tx.log_index === winner.log_index
+              )?.win_amount || 0),
+          }],
         }),
-        {} as { [key: string]: PendingWinner }
+        {} as { [key: string]: Array<PendingWinner> }
       );
 
     const jointWinnersMap = {
@@ -112,7 +123,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ({ transaction_hash }) => transaction_hash
     );
 
-    const pendingWinnersPayoutAddrs = winnersData.winners.map(
+    const pendingWinnersPayoutAddrs = pendingWinnersData.ethereum_pending_winners.map(
       ({ transaction_hash }) => transaction_hash
     );
 
@@ -195,6 +206,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           transaction: { hash },
           amount: value,
           currency: { symbol: currency },
+          sendTransactionLogIndex,
         } = transaction;
 
         return {
@@ -210,6 +222,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? value / 10 ** 12
               : value,
           currency,
+          sendTransactionLogIndex: sendTransactionLogIndex || 0
         };
       }
     );
@@ -238,7 +251,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           ? "out"
           : undefined;
 
-      const winner = jointWinnersMap[tx.hash];
+      const winners = jointWinnersMap[tx.hash];
+
+      const isPendingWinnerArray = (w: Winner[] | PendingWinner[]): w is PendingWinner[] =>
+        w.length === 0 || 'log_index' in w[0];
+
+      const winner = (isPendingWinnerArray(winners) 
+        ? winners.find(pendingWinner => pendingWinner.log_index === tx.sendTransactionLogIndex)
+        : winners.find(winner => winner.send_transaction_log_index === tx.sendTransactionLogIndex)) || winners[0]
+      
       const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
 
       return {

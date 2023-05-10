@@ -20,6 +20,7 @@ type UserTransaction = {
   timestamp: number;
   value: number;
   currency: string;
+  sendTransactionLogIndex: number;
 };
 
 export type TransactionsLoaderData = {
@@ -69,6 +70,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           created: "",
           transaction_hash: "",
           send_transaction_hash: pending_winner.transaction_hash,
+          send_transaction_log_index: pending_winner.log_index,
           winning_amount: pending_winner.win_amount,
           token_decimals: pending_winner.token_decimals,
           ethereum_application: undefined,
@@ -144,6 +146,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           transaction: { hash },
           amount: value,
           currency: { symbol: currency },
+          sendTransactionLogIndex
         } = transaction;
 
         return {
@@ -159,6 +162,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? value / 10 ** 12
               : value,
           currency,
+          sendTransactionLogIndex: sendTransactionLogIndex ?? 0
         };
       }
     );
@@ -182,15 +186,18 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const transactionMap = userTransactions.reduce(
       (map, tx) => ({
         ...map,
-        [tx.hash]: tx,
+        // tx hash is not a unique identifier - the same tx hash can have multiple user actions
+        // create an array where each entry has a unique log index
+        [tx.hash]: [...map[tx.hash], tx],
       }),
-      {} as Record<string, UserTransaction>
+      {} as Record<string, Array<UserTransaction>>
     );
 
     const mergedTransactions: Transaction[] = winners
       .filter(({ send_transaction_hash: hash }) => !!transactionMap[hash])
       .map((winner) => {
-        const tx = transactionMap[winner.send_transaction_hash];
+        const transactions = transactionMap[winner.send_transaction_hash];
+        const tx = transactions.find(tx => tx.sendTransactionLogIndex === winner.send_transaction_log_index) || transactions[0]
 
         const swapType =
           tx.sender === MintAddress
