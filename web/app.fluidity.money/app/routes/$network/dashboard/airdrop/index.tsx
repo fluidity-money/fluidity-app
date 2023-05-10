@@ -281,23 +281,20 @@ const Airdrop = () => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: '2em'
+          gap: '2em',
         }}
       >
       {
         currentModal === null &&
         (
           <>
-            <Heading as="h3" className={"no-margin"}>
+            <div>
+            <Heading as="h3" style={{marginBottom:'0.5em'}} className={"no-margin"}>
               Welcome to Fluidity&apos;s Airdrop Event!
             </Heading>
-            <div>
               <Text>
                 Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                metus, ac convallis lectus porttitor et. Donec maximus gravida
-                mauris, eget tempor felis tristique sit amet. Pellentesque at
-                hendrerit nibh, eu porttitor dui.
+                vulputate, in pharetra nisl porttitor. 
                 <LinkButton
                   size="medium"
                   type="external"
@@ -309,7 +306,14 @@ const Airdrop = () => {
                 </LinkButton>
               </Text>
             </div>
-            <BottleProgress bottles={bottleTiers} isMobile/>
+            <div style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <BottleProgress bottles={bottleTiers} isMobile/>
+            </div>
             <AirdropStats
               seeReferralsDetails={() => setCurrentModal("referral-details")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
@@ -440,8 +444,9 @@ const Airdrop = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.5fr 1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: "10%",
+            maxWidth: 1100,
           }}
         >
           <div
@@ -451,19 +456,21 @@ const Airdrop = () => {
               gap: "2em",
             }}
           >
-            <Heading className={"no-margin"}>
-              Welcome to Fluidity&apos;s Airdrop Event!
-            </Heading>
             <div>
-              <Text>
+              <Heading as="h2" className={"no-margin"} style={{marginBottom:'0.5em'}}>
+                Welcome to Fluidity&apos;s Airdrop Event!
+              </Heading>
+              <Text style={{fontSize: 14}}>
                 Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                metus, ac convallis lectus porttitor et. Donec maximus gravida
-                mauris, eget tempor felis tristique sit amet. Pellentesque at
-                hendrerit nibh, eu porttitor dui.
+                vulputate, in pharetra nisl porttitor.
                 <LinkButton
                   size="medium"
                   type="external"
+                  style={{
+                    display: 'inline-flex',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 2
+                  }}
                   handleClick={() => {
                     return;
                   }}
@@ -634,7 +641,7 @@ const MultiplierTasks = () => {
         <Text style={{ color: "black" }} bold size="md">
           Multiplier Tasks
         </Text>
-        <Text style={{ color: "black" }}>
+        <Text size="xs" style={{ color: "black" }}>
           Perform displayed tasks to earn the respective multipliers.
         </Text>
       </div>
@@ -643,6 +650,7 @@ const MultiplierTasks = () => {
         onClick={() => {
           setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
         }}
+        style={{transform: 'scale(0.6)'}}
       >
         <Form.Toggle
           color="black"
@@ -671,7 +679,7 @@ const MultiplierTasks = () => {
             animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
           >
-            <Text style={{ color: "black" }}>
+            <Text size="xs" style={{ color: "black" }}>
               Perform any type of fAsset transactions{" "}
               <b>in any on-chain protocol</b>, including sending{" "}
               <b>with any wallet</b>.
@@ -687,7 +695,9 @@ const MultiplierTasks = () => {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              gap: "1em",
+              justifyContent: "space-between",
+              width: '100%',
+              gap: 8
             }}
           >
             {providers.map((provider, i) => {
@@ -696,11 +706,11 @@ const MultiplierTasks = () => {
                   key={`airdrop-mx-provider-` + i}
                   style={{
                     cursor: "pointer",
-                    width: "32px",
-                    height: "32px",
+                    width: "24px",
+                    height: "24px",
                     borderRadius: "32px",
                     backgroundColor: "black",
-                    padding: "8px",
+                    padding: "6px",
                   }}
                   href="#"
                 >
@@ -984,7 +994,7 @@ const BottleProgress = ({ bottles, isMobile }: { bottles: BottleTiers, isMobile?
   }
   
   return (
-    <div>
+    <div style={{maxWidth: 450, display: 'flex', flexDirection: 'column', gap: '1em'}}>
       <HeroCarousel 
         title="BOTTLES I'VE EARNED"
         onSlideChange={handleHeroPageChange}
@@ -1011,14 +1021,17 @@ const BottleProgress = ({ bottles, isMobile }: { bottles: BottleTiers, isMobile?
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
-      <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
+      <div style={{ display: "flex", flexDirection: "row", gap: "1em",}}>
         <Form.Toggle
           checked={showBottleNumbers}
           onClick={() =>
             setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
           }
+          style={{
+            opacity: showBottleNumbers ? 1 : 0.3,
+          }}
         />
-        <Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
+        <Text size="sm" prominent={showBottleNumbers}>ALWAYS SHOW BOTTLE NUMBERS</Text>
       </div>
     </div>
   );

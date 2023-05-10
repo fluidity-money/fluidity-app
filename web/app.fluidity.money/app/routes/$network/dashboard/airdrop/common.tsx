@@ -44,9 +44,7 @@ const BottleDistribution = ({
 }: IBottleDistribution) => (
   <div className="bottle-distribution-container"
     style={isMobile ? {
-      maxWidth: '100%',
       overflowX: 'scroll',
-      height: 160,
     } : {}}
   >
     {Object.entries(bottles).map(([rarity, quantity], index) => {
@@ -61,21 +59,21 @@ const BottleDistribution = ({
               opacity: highlightBottleNumberIndex === index ? 1 : 0.2,
             }}
           />
-          <Text style={{ whiteSpace: "nowrap" }}>{rarity.replace('_', ' ').toUpperCase()}</Text>
+          <Text size="sm" style={{ whiteSpace: "nowrap" }}>{rarity.replace('_', ' ').toUpperCase()}</Text>
           <Text
             prominent={highlightBottleNumberIndex === index}
             style={{
               position: "absolute",
-              bottom: "120px",
+              bottom: "100px",
               zIndex: '5',
               ...(showBottleNumbers
                 ? highlightBottleNumberIndex === index
                   ? {
-                    fontSize: "2em",
+                    fontSize: "2.5em",
                   }
                   : {}
                 : highlightBottleNumberIndex === index
-                  ? { fontSize: "2em" }
+                  ? { fontSize: "2.5em" }
                   : { display: "none" }),
             }}
           >

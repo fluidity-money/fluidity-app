@@ -9,6 +9,7 @@ export interface IToggle extends React.InputHTMLAttributes<HTMLInputElement> {
   direction?: 'horizontal' | 'vertical';
   color?: 'white' | 'black';
   onClick?: () => void
+  style?: React.CSSProperties;
 }
 
 // Supports both controlled and uncontrolled behaviour
@@ -18,6 +19,7 @@ export const Toggle: React.FC<IToggle> = ({
   direction = 'horizontal',
   color = 'white',
   onClick = undefined,
+  style={},
   ...props
 }) => {
   const controlled = controlledChecked !== undefined;
@@ -33,7 +35,7 @@ export const Toggle: React.FC<IToggle> = ({
   `
 
   return (
-    <motion.div className={classNames} onClick={
+    <motion.div style={style} className={classNames} onClick={
       () => {
         if (controlled) {
           onClick?.();
