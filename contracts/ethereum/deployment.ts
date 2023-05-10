@@ -203,6 +203,7 @@ export const deployTokens = async (
   };
 };
 
+// deployRegistry with a beacon proxy
 export const deployRegistry = async(
   hre: HardhatRuntimeEnvironment,
   signer: ethers.Signer,
@@ -222,6 +223,7 @@ export const deployRegistry = async(
   return beaconProxy;
 };
 
+// deployOperator to deploy an executor (new name) with a beacon proxy
 export const deployOperator = async(
   hre: HardhatRuntimeEnvironment,
   signer: ethers.Signer,
@@ -281,6 +283,29 @@ export const deployDAOStable = async(
   emergencyCouncil,
   veGovLockupAddress
 );
+
+export const deployProxyAdmin = async(
+  hre: HardhatRuntimeEnvironment,
+  signer: ethers.Signer
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("ProxyAdmin");
+  return factory.connect(signer).deploy();
+};
+
+export const deployTransparentUpgradeableProxy = async(
+  hre: HardhatRuntimeEnvironment,
+  implAddress: string,
+  adminAddress: string,
+  calldata: string
+): Promise<ethers.Contract> => {
+  const factory = await hre.ethers.getContractFactory("TransparentUpgradeableProxy");
+
+  return factory.deploy(
+    implAddress,
+    adminAddress,
+    calldata
+  );
+};
 
 // deployFluidity by deploying contracts that aren't tokens
 export const deployFluidity = async (

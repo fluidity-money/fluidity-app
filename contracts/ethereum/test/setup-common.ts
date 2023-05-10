@@ -77,7 +77,6 @@ before(async function () {
     aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProviderFactory,
     registryFactory,
-    operatorFactory,
   );
 
   const [
@@ -86,7 +85,6 @@ before(async function () {
     aaveV2LiquidityProviderBeacon,
     aaveV3LiquidityProviderBeacon,
     registryBeacon,
-    operatorBeacon,
   ] = beacons;
 
   commonBeaconAddresses = {
