@@ -11,8 +11,8 @@ import (
 )
 
 type StakingEvent struct {
-    Address Address
-    UsdAmount misc.BigInt
-    LockupLength int
-    InsertedDate time.Time
+	Address      Address
+	UsdAmount    misc.BigInt
+	LockupLength int
+	InsertedDate time.Time
 }

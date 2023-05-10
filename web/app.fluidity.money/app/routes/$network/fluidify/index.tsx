@@ -59,8 +59,16 @@ export const loader: LoaderFunction = async ({ params }) => {
     },
   } = config;
 
+  const pairedTokenAddrs = new Set();
+  tokens.forEach(({ address, isFluidOf }) => {
+    if (isFluidOf) {
+      pairedTokenAddrs.add(address);
+      pairedTokenAddrs.add(isFluidOf);
+    }
+  });
+
   return json({
-    tokens,
+    tokens: tokens.filter(({ address }) => pairedTokenAddrs.has(address)),
     ethereumWallets,
     network,
     colors: (await colors)[network as string],
@@ -101,7 +109,6 @@ export default function FluidifyToken() {
     connecting,
     disconnect,
     balance,
-    limit,
     addToken,
   } = useContext(FluidityFacadeContext);
 
@@ -207,94 +214,65 @@ export default function FluidifyToken() {
 
   // get token data once user is connected
   useEffect(() => {
-    if (address && !swapping) {
-      (async () => {
-        switch (network) {
-          case "ethereum":
-          case "arbitrum": {
-            const [tokensMinted, userTokenBalance, mintLimit] =
-              await Promise.all([
-                Promise.all(
-                  tokens.map(async (token) => {
-                    // no mint limits on arbitrum
-                    if (network === "arbitrum") return undefined;
+    if (!address || swapping) {
+      return setTokens(
+        tokens.map((token) => ({
+          ...token,
+          userTokenBalance: new BN(0),
+        }))
+      );
+    }
 
-                    if (token.isFluidOf) return undefined;
+    (async () => {
+      switch (network) {
+        case "ethereum":
+        case "arbitrum": {
+          const [tokensMinted, userTokenBalance] = await Promise.all([
+            Promise.all(
+              tokens.map(async (token) => {
+                if (token.isFluidOf) return undefined;
 
-                    const fluidToken = tokens.find(
-                      ({ isFluidOf }) => isFluidOf === token.address
-                    );
+                const fluidToken = tokens.find(
+                  ({ isFluidOf }) => isFluidOf === token.address
+                );
 
-                    if (!fluidToken) return undefined;
+                if (!fluidToken) return undefined;
 
-                    return amountMinted?.(fluidToken.address);
-                  })
-                ),
-                Promise.all(
-                  tokens.map(
-                    async ({ address }) =>
-                      (await balance?.(address)) || new BN(0)
-                  )
-                ),
-                Promise.all(
-                  tokens.map(async (token) => {
-                    const { isFluidOf, address } = token;
-
-                    // Reverting has no mint limits
-                    if (isFluidOf) {
-                      return;
-                    }
-
-                    const fluidPair = tokens.find(
-                      ({ isFluidOf }) => isFluidOf === address
-                    );
-
-                    if (!fluidPair)
-                      throw new Error(
-                        `Could not find fluid Pair of ${token.name}`
-                      );
-
-                    return await limit?.(fluidPair.address);
-                  })
-                ),
-              ]);
-
-            return setTokens(
-              tokens.map((token, i) => ({
-                ...token,
-                userMintedAmt: tokensMinted[i],
-                userTokenBalance: userTokenBalance[i],
-                userMintLimit: mintLimit[i],
-              }))
-            );
-          }
-          case "solana": {
-            // get user token balances
-            const userTokenBalance = await Promise.all(
+                return amountMinted?.(fluidToken.address);
+              })
+            ),
+            Promise.all(
               tokens.map(
                 async ({ address }) => (await balance?.(address)) || new BN(0)
               )
-            );
+            ),
+          ]);
 
-            return setTokens(
-              tokens.map((token, i) => ({
-                ...token,
-                userTokenBalance: userTokenBalance[i],
-              }))
-            );
-          }
+          return setTokens(
+            tokens.map((token, i) => ({
+              ...token,
+              userMintedAmt: tokensMinted[i],
+              userTokenBalance: userTokenBalance[i],
+            }))
+          );
         }
-      })();
+        case "solana": {
+          // get user token balances
+          const userTokenBalance = await Promise.all(
+            tokens.map(
+              async ({ address }) => (await balance?.(address)) || new BN(0)
+            )
+          );
 
-      return;
-    }
-
-    return setTokens(
-      tokens.map((token) => ({
-        ...token,
-        userTokenBalance: new BN(0),
-      }))
-    );
+          return setTokens(
+            tokens.map((token, i) => ({
+              ...token,
+              userTokenBalance: userTokenBalance[i],
+            }))
+          );
+        }
+      }
+    })();
   }, [address, swapping]);
 
   // keep asset token up to date once token data is fetched

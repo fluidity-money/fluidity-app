@@ -20,6 +20,7 @@ type (
 	EthereumAnnouncement struct {
 		TransactionHash ethereum.Hash                         `json:"transaction_hash"`
 		BlockNumber     *misc.BigInt                          `json:"block_number"`
+		LogIndex        *misc.BigInt                        `json:"log_index"`
 		FromAddress     ethereum.Address                      `json:"from_address"`
 		ToAddress       ethereum.Address                      `json:"to_address"`
 		RandomSource    []uint32                              `json:"random_source"`
@@ -32,6 +33,7 @@ type (
 	EthereumWinnerAnnouncement struct {
 		Network         network.BlockchainNetwork           `json:"network"`
 		TransactionHash ethereum.Hash                       `json:"transaction_hash"`
+		LogIndex        *misc.BigInt                        `json:"log_index"`
 		BlockNumber     *misc.BigInt                        `json:"block_number"`
 		FromAddress     ethereum.Address                    `json:"from_address"`
 		ToAddress       ethereum.Address                    `json:"to_address"`
@@ -97,6 +99,8 @@ type (
 		SenderAddress ethereum.Address `json:"sender_address"`
 
 		RecipientAddress ethereum.Address `json:"recipient_address"`
+
+		LogIndex *misc.BigInt `json:"log_index"`
 
 		Decorator *EthereumWorkerDecorator `json:"decorator"`
 

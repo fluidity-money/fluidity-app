@@ -15,6 +15,8 @@ import {
 } from "@fluidity-money/surfing";
 
 type IReferraModal = {
+  connected: boolean;
+  connectWallet: () => void;
   closeModal: () => void;
   referrerClaimed: number;
   refereeClaimed: number;
@@ -26,6 +28,8 @@ type IReferraModal = {
 };
 
 const ReferralModal = ({
+  connected,
+  connectWallet,
   closeModal,
   referrerClaimed,
   refereeClaimed,
@@ -44,6 +48,9 @@ const ReferralModal = ({
 
   return (
     <Card
+      onClick={(e: MouseEvent) => {
+        e.stopPropagation();
+      }}
       className="referrals-container"
       type="frosted"
       border="solid"
@@ -77,7 +84,7 @@ const ReferralModal = ({
         </div>
 
         <div>
-          <Heading as={"h4"} className="referrals-heading">
+          <Heading as={"h5"} className="referrals-heading">
             YOU HAVE {referrerClaimed}
             <Hoverable
               tooltipContent={
@@ -97,7 +104,15 @@ const ReferralModal = ({
           <Text size="lg">Send more of your link to earn more rewards!</Text>
         </div>
 
-        {loaded ? (
+        {!connected ? (
+          <GeneralButton
+            type={"primary"}
+            size={"medium"}
+            handleClick={connectWallet}
+          >
+            Connect Wallet
+          </GeneralButton>
+        ) : loaded ? (
           <>
             <Card
               component="button"
@@ -116,6 +131,9 @@ const ReferralModal = ({
               type={"secondary"}
               buttontype={"icon before"}
               handleClick={() => {
+                navigator.clipboard.writeText(
+                  `https://airdrop.fluidity.money/${referralCode}`
+                );
                 setLinkCopied(true);
               }}
               size={"large"}

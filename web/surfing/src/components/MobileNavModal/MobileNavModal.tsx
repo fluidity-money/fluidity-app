@@ -57,7 +57,7 @@ const MobileNavModal = ({ navLinks }: IMobileNavModalProps) => {
         size={"large"}
         handleClick={() => {}}
       >
-        LET'S CHAT
+        DISCORD
       </GeneralButton>
     </div>
   );

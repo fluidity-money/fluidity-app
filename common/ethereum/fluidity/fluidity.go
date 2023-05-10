@@ -223,7 +223,8 @@ const registryAbiString = `[
 			  { "internalType": "uint256", "name": "exchangeRateNum", "type": "uint256" },
 			  { "internalType": "uint256", "name": "exchangeRateDenom", "type": "uint256" },
 			  { "internalType": "uint256", "name": "deltaWeightNum", "type": "uint256" },
-			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" }
+			  { "internalType": "uint256", "name": "deltaWeightDenom", "type": "uint256" },
+			  { "internalType": "string", "name": "customCalculationType", "type": "string" }
 			  ],
 			  "internalType": "struct UtilityVars",
 			  "name": "vars",
@@ -274,13 +275,13 @@ type abiOracleUpdate struct {
 type (
 	// the Winner struct from solidity, to be passed (in the abiFluidityReward struct) to batchReward
 	abiWinner struct {
-		Winner     ethCommon.Address `abi:"winner"`
-		WinAmount  *big.Int          `abi:"winAmount"`
+		Winner    ethCommon.Address `abi:"winner"`
+		WinAmount *big.Int          `abi:"winAmount"`
 	}
 	// the FluidityReward struct from solidit, to be passed to batchReward
 	abiFluidityReward struct {
-		ClientName string `abi:"clientName"`
-		Winners []abiWinner `abi:"rewards"`
+		ClientName string      `abi:"clientName"`
+		Winners    []abiWinner `abi:"rewards"`
 	}
 )
 
@@ -336,8 +337,8 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 	)
 
 	var (
-		firstBlock = &announcement.FirstBlock.Int
-		lastBlock = &announcement.LastBlock.Int
+		firstBlock     = &announcement.FirstBlock.Int
+		lastBlock      = &announcement.LastBlock.Int
 		batchedRewards = announcement.Rewards
 
 		rewards []abiFluidityReward
@@ -349,7 +350,7 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 
 		for winnerAddress, winAmount := range reward {
 			winner := abiWinner{
-				Winner:    ethereum.ConvertInternalAddress(winnerAddress),
+				Winner: ethereum.ConvertInternalAddress(winnerAddress),
 				// this references a loop variable, so we need to explicitly clone it
 				WinAmount: new(big.Int).Set(&winAmount.Int),
 			}
@@ -436,4 +437,3 @@ func TransactTransfer(client *ethclient.Client, fluidityContractAddress, recipie
 
 	return transaction, nil
 }
-

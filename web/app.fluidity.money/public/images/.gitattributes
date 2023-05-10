@@ -10,3 +10,8 @@ fluidify filter=lfs diff=lfs merge=lfs -text
 placeholderAirdrop2.png filter=lfs diff=lfs merge=lfs -text
 placeholderAirdrop3.png filter=lfs diff=lfs merge=lfs -text
 placeholderAirdrop1.png filter=lfs diff=lfs merge=lfs -text
+hero/common.png filter=lfs diff=lfs merge=lfs -text
+hero/legendary.png filter=lfs diff=lfs merge=lfs -text
+hero/rare.png filter=lfs diff=lfs merge=lfs -text
+hero/ultra_rare.png filter=lfs diff=lfs merge=lfs -text
+hero/uncommon.png filter=lfs diff=lfs merge=lfs -text

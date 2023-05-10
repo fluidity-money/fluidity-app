@@ -1,4 +1,5 @@
-import { ReactNode, useContext } from "react";
+import type { ReactNode } from "react";
+import type { StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -6,7 +7,7 @@ import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useContext } from "react";
 import {
   useWeb3React,
   Web3ReactProvider,
@@ -18,14 +19,13 @@ import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
-  getUserMintLimit,
-  userMintLimitEnabled,
   manualRewardToken,
   getUserDegenScore,
+  getUserStakingDeposits,
+  makeStakingDeposit,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
-  getAmountMinted,
   getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
 import { Buffer } from "buffer";
@@ -38,6 +38,7 @@ import {
 } from "~/util/chainUtils/chains";
 
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
+import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
 
@@ -202,38 +203,22 @@ const EthereumFacade = ({
     }
   };
 
-  // the per-user mint limit for the contract
+  /**
+   *
+   * @deprecated mint limits no longer enabled
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const limit = async (contractAddress: string): Promise<BN | undefined> => {
-    const signer = provider?.getSigner();
-    if (!signer) {
-      return;
-    }
-
-    const isEnabled = await userMintLimitEnabled(
-      signer.provider,
-      contractAddress,
-      tokenAbi
-    );
-
-    if (!isEnabled) return;
-
-    return await getUserMintLimit(signer.provider, contractAddress, tokenAbi);
+    return undefined;
   };
 
-  // the user's minted amount towards the per-user total
-  // call with a fluid token
+  /**
+   *
+   * @deprecated mint limits no longer enabled
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const amountMinted = async (contractAddress: string): Promise<BN> => {
-    const signer = provider?.getSigner();
-    if (!signer) {
-      return new BN(0);
-    }
-
-    return await getAmountMinted(
-      signer.provider,
-      contractAddress,
-      tokenAbi,
-      await signer.getAddress()
-    );
+    return new BN(0);
   };
 
   // swap <symbol> to its counterpart, with amount in its own units
@@ -285,9 +270,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -391,6 +376,78 @@ const EthereumFacade = ({
     );
   };
 
+  /**
+   * getStakingDeposits returns total tokens staked by a user.
+   */
+  const getStakingDeposits = async (
+    address: string
+  ): Promise<StakingDepositsRes | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
+
+    return getUserStakingDeposits(
+      signer.provider,
+      StakingAbi,
+      stakingAddr,
+      address
+    );
+  };
+
+  /*
+   * getStakingDeposits returns total tokens staked by a user.
+   */
+  const stakeTokens = async (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdcAmt: BN,
+    wethAmt: BN,
+    slippage: BN
+  ): Promise<StakingDepositsRes | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
+
+    const [usdcToken, fusdcToken, wethToken] = ["USDC", "fUSDC", "wETH"].map(
+      (tokenSymbol) => {
+        const token = tokens.find(({ symbol }) => symbol === tokenSymbol);
+
+        if (!token) throw Error(`Could not find token ${tokenSymbol}`);
+
+        const tokenContract: ContractToken = {
+          address: token.address,
+          ABI: tokenAbi,
+          symbol: tokenSymbol,
+          isFluidOf: !!token.isFluidOf,
+        };
+
+        return tokenContract;
+      }
+    );
+
+    return makeStakingDeposit(
+      signer,
+      usdcToken,
+      fusdcToken,
+      wethToken,
+      StakingAbi,
+      stakingAddr,
+      lockDurationSeconds,
+      usdcAmt,
+      fusdcAmt,
+      wethAmt,
+      slippage
+    );
+  };
+
   return (
     <FluidityFacadeContext.Provider
       value={{
@@ -409,6 +466,8 @@ const EthereumFacade = ({
         connected: isActive,
         connecting: isActivating,
         signBuffer,
+        getStakingDeposits,
+        stakeTokens,
       }}
     >
       {children}

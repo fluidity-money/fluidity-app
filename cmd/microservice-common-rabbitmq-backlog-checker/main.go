@@ -74,8 +74,8 @@ func main() {
 	}
 
 	var (
-		messageChan            = make(chan string)
-		done                   = make(chan bool)
+		messageChan = make(chan string)
+		done        = make(chan bool)
 	)
 
 	// get reports from the channel and concat them together,

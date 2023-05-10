@@ -1,48 +1,147 @@
-import { AirdropLeaderboardEntry } from "~/routes/$network/query/airdrop";
-import { jsonPost, gql } from "~/util";
+import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
-const queryAirdropLeaderboard = gql`
-  query AirdropLeaderboard() {
-    airdrop_leaderboard(
-      limit: 16
-    ) {
-      address: user
+const queryByUserAllTime = gql`
+  query AirdropLeaderboard($address: String!) {
+    airdrop_leaderboard(where: { address: { _eq: $address } }, limit: 1) {
+      user: address
       rank
-      referral_count: referralCount
-      total_lootboxes: bottles
-      highest_reward_tier: highestRewardTier
-      liquidity_multiplier: liquidityMultiplier
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
     }
-  } 
+  }
 `;
 
-export const useAirdropLeaderboard = async () => {
-  const url = "https://fluidity.hasura.app/v1/graphql";
-  const body = {
-    query: queryAirdropLeaderboard,
-  };
+const queryAllTime = gql`
+  query AirdropLeaderboard {
+    airdrop_leaderboard(limit: 16, order_by: { total_lootboxes: desc }) {
+      user: address
+      rank
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
+    }
+  }
+`;
 
-  return await jsonPost<
-    ExpectedAirdropLeaderboardBody,
-    ExpectedAirdropLeaderboardResponse
-  >(
-    url,
-    body,
-    process.env.FLU_HASURA_SECRET
-      ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
-      : {}
-  );
-};
+const queryByUser24Hours = gql`
+  query AirdropLeaderboard($address: String!) {
+    airdrop_leaderboard_24_hours(
+      where: { address: { _eq: $address } }
+      limit: 1
+    ) {
+      user: address
+      rank
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
+    }
+  }
+`;
 
-type ExpectedAirdropLeaderboardBody = {
+const query24Hours = gql`
+  query AirdropLeaderboard {
+    airdrop_leaderboard_24_hours(
+      limit: 16
+      order_by: { total_lootboxes: desc }
+    ) {
+      user: address
+      rank
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
+    }
+  }
+`;
+
+type AirdropLeaderboardBody = {
   query: string;
 };
 
-type ExpectedAirdropLeaderboardResponse = {
+type AirdropLeaderboardByUserBody = AirdropLeaderboardBody & {
+  variables: {
+    address: string;
+  };
+};
+
+export type AirdropLeaderboardEntry = {
+  user: string;
+  rank: number;
+  referralCount: number;
+  bottles: number;
+  highestRewardTier: number;
+  liquidityMultiplier: number;
+};
+
+type AirdropLeaderboardResponse = {
   data?: {
-    leaderboard: Array<AirdropLeaderboardEntry>;
+    airdrop_leaderboard: Array<AirdropLeaderboardEntry>;
   };
   errors?: unknown;
+};
+
+export const useAirdropLeaderboardByUserAllTime = (address: string) => {
+  const { url, headers } = fetchInternalEndpoint();
+
+  const variables = {
+    address,
+  };
+  const body = {
+    query: queryByUserAllTime,
+    variables,
+  };
+
+  return jsonPost<AirdropLeaderboardByUserBody, AirdropLeaderboardResponse>(
+    url,
+    body,
+    headers
+  );
+};
+
+export const useAirdropLeaderboardAllTime = () => {
+  const { url, headers } = fetchInternalEndpoint();
+  const body = {
+    query: queryAllTime,
+  };
+
+  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
+    url,
+    body,
+    headers
+  );
+};
+
+export const useAirdropLeaderboardByUser24Hours = (address: string) => {
+  const { url, headers } = fetchInternalEndpoint();
+
+  const variables = {
+    address,
+  };
+  const body = {
+    query: queryByUser24Hours,
+    variables,
+  };
+
+  return jsonPost<AirdropLeaderboardByUserBody, AirdropLeaderboardResponse>(
+    url,
+    body,
+    headers
+  );
+};
+
+export const useAirdropLeaderboard24Hours = () => {
+  const { url, headers } = fetchInternalEndpoint();
+  const body = {
+    query: query24Hours,
+  };
+
+  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
+    url,
+    body,
+    headers
+  );
 };

@@ -1,0 +1,146 @@
+.bottle-distribution-container {
+  display: flex;
+  gap: 2em;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.lootbottle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  padding: 1em 0;
+  position: relative;
+}
+
+.referral-details-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  padding-bottom: 1em;
+}
+
+.leaderboard-container {
+  width: 100%;
+  padding: 0;
+  margin: 2em 0;
+}
+
+.tutorial-slide-container {
+  max-width: 100%;
+  width: 500px;
+  height: auto;
+}
+.tutorial-slide-container .tutorial-image {
+  margin-top: 1em;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 5px;
+}
+
+.staking-modal-input-container {
+  border: 1px solid gray;
+  display: flex;
+  padding: 5px;
+  border-radius: 5em 14px 14px 5em;
+}
+
+.staking-modal-token-icon {
+  width: 64px;
+}
+
+.staking-modal-token-input {
+  background: none;
+  border: none;
+  width: 100%;
+  color: white;
+  font-size: 2em;
+  outline: none;
+}
+
+.pad-main {
+  container-name: main;
+  container-type: inline-size;
+}
+
+.multiplier-tasks {
+  z-index: 0;
+  color: black;
+  display: grid;
+  box-sizing: border-box;
+  grid-template-columns: 2.2fr 1fr 5fr;
+  gap: 2em;
+}
+.multiplier-tasks .multiplier-tasks-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: flex-start;
+  justify-content: center;
+  grid-column: 1/2;
+}
+.multiplier-tasks .multiplier-tasks-multiplier {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: center;
+  cursor: pointer;
+  grid-column: 2/3;
+  justify-content: flex-start;
+}
+.multiplier-tasks .multiplier-tasks-tasks {
+  grid-column: 3/4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@container main (width < 1200px) {
+  .multiplier-tasks {
+    grid-template-columns: auto min-content;
+    grid-template-rows: min-content min-content;
+    row-gap: 0.5em;
+  }
+  .multiplier-tasks .multiplier-tasks-header {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    min-width: 200px;
+  }
+  .multiplier-tasks .multiplier-tasks-multiplier {
+    grid-column: 2/3;
+    grid-row: 1/2;
+  }
+  .multiplier-tasks .multiplier-tasks-tasks {
+    grid-column: 1/3;
+    grid-row: 2/3;
+  }
+}
+.leaderboard-header {
+  padding: 2em 2em 0 2em;
+}
+
+.transactions-header {
+  padding-left: 2em;
+  padding-right: 2em;
+}
+
+th,
+td {
+  padding-left: 2em !important;
+  padding-right: 2em !important;
+}
+
+.airdrop-row {
+  border: 1px solid white !important;
+  margin: 0;
+}
+.airdrop-row td {
+  background-color: transparent !important;
+  border-bottom: 1px solid white !important;
+}
+.airdrop-row:last-of-type td {
+  border-bottom: none !important;
+}
+
+/*# sourceMappingURL=airdrop.css.map */

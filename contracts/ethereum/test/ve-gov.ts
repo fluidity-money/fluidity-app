@@ -554,8 +554,10 @@ describe("VEGovLockup", async () => {
   let veGovTokenSignerAddress: string;
 
   before(async function() {
-    if (process.env.FLU_FORKNET_NETWORK !== "mainnet")
+    if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
+      console.log("not on a mainnet fork! skipping most tests!");
       this.skip();
+    }
 
     veGovLockup = commonContracts.veGovLockup;
 

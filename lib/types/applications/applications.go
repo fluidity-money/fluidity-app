@@ -29,6 +29,9 @@ var applicationNames = []string{
 	"apeswap",
 	"saddle",
 	"gtrade_v6_1",
+	"meson",
+	"camelot",
+	"chronos",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

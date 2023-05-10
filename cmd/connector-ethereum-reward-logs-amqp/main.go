@@ -269,7 +269,6 @@ func main() {
 			})
 		}
 
-
 		log.Debug(func(k *log.Log) {
 			k.Format(
 				"Filtering for logs with filter: %s",

@@ -13,14 +13,18 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/gtrade"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/meson"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/camelot"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/chronos"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
@@ -45,13 +49,16 @@ const (
 	ApplicationApeswap
 	ApplicationSaddle
 	ApplicationGTradeV6_1
+	ApplicationMeson
+	ApplicationCamelot
+	ApplicationChronos
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns nil, nil in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt) (*big.Rat, worker.EthereumAppFees, error) {
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt, inputData misc.Blob) (*big.Rat, worker.EthereumAppFees, error) {
 	var (
 		fee      *big.Rat
 		emission worker.EthereumAppFees
@@ -189,6 +196,31 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.GTradeV6_1 += util.MaybeRatToFloat(fee)
+	case ApplicationMeson:
+		fee, err = meson.GetMesonFees(
+			transfer,
+			inputData,
+		)
+
+		emission.Meson += util.MaybeRatToFloat(fee)
+	case ApplicationCamelot:
+		fee, err = camelot.GetCamelotFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Camelot += util.MaybeRatToFloat(fee)
+	case ApplicationChronos:
+		fee, err = chronos.GetChronosFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Chronos += util.MaybeRatToFloat(fee)
 
 	default:
 		err = fmt.Errorf(
@@ -206,8 +238,9 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 // such as a DEX, the party sending the fluid tokens receives the majority payout.
 func GetApplicationTransferParties(transaction ethereum.Transaction, transfer worker.EthereumApplicationTransfer) (libEthereum.Address, libEthereum.Address, error) {
 	var (
-		logAddress = transfer.Log.Address
-		nilAddress libEthereum.Address
+		logAddress      = transfer.Log.Address
+		contractAddress = transaction.To
+		nilAddress      libEthereum.Address
 	)
 
 	switch transfer.Application {
@@ -251,6 +284,25 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationGTradeV6_1:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationMeson:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		mesonSender, err := meson.GetInitiator(transaction.Data)
+		if err != nil {
+			return libEthereum.ZeroAddress, libEthereum.ZeroAddress, err
+		}
+
+		mesonSenderAddress := libEthereum.AddressFromString(mesonSender)
+
+		return mesonSenderAddress, contractAddress, nil
+	case ApplicationCamelot:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationChronos:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil

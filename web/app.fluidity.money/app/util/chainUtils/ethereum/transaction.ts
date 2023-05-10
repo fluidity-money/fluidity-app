@@ -44,62 +44,6 @@ export const usdBalanceOfERC20 = async (
   return Number(utils.formatUnits(balance, decimals));
 };
 
-// whether the per-user mint limit is enabled for the contract
-export const userMintLimitEnabled = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface
-): Promise<boolean> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return false;
-
-  try {
-    return await contract.mintLimitsEnabled();
-  } catch (e) {
-    console.error(e);
-  }
-  return false;
-};
-
-// the user mint limit for the contract, regardless of whether it's enabled
-export const getUserMintLimit = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface
-): Promise<BN> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return new BN(0);
-  return new BN((await contract.userMintLimit()).toString());
-};
-
-// the user mint limit for the contract scaled by decimals, regardless of whether it's enabled
-export const getUsdUserMintLimit = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface
-): Promise<number> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return 0;
-
-  const limit = (await contract.userMintLimit()).toString();
-  const decimals = (await contract.decimals()).toString();
-
-  return Number(utils.formatUnits(limit, decimals));
-};
-
-// the amount towards the mint limit the given user has currently minted
-export const getAmountMinted = async (
-  provider: JsonRpcProvider,
-  contractAddress: string,
-  ABI: ContractInterface,
-  userAddress: string
-): Promise<BN> => {
-  const contract = new Contract(contractAddress, ABI, provider);
-  if (!contract) return new BN(0);
-
-  return new BN((await contract.userAmountMinted(userAddress)).toString());
-};
-
 // the amount towards the mint limit the given user has currently minted scaled by decimals
 export const getUsdAmountMinted = async (
   provider: JsonRpcProvider,
@@ -362,7 +306,7 @@ export const getTotalRewardPool = async (
   }
 };
 
-// Returns total prize pool from aggregated contract
+// Returns User DegenScore
 export const getUserDegenScore = async (
   provider: JsonRpcProvider,
   userAddr: string,
@@ -391,6 +335,121 @@ export const getUserDegenScore = async (
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return 0;
+  }
+};
+
+export type StakingDepositsRes = {
+  fusdcAmount: BN;
+  usdcAmount: BN;
+  wethAmount: BN;
+};
+
+export const getUserStakingDeposits = async (
+  provider: JsonRpcProvider,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  userAddr: string
+): Promise<StakingDepositsRes | undefined> => {
+  try {
+    const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
+
+    console.log(stakingContract);
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    const deposits = await stakingContract.callStatic.deposited(userAddr);
+
+    return deposits;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return undefined;
+  }
+};
+
+// Stake tokens
+export const makeStakingDeposit = async (
+  signer: Signer,
+  usdcToken: ContractToken,
+  fusdcToken: ContractToken,
+  wethToken: ContractToken,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  lockDurationSeconds: BN,
+  usdcAmt: BN,
+  fusdcAmt: BN,
+  wethAmt: BN,
+  slippage: BN
+): Promise<StakingDepositsRes | undefined> => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    const stakingTokenAmounts = [
+      {
+        token: usdcToken,
+        amt: usdcAmt,
+      },
+      {
+        token: fusdcToken,
+        amt: fusdcAmt,
+      },
+      {
+        token: wethToken,
+        amt: wethAmt,
+      },
+    ];
+
+    // Check whether to increase allowance
+    await Promise.all(
+      stakingTokenAmounts.map(async ({ token: { ABI, address }, amt }) => {
+        const tokenContract = getContract(ABI, address, signer);
+
+        const allowance: BigNumber = await tokenContract.allowance(
+          address,
+          stakingAddr
+        );
+
+        const amtString = amt.toString();
+
+        if (allowance.lt(amtString)) {
+          // some tokens (USDT) will revert if approving from nonzero -> nonzero,
+          // to prevent reordering attacks
+          if (!allowance.isZero()) {
+            const zeroApproval = await tokenContract.approve(
+              stakingAddr,
+              constants.Zero
+            );
+            await zeroApproval.wait();
+          }
+
+          const approval = await tokenContract.approve(
+            stakingAddr,
+            constants.MaxUint256
+          );
+
+          // `.wait()` to handle errors
+          await approval.wait();
+        }
+      })
+    );
+
+    // call deposit
+    return await stakingContract.deposit(
+      utils.parseUnits(lockDurationSeconds.toString()),
+      utils.parseUnits(fusdcAmt.toString()),
+      utils.parseUnits(usdcAmt.toString()),
+      utils.parseUnits(wethAmt.toString()),
+      utils.parseUnits(slippage.toString())
+    );
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
   }
 };
 

@@ -5,12 +5,12 @@
 package worker
 
 import (
-	"fmt"
 	"database/sql"
+	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/postgres"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
@@ -77,4 +77,15 @@ func GetFeeSwitch(originalAddress ethereum.Address, network_ network.BlockchainN
 	})
 
 	return &feeSwitch
+}
+
+// LookupFeeSwitch to get the fee switch for the given address, or the address if no switch is found
+func LookupFeeSwitch(addr ethereum.Address, network_ network.BlockchainNetwork) ethereum.Address {
+	feeSwitch := GetFeeSwitch(addr, network_)
+
+	if feeSwitch == nil {
+		return addr
+	}
+
+	return feeSwitch.NewAddress
 }

@@ -7,4 +7,4 @@ ALTER TABLE worker_emissions
 -- migrate:down
 
 ALTER TABLE worker_emissions
-	ALTER COLUMN winning_chances_distribution_pools TYPE DOUBLE PRECISION;
+	ALTER COLUMN winning_chances_distribution_pools TYPE DOUBLE PRECISION USING(winning_chances_distribution_pools::DOUBLE PRECISION);

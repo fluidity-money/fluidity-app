@@ -40,6 +40,56 @@ func BigIntFromHex(s string) (*misc.BigInt, error) {
 	return &bigInt, nil
 }
 
+func CoerceBoundContractResultsToUInt16(results []interface{}) (uint16, error) {
+	var result uint16
+
+	if resultsLen := len(results); resultsLen != 1 {
+		return 0, fmt.Errorf(
+			"returned results did not have length of 1! was %#v!",
+			resultsLen,
+		)
+	}
+
+	switch results[0].(type) {
+	case uint16:
+		result = results[0].(uint16)
+
+	default:
+		return 0, fmt.Errorf(
+			"failed to coerce the return value from balanceOfUnderlying to a uint16!",
+		)
+	}
+
+	return result, nil
+}
+
+func CoerceBoundContractResultsToInt(results []interface{}) (*big.Int, error) {
+	var result *big.Int
+
+	if resultsLen := len(results); resultsLen != 1 {
+		return nil, fmt.Errorf(
+			"returned results did not have length of 1! was %#v!",
+			resultsLen,
+		)
+	}
+
+	switch results[0].(type) {
+	case *big.Int:
+		result = results[0].(*big.Int)
+
+	default:
+		return nil, fmt.Errorf(
+			"failed to coerce the return value from balanceOfUnderlying to a *big.Int!",
+		)
+	}
+
+	if result == nil {
+		return nil, fmt.Errorf("*big.Int returned was empty!")
+	}
+
+	return result, nil
+}
+
 func CoerceBoundContractResultsToRat(results []interface{}) (*big.Rat, error) {
 	var result *big.Int
 
@@ -134,6 +184,25 @@ func CoerceBoundContractResultsToAddresses(results []interface{}) ([]ethCommon.A
 	}
 
 	return addresses, nil
+}
+
+func CoerceBoundContractResultsToBool(results []interface{}) (bool, error) {
+	var result bool
+
+	if resultsLen := len(results); resultsLen != 1 {
+		return result, fmt.Errorf(
+			"returned results did not have length of 1! was %v",
+			resultsLen,
+		)
+	}
+
+	result, ok := results[0].(bool)
+
+	if !ok {
+		return result, fmt.Errorf("results did not contain an uint8!")
+	}
+
+	return result, nil
 }
 
 func CoerceBoundContractResultsToUint8(results []interface{}) (uint8, error) {

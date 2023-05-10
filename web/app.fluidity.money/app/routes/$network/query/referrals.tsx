@@ -12,7 +12,7 @@ import {
 import { jsonPost } from "~/util";
 import { AddReferralCodeBody, AddReferralCodeData } from "./referralCode";
 
-export type ReferralCountData = {
+export type ReferralCountLoaderData = {
   numActiveReferrerReferrals: number;
   numActiveReferreeReferrals: number;
   numInactiveReferreeReferrals: number;
@@ -26,7 +26,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const url = new URL(request.url);
 
-  const address = url.searchParams.get("address");
+  const address_ = url.searchParams.get("address") ?? "";
+
+  const address = address_.toLocaleLowerCase();
 
   if (!address) {
     throw new Error("Invalid Request");
@@ -105,7 +107,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       inactiveReferrals,
       referralCode: userReferralCodeArr[0].referral_code,
       loaded: true,
-    } satisfies ReferralCountData);
+    } satisfies ReferralCountLoaderData);
   }
 
   // Create new referral code
@@ -125,5 +127,5 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     inactiveReferrals,
     referralCode: newReferralCode,
     loaded: true,
-  } satisfies ReferralCountData);
+  } satisfies ReferralCountLoaderData);
 };

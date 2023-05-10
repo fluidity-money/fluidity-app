@@ -201,6 +201,7 @@ func main() {
 			}
 
 			randomN, randomPayouts, _ := probability.WinningChances(
+				worker_types.TrfModeNormal,
 				solanaTransactionFeesNormalised,
 				atx,
 				payoutFreq,
@@ -236,7 +237,6 @@ func main() {
 
 				continue
 			}
-
 
 			payouts := probability.CalculatePayoutsCombined(randomPayouts, matchedBalls)
 			payout, exists := payouts[applications.UtilityFluid]

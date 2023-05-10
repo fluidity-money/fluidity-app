@@ -18,7 +18,7 @@ func init() {
 		dieFastEnabled = os.Getenv(EnvDebugDieFast) == "true"
 		silentEnabled  = os.Getenv(EnvSilentMode) == "true"
 
-		sentryUrl   = os.Getenv(EnvSentryUrl)
+		sentryUrl = os.Getenv(EnvSentryUrl)
 
 		environment = os.Getenv(microservice_lib.EnvEnvironmentName)
 		workerId    = os.Getenv(microservice_lib.EnvWorkerId)

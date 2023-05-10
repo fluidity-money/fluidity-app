@@ -218,6 +218,14 @@ colour = "#825902"
 isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
 decimals = 18
 
+[[config.arbitrum.tokens]]
+symbol = "wETH"
+name = "Wrapped Ether"
+logo = "/assets/tokens/weth.svg"
+address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+colour = "#eb2077"
+decimals = 18
+
 # liquidity_providers Configurations 
 # eth providers
 [liquidity_providers.ethereum]
@@ -323,6 +331,12 @@ name= "Saddle"
 [liquidity_providers.arbitrum.providers.link]
 fUSDC = "https://saddle.exchange/#/pools/fUSDC-USDC%20pool/deposit"
 
+[[liquidity_providers.arbitrum.providers]]
+name= "Chronos"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.chronos.exchange/liquidity"
+
 [[config.ethereum.wallets]]
 name = "Browser"
 id = "metamask"
@@ -356,5 +370,8 @@ ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
 
-
+[contract.staking]
+ethereum = ""
+arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
+solana = ""
 

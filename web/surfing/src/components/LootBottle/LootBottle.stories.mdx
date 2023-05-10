@@ -1,0 +1,23 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import { LootBottle } from "./"
+
+<Meta
+    title="LootBottle"
+    component={LootBottle}
+/>
+
+export const Template = ({children, ...props}) => <LootBottle {...props}/>;
+
+<Canvas columns={1}  withSource="open" withToolbar >
+    <Title>Loot Bottle</Title>
+    <Story
+        name="Loot Bottle"
+        args={{
+            size: "sm",
+            rarity: "common",
+        }}
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

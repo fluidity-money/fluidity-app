@@ -1,5 +1,5 @@
-import type { ReferralCountData } from "./query/referrals";
-import type { ReferralCodeData } from "./query/referralCode";
+import type { ReferralCountLoaderData } from "./query/referrals";
+import type { ReferralCodeLoaderData } from "./query/referralCode";
 import type { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
 
 import {
@@ -181,25 +181,24 @@ const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   },
 };
 
-const SAFE_DEFAULTS: Omit<
-  ReferralCountData & ReferralCodeData & UnclaimedRewardsLoaderData,
-  "loaded"
-> & {
-  referralCountLoaded: boolean;
-  referralCodeLoaded: boolean;
-  unclaimedRewardsLoaded: boolean;
-} = {
+const SAFE_DEFAULT_REFERRAL_COUNT = {
   numActiveReferrerReferrals: 0,
   numActiveReferreeReferrals: 0,
   numInactiveReferreeReferrals: 0,
   inactiveReferrals: [],
   referralCode: "",
-  referralCountLoaded: false,
+  loaded: false,
+};
+
+const SAFE_DEFAULT_REFERRAL_CODE = {
   referralAddress: "",
-  referralCodeLoaded: false,
+  loaded: false,
+};
+
+const SAFE_DEFAULT_UNCLAIMED_REWARDS = {
   userUnclaimedRewards: 0,
   unclaimedTokenAddrs: [],
-  unclaimedRewardsLoaded: false,
+  loaded: false,
 };
 
 export default function Dashboard() {
@@ -284,13 +283,13 @@ export default function Dashboard() {
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
   };
 
-  const { data: referralsCountData } = useCache<ReferralCountData>(
+  const { data: referralsCountData } = useCache<ReferralCountLoaderData>(
     showAirdrop && address
       ? `/${network}/query/referrals?address=${address}`
       : ""
   );
 
-  const { data: referralCodeData } = useCache<ReferralCountData>(
+  const { data: referralCodeData } = useCache<ReferralCodeLoaderData>(
     showAirdrop && clickedReferralCode && address
       ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
       : ""
@@ -304,31 +303,31 @@ export default function Dashboard() {
   );
 
   const data = {
-    ...SAFE_DEFAULTS,
-    ...{
+    referralCount: {
+      ...SAFE_DEFAULT_REFERRAL_COUNT,
       ...referralsCountData,
-      referralCountLoaded: referralsCountData?.loaded || false,
     },
-    ...{
+    referralCode: {
+      ...SAFE_DEFAULT_REFERRAL_CODE,
       ...referralCodeData,
-      referralCodeLoaded: referralCodeData?.loaded || false,
     },
-    ...{
+    unclaimedRewards: {
+      ...SAFE_DEFAULT_UNCLAIMED_REWARDS,
       ...userUnclaimedData,
-      userUnclaimedLoaded: userUnclaimedData?.loaded || false,
     },
   };
 
   const {
-    numActiveReferrerReferrals,
-    numActiveReferreeReferrals,
-    numInactiveReferreeReferrals,
-    inactiveReferrals,
-    referralCode,
-    referralCountLoaded,
-    referralAddress,
-    referralCodeLoaded,
-    userUnclaimedRewards,
+    referralCount: {
+      numActiveReferrerReferrals,
+      numActiveReferreeReferrals,
+      numInactiveReferreeReferrals,
+      inactiveReferrals,
+      referralCode,
+      loaded: referralCountLoaded,
+    },
+    referralCode: { referralAddress, loaded: referralCodeLoaded },
+    unclaimedRewards: { userUnclaimedRewards },
   } = data;
 
   const handleScroll = () => {
@@ -407,7 +406,7 @@ export default function Dashboard() {
       </header>
 
       {/* Switch Chain Modal */}
-      <Modal visible={chainModalVisibility}>
+      <Modal id="switch-chain" visible={chainModalVisibility}>
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
@@ -420,7 +419,7 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      <Modal visible={referralModalVisibility}>
+      <Modal id="referral-modal" visible={referralModalVisibility}>
         <div
           className="cover"
           onClick={() => setReferralModalVisibility(false)}
@@ -436,6 +435,11 @@ export default function Dashboard() {
             }}
           >
             <ReferralModal
+              connected={!!connected}
+              connectWallet={() => {
+                setReferralModalVisibility(false);
+                setWalletModalVisibility(true);
+              }}
               referrerClaimed={numActiveReferrerReferrals}
               refereeClaimed={numActiveReferreeReferrals}
               refereeUnclaimed={numInactiveReferreeReferrals}
@@ -450,7 +454,7 @@ export default function Dashboard() {
       </Modal>
 
       {/* Accept Referral Modal */}
-      <Modal visible={acceptReferralModalVisibility}>
+      <Modal id="accept-referral-modal" visible={acceptReferralModalVisibility}>
         <div
           className="cover"
           onClick={() => setAcceptReferralModalVisibility(false)}
@@ -471,7 +475,7 @@ export default function Dashboard() {
       </Modal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
-      <Modal visible={!otherModalOpen}>
+      <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
           className={`fluidify-button-dashboard-mobile rainbow ${
             otherModalOpen ? "z-0" : "z-1"
@@ -633,13 +637,13 @@ export default function Dashboard() {
                 size="small"
                 layout="before"
                 handleClick={() => {
-                  isMobile
+                  isMobile || isTablet
                     ? navigate(`/${network}/dashboard/airdrop#referrals`)
                     : setReferralModalVisibility(true);
                 }}
                 icon={<Referral />}
               >
-                Referral
+                {isMobile ? "" : "Referral"}
               </GeneralButton>
             )}
 
@@ -699,7 +703,10 @@ export default function Dashboard() {
         />
         <Outlet />
         {/* Provide Liquidity*/}
-        <div className="pad-main" style={{ marginBottom: "2em" }}>
+        <div
+          className="pad-main"
+          style={{ marginBottom: "2em", marginTop: "2em" }}
+        >
           {!openMobModal && (
             <ProvideLiquidity
               provider={provider}

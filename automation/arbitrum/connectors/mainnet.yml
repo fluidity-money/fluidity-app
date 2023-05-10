@@ -1,4 +1,5 @@
 SECRET_FLU_ETHEREUM_WS_URL: /fluidity/arbitrum/websocket_url
+ENV_FLU_SILENT: true
 
 SERVICES:
   - CONNECTORS_ETHEREUM_REWARD_LOGS_AMQP:
