@@ -345,6 +345,7 @@ const Airdrop = () => {
               data={leaderboardRows}
               filterIndex={leaderboardFilterIndex}
               setFilterIndex={setLeaderboardFilterIndex}
+              userAddress={address || ''}
             />
           </>
         )
@@ -514,6 +515,7 @@ const Airdrop = () => {
             data={leaderboardRows}
             filterIndex={leaderboardFilterIndex}
             setFilterIndex={setLeaderboardFilterIndex}
+            userAddress={address || ''}
           />
         </Card>
       </div>
@@ -815,11 +817,13 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
   data: AirdropLeaderboardEntry;
   index: number;
 }) => {
+  // const { address } = useContext(FluidityFacadeContext)
+  const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
   return (
     <motion.tr
-      className="airdrop-row"
+      className={`airdrop-row ${address === user ? 'highlighted-row' : ''}`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -833,25 +837,35 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
     >
       {/* Rank */}
       <td>
-        <Text prominent>{rank}</Text>
+        <Text prominent style={address === user ? {
+        color: 'black'
+      } : {}}>{rank}</Text>
       </td>
 
       {/* User */}
       <td>
-        <Text prominent>{trimAddress(user)}</Text>
+        <Text prominent style={address === user ? {
+        color: 'black'
+      } : {}}>{trimAddress(user)}</Text>
       </td>
 
       {/* Bottles */}
-      <td><Text prominent>{toSignificantDecimals(bottles, 2)}</Text></td>
+      <td><Text prominent style={address === user ? {
+        color: 'black'
+      } : {}}>{toSignificantDecimals(bottles, 2)}</Text></td>
 
       {/* Multiplier */}
       <td>
-        <Text prominent>{liquidityMultiplier.toLocaleString()}x</Text>
+        <Text prominent style={address === user ? {
+        color: 'black'
+      } : {}}>{liquidityMultiplier.toLocaleString()}x</Text>
       </td>
 
       {/* Referrals */}
       <td>
-        <Text prominent>{referralCount}</Text>
+        <Text prominent style={address === user ? {
+        color: 'black'
+      } : {}}>{referralCount}</Text>
       </td>
     </motion.tr>
   );
@@ -862,6 +876,7 @@ interface IAirdropLeaderboard {
   data: Array<AirdropLeaderboardEntry>;
   filterIndex: number;
   setFilterIndex: (index: number) => void;
+  userAddress: string;
 }
 
 const Leaderboard = ({
@@ -869,6 +884,7 @@ const Leaderboard = ({
   data,
   filterIndex,
   setFilterIndex,
+  userAddress
 }: IAirdropLeaderboard) => {
   console.log("HELOOOOOOOO", filterIndex);
   return (
@@ -917,6 +933,9 @@ const Leaderboard = ({
           count={0}
           data={data}
           renderRow={AirdropRankRow}
+          freezeRow={(data) => {
+            return data.user === "0xb3701a61a9759d10a0fc7ce55354a8163496caec";
+          }}
           onFilter={() => true}
           activeFilterIndex={0}
           filters={[]}

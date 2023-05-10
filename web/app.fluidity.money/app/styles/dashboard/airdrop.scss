@@ -142,14 +142,31 @@ th, td {
 .airdrop-row {
     td {
       background-color: transparent !important;
-    border-bottom: 1px solid white !important;
-
+      border-bottom: 1px solid white !important;
     }
+
     &:last-of-type {
       td {
         border-bottom: none !important;
       }
     }
-  border: 1px solid white !important;
-  margin: 0;
+
+    &.highlighted-row {
+      td {
+        border: none !important;
+      }
+      background: linear-gradient(
+        90deg,
+        #f3b8d8 0%,
+        #b793e9 15.1%,
+        #9fd4f3 26.04%,
+        #ffd2c4 36.46%,
+        #fbf3f3 46.88%,
+        #d9abdf 57.29%,
+        #af9ce3 72.4%,
+        #aae4e1 85.42%,
+        #c6ead0 93.23%,
+        #fdb5e4 100%
+      );
+    }
 }
