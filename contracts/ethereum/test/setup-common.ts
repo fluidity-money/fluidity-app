@@ -74,6 +74,7 @@ before(async function () {
     account1Signer.address,
     tokenFactory,
     compoundLiquidityProviderFactory,
+    operatorFactory,
     aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProviderFactory,
     registryFactory,
@@ -82,6 +83,7 @@ before(async function () {
   const [
     tokenBeacon,
     compoundLiquidityProviderBeacon,
+    operatorBeacon,
     aaveV2LiquidityProviderBeacon,
     aaveV3LiquidityProviderBeacon,
     registryBeacon,
