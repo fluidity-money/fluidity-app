@@ -13,6 +13,7 @@ export type ColumnProps = {
 };
 
 export type PaginationProps = {
+  paginate?: boolean;
   page: number;
   rowsPerPage: number;
   pageQuery?: string;
@@ -66,7 +67,7 @@ const Table = <T,>(props: ITable<T>) => {
     freezeRow,
   } = props;
 
-  const { rowsPerPage, page } = pagination;
+  const { rowsPerPage, page, paginate } = pagination;
 
   const isTransition = useTransition();
 
@@ -104,10 +105,15 @@ const Table = <T,>(props: ITable<T>) => {
         )}
 
         {/* Item Count */}
-        <Text>
-          {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
-          {cappedPageCount} {itemName}
-        </Text>
+        {
+          paginate !== false && (
+            <Text>
+              {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+              {cappedPageCount} {itemName}
+            </Text>
+          )
+        }
+        
       </div>
 
       {/* Table */}

@@ -819,8 +819,8 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
   data: AirdropLeaderboardEntry;
   index: number;
 }) => {
-  // const { address } = useContext(FluidityFacadeContext)
-  const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
+  const { address } = useContext(FluidityFacadeContext)
+  // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
   return (
@@ -841,14 +841,14 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
       <td>
         <Text prominent style={address === user ? {
         color: 'black'
-      } : {}}>{rank}</Text>
+      } : {}}>{rank === -1 ? '???' : rank}</Text>
       </td>
 
       {/* User */}
       <td>
         <Text prominent style={address === user ? {
         color: 'black'
-      } : {}}>{trimAddress(user)}</Text>
+      } : {}}>{address === user ? 'ME' : trimAddress(user)}</Text>
       </td>
 
       {/* Bottles */}
@@ -889,34 +889,50 @@ const Leaderboard = ({
   userAddress
 }: IAirdropLeaderboard) => {
   console.log("HELOOOOOOOO", filterIndex);
+
+  // This adds a dummy user entry to the leaderboard if the user's address isn't found
+  if (!data.find((entry) => entry.user === userAddress)) {
+    const userEntry = {
+      user: userAddress,
+      rank: -1,
+      referralCount: 0,
+      liquidityMultiplier: 0,
+      bottles: 0,
+      highestRewardTier: 0
+    };
+
+    data.push(userEntry);
+  }
+
   return (
     <>
         <div className="leaderboard-header">
-          <Heading as="h3">Leaderboard</Heading>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <div className="leaderboard-header-text">
+            <Heading as="h3">Leaderboard</Heading>
             <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
               This leaderboard shows your rank among other users{" "}
-              {filterIndex === 0 ? " per " : " for "}
+              {filterIndex === 0 ? " per" : " for"}
+              &nbsp;
               {filterIndex === 0 ? (
-                <ul style={{ margin: 0 }}> 24 HOURS</ul>
+                <ul style={{ margin: 0 }}>24 HOURS</ul>
               ) : (
-                <ul style={{ margin: 0 }}> ALL TIME</ul>
+                <ul style={{ margin: 0 }}>ALL TIME</ul>
               )}
             </Text>
-            <div style={{ display: "flex", gap: "1em" }}>
-              <GeneralButton
-                type={filterIndex === 0 ? "primary" : "secondary"}
-                handleClick={() => setFilterIndex(0)}
-              >
-                24 HOURS
-              </GeneralButton>
-              <GeneralButton
-                type={filterIndex === 1 ? "primary" : "secondary"}
-                handleClick={() => setFilterIndex(1)}
-              >
-                ALL TIME
-              </GeneralButton>
-            </div>
+          </div>
+          <div className="leaderboard-header-filters">
+            <GeneralButton
+              type={filterIndex === 0 ? "primary" : "secondary"}
+              handleClick={() => setFilterIndex(0)}
+            >
+              24 HOURS
+            </GeneralButton>
+            <GeneralButton
+              type={filterIndex === 1 ? "primary" : "secondary"}
+              handleClick={() => setFilterIndex(1)}
+            >
+              ALL TIME
+            </GeneralButton>
           </div>
         </div>
         <Table
@@ -929,6 +945,7 @@ const Leaderboard = ({
             { name: "REFERRALS" },
           ]}
           pagination={{
+            paginate: false,
             page: 1,
             rowsPerPage: 11,
           }}
@@ -936,7 +953,7 @@ const Leaderboard = ({
           data={data}
           renderRow={AirdropRankRow}
           freezeRow={(data) => {
-            return data.user === "0xb3701a61a9759d10a0fc7ce55354a8163496caec";
+            return data.user === userAddress
           }}
           onFilter={() => true}
           activeFilterIndex={0}

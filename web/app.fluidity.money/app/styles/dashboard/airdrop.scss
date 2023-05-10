@@ -125,6 +125,24 @@
 }
 
 .leaderboard-header {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1em;
+
+  .leaderboard-header-text {
+
+  }
+  .leaderboard-header-filters {
+    display: flex;
+    gap: 1em;
+  }
+  h3 {
+    margin: 0;
+    margin-bottom: 0.5em;
+  }
   padding: 2em 2em 0 2em;
 }
 
@@ -138,10 +156,25 @@ th, td {
   padding-right: 2em !important;
 }
 
+th {
+  &:last-child {
+    padding-right: 4em !important;
+  }
+  &:first-child {
+    padding-left: 4em !important;
+  }
+}
+
 .airdrop-row {
     td {
       background-color: transparent !important;
       border-bottom: 1px solid white !important;
+      &:last-child {
+        padding-right: 4em !important;
+      }
+      &:first-child {
+        padding-left: 4em !important;
+      }
     }
 
     &:last-of-type {

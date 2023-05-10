@@ -116,7 +116,21 @@
   }
 }
 .leaderboard-header {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1em;
   padding: 2em 2em 0 2em;
+}
+.leaderboard-header .leaderboard-header-filters {
+  display: flex;
+  gap: 1em;
+}
+.leaderboard-header h3 {
+  margin: 0;
+  margin-bottom: 0.5em;
 }
 
 .transactions-header {
@@ -129,9 +143,22 @@ th, td {
   padding-right: 2em !important;
 }
 
+th:last-child {
+  padding-right: 4em !important;
+}
+th:first-child {
+  padding-left: 4em !important;
+}
+
 .airdrop-row td {
   background-color: transparent !important;
   border-bottom: 1px solid white !important;
+}
+.airdrop-row td:last-child {
+  padding-right: 4em !important;
+}
+.airdrop-row td:first-child {
+  padding-left: 4em !important;
 }
 .airdrop-row:last-of-type td {
   border-bottom: none !important;
