@@ -101,6 +101,7 @@ interface IReferralDetailsModal {
 
 const ReferralDetailsModal = ({
   bottles,
+  totalBottles,
   activeRefereeReferralsCount,
   activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
@@ -113,9 +114,9 @@ const ReferralDetailsModal = ({
         {activeRefereeReferralsCount}
       </LabelledValue>
       <LabelledValue
-        label={<Text size="sm">Total Bottles earned from your link</Text>}
+        label={<Text size="sm">Total Bottles earned</Text>}
       >
-        1,051
+        {totalBottles}
       </LabelledValue>
     </div>
     <Text size="sm">Bottle Distribution</Text>
@@ -485,7 +486,8 @@ const StakeNowModal = ({
 
   const [showTokenSelector, setShowTokenSelector] = useState<
     "fluid" | "base" | ""
-  >("base");
+  >("");
+  console.log(fluidToken)
 
   return (
     <div
@@ -549,10 +551,12 @@ const StakeNowModal = ({
                 flexDirection: "row",
                 gap: "1em",
                 background: "black",
+ padding: "5px",
               }}
             >
               {fluidTokens.map((token) => (
-                <div
+                <button
+                  style={{background: "none", border: "none" }} 
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (fluidToken.symbol != token.symbol) {
@@ -569,17 +573,17 @@ const StakeNowModal = ({
                     token={token.symbol}
                     className={"staking-modal-token-icon"}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <div onClick={() => setShowTokenSelector("fluid")}>
+              <button style={{background: "none", border: "none" }} onClick={() => setShowTokenSelector("fluid")}>
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={fluidToken.symbol}
                 />
-              </div>
+              </button>
               <input
                 className={"staking-modal-token-input"}
                 min={""}
@@ -606,10 +610,12 @@ const StakeNowModal = ({
                 flexDirection: "row",
                 gap: "1em",
                 background: "black",
+ padding: "5px",
               }}
             >
               {baseTokens.map((token) => (
-                <div
+                <button
+                  style={{background: "none", border: "none" }} 
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (baseToken.symbol != token.symbol) {
@@ -626,17 +632,17 @@ const StakeNowModal = ({
                     key={token.symbol}
                     token={token.symbol}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <div onClick={() => setShowTokenSelector("base")}>
+              <button style={{background: "none", border: "none" }} onClick={() => setShowTokenSelector("base")}>
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={baseToken.symbol}
                 />
-              </div>
+              </button>
               <input
                 className={"staking-modal-token-input"}
                 min={""}

@@ -68,6 +68,11 @@
         "internalType": "uint256",
         "name": "_slippage",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxTimestamp",
+        "type": "uint256"
       }
     ],
     "name": "deposit",

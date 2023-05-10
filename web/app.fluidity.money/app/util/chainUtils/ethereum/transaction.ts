@@ -380,7 +380,8 @@ export const makeStakingDeposit = async (
   usdcAmt: BN,
   fusdcAmt: BN,
   wethAmt: BN,
-  slippage: BN
+  slippage: BN,
+  maxTimestamp: BN,
 ): Promise<StakingDepositsRes | undefined> => {
   try {
     const stakingContract = getContract(stakingAbi, stakingAddr, signer);
@@ -445,7 +446,8 @@ export const makeStakingDeposit = async (
       utils.parseUnits(fusdcAmt.toString()),
       utils.parseUnits(usdcAmt.toString()),
       utils.parseUnits(wethAmt.toString()),
-      utils.parseUnits(slippage.toString())
+      utils.parseUnits(slippage.toString()),
+      utils.parseUnits(maxTimestamp.toString())
     );
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);

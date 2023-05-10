@@ -383,6 +383,7 @@ const Airdrop = () => {
       >
         <ReferralDetailsModal
           bottles={bottleTiers}
+          totalBottles={bottlesCount}
           activeReferrerReferralsCount={numActiveReferrerReferrals}
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
@@ -859,7 +860,6 @@ const Leaderboard = ({
   filterIndex,
   setFilterIndex,
 }: IAirdropLeaderboard) => {
-  console.log("HELOOOOOOOO", filterIndex);
   return (
     <>
       <div className="leaderboard-header">
