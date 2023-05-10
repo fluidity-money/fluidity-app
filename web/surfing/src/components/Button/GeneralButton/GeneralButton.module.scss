@@ -18,7 +18,7 @@
   height: fit-content;
   text-transform: uppercase;
 
-  .icon {
+  .icon, * {
     display: inline-block;
   }
 
@@ -67,7 +67,7 @@
   border: 0.5px solid map-get($border, "prominent");
   color: $black;
 
-  .icon {
+  .icon, * {
     stroke: map-get($text, "secondary");
     fill: map-get($text, "secondary");
   }
@@ -81,7 +81,7 @@
     background-color: map-get($bg, default);
     border: 0.5px solid map-get($border, "prominent");
     color: map-get($text, "prominent");
-    .icon {
+    .icon, * {
       stroke: map-get($text, "prominent");
       fill: map-get($text, "prominent");
     }
@@ -92,7 +92,7 @@
     background-color: map-get($bg, "disabled");
     border: 0.5px solid map-get($bg, "disabled");
 
-    .icon {
+    .icon, * {
       stroke: map-get($text, "disabled");
       fill: map-get($text, "disabled");
     }
@@ -104,7 +104,7 @@
   border: 0.5px solid $white-a80;
   color: map-get($text, "prominent");
 
-  .icon {
+  .icon, * {
     stroke: map-get($text, "prominent");
     fill: map-get($text, "prominent");
   }
@@ -118,7 +118,7 @@
     background-color: map-get($bg, "alternate");
     border: 0.5px solid map-get($border, "prominent");
     color: map-get($text, "secondary");
-    .icon {
+    .icon, * {
       stroke: map-get($text, "secondary");
       fill: map-get($text, "secondary");
     }
@@ -129,7 +129,7 @@
     background-color: map-get($bg, default);
     border: 0.5px solid map-get($border, "disabled");
 
-    .icon {
+    .icon, * {
       stroke: map-get($text, "disabled");
       fill: map-get($text, "disabled");
     }
@@ -141,7 +141,7 @@
   border: 0.5px solid $white-a80;
   color: map-get($text, "prominent");
 
-  .icon {
+  .icon, * {
     stroke: map-get($text, "prominent");
     fill: map-get($text, "prominent");
   }
@@ -156,7 +156,7 @@
     border: 0.5px solid map-get($border, "prominent");
     color: map-get($text, "secondary");
 
-    .icon {
+    .icon, * {
       stroke: map-get($text, "secondary");
       fill: map-get($text, "secondary");
     }
@@ -164,10 +164,10 @@
 
   &:disabled {
     color: map-get($text, "disabled");
-    background-color: map-get($bg, default);
+    background-color: none;
     border: 0.5px solid map-get($border, "disabled");
 
-    .icon {
+    .icon, * {
       stroke: map-get($text, "disabled");
       fill: map-get($text, "disabled");
     }

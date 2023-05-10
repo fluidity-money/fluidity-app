@@ -8,10 +8,10 @@ import (
 	"math/big"
 	"strconv"
 
+	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
-	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -210,9 +210,11 @@ func main() {
 		message.Decode(&hintedBlock)
 
 		// set the configuration using what's in the database for the block
+
 		log.Debug(func(k *log.Log) {
 			k.Message = "About to fetch worker config from postgres!"
 		})
+
 		var (
 			workerConfig = worker_config.GetWorkerConfigEthereum(
 				dbNetwork,
@@ -336,7 +338,6 @@ func main() {
 
 		// if this block is abnormal and could be an attack, we don't use the
 		// average!
-		//
 
 		transfersInEpochRat := new(big.Rat).SetInt64(int64(transfersInEpoch))
 
@@ -404,99 +405,45 @@ func main() {
 		var blockAnnouncements []worker.EthereumAnnouncement
 
 		for _, transaction := range fluidTransactions {
-
 			var (
 				receipt = transaction.Receipt
 
-				transactionHash      = transaction.Transaction.Hash
-				transferType         = transaction.Transaction.Type
-				maxFeePerGas         = transaction.Transaction.GasFeeCap
-				maxPriorityFeePerGas = transaction.Transaction.GasTipCap
-				gasUsed              = receipt.GasUsed
+				transactionHash = transaction.Transaction.Hash
+				transactionType = transaction.Transaction.Type
 			)
 
-			if transferType != 2 {
+			var transactionFeeNormal *big.Rat
+
+			switch transactionType {
+			case ethTypes.LegacyTxType, ethTypes.AccessListTxType:
+				transactionFeeNormal = calculateLegacyFeeTransactionFee(
+					emission,
+					transaction.Transaction,
+					receipt,
+					ethPriceUsd,
+					ethereumDecimalsRat,
+				)
+
+			case ethTypes.DynamicFeeTxType:
+				transactionFeeNormal = calculateDynamicFeeTransactionFee(
+					emission,
+					transaction.Transaction,
+					receipt,
+					blockBaseFee,
+					ethPriceUsd,
+					ethereumDecimalsRat,
+				)
+
+			default:
 				log.App(func(k *log.Log) {
 					k.Format(
-						"Ignoring message with hash %#v that isn't London!",
+						"Ignoring message with hash %#v for a unsupported fee type!",
 						transactionHash,
 					)
 				})
 
 				continue
 			}
-
-			var (
-				gasTipCapRat = bigIntToRat(maxPriorityFeePerGas)
-				gasUsedRat   = bigIntToRat(gasUsed)
-			)
-
-			// remember the gas limit and tip cap in the
-			// database for comparison later - NOTE that
-			// only the gas used is used
-
-			emission.GasTipCap = maxPriorityFeePerGas
-
-			// remember the inputs to the gas actually used
-			// in usd calculation
-
-			emission.GasUsed = gasUsed.Uint64()
-
-			emission.BlockBaseFee = blockBaseFee
-
-			emission.MaxPriorityFeePerGas = maxPriorityFeePerGas
-
-			// and normalise the gas tip cap by multiplying
-			// ethereum decimals then converting to USD
-
-			normalisedGasTipCapRat := weiToUsd(
-				gasTipCapRat,
-				ethPriceUsd,
-				ethereumDecimalsRat,
-			)
-
-			emission.GasTipCapNormal, _ = normalisedGasTipCapRat.Float64()
-
-			// normalise the block base fee by dividing it
-			// by the decimals and then multiplying it by usd
-
-			blockBaseFeeRat := new(big.Rat).SetInt(&blockBaseFee.Int)
-
-			normalisedBlockBaseFeePerGasRat := weiToUsd(
-				blockBaseFeeRat,
-				ethPriceUsd,
-				ethereumDecimalsRat,
-			)
-
-			emission.BlockBaseFeeNormal, _ = normalisedBlockBaseFeePerGasRat.Float64()
-
-			maxPriorityFeePerGasRat := new(big.Rat).SetInt(&maxPriorityFeePerGas.Int)
-
-			maxFeePerGasRat := new(big.Rat).SetInt(&maxFeePerGas.Int)
-
-			// calculate the effective gas price (all values in wei)
-
-			effectiveGasPrice := commonEth.CalculateEffectiveGasPrice(
-				blockBaseFeeRat,
-				maxFeePerGasRat,
-				maxPriorityFeePerGasRat,
-			)
-
-			normalisedEffectiveGasPriceRat := weiToUsd(
-				effectiveGasPrice,
-				ethPriceUsd,
-				ethereumDecimalsRat,
-			)
-
-			emission.EffectiveGasPriceNormal, _ = normalisedEffectiveGasPriceRat.Float64()
-
-			// calculate the transfer fee usd, by multiplying
-			// the gas used by the effective gas price
-
-			transactionFeeNormal := new(big.Rat).Mul(
-				gasUsedRat,
-				normalisedEffectiveGasPriceRat,
-			)
 
 			transferCount := len(transaction.Transfers)
 
@@ -521,8 +468,8 @@ func main() {
 				)
 
 				var (
-					senderAddress    = lookupFeeSwitch(senderAddress_, dbNetwork)
-					recipientAddress = lookupFeeSwitch(recipientAddress_, dbNetwork)
+					senderAddress    = worker_config.LookupFeeSwitch(senderAddress_, dbNetwork)
+					recipientAddress = worker_config.LookupFeeSwitch(recipientAddress_, dbNetwork)
 				)
 
 				application := applications.ApplicationNone

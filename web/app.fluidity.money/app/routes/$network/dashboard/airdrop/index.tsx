@@ -1,7 +1,8 @@
 import type { LoaderFunction } from "@remix-run/node";
+import type { StakingEvent } from "../../query/dashboard/airdrop";
 
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -23,6 +24,8 @@ import {
   AnchorButton,
   TabButton,
   toSignificantDecimals,
+  useViewport,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -35,7 +38,6 @@ import {
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect } from "react";
-import Table, { IRow } from "~/components/Table";
 import { Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
@@ -46,6 +48,7 @@ import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
+import Table, { IRow } from "~/components/Table";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: april 19th, 2023
@@ -58,16 +61,11 @@ export const links = () => {
 export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
 
-  const dayDifference = (date1: Date, date2: Date) =>
-    Math.ceil(
-      Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24
-    );
-
   const epochDays = dayDifference(new Date(), EPOCH_START_DATE);
 
   // Staking Tokens
   const allowedTokenSymbols = new Set(["fUSDC", "USDC", "wETH"]);
-  const { tokens } = config.config["ethereum"];
+  const { tokens } = config.config[network];
 
   const allowedTokens = tokens.filter(({ symbol }) =>
     allowedTokenSymbols.has(symbol)
@@ -133,23 +131,39 @@ const Airdrop = () => {
 
   const showAirdrop = showExperiment("enable-airdrop-page");
 
-  const { address, balance } = useContext(FluidityFacadeContext);
+  const navigate = useNavigate();
+
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+
+  const { address, balance, stakeTokens } = useContext(FluidityFacadeContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
   const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard`
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
+    }`
   );
 
-  // const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-  //   address ? `/${network}/query/dashboard/airdropLeaderboard` : ""
-  // );
-  //
+  const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
+    address
+      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
+          leaderboardFilterIndex === 0 ? "24" : "all"
+        }&address=${address}`
+      : ""
+  );
+
   const { data: referralData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
+
+  const { width } = useViewport();
+
+  const mobileBreakpoint = 768;
+
+  const isMobile = width < mobileBreakpoint;
 
   const data = {
     airdrop: {
@@ -159,6 +173,10 @@ const Airdrop = () => {
     airdropLeaderboard: {
       ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
       ...globalAirdropLeaderboardData,
+    },
+    userAirdropLeaderboard: {
+      ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
+      ...userAirdropLeaderboardData,
     },
     referrals: {
       ...SAFE_DEFAULT_REFERRALS,
@@ -175,16 +193,26 @@ const Airdrop = () => {
       inactiveReferrals,
     },
     airdropLeaderboard: {
-      leaderboard: leaderboardRows,
-      loaded: leaderboardLoaded,
+      leaderboard: globalLeaderboardRows,
+      loaded: globalLeaderboardLoaded,
+    },
+    userAirdropLeaderboard: {
+      leaderboard: userLeaderboardRows,
+      loaded: userLeaderboardLoaded,
     },
   } = data;
+
+  const leaderboardRows = userLeaderboardLoaded
+    ? userLeaderboardRows.concat(globalLeaderboardRows)
+    : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
 
   const closeModal = () => {
     setCurrentModal(null);
   };
+
+  // const [ stakes, setStakes ] = useState<Array<>>([])
 
   // get token data once user is connected
   useEffect(() => {
@@ -213,7 +241,137 @@ const Airdrop = () => {
     })();
   }, [address]);
 
+  const Header = () => {
+    return (
+      <div
+        className="pad-main"
+        style={{ display: "flex", gap: "2em", marginBottom: "2em" }}
+      >
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("staking-stats")}
+        >
+          Airdrop Dashboard
+        </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
+          Airdrop Tutorial
+        </TabButton>
+        <TabButton
+          size="small"
+          onClick={() => {
+            if (!isMobile) navigate("#leaderboard");
+            setCurrentModal("leaderboard");
+          }}
+        >
+          Leaderboard
+        </TabButton>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("referral-details")}
+        >
+          Referrals
+        </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
+          Stake
+        </TabButton>
+      </div>
+    );
+  };
+
   if (!showAirdrop) return null;
+
+  if (isMobile)
+    return (
+      <>
+        <Header />
+        <div
+          className="pad-main"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "2em",
+          }}
+        >
+          {currentModal === null && (
+            <>
+              <Heading as="h3" className={"no-margin"}>
+                Welcome to Fluidity&apos;s Airdrop Event!
+              </Heading>
+              <div>
+                <Text>
+                  Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
+                  vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
+                  metus, ac convallis lectus porttitor et. Donec maximus gravida
+                  mauris, eget tempor felis tristique sit amet. Pellentesque at
+                  hendrerit nibh, eu porttitor dui.
+                  <LinkButton
+                    size="medium"
+                    type="external"
+                    handleClick={() => {
+                      return;
+                    }}
+                  >
+                    Learn more
+                  </LinkButton>
+                </Text>
+              </div>
+              <BottleProgress bottles={bottleTiers} isMobile />
+              <AirdropStats
+                seeReferralsDetails={() => setCurrentModal("referral-details")}
+                seeBottlesDetails={() => setCurrentModal("bottles-details")}
+                epochMax={epochDaysTotal}
+                epochDays={epochDays}
+                activatedReferrals={numActiveReferrerReferrals}
+                totalBottles={bottlesCount}
+              />
+              <MultiplierTasks />
+              <MyMultiplier
+                seeMyStakingStats={() => setCurrentModal("staking-stats")}
+                seeStakeNow={() => setCurrentModal("stake-now")}
+                liquidityMultiplier={liquidityMultiplier}
+                stakes={stakes}
+              />
+            </>
+          )}
+          {currentModal === "tutorial" && (
+            <>
+              <TutorialModal isMobile />
+            </>
+          )}
+          {currentModal === "leaderboard" && (
+            <>
+              <Leaderboard
+                loaded={globalLeaderboardLoaded}
+                data={leaderboardRows}
+                filterIndex={leaderboardFilterIndex}
+                setFilterIndex={setLeaderboardFilterIndex}
+              />
+            </>
+          )}
+          {currentModal === "stake-now" && (
+            <>
+              <Heading as="h3">Stake Now</Heading>
+
+              <StakeNowModal
+                fluidTokens={tokens.filter((tok) =>
+                  Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
+                )}
+                baseTokens={tokens.filter(
+                  (tok) =>
+                    !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
+                )}
+                stakeToken={stakeTokens}
+              />
+              <Heading as="h3">My Staking Stats</Heading>
+              <StakingStatsModal
+                liqudityMultiplier={liquidityMultiplier}
+                stakes={stakes}
+              />
+            </>
+          )}
+        </div>
+      </>
+    );
 
   return (
     <>
@@ -250,6 +408,7 @@ const Airdrop = () => {
           baseTokens={tokens.filter(
             (tok) => !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
           )}
+          stakeToken={stakeTokens}
         />
       </CardModal>
       <CardModal
@@ -271,27 +430,7 @@ const Airdrop = () => {
       </CardModal>
 
       {/* Page Content */}
-      <div className="pad-main" style={{ display: "flex", gap: "2em" }}>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("staking-stats")}
-        >
-          Airdrop Dashboard
-        </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
-          Airdrop Tutorial
-        </TabButton>
-        <TabButton size="small">Leaderboard</TabButton>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("referral-details")}
-        >
-          Referrals
-        </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
-          Stake
-        </TabButton>
-      </div>
+      <Header />
       <div className="pad-main">
         <div
           style={{
@@ -305,7 +444,6 @@ const Airdrop = () => {
               display: "flex",
               flexDirection: "column",
               gap: "2em",
-              zIndex: 1,
             }}
           >
             <Heading className={"no-margin"}>
@@ -342,17 +480,39 @@ const Airdrop = () => {
               seeMyStakingStats={() => setCurrentModal("staking-stats")}
               seeStakeNow={() => setCurrentModal("stake-now")}
               liquidityMultiplier={liquidityMultiplier}
+              stakes={stakes}
             />
           </div>
           <BottleProgress bottles={bottleTiers} />
         </div>
       </div>
       <div
-        style={{ display: "flex", justifyContent: "center", padding: "0.5em" }}
+        style={{ display: "flex", justifyContent: "center", padding: "1em" }}
       >
-        <AnchorButton>LEADERBOARD</AnchorButton>
+        <AnchorButton
+          onClick={() => {
+            navigate("#leaderboard");
+          }}
+        >
+          LEADERBOARD
+        </AnchorButton>
       </div>
-      <Leaderboard loaded={leaderboardLoaded} data={leaderboardRows} />
+      <div className="pad-main" id="#leaderboard">
+        <Card
+          className="leaderboard-container"
+          type="transparent"
+          border="solid"
+          rounded
+          color="white"
+        >
+          <Leaderboard
+            loaded={globalLeaderboardLoaded}
+            data={leaderboardRows}
+            filterIndex={leaderboardFilterIndex}
+            setFilterIndex={setLeaderboardFilterIndex}
+          />
+        </Card>
+      </div>
     </>
   );
 };
@@ -381,6 +541,7 @@ const AirdropStats = ({
         justifyContent: "space-between",
         alignItems: "center",
         flexWrap: "wrap",
+        gap: "1em",
       }}
     >
       <div>
@@ -443,29 +604,8 @@ const MultiplierTasks = () => {
     "Curve",
   ];
   return (
-    <Card
-      fill
-      color="holo"
-      rounded
-      style={{
-        zIndex: 0,
-        color: "black",
-        display: "grid",
-        boxSizing: "border-box",
-        gridTemplateColumns: "2.2fr 1fr 5fr",
-        gap: "2em",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.5em",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          gridColumn: "1 / 2",
-        }}
-      >
+    <Card fill color="holo" rounded className="multiplier-tasks">
+      <div className="multiplier-tasks-header">
         <Text style={{ color: "black" }} bold size="md">
           Multiplier Tasks
         </Text>
@@ -474,15 +614,7 @@ const MultiplierTasks = () => {
         </Text>
       </div>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: "1em",
-          alignItems: "center",
-          cursor: "pointer",
-          gridColumn: "2 / 3",
-          justifyContent: "flex-start",
-        }}
+        className="multiplier-tasks-multiplier"
         onClick={() => {
           setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
         }}
@@ -505,14 +637,7 @@ const MultiplierTasks = () => {
           </motion.div>
         </TextButton>
       </div>
-      <div
-        style={{
-          gridColumn: "3 / 4",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div className="multiplier-tasks-tasks">
         {tasks === "1x" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -568,6 +693,7 @@ const MultiplierTasks = () => {
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
+  stakes: Array<StakingEvent>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
 }
@@ -576,6 +702,7 @@ const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
   liquidityMultiplier,
+  stakes,
 }: IMyMultiplier) => {
   return (
     <div
@@ -617,64 +744,38 @@ const MyMultiplier = ({
           gridRow: "1 / 3",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$5,000 FOR 365 DAYS</Text>
-          <ProgressBar value={1} max={1} rounded color="holo" size="sm" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text holo bold prominent>
-            1X
-          </Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$500 FOR 150 DAYS</Text>
-          <ProgressBar value={0.5} max={1} rounded size="sm" color="gray" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text>0.5X</Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$500 FOR 31 DAYS</Text>
-          <ProgressBar value={0.05} max={1} rounded size="sm" color="gray" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text>0.05X</Text>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: "0.5em",
-          }}
-        >
-          <Text>$250 FOR 100 DAYS</Text>
-          <ProgressBar value={0.05} max={1} rounded size="sm" color="gray" />
-        </div>
-        <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-          <Text>0.5X</Text>
-        </div>
+        {stakes.map(({ amount, durationDays, multiplier, insertedDate }) => {
+          const stakedDays = dayDifference(new Date(), new Date(insertedDate));
+
+          return (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: "0.5em",
+                }}
+              >
+                <Text>
+                  {numberToMonetaryString(amount)} FOR {durationDays} DAYS
+                </Text>
+                <ProgressBar
+                  value={stakedDays}
+                  max={durationDays}
+                  rounded
+                  color={durationDays === stakedDays ? "holo" : "gray"}
+                  size="sm"
+                />
+              </div>
+              <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
+                <Text holo bold prominent>
+                  {multiplier}X
+                </Text>
+              </div>
+            </>
+          );
+        })}
       </div>
       <GeneralButton
         buttontype="text"
@@ -705,6 +806,7 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
 
   return (
     <motion.tr
+      className="airdrop-row"
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -718,25 +820,27 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
     >
       {/* Rank */}
       <td>
-        <Text>{rank}</Text>
+        <Text prominent>{rank}</Text>
       </td>
 
       {/* User */}
       <td>
-        <Text>{trimAddress(user)}</Text>
+        <Text prominent>{trimAddress(user)}</Text>
       </td>
 
       {/* Bottles */}
-      <td>{toSignificantDecimals(bottles, 2)}</td>
+      <td>
+        <Text prominent>{toSignificantDecimals(bottles, 2)}</Text>
+      </td>
 
       {/* Multiplier */}
       <td>
-        <Text>{liquidityMultiplier.toLocaleString()}x</Text>
+        <Text prominent>{liquidityMultiplier.toLocaleString()}x</Text>
       </td>
 
       {/* Referrals */}
       <td>
-        <Text>{referralCount}</Text>
+        <Text prominent>{referralCount}</Text>
       </td>
     </motion.tr>
   );
@@ -745,78 +849,111 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
 interface IAirdropLeaderboard {
   loaded: boolean;
   data: Array<AirdropLeaderboardEntry>;
+  filterIndex: number;
+  setFilterIndex: (index: number) => void;
 }
 
-const Leaderboard = ({ loaded, data }: IAirdropLeaderboard) => {
+const Leaderboard = ({
+  loaded,
+  data,
+  filterIndex,
+  setFilterIndex,
+}: IAirdropLeaderboard) => {
+  console.log("HELOOOOOOOO", filterIndex);
   return (
-    <div className="pad-main" id="leaderboard">
-      <Card
-        className="leaderboard-container"
-        type="transparent"
-        border="solid"
-        rounded
-        color="white"
-      >
-        <div>
-          <Heading as="h3">Leaderboard</Heading>
-          <Text prominent>
-            This leaderboard shows your rank among other users per{" "}
-            <ul>24 HOURS</ul>
+    <>
+      <div className="leaderboard-header">
+        <Heading as="h3">Leaderboard</Heading>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
+            This leaderboard shows your rank among other users{" "}
+            {filterIndex === 0 ? " per " : " for "}
+            {filterIndex === 0 ? (
+              <ul style={{ margin: 0 }}> 24 HOURS</ul>
+            ) : (
+              <ul style={{ margin: 0 }}> ALL TIME</ul>
+            )}
           </Text>
+          <div style={{ display: "flex", gap: "1em" }}>
+            <GeneralButton
+              type={filterIndex === 0 ? "primary" : "secondary"}
+              handleClick={() => setFilterIndex(0)}
+            >
+              24 HOURS
+            </GeneralButton>
+            <GeneralButton
+              type={filterIndex === 1 ? "primary" : "secondary"}
+              handleClick={() => setFilterIndex(1)}
+            >
+              ALL TIME
+            </GeneralButton>
+          </div>
         </div>
-        <Table
-          itemName=""
-          headings={[
-            { name: "RANK" },
-            { name: "USER" },
-            { name: "BOTTLES" },
-            { name: "MULTIPLIER" },
-            { name: "REFERRALS" },
-          ]}
-          pagination={{
-            page: 1,
-            rowsPerPage: 11,
-          }}
-          count={0}
-          data={data}
-          renderRow={AirdropRankRow}
-          onFilter={() => true}
-          activeFilterIndex={0}
-          filters={[]}
-          loaded={loaded}
-        />
-      </Card>
-    </div>
+      </div>
+      <Table
+        itemName=""
+        headings={[
+          { name: "RANK" },
+          { name: "USER" },
+          { name: "BOTTLES" },
+          { name: "MULTIPLIER" },
+          { name: "REFERRALS" },
+        ]}
+        pagination={{
+          page: 1,
+          rowsPerPage: 11,
+        }}
+        count={0}
+        data={data}
+        renderRow={AirdropRankRow}
+        onFilter={() => true}
+        activeFilterIndex={0}
+        filters={[]}
+        loaded={loaded}
+      />
+    </>
   );
 };
 
-const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
+const BottleProgress = ({
+  bottles,
+  isMobile,
+}: {
+  bottles: BottleTiers;
+  isMobile?: boolean;
+}) => {
   const [imgIndex, setImgIndex] = useState(0);
   const [showBottleNumbers, setShowBottleNumbers] = useState(false);
+
+  const handleHeroPageChange = (index: number) => {
+    setImgIndex(index);
+  };
+
   return (
     <div>
-      <HeroCarousel title="BOTTLES I'VE EARNED" setImgIndex={setImgIndex}>
+      <HeroCarousel
+        title="BOTTLES I'VE EARNED"
+        onSlideChange={handleHeroPageChange}
+      >
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop1.png" />
+          <img src="/images/hero/common.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop2.png" />
+          <img src="/images/hero/uncommon.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop3.png" />
+          <img src="/images/hero/rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop1.png" />
+          <img src="/images/hero/ultra_rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop2.png" />
-        </Card>
-        <Card type="frosted" fill shimmer rounded>
-          <img src="/images/placeholderAirdrop3.png" />
+          <img src="/images/hero/legendary.png" />
         </Card>
       </HeroCarousel>
       <BottleDistribution
         bottles={bottles}
+        isMobile={isMobile}
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
@@ -832,5 +969,8 @@ const BottleProgress = ({ bottles }: { bottles: BottleTiers }) => {
     </div>
   );
 };
+
+export const dayDifference = (date1: Date, date2: Date) =>
+  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
 
 export default Airdrop;

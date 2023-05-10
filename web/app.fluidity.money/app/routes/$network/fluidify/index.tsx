@@ -59,8 +59,16 @@ export const loader: LoaderFunction = async ({ params }) => {
     },
   } = config;
 
+  const pairedTokenAddrs = new Set();
+  tokens.forEach(({ address, isFluidOf }) => {
+    if (isFluidOf) {
+      pairedTokenAddrs.add(address);
+      pairedTokenAddrs.add(isFluidOf);
+    }
+  });
+
   return json({
-    tokens,
+    tokens: tokens.filter(({ address }) => pairedTokenAddrs.has(address)),
     ethereumWallets,
     network,
     colors: (await colors)[network as string],

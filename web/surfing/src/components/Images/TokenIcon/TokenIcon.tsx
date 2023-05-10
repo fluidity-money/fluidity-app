@@ -13,19 +13,19 @@ const tokenImgMap: {[K in Token]: string} = {
   fFRAX: "fFRAX.svg",
   DAI: "dai.svg",
   fDAI: "fDAI.svg",
+  wETH: "wETH.svg",
 } as const;
 
-type ITokenIcon = Partial<HTMLImageElement> & {
+type ITokenIcon = React.ImgHTMLAttributes<HTMLImageElement> & {
   token: Token
-  style?: React.CSSProperties
 };
 
-const TokenIcon = ({ token, className, style }: ITokenIcon) => (
+const TokenIcon = ({ token, className, ...props }: ITokenIcon) => (
   <img
-    style={style}
     className={className}
     src={`${baseImgPath}/${tokenImgMap[token]}`}
     alt={token}
+    {...props}
   />
 );
 
