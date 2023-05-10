@@ -442,12 +442,12 @@ export const makeStakingDeposit = async (
 
     // call deposit
     return await stakingContract.deposit(
-      utils.parseUnits(lockDurationSeconds.toString()),
-      utils.parseUnits(fusdcAmt.toString()),
-      utils.parseUnits(usdcAmt.toString()),
-      utils.parseUnits(wethAmt.toString()),
-      utils.parseUnits(slippage.toString()),
-      utils.parseUnits(maxTimestamp.toString())
+      lockDurationSeconds.toString(),
+      fusdcAmt.toString(),
+      usdcAmt.toString(),
+      wethAmt.toString(),
+      slippage.toString(),
+      maxTimestamp.toString(),
     );
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);

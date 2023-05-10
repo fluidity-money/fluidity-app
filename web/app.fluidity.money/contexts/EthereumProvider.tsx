@@ -406,7 +406,8 @@ const EthereumFacade = ({
     usdcAmt: BN,
     fusdcAmt: BN,
     wethAmt: BN,
-    slippage: BN
+    slippage: BN,
+    maxTimestamp: BN,
   ): Promise<StakingDepositsRes | undefined> => {
     const signer = provider?.getSigner();
 
@@ -444,7 +445,8 @@ const EthereumFacade = ({
       usdcAmt,
       fusdcAmt,
       wethAmt,
-      slippage
+      slippage,
+      maxTimestamp,
     );
   };
 

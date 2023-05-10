@@ -359,8 +359,9 @@ interface IStakingNowModal {
     usdcAmt: BN,
     fusdc: BN,
     wethAmt: BN,
-    slippage: BN
-  ) => void;
+    slippage: BN,
+    maxTimestamp: BN,
+  ) => Promise<void>;
 }
 
 type StakingAugmentedToken = AugmentedToken & {

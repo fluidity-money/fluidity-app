@@ -49,7 +49,8 @@ export interface IFluidityFacade {
     usdcAmt: BN,
     fusdcAmt: BN,
     wethAmt: BN,
-    slippage: BN
+    slippage: BN,
+    maxTimestamp: BN,
   ) => Promise<StakingDepositsRes | undefined>;
 }
 
