@@ -1,9 +1,13 @@
-import hre from 'hardhat';
-const ethers = hre.ethers;
+
+import hre from "hardhat";
+
 import "@nomiclabs/hardhat-waffle";
-import {USDT_ADDR, USUAL_FUSDT_ADDR} from '../test-constants';
-import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
-import { optionalEnv } from '../script-utils';
+
+import {USDT_ADDR, USUAL_FUSDT_ADDR} from "../mainnet-constants";
+
+import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
+
+import { optionalEnv } from "../script-utils";
 
 const EnvTokenAddress = `FLU_ETHEREUM_TOKEN_CONTRACT_ADDRESS`;
 const EnvUnderlyingAddress = `FLU_ETHEREUM_UNDERLYING_CONTRACT_ADDRESS`;
@@ -15,10 +19,10 @@ const underlyingAddress = optionalEnv(EnvUnderlyingAddress, USDT_ADDR);
 async function main() {
   const promises: Promise<void>[] = [];
 
-  const signers = (await ethers.getSigners()).slice(0, 10);
-  for (const signer of signers) {
+  const signers = (await hre.ethers.getSigners()).slice(0, 10);
+
+  for (const signer of signers)
     promises.push(makeTxn(signer));
-  }
 
   return Promise.allSettled(promises);
 }

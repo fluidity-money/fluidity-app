@@ -48,11 +48,11 @@ describe("token compound integration", async function () {
     await usdtAccount.approve(fUsdtAccount.address, 100000);
     await fUsdtAccount.erc20In(123);
 
-    const originalfUSDtBalance = await fUsdtAccount.balanceOf(accountAddr);
+    const originalfUSDTBalance = await fUsdtAccount.balanceOf(accountAddr);
     const originalPoolAmount = await fUsdtAccount.totalSupply();
 
     await fUsdtAccount.erc20Out(100);
-    expectEq(await fUsdtAccount.balanceOf(accountAddr), originalfUSDtBalance.sub(100));
+    expectEq(await fUsdtAccount.balanceOf(accountAddr), originalfUSDTBalance.sub(100));
     expectEq(await fUsdtAccount.totalSupply(), originalPoolAmount.sub(100));
   });
 

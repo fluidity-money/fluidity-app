@@ -1,4 +1,7 @@
 
+// these tests are pretty heavy, so we skip them unless this is on the
+// mainnet fork
+
 import * as hre from 'hardhat';
 
 import type { ethers } from 'ethers';

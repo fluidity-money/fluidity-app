@@ -26,7 +26,9 @@ import {
   deployOperator,
   deployTestUtilityWithoutDAO } from './deployment';
 
-import { AAVE_V2_POOL_PROVIDER_ADDR, TokenList } from './test-constants';
+import {
+  AAVE_V2_POOL_PROVIDER_ADDR,
+  TokenList } from "./mainnet-constants";
 
 const oracleKey = `FLU_ETHEREUM_ORACLE_ADDRESS`;
 
@@ -153,10 +155,10 @@ subtask(TASK_NODE_SERVER_READY, async (_taskArgs, hre) => {
   const testClient = await deployTestUtilityWithoutDAO(
     hre,
     operator,
-    tokens["fUSDt"].deployedToken.address
+    tokens["fUSDT"].deployedToken.address
   );
 
-  console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDt"].deployedToken.address}`);
+  console.log(`deployed the test util client to ${testClient.address} on token ${tokens["fUSDT"].deployedToken.address}`);
 
   console.log(`deployment complete`);
 });
@@ -208,21 +210,42 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
   };
 
 let forkOptions = {};
-if (process.env.FLU_FORKNET_NETWORK === "goerli" && process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI) {
-  forkOptions = {
-    forking: {
-      url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
-      blockNumber: 7906700,
-    },
-  };
-} else if (process.env.FLU_FORKNET_NETWORK == "mainnet" && process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET) {
+
+const enableMainnet =
+  process.env.FLU_FORKNET_NETWORK == "mainnet" &&
+  "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env;
+
+const enableGoerli =
+  process.env.FLU_FORKNET_NETWORK == "goerli" &&
+  "FLU_ETHEREUM_FORKNET_URL_GOERLI" in process.env;
+
+const enableArbitrum =
+  process.env.FLU_FORKNET_NETWORK == "arbitrum" &&
+  "FLU_ETHEREUM_FORKNET_URL_ARBITRUM" in process.env;
+
+if (enableMainnet)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_MAINNET,
       blockNumber: 14098096,
     },
   };
-}
+
+if (enableGoerli)
+  forkOptions = {
+    forking: {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
+      blockNumber: 7906700,
+    },
+  };
+
+if (enableArbitrum)
+  forkOptions = {
+    forking: {
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
+      blockNumber: 88060360,
+    },
+  };
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -252,6 +275,7 @@ module.exports = {
       "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
       "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
       "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol"
+
     ]
   },
   networks: {

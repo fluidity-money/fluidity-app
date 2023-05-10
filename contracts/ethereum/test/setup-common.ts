@@ -66,7 +66,7 @@ before(async function () {
     compoundLiquidityProvider: compoundLiquidityProviderFactory,
     aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
-    dao: daoFactory,
+    dao: daoFactory
   } = commonFactories;
 
   const beacons = await deployBeacons(
