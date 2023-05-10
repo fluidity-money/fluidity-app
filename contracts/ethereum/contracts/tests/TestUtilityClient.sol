@@ -44,7 +44,8 @@ contract TestClient is IFluidClient {
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
             deltaWeightNum: 1,
-            deltaWeightDenom: 31536000
+            deltaWeightDenom: 31536000,
+            customCalculationType: ""
         });
     }
 }

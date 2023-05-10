@@ -201,6 +201,7 @@ func main() {
 			}
 
 			randomN, randomPayouts, _ := probability.WinningChances(
+				worker_types.TrfModeNormal,
 				solanaTransactionFeesNormalised,
 				atx,
 				payoutFreq,
