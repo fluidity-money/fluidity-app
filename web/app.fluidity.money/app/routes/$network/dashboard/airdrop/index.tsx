@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import type { StakingEvent } from "../../query/dashboard/airdrop";
 
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -38,7 +38,7 @@ import {
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
@@ -131,8 +131,6 @@ const Airdrop = () => {
   const { showExperiment } = useContext(SplitContext);
 
   const showAirdrop = showExperiment("enable-airdrop-page");
-
-  const navigate = useNavigate();
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
@@ -242,11 +240,13 @@ const Airdrop = () => {
     })();
   }, [address]);
 
+  const leaderboardRef = useRef<HTMLDivElement>(null);
+
   const Header = () => {
     return <div className="pad-main" style={{ display: "flex", gap: "2em", marginBottom: '2em' }}>
     <TabButton
       size="small"
-      onClick={() => setCurrentModal("staking-stats")}
+      onClick={() => setCurrentModal(null)}
     >
       Airdrop Dashboard
     </TabButton>
@@ -254,7 +254,9 @@ const Airdrop = () => {
       Airdrop Tutorial
     </TabButton>
     <TabButton size="small" onClick={() => {
-      if(!isMobile) navigate("#leaderboard")
+      if(!isMobile) {
+        leaderboardRef.current?.scrollIntoView({ block: 'start', behavior: "smooth" })
+      }
       setCurrentModal('leaderboard')
     }
     }>Leaderboard</TabButton>
@@ -493,13 +495,13 @@ const Airdrop = () => {
       >
         <AnchorButton
           onClick={() => {
-            navigate("#leaderboard");
+            leaderboardRef.current?.scrollIntoView({ block: 'start', behavior: "smooth" })
           }}
         >
           LEADERBOARD
         </AnchorButton>
       </div>
-      <div className="pad-main" id="#leaderboard">
+      <div className="pad-main" id="#leaderboard" ref={leaderboardRef}>
         <Card
           className="leaderboard-container"
           type="transparent"
