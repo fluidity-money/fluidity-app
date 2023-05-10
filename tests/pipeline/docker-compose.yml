@@ -73,7 +73,7 @@ services:
       FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: spooler-out
       FLU_ETHEREUM_NETWORK: ethereum
 
-  contracts-utilmining:
+  contracts-util-mining:
     hostname: contracts
     build:
       context: ../../contracts/ethereum
@@ -85,7 +85,7 @@ services:
       FLU_ETHEREUM_FORK_URL: "${FLU_ETHEREUM_FORKNET_URL_MAINNET}"
       FLU_ETHEREUM_FORK_BLOCK_NUMBER: 16631000
 
-  contracts-special-utilmining:
+  contracts-special-util-mining:
     hostname: contracts
     build:
       context: ../../contracts/ethereum
@@ -207,7 +207,7 @@ services:
       - redis
       - postgres
       - timescale
-      - contracts-utilmining
+      - contracts-util-mining
       - connector-ethereum-block-headers-amqp
       - microservice-ethereum-block-fluid-transfers-amqp
       - microservice-ethereum-application-server-util-mining
@@ -270,7 +270,7 @@ services:
       - redis
       - postgres
       - timescale
-      - contracts-utilmining
+      - contracts-util-mining
       - microservice-ethereum-worker-server-util-mining
     environment:
       FLU_TEST: TestWorkerEpochs
@@ -280,7 +280,7 @@ services:
       <<: [*flu-envs, *util-mining-test-envs]
     restart: "no"
 
-  test-special-utilitymining:
+  test-special-util-mining:
     build:
       context: .
       dockerfile: Dockerfile.tests
@@ -289,7 +289,7 @@ services:
       - redis
       - postgres
       - timescale
-      - contracts-special-utilmining
+      - contracts-special-util-mining
       - microservice-ethereum-worker-server-util-mining
     environment:
       FLU_TEST: TestSpecialUtilityMining

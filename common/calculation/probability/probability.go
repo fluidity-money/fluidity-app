@@ -83,7 +83,6 @@ func payout(trfMode worker.TrfMode, atx, g, blockTimeRat, delta *big.Rat, winnin
 
 	a := new(big.Rat)
 
-	// TODO IS THIS CORRECT
 	switch trfMode {
 	case worker.TrfModeNoOptimisticSolution:
 		atxMulM := new(big.Rat).Mul(atx, mRat)
