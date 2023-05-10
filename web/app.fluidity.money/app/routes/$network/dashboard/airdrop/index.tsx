@@ -553,8 +553,8 @@ const AirdropStats = ({
       }}
     >
       <div>
-        <LabelledValue label="EPOCH DAYS LEFT">
-          {epochMax - epochDays}
+        <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
+        <Text prominent size="xl">{epochMax - epochDays}</Text>
         </LabelledValue>
         <div
           style={{
@@ -574,25 +574,35 @@ const AirdropStats = ({
         </div>
       </div>
       <div>
-        <LabelledValue label="REFERRALS">{activatedReferrals}</LabelledValue>
+        <LabelledValue label={<Text size="xs">REFERRALS</Text>}>
+          <Text prominent size="xl">
+            {activatedReferrals}
+          </Text>
+        </LabelledValue>
         <LinkButton
           color="gray"
           size="small"
           type="internal"
           handleClick={seeReferralsDetails}
+          style={{
+            marginLeft: -6
+          }}
         >
           SEE DETAILS
         </LinkButton>
       </div>
       <div>
-        <LabelledValue label="MY TOTAL BOTTLES">
-          {toSignificantDecimals(totalBottles)}
+        <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
+          <Text prominent size="xl">{toSignificantDecimals(totalBottles, 0)}</Text>
         </LabelledValue>
         <LinkButton
           color="gray"
           size="small"
           type="internal"
           handleClick={seeBottlesDetails}
+          style={{
+            marginLeft: -6
+          }}
         >
           SEE DETAILS
         </LinkButton>
@@ -730,7 +740,7 @@ const MyMultiplier = ({
       }}
     >
       <div>
-        <LabelledValue label="MY TOTAL LIQUIDITY MULTIPLIER">
+        <LabelledValue label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}>
           <Text size="xxl" holo>
             {liquidityMultiplier.toLocaleString()}x
           </Text>
