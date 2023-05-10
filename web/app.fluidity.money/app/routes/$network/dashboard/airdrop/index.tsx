@@ -21,11 +21,11 @@ import {
   Provider,
   CardModal,
   Rarity,
-  AnchorButton,
   TabButton,
   toSignificantDecimals,
   useViewport,
   numberToMonetaryString,
+  ArrowDown
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -492,15 +492,17 @@ const Airdrop = () => {
         </div>
       </div>
       <div
-        style={{ display: "flex", justifyContent: "center", padding: "1em" }}
+        style={{ display: "flex", justifyContent: "center", marginTop: '2em', marginBottom: '3em' }}
       >
-        <AnchorButton
+        <GeneralButton
+        type="transparent"
+        icon={<span style={{fill: 'none', transform: 'rotate(90deg)'}}><ArrowRight /></span>}
           onClick={() => {
             leaderboardRef.current?.scrollIntoView({ block: 'start', behavior: "smooth" })
           }}
         >
           LEADERBOARD
-        </AnchorButton>
+        </GeneralButton>
       </div>
       <div className="pad-main" id="#leaderboard" ref={leaderboardRef}>
         <Card
