@@ -734,12 +734,31 @@ interface IMyMultiplier {
   seeStakeNow: () => void;
 }
 
+// export type StakingEvent = {
+//   amount: number;
+//   durationDays: number;
+//   multiplier: number;
+//   insertedDate: string;
+// };
+
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
   liquidityMultiplier,
   stakes,
 }: IMyMultiplier) => {
+  
+  // If user has no stakes, render a dummy empty stake in the UI
+  if (stakes.length === 0) {
+    const emptyStake = {
+      amount: 0,
+      durationDays: 0,
+      multiplier: 0,
+      insertedDate: "",
+    };
+    stakes.push(emptyStake);
+  }
+
   return (
     <div
       style={{
