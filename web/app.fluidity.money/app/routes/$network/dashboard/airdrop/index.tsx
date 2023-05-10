@@ -25,7 +25,6 @@ import {
   toSignificantDecimals,
   useViewport,
   numberToMonetaryString,
-  ArrowDown
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -446,7 +445,7 @@ const Airdrop = () => {
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: "10%",
-            maxWidth: 1100,
+            maxWidth: 1200,
           }}
         >
           <div
