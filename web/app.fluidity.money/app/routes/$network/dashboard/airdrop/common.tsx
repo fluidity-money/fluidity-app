@@ -58,11 +58,12 @@ const BottleDistribution = ({
             quantity={quantity}
             style={{
               marginBottom: "0.6em",
+              opacity: highlightBottleNumberIndex === index ? 1 : 0.2,
             }}
           />
           <Text style={{ whiteSpace: "nowrap" }}>{rarity.replace('_', ' ').toUpperCase()}</Text>
           <Text
-            prominent
+            prominent={highlightBottleNumberIndex === index}
             style={{
               position: "absolute",
               bottom: "120px",
