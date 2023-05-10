@@ -1,11 +1,5 @@
-import {
-  AnimatePresence,
-  motion,
-  useDragControls,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
-import { ReactElement, useState } from "react";
+import { AnimatePresence, motion, useDragControls, useMotionValue, useTransform } from "framer-motion";
+import { ReactElement, useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Card, Text } from "~/components";
 import { ICard } from "../Card/Card";
 
@@ -20,7 +14,7 @@ const swipePower = (offset: number, velocity: number) => {
 interface IHeroCarousel {
   children: ReactElement<ICard>[];
   title: string;
-  setImgIndex: (index: number) => void;
+  onSlideChange?: (i: number) => void;
 }
 
 /**
@@ -30,7 +24,7 @@ interface IHeroCarousel {
 const HeroCarousel: React.FC<IHeroCarousel> = ({
   children,
   title,
-  setImgIndex,
+  onSlideChange,
 }) => {
   const slides = children.length;
   if (slides < 2) return null;
@@ -46,11 +40,14 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
 
   const prevSlideIndex = slide - 1;
   const nextSlideIndex = slide + 1;
-  setImgIndex(slide);
 
   const controls = useDragControls();
   const x = useMotionValue(0);
   const opacity = useTransform(x, [-100, 0, 100], [0, 1, 0]);
+
+  useEffect(() => {
+    if (onSlideChange) onSlideChange(slide)
+  }, [slide])
 
   return (
     <div className={styles.HeroCarousel}>
