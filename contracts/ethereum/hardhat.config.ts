@@ -249,7 +249,9 @@ module.exports = {
   },
   dependencyCompiler: {
     paths: [
-      "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol"
+      "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
+      "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
+      "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol"
     ]
   },
   networks: {
