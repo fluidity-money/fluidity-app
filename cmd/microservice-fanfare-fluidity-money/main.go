@@ -13,10 +13,10 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 	"github.com/fluidity-money/fluidity-app/lib/web"
 	"github.com/fluidity-money/fluidity-app/lib/web/websocket"
-	"github.com/fluidity-money/fluidity-app/lib/util"
-	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
 // EnvNetwork to match the endpoint for
@@ -150,11 +150,10 @@ func main() {
 					tokenDecimals    = userAction.TokenDetails.TokenDecimals
 				)
 
-				broadcast := clients[senderAddress]
-
-				if broadcast == nil {
-					continue
-				}
+				var (
+					senderBroadcast    = clients[senderAddress]
+					recipientBroadcast = clients[recipientAddress]
+				)
 
 				tokenDecimalsPow10 := pow10(tokenDecimals)
 
@@ -183,14 +182,22 @@ func main() {
 					})
 				}
 
-				broadcast.BroadcastJson(websocketNotification{
-					Type:            notificationType,
-					Source: senderAddress,
-					Destination:     recipientAddress,
-					Amount:          amount.FloatString(2),
-					Token:           tokenShortName,
-					TransactionHash: transactionHash,
-				})
+				notification := websocketNotification{
+						Type:            notificationType,
+						Source:          senderAddress,
+						Destination:     recipientAddress,
+						Amount:          amount.FloatString(2),
+						Token:           tokenShortName,
+						TransactionHash: transactionHash,
+					}
+
+				if senderBroadcast != nil {
+					senderBroadcast.BroadcastJson(notification)
+				}
+
+				if recipientBroadcast != nil {
+					recipientBroadcast.BroadcastJson(notification)
+				}
 			}
 		}
 	}()
