@@ -45,7 +45,6 @@
 .tutorial-slide-container {
 
   max-width: 100%;
-  width: 500px;
   height: auto;
 
   .tutorial-image {
@@ -53,6 +52,17 @@
     object-fit: cover;
     object-position: center;
     border-radius: 5px;
+  }
+}
+
+.tutorial-nav {
+  button {
+    svg {
+      path {
+        fill: none !important;
+        stroke: currentColor;
+      }
+    }
   }
 }
 

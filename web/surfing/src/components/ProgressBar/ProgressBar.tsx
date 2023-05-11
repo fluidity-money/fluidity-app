@@ -18,11 +18,11 @@ const ProgressBar: React.FC<IProgressBar> = ({
   max,
   border="solid",
   color="white",
-  props,
   rounded,
   size='md',
   cap='round',
-  barColor
+  barColor,
+  ...props
 }) => {
   return <Card 
     className={`${styles.ProgressBar} ${styles[size]}`}

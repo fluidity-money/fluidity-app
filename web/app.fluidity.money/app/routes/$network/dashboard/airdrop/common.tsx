@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Heading,
   Video,
+  Hoverable,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -28,7 +29,6 @@ import { dayDifference } from ".";
 import { Referral } from "~/queries";
 import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
-import { Hoverable } from "@fluidity-money/surfing";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -189,22 +189,23 @@ const ReferralDetailsModal = ({
           START CLAIMING
         </LinkButton>
       </div>
-      {nextInactiveReferral && (
         <div>
           <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
       <Text size="xs">Until Next Claim</Text>
       <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
     </div>}>
-            {nextInactiveReferral.progress}/10
+            {nextInactiveReferral?.progress || 0}/10
           </LabelledValue>
           <ProgressBar
-            value={nextInactiveReferral.progress}
+            value={nextInactiveReferral?.progress || 0}
             max={10}
             size="sm"
             color="holo"
+            style={{
+              marginTop: 6
+            }}
           />
         </div>
-      )}
     </div>
   </>
 );
@@ -888,7 +889,9 @@ const TutorialModal = ({ isMobile }: {isMobile?: boolean}) => {
         justifyContent: 'center',
         height: '100%',
         width: '100%',
+        maxWidth: isMobile ? 550 : 635,
         gap: '1em',
+        marginTop: '1em'
       }}
     >
       <Video 
@@ -904,7 +907,7 @@ const TutorialModal = ({ isMobile }: {isMobile?: boolean}) => {
     </motion.div>
     </AnimatePresence>
 
-    <div style={{
+    <div className="tutorial-nav" style={{
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
