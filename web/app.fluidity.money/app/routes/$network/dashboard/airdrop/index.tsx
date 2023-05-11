@@ -359,7 +359,7 @@ const Airdrop = () => {
           <>
         <Heading as="h3">Stake Now</Heading>
 
-                <StakeNowModal
+        <StakeNowModal
           fluidTokens={tokens.filter((tok) =>
             Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
           )}
@@ -410,6 +410,7 @@ const Airdrop = () => {
         id="stake-now"
         visible={currentModal === "stake-now"}
         closeModal={closeModal}
+        style={{gap: '2em'}}
       >
         <StakeNowModal
           fluidTokens={tokens.filter((tok) =>
@@ -621,7 +622,7 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [tasks, setTasks] = useState<"1x" | "2x">("1x");
+  const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
   const providers: Provider[] = [
     "Uniswap",
@@ -650,14 +651,14 @@ const MultiplierTasks = () => {
       <div
         className="multiplier-tasks-multiplier"
         onClick={() => {
-          setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
+          setTasks((prev) => (prev === "1x" ? "6x" : "1x"));
         }}
         style={{transform: 'scale(0.6)'}}
       >
         <Form.Toggle
           color="black"
           direction="vertical"
-          checked={tasks === "2x"}
+          checked={tasks === "6x"}
         />
         <TextButton style={{ textDecorationThickness: "3px" }}>
           <motion.div
@@ -672,14 +673,12 @@ const MultiplierTasks = () => {
           </motion.div>
         </TextButton>
       </div>
-      <div
-        className="multiplier-tasks-tasks"
-      >
         {tasks === "1x" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+            className="multiplier-tasks-tasks"
           >
             <Text size="xs" style={{ color: "black" }}>
               Perform any type of fAsset transactions{" "}
@@ -688,19 +687,12 @@ const MultiplierTasks = () => {
             </Text>
           </motion.div>
         )}
-        {tasks === "2x" && (
+        {tasks === "6x" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              width: '100%',
-              gap: 8
-            }}
+            className="multiplier-tasks-tasks"
           >
             {providers.map((provider, i) => {
               return (
@@ -708,8 +700,8 @@ const MultiplierTasks = () => {
                   key={`airdrop-mx-provider-` + i}
                   style={{
                     cursor: "pointer",
-                    width: "24px",
-                    height: "24px",
+                    width: "28px",
+                    height: "28px",
                     borderRadius: "32px",
                     backgroundColor: "black",
                     padding: "6px",
@@ -725,7 +717,6 @@ const MultiplierTasks = () => {
             })}
           </motion.div>
         )}
-      </div>
     </Card>
   );
 };
