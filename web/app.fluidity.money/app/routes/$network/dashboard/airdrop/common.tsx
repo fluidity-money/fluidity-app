@@ -798,12 +798,12 @@ const tutorialContent: {
   "0": {
     title: 'WHAT ARE LOOT BOTTLES?',
     desc: 'Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ',
-    image: 'REFERRALS',
+    image: 'WHAT_ARE_LOOT_BOTTLES',
   },
   "1": {
     title: 'HOW TO EARN LOOT BOTTLES?',
     desc: 'To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ',
-    image: 'REFERRALS',
+    image: 'HOW_TO_EARN',
   },
   "2": {
     title: 'MULTIPLIERS',
