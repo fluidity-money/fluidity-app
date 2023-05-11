@@ -1,9 +1,9 @@
 
-import * as ethers from 'ethers';
+import * as ethers from "ethers";
 
-import { assert } from 'chai';
+import { assert } from "chai";
 
-import { bindings } from './setup-mainnet';
+import { bindings } from "./setup-mainnet";
 
 describe("registry reward pools", async function () {
   let registryOperator: ethers.Contract;
@@ -11,9 +11,8 @@ describe("registry reward pools", async function () {
   let tokens: ethers.Contract[];
 
   before(async function () {
-    if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
+    if (process.env.FLU_FORKNET_NETWORK !== "mainnet")
       return this.skip();
-    }
 
     tokens = [
       bindings.usdt.fluidAccount1,

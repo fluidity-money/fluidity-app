@@ -45,8 +45,6 @@ export const forknetTakeFunds = async (
     const initialUsdtBalance: ethers.BigNumber =
       await impersonatedToken.balanceOf(token.owner);
 
-    const initialUsdtBalanceString = initialUsdtBalance.toString();
-
     const amount = initialUsdtBalance.div(accounts.length);
 
     const promises = accounts.map(async address => {
@@ -91,3 +89,9 @@ export const setOracles = async (
   });
 };
 
+export const getLatestTimestamp = async (
+  hre: HardhatRuntimeEnvironment
+): Promise<number> => {
+  const b = await hre.ethers.provider.getBlock("latest");
+  return b.timestamp;
+};

@@ -66,7 +66,7 @@ before(async function () {
     compoundLiquidityProvider: compoundLiquidityProviderFactory,
     aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
-    dao: daoFactory,
+    dao: daoFactory
   } = commonFactories;
 
   const beacons = await deployBeacons(
@@ -74,19 +74,19 @@ before(async function () {
     account1Signer.address,
     tokenFactory,
     compoundLiquidityProviderFactory,
+    operatorFactory,
     aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProviderFactory,
     registryFactory,
-    operatorFactory,
   );
 
   const [
     tokenBeacon,
     compoundLiquidityProviderBeacon,
+    operatorBeacon,
     aaveV2LiquidityProviderBeacon,
     aaveV3LiquidityProviderBeacon,
     registryBeacon,
-    operatorBeacon,
   ] = beacons;
 
   commonBeaconAddresses = {

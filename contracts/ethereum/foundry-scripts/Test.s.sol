@@ -68,7 +68,8 @@ contract TestScript is Script {
             exchangeRateNum: 1,
             exchangeRateDenom: 1,
             deltaWeightNum: 1,
-            deltaWeightDenom: 31536000
+            deltaWeightDenom: 31536000,
+            customCalculationType: ""
         }));
         require(address(fluidToken) == vm.envAddress("FLU_ETHEREUM_FLUID_TOKEN_ADDR"), "fluid token address env is set incorrectly!");
 
@@ -78,7 +79,8 @@ contract TestScript is Script {
             exchangeRateNum: 10,
             exchangeRateDenom: 1,
             deltaWeightNum: 1,
-            deltaWeightDenom: 31536000
+            deltaWeightDenom: 31536000,
+            customCalculationType: ""
         }));
         require(address(utilityClient1) == vm.envAddress("FLU_ETHEREUM_UTIL_CLIENT_ADDR"), "util client address env is set incorrectly!");
 

@@ -34,6 +34,8 @@ type (
 		// DeltaWeight is the frequency with which to distribute tokens
 		// For normal tokens, this is the number of seconds in a year (31536000)
 		DeltaWeight *big.Rat `json:"delta_weight"`
+
+		CalculationType CalculationType `json:"calculation_method"`
 	}
 
 	// Payout to store details on payouts in different token units
@@ -103,6 +105,36 @@ type (
 		NewAddress      ethereum.Address          `json:"new_address"`
 		Network         network.BlockchainNetwork `json:"network"`
 	}
+
+	SpecialPoolOptions struct {
+		PayoutFreqOverride     *big.Rat
+		DeltaWeightOverride    *big.Rat
+		WinningClassesOverride int
+	}
+)
+
+// CalculationType to determine how payouts are calculated
+type CalculationType string
+
+const (
+	// CalculationTypeNormal to indicate the calculation type that the
+	// fluid token and tokens like it use (normal trf operation)
+	CalculationTypeNormal CalculationType = ""
+
+	// CalculationTypeWorkerOverrides to indicate the calculation type used for
+	// tokens that don't use the optimistic solution and may have workerconfig overrides
+	CalculationTypeWorkerOverrides CalculationType = "worker config overrides"
+)
+
+// TrfMode allows switching trf features
+type TrfMode string
+
+const (
+	// TrfModeNormal to indicate normal trf operation
+	TrfModeNormal TrfMode = "normal"
+
+	// TrfModeNoOptimisticSolution to disable the optimistic solution
+	TrfModeNoOptimisticSolution TrfMode = "no optimistic solution"
 )
 
 // Update LastUpdated using the current time

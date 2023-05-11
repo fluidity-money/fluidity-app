@@ -1,4 +1,6 @@
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
+import type { StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
+
 import type BN from "bn.js";
 
 import { createContext } from "react";
@@ -37,6 +39,18 @@ export interface IFluidityFacade {
   getDegenScore?: (address: string) => Promise<number>;
 
   addToken?: (symbol: string) => Promise<boolean | undefined>;
+
+  getStakingDeposits?: (
+    address: string
+  ) => Promise<StakingDepositsRes | undefined>;
+
+  stakeTokens?: (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdcAmt: BN,
+    wethAmt: BN,
+    slippage: BN
+  ) => Promise<StakingDepositsRes | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

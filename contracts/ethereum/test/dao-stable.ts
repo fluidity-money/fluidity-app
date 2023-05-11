@@ -1,23 +1,23 @@
 
-import * as hre from 'hardhat';
+import * as hre from "hardhat";
 
-import { expect } from 'chai';
+import { expect } from "chai";
 
-import type { ethers } from 'ethers';
+import type { ethers } from "ethers";
 
-import { keccak256 } from '@ethersproject/keccak256';
+import { keccak256 } from "@ethersproject/keccak256";
 
 import {
   commonContracts,
   commonBindings,
   commonFactories,
   commonBeaconAddresses,
-  signers } from './setup-common';
+  signers } from "./setup-common";
 
 import {
   deployBeacons,
   deployRegistry,
-  deployOperator } from '../deployment';
+  deployOperator } from "../deployment";
 
 import {
   expectGt,
@@ -32,7 +32,7 @@ import {
   PROPOSAL_STATUS_UNFINISHED,
   PROPOSAL_STATUS_FROZEN,
   PROPOSAL_STATUS_SUCCEEDED,
-  PROPOSAL_STATUS_FAILED } from '../dao';
+  PROPOSAL_STATUS_FAILED } from "../dao";
 
 import {
   USDC_ADDR,
@@ -41,9 +41,9 @@ import {
   FEI_ADDR,
   AFEI_ADDR,
   TUSD_ADDR,
-  CTUSD_ADDR } from '../test-constants';
+  CTUSD_ADDR } from "../mainnet-constants";
 
-import { EMPTY_ADDRESS } from '../script-utils';
+import { EMPTY_ADDRESS } from "../script-utils";
 
 const GOV_TO_LOCK = 3;
 
