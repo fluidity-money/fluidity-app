@@ -39,6 +39,6 @@ export const mainDeployTransparentUpgradeableProxy = async (
   );
 
   console.log(
-    `Deployed ${factoryName} transparent proxy to ${proxy.address} with implementation address ${impl.address}, proxy admin ${proxyAdmin} and the init calldata ${initEncoded}`
+    `Deployed ${factoryName} transparent proxy to ${proxy.address} with implementation address ${impl.address}, proxy admin ${proxyAdmin}, env names ${envNames} corresponding to envs ${envs} and the init calldata ${initEncoded}`
   );
 };

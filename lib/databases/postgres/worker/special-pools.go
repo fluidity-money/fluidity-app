@@ -26,6 +26,8 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 		SELECT
 			payout_freq_num,
 			payout_freq_denom,
+			delta_weight_num,
+			delta_weight_denom,
 			winning_classes
 		FROM %s
 		WHERE network = $1 AND utility_name = $2`,
@@ -47,11 +49,15 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 		poolOverrides worker.SpecialPoolOptions
 		payoutFreqNum misc.BigInt
 		payoutFreqDenom misc.BigInt
+		deltaWeightNum misc.BigInt
+		deltaWeightDenom misc.BigInt
 	)
 
 	err := row.Scan(
 		&payoutFreqNum,
 		&payoutFreqDenom,
+		&deltaWeightNum,
+		&deltaWeightDenom,
 		&poolOverrides.WinningClassesOverride,
 	)
 
@@ -81,6 +87,7 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 	}
 
 	poolOverrides.PayoutFreqOverride = new(big.Rat).SetFrac(&payoutFreqNum.Int, &payoutFreqDenom.Int)
+	poolOverrides.DeltaWeightOverride = new(big.Rat).SetFrac(&deltaWeightNum.Int, &deltaWeightDenom.Int)
 
 	return poolOverrides, true
 }
