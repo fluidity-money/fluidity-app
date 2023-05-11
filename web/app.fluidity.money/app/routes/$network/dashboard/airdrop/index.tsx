@@ -694,7 +694,7 @@ const MultiplierTasks = () => {
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "center",
               width: '100%',
               gap: 8
             }}
@@ -747,7 +747,7 @@ const MyMultiplier = ({
   liquidityMultiplier,
   stakes,
 }: IMyMultiplier) => {
-  
+
   // If user has no stakes, render a dummy empty stake in the UI
   if (stakes.length === 0) {
     const emptyStake = {
@@ -929,7 +929,7 @@ const Leaderboard = ({
   console.log("HELOOOOOOOO", filterIndex);
 
   // This adds a dummy user entry to the leaderboard if the user's address isn't found
-  if (!data.find((entry) => entry.user === userAddress)) {
+  if (loaded && !data.find((entry) => entry.user === userAddress)) {
     const userEntry = {
       user: userAddress,
       rank: -1,
