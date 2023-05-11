@@ -92,6 +92,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     uint256 public sushiswapFusdcWethDepositedLpTokens_;
 
+    uint256 fusdcMinLiquidity_;
+
+    uint256 usdcMinLiquidity_;
+
+    uint256 wethMinLiquidity_;
+
     function init(
         address _operator,
         address _emergencyCouncil,
@@ -129,6 +135,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         sushiswapFusdcUsdcPool_ = _sushiswapFusdcUsdcPool;
 
         sushiswapFusdcWethPool_ = _sushiswapFusdcWethPool;
+
+        fusdcMinLiquidity_ = fusdc_.decimals();
+
+        usdcMinLiquidity_ = usdc_.decimals();
+
+        wethMinLiquidity_ = weth_.decimals();
 
         _enableApprovals();
     }
@@ -228,8 +240,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     function _hasEnoughWethLiquidity(
         uint256 _fusdcAmount,
         uint256 _wethAmount
-    ) internal pure returns (bool) {
-        return _fusdcAmount + 1 > MIN_LIQUIDITY && _wethAmount + 1 > MIN_LIQUIDITY;
+    ) internal view returns (bool) {
+        return _fusdcAmount + 1 > fusdcMinLiquidity_ && _wethAmount + 1 > wethMinLiquidity_;
     }
 
     function _depositTokens(
@@ -531,7 +543,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         // the ui should restrict the deposits to more than 1e18
 
         bool fusdcUsdcPair =
-            _fusdcAmount + 1 > MIN_LIQUIDITY && _usdcAmount + 1 > MIN_LIQUIDITY;
+            _fusdcAmount + 1 > fusdcMinLiquidity_ && _usdcAmount + 1 > usdcMinLiquidity_;
 
         // take the amounts given, and allocate half to camelot and half to
         // sushiswap
