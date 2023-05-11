@@ -53,7 +53,25 @@
     object-position: center;
     border-radius: 5px;
   }
+
+  svg {
+    aspect-ratio: 1/1;
+  }
 }
+
+$holo: linear-gradient(
+  90deg,
+  #f3b8d8 0%,
+  #b793e9 15.1%,
+  #9fd4f3 26.04%,
+  #ffd2c4 36.46%,
+  #fbf3f3 46.88%,
+  #d9abdf 57.29%,
+  #af9ce3 72.4%,
+  #aae4e1 85.42%,
+  #c6ead0 93.23%,
+  #fdb5e4 100%
+);
 
 .tutorial-nav {
   button {
@@ -74,16 +92,28 @@
 }
 
 .staking-modal-token-icon {
-  width: 64px;
+  width: 60px;
 }
 
 .staking-modal-token-input {
   background: none;
   border: none;
   width: 100%;
+  max-width: 180px;
   color: white;
   font-size: 2em;
   outline: none;
+  text-align: right;
+  box-sizing: border-box;
+  padding-right: 5px;
+}
+
+.staking-modal-token-selector {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  justify-content: center;
+  height: 72px;
 }
 
 .staking-modal-arrow-container {
@@ -95,6 +125,38 @@
   }
   path {
     stroke: white;
+  }
+}
+
+.duration-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1em;
+
+  h1 {
+    white-space: nowrap;
+    overflow:visible;
+  }
+
+  input {
+
+  }
+}
+
+.power-column {
+  display: flex;
+  flex-direction: column; 
+  gap: 0.5em;
+
+  &.rhs {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .power-text {
+    font-size: 3em;
   }
 }
 
@@ -229,18 +291,6 @@ th {
       td {
         border: none !important;
       }
-      background: linear-gradient(
-        90deg,
-        #f3b8d8 0%,
-        #b793e9 15.1%,
-        #9fd4f3 26.04%,
-        #ffd2c4 36.46%,
-        #fbf3f3 46.88%,
-        #d9abdf 57.29%,
-        #af9ce3 72.4%,
-        #aae4e1 85.42%,
-        #c6ead0 93.23%,
-        #fdb5e4 100%
-      );
+      background: $holo;
     }
 }

@@ -437,7 +437,7 @@ const Airdrop = () => {
         visible={currentModal === "tutorial"}
         closeModal={closeModal}
       >
-        <TutorialModal />
+        <TutorialModal closeModal={closeModal}/>
       </CardModal>
 
       {/* Page Content */}

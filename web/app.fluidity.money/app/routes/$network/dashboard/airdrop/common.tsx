@@ -424,6 +424,8 @@ const StakeNowModal = ({
 
   const [stakingDuration, setStakingDuration] = useState(31);
 
+  const maxDuration = 365;
+
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
 
@@ -521,31 +523,29 @@ const StakeNowModal = ({
   >("base");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "2em",
-      }}
-    >
+    <>
       <Card
         type="opaque"
         rounded
         color="holo"
         fill
         style={{
-          color: "black",
           textAlign: "center",
+          marginTop: '1em',
+          padding: '0.5em',
+          borderRadius: '0.5em',
         }}
       >
-        👀 TIP: Stake over 31 days for more rewards in future epochs & events!
-        🌊
+        <Text style={{color: 'black'}} size="sm">
+          👀 TIP: Stake over 31 days for more rewards in future epochs & events! 🌊
+        </Text>
       </Card>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr 2fr",
-          gap: "1em",
+          gridTemplateColumns: "auto auto 160px",
+          columnGap: "4em",
+          rowGap: '2em'
         }}
       >
         {/* Staking Amount */}
@@ -564,25 +564,28 @@ const StakeNowModal = ({
               alignItems: "center",
             }}
           >
-            <Text prominent code>
-              STAKE AMOUNT <InfoCircle />
-            </Text>
+            <Hoverable
+              tooltipContent="Lorem ipsum"
+            >
+              <Text prominent code className="helper-label">
+                STAKE AMOUNT <InfoCircle />
+              </Text>
+            </Hoverable>
             <GeneralButton
-              type="secondary"
+              type="transparent"
               size="small"
               handleClick={() => inputMaxBalance()}
+              style={{
+                padding: "0.5em 1em",
+                borderRadius: "100px",
+              }}
             >
-              Max
+              <Text size="sm">MAX</Text>
             </GeneralButton>
           </div>
           {showTokenSelector === "fluid" ? (
             <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1em",
-                background: "black",
-              }}
+              className="staking-modal-token-selector"
             >
               {fluidTokens.map((token) => (
                 <div
@@ -607,7 +610,9 @@ const StakeNowModal = ({
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <div onClick={() => setShowTokenSelector("fluid")}>
+              <div onClick={() => setShowTokenSelector("fluid")}
+                style={{height: 60}}
+              >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={fluidToken.symbol}
@@ -634,12 +639,7 @@ const StakeNowModal = ({
           )}
           {showTokenSelector === "base" ? (
             <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1em",
-                background: "black",
-              }}
+              className="staking-modal-token-selector"
             >
               {baseTokens.map((token) => (
                 <div
@@ -664,7 +664,10 @@ const StakeNowModal = ({
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <div onClick={() => setShowTokenSelector("base")}>
+              <div 
+                onClick={() => setShowTokenSelector("base")}
+                style={{height: 60}}
+              >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={baseToken.symbol}
@@ -691,15 +694,21 @@ const StakeNowModal = ({
           )}
         </div>
         {/* Arrow */}
-        <div>
+        <div className="staking-modal-arrow-container">
           <ArrowRight />
         </div>
         {/* Duration */}
-        <div>
-          <Text prominent code>
-            DURATION <InfoCircle />
-          </Text>
-          <Display>
+        <div
+          className="duration-column"
+        >
+          <Hoverable
+            tooltipContent="Lorem ipsum"
+          >
+            <Text prominent code className="helper-label">
+              DURATION <InfoCircle />
+            </Text>
+          </Hoverable>
+          <Display className="no-margin">
             {stakingDuration} D{/* Scrollbar */}
           </Display>
           <input
@@ -710,67 +719,91 @@ const StakeNowModal = ({
             step="1"
             onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
           />
-          <div>
-            <Text>
-              END: <Text>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+          <div className="helper-label">
+            <Text code>
+              END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
             </Text>
           </div>
         </div>
-      </div>
-      <div style={{ border: "1px white dashed" }} />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr 2fr",
-          gap: "1em",
-        }}
-      >
-        <div>
-          <LabelledValue
-            label={
-              <Text code>
-                DAY 1 POWER <InfoCircle />
-              </Text>
-            }
-          >
+        <div
+          style={{
+            width: '100%',
+            borderBottom: '1px solid white',
+            gridColumn: '1 / span 3',
+          }}
+        />
+        <div className="power-column">
+          <Hoverable tooltipContent="Lorem Ipsum">
+                <Text size="xs" code className="helper-label">
+                  DAY 1 POWER <InfoCircle />
+                </Text>
+              </Hoverable>
+            <Text
+              prominent
+              holo={stakingDuration === maxDuration}
+              size="xxl"
+              className="power-text"
+            >
             {toSignificantDecimals(
               stakingLiquidityMultiplierEq(1, stakingDuration)
-            )}
-          </LabelledValue>
-          <Text prominent code>
+            ,1)}
+            </Text>
+          {
+            stakingLiquidityMultiplierEq(1, stakingDuration) < 1 ?
+            (          <Text size="xs" prominent code>
             @ MULTIPLIER{" "}
             {toSignificantDecimals(
               stakingLiquidityMultiplierEq(1, stakingDuration)
             )}
             X
-          </Text>
+          </Text>) : (
+              <Card
+                type="opaque"
+                color="holo"
+                style={{ padding: "4px 8px 4px 8px", borderRadius: 4 }}
+              >
+            <Text size="xs" style={{color: 'black'}}>
+              @ MULTIPLIER 1X
+            </Text>
+          </Card>
+            )
+          }
+
         </div>
-        <div>
+        <div className="staking-modal-arrow-container">
           <ArrowRight />
         </div>
-        <div>
-          <LabelledValue
-            label={
-              <Text code>
+        <div className="power-column rhs">
+            <Hoverable
+              tooltipContent="Lorem ipsum"
+            >                
+              <Text size="xs" className="helper-label" code>
                 DAY 31 POWER <InfoCircle />
               </Text>
-            }
-          >
-            {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration)
-            )}
-          </LabelledValue>
+            </Hoverable>
+            <Text
+              prominent
+              holo
+              size="xl"
+              className="power-text"
+            >
+              {toSignificantDecimals(
+                stakingLiquidityMultiplierEq(31, stakingDuration)
+              ,1)}
+            </Text>
           <Card
             type="opaque"
             color="holo"
-            style={{ padding: "4px 8px 4px 8px", color: "black" }}
+            style={{ padding: "4px 8px 4px 8px", borderRadius: 4, whiteSpace: 'nowrap' }}
           >
-            @ MULTIPLIER{" "}
-            {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration)
-            )}
-            X
+            <Text size="xs" style={{color: 'black'}}>
+              @ MULTIPLIER{" "}
+              {toSignificantDecimals(
+                stakingLiquidityMultiplierEq(31, stakingDuration)
+              )}
+              X
+            </Text>
           </Card>
         </div>
       </div>
@@ -782,7 +815,7 @@ const StakeNowModal = ({
       >
         Stake
       </GeneralButton>
-    </div>
+    </>
   );
 };
 
@@ -822,7 +855,7 @@ const tutorialContent: {
           <Display style={{margin:0, textAlign: 'right'}} size="xs">2x</Display> 
         </Text>
         <Text size="md" holo>
-          Transacting fAssets using our supported DEXs
+          Transacting fAssets using our Boosted Protocols
         </Text>
         <LootBottle
           size="sm"
@@ -867,7 +900,7 @@ const tutorialContent: {
   },
 }
 
-const TutorialModal = ({ isMobile }: {isMobile?: boolean}) => {
+const TutorialModal = ({ isMobile, closeModal }: {isMobile?: boolean, closeModal?: () => void}) => {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   return <>
@@ -925,17 +958,30 @@ const TutorialModal = ({ isMobile }: {isMobile?: boolean}) => {
         PREV
       </GeneralButton>
       { currentSlide + 1 } / 5
-      <GeneralButton
-        icon={<ArrowRight />}
-        layout="after"
-        handleClick={() => {
-          setCurrentSlide(currentSlide + 1)
-        }}
-        type="transparent"
-        disabled={currentSlide === 4}
-      >
-        Next
-      </GeneralButton>
+      {
+        currentSlide !== 4 ? (
+          <GeneralButton
+          icon={<ArrowRight />}
+          layout="after"
+          handleClick={() => {
+            setCurrentSlide(currentSlide + 1)
+          }}
+          type="transparent"
+          disabled={currentSlide === 4}
+        >
+          Next
+        </GeneralButton>
+        ) : !isMobile && (
+          <GeneralButton
+          type="primary"
+          handleClick={closeModal}
+          className="start-earning-button"
+        >
+          START EARNING 
+        </GeneralButton>
+        )
+      }
+
     </div>
   </>;
 };

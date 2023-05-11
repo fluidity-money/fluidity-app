@@ -48,6 +48,9 @@
   object-position: center;
   border-radius: 5px;
 }
+.tutorial-slide-container svg {
+  aspect-ratio: 1/1;
+}
 
 .tutorial-nav button svg path {
   fill: none !important;
@@ -62,16 +65,28 @@
 }
 
 .staking-modal-token-icon {
-  width: 64px;
+  width: 60px;
 }
 
 .staking-modal-token-input {
   background: none;
   border: none;
   width: 100%;
+  max-width: 180px;
   color: white;
   font-size: 2em;
   outline: none;
+  text-align: right;
+  box-sizing: border-box;
+  padding-right: 5px;
+}
+
+.staking-modal-token-selector {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  justify-content: center;
+  height: 72px;
 }
 
 .staking-modal-arrow-container {
@@ -84,6 +99,30 @@
 }
 .staking-modal-arrow-container path {
   stroke: white;
+}
+
+.duration-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1em;
+}
+.duration-column h1 {
+  white-space: nowrap;
+  overflow: visible;
+}
+.power-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.power-column.rhs {
+  align-items: flex-end;
+  text-align: right;
+}
+.power-column .power-text {
+  font-size: 3em;
 }
 
 .pad-main {
