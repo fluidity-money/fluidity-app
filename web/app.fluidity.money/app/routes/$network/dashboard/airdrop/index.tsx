@@ -455,6 +455,7 @@ const Airdrop = () => {
               display: "flex",
               flexDirection: "column",
               gap: "2em",
+              zIndex: 100
             }}
           >
             <div>
