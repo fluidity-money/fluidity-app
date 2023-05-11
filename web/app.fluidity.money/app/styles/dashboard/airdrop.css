@@ -97,7 +97,7 @@
   display: grid;
   box-sizing: border-box;
   grid-template-columns: 180px 64px auto;
-  gap: 1em;
+  gap: 0.5em;
   max-width: 100%;
 }
 .multiplier-tasks .multiplier-tasks-header {

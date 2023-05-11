@@ -629,7 +629,8 @@ const MultiplierTasks = () => {
     "Sushiswap",
     "Camelot",
     "Saddle",
-    "Curve",
+    "Chronos",
+    "Curve"
   ];
   return (
     <Card
@@ -700,8 +701,8 @@ const MultiplierTasks = () => {
                   key={`airdrop-mx-provider-` + i}
                   style={{
                     cursor: "pointer",
-                    width: "28px",
-                    height: "28px",
+                    width: "24px",
+                    height: "24px",
                     borderRadius: "32px",
                     backgroundColor: "black",
                     padding: "6px",
