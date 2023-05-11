@@ -92,11 +92,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     uint256 public sushiswapFusdcWethDepositedLpTokens_;
 
-    uint256 fusdcMinLiquidity_;
+    uint256 public fusdcMinLiquidity_;
 
-    uint256 usdcMinLiquidity_;
+    uint256 public usdcMinLiquidity_;
 
-    uint256 wethMinLiquidity_;
+    uint256 public wethMinLiquidity_;
 
     function init(
         address _operator,
