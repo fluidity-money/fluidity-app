@@ -1,9 +1,13 @@
 .bottle-distribution-container {
-  display: flex;
+  display: grid;
   width: 100%;
   gap: 1em;
-  justify-content: space-between;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   align-items: flex-end;
+
+  svg {
+    aspect-ratio: 1/1;
+  }
 }
 
 .helper-label {

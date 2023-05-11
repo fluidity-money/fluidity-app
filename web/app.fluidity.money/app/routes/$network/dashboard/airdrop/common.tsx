@@ -56,12 +56,12 @@ const BottleDistribution = ({
             quantity={quantity}
             style={{
               marginBottom: "0.6em",
-              opacity: highlightBottleNumberIndex === index ? 1 : 0.2,
+              opacity: numberPosition === 'relative' || highlightBottleNumberIndex === index ? 1 : 0.2,
             }}
           />
           <Text size="sm" style={{ whiteSpace: "nowrap", textTransform: 'capitalize' }}>{rarity.replace('_', ' ')}</Text>
           <Text
-            prominent={numberPosition === 'relative' ? true : highlightBottleNumberIndex === index}
+            prominent={numberPosition === 'relative' || highlightBottleNumberIndex === index}
             style={numberPosition === 'absolute' ? {
               position: "absolute",
               bottom: "100px",
@@ -101,7 +101,7 @@ const ReferralDetailsModal = ({
   nextInactiveReferral,
 }: IReferralDetailsModal) => (
   <>
-    <div style={{display: 'flex', gap: '1em', alignItems: 'center', marginBottom: '1em'}}>
+    <div style={{display: 'flex', gap: '1em', alignItems: 'center'}}>
       <Display className='no-margin' size="xxxs">My Referral Link</Display>
       <Hoverable
         tooltipContent={"Lorem ipsum"}
@@ -135,10 +135,9 @@ const ReferralDetailsModal = ({
       style={{
         width: "100%",
         borderBottom: "1px solid white",
-        margin: "1em 0",
       }}
     />
-    <div style={{display: 'flex', gap: '1em', alignItems: 'center', margin: '1em 0'}}>
+    <div style={{display: 'flex', gap: '1em', alignItems: 'center'}}>
       <Display className='no-margin' size="xxxs">Links I&apos;ve Clicked</Display>
       <Hoverable
         tooltipContent={"Lorem ipsum"}
@@ -215,15 +214,8 @@ interface IBottlesDetailsModal {
 }
 
 const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "1em",
-      alignItems: "center",
-    }}
-  >
-    <BottleDistribution bottles={bottles} />
+  <>
+    <BottleDistribution numberPosition="relative" bottles={bottles} />
     <GeneralButton
       icon={<ArrowRight />}
       layout="after"
@@ -231,6 +223,9 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         return;
       }}
       type="transparent"
+      style={{
+        alignSelf: 'center'
+      }}
     >
       SEE YOUR LOOTBOTTLE TX HISTORY
     </GeneralButton>
@@ -241,12 +236,16 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <LabelledValue
-      label={<Text size="sm">Bottles earned since last checked</Text>}
-    >
+    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+      <Text size="sm">Bottles earned since last checked</Text>
+      <Hoverable tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>
+    <div>
+      {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
       <LootBottle size="lg" rarity="legendary"></LootBottle>
-    </LabelledValue>
-  </div>
+      <Text prominent size="lg">x22</Text>
+    </div>
+  </>
 );
 
 interface IStakingStatsModal {

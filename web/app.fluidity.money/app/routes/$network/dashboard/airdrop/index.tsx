@@ -388,6 +388,7 @@ const Airdrop = () => {
         id="referral-details"
         visible={currentModal === "referral-details"}
         closeModal={closeModal}
+        style={{gap: '1em'}}
       >
         <ReferralDetailsModal
           bottles={bottleTiers}
@@ -401,6 +402,7 @@ const Airdrop = () => {
         id="bottles-details"
         visible={currentModal === "bottles-details"}
         closeModal={closeModal}
+        style={{gap: '1em'}}
       >
         <BottlesDetailsModal bottles={bottleTiers} />
       </CardModal>
