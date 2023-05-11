@@ -118,10 +118,16 @@ func volumeLiquidityMultiplier(volume misc.BigInt, tokenDecimals int, address st
 func protocolMultiplier(application applications.Application) *big.Rat {
 	switch application.String() {
 	case "uniswap_v2":
+		fallthrough
 	case "uniswap_v3":
+		fallthrough
 	case "saddle":
+		fallthrough
 	case "curve":
+		fallthrough
 	case "camelot":
+		fallthrough
+	case "chronos":
 		return big.NewRat(2, 100)
 	}
 

@@ -27,8 +27,6 @@ abstract contract BaseNativeToken is IERC20, IERC2612 {
                             METADATA STORAGE
     //////////////////////////////////////////////////////////////*/
 
-    bool private created_;
-
     string private name_;
 
     string private symbol_;
@@ -59,15 +57,11 @@ abstract contract BaseNativeToken is IERC20, IERC2612 {
                                   INITIALISE
     //////////////////////////////////////////////////////////////*/
 
-    function init(
+    constructor(
         string memory _name,
         string memory _symbol,
         uint8 _decimals
-    ) public {
-        require(!created_, "already initialised");
-
-        created_ = true;
-
+    ) {
         name_ = _name;
         symbol_ = _symbol;
         decimals_ = _decimals;
