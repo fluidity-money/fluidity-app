@@ -22,7 +22,9 @@ import {
   manualRewardToken,
   getUserDegenScore,
   getUserStakingDeposits,
+  getTokenStakingRatio,
   makeStakingDeposit,
+  testMakeStakingDeposit,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -388,13 +390,61 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
     return getUserStakingDeposits(
       signer.provider,
       StakingAbi,
       stakingAddr,
       address
+    );
+  };
+
+  const getStakingRatios = async () => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    return getTokenStakingRatio(
+      signer.provider,
+      StakingAbi,
+      stakingAddr,
+    )
+  }
+
+  /*
+   * testStakeTokens returns total tokens staked by a user.
+   */
+  const testStakeTokens = async (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdcAmt: BN,
+    wethAmt: BN,
+    slippage: BN,
+    maxTimestamp: BN,
+  ): Promise<TransactionResponse | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    return testMakeStakingDeposit(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      lockDurationSeconds,
+      usdcAmt,
+      fusdcAmt,
+      wethAmt,
+      slippage,
+      maxTimestamp,
     );
   };
 
@@ -408,14 +458,14 @@ const EthereumFacade = ({
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN,
-  ): Promise<StakingDepositsRes | undefined> => {
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
       return undefined;
     }
 
-    const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
     const [usdcToken, fusdcToken, wethToken] = ["USDC", "fUSDC", "wETH"].map(
       (tokenSymbol) => {
@@ -470,6 +520,8 @@ const EthereumFacade = ({
         signBuffer,
         getStakingDeposits,
         stakeTokens,
+        testStakeTokens,
+        getStakingRatios,
       }}
     >
       {children}

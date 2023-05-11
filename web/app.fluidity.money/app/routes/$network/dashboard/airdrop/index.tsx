@@ -1,5 +1,9 @@
 import type { LoaderFunction } from "@remix-run/node";
 import type { StakingEvent } from "../../query/dashboard/airdrop";
+import type {
+  StakingDepositsRes,
+  StakingRatioRes,
+} from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate } from "@remix-run/react";
@@ -135,23 +139,28 @@ const Airdrop = () => {
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
-  const { address, balance, stakeTokens } = useContext(FluidityFacadeContext);
+  const {
+    address,
+    balance,
+    stakeTokens,
+    getStakingDeposits,
+    testStakeTokens,
+    getStakingRatios,
+  } = useContext(FluidityFacadeContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
   const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
     }`
   );
 
   const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
     address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
-          leaderboardFilterIndex === 0 ? "24" : "all"
-        }&address=${address}`
+      ? `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+      }&address=${address}`
       : ""
   );
 
@@ -207,12 +216,11 @@ const Airdrop = () => {
     : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
 
   const closeModal = () => {
     setCurrentModal(null);
   };
-
-  // const [ stakes, setStakes ] = useState<Array<>>([])
 
   // get token data once user is connected
   useEffect(() => {
@@ -238,6 +246,16 @@ const Airdrop = () => {
           userTokenBalance: userTokenBalance[i],
         }))
       );
+    })();
+
+    // (async () => {
+    //   const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+    //   setStakes(stakingDeposits);
+    // })();
+
+    (async () => {
+      const stakingRatios = (await getStakingRatios?.()) ?? null;
+      setTokenRatios(stakingRatios);
     })();
   }, [address]);
 
@@ -360,7 +378,9 @@ const Airdrop = () => {
                   (tok) =>
                     !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
                 )}
-                stakeToken={stakeTokens}
+                stakeTokens={stakeTokens}
+                testStakeTokens={testStakeTokens}
+                ratios={tokenRatios}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
@@ -409,7 +429,9 @@ const Airdrop = () => {
           baseTokens={tokens.filter(
             (tok) => !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
           )}
-          stakeToken={stakeTokens}
+          stakeTokens={stakeTokens}
+          testStakeTokens={testStakeTokens}
+          ratios={tokenRatios}
         />
       </CardModal>
       <CardModal
@@ -745,7 +767,7 @@ const MyMultiplier = ({
           gridRow: "1 / 3",
         }}
       >
-        {stakes.map(({ amount, durationDays, multiplier, insertedDate }) => {
+        {stakes.map(({ amountUsd, durationDays, multiplier, insertedDate }) => {
           const stakedDays = dayDifference(new Date(), new Date(insertedDate));
 
           return (
@@ -758,8 +780,8 @@ const MyMultiplier = ({
                   gap: "0.5em",
                 }}
               >
-                <Text>
-                  {numberToMonetaryString(amount)} FOR {durationDays} DAYS
+                <Text prominent code>
+                  {numberToMonetaryString(amountUsd)} FOR {durationDays} DAYS
                 </Text>
                 <ProgressBar
                   value={stakedDays}

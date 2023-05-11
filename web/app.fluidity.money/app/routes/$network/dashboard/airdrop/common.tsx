@@ -1,4 +1,6 @@
-import { useState } from "react";
+import type { StakingRatiosRes } from "~/util/chainUtils/ethereum/transaction";
+
+import { useState, useEffect } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -47,10 +49,10 @@ const BottleDistribution = ({
     style={
       isMobile
         ? {
-            maxWidth: "100%",
-            overflowX: "scroll",
-            height: 160,
-          }
+          maxWidth: "100%",
+          overflowX: "scroll",
+          height: 160,
+        }
         : {}
     }
   >
@@ -75,12 +77,12 @@ const BottleDistribution = ({
               ...(showBottleNumbers
                 ? highlightBottleNumberIndex === index
                   ? {
-                      fontSize: "2em",
-                    }
+                    fontSize: "2em",
+                  }
                   : {}
                 : highlightBottleNumberIndex === index
-                ? { fontSize: "2em" }
-                : { display: "none" }),
+                  ? { fontSize: "2em" }
+                  : { display: "none" }),
             }}
           >
             {toSignificantDecimals(quantity)}
@@ -93,6 +95,7 @@ const BottleDistribution = ({
 
 interface IReferralDetailsModal {
   bottles: BottleTiers;
+  totalBottles: number;
   activeRefereeReferralsCount: number;
   activeReferrerReferralsCount: number;
   inactiveReferrerReferralsCount: number;
@@ -113,9 +116,7 @@ const ReferralDetailsModal = ({
       <LabelledValue label={<Text size="sm">Active Referrals</Text>}>
         {activeRefereeReferralsCount}
       </LabelledValue>
-      <LabelledValue
-        label={<Text size="sm">Total Bottles earned</Text>}
-      >
+      <LabelledValue label={<Text size="sm">Total Bottles earned</Text>}>
         {totalBottles}
       </LabelledValue>
     </div>
@@ -244,7 +245,7 @@ const StakingStatsModal = ({
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
           {numberToMonetaryString(
-            stakes.reduce((sum, { amount }) => sum + amount, 0)
+            stakes.reduce((sum, { amountUsd }) => sum + amountUsd, 0)
           )}
         </LabelledValue>
       </div>
@@ -257,14 +258,13 @@ const StakingStatsModal = ({
             justifyContent: "space-between",
           }}
         >
-          <GeneralButton> Select All</GeneralButton>
-          <GeneralButton> Withdraw</GeneralButton>
+          <GeneralButton>Withdraw</GeneralButton>
         </div>
         <div>
           {stakes.map(
             (
               {
-                amount,
+                amountUsd,
                 durationDays,
                 multiplier,
                 insertedDate: insertedDateStr,
@@ -282,7 +282,7 @@ const StakingStatsModal = ({
                   key={`stake-${i}`}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "0.2 0.6 0.1 0.1",
+                    gridTemplateColumns: "1fr 3fr 1fr",
                   }}
                 >
                   {/* Dates */}
@@ -310,7 +310,9 @@ const StakingStatsModal = ({
                       gap: "0.5em",
                     }}
                   >
-                    <Heading as="h3">{numberToMonetaryString(amount)}</Heading>
+                    <Heading as="h3">
+                      {numberToMonetaryString(amountUsd)}
+                    </Heading>
                     <ProgressBar
                       value={stakedDays}
                       max={durationDays}
@@ -338,9 +340,6 @@ const StakingStatsModal = ({
                     <Heading as="h2">{durationDays}</Heading>
                     <Text>Days</Text>
                   </div>
-                  <div>
-                    <input type="checkbox" />
-                  </div>
                 </div>
               );
             }
@@ -354,14 +353,23 @@ const StakingStatsModal = ({
 interface IStakingNowModal {
   fluidTokens: Array<AugmentedToken>;
   baseTokens: Array<AugmentedToken>;
-  stakeToken?: (
+  stakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
     fusdc: BN,
     wethAmt: BN,
     slippage: BN,
-    maxTimestamp: BN,
+    maxTimestamp: BN
   ) => Promise<void>;
+  testStakeTokens?: (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdc: BN,
+    wethAmt: BN,
+    slippage: BN,
+    maxTimestamp: BN
+  ) => Promise<void>;
+  ratios: StakingRatiosRes;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -380,7 +388,9 @@ export const stakingLiquidityMultiplierEq = (
 const StakeNowModal = ({
   fluidTokens,
   baseTokens,
-  stakeToken,
+  stakeTokens,
+  testStakeTokens,
+  ratios,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -392,9 +402,13 @@ const StakeNowModal = ({
   });
 
   const [stakingDuration, setStakingDuration] = useState(31);
+  const [slippage, setSlippage] = useState(5);
+  const [stakeErr, setStakeErr] = useState();
 
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
+
+  const daysToSeconds = (days: number) => days * 24 * 60 * 60;
 
   const parseSwapInputToTokenAmount = (
     input: string,
@@ -430,27 +444,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-      if (dec === undefined) {
+        if (dec === undefined) {
+          return setInput({
+            ...token,
+            amount: `${unpaddedWhole}`,
+          });
+        }
+
+        const limitedDecimals = dec.slice(0 - token.decimals);
+
         return setInput({
           ...token,
-          amount: `${unpaddedWhole}`,
+          amount: [whole, limitedDecimals].join("."),
         });
-      }
-
-      const limitedDecimals = dec.slice(0 - token.decimals);
-
-      return setInput({
-        ...token,
-        amount: [whole, limitedDecimals].join("."),
-      });
-    };
+      };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -470,14 +484,58 @@ const StakeNowModal = ({
     });
   };
 
-  const canStake = () => false;
+  const [canStake, setCanStake] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setCanStake(await testStake());
+    })();
+  }, [baseToken, fluidToken, slippage]);
+
+  const testStake = async () => {
+    try {
+      await testStakeTokens?.(
+        new BN(daysToSeconds(stakingDuration)),
+        baseToken.symbol === "USDC"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        fluidToken.symbol === "fUSDC"
+          ? snapToValidValue(fluidToken.amount, fluidToken)
+          : new BN(0),
+        baseToken.symbol === "wETH"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(1000),
+        new BN(slippage),
+        new BN(Math.floor(new Date() / 1000) + 30 * 60) // 30 Minutes after now
+      );
+
+      return true;
+    } catch (e) {
+      // Expect error on fail
+      setStakeErr(e);
+      return false;
+    }
+  };
 
   const handleStake = async () => {
-    if (!stakeToken) return;
-    if (!canStake()) return;
+    if (!stakeTokens) return;
+    if (!canStake) return;
 
     try {
-      // await stakeToken();
+      await stakeTokens(
+        new BN(daysToSeconds(stakingDuration)),
+        baseToken.symbol === "USDC"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        fluidToken.symbol === "fUSDC"
+          ? snapToValidValue(fluidToken.amount, fluidToken)
+          : new BN(0),
+        baseToken.symbol === "wETH"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        new BN(slippage),
+        new BN(Math.floor(new Date() / 1000) + 30 * 60) // 30 Minutes after now
+      );
     } catch (e) {
       // Expect error on fail
       console.log(e);
@@ -488,7 +546,6 @@ const StakeNowModal = ({
   const [showTokenSelector, setShowTokenSelector] = useState<
     "fluid" | "base" | ""
   >("");
-  console.log(fluidToken)
 
   return (
     <div
@@ -552,12 +609,12 @@ const StakeNowModal = ({
                 flexDirection: "row",
                 gap: "1em",
                 background: "black",
- padding: "5px",
+                padding: "5px",
               }}
             >
               {fluidTokens.map((token) => (
                 <button
-                  style={{background: "none", border: "none" }} 
+                  style={{ background: "none", border: "none" }}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (fluidToken.symbol != token.symbol) {
@@ -579,7 +636,10 @@ const StakeNowModal = ({
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <button style={{background: "none", border: "none" }} onClick={() => setShowTokenSelector("fluid")}>
+              <button
+                style={{ background: "none", border: "none" }}
+                onClick={() => setShowTokenSelector("fluid")}
+              >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={fluidToken.symbol}
@@ -604,6 +664,10 @@ const StakeNowModal = ({
               />
             </div>
           )}
+          <Text>
+            {fluidToken.symbol} Balance:{" "}
+            {addDecimalToBn(fluidToken.userTokenBalance, fluidToken.decimals)}
+          </Text>
           {showTokenSelector === "base" ? (
             <div
               style={{
@@ -611,12 +675,12 @@ const StakeNowModal = ({
                 flexDirection: "row",
                 gap: "1em",
                 background: "black",
- padding: "5px",
+                padding: "5px",
               }}
             >
               {baseTokens.map((token) => (
                 <button
-                  style={{background: "none", border: "none" }} 
+                  style={{ background: "none", border: "none" }}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (baseToken.symbol != token.symbol) {
@@ -638,7 +702,10 @@ const StakeNowModal = ({
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <button style={{background: "none", border: "none" }} onClick={() => setShowTokenSelector("base")}>
+              <button
+                style={{ background: "none", border: "none" }}
+                onClick={() => setShowTokenSelector("base")}
+              >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={baseToken.symbol}
@@ -663,6 +730,10 @@ const StakeNowModal = ({
               />
             </div>
           )}
+          <Text>
+            {baseToken.symbol} Balance:{" "}
+            {addDecimalToBn(baseToken.userTokenBalance, baseToken.decimals)}
+          </Text>
         </div>
         {/* Arrow */}
         <div>
@@ -732,7 +803,10 @@ const StakeNowModal = ({
             }
           >
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration)
+              Math.min(
+                1,
+                Math.max(0, stakingLiquidityMultiplierEq(31, stakingDuration))
+              )
             )}
           </LabelledValue>
           <Card
@@ -742,7 +816,10 @@ const StakeNowModal = ({
           >
             @ MULTIPLIER{" "}
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration)
+              Math.min(
+                1,
+                Math.max(0, stakingLiquidityMultiplierEq(31, stakingDuration))
+              )
             )}
             X
           </Card>
@@ -750,7 +827,7 @@ const StakeNowModal = ({
       </div>
       <GeneralButton
         type="secondary"
-        disabled={!canStake()}
+        disabled={!canStake}
         style={{ width: "95%" }}
         handleClick={() => handleStake()}
       >
@@ -876,9 +953,8 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
             width={isMobile ? 550 : 1270 / 2}
             height={isMobile ? 550 : 460 / 2}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
           />
           <Display size="xxs" style={{ margin: 0 }}>
