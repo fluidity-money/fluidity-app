@@ -1034,8 +1034,11 @@ const BottleProgress = ({ bottles, isMobile }: { bottles: BottleTiers, isMobile?
         </Card>
       </HeroCarousel>
       <BottleDistribution
+        style={{
+          height: 100,
+          overflowX: isMobile ? 'scroll' : 'visible',
+        }}
         bottles={bottles}
-        isMobile={isMobile}
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />

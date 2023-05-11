@@ -28,24 +28,24 @@ import { dayDifference } from ".";
 import { Referral } from "~/queries";
 import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
+import { Hoverable } from "@fluidity-money/surfing";
 
-interface IBottleDistribution {
+interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
   showBottleNumbers?: boolean;
   highlightBottleNumberIndex?: number;
-  isMobile?: boolean;
+  numberPosition?: "absolute" | "relative";
 }
 
 const BottleDistribution = ({
   bottles,
   showBottleNumbers = true,
   highlightBottleNumberIndex,
-  isMobile = false
+  numberPosition = "absolute",
+  ...props
 }: IBottleDistribution) => (
   <div className="bottle-distribution-container"
-    style={isMobile ? {
-      overflowX: 'scroll',
-    } : {}}
+    {...props}
   >
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
@@ -59,10 +59,10 @@ const BottleDistribution = ({
               opacity: highlightBottleNumberIndex === index ? 1 : 0.2,
             }}
           />
-          <Text size="sm" style={{ whiteSpace: "nowrap" }}>{rarity.replace('_', ' ').toUpperCase()}</Text>
+          <Text size="sm" style={{ whiteSpace: "nowrap", textTransform: 'capitalize' }}>{rarity.replace('_', ' ')}</Text>
           <Text
-            prominent={highlightBottleNumberIndex === index}
-            style={{
+            prominent={numberPosition === 'relative' ? true : highlightBottleNumberIndex === index}
+            style={numberPosition === 'absolute' ? {
               position: "absolute",
               bottom: "100px",
               zIndex: '5',
@@ -75,7 +75,7 @@ const BottleDistribution = ({
                 : highlightBottleNumberIndex === index
                   ? { fontSize: "2.5em" }
                   : { display: "none" }),
-            }}
+            } : {fontSize: '1em'}}
           >
             {toSignificantDecimals(quantity)}
           </Text>
@@ -101,19 +101,36 @@ const ReferralDetailsModal = ({
   nextInactiveReferral,
 }: IReferralDetailsModal) => (
   <>
-    <Display size="xxxs">My Referral Link</Display>
+    <div style={{display: 'flex', gap: '1em', alignItems: 'center', marginBottom: '1em'}}>
+      <Display className='no-margin' size="xxxs">My Referral Link</Display>
+      <Hoverable
+        tooltipContent={"Lorem ipsum"}
+      >
+        <InfoCircle />
+      </Hoverable>
+    </div>
     <div className="referral-details-container">
-      <LabelledValue label={<Text size="sm">Active Referrals</Text>}>
+      <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+      <Text size="xs">Active Referrals</Text>
+      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>}>
         {activeRefereeReferralsCount}
       </LabelledValue>
       <LabelledValue
-        label={<Text size="sm">Total Bottles earned from your link</Text>}
+        label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+        <Text size="xs">Total Bottles earned from your link</Text>
+        <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+      </div>}
       >
         1,051
+        {/* TODO REPLACE THIS WITH REAL DATA */}
       </LabelledValue>
     </div>
-    <Text size="sm">Bottle Distribution</Text>
-    <BottleDistribution bottles={bottles} />
+    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+      <Text size="xs">Bottle Distribution</Text>
+      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>
+    <BottleDistribution numberPosition="relative" bottles={bottles} />
     <div
       style={{
         width: "100%",
@@ -121,26 +138,45 @@ const ReferralDetailsModal = ({
         margin: "1em 0",
       }}
     />
-    <Display size="xxxs">Links I&apos;ve Clicked</Display>
+    <div style={{display: 'flex', gap: '1em', alignItems: 'center', margin: '1em 0'}}>
+      <Display className='no-margin' size="xxxs">Links I&apos;ve Clicked</Display>
+      <Hoverable
+        tooltipContent={"Lorem ipsum"}
+      >
+        <InfoCircle />
+      </Hoverable>
+    </div>
     <div
       style={{
         display: "grid",
         gridTemplateColumns: "auto auto auto auto",
-        gap: "1em",
+        gap: "3em",
         paddingBottom: "1em",
       }}
     >
-      <LabelledValue label="Total Clicked">
+      <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+      <Text size="xs">Total Clicked</Text>
+      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>}>
         {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
       </LabelledValue>
       <div>
-        <LabelledValue label="Claimed">
+        <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+        <div style={{width: 8, height: 8, borderRadius: 100, backgroundColor: '#2af73b', marginTop: 2}}/>
+
+      <Text size="xs">Claimed</Text>
+      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>}>
           {activeReferrerReferralsCount}
         </LabelledValue>
-        <Text>{activeReferrerReferralsCount * 10} BOTTLES</Text>
+        <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
       </div>
       <div>
-        <LabelledValue label="Unclaimed">
+        <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+        <div style={{width: 8, height: 8, borderRadius: 100, backgroundColor: 'red', marginTop: 2}}/>
+      <Text size="xs">Unclaimed</Text>
+      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>}>
           {inactiveReferrerReferralsCount}
         </LabelledValue>
         <LinkButton
@@ -156,7 +192,10 @@ const ReferralDetailsModal = ({
       </div>
       {nextInactiveReferral && (
         <div>
-          <LabelledValue label="Until Next Claim">
+          <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+      <Text size="xs">Until Next Claim</Text>
+      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+    </div>}>
             {nextInactiveReferral.progress}/10
           </LabelledValue>
           <ProgressBar
