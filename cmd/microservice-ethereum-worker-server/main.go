@@ -90,11 +90,21 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 		details, found := workerDb.GetSpecialPoolOverrides(dbNetwork, pool.Name)
 
 		if found {
-			if details.WinningClassesOverride != 0 {
-				winningClasses = details.WinningClassesOverride
+			var (
+				winningClassesOverride = details.WinningClassesOverride
+				payoutFreqOverride     = details.PayoutFreqOverride
+				deltaWeightOverride    = details.DeltaWeightOverride
+			)
+
+			if winningClassesOverride != 0 {
+				winningClasses = winningClassesOverride
 			}
-			if details.PayoutFreqOverride.Cmp(zeroRat) != 0 {
-				payoutFreq.Set(details.PayoutFreqOverride)
+			if payoutFreqOverride != nil && payoutFreqOverride.Cmp(zeroRat) != 0 {
+				payoutFreq.Set(payoutFreqOverride)
+			}
+			if deltaWeightOverride != nil && deltaWeightOverride.Cmp(zeroRat) != 0 {
+				// this overrides a pool variable !!
+				pool.DeltaWeight.Set(deltaWeightOverride)
 			}
 		}
 
@@ -516,7 +526,7 @@ func main() {
 					})
 				}
 
-				for i, pool := range pools {
+				for _, pool := range pools {
 					// trigger
 					log.Debugf(
 						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
@@ -528,10 +538,6 @@ func main() {
 						pool.ExchangeRate,
 						pool.DeltaWeight,
 					)
-
-					// temporarily set the delta weight
-
-					pools[i].DeltaWeight = new(big.Rat).SetInt64(31536000)
 				}
 
 				var (
