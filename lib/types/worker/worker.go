@@ -107,14 +107,15 @@ type (
 	}
 
 	SpecialPoolOptions struct {
-		PayoutFreqOverride *big.Rat
+		PayoutFreqOverride     *big.Rat
+		DeltaWeightOverride    *big.Rat
 		WinningClassesOverride int
 	}
 )
 
-
 // CalculationType to determine how payouts are calculated
 type CalculationType string
+
 const (
 	// CalculationTypeNormal to indicate the calculation type that the
 	// fluid token and tokens like it use (normal trf operation)
@@ -127,6 +128,7 @@ const (
 
 // TrfMode allows switching trf features
 type TrfMode string
+
 const (
 	// TrfModeNormal to indicate normal trf operation
 	TrfModeNormal TrfMode = "normal"
