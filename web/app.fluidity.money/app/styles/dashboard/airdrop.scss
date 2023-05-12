@@ -202,6 +202,10 @@ $holo: linear-gradient(
     justify-content: space-around;
     width: 100%;
     gap: 6px;
+
+    a {
+      text-align:center;
+    }
   }
 }
 

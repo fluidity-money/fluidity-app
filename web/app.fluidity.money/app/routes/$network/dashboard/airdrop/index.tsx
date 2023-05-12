@@ -630,7 +630,7 @@ const MultiplierTasks = () => {
     "Camelot",
     "Saddle",
     "Chronos",
-    "Curve"
+    "Kyber"
   ];
   return (
     <Card

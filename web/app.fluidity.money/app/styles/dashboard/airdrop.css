@@ -165,6 +165,9 @@
   width: 100%;
   gap: 6px;
 }
+.multiplier-tasks .multiplier-tasks-tasks a {
+  text-align: center;
+}
 
 @container main (width < 1200px) {
   .multiplier-tasks {

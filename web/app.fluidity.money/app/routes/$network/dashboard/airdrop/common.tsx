@@ -716,7 +716,7 @@ const StakeNowModal = ({
             min={31}
             max={365}
             step={1}
-            valueCallback={(value) => setStakingDuration(value)}
+            valueCallback={(value: number) => setStakingDuration(value)}
           />
           <div className="helper-label">
             <Text code>
