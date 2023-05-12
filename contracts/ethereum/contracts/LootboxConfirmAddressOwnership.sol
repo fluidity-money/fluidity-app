@@ -7,10 +7,10 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-contract ConfirmAddressOwnership {
-    bytes32 constant CONFIRM_SELECTOR = keccak256("confirm(address addr, address owner)");
+import "../interfaces/ILootboxConfirmAddressOwnership.sol";
 
-    event AddressConfirmed(address indexed addr, address indexed owner);
+contract LootboxConfirmAddressOwnership is ILootboxConfirmAddressOwnership {
+    bytes32 constant CONFIRM_SELECTOR = keccak256("confirm(address addr, address owner)");
 
     // address => owner
     mapping(address => address) private addresses_;

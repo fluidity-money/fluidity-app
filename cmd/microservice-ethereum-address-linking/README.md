@@ -1,14 +1,14 @@
 
 # microservice-ethereum-address-linking
 
-enter README description here!
+Watches for events from the LootboxConfirmAddressOwnership contract, decodes them, and sends the result down rabbit.
 
 ## Environment variables
 
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
-| `ENV_1`                      | Env 1 description                                                            |
-| `ENV_2`                      | Env 2 description                                                            |
+| `FLU_ETHERUEM_ADDRESS_CONFIRMATION_CONTRACT_ADDR`                      | The address of the LootboxConfirmAddressOwnership contract. |
+| `FLU_ETHEREUM_NETWORK`                      | The network the service is running for. |
 
 ## Building
 

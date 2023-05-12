@@ -1,7 +1,7 @@
 
 # connector-ethereum-linked-addresses-timescale
 
-enter README description here!
+Writes linked addresses into timescale.
 
 ## Environment variables
 

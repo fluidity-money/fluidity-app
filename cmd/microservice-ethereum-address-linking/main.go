@@ -42,23 +42,30 @@ func main() {
 	addressConfirmerAddr := ethTypes.AddressFromString(addressConfirmerAddr_)
 
 	ethQueue.Logs(func(log_ ethQueue.Log) {
-		if log_.Address == addressConfirmerAddr {
-			addr, owner, err := addresslinker.DecodeAddressConfirmation(log_)
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Message = "Failed to decode a log from the address confirmer service!"
-					k.Payload = err
-				})
-			}
-
-			addrs := addresslinkerTypes.LinkedAddresses{
-				Address: addr,
-				Owner:   owner,
-				Network: network_,
-			}
-
-			queue.SendMessage(addresslinkerQueue.TopicLinkedAddresses, addrs)
+		if log_.Address != addressConfirmerAddr {
+			return
 		}
+
+		addr, owner, err := addresslinker.DecodeAddressConfirmation(log_)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to decode a log from the address confirmer service from transaction has %s and log index %v!",
+					log_.TxHash.String(),
+					log_.Index.String(),
+				)
+
+				k.Payload = err
+			})
+		}
+
+		addrs := addresslinkerTypes.LinkedAddresses{
+			Address: addr,
+			Owner:   owner,
+			Network: network_,
+		}
+
+		queue.SendMessage(addresslinkerQueue.TopicLinkedAddresses, addrs)
 	})
 }

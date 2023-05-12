@@ -19,7 +19,7 @@ const (
 	Context = `TIMESCALE/ADDRESSLINKING`
 
 	// TableAddressLinks to store address links in
-	TableAddressLinks = `ethereum_linked_addresses`
+	TableAddressLinks = `lootbox_ethereum_linked_addresses`
 )
 
 func InsertAddressLink(link addresslinker.LinkedAddresses) {

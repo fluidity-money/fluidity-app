@@ -1,6 +1,6 @@
 -- migrate:up
 
-CREATE TABLE ethereum_linked_addresses (
+CREATE TABLE lootbox_ethereum_linked_addresses (
 	address VARCHAR NOT NULL,
 	owner VARCHAR NOT NULL,
 	network network_blockchain NOT NULL
@@ -8,5 +8,5 @@ CREATE TABLE ethereum_linked_addresses (
 
 -- migrate:down
 
-DROP TABLE ethereum_linked_addresses;
+DROP TABLE lootbox_ethereum_linked_addresses;
 
