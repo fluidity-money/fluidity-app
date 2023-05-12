@@ -1,7 +1,8 @@
 import type { LoaderFunction } from "@remix-run/node";
-import type { StakingEvent } from "../../query/dashboard/airdrop";
+import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
+import { stakingLiquidityMultiplierEq } from "./common";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -25,7 +26,6 @@ import {
   TabButton,
   toSignificantDecimals,
   useViewport,
-  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -38,7 +38,7 @@ import {
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect } from "react";
-import { Token, trimAddress } from "~/util";
+import { addDecimalToBn, Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
@@ -135,7 +135,14 @@ const Airdrop = () => {
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
-  const { address, balance, stakeTokens } = useContext(FluidityFacadeContext);
+  const {
+    address,
+    balance,
+    stakeTokens,
+    getStakingDeposits,
+    testStakeTokens,
+    getStakingRatios,
+  } = useContext(FluidityFacadeContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
@@ -185,7 +192,7 @@ const Airdrop = () => {
   };
 
   const {
-    airdrop: { bottleTiers, liquidityMultiplier, stakes, bottlesCount },
+    airdrop: { bottleTiers, liquidityMultiplier, bottlesCount },
     referrals: {
       numActiveReferreeReferrals,
       numActiveReferrerReferrals,
@@ -207,12 +214,14 @@ const Airdrop = () => {
     : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
+  const [stakes, setStakes] = useState<
+    Array<{ amount: BN; durationDays: number; depositDate: Date }>
+  >([]);
 
   const closeModal = () => {
     setCurrentModal(null);
   };
-
-  // const [ stakes, setStakes ] = useState<Array<>>([])
 
   // get token data once user is connected
   useEffect(() => {
@@ -238,6 +247,16 @@ const Airdrop = () => {
           userTokenBalance: userTokenBalance[i],
         }))
       );
+    })();
+
+    (async () => {
+      const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+      setStakes(stakingDeposits);
+    })();
+
+    (async () => {
+      const stakingRatios = (await getStakingRatios?.()) ?? null;
+      setTokenRatios(stakingRatios);
     })();
   }, [address]);
 
@@ -360,7 +379,9 @@ const Airdrop = () => {
                   (tok) =>
                     !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
                 )}
-                stakeToken={stakeTokens}
+                stakeTokens={stakeTokens}
+                testStakeTokens={testStakeTokens}
+                ratios={tokenRatios}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
@@ -383,6 +404,7 @@ const Airdrop = () => {
       >
         <ReferralDetailsModal
           bottles={bottleTiers}
+          totalBottles={bottlesCount}
           activeReferrerReferralsCount={numActiveReferrerReferrals}
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
@@ -408,7 +430,9 @@ const Airdrop = () => {
           baseTokens={tokens.filter(
             (tok) => !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
           )}
-          stakeToken={stakeTokens}
+          stakeTokens={stakeTokens}
+          testStakeTokens={testStakeTokens}
+          ratios={tokenRatios}
         />
       </CardModal>
       <CardModal
@@ -693,7 +717,7 @@ const MultiplierTasks = () => {
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
-  stakes: Array<StakingEvent>;
+  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
 }
@@ -744,8 +768,12 @@ const MyMultiplier = ({
           gridRow: "1 / 3",
         }}
       >
-        {stakes.map(({ amount, durationDays, multiplier, insertedDate }) => {
-          const stakedDays = dayDifference(new Date(), new Date(insertedDate));
+        {stakes.map(({ amount, durationDays, depositDate }) => {
+          const stakedDays = dayDifference(new Date(), new Date(depositDate));
+          const multiplier = stakingLiquidityMultiplierEq(
+            stakedDays,
+            durationDays
+          );
 
           return (
             <>
@@ -757,8 +785,8 @@ const MyMultiplier = ({
                   gap: "0.5em",
                 }}
               >
-                <Text>
-                  {numberToMonetaryString(amount)} FOR {durationDays} DAYS
+                <Text prominent code>
+                  ${addDecimalToBn(amount, 6)} FOR {durationDays} DAYS
                 </Text>
                 <ProgressBar
                   value={stakedDays}
@@ -859,7 +887,6 @@ const Leaderboard = ({
   filterIndex,
   setFilterIndex,
 }: IAirdropLeaderboard) => {
-  console.log("HELOOOOOOOO", filterIndex);
   return (
     <>
       <div className="leaderboard-header">
