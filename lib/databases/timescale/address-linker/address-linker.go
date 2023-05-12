@@ -35,10 +35,10 @@ func InsertAddressLink(link addresslinker.LinkedAddresses) {
 
 	statementText = fmt.Sprintf(
 		`INSERT INTO %s (
-            address,
-            owner,
-            network
-         ) VALUES (
+			address,
+			owner,
+			network
+		) VALUES (
 			$1,
 			$2,
 			$3
