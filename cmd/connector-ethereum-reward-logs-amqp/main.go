@@ -18,6 +18,7 @@ import (
 	ethRpc "github.com/ethereum/go-ethereum/rpc"
 
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
+	addresslinker "github.com/fluidity-money/fluidity-app/common/ethereum/address-linker"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -157,6 +158,7 @@ func main() {
 			fluidity.FluidityContractAbi.Events["MintFluid"].ID,
 			fluidity.FluidityContractAbi.Events["BurnFluid"].ID,
 			fluidity.StakingAbi.Events["Staked"].ID,
+			addresslinker.AddressConfirmerAbi.Events["AddressConfirmed"].ID,
 		},
 	}
 
