@@ -331,6 +331,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 tokenBAfter = _tokenB.balanceOf(address(this));
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
+        dep.depositTimestamp = block.timestamp;
 
         if (_fusdcUsdcPair) {
             camelotFusdcUsdcDepositedLpTokens_ += dep.camelotLpMinted;
