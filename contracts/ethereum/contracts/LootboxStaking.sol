@@ -43,12 +43,6 @@ uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
 
-/**
- * @dev MIN_LIQUIDITY since we split it up in half and there's a
- *      minimum liquidity on each platform (the token decimals on Sushi)
- */
-uint256 constant MIN_LIQUIDITY = 1e18 * 2;
-
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
 
