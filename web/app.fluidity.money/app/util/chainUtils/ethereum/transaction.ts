@@ -369,7 +369,7 @@ export const getTokenStakingRatio = async (
   }
 };
 
-type StakingDepositsRes = Array<{
+export type StakingDepositsRes = Array<{
   depositTimestamp: BigNumber;
   redeemTimestamp: BigNumber;
   camelotLpMinted: BigNumber;

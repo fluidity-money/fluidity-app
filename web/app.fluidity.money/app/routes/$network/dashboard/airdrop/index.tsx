@@ -1,5 +1,4 @@
 import type { LoaderFunction } from "@remix-run/node";
-import type { StakingEvent } from "../../query/dashboard/airdrop";
 import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
@@ -27,7 +26,6 @@ import {
   TabButton,
   toSignificantDecimals,
   useViewport,
-  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -151,14 +149,16 @@ const Airdrop = () => {
   );
 
   const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
     }`
   );
 
   const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
     address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-      }&address=${address}`
+      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
+          leaderboardFilterIndex === 0 ? "24" : "all"
+        }&address=${address}`
       : ""
   );
 

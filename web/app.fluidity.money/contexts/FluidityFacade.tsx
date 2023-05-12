@@ -1,5 +1,8 @@
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
-import type { StakingDepositsRes, StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
+import type {
+  StakingRatioRes,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
 
@@ -40,12 +43,13 @@ export interface IFluidityFacade {
 
   addToken?: (symbol: string) => Promise<boolean | undefined>;
 
-  getStakingRatios?: (
-  ) => Promise<StakingRatioRes | undefined>;
+  getStakingRatios?: () => Promise<StakingRatioRes | undefined>;
 
   getStakingDeposits?: (
     address: string
-  ) => Promise<StakingDepositsRes | undefined>;
+  ) => Promise<
+    Array<{ amount: BN; durationDays: number; depositDate: Date }> | undefined
+  >;
 
   testStakeTokens?: (
     lockDurationSeconds: BN,
@@ -53,16 +57,16 @@ export interface IFluidityFacade {
     fusdcAmt: BN,
     wethAmt: BN,
     slippage: BN,
-    maxTimestamp: BN,
+    maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
-  
+
   stakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
     fusdcAmt: BN,
     wethAmt: BN,
     slippage: BN,
-    maxTimestamp: BN,
+    maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
 }
 

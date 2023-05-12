@@ -1,4 +1,7 @@
-import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
+import type {
+  StakingRatioRes,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
 
 import { useState, useEffect } from "react";
 import BN from "bn.js";
@@ -48,10 +51,10 @@ const BottleDistribution = ({
     style={
       isMobile
         ? {
-          maxWidth: "100%",
-          overflowX: "scroll",
-          height: 160,
-        }
+            maxWidth: "100%",
+            overflowX: "scroll",
+            height: 160,
+          }
         : {}
     }
   >
@@ -76,12 +79,12 @@ const BottleDistribution = ({
               ...(showBottleNumbers
                 ? highlightBottleNumberIndex === index
                   ? {
-                    fontSize: "2em",
-                  }
+                      fontSize: "2em",
+                    }
                   : {}
                 : highlightBottleNumberIndex === index
-                  ? { fontSize: "2em" }
-                  : { display: "none" }),
+                ? { fontSize: "2em" }
+                : { display: "none" }),
             }}
           >
             {toSignificantDecimals(quantity)}
@@ -342,7 +345,7 @@ interface IStakingNowModal {
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ) => Promise<void>;
+  ) => Promise<StakingDepositsRes | undefined>;
   testStakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
@@ -350,8 +353,8 @@ interface IStakingNowModal {
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ) => Promise<void>;
-  ratios: StakingRatioRes;
+  ) => Promise<StakingDepositsRes | undefined>;
+  ratios: StakingRatioRes | null;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -426,27 +429,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-        if (dec === undefined) {
-          return setInput({
-            ...token,
-            amount: `${unpaddedWhole}`,
-          });
-        }
-
-        const limitedDecimals = dec.slice(0 - token.decimals);
-
+      if (dec === undefined) {
         return setInput({
           ...token,
-          amount: [whole, limitedDecimals].join("."),
+          amount: `${unpaddedWhole}`,
         });
-      };
+      }
+
+      const limitedDecimals = dec.slice(0 - token.decimals);
+
+      return setInput({
+        ...token,
+        amount: [whole, limitedDecimals].join("."),
+      });
+    };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -495,7 +498,7 @@ const StakeNowModal = ({
       return true;
     } catch (e) {
       // Expect error on fail
-      const errMsgMatchReason = /reason=\"[a-z :_]+/i;
+      const errMsgMatchReason = /reason="[a-z :_]+/i;
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);
@@ -981,8 +984,9 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
             width={isMobile ? 550 : 1270 / 2}
             height={isMobile ? 550 : 460 / 2}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
           />
           <Display size="xxs" style={{ margin: 0 }}>
