@@ -182,6 +182,11 @@
         "components": [
           {
             "internalType": "uint256",
+            "name": "depositTimestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "redeemTimestamp",
             "type": "uint256"
           },

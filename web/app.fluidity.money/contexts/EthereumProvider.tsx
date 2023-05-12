@@ -272,9 +272,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
       : undefined;
   };
 
@@ -392,11 +392,31 @@ const EthereumFacade = ({
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    return getUserStakingDeposits(
-      signer.provider,
-      StakingAbi,
-      stakingAddr,
-      address
+    const stakingDeposits =
+      (await getUserStakingDeposits(
+        signer.provider,
+        StakingAbi,
+        stakingAddr,
+        address
+      )) ?? [];
+
+    return stakingDeposits.map(
+      ({
+        camelotLpMinted,
+        sushiswapLpMinted,
+        redeemTimestamp,
+        depositTimestamp,
+      }) => {
+        const camelotLp = new BN(camelotLpMinted.toString());
+        const sushiswapLp = new BN(sushiswapLpMinted.toString());
+        const totalLp = camelotLp.add(sushiswapLp);
+
+        return {
+          amount: totalLp,
+          durationDays: redeemTimestamp.toNumber() / 24 / 60 / 60,
+          depositDate: new Date(depositTimestamp.toNumber() * 1000),
+        };
+      }
     );
   };
 
@@ -409,12 +429,8 @@ const EthereumFacade = ({
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    return getTokenStakingRatio(
-      signer.provider,
-      StakingAbi,
-      stakingAddr,
-    )
-  }
+    return getTokenStakingRatio(signer.provider, StakingAbi, stakingAddr);
+  };
 
   /*
    * testStakeTokens returns total tokens staked by a user.
@@ -425,7 +441,7 @@ const EthereumFacade = ({
     fusdcAmt: BN,
     wethAmt: BN,
     slippage: BN,
-    maxTimestamp: BN,
+    maxTimestamp: BN
   ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
@@ -444,12 +460,12 @@ const EthereumFacade = ({
       fusdcAmt,
       wethAmt,
       slippage,
-      maxTimestamp,
+      maxTimestamp
     );
   };
 
   /*
-   * getStakingDeposits returns total tokens staked by a user.
+   * stakeTokens locks up user tokens.
    */
   const stakeTokens = async (
     lockDurationSeconds: BN,
@@ -457,7 +473,7 @@ const EthereumFacade = ({
     fusdcAmt: BN,
     wethAmt: BN,
     slippage: BN,
-    maxTimestamp: BN,
+    maxTimestamp: BN
   ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
@@ -496,7 +512,7 @@ const EthereumFacade = ({
       fusdcAmt,
       wethAmt,
       slippage,
-      maxTimestamp,
+      maxTimestamp
     );
   };
 

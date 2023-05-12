@@ -1,4 +1,4 @@
-import type { StakingRatiosRes } from "~/util/chainUtils/ethereum/transaction";
+import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { useState, useEffect } from "react";
 import BN from "bn.js";
@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Display,
   LootBottle,
-  numberToMonetaryString,
   InfoCircle,
   TokenIcon,
   toSignificantDecimals,
@@ -28,7 +27,7 @@ import {
 import { dayDifference } from ".";
 
 import { Referral } from "~/queries";
-import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
+import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface IBottleDistribution {
@@ -220,7 +219,7 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
 
 interface IStakingStatsModal {
   liqudityMultiplier: number;
-  stakes: Array<StakingEvent>;
+  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
 }
 const StakingStatsModal = ({
   liqudityMultiplier,
@@ -244,106 +243,89 @@ const StakingStatsModal = ({
           {stakes.length}
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
-          {numberToMonetaryString(
-            stakes.reduce((sum, { amountUsd }) => sum + amountUsd, 0)
+          $
+          {addDecimalToBn(
+            stakes.reduce((sum, { amount }) => sum.add(amount), new BN(0)),
+            6
           )}
         </LabelledValue>
       </div>
       <div style={{ position: "relative", border: "1px gray" }}>
-        <div
-          style={{
-            position: "absolute",
-            top: "-24px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <GeneralButton>Withdraw</GeneralButton>
-        </div>
+        <GeneralButton disabled={true} style={{ right: "0" }}>
+          Withdraw
+        </GeneralButton>
         <div>
-          {stakes.map(
-            (
-              {
-                amountUsd,
-                durationDays,
-                multiplier,
-                insertedDate: insertedDateStr,
-              },
-              i
-            ) => {
-              const insertedDate = new Date(insertedDateStr);
-              const stakedDays = dayDifference(new Date(), insertedDate);
+          {stakes.map(({ amount, durationDays, depositDate }, i) => {
+            const stakedDays = dayDifference(new Date(), depositDate);
+            const multiplier = stakingLiquidityMultiplierEq(
+              stakedDays,
+              durationDays
+            );
 
-              const endDate = new Date(insertedDate);
-              endDate.setDate(endDate.getDate() + durationDays);
+            const endDate = new Date(depositDate);
+            endDate.setDate(endDate.getDate() + durationDays);
 
-              return (
+            return (
+              <div
+                key={`stake-${i}`}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 3fr 1fr",
+                }}
+              >
+                {/* Dates */}
                 <div
-                  key={`stake-${i}`}
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 3fr 1fr",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "0.5em",
                   }}
                 >
-                  {/* Dates */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
-                    }}
-                  >
-                    <Text>Start Date</Text>
-                    <Text prominent>
-                      {insertedDate.toLocaleDateString("en-US")}
-                    </Text>
+                  <Text>Start Date</Text>
+                  <Text prominent>
+                    {depositDate.toLocaleDateString("en-US")}
+                  </Text>
 
-                    <Text>End Date</Text>
-                    <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
-                  </div>
+                  <Text>End Date</Text>
+                  <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "0.5em",
+                  }}
+                >
+                  <Heading as="h3">{addDecimalToBn(amount, 6)}</Heading>
+                  <ProgressBar
+                    value={stakedDays}
+                    max={durationDays}
+                    rounded
+                    color={durationDays === stakedDays ? "holo" : "gray"}
+                    size="sm"
+                  />
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <Heading as="h3">
-                      {numberToMonetaryString(amountUsd)}
-                    </Heading>
-                    <ProgressBar
-                      value={stakedDays}
-                      max={durationDays}
-                      rounded
-                      color={durationDays === stakedDays ? "holo" : "gray"}
-                      size="sm"
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text prominent>{multiplier}x Multiplier</Text>
-                      <Text prominent>
-                        {durationDays - stakedDays} Days Left
-                      </Text>
-                    </div>
-                  </div>
-                  <div
-                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                  >
-                    <Text>Staked For</Text>
-                    <Heading as="h2">{durationDays}</Heading>
-                    <Text>Days</Text>
+                    <Text prominent>{multiplier}x Multiplier</Text>
+                    <br />
+                    <Text prominent>{durationDays - stakedDays} Days Left</Text>
                   </div>
                 </div>
-              );
-            }
-          )}
+                <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
+                  <Text>Staked For</Text>
+                  <Heading as="h2">{Math.floor(durationDays)}</Heading>
+                  <Text>Days</Text>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
@@ -369,7 +351,7 @@ interface IStakingNowModal {
     slippage: BN,
     maxTimestamp: BN
   ) => Promise<void>;
-  ratios: StakingRatiosRes;
+  ratios: StakingRatioRes;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -403,7 +385,7 @@ const StakeNowModal = ({
 
   const [stakingDuration, setStakingDuration] = useState(31);
   const [slippage, setSlippage] = useState(5);
-  const [stakeErr, setStakeErr] = useState();
+  const [stakeErr, setStakeErr] = useState("");
 
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
@@ -492,7 +474,7 @@ const StakeNowModal = ({
     })();
   }, [baseToken, fluidToken, slippage]);
 
-  const testStake = async () => {
+  const testStake = async (): Promise<boolean> => {
     try {
       await testStakeTokens?.(
         new BN(daysToSeconds(stakingDuration)),
@@ -504,15 +486,23 @@ const StakeNowModal = ({
           : new BN(0),
         baseToken.symbol === "wETH"
           ? snapToValidValue(baseToken.amount, baseToken)
-          : new BN(1000),
+          : new BN(0),
         new BN(slippage),
-        new BN(Math.floor(new Date() / 1000) + 30 * 60) // 30 Minutes after now
+        new BN(Math.floor(new Date().getMilliseconds() / 1000) + 30 * 60) // 30 Minutes after now
       );
 
+      setStakeErr("");
       return true;
     } catch (e) {
       // Expect error on fail
-      setStakeErr(e);
+      const errMsgMatchReason = /reason=\"[a-z :_]+/i;
+      const stakingError = (e as { message: string }).message
+        .match(errMsgMatchReason)?.[0]
+        .slice(8);
+
+      if (stakingError) {
+        setStakeErr(stakingError);
+      }
       return false;
     }
   };
@@ -534,7 +524,7 @@ const StakeNowModal = ({
           ? snapToValidValue(baseToken.amount, baseToken)
           : new BN(0),
         new BN(slippage),
-        new BN(Math.floor(new Date() / 1000) + 30 * 60) // 30 Minutes after now
+        new BN(Math.floor(new Date().getMilliseconds() / 1000) + 30 * 60) // 30 Minutes after now
       );
     } catch (e) {
       // Expect error on fail
@@ -734,31 +724,59 @@ const StakeNowModal = ({
             {baseToken.symbol} Balance:{" "}
             {addDecimalToBn(baseToken.userTokenBalance, baseToken.decimals)}
           </Text>
+          <Text prominent>
+            {fluidToken.symbol}/{baseToken.symbol} ratio:{" "}
+            {ratios?.fusdcUsdcRatio.toString()}
+          </Text>
         </div>
         {/* Arrow */}
         <div>
           <ArrowRight />
         </div>
         {/* Duration */}
-        <div>
-          <Text prominent code>
-            DURATION <InfoCircle />
-          </Text>
-          <Display>
-            {stakingDuration} D{/* Scrollbar */}
-          </Display>
-          <input
-            type="range"
-            min={31}
-            value={stakingDuration}
-            max={365}
-            step="1"
-            onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
-          />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
           <div>
-            <Text>
-              END: <Text>{endDate.toLocaleDateString("en-US")}</Text>{" "}
-              <InfoCircle />
+            <Text prominent code>
+              DURATION <InfoCircle />
+            </Text>
+            <Display style={{ margin: "0.5em 0 0.5em 0" }}>
+              {stakingDuration} D{/* Scrollbar */}
+            </Display>
+            <input
+              type="range"
+              min={31}
+              value={stakingDuration}
+              max={365}
+              step="1"
+              onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
+            />
+            <div>
+              <Text>
+                END: <Text>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+                <InfoCircle />
+              </Text>
+            </div>
+          </div>
+          <div>
+            <Text prominent code>
+              SLIPPAGE % <InfoCircle />
+              <input
+                type="number"
+                pattern="[0-9]"
+                min={1}
+                value={slippage}
+                max={50}
+                step="1"
+                onChange={(e) =>
+                  setSlippage(Math.floor(e.target.valueAsNumber))
+                }
+              />
             </Text>
           </div>
         </div>
@@ -833,6 +851,16 @@ const StakeNowModal = ({
       >
         Stake
       </GeneralButton>
+      <Text
+        style={{
+          textAlign: "center",
+          display: stakeErr ? "false" : "",
+          color: "red",
+          textTransform: "capitalize",
+        }}
+      >
+        {stakeErr}
+      </Text>
     </div>
   );
 };

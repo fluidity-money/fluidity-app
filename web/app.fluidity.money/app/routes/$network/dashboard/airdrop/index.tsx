@@ -1,11 +1,9 @@
 import type { LoaderFunction } from "@remix-run/node";
 import type { StakingEvent } from "../../query/dashboard/airdrop";
-import type {
-  StakingDepositsRes,
-  StakingRatioRes,
-} from "~/util/chainUtils/ethereum/transaction";
+import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
+import { stakingLiquidityMultiplierEq } from "./common";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -42,7 +40,7 @@ import {
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect } from "react";
-import { Token, trimAddress } from "~/util";
+import { addDecimalToBn, Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
@@ -194,7 +192,7 @@ const Airdrop = () => {
   };
 
   const {
-    airdrop: { bottleTiers, liquidityMultiplier, stakes, bottlesCount },
+    airdrop: { bottleTiers, liquidityMultiplier, bottlesCount },
     referrals: {
       numActiveReferreeReferrals,
       numActiveReferrerReferrals,
@@ -217,6 +215,9 @@ const Airdrop = () => {
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
+  const [stakes, setStakes] = useState<
+    Array<{ amount: BN; durationDays: number; depositDate: Date }>
+  >([]);
 
   const closeModal = () => {
     setCurrentModal(null);
@@ -248,10 +249,10 @@ const Airdrop = () => {
       );
     })();
 
-    // (async () => {
-    //   const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
-    //   setStakes(stakingDeposits);
-    // })();
+    (async () => {
+      const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+      setStakes(stakingDeposits);
+    })();
 
     (async () => {
       const stakingRatios = (await getStakingRatios?.()) ?? null;
@@ -716,7 +717,7 @@ const MultiplierTasks = () => {
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
-  stakes: Array<StakingEvent>;
+  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
 }
@@ -767,8 +768,12 @@ const MyMultiplier = ({
           gridRow: "1 / 3",
         }}
       >
-        {stakes.map(({ amountUsd, durationDays, multiplier, insertedDate }) => {
-          const stakedDays = dayDifference(new Date(), new Date(insertedDate));
+        {stakes.map(({ amount, durationDays, depositDate }) => {
+          const stakedDays = dayDifference(new Date(), new Date(depositDate));
+          const multiplier = stakingLiquidityMultiplierEq(
+            stakedDays,
+            durationDays
+          );
 
           return (
             <>
@@ -781,7 +786,7 @@ const MyMultiplier = ({
                 }}
               >
                 <Text prominent code>
-                  {numberToMonetaryString(amountUsd)} FOR {durationDays} DAYS
+                  ${addDecimalToBn(amount, 6)} FOR {durationDays} DAYS
                 </Text>
                 <ProgressBar
                   value={stakedDays}
