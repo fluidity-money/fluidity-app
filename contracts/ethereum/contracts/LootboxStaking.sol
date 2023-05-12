@@ -21,8 +21,6 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -352,10 +350,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _tokenB.transfer(_sender, tokenBAfter - tokenBBefore);
 
         // return the amount that we deposited
-
-        require(tokenABefore + 1 > tokenAAfter, "token A not drained");
-
-        require(tokenBBefore + 1 > tokenBAfter, "token B not drained");
 
         tokenADeposited = dep.camelotTokenA + dep.sushiswapTokenA;
 
