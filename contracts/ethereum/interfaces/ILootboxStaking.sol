@@ -24,6 +24,8 @@ interface ILootboxStaking {
         uint256 sushiswapTokenB;
 
         bool fusdcUsdcPair;
+
+        uint256 depositTimestamp;
     }
 
     event Deposited(
