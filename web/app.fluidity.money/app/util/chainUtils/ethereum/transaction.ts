@@ -6,6 +6,13 @@ import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
 
+export type ContractToken = {
+  address: string;
+  ABI: ContractInterface;
+  symbol: string;
+  isFluidOf: boolean;
+};
+
 export const getContract = (
   ABI: ContractInterface,
   address: string,
@@ -59,13 +66,6 @@ export const getUsdAmountMinted = async (
   const decimals = (await contract.decimals()).toString();
 
   return Number(utils.formatUnits(amount, decimals));
-};
-
-export type ContractToken = {
-  address: string;
-  ABI: ContractInterface;
-  symbol: string;
-  isFluidOf: boolean;
 };
 
 const makeContractSwap = async (
