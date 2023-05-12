@@ -36,8 +36,8 @@ export const Slider: React.FC<ISlider> = ({
   useLayoutEffect(() => {
     const measure = () => {
       if (!trackRef?.current) return
-      console.log('window', window.innerWidth)
-      console.log('track', trackRef.current.clientWidth)
+      // console.log('window', window.innerWidth)
+      // console.log('track', trackRef.current.clientWidth)
       setContainerWidth(trackRef.current.clientWidth)
     }
 
