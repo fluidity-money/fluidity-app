@@ -18,6 +18,7 @@ import {
   Heading,
   Video,
   Hoverable,
+  Form
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -711,14 +712,20 @@ const StakeNowModal = ({
           <Display className="no-margin">
             {stakingDuration} D{/* Scrollbar */}
           </Display>
-          <input
+          <Form.Slider 
+            min={31}
+            max={365}
+            step={1}
+            valueCallback={(value) => setStakingDuration(value)}
+          />
+          {/* <input
             type="range"
             min={31}
             value={stakingDuration}
             max={365}
             step="1"
             onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
-          />
+          /> */}
           <div className="helper-label">
             <Text code>
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
