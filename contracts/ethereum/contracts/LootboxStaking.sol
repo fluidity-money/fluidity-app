@@ -134,6 +134,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         wethMinLiquidity_ = weth_.decimals();
 
+        require(fusdcMinLiquidity_ == usdcMinLiquidity_, "fusdc&weth must be same dec");
+
+        require(wethMinLiquidity_ > fusdcMinLiquidity_, "fusdc >= weth");
+
         _enableApprovals();
     }
 
@@ -712,37 +716,21 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcUsdcRatio,
         uint256 fusdcWethRatio,
         uint256 fusdcUsdcSpread,
-        uint256 fusdcWethSpread,
-        uint256 fusdcUsdcLiq,
-        uint256 fusdcWethLiq
+        uint256 fusdcWethSpread
     ) {
         (
             uint256 camelotFusdcUsdcRatio,
-            uint256 camelotFusdcWethRatio,
-            uint256 camelotFusdcUsdcLiq,
-            uint256 camelotFusdcWethLiq
+            uint256 camelotFusdcWethRatio
         ) =  _camelotRatios();
 
         (
             uint256 sushiswapFusdcUsdcRatio,
-            uint256 sushiswapFusdcWethRatio,
-            uint256 sushiswapFusdcUsdcLiq,
-            uint256 sushiswapFusdcWethLiq
+            uint256 sushiswapFusdcWethRatio
         ) = _sushiswapRatios();
 
-        fusdcUsdcLiq = sushiswapFusdcUsdcLiq + camelotFusdcUsdcLiq;
+        fusdcUsdcRatio =  (camelotFusdcUsdcRatio + sushiswapFusdcUsdcRatio) / 2;
 
-        fusdcWethLiq = sushiswapFusdcWethLiq + camelotFusdcWethLiq;
-
-        // calculate the ratio by weighting the amount of liquidity available in each pool
-
-        fusdcUsdcRatio =
-            (camelotFusdcUsdcRatio * (camelotFusdcUsdcLiq * fusdcUsdcLiq / 100) / 100) +
-            (sushiswapFusdcUsdcRatio * (sushiswapFusdcUsdcLiq * fusdcUsdcLiq / 100) / 100);
-
-        fusdcWethRatio =
-            (camelotFusdcWethRatio * (camelotFusdcWethLiq * fusdcWethLiq / 100) / 100) +
-            (sushiswapFusdcWethRatio * (sushiswapFusdcWethLiq * fusdcWethLiq / 100) / 100);
+        fusdcWethRatio = (camelotFusdcWethRatio + sushiswapFusdcWethRatio) / 2;
 
         if (camelotFusdcUsdcRatio > sushiswapFusdcUsdcRatio) {
             fusdcUsdcSpread = camelotFusdcUsdcRatio - sushiswapFusdcUsdcRatio;
@@ -760,9 +748,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             fusdcUsdcRatio,
             fusdcWethRatio,
             fusdcUsdcSpread,
-            fusdcWethSpread,
-            fusdcUsdcLiq,
-            fusdcWethLiq
+            fusdcWethSpread
         );
     }
 
@@ -838,17 +824,18 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     function _camelotRatios() internal view returns (
         uint256 fusdcUsdcRatio,
-        uint256 fusdcWethRatio,
-        uint256 fusdcUsdcLiq,
-        uint256 fusdcWethLiq
+        uint256 fusdcWethRatio
     ) {
         (uint256 camelotFusdcUsdcReserveA, uint256 camelotFusdcUsdcReserveB) =
             _uniswapPairReserves(
                 camelotFusdcUsdcPair_,
-                fusdc_
+                usdc_
             );
 
-        fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
+        camelotFusdcUsdcReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+        camelotFusdcUsdcReserveB *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+
+        uint256 fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
 
         fusdcUsdcRatio = 1e12 * camelotFusdcUsdcReserveA / fusdcUsdcLiq;
 
@@ -858,31 +845,35 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 weth_
             );
 
-        fusdcWethLiq = camelotFusdcWethReserveA + camelotFusdcWethReserveB;
+	// exponentiate fudsc by the difference between it's decimals and
+	// weth's for an equal calculation to get an accurate ratio
+
+	camelotFusdcWethReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+
+        uint256 fusdcWethLiq = camelotFusdcWethReserveA + camelotFusdcWethReserveB;
 
         fusdcWethRatio = 1e12 * camelotFusdcWethReserveA / fusdcWethLiq;
 
         return (
             fusdcUsdcRatio,
-            fusdcWethRatio,
-            fusdcUsdcLiq,
-            fusdcWethLiq
+            fusdcWethRatio
         );
     }
 
     function _sushiswapRatios() internal view returns (
         uint256 fusdcUsdcRatio,
-        uint256 fusdcWethRatio,
-        uint256 fusdcUsdcLiq,
-        uint256 fusdcWethLiq
+        uint256 fusdcWethRatio
     ) {
         (uint256 sushiswapFusdcUsdcReserveA, uint256 sushiswapFusdcUsdcReserveB) =
             _sushiswapPoolReserves(
                 sushiswapFusdcUsdcPool_,
-                fusdc_
+                usdc_
             );
 
-        fusdcUsdcLiq = sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB;
+        sushiswapFusdcUsdcReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+        sushiswapFusdcUsdcReserveB *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+
+        uint256 fusdcUsdcLiq = sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB;
 
         fusdcUsdcRatio = 1e12 * sushiswapFusdcUsdcReserveA / fusdcUsdcLiq;
 
@@ -892,15 +883,15 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 weth_
             );
 
-        fusdcWethLiq = sushiswapFusdcWethReserveA + sushiswapFusdcWethReserveB;
+        sushiswapFusdcWethReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+
+        uint256 fusdcWethLiq = sushiswapFusdcWethReserveA + sushiswapFusdcWethReserveB;
 
         fusdcWethRatio = 1e12 * sushiswapFusdcWethReserveA / fusdcWethLiq;
 
         return (
             fusdcUsdcRatio,
-            fusdcWethRatio,
-            fusdcUsdcLiq,
-            fusdcWethLiq
+            fusdcWethRatio
         );
     }
 
