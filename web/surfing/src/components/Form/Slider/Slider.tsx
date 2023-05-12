@@ -51,7 +51,7 @@ export const Slider: React.FC<ISlider> = ({
   }, [])
 
   const range = max - min;
-  const steps = range / step;
+  const steps = (range / step) + 1; // the +1 is a hack to make sure the max value always appears. just gives extra padding on the rhs
   const stepWidth = containerWidth / steps;
 
   useEffect(() => x.onChange(latest => {setDragX(latest)}), [x])

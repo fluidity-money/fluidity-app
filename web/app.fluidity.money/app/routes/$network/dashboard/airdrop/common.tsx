@@ -718,14 +718,6 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value) => setStakingDuration(value)}
           />
-          {/* <input
-            type="range"
-            min={31}
-            value={stakingDuration}
-            max={365}
-            step="1"
-            onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
-          /> */}
           <div className="helper-label">
             <Text code>
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
