@@ -19,6 +19,8 @@ import "../interfaces/IUniswapV2Pair.sol";
 import "../interfaces/ISushiswapStablePool.sol";
 import "../interfaces/ISushiswapBentoBox.sol";
 
+import "./openzeppelin/SafeERC20.sol";
+
 /*
  * Network(s): Ethereum & Arbitrum
  *
