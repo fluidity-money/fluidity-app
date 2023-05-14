@@ -32,6 +32,8 @@ func GetLastBlocksTransactionCount(tokenShortName string, network network.Blockc
 
 	timescaleClient := timescale.Client()
 
+	//
+
 	statementText := fmt.Sprintf(
 		`SELECT AVG(transaction_count), SUM(transaction_count)
 		FROM (
