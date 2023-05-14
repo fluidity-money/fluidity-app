@@ -3,7 +3,7 @@ import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -466,7 +466,7 @@ const Airdrop = () => {
         visible={currentModal === "tutorial"}
         closeModal={closeModal}
       >
-        <TutorialModal closeModal={closeModal} />
+        <TutorialModal />
       </CardModal>
 
       {/* Page Content */}
