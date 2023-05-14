@@ -30,9 +30,7 @@ type Emission = worker.Emission
 // transactions
 func GetLastBlocksTransactionCount(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, sum int) {
 
-	timescaleClient := timescale.Client()
-
-	//
+	timescaleClient := timescale.Client() //
 
 	statementText := fmt.Sprintf(
 		`SELECT AVG(transaction_count), SUM(transaction_count)
