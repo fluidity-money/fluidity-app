@@ -24,7 +24,7 @@ func addBtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortNa
 	)
 }
 
-func computeTransactionsSumAndAverage(network_ network.BlockchainNetwork, tokenShortName string, limit int) (int, int, []uint64, []int) {
+func computeTransactionsSumAndAverage(network_ network.BlockchainNetwork, tokenShortName string, limit int) (int, int) {
 	log.Debug(func(k *log.Log) {
 		k.Message = "About to get average atx from timescale!"
 	})
