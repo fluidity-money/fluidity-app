@@ -282,7 +282,7 @@ func main() {
 			transfersInBlock,
 		)
 
-		averageTransfersInBlock, _ := computeTransactionsSumAndAverage(
+		averageTransfersInBlock, transfersInEpoch := computeTransactionsSumAndAverage(
 			dbNetwork,
 			tokenName,
 			atxBufferSize,
@@ -294,20 +294,6 @@ func main() {
 			tokenName,
 			atxBufferSize,
 			averageTransfersInBlock,
-		)
-
-		_, transfersInEpoch := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
-			epochBlocks,
-		)
-
-		log.Debugf(
-			"Computed transfers in epoch for the network %v, token name %v, atx buffer size %v is %v",
-			dbNetwork,
-			tokenName,
-			atxBufferSize,
-			transfersInEpoch,
 		)
 
 		emission.AtxBufferSize = atxBufferSize
