@@ -21,7 +21,7 @@ export const CardModal: React.FC<ICardModal> = ({
   children,
   type="frosted",
   border="solid",
-  props,
+  ...props
 }) => {
   const ref = useRef(null);
 

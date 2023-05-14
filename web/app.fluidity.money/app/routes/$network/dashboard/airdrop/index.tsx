@@ -3,7 +3,7 @@ import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -22,7 +22,6 @@ import {
   Provider,
   CardModal,
   Rarity,
-  AnchorButton,
   TabButton,
   toSignificantDecimals,
   useViewport,
@@ -37,7 +36,7 @@ import {
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { addDecimalToBn, Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
@@ -131,8 +130,6 @@ const Airdrop = () => {
 
   const showAirdrop = showExperiment("enable-airdrop-page");
 
-  const navigate = useNavigate();
-
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
   const {
@@ -218,6 +215,7 @@ const Airdrop = () => {
   const [stakes, setStakes] = useState<
     Array<{ amount: BN; durationDays: number; depositDate: Date }>
   >([]);
+  console.log(stakes);
 
   const closeModal = () => {
     setCurrentModal(null);
@@ -260,16 +258,15 @@ const Airdrop = () => {
     })();
   }, [address]);
 
+  const leaderboardRef = useRef<HTMLDivElement>(null);
+
   const Header = () => {
     return (
       <div
         className="pad-main"
         style={{ display: "flex", gap: "2em", marginBottom: "2em" }}
       >
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("staking-stats")}
-        >
+        <TabButton size="small" onClick={() => setCurrentModal(null)}>
           Airdrop Dashboard
         </TabButton>
         <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
@@ -278,7 +275,12 @@ const Airdrop = () => {
         <TabButton
           size="small"
           onClick={() => {
-            if (!isMobile) navigate("#leaderboard");
+            if (!isMobile) {
+              leaderboardRef.current?.scrollIntoView({
+                block: "start",
+                behavior: "smooth",
+              });
+            }
             setCurrentModal("leaderboard");
           }}
         >
@@ -313,16 +315,17 @@ const Airdrop = () => {
         >
           {currentModal === null && (
             <>
-              <Heading as="h3" className={"no-margin"}>
-                Welcome to Fluidity&apos;s Airdrop Event!
-              </Heading>
               <div>
+                <Heading
+                  as="h3"
+                  style={{ marginBottom: "0.5em" }}
+                  className={"no-margin"}
+                >
+                  Welcome to Fluidity&apos;s Airdrop Event!
+                </Heading>
                 <Text>
                   Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                  vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                  metus, ac convallis lectus porttitor et. Donec maximus gravida
-                  mauris, eget tempor felis tristique sit amet. Pellentesque at
-                  hendrerit nibh, eu porttitor dui.
+                  vulputate, in pharetra nisl porttitor.
                   <LinkButton
                     size="medium"
                     type="external"
@@ -334,7 +337,16 @@ const Airdrop = () => {
                   </LinkButton>
                 </Text>
               </div>
-              <BottleProgress bottles={bottleTiers} isMobile />
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <BottleProgress bottles={bottleTiers} isMobile />
+              </div>
               <AirdropStats
                 seeReferralsDetails={() => setCurrentModal("referral-details")}
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
@@ -364,6 +376,7 @@ const Airdrop = () => {
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
+                userAddress={address || ""}
               />
             </>
           )}
@@ -401,6 +414,7 @@ const Airdrop = () => {
         id="referral-details"
         visible={currentModal === "referral-details"}
         closeModal={closeModal}
+        style={{ gap: "1em" }}
       >
         <ReferralDetailsModal
           bottles={bottleTiers}
@@ -415,6 +429,7 @@ const Airdrop = () => {
         id="bottles-details"
         visible={currentModal === "bottles-details"}
         closeModal={closeModal}
+        style={{ gap: "1em" }}
       >
         <BottlesDetailsModal bottles={bottleTiers} />
       </CardModal>
@@ -422,6 +437,7 @@ const Airdrop = () => {
         id="stake-now"
         visible={currentModal === "stake-now"}
         closeModal={closeModal}
+        style={{ gap: "2em" }}
       >
         <StakeNowModal
           fluidTokens={tokens.filter((tok) =>
@@ -459,8 +475,9 @@ const Airdrop = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.5fr 1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: "10%",
+            maxWidth: 1200,
           }}
         >
           <div
@@ -468,21 +485,28 @@ const Airdrop = () => {
               display: "flex",
               flexDirection: "column",
               gap: "2em",
+              zIndex: 100,
             }}
           >
-            <Heading className={"no-margin"}>
-              Welcome to Fluidity&apos;s Airdrop Event!
-            </Heading>
             <div>
-              <Text>
+              <Heading
+                as="h2"
+                className={"no-margin"}
+                style={{ marginBottom: "0.5em" }}
+              >
+                Welcome to Fluidity&apos;s Airdrop Event!
+              </Heading>
+              <Text style={{ fontSize: 14 }}>
                 Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                metus, ac convallis lectus porttitor et. Donec maximus gravida
-                mauris, eget tempor felis tristique sit amet. Pellentesque at
-                hendrerit nibh, eu porttitor dui.
+                vulputate, in pharetra nisl porttitor.
                 <LinkButton
                   size="medium"
                   type="external"
+                  style={{
+                    display: "inline-flex",
+                    textDecoration: "underline",
+                    textUnderlineOffset: 2,
+                  }}
                   handleClick={() => {
                     return;
                   }}
@@ -511,17 +535,31 @@ const Airdrop = () => {
         </div>
       </div>
       <div
-        style={{ display: "flex", justifyContent: "center", padding: "1em" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "2em",
+          marginBottom: "3em",
+        }}
       >
-        <AnchorButton
+        <GeneralButton
+          type="transparent"
+          icon={
+            <span style={{ fill: "none", transform: "rotate(90deg)" }}>
+              <ArrowRight />
+            </span>
+          }
           onClick={() => {
-            navigate("#leaderboard");
+            leaderboardRef.current?.scrollIntoView({
+              block: "start",
+              behavior: "smooth",
+            });
           }}
         >
           LEADERBOARD
-        </AnchorButton>
+        </GeneralButton>
       </div>
-      <div className="pad-main" id="#leaderboard">
+      <div className="pad-main" id="#leaderboard" ref={leaderboardRef}>
         <Card
           className="leaderboard-container"
           type="transparent"
@@ -534,6 +572,7 @@ const Airdrop = () => {
             data={leaderboardRows}
             filterIndex={leaderboardFilterIndex}
             setFilterIndex={setLeaderboardFilterIndex}
+            userAddress={address || ""}
           />
         </Card>
       </div>
@@ -569,8 +608,10 @@ const AirdropStats = ({
       }}
     >
       <div>
-        <LabelledValue label="EPOCH DAYS LEFT">
-          {epochMax - epochDays}
+        <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
+          <Text prominent size="xl">
+            {epochMax - epochDays}
+          </Text>
         </LabelledValue>
         <div
           style={{
@@ -590,25 +631,37 @@ const AirdropStats = ({
         </div>
       </div>
       <div>
-        <LabelledValue label="REFERRALS">{activatedReferrals}</LabelledValue>
+        <LabelledValue label={<Text size="xs">REFERRALS</Text>}>
+          <Text prominent size="xl">
+            {activatedReferrals}
+          </Text>
+        </LabelledValue>
         <LinkButton
           color="gray"
           size="small"
           type="internal"
           handleClick={seeReferralsDetails}
+          style={{
+            marginLeft: -6,
+          }}
         >
           SEE DETAILS
         </LinkButton>
       </div>
       <div>
-        <LabelledValue label="MY TOTAL BOTTLES">
-          {toSignificantDecimals(totalBottles)}
+        <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
+          <Text prominent size="xl">
+            {toSignificantDecimals(totalBottles, 0)}
+          </Text>
         </LabelledValue>
         <LinkButton
           color="gray"
           size="small"
           type="internal"
           handleClick={seeBottlesDetails}
+          style={{
+            marginLeft: -6,
+          }}
         >
           SEE DETAILS
         </LinkButton>
@@ -618,14 +671,15 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [tasks, setTasks] = useState<"1x" | "2x">("1x");
+  const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
   const providers: Provider[] = [
     "Uniswap",
     "Sushiswap",
     "Camelot",
     "Saddle",
-    "Curve",
+    "Chronos",
+    "Kyber",
   ];
   return (
     <Card fill color="holo" rounded className="multiplier-tasks">
@@ -633,20 +687,21 @@ const MultiplierTasks = () => {
         <Text style={{ color: "black" }} bold size="md">
           Multiplier Tasks
         </Text>
-        <Text style={{ color: "black" }}>
+        <Text size="xs" style={{ color: "black" }}>
           Perform displayed tasks to earn the respective multipliers.
         </Text>
       </div>
       <div
         className="multiplier-tasks-multiplier"
         onClick={() => {
-          setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
+          setTasks((prev) => (prev === "1x" ? "6x" : "1x"));
         }}
+        style={{ transform: "scale(0.6)" }}
       >
         <Form.Toggle
           color="black"
           direction="vertical"
-          checked={tasks === "2x"}
+          checked={tasks === "6x"}
         />
         <TextButton style={{ textDecorationThickness: "3px" }}>
           <motion.div
@@ -661,56 +716,47 @@ const MultiplierTasks = () => {
           </motion.div>
         </TextButton>
       </div>
-      <div className="multiplier-tasks-tasks">
-        {tasks === "1x" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-          >
-            <Text style={{ color: "black" }}>
-              Perform any type of fAsset transactions{" "}
-              <b>in any on-chain protocol</b>, including sending{" "}
-              <b>with any wallet</b>.
-            </Text>
-          </motion.div>
-        )}
-        {tasks === "2x" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1em",
-            }}
-          >
-            {providers.map((provider, i) => {
-              return (
-                <a
-                  key={`airdrop-mx-provider-` + i}
-                  style={{
-                    cursor: "pointer",
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "32px",
-                    backgroundColor: "black",
-                    padding: "8px",
-                  }}
-                  href="#"
-                >
-                  <ProviderIcon
-                    provider={provider}
-                    style={{ height: "100%" }}
-                  />
-                </a>
-              );
-            })}
-          </motion.div>
-        )}
-      </div>
+      {tasks === "1x" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+          className="multiplier-tasks-tasks"
+        >
+          <Text size="xs" style={{ color: "black" }}>
+            Perform any type of fAsset transactions{" "}
+            <b>in any on-chain protocol</b>, including sending{" "}
+            <b>with any wallet</b>.
+          </Text>
+        </motion.div>
+      )}
+      {tasks === "6x" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+          className="multiplier-tasks-tasks"
+        >
+          {providers.map((provider, i) => {
+            return (
+              <a
+                key={`airdrop-mx-provider-` + i}
+                style={{
+                  cursor: "pointer",
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "32px",
+                  backgroundColor: "black",
+                  padding: "6px",
+                }}
+                href="#"
+              >
+                <ProviderIcon provider={provider} style={{ height: "100%" }} />
+              </a>
+            );
+          })}
+        </motion.div>
+      )}
     </Card>
   );
 };
@@ -721,6 +767,13 @@ interface IMyMultiplier {
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
 }
+
+// export type StakingEvent = {
+//   amount: number;
+//   durationDays: number;
+//   multiplier: number;
+//   insertedDate: string;
+// };
 
 const MyMultiplier = ({
   seeMyStakingStats,
@@ -737,7 +790,9 @@ const MyMultiplier = ({
       }}
     >
       <div>
-        <LabelledValue label="MY TOTAL LIQUIDITY MULTIPLIER">
+        <LabelledValue
+          label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
+        >
           <Text size="xxl" holo>
             {liquidityMultiplier.toLocaleString()}x
           </Text>
@@ -830,11 +885,13 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
   data: AirdropLeaderboardEntry;
   index: number;
 }) => {
+  const { address } = useContext(FluidityFacadeContext);
+  // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
   return (
     <motion.tr
-      className="airdrop-row"
+      className={`airdrop-row ${address === user ? "highlighted-row" : ""}`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -848,27 +905,82 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
     >
       {/* Rank */}
       <td>
-        <Text prominent>{rank}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {rank === -1 ? "???" : rank}
+        </Text>
       </td>
 
       {/* User */}
       <td>
-        <Text prominent>{trimAddress(user)}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {address === user ? "ME" : trimAddress(user)}
+        </Text>
       </td>
 
       {/* Bottles */}
       <td>
-        <Text prominent>{toSignificantDecimals(bottles, 2)}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {toSignificantDecimals(bottles, 2)}
+        </Text>
       </td>
 
       {/* Multiplier */}
       <td>
-        <Text prominent>{liquidityMultiplier.toLocaleString()}x</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {liquidityMultiplier.toLocaleString()}x
+        </Text>
       </td>
 
       {/* Referrals */}
       <td>
-        <Text prominent>{referralCount}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {referralCount}
+        </Text>
       </td>
     </motion.tr>
   );
@@ -879,6 +991,7 @@ interface IAirdropLeaderboard {
   data: Array<AirdropLeaderboardEntry>;
   filterIndex: number;
   setFilterIndex: (index: number) => void;
+  userAddress: string;
 }
 
 const Leaderboard = ({
@@ -886,35 +999,51 @@ const Leaderboard = ({
   data,
   filterIndex,
   setFilterIndex,
+  userAddress,
 }: IAirdropLeaderboard) => {
+  // This adds a dummy user entry to the leaderboard if the user's address isn't found
+  if (loaded && !data.find((entry) => entry.user === userAddress)) {
+    const userEntry = {
+      user: userAddress,
+      rank: -1,
+      referralCount: 0,
+      liquidityMultiplier: 0,
+      bottles: 0,
+      highestRewardTier: 0,
+    };
+
+    data.push(userEntry);
+  }
+
   return (
     <>
       <div className="leaderboard-header">
-        <Heading as="h3">Leaderboard</Heading>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div className="leaderboard-header-text">
+          <Heading as="h3">Leaderboard</Heading>
           <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
             This leaderboard shows your rank among other users{" "}
-            {filterIndex === 0 ? " per " : " for "}
+            {filterIndex === 0 ? " per" : " for"}
+            &nbsp;
             {filterIndex === 0 ? (
-              <ul style={{ margin: 0 }}> 24 HOURS</ul>
+              <ul style={{ margin: 0 }}>24 HOURS</ul>
             ) : (
-              <ul style={{ margin: 0 }}> ALL TIME</ul>
+              <ul style={{ margin: 0 }}>ALL TIME</ul>
             )}
           </Text>
-          <div style={{ display: "flex", gap: "1em" }}>
-            <GeneralButton
-              type={filterIndex === 0 ? "primary" : "secondary"}
-              handleClick={() => setFilterIndex(0)}
-            >
-              24 HOURS
-            </GeneralButton>
-            <GeneralButton
-              type={filterIndex === 1 ? "primary" : "secondary"}
-              handleClick={() => setFilterIndex(1)}
-            >
-              ALL TIME
-            </GeneralButton>
-          </div>
+        </div>
+        <div className="leaderboard-header-filters">
+          <GeneralButton
+            type={filterIndex === 0 ? "primary" : "secondary"}
+            handleClick={() => setFilterIndex(0)}
+          >
+            24 HOURS
+          </GeneralButton>
+          <GeneralButton
+            type={filterIndex === 1 ? "primary" : "secondary"}
+            handleClick={() => setFilterIndex(1)}
+          >
+            ALL TIME
+          </GeneralButton>
         </div>
       </div>
       <Table
@@ -927,12 +1056,16 @@ const Leaderboard = ({
           { name: "REFERRALS" },
         ]}
         pagination={{
+          paginate: false,
           page: 1,
           rowsPerPage: 11,
         }}
         count={0}
         data={data}
         renderRow={AirdropRankRow}
+        freezeRow={(data) => {
+          return data.user === userAddress;
+        }}
         onFilter={() => true}
         activeFilterIndex={0}
         filters={[]}
@@ -957,7 +1090,14 @@ const BottleProgress = ({
   };
 
   return (
-    <div>
+    <div
+      style={{
+        maxWidth: 450,
+        display: "flex",
+        flexDirection: "column",
+        gap: "1em",
+      }}
+    >
       <HeroCarousel
         title="BOTTLES I'VE EARNED"
         onSlideChange={handleHeroPageChange}
@@ -979,8 +1119,11 @@ const BottleProgress = ({
         </Card>
       </HeroCarousel>
       <BottleDistribution
+        style={{
+          height: 100,
+          overflowX: isMobile ? "scroll" : "visible",
+        }}
         bottles={bottles}
-        isMobile={isMobile}
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
@@ -990,8 +1133,13 @@ const BottleProgress = ({
           onClick={() =>
             setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
           }
+          style={{
+            opacity: showBottleNumbers ? 1 : 0.3,
+          }}
         />
-        <Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
+        <Text size="sm" prominent={showBottleNumbers}>
+          ALWAYS SHOW BOTTLE NUMBERS
+        </Text>
       </div>
     </div>
   );

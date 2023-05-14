@@ -21,6 +21,8 @@ import {
   ArrowLeft,
   Heading,
   Video,
+  Hoverable,
+  Form,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -33,31 +35,21 @@ import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface IBottleDistribution {
+interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
   showBottleNumbers?: boolean;
   highlightBottleNumberIndex?: number;
-  isMobile?: boolean;
+  numberPosition?: "absolute" | "relative";
 }
 
 const BottleDistribution = ({
   bottles,
   showBottleNumbers = true,
   highlightBottleNumberIndex,
-  isMobile = false,
+  numberPosition = "absolute",
+  ...props
 }: IBottleDistribution) => (
-  <div
-    className="bottle-distribution-container"
-    style={
-      isMobile
-        ? {
-            maxWidth: "100%",
-            overflowX: "scroll",
-            height: 160,
-          }
-        : {}
-    }
-  >
+  <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
         <div key={index} className="lootbottle-container">
@@ -67,25 +59,42 @@ const BottleDistribution = ({
             quantity={quantity}
             style={{
               marginBottom: "0.6em",
+              opacity:
+                numberPosition === "relative" ||
+                highlightBottleNumberIndex === index
+                  ? 1
+                  : 0.2,
             }}
           />
-          <Text style={{ whiteSpace: "nowrap" }}>{rarity.toUpperCase()}</Text>
           <Text
-            prominent
-            style={{
-              position: "absolute",
-              bottom: "120px",
-              zIndex: "5",
-              ...(showBottleNumbers
-                ? highlightBottleNumberIndex === index
-                  ? {
-                      fontSize: "2em",
-                    }
-                  : {}
-                : highlightBottleNumberIndex === index
-                ? { fontSize: "2em" }
-                : { display: "none" }),
-            }}
+            size="sm"
+            style={{ whiteSpace: "nowrap", textTransform: "capitalize" }}
+          >
+            {rarity.replace("_", " ")}
+          </Text>
+          <Text
+            prominent={
+              numberPosition === "relative" ||
+              highlightBottleNumberIndex === index
+            }
+            style={
+              numberPosition === "absolute"
+                ? {
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottleNumberIndex === index
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottleNumberIndex === index
+                      ? { fontSize: "2.5em" }
+                      : { display: "none" }),
+                  }
+                : { fontSize: "1em" }
+            }
           >
             {toSignificantDecimals(quantity)}
           </Text>
@@ -113,44 +122,142 @@ const ReferralDetailsModal = ({
   nextInactiveReferral,
 }: IReferralDetailsModal) => (
   <>
-    <Display size="xxxs">My Referral Link</Display>
+    <div style={{ display: "flex", gap: "1em", alignItems: "center" }}>
+      <Display className="no-margin" size="xxxs">
+        My Referral Link
+      </Display>
+      <Hoverable tooltipContent={"Lorem ipsum"}>
+        <InfoCircle />
+      </Hoverable>
+    </div>
     <div className="referral-details-container">
-      <LabelledValue label={<Text size="sm">Active Referrals</Text>}>
+      <LabelledValue
+        label={
+          <div
+            className="helper-label"
+            style={{ display: "flex", gap: "0.5em" }}
+          >
+            <Text size="xs">Active Referrals</Text>
+            <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+              <InfoCircle />
+            </Hoverable>
+          </div>
+        }
+      >
         {activeRefereeReferralsCount}
       </LabelledValue>
-      <LabelledValue label={<Text size="sm">Total Bottles earned</Text>}>
+      <LabelledValue
+        label={
+          <div
+            className="helper-label"
+            style={{ display: "flex", gap: "0.5em" }}
+          >
+            <Text size="xs">Total Bottles earned from your link</Text>
+            <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+              <InfoCircle />
+            </Hoverable>
+          </div>
+        }
+      >
         {totalBottles}
+        {/* TODO REPLACE THIS WITH REAL DATA */}
       </LabelledValue>
     </div>
-    <Text size="sm">Bottle Distribution</Text>
-    <BottleDistribution bottles={bottles} />
+    <div className="helper-label" style={{ display: "flex", gap: "0.5em" }}>
+      <Text size="xs">Bottle Distribution</Text>
+      <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+        <InfoCircle />
+      </Hoverable>
+    </div>
+    <BottleDistribution numberPosition="relative" bottles={bottles} />
     <div
       style={{
         width: "100%",
         borderBottom: "1px solid white",
-        margin: "1em 0",
       }}
     />
-    <Display size="xxxs">Links I&apos;ve Clicked</Display>
+    <div style={{ display: "flex", gap: "1em", alignItems: "center" }}>
+      <Display className="no-margin" size="xxxs">
+        Links I&apos;ve Clicked
+      </Display>
+      <Hoverable tooltipContent={"Lorem ipsum"}>
+        <InfoCircle />
+      </Hoverable>
+    </div>
     <div
       style={{
         display: "grid",
         gridTemplateColumns: "auto auto auto auto",
-        gap: "1em",
+        gap: "3em",
         paddingBottom: "1em",
       }}
     >
-      <LabelledValue label="Total Clicked">
+      <LabelledValue
+        label={
+          <div
+            className="helper-label"
+            style={{ display: "flex", gap: "0.5em" }}
+          >
+            <Text size="xs">Total Clicked</Text>
+            <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+              <InfoCircle />
+            </Hoverable>
+          </div>
+        }
+      >
         {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
       </LabelledValue>
       <div>
-        <LabelledValue label="Claimed">
+        <LabelledValue
+          label={
+            <div
+              className="helper-label"
+              style={{ display: "flex", gap: "0.5em" }}
+            >
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 100,
+                  backgroundColor: "#2af73b",
+                  marginTop: 2,
+                }}
+              />
+
+              <Text size="xs">Claimed</Text>
+              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <InfoCircle />
+              </Hoverable>
+            </div>
+          }
+        >
           {activeReferrerReferralsCount}
         </LabelledValue>
-        <Text>{activeReferrerReferralsCount * 10} BOTTLES</Text>
+        <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
       </div>
       <div>
-        <LabelledValue label="Unclaimed">
+        <LabelledValue
+          label={
+            <div
+              className="helper-label"
+              style={{ display: "flex", gap: "0.5em" }}
+            >
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 100,
+                  backgroundColor: "red",
+                  marginTop: 2,
+                }}
+              />
+              <Text size="xs">Unclaimed</Text>
+              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <InfoCircle />
+              </Hoverable>
+            </div>
+          }
+        >
           {inactiveReferrerReferralsCount}
         </LabelledValue>
         <LinkButton
@@ -164,19 +271,32 @@ const ReferralDetailsModal = ({
           START CLAIMING
         </LinkButton>
       </div>
-      {nextInactiveReferral && (
-        <div>
-          <LabelledValue label="Until Next Claim">
-            {nextInactiveReferral.progress}/10
-          </LabelledValue>
-          <ProgressBar
-            value={nextInactiveReferral.progress}
-            max={10}
-            size="sm"
-            color="holo"
-          />
-        </div>
-      )}
+      <div>
+        <LabelledValue
+          label={
+            <div
+              className="helper-label"
+              style={{ display: "flex", gap: "0.5em" }}
+            >
+              <Text size="xs">Until Next Claim</Text>
+              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <InfoCircle />
+              </Hoverable>
+            </div>
+          }
+        >
+          {nextInactiveReferral?.progress || 0}/10
+        </LabelledValue>
+        <ProgressBar
+          value={nextInactiveReferral?.progress || 0}
+          max={10}
+          size="sm"
+          color="holo"
+          style={{
+            marginTop: 6,
+          }}
+        />
+      </div>
     </div>
   </>
 );
@@ -186,15 +306,8 @@ interface IBottlesDetailsModal {
 }
 
 const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "1em",
-      alignItems: "center",
-    }}
-  >
-    <BottleDistribution bottles={bottles} />
+  <>
+    <BottleDistribution numberPosition="relative" bottles={bottles} />
     <GeneralButton
       icon={<ArrowRight />}
       layout="after"
@@ -202,6 +315,9 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         return;
       }}
       type="transparent"
+      style={{
+        alignSelf: "center",
+      }}
     >
       SEE YOUR LOOTBOTTLE TX HISTORY
     </GeneralButton>
@@ -212,12 +328,20 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <LabelledValue
-      label={<Text size="sm">Bottles earned since last checked</Text>}
-    >
+    <div className="helper-label" style={{ display: "flex", gap: "0.5em" }}>
+      <Text size="sm">Bottles earned since last checked</Text>
+      <Hoverable tooltipContent="Lorem ipsum">
+        <InfoCircle />
+      </Hoverable>
+    </div>
+    <div>
+      {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
       <LootBottle size="lg" rarity="legendary"></LootBottle>
-    </LabelledValue>
-  </div>
+      <Text prominent size="lg">
+        x22
+      </Text>
+    </div>
+  </>
 );
 
 interface IStakingStatsModal {
@@ -366,9 +490,15 @@ export const stakingLiquidityMultiplierEq = (
   stakedDays: number,
   totalStakedDays: number
 ) =>
-  (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-  (396 * totalStakedDays) / 133225 -
-  31 / 365;
+  Math.max(
+    0,
+    Math.min(
+      1,
+      (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
+    )
+  );
 
 const StakeNowModal = ({
   fluidTokens,
@@ -389,6 +519,9 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
   const [slippage, setSlippage] = useState(5);
   const [stakeErr, setStakeErr] = useState("");
+
+  const minDurationDays = 31;
+  const maxDurationDays = 365;
 
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
@@ -541,31 +674,30 @@ const StakeNowModal = ({
   >("");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "2em",
-      }}
-    >
+    <>
       <Card
         type="opaque"
         rounded
         color="holo"
         fill
         style={{
-          color: "black",
           textAlign: "center",
+          marginTop: "1em",
+          padding: "0.5em",
+          borderRadius: "0.5em",
         }}
       >
-        👀 TIP: Stake over 31 days for more rewards in future epochs & events!
-        🌊
+        <Text style={{ color: "black" }} size="sm">
+          👀 TIP: Stake over 31 days for more rewards in future epochs & events!
+          🌊
+        </Text>
       </Card>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr 2fr",
-          gap: "1em",
+          gridTemplateColumns: "auto auto 160px",
+          columnGap: "4em",
+          rowGap: "2em",
         }}
       >
         {/* Staking Amount */}
@@ -584,27 +716,25 @@ const StakeNowModal = ({
               alignItems: "center",
             }}
           >
-            <Text prominent code>
-              STAKE AMOUNT <InfoCircle />
-            </Text>
+            <Hoverable tooltipContent="Lorem ipsum">
+              <Text prominent code className="helper-label">
+                STAKE AMOUNT <InfoCircle />
+              </Text>
+            </Hoverable>
             <GeneralButton
-              type="secondary"
+              type="transparent"
               size="small"
               handleClick={() => inputMaxBalance()}
+              style={{
+                padding: "0.5em 1em",
+                borderRadius: "100px",
+              }}
             >
-              Max
+              <Text size="sm">MAX</Text>
             </GeneralButton>
           </div>
           {showTokenSelector === "fluid" ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1em",
-                background: "black",
-                padding: "5px",
-              }}
-            >
+            <div className="staking-modal-token-selector">
               {fluidTokens.map((token) => (
                 <button
                   style={{ background: "none", border: "none" }}
@@ -629,15 +759,15 @@ const StakeNowModal = ({
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <button
-                style={{ background: "none", border: "none" }}
+              <div
                 onClick={() => setShowTokenSelector("fluid")}
+                style={{ height: 60 }}
               >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={fluidToken.symbol}
                 />
-              </button>
+              </div>
               <input
                 className={"staking-modal-token-input"}
                 min={""}
@@ -662,15 +792,7 @@ const StakeNowModal = ({
             {addDecimalToBn(fluidToken.userTokenBalance, fluidToken.decimals)}
           </Text>
           {showTokenSelector === "base" ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1em",
-                background: "black",
-                padding: "5px",
-              }}
-            >
+            <div className="staking-modal-token-selector">
               {baseTokens.map((token) => (
                 <button
                   style={{ background: "none", border: "none" }}
@@ -695,15 +817,15 @@ const StakeNowModal = ({
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <button
-                style={{ background: "none", border: "none" }}
+              <div
                 onClick={() => setShowTokenSelector("base")}
+                style={{ height: 60 }}
               >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={baseToken.symbol}
                 />
-              </button>
+              </div>
               <input
                 className={"staking-modal-token-input"}
                 min={""}
@@ -733,38 +855,30 @@ const StakeNowModal = ({
           </Text>
         </div>
         {/* Arrow */}
-        <div>
+        <div className="staking-modal-arrow-container">
           <ArrowRight />
         </div>
         {/* Duration */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
-        >
-          <div>
-            <Text prominent code>
+        <div className="duration-column">
+          <Hoverable tooltipContent="Lorem ipsum">
+            <Text prominent code className="helper-label">
               DURATION <InfoCircle />
             </Text>
-            <Display style={{ margin: "0.5em 0 0.5em 0" }}>
-              {stakingDuration} D{/* Scrollbar */}
-            </Display>
-            <input
-              type="range"
-              min={31}
-              value={stakingDuration}
-              max={365}
-              step="1"
-              onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
-            />
-            <div>
-              <Text>
-                END: <Text>{endDate.toLocaleDateString("en-US")}</Text>{" "}
-                <InfoCircle />
-              </Text>
-            </div>
+          </Hoverable>
+          <Display className="no-margin">
+            {stakingDuration} D{/* Scrollbar */}
+          </Display>
+          <Form.Slider
+            min={minDurationDays}
+            max={maxDurationDays}
+            step={1}
+            valueCallback={(value: number) => setStakingDuration(value)}
+          />
+          <div className="helper-label">
+            <Text code>
+              END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+              <InfoCircle />
+            </Text>
           </div>
           <div>
             <Text prominent code>
@@ -783,66 +897,81 @@ const StakeNowModal = ({
             </Text>
           </div>
         </div>
-      </div>
-      <div style={{ border: "1px white dashed" }} />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr 2fr",
-          gap: "1em",
-        }}
-      >
-        <div>
-          <LabelledValue
-            label={
-              <Text code>
-                DAY 1 POWER <InfoCircle />
-              </Text>
-            }
+        <div
+          style={{
+            width: "100%",
+            borderBottom: "1px solid white",
+            gridColumn: "1 / span 3",
+          }}
+        />
+        <div className="power-column">
+          <Hoverable tooltipContent="Lorem Ipsum">
+            <Text size="xs" code className="helper-label">
+              DAY 1 POWER <InfoCircle />
+            </Text>
+          </Hoverable>
+          <Text
+            prominent
+            holo={stakingDuration === maxDurationDays}
+            size="xxl"
+            className="power-text"
           >
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(1, stakingDuration)
+              stakingLiquidityMultiplierEq(1, stakingDuration),
+              1
             )}
-          </LabelledValue>
-          <Text prominent code>
-            @ MULTIPLIER{" "}
-            {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(1, stakingDuration)
-            )}
-            X
           </Text>
+          {stakingLiquidityMultiplierEq(1, stakingDuration) < 1 ? (
+            <Text size="xs" prominent code>
+              @ MULTIPLIER{" "}
+              {toSignificantDecimals(
+                stakingLiquidityMultiplierEq(1, stakingDuration)
+              )}
+              X
+            </Text>
+          ) : (
+            <Card
+              type="opaque"
+              color="holo"
+              style={{ padding: "4px 8px 4px 8px", borderRadius: 4 }}
+            >
+              <Text size="xs" style={{ color: "black" }}>
+                @ MULTIPLIER 1X
+              </Text>
+            </Card>
+          )}
         </div>
-        <div>
+        <div className="staking-modal-arrow-container">
           <ArrowRight />
         </div>
-        <div>
-          <LabelledValue
-            label={
-              <Text code>
-                DAY 31 POWER <InfoCircle />
-              </Text>
-            }
-          >
+        <div className="power-column rhs">
+          <Hoverable tooltipContent="Lorem ipsum">
+            <Text size="xs" className="helper-label" code>
+              DAY 31 POWER <InfoCircle />
+            </Text>
+          </Hoverable>
+          <Text prominent holo size="xl" className="power-text">
             {toSignificantDecimals(
-              Math.min(
-                1,
-                Math.max(0, stakingLiquidityMultiplierEq(31, stakingDuration))
-              )
+              stakingLiquidityMultiplierEq(31, stakingDuration),
+              1
             )}
-          </LabelledValue>
+          </Text>
           <Card
             type="opaque"
             color="holo"
-            style={{ padding: "4px 8px 4px 8px", color: "black" }}
+            style={{
+              padding: "4px 8px 4px 8px",
+              borderRadius: 4,
+              whiteSpace: "nowrap",
+            }}
           >
-            @ MULTIPLIER{" "}
-            {toSignificantDecimals(
-              Math.min(
-                1,
-                Math.max(0, stakingLiquidityMultiplierEq(31, stakingDuration))
-              )
-            )}
-            X
+            <Text size="xs" style={{ color: "black" }}>
+              @ MULTIPLIER{" "}
+              {toSignificantDecimals(
+                stakingLiquidityMultiplierEq(31, stakingDuration)
+              )}
+              X
+            </Text>
           </Card>
         </div>
       </div>
@@ -864,7 +993,7 @@ const StakeNowModal = ({
       >
         {stakeErr}
       </Text>
-    </div>
+    </>
   );
 };
 
@@ -880,12 +1009,12 @@ const tutorialContent: {
   "0": {
     title: "WHAT ARE LOOT BOTTLES?",
     desc: "Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ",
-    image: "REFERRALS",
+    image: "WHAT_ARE_LOOT_BOTTLES",
   },
   "1": {
     title: "HOW TO EARN LOOT BOTTLES?",
     desc: "To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ",
-    image: "REFERRALS",
+    image: "HOW_TO_EARN",
   },
   "2": {
     title: "MULTIPLIERS",

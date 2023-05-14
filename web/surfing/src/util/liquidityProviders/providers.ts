@@ -18,6 +18,7 @@ const providerImgNames: { [K in Provider]: string } = {
   Dodo: "DODO.png",
   Fluidity: "logoMetallic.png",
   Jupiter: "Jupiter.svg",
+  Kyber: "Kyber.svg",
   Lemniscap: "Lemniscap.png",
   Lifinity: "lifinity.png",
   Maker: "maker-mkr-logo.png",

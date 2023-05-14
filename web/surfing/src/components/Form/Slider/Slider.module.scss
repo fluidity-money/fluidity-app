@@ -1,0 +1,34 @@
+@use 'common' as *;
+
+.Slider {
+  width: 100%;
+  // background: red;
+  cursor: pointer;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 8px;
+  margin: 0 -8px;
+  box-sizing: content-box;
+
+  .track {
+    height: 4px;
+    top: 6px;
+    left: 8px;
+    right: 8px;
+    background-color: grey;
+    position: absolute;
+  }
+  
+  .thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: white;
+    cursor: grab;
+  }
+}
