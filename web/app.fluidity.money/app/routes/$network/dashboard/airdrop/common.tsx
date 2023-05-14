@@ -1,4 +1,9 @@
-import { useState } from "react";
+import type {
+  StakingRatioRes,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
+
+import { useState, useEffect } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -10,7 +15,6 @@ import {
   ArrowRight,
   Display,
   LootBottle,
-  numberToMonetaryString,
   InfoCircle,
   TokenIcon,
   toSignificantDecimals,
@@ -28,7 +32,7 @@ import {
 import { dayDifference } from ".";
 
 import { Referral } from "~/queries";
-import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
+import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
@@ -76,7 +80,7 @@ const BottleDistribution = ({
                 : highlightBottleNumberIndex === index
                   ? { fontSize: "2.5em" }
                   : { display: "none" }),
-            } : {fontSize: '1em'}}
+            } : { fontSize: '1em' }}
           >
             {toSignificantDecimals(quantity)}
           </Text>
@@ -88,6 +92,7 @@ const BottleDistribution = ({
 
 interface IReferralDetailsModal {
   bottles: BottleTiers;
+  totalBottles: number;
   activeRefereeReferralsCount: number;
   activeReferrerReferralsCount: number;
   inactiveReferrerReferralsCount: number;
@@ -96,13 +101,14 @@ interface IReferralDetailsModal {
 
 const ReferralDetailsModal = ({
   bottles,
+  totalBottles,
   activeRefereeReferralsCount,
   activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
 }: IReferralDetailsModal) => (
   <>
-    <div style={{display: 'flex', gap: '1em', alignItems: 'center'}}>
+    <div style={{ display: 'flex', gap: '1em', alignItems: 'center' }}>
       <Display className='no-margin' size="xxxs">My Referral Link</Display>
       <Hoverable
         tooltipContent={"Lorem ipsum"}
@@ -111,25 +117,25 @@ const ReferralDetailsModal = ({
       </Hoverable>
     </div>
     <div className="referral-details-container">
-      <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
-      <Text size="xs">Active Referrals</Text>
-      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
-    </div>}>
+      <LabelledValue label={<div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
+        <Text size="xs">Active Referrals</Text>
+        <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+      </div>}>
         {activeRefereeReferralsCount}
       </LabelledValue>
       <LabelledValue
-        label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
-        <Text size="xs">Total Bottles earned from your link</Text>
-        <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
-      </div>}
+        label={<div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
+          <Text size="xs">Total Bottles earned from your link</Text>
+          <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+        </div>}
       >
-        1,051
+        {totalBottles}
         {/* TODO REPLACE THIS WITH REAL DATA */}
       </LabelledValue>
     </div>
-    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+    <div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
       <Text size="xs">Bottle Distribution</Text>
-      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+      <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
     </div>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
     <div
@@ -138,7 +144,7 @@ const ReferralDetailsModal = ({
         borderBottom: "1px solid white",
       }}
     />
-    <div style={{display: 'flex', gap: '1em', alignItems: 'center'}}>
+    <div style={{ display: 'flex', gap: '1em', alignItems: 'center' }}>
       <Display className='no-margin' size="xxxs">Links I&apos;ve Clicked</Display>
       <Hoverable
         tooltipContent={"Lorem ipsum"}
@@ -154,29 +160,29 @@ const ReferralDetailsModal = ({
         paddingBottom: "1em",
       }}
     >
-      <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
-      <Text size="xs">Total Clicked</Text>
-      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
-    </div>}>
+      <LabelledValue label={<div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
+        <Text size="xs">Total Clicked</Text>
+        <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+      </div>}>
         {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
       </LabelledValue>
       <div>
-        <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
-        <div style={{width: 8, height: 8, borderRadius: 100, backgroundColor: '#2af73b', marginTop: 2}}/>
+        <LabelledValue label={<div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
+          <div style={{ width: 8, height: 8, borderRadius: 100, backgroundColor: '#2af73b', marginTop: 2 }} />
 
-      <Text size="xs">Claimed</Text>
-      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
-    </div>}>
+          <Text size="xs">Claimed</Text>
+          <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+        </div>}>
           {activeReferrerReferralsCount}
         </LabelledValue>
         <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
       </div>
       <div>
-        <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
-        <div style={{width: 8, height: 8, borderRadius: 100, backgroundColor: 'red', marginTop: 2}}/>
-      <Text size="xs">Unclaimed</Text>
-      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
-    </div>}>
+        <LabelledValue label={<div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
+          <div style={{ width: 8, height: 8, borderRadius: 100, backgroundColor: 'red', marginTop: 2 }} />
+          <Text size="xs">Unclaimed</Text>
+          <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+        </div>}>
           {inactiveReferrerReferralsCount}
         </LabelledValue>
         <LinkButton
@@ -190,23 +196,23 @@ const ReferralDetailsModal = ({
           START CLAIMING
         </LinkButton>
       </div>
-        <div>
-          <LabelledValue label={    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
-      <Text size="xs">Until Next Claim</Text>
-      <Hoverable style={{marginTop: -2}} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
-    </div>}>
-            {nextInactiveReferral?.progress || 0}/10
-          </LabelledValue>
-          <ProgressBar
-            value={nextInactiveReferral?.progress || 0}
-            max={10}
-            size="sm"
-            color="holo"
-            style={{
-              marginTop: 6
-            }}
-          />
-        </div>
+      <div>
+        <LabelledValue label={<div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
+          <Text size="xs">Until Next Claim</Text>
+          <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
+        </div>}>
+          {nextInactiveReferral?.progress || 0}/10
+        </LabelledValue>
+        <ProgressBar
+          value={nextInactiveReferral?.progress || 0}
+          max={10}
+          size="sm"
+          color="holo"
+          style={{
+            marginTop: 6
+          }}
+        />
+      </div>
     </div>
   </>
 );
@@ -238,7 +244,7 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <div className="helper-label" style={{display: 'flex', gap: '0.5em'}}>
+    <div className="helper-label" style={{ display: 'flex', gap: '0.5em' }}>
       <Text size="sm">Bottles earned since last checked</Text>
       <Hoverable tooltipContent="Lorem ipsum"><InfoCircle /></Hoverable>
     </div>
@@ -252,7 +258,7 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
 
 interface IStakingStatsModal {
   liqudityMultiplier: number;
-  stakes: Array<StakingEvent>;
+  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
 }
 const StakingStatsModal = ({
   liqudityMultiplier,
@@ -276,108 +282,89 @@ const StakingStatsModal = ({
           {stakes.length}
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
-          {numberToMonetaryString(
-            stakes.reduce((sum, { amount }) => sum + amount, 0)
+          $
+          {addDecimalToBn(
+            stakes.reduce((sum, { amount }) => sum.add(amount), new BN(0)),
+            6
           )}
         </LabelledValue>
       </div>
       <div style={{ position: "relative", border: "1px gray" }}>
-        <div
-          style={{
-            position: "absolute",
-            top: "-24px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <GeneralButton> Select All</GeneralButton>
-          <GeneralButton> Withdraw</GeneralButton>
-        </div>
+        <GeneralButton disabled={true} style={{ right: "0" }}>
+          Withdraw
+        </GeneralButton>
         <div>
-          {stakes.map(
-            (
-              {
-                amount,
-                durationDays,
-                multiplier,
-                insertedDate: insertedDateStr,
-              },
-              i
-            ) => {
-              const insertedDate = new Date(insertedDateStr);
-              const stakedDays = dayDifference(new Date(), insertedDate);
+          {stakes.map(({ amount, durationDays, depositDate }, i) => {
+            const stakedDays = dayDifference(new Date(), depositDate);
+            const multiplier = stakingLiquidityMultiplierEq(
+              stakedDays,
+              durationDays
+            );
 
-              const endDate = new Date(insertedDate);
-              endDate.setDate(endDate.getDate() + durationDays);
+            const endDate = new Date(depositDate);
+            endDate.setDate(endDate.getDate() + durationDays);
 
-              return (
+            return (
+              <div
+                key={`stake-${i}`}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 3fr 1fr",
+                }}
+              >
+                {/* Dates */}
                 <div
-                  key={`stake-${i}`}
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "0.2 0.6 0.1 0.1",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "0.5em",
                   }}
                 >
-                  {/* Dates */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
-                    }}
-                  >
-                    <Text>Start Date</Text>
-                    <Text prominent>
-                      {insertedDate.toLocaleDateString("en-US")}
-                    </Text>
+                  <Text>Start Date</Text>
+                  <Text prominent>
+                    {depositDate.toLocaleDateString("en-US")}
+                  </Text>
 
-                    <Text>End Date</Text>
-                    <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
-                  </div>
+                  <Text>End Date</Text>
+                  <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "0.5em",
+                  }}
+                >
+                  <Heading as="h3">{addDecimalToBn(amount, 6)}</Heading>
+                  <ProgressBar
+                    value={stakedDays}
+                    max={durationDays}
+                    rounded
+                    color={durationDays === stakedDays ? "holo" : "gray"}
+                    size="sm"
+                  />
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <Heading as="h3">{numberToMonetaryString(amount)}</Heading>
-                    <ProgressBar
-                      value={stakedDays}
-                      max={durationDays}
-                      rounded
-                      color={durationDays === stakedDays ? "holo" : "gray"}
-                      size="sm"
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Text prominent>{multiplier}x Multiplier</Text>
-                      <Text prominent>
-                        {durationDays - stakedDays} Days Left
-                      </Text>
-                    </div>
-                  </div>
-                  <div
-                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                  >
-                    <Text>Staked For</Text>
-                    <Heading as="h2">{durationDays}</Heading>
-                    <Text>Days</Text>
-                  </div>
-                  <div>
-                    <input type="checkbox" />
+                    <Text prominent>{multiplier}x Multiplier</Text>
+                    <br />
+                    <Text prominent>{durationDays - stakedDays} Days Left</Text>
                   </div>
                 </div>
-              );
-            }
-          )}
+                <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
+                  <Text>Staked For</Text>
+                  <Heading as="h2">{Math.floor(durationDays)}</Heading>
+                  <Text>Days</Text>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
@@ -387,13 +374,23 @@ const StakingStatsModal = ({
 interface IStakingNowModal {
   fluidTokens: Array<AugmentedToken>;
   baseTokens: Array<AugmentedToken>;
-  stakeToken?: (
+  stakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
     fusdc: BN,
     wethAmt: BN,
-    slippage: BN
-  ) => void;
+    slippage: BN,
+    maxTimestamp: BN
+  ) => Promise<StakingDepositsRes | undefined>;
+  testStakeTokens?: (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdc: BN,
+    wethAmt: BN,
+    slippage: BN,
+    maxTimestamp: BN
+  ) => Promise<StakingDepositsRes | undefined>;
+  ratios: StakingRatioRes | null;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -405,14 +402,16 @@ export const stakingLiquidityMultiplierEq = (
   stakedDays: number,
   totalStakedDays: number
 ) =>
-  (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
+  Math.max(0, Math.min(1, (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
   (396 * totalStakedDays) / 133225 -
-  31 / 365;
+  31 / 365));
 
 const StakeNowModal = ({
   fluidTokens,
   baseTokens,
-  stakeToken,
+  stakeTokens,
+  testStakeTokens,
+  ratios,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -424,11 +423,16 @@ const StakeNowModal = ({
   });
 
   const [stakingDuration, setStakingDuration] = useState(31);
+  const [slippage, setSlippage] = useState(5);
+  const [stakeErr, setStakeErr] = useState("");
 
-  const maxDuration = 365;
+  const minDurationDays = 31;
+  const maxDurationDays = 365;
 
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
+
+  const daysToSeconds = (days: number) => days * 24 * 60 * 60;
 
   const parseSwapInputToTokenAmount = (
     input: string,
@@ -504,14 +508,66 @@ const StakeNowModal = ({
     });
   };
 
-  const canStake = () => false;
+  const [canStake, setCanStake] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setCanStake(await testStake());
+    })();
+  }, [baseToken, fluidToken, slippage]);
+
+  const testStake = async (): Promise<boolean> => {
+    try {
+      await testStakeTokens?.(
+        new BN(daysToSeconds(stakingDuration)),
+        baseToken.symbol === "USDC"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        fluidToken.symbol === "fUSDC"
+          ? snapToValidValue(fluidToken.amount, fluidToken)
+          : new BN(0),
+        baseToken.symbol === "wETH"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        new BN(slippage),
+        new BN(Math.floor(new Date().getMilliseconds() / 1000) + 30 * 60) // 30 Minutes after now
+      );
+
+      setStakeErr("");
+      return true;
+    } catch (e) {
+      // Expect error on fail
+      const errMsgMatchReason = /reason="[a-z :_]+/i;
+      const stakingError = (e as { message: string }).message
+        .match(errMsgMatchReason)?.[0]
+        .slice(8);
+
+      if (stakingError) {
+        setStakeErr(stakingError);
+      }
+      return false;
+    }
+  };
 
   const handleStake = async () => {
-    if (!stakeToken) return;
-    if (!canStake()) return;
+    if (!stakeTokens) return;
+    if (!canStake) return;
 
     try {
-      // await stakeToken();
+      await stakeTokens(
+        new BN(daysToSeconds(stakingDuration)),
+        baseToken.symbol === "USDC"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        fluidToken.symbol === "fUSDC"
+          ? snapToValidValue(fluidToken.amount, fluidToken)
+          : new BN(0),
+        baseToken.symbol === "wETH"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        new BN(slippage),
+        new BN(Math.floor(new Date().getMilliseconds() / 1000) + 30 * 60) // 30 Minutes after now
+      );
     } catch (e) {
       // Expect error on fail
       console.log(e);
@@ -521,7 +577,7 @@ const StakeNowModal = ({
 
   const [showTokenSelector, setShowTokenSelector] = useState<
     "fluid" | "base" | ""
-  >("base");
+  >("");
 
   return (
     <>
@@ -537,7 +593,7 @@ const StakeNowModal = ({
           borderRadius: '0.5em',
         }}
       >
-        <Text style={{color: 'black'}} size="sm">
+        <Text style={{ color: 'black' }} size="sm">
           👀 TIP: Stake over 31 days for more rewards in future epochs & events! 🌊
         </Text>
       </Card>
@@ -589,7 +645,8 @@ const StakeNowModal = ({
               className="staking-modal-token-selector"
             >
               {fluidTokens.map((token) => (
-                <div
+                <button
+                  style={{ background: "none", border: "none" }}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (fluidToken.symbol != token.symbol) {
@@ -606,7 +663,7 @@ const StakeNowModal = ({
                     token={token.symbol}
                     className={"staking-modal-token-icon"}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -638,12 +695,17 @@ const StakeNowModal = ({
               />
             </div>
           )}
+          <Text>
+            {fluidToken.symbol} Balance:{" "}
+            {addDecimalToBn(fluidToken.userTokenBalance, fluidToken.decimals)}
+          </Text>
           {showTokenSelector === "base" ? (
             <div
               className="staking-modal-token-selector"
             >
               {baseTokens.map((token) => (
-                <div
+                <button
+                  style={{ background: "none", border: "none" }}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (baseToken.symbol != token.symbol) {
@@ -660,7 +722,7 @@ const StakeNowModal = ({
                     key={token.symbol}
                     token={token.symbol}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -693,6 +755,14 @@ const StakeNowModal = ({
               />
             </div>
           )}
+          <Text>
+            {baseToken.symbol} Balance:{" "}
+            {addDecimalToBn(baseToken.userTokenBalance, baseToken.decimals)}
+          </Text>
+          <Text prominent>
+            {fluidToken.symbol}/{baseToken.symbol} ratio:{" "}
+            {ratios?.fusdcUsdcRatio.toString()}
+          </Text>
         </div>
         {/* Arrow */}
         <div className="staking-modal-arrow-container">
@@ -713,8 +783,8 @@ const StakeNowModal = ({
             {stakingDuration} D{/* Scrollbar */}
           </Display>
           <Form.Slider 
-            min={31}
-            max={365}
+            min={minDurationDays}
+            max={maxDurationDays}
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
@@ -722,6 +792,22 @@ const StakeNowModal = ({
             <Text code>
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
+            </Text>
+          </div>
+          <div>
+            <Text prominent code>
+              SLIPPAGE % <InfoCircle />
+              <input
+                type="number"
+                pattern="[0-9]"
+                min={1}
+                value={slippage}
+                max={50}
+                step="1"
+                onChange={(e) =>
+                  setSlippage(Math.floor(e.target.valueAsNumber))
+                }
+              />
             </Text>
           </div>
         </div>
@@ -740,33 +826,33 @@ const StakeNowModal = ({
               </Hoverable>
             <Text
               prominent
-              holo={stakingDuration === maxDuration}
+              holo={stakingDuration === maxDurationDays}
               size="xxl"
               className="power-text"
             >
             {toSignificantDecimals(
               stakingLiquidityMultiplierEq(1, stakingDuration)
-            ,1)}
-            </Text>
+              , 1)}
+          </Text>
           {
             stakingLiquidityMultiplierEq(1, stakingDuration) < 1 ?
-            (          <Text size="xs" prominent code>
-            @ MULTIPLIER{" "}
-            {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(1, stakingDuration)
-            )}
-            X
-          </Text>) : (
-              <Card
-                type="opaque"
-                color="holo"
-                style={{ padding: "4px 8px 4px 8px", borderRadius: 4 }}
-              >
-            <Text size="xs" style={{color: 'black'}}>
-              @ MULTIPLIER 1X
-            </Text>
-          </Card>
-            )
+              (<Text size="xs" prominent code>
+                @ MULTIPLIER{" "}
+                {toSignificantDecimals(
+                  stakingLiquidityMultiplierEq(1, stakingDuration)
+                )}
+                X
+              </Text>) : (
+                <Card
+                  type="opaque"
+                  color="holo"
+                  style={{ padding: "4px 8px 4px 8px", borderRadius: 4 }}
+                >
+                  <Text size="xs" style={{ color: 'black' }}>
+                    @ MULTIPLIER 1X
+                  </Text>
+                </Card>
+              )
           }
 
         </div>
@@ -808,12 +894,22 @@ const StakeNowModal = ({
       </div>
       <GeneralButton
         type="secondary"
-        disabled={!canStake()}
+        disabled={!canStake}
         style={{ width: "95%" }}
         handleClick={() => handleStake()}
       >
         Stake
       </GeneralButton>
+      <Text
+        style={{
+          textAlign: "center",
+          display: stakeErr ? "false" : "",
+          color: "red",
+          textTransform: "capitalize",
+        }}
+      >
+        {stakeErr}
+      </Text>
     </>
   );
 };
@@ -822,10 +918,10 @@ type TutorialSlide = {
   title: string;
   desc: React.ReactNode;
   image: string;
-}
+};
 
 const tutorialContent: {
-  [key: number]: TutorialSlide
+  [key: number]: TutorialSlide;
 } = {
   "0": {
     title: 'WHAT ARE LOOT BOTTLES?',
@@ -851,14 +947,14 @@ const tutorialContent: {
         }}
       >
         <Text prominent code holo>
-          <Display style={{margin:0, textAlign: 'right'}} size="xs">2x</Display> 
+          <Display style={{ margin: 0, textAlign: 'right' }} size="xs">2x</Display>
         </Text>
         <Text size="md" holo>
-          Transacting fAssets using our Boosted Protocols
+          Transacting fAssets using our supported DEXs
         </Text>
         <LootBottle
           size="sm"
-          style={{width: 40, height: 40}}
+          style={{ width: 40, height: 40 }}
           rarity="rare"
           quantity={100}
         />
@@ -867,7 +963,7 @@ const tutorialContent: {
         </Text>
         <LootBottle
           size="sm"
-          style={{width: 40, height: 40}}
+          style={{ width: 40, height: 40 }}
           rarity="legendary"
           quantity={10}
         />
@@ -876,7 +972,7 @@ const tutorialContent: {
         </Text>
         <LootBottle
           size="sm"
-          style={{width: 40, height: 40}}
+          style={{ width: 40, height: 40 }}
           rarity="ultra_rare"
           quantity={10}
         />
@@ -888,58 +984,56 @@ const tutorialContent: {
     image: 'MULTIPLIER',
   },
   "3": {
-    title: 'REFERRALS',
-    desc: 'You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions. ',
-    image: 'REFERRALS',
+    title: "REFERRALS",
+    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions. ",
+    image: "REFERRALS",
   },
   "4": {
-    title: 'LEARN MORE',
-    desc: 'To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.',
-    image: 'AIRDROP_DEEP_DIVE',
+    title: "LEARN MORE",
+    desc: "To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.",
+    image: "AIRDROP_DEEP_DIVE",
   },
-}
+};
 
-const TutorialModal = ({ isMobile, closeModal }: {isMobile?: boolean, closeModal?: () => void}) => {
+const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   return <>
-  <AnimatePresence
-    mode="wait"
-  >
-    <motion.div
-      key={`tutorial-slide-${currentSlide}`}
-      initial={{ opacity: 0 }}
-      animate={{opacity: 1}}
-      exit={{opacity: 0}}
-      transition={{duration: 0.1}}
-
-      className={'tutorial-slide-container'}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%',
-        maxWidth: isMobile ? 550 : 635,
-        gap: '1em',
-        marginTop: '1em'
-      }}
+    <AnimatePresence
+      mode="wait"
     >
-      <Video 
-        type="cover"
-        width={isMobile ? 550 : (1270/2)}
-        height={isMobile ? 550 : (460/2)}
-        loop
-        src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image}.mp4`} 
-        className='tutorial-image'
-      />
-      <Display size="xxs" style={{margin: 0}}>{ tutorialContent[currentSlide].title }</Display>
-      { tutorialContent[currentSlide].desc }
-    </motion.div>
+      <motion.div
+        key={`tutorial-slide-${currentSlide}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.1 }}
+
+        className={'tutorial-slide-container'}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          width: '100%',
+          gap: '1em',
+        }}
+      >
+        <Video
+          type="cover"
+          width={isMobile ? 550 : (1270 / 2)}
+          height={isMobile ? 550 : (460 / 2)}
+          loop
+          src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image}.mp4`}
+          className='tutorial-image'
+        />
+        <Display size="xxs" style={{ margin: 0 }}>{tutorialContent[currentSlide].title}</Display>
+        {tutorialContent[currentSlide].desc}
+      </motion.div>
     </AnimatePresence>
 
-    <div className="tutorial-nav" style={{
+    <div style={{
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
@@ -956,31 +1050,18 @@ const TutorialModal = ({ isMobile, closeModal }: {isMobile?: boolean, closeModal
       >
         PREV
       </GeneralButton>
-      { currentSlide + 1 } / 5
-      {
-        currentSlide !== 4 ? (
-          <GeneralButton
-          icon={<ArrowRight />}
-          layout="after"
-          handleClick={() => {
-            setCurrentSlide(currentSlide + 1)
-          }}
-          type="transparent"
-          disabled={currentSlide === 4}
-        >
-          Next
-        </GeneralButton>
-        ) : !isMobile && (
-          <GeneralButton
-          type="primary"
-          handleClick={closeModal}
-          className="start-earning-button"
-        >
-          START EARNING 
-        </GeneralButton>
-        )
-      }
-
+      {currentSlide + 1} / 5
+      <GeneralButton
+        icon={<ArrowRight />}
+        layout="after"
+        handleClick={() => {
+          setCurrentSlide(currentSlide + 1)
+        }}
+        type="transparent"
+        disabled={currentSlide === 4}
+      >
+        Next
+      </GeneralButton>
     </div>
   </>;
 };

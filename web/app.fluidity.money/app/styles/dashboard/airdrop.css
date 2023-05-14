@@ -213,7 +213,8 @@
   padding-right: 2em;
 }
 
-th, td {
+th,
+td {
   padding-left: 2em !important;
   padding-right: 2em !important;
 }

@@ -74,7 +74,7 @@ func calculatePayoutFrac(tokenBpy, totalBpy *big.Rat) *big.Rat {
 
 // A / p(b)
 // Calculates the payouts for the different reward tiers, returns the probabilities and payouts
-func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64, emission *worker.Emission) (payout *big.Rat, probability_ *big.Rat) {
+func payout(trfMode worker.TrfMode, atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64, emission *worker.Emission) (payout *big.Rat, probability_ *big.Rat) {
 	m := int64(winningClasses)
 
 	gTimesAtx := new(big.Rat).Mul(g, atx)
@@ -83,16 +83,24 @@ func payout(atx, g, blockTimeRat, delta *big.Rat, winningClasses int, n, b int64
 
 	a := new(big.Rat)
 
-	if gTimesAtx.Cmp(delta) < 0 {
-
-		a = new(big.Rat).Quo(g, mRat)
-
-	} else {
-
+	switch trfMode {
+	case worker.TrfModeNoOptimisticSolution:
 		atxMulM := new(big.Rat).Mul(atx, mRat)
 
 		a = new(big.Rat).Quo(delta, atxMulM)
 
+	default:
+		if gTimesAtx.Cmp(delta) < 0 {
+
+			a = new(big.Rat).Quo(g, mRat)
+
+		} else {
+
+			atxMulM := new(big.Rat).Mul(atx, mRat)
+
+			a = new(big.Rat).Quo(delta, atxMulM)
+
+		}
 	}
 
 	p := probability(m, n, b)
@@ -180,7 +188,7 @@ func calculateN(winningClasses int, atx, payoutFreq *big.Rat, emission *worker.E
 }
 
 // n, payouts[]
-func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.UtilityVars, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[applications.UtilityName][]worker.Payout, probabilities []*big.Rat) {
+func WinningChances(trfMode worker.TrfMode, gasFee, atx, payoutFreq *big.Rat, distributionPools []worker.UtilityVars, winningClasses, averageTransfersInBlock int, blockTimeInSeconds uint64, emission *worker.Emission) (winningTier uint, payouts map[applications.UtilityName][]worker.Payout, probabilities []*big.Rat) {
 
 	averageTransfersInBlock_ := intToRat(averageTransfersInBlock)
 
@@ -221,6 +229,7 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 		winningClass := int64(i + 1)
 
 		payout, probability := payout(
+			trfMode,
 			averageTransfersInBlock_,
 			gasFee,
 			blockTimeRat,
@@ -289,11 +298,22 @@ func WinningChances(gasFee, atx, payoutFreq *big.Rat, distributionPools []worker
 
 	// set the emissions data for logging after the fact
 
-	emission.WinningChances.Probability1, _ = probabilities[0].Float64()
-	emission.WinningChances.Probability2, _ = probabilities[1].Float64()
-	emission.WinningChances.Probability3, _ = probabilities[2].Float64()
-	emission.WinningChances.Probability4, _ = probabilities[3].Float64()
-	emission.WinningChances.Probability5, _ = probabilities[4].Float64()
+	switch len(probabilities) {
+	case 5:
+		emission.WinningChances.Probability5, _ = probabilities[4].Float64()
+		fallthrough
+	case 4:
+		emission.WinningChances.Probability4, _ = probabilities[3].Float64()
+		fallthrough
+	case 3:
+		emission.WinningChances.Probability3, _ = probabilities[2].Float64()
+		fallthrough
+	case 2:
+		emission.WinningChances.Probability2, _ = probabilities[1].Float64()
+		fallthrough
+	case 1:
+		emission.WinningChances.Probability1, _ = probabilities[0].Float64()
+	}
 
 	emission.WinningChances.AtxAtEnd, _ = atx.Float64()
 

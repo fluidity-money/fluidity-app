@@ -21,9 +21,15 @@ struct UtilityVars {
     uint256 exchangeRateDenom;
     uint256 deltaWeightNum;
     uint256 deltaWeightDenom;
+    string customCalculationType;
 }
 
+// DEFAULT_CALCULATION_TYPE to use as the value for customCalculationType if
+// your utility doesn't have a worker override
+string constant DEFAULT_CALCULATION_TYPE = "";
+
 interface IFluidClient {
+
     /// @notice MUST be emitted when any reward is paid out
     event Reward(
         address indexed winner,

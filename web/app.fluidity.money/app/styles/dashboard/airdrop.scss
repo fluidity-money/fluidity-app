@@ -17,14 +17,13 @@
     path {
       fill: currentColor;
     }
-  }  
+  }
 }
-
 
 .lootbottle-container {
   display: flex;
   flex-direction: column;
-  align-items: center;  
+  align-items: center;
   gap: 0.2em;
   padding: 1em 0;
   position: relative;
@@ -43,7 +42,6 @@
 }
 
 .tutorial-slide-container {
-
   max-width: 100%;
   height: auto;
 
@@ -138,17 +136,16 @@ $holo: linear-gradient(
 
   h1 {
     white-space: nowrap;
-    overflow:visible;
+    overflow: visible;
   }
 
   input {
-
   }
 }
 
 .power-column {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   gap: 0.5em;
 
   &.rhs {
@@ -192,7 +189,6 @@ $holo: linear-gradient(
     cursor: pointer;
     grid-column: 2 / 3;
     justify-content: center;
-
   }
 
   .multiplier-tasks-tasks {
@@ -204,7 +200,7 @@ $holo: linear-gradient(
     gap: 6px;
 
     a {
-      text-align:center;
+      text-align: center;
     }
   }
 }
@@ -229,7 +225,6 @@ $holo: linear-gradient(
       grid-row: 2 / 3;
       justify-content: center;
     }
-
   }
 }
 
@@ -242,7 +237,6 @@ $holo: linear-gradient(
   margin-bottom: 1em;
 
   .leaderboard-header-text {
-
   }
   .leaderboard-header-filters {
     display: flex;
@@ -260,7 +254,8 @@ $holo: linear-gradient(
   padding-right: 2em;
 }
 
-th, td {
+th,
+td {
   padding-left: 2em !important;
   padding-right: 2em !important;
 }
@@ -275,27 +270,27 @@ th {
 }
 
 .airdrop-row {
+  td {
+    background-color: transparent !important;
+    border-bottom: 1px solid white !important;
+    &:last-child {
+      padding-right: 4em !important;
+    }
+    &:first-child {
+      padding-left: 4em !important;
+    }
+  }
+
+  &:last-of-type {
     td {
-      background-color: transparent !important;
-      border-bottom: 1px solid white !important;
-      &:last-child {
-        padding-right: 4em !important;
-      }
-      &:first-child {
-        padding-left: 4em !important;
-      }
+      border-bottom: none !important;
     }
+  }
 
-    &:last-of-type {
-      td {
-        border-bottom: none !important;
-      }
+  &.highlighted-row {
+    td {
+      border: none !important;
     }
-
-    &.highlighted-row {
-      td {
-        border: none !important;
-      }
-      background: $holo;
-    }
+    background: $holo;
+  }
 }

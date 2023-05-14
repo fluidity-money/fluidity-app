@@ -11,7 +11,7 @@ import { bindings, contracts } from './setup-mainnet';
 
 import { signers } from './setup-common';
 
-import { USDT_ADDR } from '../test-constants';
+import { USDT_ADDR } from '../mainnet-constants';
 
 function fluidityReward(...winners: [string, number][]) {
     return [[
@@ -29,9 +29,8 @@ describe("Token", async function () {
     let accountAddr: string;
 
     before(async function () {
-        if (process.env.FLU_FORKNET_NETWORK !== "mainnet") {
+        if (process.env.FLU_FORKNET_NETWORK !== "mainnet")
             return this.skip();
-        }
 
         ({
             usdt: {

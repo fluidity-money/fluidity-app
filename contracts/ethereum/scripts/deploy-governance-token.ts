@@ -1,9 +1,5 @@
 import hre from "hardhat";
-import { mustEnv } from "../script-utils";
-import type { ethers } from "ethers";
 import { BigNumber} from "ethers";
-
-const ENV_OPERATOR = `FLU_ETHEREUM_OPERATOR_ADDRESS`;
 
 const name = "Fluidity Money";
 const symbol = "FLUID";

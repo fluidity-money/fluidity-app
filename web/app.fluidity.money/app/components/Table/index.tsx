@@ -105,15 +105,12 @@ const Table = <T,>(props: ITable<T>) => {
         )}
 
         {/* Item Count */}
-        {
-          paginate !== false && (
-            <Text>
-              {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
-              {cappedPageCount} {itemName}
-            </Text>
-          )
-        }
-        
+        {paginate !== false && (
+          <Text>
+            {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+            {cappedPageCount} {itemName}
+          </Text>
+        )}
       </div>
 
       {/* Table */}

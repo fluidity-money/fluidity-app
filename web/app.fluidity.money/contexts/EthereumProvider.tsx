@@ -1,4 +1,5 @@
-import { ReactNode, useContext } from "react";
+import type { StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
+import type { ReactNode } from "react";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -6,7 +7,7 @@ import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useContext } from "react";
 import {
   useWeb3React,
   Web3ReactProvider,
@@ -21,7 +22,9 @@ import {
   manualRewardToken,
   getUserDegenScore,
   getUserStakingDeposits,
+  getTokenStakingRatio,
   makeStakingDeposit,
+  testMakeStakingDeposit,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -269,9 +272,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -378,40 +381,109 @@ const EthereumFacade = ({
   /**
    * getStakingDeposits returns total tokens staked by a user.
    */
-  const getStakingDeposits = async (address: string): Promise<unknown> => {
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return 0;
-    }
-
-    const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
-
-    return getUserStakingDeposits(
-      signer.provider,
-      StakingAbi,
-      stakingAddr,
-      address
-    );
-  };
-
-  /*
-   * getStakingDeposits returns total tokens staked by a user.
-   */
-  const stakeTokens = async (
-    lockDurationSeconds: BN,
-    usdcAmt: BN,
-    fusdcAmt: BN,
-    wethAmt: BN,
-    slippage: BN
-  ) => {
+  const getStakingDeposits = async (
+    address: string
+  ): Promise<
+    Array<{ amount: BN; durationDays: number; depositDate: Date }> | undefined
+  > => {
     const signer = provider?.getSigner();
 
     if (!signer) {
       return undefined;
     }
 
-    const stakingAddr = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0";
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    const stakingDeposits =
+      (await getUserStakingDeposits(
+        signer.provider,
+        StakingAbi,
+        stakingAddr,
+        address
+      )) ?? [];
+
+    return stakingDeposits.map(
+      ({
+        camelotLpMinted,
+        sushiswapLpMinted,
+        redeemTimestamp,
+        depositTimestamp,
+      }) => {
+        const camelotLp = new BN(camelotLpMinted.toString());
+        const sushiswapLp = new BN(sushiswapLpMinted.toString());
+        const totalLp = camelotLp.add(sushiswapLp);
+
+        return {
+          amount: totalLp,
+          durationDays: redeemTimestamp.toNumber() / 24 / 60 / 60,
+          depositDate: new Date(depositTimestamp.toNumber() * 1000),
+        };
+      }
+    );
+  };
+
+  const getStakingRatios = async () => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    return getTokenStakingRatio(signer.provider, StakingAbi, stakingAddr);
+  };
+
+  /*
+   * testStakeTokens returns total tokens staked by a user.
+   */
+  const testStakeTokens = async (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdcAmt: BN,
+    wethAmt: BN,
+    slippage: BN,
+    maxTimestamp: BN
+  ): Promise<StakingDepositsRes | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    return testMakeStakingDeposit(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      lockDurationSeconds,
+      usdcAmt,
+      fusdcAmt,
+      wethAmt,
+      slippage,
+      maxTimestamp
+    );
+  };
+
+  /*
+   * stakeTokens locks up user tokens.
+   */
+  const stakeTokens = async (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdcAmt: BN,
+    wethAmt: BN,
+    slippage: BN,
+    maxTimestamp: BN
+  ): Promise<StakingDepositsRes | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
     const [usdcToken, fusdcToken, wethToken] = ["USDC", "fUSDC", "wETH"].map(
       (tokenSymbol) => {
@@ -441,7 +513,8 @@ const EthereumFacade = ({
       usdcAmt,
       fusdcAmt,
       wethAmt,
-      slippage
+      slippage,
+      maxTimestamp
     );
   };
 
@@ -465,6 +538,8 @@ const EthereumFacade = ({
         signBuffer,
         getStakingDeposits,
         stakeTokens,
+        testStakeTokens,
+        getStakingRatios,
       }}
     >
       {children}

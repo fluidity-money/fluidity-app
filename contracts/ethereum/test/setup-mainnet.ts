@@ -6,7 +6,7 @@ import { deployTokens } from "../deployment";
 
 import {
   AAVE_V2_POOL_PROVIDER_ADDR,
-  TokenList } from "../test-constants";
+  TokenList } from "../mainnet-constants";
 
 import {
   commonBindings,
@@ -145,8 +145,8 @@ before(async function () {
 
   contracts = {
     ...commonContracts,
-    usdt: tokens["fUSDt"],
-    fei: tokens["fFei"],
+    usdt: tokens["fUSDT"],
+    fei: tokens["fFEI"],
     dai: tokens["fDAI"],
     weth: tokens["fwETH"],
     ethConvertor
