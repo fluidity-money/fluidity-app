@@ -3,7 +3,7 @@ SERVICES:
       SERVICE_NAME: microservice-arbitrum-fanfare-fluidity-money
       DOCKERFILE_PATH: ./cmd/microservice-fanfare-fluidity-money
       DOCKER_IMAGE: microservice-arbitrum-fanfare-fluidity-money
-      TARGET_GROUP_01: flu-mainnet-arb-fanfare-tg
+      TARGET_GROUP: flu-mainnet-arb-fanfare-tg
       ENV_FLU_WORKER_ID: arbitrum-microservice-fanfare-fluidity-money
       ENV_FLU_ETHEREUM_NETWORK: arbitrum
       
