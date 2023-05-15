@@ -62,7 +62,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to join the network to create an endpoint!"
+			k.Message = "Failed to create network-centric URL!"
 			k.Payload = err
 		})
 	}
