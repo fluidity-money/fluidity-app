@@ -37,10 +37,11 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 	http.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
 		ipAddress := r.Header.Get(web.HeaderIpAddress)
 
-		log.Debugf(
-			"Upgrading IP %v to a websocket!",
-			ipAddress,
-		)
+		log.Debug(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Upgrading IP %v to a websocket!"
+			k.Payload = ipAddress
+		})
 
 		websocketConn, err := websocketUpgrader.Upgrade(w, r, nil)
 
@@ -78,7 +79,11 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 		)
 
 		go func() {
-			log.Debugf("Beginning to read messages from IP %#v!", ipAddress)
+			log.Debug(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "Beginning to read messages!"
+				k.Payload = ipAddress
+			})
 
 			for {
 				_, content, err := websocketConn.ReadMessage()
@@ -95,27 +100,30 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 						k.Payload = err
 					})
 
-					log.Debugf(
-						"After an error with IP %#v, sending a message to chanHandlerShutdown...",
-						ipAddress,
-					)
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "After an error with IP %#v, sending a message to chanHandlerShutdown..."
+						k.Payload = ipAddress
+					})
 
 					chanHandlerShutdown <- true
 
-					log.Debugf(
-						"After an error with IP %#v, sending a message to chanShutdownWriter...",
-						ipAddress,
-					)
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "After an error, sending a message to chanShutdownWriter..."
+						k.Payload = ipAddress
+					})
 
 					chanShutdownWriter <- true
 
 					return
 				}
 
-				log.Debugf(
-					"Sending a mesage to the replies channel for IP %#v!",
-					ipAddress,
-				)
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Sending a mesage to the replies channel!"
+					k.Payload = ipAddress
+				})
 
 				replies <- content
 			}
@@ -125,18 +133,20 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 			for {
 				select {
 				case _ = <-chanShutdownWriter:
-					log.Debugf(
-						"Received a message to shut down the writer for IP %#v!",
-						ipAddress,
-					)
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "Received a message to shut down the writer!"
+						k.Payload = ipAddress
+					})
 
 					return
 
 				case message := <-messages:
-					log.Debugf(
-						"Received a message to write to IP %#v!",
-						ipAddress,
-					)
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "Received a message to write!"
+						k.Payload = ipAddress
+					})
 
 					err := websocketConn.WriteMessage(
 						websocket.TextMessage,
@@ -160,10 +170,11 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 						return
 					}
 
-					log.Debugf(
-						"Wrote a message to the websocket for IP %#v!",
-						ipAddress,
-					)
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "Wrote a message to the websocket!"
+						k.Payload = ipAddress
+					})
 				}
 			}
 		}()
