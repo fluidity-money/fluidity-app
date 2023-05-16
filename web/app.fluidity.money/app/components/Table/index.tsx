@@ -13,7 +13,6 @@ export type ColumnProps = {
 };
 
 export type PaginationProps = {
-  paginate?: boolean;
   page: number;
   rowsPerPage: number;
   pageQuery?: string;
@@ -47,8 +46,7 @@ type ITable<T> = {
 
   showLoadingAnimation?: boolean;
 
-  // Freeze a given row to the top of the table according to a boolean function
-  freezeRow?: (data: T) => boolean;
+  style?: "dashboard" | "airdrop";
 };
 
 const Table = <T,>(props: ITable<T>) => {
@@ -64,10 +62,9 @@ const Table = <T,>(props: ITable<T>) => {
     activeFilterIndex,
     loaded,
     showLoadingAnimation = false,
-    freezeRow,
   } = props;
 
-  const { rowsPerPage, page, paginate } = pagination;
+  const { rowsPerPage, page } = pagination;
 
   const isTransition = useTransition();
 
@@ -77,8 +74,6 @@ const Table = <T,>(props: ITable<T>) => {
 
   const startIndex = (page - 1) * rowsPerPage + 1;
   const endIndex = Math.min(page * rowsPerPage, cappedPageCount);
-
-  const frozenRows = data.filter((row) => freezeRow?.(row));
 
   return (
     <div>
@@ -105,12 +100,10 @@ const Table = <T,>(props: ITable<T>) => {
         )}
 
         {/* Item Count */}
-        {paginate !== false && (
-          <Text>
-            {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
-            {cappedPageCount} {itemName}
-          </Text>
-        )}
+        <Text>
+          {cappedPageCount > 0 ? `${startIndex} - ${endIndex}` : 0} of{" "}
+          {cappedPageCount} {itemName}
+        </Text>
       </div>
 
       {/* Table */}
@@ -176,12 +169,7 @@ const Table = <T,>(props: ITable<T>) => {
                 transitioning: {},
               }}
             >
-              {/* Frozen Rows */}
-              {frozenRows.map((row, i) => renderRow({ data: row, index: i }))}
-              {/* Unfrozen Rows */}
-              {data
-                .filter((_) => !freezeRow?.(_))
-                .map((row, i) => renderRow({ data: row, index: i }))}
+              {data.map((row, i) => renderRow({ data: row, index: i }))}
             </motion.tbody>
           </AnimatePresence>
         </table>
