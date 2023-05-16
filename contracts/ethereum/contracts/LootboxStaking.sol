@@ -838,6 +838,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
 
         fusdcUsdcRatio = 1e12 * camelotFusdcUsdcReserveA / fusdcUsdcLiq;
+        //
 
         (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
             _uniswapPairReserves(
