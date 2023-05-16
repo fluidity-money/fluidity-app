@@ -1,14 +1,8 @@
 @use 'common' as *;
 
-.Hoverable {
-  position: relative;
-  width: max-content;
-  
-  .pseudoBridge {
-    position: absolute; 
-    z-index: 1;
-    width: auto;
-    padding-top: 12px;
-  }
+.pseudoBridge {
+  position: absolute; 
+  z-index: 1;
+  width: auto;
+  padding-top: 12px;
 }
-

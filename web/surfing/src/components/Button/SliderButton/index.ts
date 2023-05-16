@@ -1,1 +1,0 @@
-export { SliderButton } from './SliderButton'

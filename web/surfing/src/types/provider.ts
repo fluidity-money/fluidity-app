@@ -10,7 +10,6 @@ export type Provider =
   | "Dodo"
   | "Fluidity"
   | "Jupiter"
-  | "Kyber"
   | "Lemniscap"
   | "Lifinity"
   | "Maker"

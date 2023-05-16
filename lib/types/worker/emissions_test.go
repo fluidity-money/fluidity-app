@@ -95,7 +95,7 @@ func TestString(t *testing.T) {
 		"apeswap":0,
 		"saddle":0,
 		"gtrade_v6_1":0,
-        "meson":0,
+		"meson":0,
 		"camelot":0,
 		"chronos":0
 	},
@@ -144,6 +144,19 @@ func TestString(t *testing.T) {
 		"probability_5":0,
 		"total_bpy":0,
 		"distribution_pools":""
+	},
+	"fee_switch_sender":{
+		"original_address":"",
+		"new_address":""
+	},
+	"fee_switch_recipient":{
+		"original_address":"",
+		"new_address":""
+	},
+	"special_pool_options":{
+		"payout_freq_override":0,
+		"delta_weight_override":0,
+		"winning_classes_override":0
 	}
 }
 `

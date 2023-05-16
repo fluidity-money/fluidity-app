@@ -6,13 +6,6 @@ import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
 
-export type ContractToken = {
-  address: string;
-  ABI: ContractInterface;
-  symbol: string;
-  isFluidOf: boolean;
-};
-
 export const getContract = (
   ABI: ContractInterface,
   address: string,
@@ -66,6 +59,13 @@ export const getUsdAmountMinted = async (
   const decimals = (await contract.decimals()).toString();
 
   return Number(utils.formatUnits(amount, decimals));
+};
+
+export type ContractToken = {
+  address: string;
+  ABI: ContractInterface;
+  symbol: string;
+  isFluidOf: boolean;
 };
 
 const makeContractSwap = async (
@@ -338,48 +338,11 @@ export const getUserDegenScore = async (
   }
 };
 
-export type StakingRatioRes = {
-  fusdcUsdcRatio: BigNumber;
-  fusdcWethRatio: BigNumber;
-  fusdcUsdcSpread: BigNumber;
-  fusdcWethSpread: BigNumber;
-  fusdcUsdcLiquidity: BigNumber;
-  fusdcWethLiquidity: BigNumber;
+export type StakingDepositsRes = {
+  fusdcAmount: BN;
+  usdcAmount: BN;
+  wethAmount: BN;
 };
-
-export const getTokenStakingRatio = async (
-  provider: JsonRpcProvider,
-  stakingAbi: ContractInterface,
-  stakingAddr: string
-) => {
-  try {
-    const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
-
-    if (!stakingContract)
-      throw new Error(
-        `Could not instantiate Staking Contract at ${stakingAddr}`
-      );
-
-    const ratios = await stakingContract.ratios();
-
-    return ratios;
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return undefined;
-  }
-};
-
-export type StakingDepositsRes = Array<{
-  depositTimestamp: BigNumber;
-  redeemTimestamp: BigNumber;
-  camelotLpMinted: BigNumber;
-  camelotTokenA: BigNumber;
-  camelotTokenB: BigNumber;
-  sushiswapLpMinted: BigNumber;
-  sushiswapTokenA: BigNumber;
-  sushiswapTokenB: BigNumber;
-  fusdcUsdcPair: boolean;
-}>;
 
 export const getUserStakingDeposits = async (
   provider: JsonRpcProvider,
@@ -390,12 +353,13 @@ export const getUserStakingDeposits = async (
   try {
     const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
 
+    console.log(stakingContract);
     if (!stakingContract)
       throw new Error(
         `Could not instantiate Staking Contract at ${stakingAddr}`
       );
 
-    const deposits = await stakingContract.deposits(userAddr);
+    const deposits = await stakingContract.callStatic.deposited(userAddr);
 
     return deposits;
   } catch (error) {
@@ -404,33 +368,6 @@ export const getUserStakingDeposits = async (
   }
 };
 
-// Call Static Stake tokens - For Error Checking
-export const testMakeStakingDeposit = async (
-  signer: Signer,
-  stakingAbi: ContractInterface,
-  stakingAddr: string,
-  lockDurationSeconds: BN,
-  usdcAmt: BN,
-  fusdcAmt: BN,
-  wethAmt: BN,
-  slippage: BN,
-  maxTimestamp: BN
-) => {
-  const stakingContract = getContract(stakingAbi, stakingAddr, signer);
-
-  if (!stakingContract)
-    throw new Error(`Could not instantiate Staking Contract at ${stakingAddr}`);
-
-  // call deposit
-  return await stakingContract.callStatic.deposit(
-    lockDurationSeconds.toString(),
-    fusdcAmt.toString(),
-    usdcAmt.toString(),
-    wethAmt.toString(),
-    slippage.toString(),
-    maxTimestamp.toString()
-  );
-};
 // Stake tokens
 export const makeStakingDeposit = async (
   signer: Signer,
@@ -443,9 +380,8 @@ export const makeStakingDeposit = async (
   usdcAmt: BN,
   fusdcAmt: BN,
   wethAmt: BN,
-  slippage: BN,
-  maxTimestamp: BN
-) => {
+  slippage: BN
+): Promise<StakingDepositsRes | undefined> => {
   try {
     const stakingContract = getContract(stakingAbi, stakingAddr, signer);
 
@@ -482,7 +418,20 @@ export const makeStakingDeposit = async (
         const amtString = amt.toString();
 
         if (allowance.lt(amtString)) {
-          const approval = await tokenContract.approve(stakingAddr, amtString);
+          // some tokens (USDT) will revert if approving from nonzero -> nonzero,
+          // to prevent reordering attacks
+          if (!allowance.isZero()) {
+            const zeroApproval = await tokenContract.approve(
+              stakingAddr,
+              constants.Zero
+            );
+            await zeroApproval.wait();
+          }
+
+          const approval = await tokenContract.approve(
+            stakingAddr,
+            constants.MaxUint256
+          );
 
           // `.wait()` to handle errors
           await approval.wait();
@@ -492,12 +441,11 @@ export const makeStakingDeposit = async (
 
     // call deposit
     return await stakingContract.deposit(
-      lockDurationSeconds.toString(),
-      fusdcAmt.toString(),
-      usdcAmt.toString(),
-      wethAmt.toString(),
-      slippage.toString(),
-      maxTimestamp.toString()
+      utils.parseUnits(lockDurationSeconds.toString()),
+      utils.parseUnits(fusdcAmt.toString()),
+      utils.parseUnits(usdcAmt.toString()),
+      utils.parseUnits(wethAmt.toString()),
+      utils.parseUnits(slippage.toString())
     );
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);

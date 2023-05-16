@@ -21,6 +21,8 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -40,6 +42,12 @@ uint256 constant MAX_UINT256 = type(uint256).max;
 uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
+
+/**
+ * @dev MIN_LIQUIDITY since we split it up in half and there's a
+ *      minimum liquidity on each platform (the token decimals on Sushi)
+ */
+uint256 constant MIN_LIQUIDITY = 1e18 * 2;
 
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
@@ -84,11 +92,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     uint256 public sushiswapFusdcWethDepositedLpTokens_;
 
-    uint256 public fusdcMinLiquidity_;
+    uint256 fusdcMinLiquidity_;
 
-    uint256 public usdcMinLiquidity_;
+    uint256 usdcMinLiquidity_;
 
-    uint256 public wethMinLiquidity_;
+    uint256 wethMinLiquidity_;
 
     function init(
         address _operator,
@@ -333,7 +341,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 tokenBAfter = _tokenB.balanceOf(address(this));
 
         dep.redeemTimestamp = _lockupLength + block.timestamp;
-        dep.depositTimestamp = block.timestamp;
 
         if (_fusdcUsdcPair) {
             camelotFusdcUsdcDepositedLpTokens_ += dep.camelotLpMinted;
@@ -354,6 +361,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _tokenB.transfer(_sender, tokenBAfter - tokenBBefore);
 
         // return the amount that we deposited
+
+        require(tokenABefore + 1 > tokenAAfter, "token A not drained");
+
+        require(tokenBBefore + 1 > tokenBAfter, "token B not drained");
 
         tokenADeposited = dep.camelotTokenA + dep.sushiswapTokenA;
 
@@ -838,6 +849,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
 
         fusdcUsdcRatio = 1e12 * camelotFusdcUsdcReserveA / fusdcUsdcLiq;
+        //
 
         (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
             _uniswapPairReserves(
