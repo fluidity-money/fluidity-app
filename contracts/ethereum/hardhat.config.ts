@@ -13,6 +13,8 @@ import type { HardhatUserConfig } from "hardhat/types";
 
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
 
+import * as tdly from "@tenderly/hardhat-tenderly";
+
 import {
   setOracles,
   forknetTakeFunds,
@@ -243,9 +245,11 @@ if (enableArbitrum)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
-      blockNumber: 88060360,
+      blockNumber: 88934647,
     },
   };
+
+tdly.setup();
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -293,5 +297,9 @@ module.exports = {
   },
   docgen: {
     except: [`Interface`, `openzeppelin`],
+  },
+  tenderly: {
+    username: "alexflu",
+    project: "Fluidity"
   }
 };
