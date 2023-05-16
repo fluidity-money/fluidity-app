@@ -245,6 +245,8 @@ func main() {
 
 				broadcast = newBroadcast
 
+				outgoing <- []byte(`"ok"`)
+
 			case message := <-broadcastMessages:
 				outgoing <- message
 
