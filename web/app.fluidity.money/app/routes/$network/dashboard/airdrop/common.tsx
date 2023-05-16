@@ -297,9 +297,10 @@ const ReferralDetailsModal = ({
 
 interface IBottlesDetailsModal {
   bottles: BottleTiers;
+  isMobile?: boolean;
 }
 
-const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
+const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
   <>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
     <GeneralButton
@@ -322,12 +323,9 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <div className="helper-label" style={{ display: "flex", gap: "0.5em" }}>
-      <Text size="sm">Bottles earned since last checked</Text>
-      <Hoverable tooltipContent="Lorem ipsum">
-        <InfoCircle />
-      </Hoverable>
-    </div>
+    <Hoverable tooltipStyle={isMobile ? "frosted" : "solid"} tooltipContent="The amount of Loot Bottles you have earned since you last checked this page.">
+      <Text size="sm">Bottles earned since last checked <InfoCircle /></Text>
+    </Hoverable>
     <div>
       {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
       <LootBottle size="lg" rarity="legendary"></LootBottle>
