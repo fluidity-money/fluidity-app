@@ -146,16 +146,14 @@ const Airdrop = () => {
   );
 
   const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
     }`
   );
 
   const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
     address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
-          leaderboardFilterIndex === 0 ? "24" : "all"
-        }&address=${address}`
+      ? `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+      }&address=${address}`
       : ""
   );
 
@@ -215,7 +213,6 @@ const Airdrop = () => {
   const [stakes, setStakes] = useState<
     Array<{ amount: BN; durationDays: number; depositDate: Date }>
   >([]);
-  console.log(stakes);
 
   const closeModal = () => {
     setCurrentModal(null);
@@ -324,8 +321,7 @@ const Airdrop = () => {
                   Welcome to Fluidity&apos;s Airdrop Event!
                 </Heading>
                 <Text>
-                  Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                  vulputate, in pharetra nisl porttitor.
+                  Dive into the thrilling world of DeFi with Fluidity Money. Fluidify your assets, transact them, and boost your rewards by using your Fluid Assets on partnered protocols and staking liquidity right here on Fluidity! Keep an eye on the leaderboard as you compete with fellow enthusiasts for the top spot! Future Fluid Governance Tokens await – seize this chance to revolutionize your DeFi experience and make an impact on the on-chain economy!
                   <LinkButton
                     size="medium"
                     type="external"
@@ -395,6 +391,7 @@ const Airdrop = () => {
                 stakeTokens={stakeTokens}
                 testStakeTokens={testStakeTokens}
                 ratios={tokenRatios}
+                isMobile={isMobile}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
@@ -449,6 +446,7 @@ const Airdrop = () => {
           stakeTokens={stakeTokens}
           testStakeTokens={testStakeTokens}
           ratios={tokenRatios}
+          isMobile={isMobile}
         />
       </CardModal>
       <CardModal
@@ -466,7 +464,7 @@ const Airdrop = () => {
         visible={currentModal === "tutorial"}
         closeModal={closeModal}
       >
-        <TutorialModal />
+        <TutorialModal closeModal={closeModal} />
       </CardModal>
 
       {/* Page Content */}
@@ -497,8 +495,7 @@ const Airdrop = () => {
                 Welcome to Fluidity&apos;s Airdrop Event!
               </Heading>
               <Text style={{ fontSize: 14 }}>
-                Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                vulputate, in pharetra nisl porttitor.
+                Dive into the thrilling world of DeFi with Fluidity Money. Fluidify your assets, transact them, and boost your rewards by using your Fluid Assets on partnered protocols and staking liquidity right here on Fluidity! Keep an eye on the leaderboard as you compete with fellow enthusiasts for the top spot! Future Fluid Governance Tokens await – seize this chance to revolutionize your DeFi experience and make an impact on the on-chain economy!
                 <LinkButton
                   size="medium"
                   type="external"
@@ -781,6 +778,17 @@ const MyMultiplier = ({
   liquidityMultiplier,
   stakes,
 }: IMyMultiplier) => {
+
+  // If user has no stakes, render a dummy empty stake in the UI
+  if (stakes.length === 0) {
+    const emptyStake = {
+      amount: new BN(0),
+      durationDays: 0,
+      depositDate: new Date(),
+    };
+    stakes.push(emptyStake);
+  }
+
   return (
     <div
       style={{
@@ -910,8 +918,8 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -926,8 +934,8 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -942,8 +950,8 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -958,8 +966,8 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -974,8 +982,8 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >

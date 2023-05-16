@@ -52,6 +52,19 @@
   aspect-ratio: 1/1;
 }
 
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1em;
+  position: relative;
+}
+.tutorial-nav .tutorial-nav-status {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
 .tutorial-nav button svg path {
   fill: none !important;
   stroke: currentColor;
@@ -240,19 +253,7 @@ th:first-child {
   border-bottom: none !important;
 }
 .airdrop-row.highlighted-row {
-  background: linear-gradient(
-    90deg,
-    #f3b8d8 0%,
-    #b793e9 15.1%,
-    #9fd4f3 26.04%,
-    #ffd2c4 36.46%,
-    #fbf3f3 46.88%,
-    #d9abdf 57.29%,
-    #af9ce3 72.4%,
-    #aae4e1 85.42%,
-    #c6ead0 93.23%,
-    #fdb5e4 100%
-  );
+  background: linear-gradient(90deg, #f3b8d8 0%, #b793e9 15.1%, #9fd4f3 26.04%, #ffd2c4 36.46%, #fbf3f3 46.88%, #d9abdf 57.29%, #af9ce3 72.4%, #aae4e1 85.42%, #c6ead0 93.23%, #fdb5e4 100%);
 }
 .airdrop-row.highlighted-row td {
   border: none !important;

@@ -61,7 +61,7 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
               opacity:
                 numberPosition === "relative" ||
-                highlightBottleNumberIndex === index
+                  highlightBottleNumberIndex === index
                   ? 1
                   : 0.2,
             }}
@@ -80,19 +80,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottleNumberIndex === index
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottleNumberIndex === index
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottleNumberIndex === index
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottleNumberIndex === index
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -479,6 +479,7 @@ interface IStakingNowModal {
     maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
   ratios: StakingRatioRes | null;
+  isMobile: boolean
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -495,8 +496,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -506,6 +507,7 @@ const StakeNowModal = ({
   stakeTokens,
   testStakeTokens,
   ratios,
+  isMobile
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -562,27 +564,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-      if (dec === undefined) {
+        if (dec === undefined) {
+          return setInput({
+            ...token,
+            amount: `${unpaddedWhole}`,
+          });
+        }
+
+        const limitedDecimals = dec.slice(0 - token.decimals);
+
         return setInput({
           ...token,
-          amount: `${unpaddedWhole}`,
+          amount: [whole, limitedDecimals].join("."),
         });
-      }
-
-      const limitedDecimals = dec.slice(0 - token.decimals);
-
-      return setInput({
-        ...token,
-        amount: [whole, limitedDecimals].join("."),
-      });
-    };
+      };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -716,7 +718,7 @@ const StakeNowModal = ({
               alignItems: "center",
             }}
           >
-            <Hoverable tooltipContent="Lorem ipsum">
+            <Hoverable tooltipStyle={isMobile ? "frosted" : "solid"} tooltipContent="Lorem ipsum">
               <Text prominent code className="helper-label">
                 STAKE AMOUNT <InfoCircle />
               </Text>
@@ -1035,11 +1037,11 @@ const tutorialContent: {
         >
           <Text prominent code holo>
             <Display style={{ margin: 0, textAlign: "right" }} size="xs">
-              2x
+              6x
             </Display>
           </Text>
           <Text size="md" holo>
-            Transacting fAssets using our supported DEXs
+            Transacting fAssets using our Boosted Protocols
           </Text>
           <LootBottle
             size="sm"
@@ -1085,7 +1087,7 @@ const tutorialContent: {
   },
 };
 
-const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
+const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModal?: () => void }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   return (
@@ -1105,17 +1107,18 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
             justifyContent: "center",
             height: "100%",
             width: "100%",
+            maxWidth: isMobile ? 550 : 635,
             gap: "1em",
+            marginTop: '1em'
           }}
         >
           <Video
             type="cover"
-            width={isMobile ? 550 : 1270 / 2}
-            height={isMobile ? 550 : 460 / 2}
+            width={isMobile ? 550 : 635}
+            height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
           />
           <Display size="xxs" style={{ margin: 0 }}>
@@ -1126,12 +1129,7 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
       </AnimatePresence>
 
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "1em",
-        }}
+        className="tutorial-nav"
       >
         <GeneralButton
           icon={<ArrowLeft />}
@@ -1144,18 +1142,34 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
         >
           PREV
         </GeneralButton>
-        {currentSlide + 1} / 5
-        <GeneralButton
-          icon={<ArrowRight />}
-          layout="after"
-          handleClick={() => {
-            setCurrentSlide(currentSlide + 1);
-          }}
-          type="transparent"
-          disabled={currentSlide === 4}
-        >
-          Next
-        </GeneralButton>
+        <div className="tutorial-nav-status">
+          <Text size="md">
+            {currentSlide + 1} / 5
+          </Text>
+        </div>
+        {
+          currentSlide !== 4 ? (
+            <GeneralButton
+              icon={<ArrowRight />}
+              layout="after"
+              handleClick={() => {
+                setCurrentSlide(currentSlide + 1);
+              }}
+              type="transparent"
+              disabled={currentSlide === 4}
+            >
+              Next
+            </GeneralButton>
+          ) : !isMobile && (
+            <GeneralButton
+              type="primary"
+              handleClick={closeModal}
+              className="start-earning-button"
+            >
+              START EARNING
+            </GeneralButton>
+          )
+        }
       </div>
     </>
   );

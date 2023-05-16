@@ -71,7 +71,21 @@ $holo: linear-gradient(
   #fdb5e4 100%
 );
 
+
 .tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1em;
+  position: relative;
+
+  .tutorial-nav-status {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
   button {
     svg {
       path {
