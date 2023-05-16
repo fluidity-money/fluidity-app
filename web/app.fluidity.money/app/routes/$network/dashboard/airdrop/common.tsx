@@ -675,6 +675,8 @@ const StakeNowModal = ({
     "fluid" | "base" | ""
   >("");
 
+  const tooltipStyle = isMobile ? "frosted" : "solid"
+
   return (
     <>
       <Card
@@ -718,7 +720,7 @@ const StakeNowModal = ({
               alignItems: "center",
             }}
           >
-            <Hoverable tooltipStyle={isMobile ? "frosted" : "solid"} tooltipContent="Lorem ipsum">
+            <Hoverable tooltipStyle={tooltipStyle} tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake.">
               <Text prominent code className="helper-label">
                 STAKE AMOUNT <InfoCircle />
               </Text>
@@ -862,7 +864,7 @@ const StakeNowModal = ({
         </div>
         {/* Duration */}
         <div className="duration-column">
-          <Hoverable tooltipContent="Lorem ipsum">
+          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days.">
             <Text prominent code className="helper-label">
               DURATION <InfoCircle />
             </Text>
@@ -876,12 +878,12 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
-          <div className="helper-label">
-            <Text code>
+          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The end date of staking, when you can reclaim your provided liquidity.">
+            <Text code className="helper-label">
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
             </Text>
-          </div>
+          </Hoverable>
           <div>
             <Text prominent code>
               SLIPPAGE % <InfoCircle />
@@ -907,7 +909,7 @@ const StakeNowModal = ({
           }}
         />
         <div className="power-column">
-          <Hoverable tooltipContent="Lorem Ipsum">
+          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1.">
             <Text size="xs" code className="helper-label">
               DAY 1 POWER <InfoCircle />
             </Text>
@@ -947,7 +949,7 @@ const StakeNowModal = ({
           <ArrowRight />
         </div>
         <div className="power-column rhs">
-          <Hoverable tooltipContent="Lorem ipsum">
+          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier.">
             <Text size="xs" className="helper-label" code>
               DAY 31 POWER <InfoCircle />
             </Text>
