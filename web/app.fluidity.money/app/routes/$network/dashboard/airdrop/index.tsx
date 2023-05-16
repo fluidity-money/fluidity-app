@@ -23,6 +23,7 @@ import {
   CardModal,
   Rarity,
   TabButton,
+  BloomEffect,
   toSignificantDecimals,
   useViewport,
 } from "@fluidity-money/surfing";
@@ -368,6 +369,7 @@ const Airdrop = () => {
                 seeStakeNow={() => setCurrentModal("stake-now")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                isMobile
               />
             </>
           )}
@@ -780,6 +782,7 @@ interface IMyMultiplier {
   stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
+  isMobile: boolean;
 }
 
 // export type StakingEvent = {
@@ -794,6 +797,7 @@ const MyMultiplier = ({
   seeStakeNow,
   liquidityMultiplier,
   stakes,
+  isMobile = false,
 }: IMyMultiplier) => {
 
   // If user has no stakes, render a dummy empty stake in the UI
@@ -807,15 +811,19 @@ const MyMultiplier = ({
   }
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "2em",
-      }}
-    >
+    <div className={`airdrop-my-multiplier ${isMobile ? 'airdrop-mobile' : ''}`}>
+      {
+        isMobile &&
+        <BloomEffect
+          color="#d9abdf"
+          width={20}
+          className="mx-bloom"
+        />
+      }
       <div>
         <LabelledValue
+          align={isMobile ? "center" : "left"}
+          className="mx-my-multiplier"
           label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
         >
           <Text size="xxl" holo>
@@ -829,73 +837,60 @@ const MyMultiplier = ({
         size="small"
         type="secondary"
         handleClick={seeMyStakingStats}
-        style={{
-          width: "100%",
-          gridArea: "2 / 1",
-          boxSizing: "border-box",
-          alignSelf: "end",
-        }}
+        id="mx-see-my-staking-stats"
       >
         MY STAKING STATS
       </GeneralButton>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto max-content",
-          alignContent: "start",
-          gap: "1em",
-          gridColumn: "2 / 3",
-          gridRow: "1 / 3",
-        }}
-      >
-        {stakes.map(({ amount, durationDays, depositDate }) => {
-          const stakedDays = dayDifference(new Date(), new Date(depositDate));
-          const multiplier = stakingLiquidityMultiplierEq(
-            stakedDays,
-            durationDays
-          );
+      {!isMobile &&
+        <div
+          id="mx-my-stakes"
+        >
+          {stakes.map(({ amount, durationDays, depositDate }) => {
+            const stakedDays = dayDifference(new Date(), new Date(depositDate));
+            const multiplier = stakingLiquidityMultiplierEq(
+              stakedDays,
+              durationDays
+            );
 
-          return (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: "0.5em",
-                }}
-              >
-                <Text prominent code>
-                  ${addDecimalToBn(amount, 6)} FOR {durationDays} DAYS
-                </Text>
-                <ProgressBar
-                  value={stakedDays}
-                  max={durationDays}
-                  rounded
-                  color={durationDays === stakedDays ? "holo" : "gray"}
-                  size="sm"
-                />
-              </div>
-              <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-                <Text holo bold prominent>
-                  {multiplier}X
-                </Text>
-              </div>
-            </>
-          );
-        })}
-      </div>
+            return (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "0.5em",
+                  }}
+                >
+                  <Text prominent code>
+                    ${addDecimalToBn(amount, 6)} FOR {durationDays} DAYS
+                  </Text>
+                  <ProgressBar
+                    value={stakedDays}
+                    max={durationDays}
+                    rounded
+                    color={durationDays === stakedDays ? "holo" : "gray"}
+                    size="sm"
+                  />
+                </div>
+                <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
+                  <Text holo bold prominent>
+                    {multiplier}X
+                  </Text>
+                </div>
+              </>
+            );
+          })}
+        </div>
+      }
       <GeneralButton
+        icon={isMobile ? <ArrowRight /> : undefined}
+        layout={"after"}
         buttontype="text"
         size="medium"
         version="primary"
         handleClick={seeStakeNow}
-        style={{
-          width: "100%",
-          boxSizing: "border-box",
-          gridColumn: "1 / 3",
-          gridRow: "3 / 4",
-        }}
+        id="mx-stake-now-button"
       >
         STAKE NOW
       </GeneralButton>

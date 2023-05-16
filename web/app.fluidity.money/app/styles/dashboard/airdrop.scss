@@ -349,3 +349,68 @@ th {
   justify-content: center;
   text-align: center;
 }
+
+.airdrop-my-multiplier {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+
+  svg, path {
+    fill: none !important;
+    stroke: currentColor !important;
+  }
+
+  &.airdrop-mobile {
+    .mx-bloom {
+      z-index: -1;
+      opacity: 0.5;
+      margin-top: -85px;
+    }
+
+    grid-template-columns: 1fr;
+    gap: 1em;
+
+    #mx-see-my-staking-stats,
+    #mx-my-stakes,
+    #mx-stake-now-button {
+      grid-area: unset;
+    }
+
+    #mx-stake-now-button {
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .mx-my-multiplier {
+      text-align: center;
+
+      h1 {
+        filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.8));
+      }
+    }
+  }
+
+  #mx-see-my-staking-stats {
+    width: 100%;
+    grid-area: 2 / 1;
+    box-sizing: border-box;
+    align-self: end;
+  }
+
+  #mx-my-stakes {
+    display: grid;
+    grid-template-columns: auto max-content;
+    align-content: start;
+    gap: 1em;
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+  }
+
+  #mx-stake-now-button {
+    width: 100%;
+    box-sizing: border-box;
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+  }
+}
