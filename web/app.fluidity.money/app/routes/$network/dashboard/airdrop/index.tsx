@@ -321,7 +321,7 @@ const Airdrop = () => {
                   Welcome to Fluidity&apos;s Airdrop Event!
                 </Heading>
                 <Text>
-                  Dive into the thrilling world of DeFi with Fluidity Money. Fluidify your assets, transact them, and boost your rewards by using your Fluid Assets on partnered protocols and staking liquidity right here on Fluidity! Keep an eye on the leaderboard as you compete with fellow enthusiasts for the top spot! Future Fluid Governance Tokens await – seize this chance to revolutionize your DeFi experience and make an impact on the on-chain economy!
+                  Fluidify your assets, transact them, and boost your rewards by using your Fluid Assets on partnered protocols and staking liquidity right here on Fluidity! Keep an eye on the leaderboard as you compete with fellow Fluiders for the top spot. Future Fluid Governance Tokens await!
                   <LinkButton
                     size="medium"
                     type="external"
@@ -495,7 +495,7 @@ const Airdrop = () => {
                 Welcome to Fluidity&apos;s Airdrop Event!
               </Heading>
               <Text style={{ fontSize: 14 }}>
-                Dive into the thrilling world of DeFi with Fluidity Money. Fluidify your assets, transact them, and boost your rewards by using your Fluid Assets on partnered protocols and staking liquidity right here on Fluidity! Keep an eye on the leaderboard as you compete with fellow enthusiasts for the top spot! Future Fluid Governance Tokens await – seize this chance to revolutionize your DeFi experience and make an impact on the on-chain economy!
+                Fluidify your assets, transact them, and boost your rewards by using your Fluid Assets on partnered protocols and staking liquidity right here on Fluidity! Keep an eye on the leaderboard as you compete with fellow Fluiders for the top spot. Future Fluid Governance Tokens await!
                 <LinkButton
                   size="medium"
                   type="external"
