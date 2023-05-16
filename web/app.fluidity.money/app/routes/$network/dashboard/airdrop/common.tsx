@@ -40,6 +40,7 @@ interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   showBottleNumbers?: boolean;
   highlightBottleNumberIndex?: number;
   numberPosition?: "absolute" | "relative";
+  handleClickBottle?: (index: number) => void;
 }
 
 const BottleDistribution = ({
@@ -47,12 +48,13 @@ const BottleDistribution = ({
   showBottleNumbers = true,
   highlightBottleNumberIndex,
   numberPosition = "absolute",
+  handleClickBottle,
   ...props
 }: IBottleDistribution) => (
   <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
-        <div key={index} className="lootbottle-container">
+        <div key={index} className="lootbottle-container" onClick={() => handleClickBottle?.(index)}>
           <LootBottle
             size="lg"
             rarity={rarity}
@@ -64,6 +66,7 @@ const BottleDistribution = ({
                   highlightBottleNumberIndex === index
                   ? 1
                   : 0.2,
+              ...(handleClickBottle ? { cursor: 'pointer' } : {})
             }}
           />
           <Text

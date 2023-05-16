@@ -1110,6 +1110,7 @@ const BottleProgress = ({
       <HeroCarousel
         title="BOTTLES I'VE EARNED"
         onSlideChange={handleHeroPageChange}
+        controlledIndex={imgIndex}
       >
         <Card type="frosted" fill shimmer rounded>
           <img src="/images/hero/common.png" />
@@ -1128,6 +1129,9 @@ const BottleProgress = ({
         </Card>
       </HeroCarousel>
       <BottleDistribution
+        handleClickBottle={(index) => {
+          setImgIndex(index);
+        }}
         style={{
           height: 100,
           overflowX: isMobile ? "scroll" : "visible",
