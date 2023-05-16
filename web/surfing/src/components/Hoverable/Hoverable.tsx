@@ -15,7 +15,7 @@ interface IHoverable extends React.HTMLAttributes<HTMLElement> {
 
 const Hoverable = ({
   children,
-  className='',
+  className,
   tooltipContent,
   ...props
 }: IHoverable) => {
@@ -23,10 +23,7 @@ const Hoverable = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const classProps = `
-    ${styles.Hoverable}
-    ${className}
-  `;
+  const classProps = className || "";
 
   useEffect(() => {
     if (isHovered || isFocused) {
