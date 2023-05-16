@@ -242,6 +242,8 @@ func main() {
 
 				cookie = newBroadcast.Subscribe(broadcastMessages)
 
+				outgoing <- []byte(`"ok"`)
+
 				broadcast = newBroadcast
 
 			case message := <-broadcastMessages:
