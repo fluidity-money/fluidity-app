@@ -20,6 +20,7 @@ const Hoverable = ({
   className = '',
   tooltipContent,
   tooltipStyle,
+  style = {},
   ...props
 }: IHoverable) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -73,9 +74,10 @@ const Hoverable = ({
           >
             <Tooltip
               type={tooltipStyle === "frosted" ? "frosted" : "opaque"}
-              style={{ backgroundColor: 'black' }}
+              style={{ ...style, ...(tooltipStyle === "solid" ? { backgroundColor: 'black' } : {}) }}
             >
-              {tooltipContent}</Tooltip>
+              {tooltipContent}
+            </Tooltip>
           </motion.div>
         )}
       </AnimatePresence>

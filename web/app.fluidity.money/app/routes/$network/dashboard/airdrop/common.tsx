@@ -128,18 +128,13 @@ const ReferralDetailsModal = ({
 
   return (
     <>
-      <div style={{ display: "flex", gap: "1em", alignItems: "center" }}>
-        <Display className="no-margin" size="xxxs">
-          My Referral Link
-        </Display>
-        {/* <Hoverable tooltipStyle={tooltipStyle} tooltipContent={"Lorem ipsum"}>
-        <InfoCircle />
-      </Hoverable> */}
-      </div>
+      <Display className="no-margin" size="xxxs">
+        My Referral Link
+      </Display>
       <div className="referral-details-container">
         <LabelledValue
           label={
-            <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles.">
+            <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles.">
               <Text className="helper-label" size="xs">Active Referrals <InfoCircle />
               </Text>
             </Hoverable>
@@ -149,7 +144,7 @@ const ReferralDetailsModal = ({
         </LabelledValue>
         <LabelledValue
           label={
-            <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The amount of Loot Bottles you have earned from referring users with your link.">
+            <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The amount of Loot Bottles you have earned from referring users with your link.">
               <Text className="helper-label" size="xs">Total Bottles earned from your link <InfoCircle />
               </Text>
             </Hoverable>
@@ -158,7 +153,7 @@ const ReferralDetailsModal = ({
           {totalBottles}
         </LabelledValue>
       </div>
-      <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The amount of Loot Bottles you have earned through your referral link based on their rarity.">
+      <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The amount of Loot Bottles you have earned through your referral link based on their rarity.">
         <Text className="helper-label" size="xs">Bottle Distribution <InfoCircle />
         </Text>
       </Hoverable>
@@ -169,14 +164,9 @@ const ReferralDetailsModal = ({
           borderBottom: "1px solid white",
         }}
       />
-      <div style={{ display: "flex", gap: "1em", alignItems: "center" }}>
-        <Display className="no-margin" size="xxxs">
-          Links I&apos;ve Clicked
-        </Display>
-        <Hoverable tooltipContent={"Lorem ipsum"}>
-          <InfoCircle />
-        </Hoverable>
-      </div>
+      <Display className="no-margin" size="xxxs">
+        Links I&apos;ve Clicked
+      </Display>
       <div
         style={{
           display: "grid",
@@ -323,7 +313,7 @@ const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <Hoverable tooltipStyle={isMobile ? "frosted" : "solid"} tooltipContent="The amount of Loot Bottles you have earned since you last checked this page.">
+    <Hoverable style={{ minWidth: 250 }} tooltipStyle={isMobile ? "frosted" : "solid"} tooltipContent="The amount of Loot Bottles you have earned since you last checked this page.">
       <Text size="sm">Bottles earned since last checked <InfoCircle /></Text>
     </Hoverable>
     <div>
@@ -710,9 +700,10 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
+              gap: "0.5em"
             }}
           >
-            <Hoverable tooltipStyle={tooltipStyle} tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake.">
+            <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake.">
               <Text prominent code className="helper-label">
                 STAKE AMOUNT <InfoCircle />
               </Text>
@@ -856,7 +847,7 @@ const StakeNowModal = ({
         </div>
         {/* Duration */}
         <div className="duration-column">
-          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days.">
+          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days.">
             <Text prominent code className="helper-label">
               DURATION <InfoCircle />
             </Text>
@@ -870,7 +861,7 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
-          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The end date of staking, when you can reclaim your provided liquidity.">
+          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The end date of staking, when you can reclaim your provided liquidity.">
             <Text code className="helper-label">
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
@@ -901,7 +892,7 @@ const StakeNowModal = ({
           }}
         />
         <div className="power-column">
-          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1.">
+          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1.">
             <Text size="xs" code className="helper-label">
               DAY 1 POWER <InfoCircle />
             </Text>
@@ -941,7 +932,7 @@ const StakeNowModal = ({
           <ArrowRight />
         </div>
         <div className="power-column rhs">
-          <Hoverable tooltipStyle={tooltipStyle} tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier.">
+          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier.">
             <Text size="xs" className="helper-label" code>
               DAY 31 POWER <InfoCircle />
             </Text>
