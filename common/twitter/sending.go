@@ -12,7 +12,7 @@ type twitterInReplyTo struct {
 	InReplyTo string `json:"in_reply_to_tweet_id"`
 }
 
-func SendTweet(text, replyToTweetId string) (tweetId string, err error) {
+func SendTweet(text, replyToTweetId string) (tweetId string) {
 	twitterBearerToken, _ := getTwitterEnvs()
 
 	httpClient := http.Client{
@@ -34,7 +34,7 @@ func SendTweet(text, replyToTweetId string) (tweetId string, err error) {
 
 	var buf bytes.Buffer
 
-	err = json.NewEncoder(&buf).Encode(twitterJson)
+	err := json.NewEncoder(&buf).Encode(twitterJson)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
@@ -74,5 +74,5 @@ func SendTweet(text, replyToTweetId string) (tweetId string, err error) {
 
 	tweetId = twitterResp.Data.Id
 
-	return tweetId, err
+	return tweetId
 }

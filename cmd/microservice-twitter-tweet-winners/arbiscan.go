@@ -5,10 +5,10 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
-
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 type arbiscanResponse struct {
@@ -17,28 +17,28 @@ type arbiscanResponse struct {
 	Result  string `json:"result"`
 }
 
-func createUrlArbiscanGetAddressLabel(address, apikey string) (*net.Url, error) {
-	url_, err := url.Parse(address)
+func createUrlArbiscanGetAddressLabel(address, apikey string) (*url.URL, error) {
+	u, err := url.Parse("https://api.arbiscan.io/api")
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to create arbiscan url: %v", err)
 	}
 
-	q := url.Query()
+	q := u.Query()
 
 	q.Set("module", "account")
 	q.Set("action", "getlabel")
 	q.Set("address", address)
 	q.Set("apikey", apikey)
 
-	return url_
+	return u, nil
 }
 
-func getArbiscanAddressLabel(address ethereum.Address, apiKey string) (string, error) {
-	url_, err := createUrlArbiscanGetAddress(address.String(), apiKey)
+func getArbiscanAddressLabel(address, apiKey string) (string, error) {
+	u, err := createUrlArbiscanGetAddressLabel(address, apiKey)
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create url: %v", err)
 	}
 
 	req, err := http.NewRequest("GET", "", nil)
@@ -49,6 +49,8 @@ func getArbiscanAddressLabel(address ethereum.Address, apiKey string) (string, e
 			err,
 		)
 	}
+
+	req.URL = u
 
 	var client http.Client
 
