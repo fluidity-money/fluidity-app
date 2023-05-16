@@ -1,4 +1,4 @@
-import { motion, useDragControls, useMotionValue } from 'framer-motion'
+import { motion, useDragControls, useMotionValue, useTransform } from 'framer-motion'
 import styles from './SliderButton.module.scss'
 import { ArrowRight } from '~/lib'
 import { useEffect, useRef, useState } from 'react'
@@ -26,12 +26,15 @@ export const SliderButton: React.FC<ISliderButton> = ({
     setWidth(containerRef.current.offsetWidth)
   }, [containerRef])
 
+  const arrowOpacity = useTransform(x, [0, (width || 0) - 64], [1, 0])
+
   return (
     <motion.div className={styles.SliderButton} ref={containerRef} style={dragComplete ? { background: 'white' } : {}}>
       <motion.div
         className={styles.draggable}
         drag="x"
-        dragElastic={0}
+        style={{ x, cursor: 'grab' }}
+        dragElastic={0.1}
         dragSnapToOrigin
         dragMomentum={false}
         dragConstraints={
@@ -39,20 +42,26 @@ export const SliderButton: React.FC<ISliderButton> = ({
         }
         onDragEnd={(event, info) => {
           if (!width) return
-          if (info.offset.x >= width) {
+          if (info.offset.x >= width - 64) {
             setDragComplete(true)
             onSlideComplete()
           }
         }}
-        style={{ cursor: 'grab' }}
       >
         <div
           className={styles.track}
 
         />
-        <div className={styles.thumb}>
-          <ArrowRight />
-        </div>
+        {
+          !dragComplete &&
+          <div className={styles.thumb}>
+            <motion.div
+              style={{ opacity: arrowOpacity }}
+            >
+              <ArrowRight />
+            </motion.div>
+          </div>
+        }
       </motion.div>
       <motion.div className={styles.content}>
         {children}
