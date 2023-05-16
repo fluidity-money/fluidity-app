@@ -420,6 +420,7 @@ const Airdrop = () => {
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
           nextInactiveReferral={inactiveReferrals[0]}
+          isMobile={isMobile}
         />
       </CardModal>
       <CardModal
