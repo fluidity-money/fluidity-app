@@ -75,6 +75,7 @@
   display: flex;
   padding: 5px;
   border-radius: 5em 14px 14px 5em;
+  max-width: 260px;
 }
 
 .staking-modal-token-icon {
@@ -86,7 +87,6 @@
   background: none;
   border: none;
   width: 100%;
-  max-width: 180px;
   color: white;
   font-size: 2em;
   outline: none;
