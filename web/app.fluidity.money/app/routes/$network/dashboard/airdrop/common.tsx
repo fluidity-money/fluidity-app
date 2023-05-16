@@ -63,10 +63,10 @@ const BottleDistribution = ({
             style={{
               marginBottom: "0.6em",
               opacity:
-                numberPosition === "relative" ||
-                  highlightBottleNumberIndex === index
-                  ? 1
-                  : 0.2,
+                highlightBottleNumberIndex === undefined ||
+                  highlightBottleNumberIndex !== index
+                  ? 0.2
+                  : 1,
               ...(handleClickBottle ? { cursor: 'pointer' } : {})
             }}
           />
@@ -78,7 +78,7 @@ const BottleDistribution = ({
           </Text>
           <Text
             prominent={
-              numberPosition === "relative" ||
+              highlightBottleNumberIndex === undefined ||
               highlightBottleNumberIndex === index
             }
             style={

@@ -11,7 +11,7 @@ const swipePower = (offset: number, velocity: number) => {
   return Math.abs(offset) * velocity;
 };
 
-interface IHeroCarousel {
+interface IHeroCarousel extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactElement<ICard>[];
   title: string;
   onSlideChange?: (i: number) => void;
@@ -27,6 +27,7 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
   title,
   onSlideChange,
   controlledIndex = 0,
+  ...props
 }) => {
   const slides = children.length;
   if (slides < 2) return null;
@@ -62,7 +63,7 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
   }, [slide])
 
   return (
-    <div className={styles.HeroCarousel}>
+    <div {...props} className={styles.HeroCarousel}>
       <div className={styles.nav}>
         <motion.div
           animate={{

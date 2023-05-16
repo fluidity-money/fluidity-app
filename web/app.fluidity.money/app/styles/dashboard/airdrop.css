@@ -259,4 +259,44 @@ th:first-child {
   border: none !important;
 }
 
+.bottles-earned-button {
+  margin-bottom: 0.5em;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+.bottles-earned-button svg {
+  fill: none;
+  stroke: currentColor;
+}
+
+.airdrop-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2em;
+  flex-wrap: wrap;
+}
+
+.airdrop-stats-item {
+  flex-grow: 1;
+}
+
+.see-the-leaderboard-button {
+  align-self: flex-start;
+  justify-self: flex-end;
+  flex-grow: 1;
+  flex-shrink: 0;
+  padding: 1em;
+  border: 1px solid white;
+  border-radius: 0.5em;
+  height: 100%;
+  flex-basis: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 /*# sourceMappingURL=airdrop.css.map */

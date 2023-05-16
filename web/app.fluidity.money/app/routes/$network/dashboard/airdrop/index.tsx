@@ -218,6 +218,13 @@ const Airdrop = () => {
     setCurrentModal(null);
   };
 
+  useEffect(() => {
+    // If we change page on mobile, reset the scroll position
+    if (!isMobile) return
+
+    window.scrollTo(0, 0)
+  }, [isMobile, currentModal])
+
   // get token data once user is connected
   useEffect(() => {
     if (!address) {
@@ -339,17 +346,21 @@ const Airdrop = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  gap: "1em"
                 }}
               >
                 <BottleProgress bottles={bottleTiers} isMobile />
+                <TextButton className="bottles-earned-button">Bottles Earned Since Last Checked <ArrowRight /></TextButton>
               </div>
               <AirdropStats
                 seeReferralsDetails={() => setCurrentModal("referral-details")}
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
+                seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
                 epochDays={epochDays}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
+                isMobile
               />
               <MultiplierTasks />
               <MyMultiplier
@@ -516,6 +527,7 @@ const Airdrop = () => {
             <AirdropStats
               seeReferralsDetails={() => setCurrentModal("referral-details")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
+              seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
               epochMax={epochDaysTotal}
               epochDays={epochDays}
               activatedReferrals={numActiveReferrerReferrals}
@@ -581,31 +593,35 @@ const Airdrop = () => {
 interface IAirdropStats {
   seeReferralsDetails: () => void;
   seeBottlesDetails: () => void;
+  seeLeaderboardMobile?: () => void;
   epochDays: number;
   epochMax: number;
   activatedReferrals: number;
   totalBottles: number;
+  isMobile?: boolean;
 }
 
 const AirdropStats = ({
   seeReferralsDetails,
   seeBottlesDetails,
+  seeLeaderboardMobile,
   epochDays,
   epochMax,
   activatedReferrals,
   totalBottles,
+  isMobile
 }: IAirdropStats) => {
   return (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "1em",
-      }}
+      className="airdrop-stats"
+      style={isMobile ? { flexWrap: 'wrap-reverse', flexDirection: 'row-reverse' } : {}}
     >
-      <div>
+      {isMobile && <div className="airdrop-stats-item see-the-leaderboard-button" onClick={() => { seeLeaderboardMobile?.() }}>
+
+        <Text prominent size="xs">SEE THE LEADERBOARD</Text>
+
+      </div>}
+      <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
           <Text prominent size="xl">
             {epochMax - epochDays}
@@ -628,7 +644,7 @@ const AirdropStats = ({
           <Text>{Math.floor((epochDays / epochMax) * 100)}%</Text>
         </div>
       </div>
-      <div>
+      <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">REFERRALS</Text>}>
           <Text prominent size="xl">
             {activatedReferrals}
@@ -646,7 +662,7 @@ const AirdropStats = ({
           SEE DETAILS
         </LinkButton>
       </div>
-      <div>
+      <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
           <Text prominent size="xl">
             {toSignificantDecimals(totalBottles, 0)}
@@ -656,12 +672,12 @@ const AirdropStats = ({
           color="gray"
           size="small"
           type="internal"
-          handleClick={seeBottlesDetails}
+          handleClick={isMobile ? () => { console.log('TODO REDIRECT') } : seeBottlesDetails}
           style={{
             marginLeft: -6,
           }}
         >
-          SEE DETAILS
+          {isMobile ? 'SEE TX HISTORY' : 'SEE DETAILS'}
         </LinkButton>
       </div>
     </div>
@@ -1101,7 +1117,7 @@ const BottleProgress = ({
   return (
     <div
       style={{
-        maxWidth: 450,
+        maxWidth: isMobile ? '100%' : 450,
         display: "flex",
         flexDirection: "column",
         gap: "1em",
@@ -1111,6 +1127,7 @@ const BottleProgress = ({
         title="BOTTLES I'VE EARNED"
         onSlideChange={handleHeroPageChange}
         controlledIndex={imgIndex}
+        style={isMobile ? { flexDirection: 'column-reverse', gap: '2em' } : {}}
       >
         <Card type="frosted" fill shimmer rounded>
           <img src="/images/hero/common.png" />
@@ -1133,27 +1150,31 @@ const BottleProgress = ({
           setImgIndex(index);
         }}
         style={{
-          height: 100,
+          height: !isMobile ? 100 : 'auto',
           overflowX: isMobile ? "scroll" : "visible",
         }}
+        numberPosition={isMobile ? "relative" : "absolute"}
         bottles={bottles}
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
-      <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
-        <Form.Toggle
-          checked={showBottleNumbers}
-          onClick={() =>
-            setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
-          }
-          style={{
-            opacity: showBottleNumbers ? 1 : 0.3,
-          }}
-        />
-        <Text size="sm" prominent={showBottleNumbers}>
-          ALWAYS SHOW BOTTLE NUMBERS
-        </Text>
-      </div>
+      {!isMobile &&
+        <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
+          <Form.Toggle
+            checked={showBottleNumbers}
+            onClick={() =>
+              setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
+            }
+            style={{
+              opacity: showBottleNumbers ? 1 : 0.3,
+            }}
+          />
+
+          <Text size="sm" prominent={showBottleNumbers}>
+            ALWAYS SHOW BOTTLE NUMBERS
+          </Text>
+        </div>
+      }
     </div>
   );
 };
