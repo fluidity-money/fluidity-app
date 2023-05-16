@@ -28,22 +28,22 @@ contract DefaultWorkerOverrideUtilityClient is IFluidClient, IEmergencyMode {
     bool private noEmergencyMode_;
 
     constructor(
-        IERC20 token,
-        uint deltaWeightNum,
-        uint deltaWeightDenom,
-        address dustCollector,
-        address oracle,
-        address operator,
-        address council
+        IERC20 _token,
+        uint _deltaWeightNum,
+        uint _deltaWeightDenom,
+        address _dustCollector,
+        address _oracle,
+        address _operator,
+        address _council
     ) {
-        token_ = token;
-        deltaWeightNum_ = deltaWeightNum;
-        deltaWeightDenom_ = deltaWeightDenom;
-        dustCollector_ = dustCollector;
+        token_ = _token;
+        deltaWeightNum_ = _deltaWeightNum;
+        deltaWeightDenom_ = _deltaWeightDenom;
+        dustCollector_ = _dustCollector;
 
-        oracle_ = oracle;
-        operator_ = operator;
-        emergencyCouncil_ = council;
+        oracle_ = _oracle;
+        operator_ = _operator;
+        emergencyCouncil_ = _council;
         noEmergencyMode_ = true;
     }
 
@@ -60,14 +60,14 @@ contract DefaultWorkerOverrideUtilityClient is IFluidClient, IEmergencyMode {
     // implements IFluidClient
 
     /// @inheritdoc IFluidClient
-    function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) external {
+    function batchReward(Winner[] memory _rewards, uint _firstBlock, uint _lastBlock) external {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
         uint poolAmount = token_.balanceOf(address(this));
 
-        for (uint i = 0; i < rewards.length; i++) {
-            Winner memory winner = rewards[i];
+        for (uint i = 0; i < _rewards.length; i++) {
+            Winner memory winner = _rewards[i];
 
             require(poolAmount >= winner.amount, "empty reward pool");
 
@@ -77,8 +77,8 @@ contract DefaultWorkerOverrideUtilityClient is IFluidClient, IEmergencyMode {
             emit Reward(
                 winner.winner,
                 winner.amount,
-                firstBlock,
-                lastBlock
+                _firstBlock,
+                _lastBlock
             );
         }
     }
