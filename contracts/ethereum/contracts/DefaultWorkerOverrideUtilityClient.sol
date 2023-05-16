@@ -94,6 +94,7 @@ contract DefaultWorkerOverrideUtilityClient is IFluidClient, IEmergencyMode {
             exchangeRateDenom: 1,
             deltaWeightNum: deltaWeightNum_,
             deltaWeightDenom: deltaWeightDenom_,
+            // this is a constant that the offchain worker knows !
             customCalculationType: "worker config overrides"
         });
     }
