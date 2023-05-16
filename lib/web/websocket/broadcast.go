@@ -83,31 +83,39 @@ func NewBroadcast() *Broadcast {
 
 				previous := broadcast.incrementCookie()
 
-				log.Debugf(
-					"Received a request to subscribe with cookie %#v!",
-					previous,
-				)
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Received a request to subscribe with cookie!"
+					k.Payload = previous
+				})
 
 				cookieReply <- previous
 
-				log.Debugf(
-					"Done sending a message with the cookie to the request to subscribe! %#v",
-					previous,
-				)
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Done sending a message with the cookie to the request to subscribe!"
+					k.Payload = previous
+				})
 
 				broadcast.subscribed[previous] = replies
 
 			case cookie := <-unsubscriptionRequests:
-				log.Debugf(
-					"Cookie %#v has sent a request to unsubscribe!",
-					cookie,
-				)
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+
+					k.Format(
+						"Cookie %#v has sent a request to unsubscribe!",
+						cookie,
+					)
+				})
 
 				broadcast.subscribed[cookie] = nil
 
 			case _ = <-shutdownRequests:
-
-				log.Debugf("Received a request to shutdown the broadcast server!")
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Received a request to shutdown the broadcast server!"
+				})
 
 				return
 			}
@@ -136,20 +144,22 @@ func (broadcast Broadcast) Subscribe(messages chan []byte) uint64 {
 		subscriptionId = generateSubscriptionId()
 	}
 
-	log.Debugf(
-		"Subscribe to the channel request to receiving messages with subscription id %#v!",
-		subscriptionId,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Message = "Subscribe to the channel request to receiving messages with subscription id!"
+		k.Payload = subscriptionId
+	})
 
 	broadcast.subscriptionRequests <- registration{
 		cookieReply: cookieChan,
 		replies:     messages,
 	}
 
-	log.Debugf(
-		"Received a response with subscription id %#v!",
-		subscriptionId,
-	)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
+		k.Message = "Received a response with subscription id!"
+		k.Payload = subscriptionId
+	})
 
 	return <-cookieChan
 }
