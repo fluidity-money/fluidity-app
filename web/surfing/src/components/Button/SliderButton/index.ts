@@ -1,1 +1,1 @@
-export { SliderButton } from './SliderButton'
+export { SliderButton as default } from './SliderButton'

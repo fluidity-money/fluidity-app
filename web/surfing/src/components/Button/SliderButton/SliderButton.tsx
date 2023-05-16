@@ -29,7 +29,7 @@ export const SliderButton: React.FC<ISliderButton> = ({
   const arrowOpacity = useTransform(x, [0, (width || 0) - 64], [1, 0])
 
   return (
-    <motion.div className={styles.SliderButton} ref={containerRef} style={dragComplete ? { background: 'white' } : {}}>
+    <motion.div className={`${styles.SliderButton} ${disabled ? styles.disabled : ''}`} ref={containerRef} style={dragComplete ? { background: 'white' } : {}}>
       <motion.div
         className={styles.draggable}
         drag="x"

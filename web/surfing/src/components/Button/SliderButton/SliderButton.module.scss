@@ -13,6 +13,12 @@
   overflow: hidden;
   cursor: default;
 
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
   .draggable {
     position: relative;
     width: 64px;

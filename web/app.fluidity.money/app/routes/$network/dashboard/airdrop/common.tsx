@@ -23,6 +23,7 @@ import {
   Video,
   Hoverable,
   Form,
+  SliderButton
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -634,6 +635,8 @@ const StakeNowModal = ({
     if (!stakeTokens) return;
     if (!canStake) return;
 
+    setButtonText('PROCESSING...')
+
     try {
       await stakeTokens(
         new BN(daysToSeconds(stakingDuration)),
@@ -651,6 +654,7 @@ const StakeNowModal = ({
       );
     } catch (e) {
       // Expect error on fail
+      setButtonText('SLIDE TO STAKE')
       console.log(e);
       return;
     }
@@ -661,6 +665,8 @@ const StakeNowModal = ({
   >("");
 
   const tooltipStyle = isMobile ? "frosted" : "solid"
+
+  const [buttonText, setButtonText] = useState("SLIDE TO STAKE")
 
   return (
     <>
@@ -965,14 +971,13 @@ const StakeNowModal = ({
           </Card>
         </div>
       </div>
-      <GeneralButton
-        type="secondary"
+      <SliderButton
         disabled={!canStake}
         style={{ width: "95%" }}
-        handleClick={() => handleStake()}
+        onSlideComplete={() => handleStake()}
       >
-        Stake
-      </GeneralButton>
+        <Text prominent={buttonText === "SLIDE TO STAKE"}>{buttonText}</Text>
+      </SliderButton>
       <Text
         style={{
           textAlign: "center",
