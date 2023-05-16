@@ -138,4 +138,23 @@ type Emission struct {
 		TotalBpy          float64 `json:"total_bpy"`
 		DistributionPools string  `json:"distribution_pools"`
 	} `json:"winning_chances"`
+
+	// FeeSwitchSender if enabled and their custom arguments
+	FeeSwitchSender struct {
+		OriginalAddress string `json:"original_address"`
+		NewAddress string `json:"new_address"`
+	} `json:"fee_switch_sender"`
+
+	// FeeSwitchRecipient if enabled and their custom arguments
+	FeeSwitchRecipient struct {
+		OriginalAddress string `json:"original_address"`
+		NewAddress string `json:"new_address"`
+	} `json:"fee_switch_recipient"`
+
+	// SpecialPoolOptions enabled by enabling the utility mining feature
+	SpecialPoolOptions struct {
+		PayoutFreqOverride float64 `json:"payout_freq_override"`
+		DeltaWeightOverride float64 `json:"delta_weight_override"`
+		WinningClassesOverride float64 `json:"winning_classes_override"`
+	} `json:"special_pool_options"`
 }
