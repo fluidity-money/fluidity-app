@@ -21,7 +21,6 @@ import (
 func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error) {
 	logsReqParams := LogParams{{
 		BlockHash: blockHash,
-		Topics:    []string{common.TransferLogTopic},
 	}}
 
 	logsReqBody_, err := json.Marshal(GethBody{
