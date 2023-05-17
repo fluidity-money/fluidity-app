@@ -5,6 +5,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	winnersDb "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	winnersQueue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -117,6 +118,16 @@ func convertWinners(pendingRewards []winnersDb.PendingRewardData, transactionHas
 			rewardTier     = pendingReward.RewardTier
 			logIndex       = pendingReward.LogIndex
 		)
+
+		log.Debug(func(k *log.Log) {
+			k.Format(
+				"Converting a pending reward to winner with send hash %v, transaction hash %v, log index %v, application %v",
+				sendHashString,
+				hashString,
+				logIndex.String(),
+				appString,
+			)
+		})
 
 		winners[i] = winnersDb.Winner{
 			Application:             appString,
