@@ -30,9 +30,7 @@ func StoreValue(key string, x interface{}) {
 func CalculateMovingAverageAndSumMaybePop(key string, limit int, shouldPopIfExcess bool) (average int, sum int, err error) {
 	listLength_ := state.LLen(key)
 
-	shouldPop := listLength_ > math.MaxInt && shouldPopIfExcess
-
-	if shouldPop {
+	if listLength_ > math.MaxInt {
 		return 0, 0, fmt.Errorf(
 			"key list %#v length too large: %v",
 			key,
@@ -42,7 +40,11 @@ func CalculateMovingAverageAndSumMaybePop(key string, limit int, shouldPopIfExce
 
 	listLength := int(listLength_)
 
-	if listLength > limit {
+	shouldPop := listLength > limit && shouldPopIfExcess
+
+	// should only pop if there's excess and the argument is set
+
+	if shouldPop {
 		state.RPopCount(key, listLength - limit)
 	}
 
