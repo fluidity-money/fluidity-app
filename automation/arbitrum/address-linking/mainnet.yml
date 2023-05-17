@@ -1,0 +1,9 @@
+SERVICES:
+  - ARB_ADDRRESS_LINKING:
+      SERVICE_NAME: microservice-ethereum-address-linking
+      DOCKERFILE_PATH: ./cmd/microservice-ethereum-address-linking
+      ENV_FLU_WORKER_ID: arbitrum-microservice-ethereum-address-linking
+      ENV_FLU_ETHEREUM_NETWORK: arbitrum
+      ENV_FLU_ETHERUEM_ADDRESS_CONFIRMATION_CONTRACT_ADDR: 0XD93E0D3F43AB7B151484618B50714F713FAF563E
+      
+
