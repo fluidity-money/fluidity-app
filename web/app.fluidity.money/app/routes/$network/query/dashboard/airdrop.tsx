@@ -5,7 +5,7 @@ import { useAirdropStatsByAddress } from "~/queries/useAirdropStats";
 import { useStakingDataByAddress } from "~/queries/useStakingData";
 
 export type StakingEvent = {
-  amount: number;
+  amountUsd: number;
   durationDays: number;
   multiplier: number;
   insertedDate: string;
@@ -62,7 +62,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         aggregate: { count: referralsCount },
       },
     } = airdropStatsData;
-    const { stakes } = stakingData;
+
+    const stakes = stakingData.stakes.map(
+      ({ multiplier, durationSecs, amount, ...stake }) => ({
+        ...stake,
+        amountUsd: amount / 1e6,
+        durationDays: durationSecs / 60 / 60 / 24,
+        multiplier: multiplier[0].result,
+      })
+    );
 
     const bottleTiers = bottleTiers_ || {
       [Rarity.Common]: 0,
