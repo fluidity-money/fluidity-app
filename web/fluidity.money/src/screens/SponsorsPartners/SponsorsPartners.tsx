@@ -74,7 +74,6 @@ const SponsorsPartners = () => {
       title: "Aldrin",
       info: "Aldrin is a decentralized exchange whose mission is to simplify DeFi and create powerful tools to help all traders succeed, leading to more equality.",
     },
-
     {
       img: "/assets/images/Partners/DODO.png",
       url: "https://dodoex.io",
@@ -87,6 +86,60 @@ const SponsorsPartners = () => {
       title: "Orca",
       info: "Orca is the easiest, fastest, and most user-friendly cryptocurrency exchange on the Solana blockchain.",
     },
+    {
+      img: "/assets/images/Partners/Chronos.png",
+      url: "https://chronos.exchange",
+      title: "Chronos",
+      info: "Chronos is a community-owned decentralized exchange (DEX) and liquidity provider constructed on the Arbitrum Layer 2 (L2) network, aimed at fostering DeFi growth through sustainable liquidity incentives."
+    },
+    {
+      img: "/assets/images/Partners/Gains-Network.png",
+      url: "https://gainsnetwork.io",
+      title: "Gains Network",
+      info: "Gains Network is developing gTrade, a liquidity-efficient, powerful, and user-friendly decentralized leveraged trading platform."
+    },
+    {
+      img: "/assets/images/Partners/Factor.png",
+      url: "https://factor.fi",
+      title: "Factor",
+      info: "Factor's no-code platform makes DeFi asset management easy, allowing you to create innovative products, strategies, and vaults."
+    },
+    {
+      img: "/assets/images/Partners/Saddle.png",
+      url: "https://saddle.finance",
+      title: "Saddle",
+      info: "Saddle is a DeFi protocol committed to building new financial primitives open to everyone."
+    },
+    {
+      img: "/assets/images/Partners/Coin98.png",
+      url: "https://coin98.com",
+      title: "Coin98",
+      info: "Coin98 is building the infrastructure for Web3 with a suite of DeFi products."
+    },
+    {
+      img: "/assets/images/Partners/OKX.png",
+      url: "https://www.okx.com",
+      title: "OKX",
+      info: "Buy BTC, ETH, and more on OKX, a leading crypto exchange."
+    },
+    {
+      img: "/assets/images/Partners/Halls-of-Olympia.png",
+      url: "https://hallsofolympia.io",
+      title: "Halls of Olympia",
+      info: "Halls of Olympia"
+    },
+    {
+      img: "/assets/images/Partners/Meson.png",
+      url: "https://meson.fi",
+      title: "Meson",
+      info: "Meson provides minute-fast swaps with almost-zero fee & slippage across all major blockchains."
+    },
+    {
+      img: "/assets/images/Partners/Vesta.png",
+      url: "https://vestafinance.xyz",
+      title: "Vesta",
+      info: "Vesta Finance allows you to borrow collateralized stablecoin VST against supported crypto assets with low interest rate."
+    }
   ];
 
   //Note: every value rep is in pixel
