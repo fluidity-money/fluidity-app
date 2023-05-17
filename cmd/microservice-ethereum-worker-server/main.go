@@ -521,6 +521,14 @@ func main() {
 				)
 
 				for _, payoutDetails := range payouts {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Transaction with hash %v, log index %v had application %v",
+							transactionHash,
+							logIndex,
+							application.String(),
+						)
+					})
 					// create announcement and container
 					announcement := worker.EthereumAnnouncement{
 						TransactionHash: transactionHash,
