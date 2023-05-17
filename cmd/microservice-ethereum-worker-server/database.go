@@ -16,8 +16,12 @@ func addBtx(key string, transfers int) {
 	moving_average.StoreValue(key, transfers)
 }
 
-func computeTransactionsSumAndAverage(key string, limit int) (int, int) {
-	average, sum, err := moving_average.CalculateMovingAverageAndSum(key, limit)
+func computeTransactionsSumAndAverage(key string, limit int, shouldPop bool) (int, int) {
+	average, sum, err := moving_average.CalculateMovingAverageAndSumMaybePop(
+		key,
+		limit,
+		shouldPop,
+	)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {

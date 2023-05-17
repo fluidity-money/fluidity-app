@@ -24,11 +24,15 @@ func StoreValue(key string, x interface{}) {
 	state.LPush(key, x)
 }
 
-// CalculateMovingAverageAndSum with the limit given, by getting a range over each item then popping anything that exceeds the limit
-func CalculateMovingAverageAndSum(key string, limit int) (average int, sum int, err error) {
+// CalculateMovingAverageAndSumMaybePop with the limit given, by getting
+// a range over each item then popping anything that exceeds the limit if
+// the flag is set
+func CalculateMovingAverageAndSumMaybePop(key string, limit int, shouldPopIfExcess bool) (average int, sum int, err error) {
 	listLength_ := state.LLen(key)
 
-	if listLength_ > math.MaxInt {
+	shouldPop := listLength_ > math.MaxInt && shouldPopIfExcess
+
+	if shouldPop {
 		return 0, 0, fmt.Errorf(
 			"key list %#v length too large: %v",
 			key,

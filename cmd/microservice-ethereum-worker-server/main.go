@@ -191,9 +191,14 @@ func main() {
 
 		addBtx(movingAverageKey, transfersInBlock)
 
+		// if this is set, then any excess items in the list should be popped
+
+		shouldAverageTransfersScanPopExcess := atxBufferSize > epochBlocks
+
 		averageTransfersInBlock, _ := computeTransactionsSumAndAverage(
 			movingAverageKey,
 			atxBufferSize,
+			shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
@@ -205,9 +210,14 @@ func main() {
 			movingAverageKey,
 		)
 
+		// the average transfers scan pop excess check is
+		// inverted so we can remove items if the epoch size is
+		// larger than the atx buffer size
+
 		_, transfersInEpoch := computeTransactionsSumAndAverage(
 			movingAverageKey,
 			epochBlocks,
+			!shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
