@@ -1083,8 +1083,55 @@ const tutorialContent: {
 const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModal?: () => void }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const Navigation = () => {
+    return <div
+      className="tutorial-nav"
+    >
+      <GeneralButton
+        icon={<ArrowLeft />}
+        layout="before"
+        handleClick={() => {
+          setCurrentSlide(currentSlide - 1);
+        }}
+        type="transparent"
+        disabled={currentSlide === 0}
+      >
+        PREV
+      </GeneralButton>
+      <div className="tutorial-nav-status">
+        <Text size="md">
+          {currentSlide + 1} / 5
+        </Text>
+      </div>
+      {
+        currentSlide !== 4 ? (
+          <GeneralButton
+            icon={<ArrowRight />}
+            layout="after"
+            handleClick={() => {
+              setCurrentSlide(currentSlide + 1);
+            }}
+            type="transparent"
+            disabled={currentSlide === 4}
+          >
+            Next
+          </GeneralButton>
+        ) : !isMobile && (
+          <GeneralButton
+            type="primary"
+            handleClick={closeModal}
+            className="start-earning-button"
+          >
+            START EARNING
+          </GeneralButton>
+        )
+      }
+    </div>
+  }
+
   return (
     <>
+      {isMobile && <Navigation />}
       <AnimatePresence mode="wait">
         <motion.div
           key={`tutorial-slide-${currentSlide}`}
@@ -1100,9 +1147,9 @@ const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModa
             justifyContent: "center",
             height: "100%",
             width: "100%",
-            maxWidth: isMobile ? 550 : 635,
+            maxWidth: !isMobile ? 635 : 'unset',
             gap: "1em",
-            marginTop: '1em'
+            marginTop: isMobile ? 0 : '1em'
           }}
         >
           <Video
@@ -1113,57 +1160,15 @@ const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModa
             src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
               }.mp4`}
             className="tutorial-image"
+            style={{ maxWidth: '100%' }}
           />
-          <Display size="xxs" style={{ margin: 0 }}>
+          <Display size="xxs" style={{ margin: 0, textAlign: 'center' }}>
             {tutorialContent[currentSlide].title}
           </Display>
           {tutorialContent[currentSlide].desc}
         </motion.div>
       </AnimatePresence>
-
-      <div
-        className="tutorial-nav"
-      >
-        <GeneralButton
-          icon={<ArrowLeft />}
-          layout="before"
-          handleClick={() => {
-            setCurrentSlide(currentSlide - 1);
-          }}
-          type="transparent"
-          disabled={currentSlide === 0}
-        >
-          PREV
-        </GeneralButton>
-        <div className="tutorial-nav-status">
-          <Text size="md">
-            {currentSlide + 1} / 5
-          </Text>
-        </div>
-        {
-          currentSlide !== 4 ? (
-            <GeneralButton
-              icon={<ArrowRight />}
-              layout="after"
-              handleClick={() => {
-                setCurrentSlide(currentSlide + 1);
-              }}
-              type="transparent"
-              disabled={currentSlide === 4}
-            >
-              Next
-            </GeneralButton>
-          ) : !isMobile && (
-            <GeneralButton
-              type="primary"
-              handleClick={closeModal}
-              className="start-earning-button"
-            >
-              START EARNING
-            </GeneralButton>
-          )
-        }
-      </div>
+      {!isMobile && <Navigation />}
     </>
   );
 };

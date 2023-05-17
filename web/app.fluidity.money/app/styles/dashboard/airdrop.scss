@@ -44,9 +44,9 @@
 .tutorial-slide-container {
   max-width: 100%;
   height: auto;
+  padding-bottom: 1em;
 
   .tutorial-image {
-    margin-top: 1em;
     object-fit: cover;
     object-position: center;
     border-radius: 5px;
@@ -76,7 +76,6 @@ $holo: linear-gradient(
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1em;
   position: relative;
 
   .tutorial-nav-status {
@@ -412,5 +411,19 @@ th {
     box-sizing: border-box;
     grid-column: 1 / 3;
     grid-row: 3 / 4;
+  }
+}
+
+.airdrop-header {
+  display: flex;
+  gap: 2em;
+  margin-bottom: 2em;
+  white-space: nowrap;
+
+  &.airdrop-mobile {
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 1em;
+    overflow-x: scroll;
   }
 }

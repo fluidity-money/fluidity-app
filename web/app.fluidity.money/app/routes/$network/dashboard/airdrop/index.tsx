@@ -268,8 +268,7 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className="pad-main"
-        style={{ display: "flex", gap: "2em", marginBottom: "2em" }}
+        className={`pad-main airdrop-header ${isMobile ? 'airdrop-mobile' : ''}`}
       >
         <TabButton size="small" onClick={() => setCurrentModal(null)}>
           Airdrop Dashboard
@@ -310,13 +309,14 @@ const Airdrop = () => {
     return (
       <>
         <Header />
-        <div
+        <motion.div
           className="pad-main"
           style={{
             display: "flex",
             flexDirection: "column",
             gap: "2em",
           }}
+          key={`airdrop-mobile-${currentModal}`}
         >
           {currentModal === null && (
             <>
@@ -413,7 +413,7 @@ const Airdrop = () => {
               />
             </>
           )}
-        </div>
+        </motion.div>
       </>
     );
 
