@@ -19,6 +19,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
       ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
       ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.usdc
+      ENV_FLU_DEBUG: true
 
   - APPSERVER_DAI:
       SERVICE_NAME: microservice-arbitrum-application-server-dai

@@ -26,38 +26,44 @@ const (
 
 type Emission = worker.Emission
 
-// GetLastBlocksTransactionCount, returning the average
-// and sum of the transactions
-func GetLastBlocksTransactionCount(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, sum int, blocks []uint64, transactionCounts []int) {
+// GetLastBlocksTransactionCount, returning the average and sum of the
+// transactions
+func GetLastBlocksTransactionCount(tokenShortName string, network network.BlockchainNetwork, limit int) (average int, sum int) {
 
-	timescaleClient := timescale.Client() //
+	timescaleClient := timescale.Client()
+
+	//
 
 	statementText := fmt.Sprintf(
-		`SELECT block_number, transaction_count
-		FROM %s
-		WHERE token_short_name = $1
-		AND network = $2
-		ORDER BY block_number DESC
-		LIMIT $3`,
+		`SELECT AVG(transaction_count), SUM(transaction_count)
+		FROM (
+			SELECT transaction_count
+			FROM %s
+			WHERE token_short_name = $1
+			AND network = $2
+			ORDER BY block_number DESC
+			LIMIT $3
+		) as sum`,
 
 		TableAverageAtx,
 	)
 
-	log.Debugf(
-		"token short name: %#v, network: %#v, limit: %#v",
-		tokenShortName,
-		network,
-		limit,
-	)
-
-	rows, err := timescaleClient.Query(
+	row := timescaleClient.QueryRow(
 		statementText,
 		tokenShortName,
 		network,
 		limit,
 	)
 
-	if err != nil {
+	if err := row.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to query an average atx field for calculation!"
+			k.Payload = err
+		})
+	}
+
+	if err := row.Err(); err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 			k.Message = "Failed to query the average atx field for calculation!"
@@ -65,40 +71,7 @@ func GetLastBlocksTransactionCount(tokenShortName string, network network.Blockc
 		})
 	}
 
-	defer rows.Close()
-
-	sum = 0
-
-	blocks = make([]uint64, 0)
-
-	transactionCounts = make([]int, 0)
-
-	for rows.Next() {
-		var (
-			blockNumber      uint64
-			transactionCount int
-		)
-
-		err := rows.Scan(&blockNumber, &transactionCount)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to scan the transaction count to an int!"
-				k.Payload = err
-			})
-		}
-
-		blocks = append(blocks, blockNumber)
-
-		transactionCounts = append(transactionCounts, transactionCount)
-
-		sum += transactionCount
-	}
-
-	average = sum / limit
-
-	return average, sum, blocks, transactionCounts
+	return average, sum
 }
 
 // InsertTransactionCount for a block number for the number of transactions
