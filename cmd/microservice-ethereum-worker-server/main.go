@@ -166,6 +166,8 @@ func main() {
 			transfersInBlock += len(transfers.Transfers)
 		}
 
+		movingAverageKey := createMovingAverageKey(dbNetwork, tokenName)
+
 		secondsSinceLastBlockRat := new(big.Rat).SetFloat64(secondsSinceLastBlock)
 
 		secondsSinceLastEpochFloat := secondsSinceLastBlock * float64(epochBlocks)
@@ -182,31 +184,40 @@ func main() {
 
 		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-		addBtx(
-			dbNetwork,
-			blockNumber.Uint64(),
-			tokenName,
-			transfersInBlock,
-		)
+		// add the transaction count in the block that just came in without
+		// recording the block, assuming that things are coming in linearly -
+		// this can create issues if infra is having partial downtime and is
+		// coming from a backlog
+
+		addBtx(movingAverageKey, transfersInBlock)
+
+		// if this is set, then any excess items in the list should be popped
+
+		shouldAverageTransfersScanPopExcess := atxBufferSize > epochBlocks
 
 		averageTransfersInBlock, _ := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
+			movingAverageKey,
 			atxBufferSize,
+			shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
-			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v",
+			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v, key %v",
 			dbNetwork,
 			tokenName,
 			atxBufferSize,
 			averageTransfersInBlock,
+			movingAverageKey,
 		)
 
+		// the average transfers scan pop excess check is
+		// inverted so we can remove items if the epoch size is
+		// larger than the atx buffer size
+
 		_, transfersInEpoch := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
+			movingAverageKey,
 			epochBlocks,
+			!shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(

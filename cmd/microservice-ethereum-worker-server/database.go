@@ -5,33 +5,38 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
-	timescale "github.com/fluidity-money/fluidity-app/lib/databases/timescale/worker"
-	"github.com/fluidity-money/fluidity-app/lib/log"
+	"fmt"
+
+	"github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
-func addBtx(network_ network.BlockchainNetwork, blockNumber uint64, tokenShortName string, transfers int) {
-	log.Debug(func(k *log.Log) {
-		k.Message = "About to insert a transaction count into timescale!"
-	})
-
-	timescale.InsertTransactionCount(
-		blockNumber,
-		tokenShortName,
-		transfers,
-		network_,
-	)
+func addBtx(key string, transfers int) {
+	moving_average.StoreValue(key, transfers)
 }
 
-func computeTransactionsSumAndAverage(network_ network.BlockchainNetwork, tokenShortName string, limit int) (int, int) {
-	log.Debug(func(k *log.Log) {
-		k.Message = "About to get average atx from timescale!"
-	})
-
-	return worker.GetLastBlocksTransactionCount(
-		tokenShortName,
-		network_,
+func computeTransactionsSumAndAverage(key string, limit int, shouldPop bool) (int, int) {
+	average, sum, err := moving_average.CalculateMovingAverageAndSumMaybePop(
+		key,
 		limit,
+		shouldPop,
 	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to compute the moving average for key %v!",
+				key,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	return average, sum
+}
+
+func createMovingAverageKey(network_ network.BlockchainNetwork, token string) string {
+	return fmt.Sprintf("%v.%v.transfer-count", network_, token)
 }
