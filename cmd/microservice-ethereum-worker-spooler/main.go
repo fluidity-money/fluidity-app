@@ -78,6 +78,14 @@ func main() {
 				blockNumber = uint64(blockNumberInt.Int64())
 			)
 
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Inserting pending reward type for transaction with hash %v and application %v",
+					transactionHash,
+					application.String(),
+				)
+			})
+
 			// write the sender and receiver to be stored once the win is paid out
 			winners.InsertPendingRewardType(
 				dbNetwork,

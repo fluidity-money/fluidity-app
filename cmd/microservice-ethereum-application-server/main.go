@@ -403,6 +403,21 @@ func main() {
 			DecoratedTransactions: decoratedTransactions,
 		}
 
+		for transactionHash, decoratedTransaction := range decoratedTransactions {
+			for i, transfer := range decoratedTransaction.Transfers {
+				if transfer.Decorator != nil {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"For transaction hash %v, transfer with index %v had application %v!",
+							transactionHash,
+							i,
+							transfer.Decorator.Application.String(),
+						)
+					})
+				}
+			}
+		}
+
 		// send to server
 		queue.SendMessage(publishAmqpTopic, serverWork)
 	})
