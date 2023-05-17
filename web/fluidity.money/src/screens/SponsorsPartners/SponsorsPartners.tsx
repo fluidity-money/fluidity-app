@@ -99,19 +99,19 @@ const SponsorsPartners = () => {
       info: "Gains Network is developing gTrade, a liquidity-efficient, powerful, and user-friendly decentralized leveraged trading platform."
     },
     {
-      img: "/assets/images/Partners/Factor.png",
+      img: "/assets/images/Partners/Factor.svg",
       url: "https://factor.fi",
       title: "Factor",
       info: "Factor's no-code platform makes DeFi asset management easy, allowing you to create innovative products, strategies, and vaults."
     },
     {
-      img: "/assets/images/Partners/Saddle.png",
+      img: "/assets/images/Partners/Saddle.svg",
       url: "https://saddle.finance",
       title: "Saddle",
       info: "Saddle is a DeFi protocol committed to building new financial primitives open to everyone."
     },
     {
-      img: "/assets/images/Partners/Coin98.png",
+      img: "/assets/images/Partners/Coin98.svg",
       url: "https://coin98.com",
       title: "Coin98",
       info: "Coin98 is building the infrastructure for Web3 with a suite of DeFi products."
@@ -129,13 +129,13 @@ const SponsorsPartners = () => {
       info: "Halls of Olympia"
     },
     {
-      img: "/assets/images/Partners/Meson.png",
+      img: "/assets/images/Partners/Meson.svg",
       url: "https://meson.fi",
       title: "Meson",
       info: "Meson provides minute-fast swaps with almost-zero fee & slippage across all major blockchains."
     },
     {
-      img: "/assets/images/Partners/Vesta.png",
+      img: "/assets/images/Partners/Vesta.svg",
       url: "https://vestafinance.xyz",
       title: "Vesta",
       info: "Vesta Finance allows you to borrow collateralized stablecoin VST against supported crypto assets with low interest rate."
