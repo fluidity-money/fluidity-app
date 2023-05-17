@@ -39,7 +39,50 @@
         "type": "uint256"
       }
     ],
-    "name": "Staked",
+    "name": "Deposited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lockupLength",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lockedTimestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fusdcAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "usdcAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "wethAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Redeemed",
     "type": "event"
   },
   {
@@ -67,6 +110,11 @@
       {
         "internalType": "uint256",
         "name": "_slippage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxTimestamp",
         "type": "uint256"
       }
     ],
@@ -117,11 +165,121 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_spender",
+        "type": "address"
+      }
+    ],
+    "name": "deposits",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "depositTimestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "redeemTimestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "camelotLpMinted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "camelotTokenA",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "camelotTokenB",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sushiswapLpMinted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sushiswapTokenA",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sushiswapTokenB",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "fusdcUsdcPair",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ILootboxStaking.Deposit[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
+    "name": "ratios",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "fusdcUsdcRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fusdcWethRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fusdcUsdcSpread",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fusdcWethSpread",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fusdcUsdcLiquidity",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fusdcWethLiquidity",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxTimestamp",
+        "type": "uint256"
+      }
+    ],
     "name": "redeem",
     "outputs": [
       {

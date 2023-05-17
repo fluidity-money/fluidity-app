@@ -1,8 +1,23 @@
 .bottle-distribution-container {
-  display: flex;
-  gap: 2em;
-  justify-content: space-between;
+  display: grid;
+  width: 100%;
+  gap: 1em;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   align-items: flex-end;
+
+  svg {
+    aspect-ratio: 1/1;
+  }
+}
+
+.helper-label {
+  svg {
+    fill: none;
+    stroke: none;
+    path {
+      fill: currentColor;
+    }
+  }
 }
 
 .lootbottle-container {
@@ -16,7 +31,7 @@
 
 .referral-details-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto auto;
   gap: 1em;
   padding-bottom: 1em;
 }
@@ -24,12 +39,10 @@
 .leaderboard-container {
   width: 100%;
   padding: 0;
-  margin: 2em 0;
 }
 
 .tutorial-slide-container {
   max-width: 100%;
-  width: 500px;
   height: auto;
 
   .tutorial-image {
@@ -37,6 +50,35 @@
     object-fit: cover;
     object-position: center;
     border-radius: 5px;
+  }
+
+  svg {
+    aspect-ratio: 1/1;
+  }
+}
+
+$holo: linear-gradient(
+  90deg,
+  #f3b8d8 0%,
+  #b793e9 15.1%,
+  #9fd4f3 26.04%,
+  #ffd2c4 36.46%,
+  #fbf3f3 46.88%,
+  #d9abdf 57.29%,
+  #af9ce3 72.4%,
+  #aae4e1 85.42%,
+  #c6ead0 93.23%,
+  #fdb5e4 100%
+);
+
+.tutorial-nav {
+  button {
+    svg {
+      path {
+        fill: none !important;
+        stroke: currentColor;
+      }
+    }
   }
 }
 
@@ -48,16 +90,72 @@
 }
 
 .staking-modal-token-icon {
-  width: 64px;
+  width: 60px;
+  cursor: pointer;
 }
 
 .staking-modal-token-input {
   background: none;
   border: none;
   width: 100%;
+  max-width: 180px;
   color: white;
   font-size: 2em;
   outline: none;
+  text-align: right;
+  box-sizing: border-box;
+  padding-right: 5px;
+}
+
+.staking-modal-token-selector {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  justify-content: center;
+  height: 72px;
+}
+
+.staking-modal-arrow-container {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  svg {
+    transform: scale(2);
+  }
+  path {
+    stroke: white;
+  }
+}
+
+.duration-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1em;
+
+  h1 {
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+  input {
+  }
+}
+
+.power-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  &.rhs {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .power-text {
+    font-size: 3em;
+  }
 }
 
 .pad-main {
@@ -70,8 +168,9 @@
   color: black;
   display: grid;
   box-sizing: border-box;
-  grid-template-columns: 2.2fr 1fr 5fr;
-  gap: 2em;
+  grid-template-columns: 180px 64px auto;
+  gap: 0.5em;
+  max-width: 100%;
 
   .multiplier-tasks-header {
     display: flex;
@@ -89,14 +188,20 @@
     align-items: center;
     cursor: pointer;
     grid-column: 2 / 3;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .multiplier-tasks-tasks {
     grid-column: 3/4;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
+    width: 100%;
+    gap: 6px;
+
+    a {
+      text-align: center;
+    }
   }
 }
 
@@ -118,11 +223,29 @@
     .multiplier-tasks-tasks {
       grid-column: 1 / 3;
       grid-row: 2 / 3;
+      justify-content: center;
     }
   }
 }
 
 .leaderboard-header {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1em;
+
+  .leaderboard-header-text {
+  }
+  .leaderboard-header-filters {
+    display: flex;
+    gap: 1em;
+  }
+  h3 {
+    margin: 0;
+    margin-bottom: 0.5em;
+  }
   padding: 2em 2em 0 2em;
 }
 
@@ -137,16 +260,37 @@ td {
   padding-right: 2em !important;
 }
 
+th {
+  &:last-child {
+    padding-right: 4em !important;
+  }
+  &:first-child {
+    padding-left: 4em !important;
+  }
+}
+
 .airdrop-row {
   td {
     background-color: transparent !important;
     border-bottom: 1px solid white !important;
+    &:last-child {
+      padding-right: 4em !important;
+    }
+    &:first-child {
+      padding-left: 4em !important;
+    }
   }
+
   &:last-of-type {
     td {
       border-bottom: none !important;
     }
   }
-  border: 1px solid white !important;
-  margin: 0;
+
+  &.highlighted-row {
+    td {
+      border: none !important;
+    }
+    background: $holo;
+  }
 }
