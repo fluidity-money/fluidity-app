@@ -302,30 +302,14 @@
 }
 .airdrop-leaderboard-mobile .transaction-table > thead > tr td:first-child,
 .airdrop-leaderboard-mobile .transaction-table > thead > tr th:first-child,
-.airdrop-leaderboard-mobile
-  .transaction-table
-  > tbody
-  > tr.airdrop-row
-  td:first-child,
-.airdrop-leaderboard-mobile
-  .transaction-table
-  > tbody
-  > tr.airdrop-row
-  th:first-child {
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row td:first-child,
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row th:first-child {
   padding-left: 1em;
 }
 .airdrop-leaderboard-mobile .transaction-table > thead > tr td:last-child,
 .airdrop-leaderboard-mobile .transaction-table > thead > tr th:last-child,
-.airdrop-leaderboard-mobile
-  .transaction-table
-  > tbody
-  > tr.airdrop-row
-  td:last-child,
-.airdrop-leaderboard-mobile
-  .transaction-table
-  > tbody
-  > tr.airdrop-row
-  th:last-child {
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row td:last-child,
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row th:last-child {
   padding-right: 1em;
 }
 .airdrop-leaderboard-mobile .transaction-table > thead > tr td,

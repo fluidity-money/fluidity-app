@@ -9,7 +9,7 @@ import {
   useViewport,
   BloomEffect,
 } from "@fluidity-money/surfing";
-import { generateTweet } from "~/util/tweeter";
+import { generateRewardTweet } from "~/util/tweeter";
 
 interface IPropsConnectedWalletModal {
   visible: boolean;
@@ -115,7 +115,10 @@ export const ViewRewardModal = ({
                 WINNINGS BREAKDOWN
               </GeneralButton>
               <a
-                href={generateTweet(winAmount, forSending ? "send" : "receive")}
+                href={generateRewardTweet(
+                  winAmount,
+                  forSending ? "send" : "receive"
+                )}
                 rel="noopener noreferrer"
                 target="_blank"
               >

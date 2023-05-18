@@ -23,12 +23,14 @@ import {
   Video,
   Hoverable,
   Form,
+  numberToMonetaryString,
   SliderButton,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
+  getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
 
@@ -371,13 +373,24 @@ const StakingStatsModal = ({
   liqudityMultiplier,
   stakes,
 }: IStakingStatsModal) => {
+  const canWithdraw = stakes.some(({ durationDays, depositDate }) => {
+    const stakedDays = dayDifference(new Date(), depositDate);
+    return durationDays - stakedDays <= 0;
+  });
+
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1em",
+      }}
+    >
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "auto auto auto",
-          gap: "1em",
+          gap: "2em",
         }}
       >
         <LabelledValue
@@ -389,15 +402,16 @@ const StakingStatsModal = ({
           {stakes.length}
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
-          $
-          {addDecimalToBn(
-            stakes.reduce((sum, { amount }) => sum.add(amount), new BN(0)),
-            6
+          {numberToMonetaryString(
+            getUsdFromTokenAmount(
+              stakes.reduce((sum, { amount }) => sum.add(amount), new BN(0)),
+              6
+            )
           )}
         </LabelledValue>
       </div>
-      <div style={{ position: "relative", border: "1px gray" }}>
-        <GeneralButton disabled={true} style={{ right: "0" }}>
+      <div style={{ position: "relative", border: "1px gray", width: "100%" }}>
+        <GeneralButton disabled={!canWithdraw} style={{ right: "0" }}>
           Withdraw
         </GeneralButton>
         <div>
@@ -417,6 +431,9 @@ const StakingStatsModal = ({
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 3fr 1fr",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "1em",
                 }}
               >
                 {/* Dates */}
@@ -424,7 +441,6 @@ const StakingStatsModal = ({
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    alignItems: "flex-start",
                     gap: "0.5em",
                   }}
                 >
@@ -444,12 +460,16 @@ const StakingStatsModal = ({
                     gap: "0.5em",
                   }}
                 >
-                  <Heading as="h3">{addDecimalToBn(amount, 6)}</Heading>
+                  <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
+                    {numberToMonetaryString(getUsdFromTokenAmount(amount, 6))}
+                  </Heading>
                   <ProgressBar
                     value={stakedDays}
-                    max={durationDays}
+                    max={Math.floor(durationDays)}
                     rounded
-                    color={durationDays === stakedDays ? "holo" : "gray"}
+                    color={
+                      stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                    }
                     size="sm"
                   />
                   <div
@@ -460,13 +480,17 @@ const StakingStatsModal = ({
                     }}
                   >
                     <Text prominent>{multiplier}x Multiplier</Text>
-                    <br />
-                    <Text prominent>{durationDays - stakedDays} Days Left</Text>
+                    <Text prominent>
+                      {Math.max(0, Math.floor(durationDays - stakedDays))} Days
+                      Left
+                    </Text>
                   </div>
                 </div>
                 <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
                   <Text>Staked For</Text>
-                  <Heading as="h2">{Math.floor(durationDays)}</Heading>
+                  <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
+                    {Math.floor(durationDays)}
+                  </Heading>
                   <Text>Days</Text>
                 </div>
               </div>
@@ -474,7 +498,7 @@ const StakingStatsModal = ({
           })}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -962,7 +986,8 @@ const StakeNowModal = ({
             className="power-text"
           >
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(1, stakingDuration),
+              (parseFloat(fluidToken.amount) || 0) *
+                stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1001,7 +1026,8 @@ const StakeNowModal = ({
           </Hoverable>
           <Text prominent holo size="xl" className="power-text">
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration),
+              (parseFloat(fluidToken.amount) || 0) *
+                stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
