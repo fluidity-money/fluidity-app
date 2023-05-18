@@ -41,9 +41,9 @@
 .tutorial-slide-container {
   max-width: 100%;
   height: auto;
+  padding-bottom: 1em;
 }
 .tutorial-slide-container .tutorial-image {
-  margin-top: 1em;
   object-fit: cover;
   object-position: center;
   border-radius: 5px;
@@ -52,6 +52,18 @@
   aspect-ratio: 1/1;
 }
 
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+.tutorial-nav .tutorial-nav-status {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
 .tutorial-nav button svg path {
   fill: none !important;
   stroke: currentColor;
@@ -62,6 +74,7 @@
   display: flex;
   padding: 5px;
   border-radius: 5em 14px 14px 5em;
+  max-width: 260px;
 }
 
 .staking-modal-token-icon {
@@ -73,7 +86,6 @@
   background: none;
   border: none;
   width: 100%;
-  max-width: 180px;
   color: white;
   font-size: 2em;
   outline: none;
@@ -191,17 +203,24 @@
   }
 }
 .leaderboard-header {
+  padding: 2em 2em 0 2em;
   display: flex;
   flex-direction: row;
   gap: 1em;
   justify-content: space-between;
-  align-items: flex-end;
   margin-bottom: 1em;
-  padding: 2em 2em 0 2em;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.leaderboard-header .leaderboard-header-text .airdrop-ldb-time-filter {
+  text-decoration: underline;
 }
 .leaderboard-header .leaderboard-header-filters {
   display: flex;
   gap: 1em;
+}
+.leaderboard-header .leaderboard-header-filters button {
+  padding: 0.5em 1em;
 }
 .leaderboard-header h3 {
   margin: 0;
@@ -209,37 +228,39 @@
 }
 
 .transactions-header {
+  display: none;
+}
+
+.transaction-table > thead > tr th,
+.transaction-table > thead > tr td,
+.transaction-table > tbody > tr.airdrop-row th,
+.transaction-table > tbody > tr.airdrop-row td {
   padding-left: 2em;
   padding-right: 2em;
 }
-
-th,
-td {
-  padding-left: 2em !important;
-  padding-right: 2em !important;
+.transaction-table > thead > tr th:last-child,
+.transaction-table > thead > tr td:last-child,
+.transaction-table > tbody > tr.airdrop-row th:last-child,
+.transaction-table > tbody > tr.airdrop-row td:last-child {
+  padding-right: 4em;
 }
-
-th:last-child {
-  padding-right: 4em !important;
+.transaction-table > thead > tr th:first-child,
+.transaction-table > thead > tr td:first-child,
+.transaction-table > tbody > tr.airdrop-row th:first-child,
+.transaction-table > tbody > tr.airdrop-row td:first-child {
+  padding-left: 4em;
 }
-th:first-child {
-  padding-left: 4em !important;
-}
-
-.airdrop-row td {
+.transaction-table > thead > tr td,
+.transaction-table > tbody > tr.airdrop-row td {
   background-color: transparent !important;
-  border-bottom: 1px solid white !important;
+  border-bottom: 1px solid white;
 }
-.airdrop-row td:last-child {
-  padding-right: 4em !important;
-}
-.airdrop-row td:first-child {
-  padding-left: 4em !important;
-}
-.airdrop-row:last-of-type td {
+.transaction-table > thead > tr:last-of-type td,
+.transaction-table > tbody > tr.airdrop-row:last-of-type td {
   border-bottom: none !important;
 }
-.airdrop-row.highlighted-row {
+.transaction-table > thead > tr.highlighted-row,
+.transaction-table > tbody > tr.airdrop-row.highlighted-row {
   background: linear-gradient(
     90deg,
     #f3b8d8 0%,
@@ -254,8 +275,175 @@ th:first-child {
     #fdb5e4 100%
   );
 }
-.airdrop-row.highlighted-row td {
+.transaction-table > thead > tr.highlighted-row td,
+.transaction-table > tbody > tr.airdrop-row.highlighted-row td {
   border: none !important;
+}
+
+.airdrop-leaderboard-mobile {
+  padding: 0;
+  gap: 0.5em;
+}
+.airdrop-leaderboard-mobile .leaderboard-header {
+  padding: 0 25px;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+}
+.airdrop-leaderboard-mobile .leaderboard-header .leaderboard-header-filters {
+  align-self: center;
+  gap: 2em;
+}
+.airdrop-leaderboard-mobile .transaction-table > thead > tr td,
+.airdrop-leaderboard-mobile .transaction-table > thead > tr th,
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row td,
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row th {
+  padding: 0.5em;
+}
+.airdrop-leaderboard-mobile .transaction-table > thead > tr td:first-child,
+.airdrop-leaderboard-mobile .transaction-table > thead > tr th:first-child,
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  td:first-child,
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  th:first-child {
+  padding-left: 1em;
+}
+.airdrop-leaderboard-mobile .transaction-table > thead > tr td:last-child,
+.airdrop-leaderboard-mobile .transaction-table > thead > tr th:last-child,
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  td:last-child,
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  th:last-child {
+  padding-right: 1em;
+}
+.airdrop-leaderboard-mobile .transaction-table > thead > tr td,
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row td {
+  border-bottom: 1px solid #404040;
+}
+.airdrop-leaderboard-mobile .transaction-table > thead > tr th,
+.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row th {
+  font-size: 12px;
+}
+
+.bottles-earned-button {
+  margin-bottom: 0.5em;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+.bottles-earned-button svg {
+  fill: none;
+  stroke: currentColor;
+}
+
+.airdrop-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2em;
+  flex-wrap: wrap;
+}
+
+.airdrop-stats-item {
+  flex-grow: 1;
+}
+
+.see-the-leaderboard-button {
+  align-self: flex-start;
+  justify-self: flex-end;
+  flex-grow: 1;
+  flex-shrink: 0;
+  padding: 1em;
+  border: 1px solid white;
+  border-radius: 0.5em;
+  height: 100%;
+  flex-basis: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.airdrop-my-multiplier {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+}
+.airdrop-my-multiplier svg,
+.airdrop-my-multiplier path {
+  fill: none !important;
+  stroke: currentColor !important;
+}
+.airdrop-my-multiplier.airdrop-mobile {
+  grid-template-columns: 1fr;
+  gap: 1em;
+}
+.airdrop-my-multiplier.airdrop-mobile .mx-bloom {
+  z-index: -1;
+  opacity: 0.5;
+  margin-top: -85px;
+}
+.airdrop-my-multiplier.airdrop-mobile #mx-see-my-staking-stats,
+.airdrop-my-multiplier.airdrop-mobile #mx-my-stakes,
+.airdrop-my-multiplier.airdrop-mobile #mx-stake-now-button {
+  grid-area: unset;
+}
+.airdrop-my-multiplier.airdrop-mobile #mx-stake-now-button {
+  padding: 12px;
+  font-size: 12px;
+}
+.airdrop-my-multiplier.airdrop-mobile .mx-my-multiplier {
+  text-align: center;
+}
+.airdrop-my-multiplier.airdrop-mobile .mx-my-multiplier h1 {
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.8));
+}
+.airdrop-my-multiplier #mx-see-my-staking-stats {
+  width: 100%;
+  grid-area: 2/1;
+  box-sizing: border-box;
+  align-self: end;
+}
+.airdrop-my-multiplier #mx-my-stakes {
+  display: grid;
+  grid-template-columns: auto max-content;
+  align-content: start;
+  gap: 1em;
+  grid-column: 2/3;
+  grid-row: 1/3;
+}
+.airdrop-my-multiplier #mx-stake-now-button {
+  width: 100%;
+  box-sizing: border-box;
+  grid-column: 1/3;
+  grid-row: 3/4;
+}
+
+.airdrop-header {
+  display: flex;
+  gap: 2em;
+  margin-bottom: 2em;
+  white-space: nowrap;
+}
+.airdrop-header.airdrop-mobile {
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1em;
+  overflow-x: scroll;
 }
 
 /*# sourceMappingURL=airdrop.css.map */

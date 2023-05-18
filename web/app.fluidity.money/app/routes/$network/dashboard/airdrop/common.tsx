@@ -24,6 +24,7 @@ import {
   Hoverable,
   Form,
   numberToMonetaryString,
+  SliderButton,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -42,6 +43,7 @@ interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   showBottleNumbers?: boolean;
   highlightBottleNumberIndex?: number;
   numberPosition?: "absolute" | "relative";
+  handleClickBottle?: (index: number) => void;
 }
 
 const BottleDistribution = ({
@@ -49,12 +51,17 @@ const BottleDistribution = ({
   showBottleNumbers = true,
   highlightBottleNumberIndex,
   numberPosition = "absolute",
+  handleClickBottle,
   ...props
 }: IBottleDistribution) => (
   <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
-        <div key={index} className="lootbottle-container">
+        <div
+          key={index}
+          className="lootbottle-container"
+          onClick={() => handleClickBottle?.(index)}
+        >
           <LootBottle
             size="lg"
             rarity={rarity}
@@ -62,10 +69,11 @@ const BottleDistribution = ({
             style={{
               marginBottom: "0.6em",
               opacity:
-                numberPosition === "relative" ||
-                highlightBottleNumberIndex === index
-                  ? 1
-                  : 0.2,
+                highlightBottleNumberIndex === undefined ||
+                highlightBottleNumberIndex !== index
+                  ? 0.2
+                  : 1,
+              ...(handleClickBottle ? { cursor: "pointer" } : {}),
             }}
           />
           <Text
@@ -76,7 +84,7 @@ const BottleDistribution = ({
           </Text>
           <Text
             prominent={
-              numberPosition === "relative" ||
+              highlightBottleNumberIndex === undefined ||
               highlightBottleNumberIndex === index
             }
             style={
@@ -113,6 +121,7 @@ interface IReferralDetailsModal {
   activeReferrerReferralsCount: number;
   inactiveReferrerReferralsCount: number;
   nextInactiveReferral?: Referral;
+  isMobile?: boolean;
 }
 
 const ReferralDetailsModal = ({
@@ -122,192 +131,199 @@ const ReferralDetailsModal = ({
   activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
-}: IReferralDetailsModal) => (
-  <>
-    <div style={{ display: "flex", gap: "1em", alignItems: "center" }}>
+  isMobile,
+}: IReferralDetailsModal) => {
+  const tooltipStyle = isMobile ? "frosted" : "solid";
+
+  return (
+    <>
       <Display className="no-margin" size="xxxs">
         My Referral Link
       </Display>
-      <Hoverable tooltipContent={"Lorem ipsum"}>
-        <InfoCircle />
-      </Hoverable>
-    </div>
-    <div className="referral-details-container">
-      <LabelledValue
-        label={
-          <div
-            className="helper-label"
-            style={{ display: "flex", gap: "0.5em" }}
-          >
-            <Text size="xs">Active Referrals</Text>
-            <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-              <InfoCircle />
+      <div className="referral-details-container">
+        <LabelledValue
+          label={
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
+            >
+              <Text className="helper-label" size="xs">
+                Active Referrals <InfoCircle />
+              </Text>
             </Hoverable>
-          </div>
-        }
-      >
-        {activeRefereeReferralsCount}
-      </LabelledValue>
-      <LabelledValue
-        label={
-          <div
-            className="helper-label"
-            style={{ display: "flex", gap: "0.5em" }}
-          >
-            <Text size="xs">Total Bottles earned from your link</Text>
-            <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-              <InfoCircle />
+          }
+        >
+          {activeRefereeReferralsCount}
+        </LabelledValue>
+        <LabelledValue
+          label={
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+            >
+              <Text className="helper-label" size="xs">
+                Total Bottles earned from your link <InfoCircle />
+              </Text>
             </Hoverable>
-          </div>
-        }
+          }
+        >
+          {totalBottles}
+        </LabelledValue>
+      </div>
+      <Hoverable
+        style={{ minWidth: 250 }}
+        tooltipStyle={tooltipStyle}
+        tooltipContent="The amount of Loot Bottles you have earned through your referral link based on their rarity."
       >
-        {totalBottles}
-        {/* TODO REPLACE THIS WITH REAL DATA */}
-      </LabelledValue>
-    </div>
-    <div className="helper-label" style={{ display: "flex", gap: "0.5em" }}>
-      <Text size="xs">Bottle Distribution</Text>
-      <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-        <InfoCircle />
+        <Text className="helper-label" size="xs">
+          Bottle Distribution <InfoCircle />
+        </Text>
       </Hoverable>
-    </div>
-    <BottleDistribution numberPosition="relative" bottles={bottles} />
-    <div
-      style={{
-        width: "100%",
-        borderBottom: "1px solid white",
-      }}
-    />
-    <div style={{ display: "flex", gap: "1em", alignItems: "center" }}>
+      <BottleDistribution numberPosition="relative" bottles={bottles} />
+      <div
+        style={{
+          width: "100%",
+          borderBottom: "1px solid white",
+        }}
+      />
       <Display className="no-margin" size="xxxs">
         Links I&apos;ve Clicked
       </Display>
-      <Hoverable tooltipContent={"Lorem ipsum"}>
-        <InfoCircle />
-      </Hoverable>
-    </div>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "auto auto auto auto",
-        gap: "3em",
-        paddingBottom: "1em",
-      }}
-    >
-      <LabelledValue
-        label={
-          <div
-            className="helper-label"
-            style={{ display: "flex", gap: "0.5em" }}
-          >
-            <Text size="xs">Total Clicked</Text>
-            <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-              <InfoCircle />
-            </Hoverable>
-          </div>
-        }
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto auto auto auto",
+          gap: "3em",
+          paddingBottom: "1em",
+        }}
       >
-        {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
-      </LabelledValue>
-      <div>
         <LabelledValue
           label={
             <div
               className="helper-label"
               style={{ display: "flex", gap: "0.5em" }}
             >
+              <Text size="xs">Total Clicked</Text>
+              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <InfoCircle />
+              </Hoverable>
+            </div>
+          }
+        >
+          {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
+        </LabelledValue>
+        <div>
+          <LabelledValue
+            label={
               <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 100,
-                  backgroundColor: "#2af73b",
-                  marginTop: 2,
-                }}
-              />
+                className="helper-label"
+                style={{ display: "flex", gap: "0.5em" }}
+              >
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 100,
+                    backgroundColor: "#2af73b",
+                    marginTop: 2,
+                  }}
+                />
 
-              <Text size="xs">Claimed</Text>
-              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-                <InfoCircle />
-              </Hoverable>
-            </div>
-          }
-        >
-          {activeReferrerReferralsCount}
-        </LabelledValue>
-        <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
-      </div>
-      <div>
-        <LabelledValue
-          label={
-            <div
-              className="helper-label"
-              style={{ display: "flex", gap: "0.5em" }}
-            >
+                <Text size="xs">Claimed</Text>
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
+                  <InfoCircle />
+                </Hoverable>
+              </div>
+            }
+          >
+            {activeReferrerReferralsCount}
+          </LabelledValue>
+          <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
+        </div>
+        <div>
+          <LabelledValue
+            label={
               <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 100,
-                  backgroundColor: "red",
-                  marginTop: 2,
-                }}
-              />
-              <Text size="xs">Unclaimed</Text>
-              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-                <InfoCircle />
-              </Hoverable>
-            </div>
-          }
-        >
-          {inactiveReferrerReferralsCount}
-        </LabelledValue>
-        <LinkButton
-          handleClick={() => {
-            return;
-          }}
-          color="gray"
-          size="small"
-          type="internal"
-        >
-          START CLAIMING
-        </LinkButton>
+                className="helper-label"
+                style={{ display: "flex", gap: "0.5em" }}
+              >
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 100,
+                    backgroundColor: "red",
+                    marginTop: 2,
+                  }}
+                />
+                <Text size="xs">Unclaimed</Text>
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
+                  <InfoCircle />
+                </Hoverable>
+              </div>
+            }
+          >
+            {inactiveReferrerReferralsCount}
+          </LabelledValue>
+          <LinkButton
+            handleClick={() => {
+              return;
+            }}
+            color="gray"
+            size="small"
+            type="internal"
+          >
+            START CLAIMING
+          </LinkButton>
+        </div>
+        <div>
+          <LabelledValue
+            label={
+              <div
+                className="helper-label"
+                style={{ display: "flex", gap: "0.5em" }}
+              >
+                <Text size="xs">Until Next Claim</Text>
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
+                  <InfoCircle />
+                </Hoverable>
+              </div>
+            }
+          >
+            {nextInactiveReferral?.progress || 0}/10
+          </LabelledValue>
+          <ProgressBar
+            value={nextInactiveReferral?.progress || 0}
+            max={10}
+            size="sm"
+            color="holo"
+            style={{
+              marginTop: 6,
+            }}
+          />
+        </div>
       </div>
-      <div>
-        <LabelledValue
-          label={
-            <div
-              className="helper-label"
-              style={{ display: "flex", gap: "0.5em" }}
-            >
-              <Text size="xs">Until Next Claim</Text>
-              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-                <InfoCircle />
-              </Hoverable>
-            </div>
-          }
-        >
-          {nextInactiveReferral?.progress || 0}/10
-        </LabelledValue>
-        <ProgressBar
-          value={nextInactiveReferral?.progress || 0}
-          max={10}
-          size="sm"
-          color="holo"
-          style={{
-            marginTop: 6,
-          }}
-        />
-      </div>
-    </div>
-  </>
-);
+    </>
+  );
+};
 
 interface IBottlesDetailsModal {
   bottles: BottleTiers;
+  isMobile?: boolean;
 }
 
-const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
+const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
   <>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
     <GeneralButton
@@ -330,12 +346,15 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <div className="helper-label" style={{ display: "flex", gap: "0.5em" }}>
-      <Text size="sm">Bottles earned since last checked</Text>
-      <Hoverable tooltipContent="Lorem ipsum">
-        <InfoCircle />
-      </Hoverable>
-    </div>
+    <Hoverable
+      style={{ minWidth: 250 }}
+      tooltipStyle={isMobile ? "frosted" : "solid"}
+      tooltipContent="The amount of Loot Bottles you have earned since you last checked this page."
+    >
+      <Text size="sm">
+        Bottles earned since last checked <InfoCircle />
+      </Text>
+    </Hoverable>
     <div>
       {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
       <LootBottle size="lg" rarity="legendary"></LootBottle>
@@ -503,6 +522,7 @@ interface IStakingNowModal {
     maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
   ratios: StakingRatioRes | null;
+  isMobile: boolean;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -530,6 +550,7 @@ const StakeNowModal = ({
   stakeTokens,
   testStakeTokens,
   ratios,
+  isMobile,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -671,6 +692,8 @@ const StakeNowModal = ({
     if (!stakeTokens) return;
     if (!canStake) return;
 
+    setButtonText("PROCESSING...");
+
     try {
       await stakeTokens(
         new BN(daysToSeconds(stakingDuration)),
@@ -688,6 +711,7 @@ const StakeNowModal = ({
       );
     } catch (e) {
       // Expect error on fail
+      setButtonText("SLIDE TO STAKE");
       console.log(e);
       return;
     }
@@ -696,6 +720,10 @@ const StakeNowModal = ({
   const [showTokenSelector, setShowTokenSelector] = useState<
     "fluid" | "base" | ""
   >("");
+
+  const tooltipStyle = isMobile ? "frosted" : "solid";
+
+  const [buttonText, setButtonText] = useState("SLIDE TO STAKE");
 
   return (
     <>
@@ -738,9 +766,14 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
+              gap: "0.5em",
             }}
           >
-            <Hoverable tooltipContent="Lorem ipsum">
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake."
+            >
               <Text prominent code className="helper-label">
                 STAKE AMOUNT <InfoCircle />
               </Text>
@@ -884,7 +917,11 @@ const StakeNowModal = ({
         </div>
         {/* Duration */}
         <div className="duration-column">
-          <Hoverable tooltipContent="Lorem ipsum">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days."
+          >
             <Text prominent code className="helper-label">
               DURATION <InfoCircle />
             </Text>
@@ -898,12 +935,16 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
-          <div className="helper-label">
-            <Text code>
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+          >
+            <Text code className="helper-label">
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
             </Text>
-          </div>
+          </Hoverable>
           <div>
             <Text prominent code>
               SLIPPAGE % <InfoCircle />
@@ -929,7 +970,11 @@ const StakeNowModal = ({
           }}
         />
         <div className="power-column">
-          <Hoverable tooltipContent="Lorem Ipsum">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1."
+          >
             <Text size="xs" code className="helper-label">
               DAY 1 POWER <InfoCircle />
             </Text>
@@ -970,7 +1015,11 @@ const StakeNowModal = ({
           <ArrowRight />
         </div>
         <div className="power-column rhs">
-          <Hoverable tooltipContent="Lorem ipsum">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier."
+          >
             <Text size="xs" className="helper-label" code>
               DAY 31 POWER <InfoCircle />
             </Text>
@@ -1001,14 +1050,13 @@ const StakeNowModal = ({
           </Card>
         </div>
       </div>
-      <GeneralButton
-        type="secondary"
+      <SliderButton
         disabled={!canStake}
         style={{ width: "95%" }}
-        handleClick={() => handleStake()}
+        onSlideComplete={() => handleStake()}
       >
-        Stake
-      </GeneralButton>
+        <Text prominent={buttonText === "SLIDE TO STAKE"}>{buttonText}</Text>
+      </SliderButton>
       <Text
         style={{
           textAlign: "center",
@@ -1061,11 +1109,11 @@ const tutorialContent: {
         >
           <Text prominent code holo>
             <Display style={{ margin: 0, textAlign: "right" }} size="xs">
-              2x
+              6x
             </Display>
           </Text>
           <Text size="md" holo>
-            Transacting fAssets using our supported DEXs
+            Transacting fAssets using our Boosted Protocols
           </Text>
           <LootBottle
             size="sm"
@@ -1111,11 +1159,62 @@ const tutorialContent: {
   },
 };
 
-const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
+const TutorialModal = ({
+  isMobile,
+  closeModal,
+}: {
+  isMobile?: boolean;
+  closeModal?: () => void;
+}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const Navigation = () => {
+    return (
+      <div className="tutorial-nav">
+        <GeneralButton
+          icon={<ArrowLeft />}
+          layout="before"
+          handleClick={() => {
+            setCurrentSlide(currentSlide - 1);
+          }}
+          type="transparent"
+          disabled={currentSlide === 0}
+        >
+          PREV
+        </GeneralButton>
+        <div className="tutorial-nav-status">
+          <Text size="md">{currentSlide + 1} / 5</Text>
+        </div>
+        {currentSlide !== 4 ? (
+          <GeneralButton
+            icon={<ArrowRight />}
+            layout="after"
+            handleClick={() => {
+              setCurrentSlide(currentSlide + 1);
+            }}
+            type="transparent"
+            disabled={currentSlide === 4}
+          >
+            Next
+          </GeneralButton>
+        ) : (
+          !isMobile && (
+            <GeneralButton
+              type="primary"
+              handleClick={closeModal}
+              className="start-earning-button"
+            >
+              START EARNING
+            </GeneralButton>
+          )
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
+      {isMobile && <Navigation />}
       <AnimatePresence mode="wait">
         <motion.div
           key={`tutorial-slide-${currentSlide}`}
@@ -1131,58 +1230,29 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
             justifyContent: "center",
             height: "100%",
             width: "100%",
+            maxWidth: !isMobile ? 635 : "unset",
             gap: "1em",
+            marginTop: isMobile ? 0 : "1em",
           }}
         >
           <Video
             type="cover"
-            width={isMobile ? 550 : 1270 / 2}
-            height={isMobile ? 550 : 460 / 2}
+            width={isMobile ? 550 : 635}
+            height={isMobile ? 550 : 230}
             loop
             src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
               tutorialContent[currentSlide].image
             }.mp4`}
             className="tutorial-image"
+            style={{ maxWidth: "100%" }}
           />
-          <Display size="xxs" style={{ margin: 0 }}>
+          <Display size="xxs" style={{ margin: 0, textAlign: "center" }}>
             {tutorialContent[currentSlide].title}
           </Display>
           {tutorialContent[currentSlide].desc}
         </motion.div>
       </AnimatePresence>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "1em",
-        }}
-      >
-        <GeneralButton
-          icon={<ArrowLeft />}
-          layout="before"
-          handleClick={() => {
-            setCurrentSlide(currentSlide - 1);
-          }}
-          type="transparent"
-          disabled={currentSlide === 0}
-        >
-          PREV
-        </GeneralButton>
-        {currentSlide + 1} / 5
-        <GeneralButton
-          icon={<ArrowRight />}
-          layout="after"
-          handleClick={() => {
-            setCurrentSlide(currentSlide + 1);
-          }}
-          type="transparent"
-          disabled={currentSlide === 4}
-        >
-          Next
-        </GeneralButton>
-      </div>
+      {!isMobile && <Navigation />}
     </>
   );
 };

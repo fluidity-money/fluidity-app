@@ -16,7 +16,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
-	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -71,98 +70,6 @@ type PayoutDetails struct {
 	randomSource     []uint32
 	randomPayouts    map[appTypes.UtilityName][]workerTypes.Payout
 	customPayoutType workerTypes.CalculationType
-}
-
-func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool workerTypes.UtilityVars, transferFeeNormal, currentAtx, payoutFreq *big.Rat, winningClasses, btx int, epochTime uint64, emission *worker.Emission) PayoutDetails {
-	calculationType := pool.CalculationType
-
-	switch calculationType {
-	case workerTypes.CalculationTypeWorkerOverrides:
-		var (
-			// defaults
-			winningClasses = winningClasses
-			payoutFreq     = payoutFreq
-
-			zeroRat = big.NewRat(0, 1)
-		)
-
-		// get overrides
-		details, found := workerDb.GetSpecialPoolOverrides(dbNetwork, pool.Name)
-
-		if found {
-			var (
-				winningClassesOverride = details.WinningClassesOverride
-				payoutFreqOverride     = details.PayoutFreqOverride
-				deltaWeightOverride    = details.DeltaWeightOverride
-			)
-
-			if winningClassesOverride != 0 {
-				winningClasses = winningClassesOverride
-			}
-			if payoutFreqOverride != nil && payoutFreqOverride.Cmp(zeroRat) != 0 {
-				payoutFreq.Set(payoutFreqOverride)
-			}
-			if deltaWeightOverride != nil && deltaWeightOverride.Cmp(zeroRat) != 0 {
-				// this overrides a pool variable !!
-				pool.DeltaWeight.Set(deltaWeightOverride)
-			}
-		}
-
-		// call the trf normally now
-		specialPayout := calculatePayoutDetails(
-			workerTypes.TrfModeNoOptimisticSolution,
-			transferFeeNormal,
-			currentAtx,
-			payoutFreq,
-			[]workerTypes.UtilityVars{pool},
-			winningClasses,
-			btx,
-			epochTime,
-			emission,
-		)
-
-		specialPayout.customPayoutType = calculationType
-
-		return specialPayout
-
-	default:
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Unhandled calculation type '%s'!",
-				calculationType,
-			)
-		})
-
-		panic("unreachable")
-	}
-}
-
-// calculatePayoutDetails takes everything relevant to the trf and returns a list of payouts and balls
-func calculatePayoutDetails(trfMode workerTypes.TrfMode, transferFeeNormal, currentAtx, payoutFreq *big.Rat, pools []workerTypes.UtilityVars, winningClasses, btx int, epochTime uint64, emission *worker.Emission) PayoutDetails {
-	randomN, randomPayouts, _ := probability.WinningChances(
-		trfMode,
-		transferFeeNormal,
-		currentAtx,
-		payoutFreq,
-		pools,
-		winningClasses,
-		btx,
-		epochTime,
-		emission,
-	)
-
-	randomSource := util.RandomIntegers(
-		winningClasses,
-		1,
-		uint32(randomN),
-	)
-
-	payoutDetails := PayoutDetails{
-		randomSource:  randomSource,
-		randomPayouts: randomPayouts,
-	}
-
-	return payoutDetails
 }
 
 func main() {
@@ -259,6 +166,8 @@ func main() {
 			transfersInBlock += len(transfers.Transfers)
 		}
 
+		movingAverageKey := createMovingAverageKey(dbNetwork, tokenName)
+
 		secondsSinceLastBlockRat := new(big.Rat).SetFloat64(secondsSinceLastBlock)
 
 		secondsSinceLastEpochFloat := secondsSinceLastBlock * float64(epochBlocks)
@@ -275,31 +184,40 @@ func main() {
 
 		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-		addBtx(
-			dbNetwork,
-			blockNumber.Uint64(),
-			tokenName,
-			transfersInBlock,
-		)
+		// add the transaction count in the block that just came in without
+		// recording the block, assuming that things are coming in linearly -
+		// this can create issues if infra is having partial downtime and is
+		// coming from a backlog
+
+		addBtx(movingAverageKey, transfersInBlock)
+
+		// if this is set, then any excess items in the list should be popped
+
+		shouldAverageTransfersScanPopExcess := atxBufferSize > epochBlocks
 
 		averageTransfersInBlock, _ := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
+			movingAverageKey,
 			atxBufferSize,
+			shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
-			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v",
+			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v, key %v",
 			dbNetwork,
 			tokenName,
 			atxBufferSize,
 			averageTransfersInBlock,
+			movingAverageKey,
 		)
 
+		// the average transfers scan pop excess check is
+		// inverted so we can remove items if the epoch size is
+		// larger than the atx buffer size
+
 		_, transfersInEpoch := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
+			movingAverageKey,
 			epochBlocks,
+			!shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
@@ -472,10 +390,25 @@ func main() {
 					fluidClients = []appTypes.UtilityName{appTypes.UtilityFluid}
 				)
 
-				var (
-					senderAddress    = worker_config.LookupFeeSwitch(senderAddress_, dbNetwork)
-					recipientAddress = worker_config.LookupFeeSwitch(recipientAddress_, dbNetwork)
+				senderAddress, senderAddressChanged := worker_config.LookupFeeSwitch(
+					senderAddress_,
+					dbNetwork,
 				)
+
+				recipientAddress, recipientAddressChanged := worker_config.LookupFeeSwitch(
+					recipientAddress_,
+					dbNetwork,
+				)
+
+				if senderAddressChanged {
+					emission.FeeSwitchSender.OriginalAddress = senderAddress_.String()
+					emission.FeeSwitchSender.NewAddress = senderAddress.String()
+				}
+
+				if recipientAddressChanged {
+					emission.FeeSwitchRecipient.OriginalAddress = recipientAddress_.String()
+					emission.FeeSwitchRecipient.NewAddress = recipientAddress.String()
+				}
 
 				application := applications.ApplicationNone
 
@@ -599,6 +532,14 @@ func main() {
 				)
 
 				for _, payoutDetails := range payouts {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Transaction with hash %v, log index %v had application %v",
+							transactionHash,
+							logIndex,
+							application.String(),
+						)
+					})
 					// create announcement and container
 					announcement := worker.EthereumAnnouncement{
 						TransactionHash: transactionHash,
