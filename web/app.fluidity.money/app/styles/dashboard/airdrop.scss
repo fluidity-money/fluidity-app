@@ -242,56 +242,55 @@ $holo: linear-gradient(
 }
 
 .leaderboard-header {
+  padding: 2em 2em 0 2em;
   display: flex;
   flex-direction: row;
   gap: 1em;
   justify-content: space-between;
-  align-items: flex-end;
   margin-bottom: 1em;
+  box-sizing: border-box;
+  max-width: 100%;
 
   .leaderboard-header-text {
+    .airdrop-ldb-time-filter {
+      text-decoration: underline;
+    }
   }
   .leaderboard-header-filters {
     display: flex;
     gap: 1em;
+
+    button {
+      padding: 0.5em 1em;
+    }
   }
   h3 {
     margin: 0;
     margin-bottom: 0.5em;
   }
-  padding: 2em 2em 0 2em;
 }
 
 .transactions-header {
-  padding-left: 2em;
-  padding-right: 2em;
+  display: none;
 }
 
-th,
-td {
-  padding-left: 2em !important;
-  padding-right: 2em !important;
-}
-
-th {
-  &:last-child {
-    padding-right: 4em !important;
-  }
-  &:first-child {
-    padding-left: 4em !important;
-  }
-}
-
-.airdrop-row {
+.transaction-table > thead > tr,
+.transaction-table > tbody > tr.airdrop-row {
+  th,
   td {
-    background-color: transparent !important;
-    border-bottom: 1px solid white !important;
+    padding-left: 2em;
+    padding-right: 2em;
     &:last-child {
-      padding-right: 4em !important;
+      padding-right: 4em;
     }
     &:first-child {
-      padding-left: 4em !important;
+      padding-left: 4em;
     }
+  }
+
+  td {
+    background-color: transparent !important;
+    border-bottom: 1px solid white;
   }
 
   &:last-of-type {
@@ -305,6 +304,44 @@ th {
       border: none !important;
     }
     background: $holo;
+  }
+}
+
+.airdrop-leaderboard-mobile {
+  padding: 0;
+  gap: 0.5em;
+  .leaderboard-header {
+    padding: 0 25px;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+
+    .leaderboard-header-filters {
+      align-self: center;
+      gap: 2em;
+    }
+  }
+
+  .transaction-table > thead > tr,
+  .transaction-table > tbody > tr.airdrop-row {
+    td, th {
+      padding: 0.5em;
+
+      &:first-child {
+        padding-left: 1em;
+      }
+      &:last-child {
+        padding-right: 1em;
+      }
+    }
+
+    td {
+      border-bottom: 1px solid #404040;
+    }
+
+    th {
+    font-size: 12px;
+    }
   }
 }
 

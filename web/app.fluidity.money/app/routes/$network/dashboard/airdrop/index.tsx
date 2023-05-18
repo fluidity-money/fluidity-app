@@ -131,7 +131,7 @@ const Airdrop = () => {
 
   const showAirdrop = showExperiment("enable-airdrop-page");
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
   const {
     address,
@@ -310,11 +310,11 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className="pad-main"
+          className={`pad-main ${currentModal === "leaderboard" ? 'airdrop-leaderboard-mobile' : ''}`}
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "2em",
+            gap: currentModal === "tutorial" || currentModal === "leaderboard" ? "0.5em" : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -375,6 +375,7 @@ const Airdrop = () => {
           )}
           {currentModal === "tutorial" && (
             <>
+              <Heading as="h3" className="no-margin">Airdrop Tutorial</Heading>
               <TutorialModal isMobile />
             </>
           )}
@@ -386,12 +387,13 @@ const Airdrop = () => {
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
                 userAddress={address || ""}
+                isMobile
               />
             </>
           )}
           {currentModal === "stake-now" && (
             <>
-              <Heading as="h3">Stake Now</Heading>
+              <Heading as="h3" className="no-margin">Stake Now</Heading>
 
               <StakeNowModal
                 fluidTokens={tokens.filter((tok) =>
@@ -898,12 +900,18 @@ const MyMultiplier = ({
   );
 };
 
-const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
+interface IAirdropRankRow extends IRow<AirdropLeaderboardEntry> {
+  isMobile?: boolean;
+}
+
+const AirdropRankRow: IAirdropRankRow = ({
   data,
   index,
+  isMobile = false,
 }: {
   data: AirdropLeaderboardEntry;
   index: number;
+  isMobile?: boolean;
 }) => {
   const { address } = useContext(FluidityFacadeContext);
   // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
@@ -911,7 +919,7 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${address === user ? "highlighted-row" : ""}`}
+      className={`airdrop-row ${isMobile ? 'airdrop-mobile' : ''} ${address === user ? "highlighted-row" : ""}`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -967,7 +975,7 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
               : {}
           }
         >
-          {toSignificantDecimals(bottles, 2)}
+          {toSignificantDecimals(bottles, 0)}
         </Text>
       </td>
 
@@ -1012,6 +1020,7 @@ interface IAirdropLeaderboard {
   filterIndex: number;
   setFilterIndex: (index: number) => void;
   userAddress: string;
+  isMobile?: boolean;
 }
 
 const Leaderboard = ({
@@ -1020,6 +1029,7 @@ const Leaderboard = ({
   filterIndex,
   setFilterIndex,
   userAddress,
+  isMobile = false,
 }: IAirdropLeaderboard) => {
   // This adds a dummy user entry to the leaderboard if the user's address isn't found
   if (loaded && !data.find((entry) => entry.user === userAddress)) {
@@ -1037,17 +1047,17 @@ const Leaderboard = ({
 
   return (
     <>
-      <div className="leaderboard-header">
+      <div className={`leaderboard-header ${isMobile ? 'airdrop-mobile' : ''}`}>
         <div className="leaderboard-header-text">
           <Heading as="h3">Leaderboard</Heading>
-          <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
+          <Text prominent>
             This leaderboard shows your rank among other users{" "}
             {filterIndex === 0 ? " per" : " for"}
             &nbsp;
             {filterIndex === 0 ? (
-              <ul style={{ margin: 0 }}>24 HOURS</ul>
+              <span className="airdrop-ldb-time-filter">24 HOURS</span>
             ) : (
-              <ul style={{ margin: 0 }}>ALL TIME</ul>
+              <span className="airdrop-ldb-time-filter">ALL TIME</span>
             )}
           </Text>
         </div>
@@ -1056,13 +1066,13 @@ const Leaderboard = ({
             type={filterIndex === 0 ? "primary" : "secondary"}
             handleClick={() => setFilterIndex(0)}
           >
-            24 HOURS
+            <Text code size="sm" style={{ color: 'inherit' }}>24 HOURS</Text>
           </GeneralButton>
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "secondary"}
             handleClick={() => setFilterIndex(1)}
           >
-            ALL TIME
+            <Text code size="sm" style={{ color: 'inherit' }}>ALL TIME</Text>
           </GeneralButton>
         </div>
       </div>
@@ -1082,7 +1092,7 @@ const Leaderboard = ({
         }}
         count={0}
         data={data}
-        renderRow={AirdropRankRow}
+        renderRow={(data) => <AirdropRankRow data={data.data} index={data.index} isMobile={isMobile} />}
         freezeRow={(data) => {
           return data.user === userAddress;
         }}
