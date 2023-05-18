@@ -16,8 +16,8 @@ import { NotificationSubscription } from "~/components/NotificationSubscription"
 
 type ProviderMap = {
   [key: string]:
-  | ((props: { children: React.ReactNode }) => JSX.Element)
-  | undefined;
+    | ((props: { children: React.ReactNode }) => JSX.Element)
+    | undefined;
 };
 
 const Provider = ({

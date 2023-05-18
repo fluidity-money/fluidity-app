@@ -59,7 +59,7 @@ const translateRewardTierToRarity = (rewardTier: number): Rarity => {
       return Rarity.UltraRare;
     case 3:
       return Rarity.Rare;
-    case 1:
+    case 2:
       return Rarity.Uncommon;
     case 1:
     default:

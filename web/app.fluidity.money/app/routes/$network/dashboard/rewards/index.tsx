@@ -47,7 +47,6 @@ import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
 import { SplitContext } from "contexts/SplitProvider";
-import { Rarity } from "@fluidity-money/surfing";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -522,13 +521,13 @@ export default function Rewards() {
             (lootBottles ? (
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
-                  ([rarity, quantity]: [Rarity, number], index) => {
+                  ([rarity, quantity]: [string, number], index) => {
                     if (!Math.floor(quantity)) return <></>;
 
                     return (
                       <div key={index} className="lootbottle-container">
                         <LootBottle
-                          size="small"
+                          size="sm"
                           rarity={rarity}
                           quantity={quantity}
                         />

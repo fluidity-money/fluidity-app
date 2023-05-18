@@ -1,4 +1,3 @@
-import type { Rarity } from "@fluidity-money/surfing";
 import type { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
 
 type Transaction = {

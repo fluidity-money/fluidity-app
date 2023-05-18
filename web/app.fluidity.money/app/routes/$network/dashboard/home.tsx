@@ -521,13 +521,13 @@ export default function Home() {
             (lootBottles ? (
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
-                  ([rarity, quantity]: [Rarity, number], index) => {
+                  ([rarity, quantity]: [string, number], index) => {
                     if (!Math.floor(quantity)) return <></>;
 
                     return (
                       <div key={index} className="lootbottle-container">
                         <LootBottle
-                          size="small"
+                          size="sm"
                           rarity={rarity}
                           quantity={quantity}
                         />
