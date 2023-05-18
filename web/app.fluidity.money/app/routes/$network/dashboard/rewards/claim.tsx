@@ -15,7 +15,7 @@ import {
 } from "@fluidity-money/surfing";
 
 import claimStyles from "~/styles/dashboard/rewards/claim.css";
-import { generateTweet } from "~/util/tweeter";
+import { generateRewardTweet } from "~/util/tweeter";
 import { networkMapper } from "~/util";
 
 export const links: LinksFunction = () => {
@@ -138,7 +138,7 @@ const ClaimedRewards = () => {
           layout="before"
           icon={<Twitter />}
           handleClick={() => {
-            window.open(generateTweet(reward, "claim"));
+            window.open(generateRewardTweet(reward, "claim"));
           }}
         >
           SHARE

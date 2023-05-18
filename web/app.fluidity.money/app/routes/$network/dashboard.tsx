@@ -436,6 +436,7 @@ export default function Dashboard() {
           >
             <ReferralModal
               connected={!!connected}
+              network={network}
               connectWallet={() => {
                 setReferralModalVisibility(false);
                 setWalletModalVisibility(true);

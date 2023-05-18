@@ -74,7 +74,7 @@ const AcceptReferralModal = ({
           <GeneralButton
             type={"secondary"}
             handleClick={() => navigate("./")}
-            size={"medium"}
+            size={"small"}
             border="box"
           >
             ?
@@ -85,7 +85,7 @@ const AcceptReferralModal = ({
           <GeneralButton
             type={"secondary"}
             handleClick={closeModal}
-            size={"medium"}
+            size={"small"}
             border="box"
           >
             X
@@ -105,10 +105,10 @@ const AcceptReferralModal = ({
         >
           {/* How it works Box Left*/}
           <div>
-            <Text prominent size="xl" className="single-line">
+            <Text prominent size="lg" className="single-line">
               <ul>You Get</ul> 💸
             </Text>
-            <Text prominent size="lg">
+            <Text prominent size="md">
               <strong>10 Loot Bottles</strong>
               <br />
               on activating their referral
@@ -116,10 +116,10 @@ const AcceptReferralModal = ({
           </div>
           {/* How it works Box Right*/}
           <div>
-            <Text prominent size="xl" className="single-line">
+            <Text prominent size="lg" className="single-line">
               🍾<ul>They Get</ul>
             </Text>
-            <Text prominent size="lg">
+            <Text prominent size="md">
               <strong>10% of your airdrop</strong>
               <br />
               earnings throughout
@@ -136,7 +136,11 @@ const AcceptReferralModal = ({
         >
           {!acceptedReferral ? "ACCEPT REFERRAL" : "ACCEPTED!"}
         </GeneralButton>
-        <LinkButton size="large" type="internal" handleClick={() => 1}>
+        <LinkButton
+          size="medium"
+          type="internal"
+          handleClick={() => navigate(`/${network}/dashboard/airdrop#tutorial`)}
+        >
           Learn more
         </LinkButton>
       </div>

@@ -7,6 +7,7 @@ type ILabelledValue = {
   className?: string;
   label: string | React.ReactNode;
   icon?: string | React.ReactNode;
+  align?: "left" | "right" | "center";
 };
 
 const LabelledValue = ({
@@ -14,10 +15,11 @@ const LabelledValue = ({
   className,
   children,
   label,
+  align = "left",
 }: ILabelledValue) => {
   const classNameProps = className || "";
 
-  const classProps = `${styles.container} ${classNameProps}`;
+  const classProps = `${styles.container} ${classNameProps} ${styles[align]}`;
 
   const { width } = useViewport();
   const mobileView = width <= 500;

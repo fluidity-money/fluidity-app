@@ -1,4 +1,8 @@
-interface ITooltip {
+import { Card } from '../Container/Card';
+import { ICard } from '../Container/Card/Card';
+import styles from './Tooltip.module.scss'
+
+interface ITooltip extends Pick<ICard, "type" | "color" | "border"> {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
@@ -6,27 +10,28 @@ interface ITooltip {
   onMouseLeave?: () => void;
 }
 
-import { Card } from '../Container';
-import styles from './Tooltip.module.scss'
-
 const Tooltip = ({
   children,
   className,
   style = {},
   onMouseEnter,
   onMouseLeave,
+  type = "frosted",
+  color = "gray",
+  border = "solid",
   ...props
 }: ITooltip) => {
   return (
-    <Card 
-      style={style} 
-      type="frosted" 
-      color="gray"
-      border="solid"
-      rounded 
-      onMouseEnter={onMouseEnter} 
-      onMouseLeave={onMouseLeave} 
+    <Card
+      style={style}
+      type={type}
+      color={color}
+      border={border}
+      rounded
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className={styles.Tooltip}
+      {...props}
     >
       {children}
     </Card>

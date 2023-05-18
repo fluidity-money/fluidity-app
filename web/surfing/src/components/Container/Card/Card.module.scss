@@ -124,8 +124,8 @@
 
     &.frosted {
       background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(50px);
+      -webkit-backdrop-filter: blur(50px);
 
       &::before {
         content: "";
@@ -177,8 +177,8 @@
 
   &.frosted {
     // background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
 
     // Override border styles
     &.dashed,

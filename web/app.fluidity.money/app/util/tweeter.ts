@@ -42,7 +42,7 @@ export const generateMeta = (action: string) => {
   }
 };
 
-export const generateTweet = (
+export const generateRewardTweet = (
   reward: number | string,
   action?: "send" | "receive" | "claim",
   extraHashtags: string[] = []
@@ -64,8 +64,6 @@ export const generateTweet = (
   });
 
   tweetQueries["url"] = inboundUrl.href;
-
-  const twitterUrl = new URL("https://twitter.com/intent/tweet");
 
   if (!reward) return "";
 
@@ -95,6 +93,43 @@ export const generateTweet = (
   tweetQueries["hashtags"] = ["fluiditymoney", ...extraHashtags].join(",");
 
   tweetQueries["via"] = `fluiditymoney`;
+
+  return generateTweet(tweetQueries);
+};
+
+export const generateReferralTweet = (
+  referralLink: string,
+  extraHashtags: string[] = []
+) => {
+  const inboundQueries: Record<string, string> = {
+    utm_source: "twitter",
+    utm_medium: "social",
+    utm_campaign: `referral-share`,
+  };
+
+  const tweetQueries: Record<string, string> = {};
+
+  const inboundUrl = new URL(referralLink);
+
+  Object.entries(inboundQueries).forEach(([key, value]) => {
+    inboundUrl.searchParams.set(key, value);
+  });
+
+  tweetQueries["url"] = inboundUrl.href;
+
+  const text = `🏄‍♂️🌊 Grab your virtual surfboard and ride the Fluidity Airdrop Waves with me! Click my referral link for free LootBottles 💸🍾 ${referralLink}`;
+
+  tweetQueries["text"] = text;
+
+  tweetQueries["hashtags"] = ["fluiditymoney", ...extraHashtags].join(",");
+
+  tweetQueries["via"] = `fluiditymoney`;
+
+  return generateTweet(tweetQueries);
+};
+
+const generateTweet = (tweetQueries: Record<string, string>) => {
+  const twitterUrl = new URL("https://twitter.com/intent/tweet");
 
   Object.entries(tweetQueries).forEach(([key, value]) => {
     twitterUrl.searchParams.set(key, value);
