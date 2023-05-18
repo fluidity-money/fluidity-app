@@ -1,5 +1,4 @@
 import { gql, jsonPost } from "~/util";
-import config from "~/webapp.config.server";
 import { Rarity } from "@fluidity-money/surfing";
 
 const QUERY_BY_TX_HASH = gql`
@@ -47,8 +46,8 @@ const useLootboxesByTxHash = (filterHashes: string[]) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-      }
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
       : {}
   );
 };
