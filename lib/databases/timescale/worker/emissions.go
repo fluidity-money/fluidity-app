@@ -52,6 +52,9 @@ func InsertEmissions(emission Emission) {
 		maxFeePerGas               = emission.MaxFeePerGas
 		maxFeePerGasNormal         = emission.MaxFeePerGasNormal
 		effectiveGasPriceNormal    = emission.EffectiveGasPriceNormal
+		feeSwitchSender            = emission.FeeSwitchSender
+		feeSwitchRecipient         = emission.FeeSwitchRecipient
+		specialPoolOptions         = emission.SpecialPoolOptions
 	)
 
 	var testingBallsString strings.Builder
@@ -183,7 +186,17 @@ func InsertEmissions(emission Emission) {
 			winning_chances_total_bpy,
 			winning_chances_distribution_pools,
 
-			gas_price
+			gas_price,
+
+			fee_switch_sender_original_address,
+			fee_switch_sender_new_address,
+
+			fee_switch_recipient_original_address,
+			fee_switch_recipient_new_address,
+
+			special_pool_options_payout_freq_override,
+			special_pool_options_delta_weight_override,
+			special_pool_options_winning_classes_override
 		)
 
 		VALUES (
@@ -302,7 +315,17 @@ func InsertEmissions(emission Emission) {
 			$93,
 			$94,
 
-			$95
+			$95,
+
+			$96,
+			$97,
+
+			$98,
+			$99,
+
+			$100,
+			$101,
+			$102
 		);`,
 
 		TableEmissions,
@@ -427,6 +450,16 @@ func InsertEmissions(emission Emission) {
 		winningChances.DistributionPools,
 
 		gasPrice,
+
+		feeSwitchSender.OriginalAddress,
+		feeSwitchSender.NewAddress,
+
+		feeSwitchRecipient.OriginalAddress,
+		feeSwitchRecipient.NewAddress,
+
+		specialPoolOptions.PayoutFreqOverride,
+		specialPoolOptions.DeltaWeightOverride,
+		specialPoolOptions.WinningClassesOverride,
 	)
 
 	if err != nil {

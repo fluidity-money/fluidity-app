@@ -442,7 +442,12 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Message = "Failed to scan a user action row filtered by log index!"
+			k.Format(
+				"Failed to scan a user action row filtered by network %v, transaction hash %v and log index %v!",
+				network,
+				transactionHash,
+				logIndex.String(),
+			)
 			k.Payload = err
 		})
 	}
