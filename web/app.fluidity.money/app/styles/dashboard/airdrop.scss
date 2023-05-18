@@ -71,7 +71,6 @@ $holo: linear-gradient(
   #fdb5e4 100%
 );
 
-
 .tutorial-nav {
   display: flex;
   justify-content: space-between;
@@ -324,7 +323,8 @@ $holo: linear-gradient(
 
   .transaction-table > thead > tr,
   .transaction-table > tbody > tr.airdrop-row {
-    td, th {
+    td,
+    th {
       padding: 0.5em;
 
       &:first-child {
@@ -340,7 +340,7 @@ $holo: linear-gradient(
     }
 
     th {
-    font-size: 12px;
+      font-size: 12px;
     }
   }
 }
@@ -392,7 +392,8 @@ $holo: linear-gradient(
   grid-template-columns: 1fr 1fr;
   gap: 2em;
 
-  svg, path {
+  svg,
+  path {
     fill: none !important;
     stroke: currentColor !important;
   }
@@ -422,7 +423,7 @@ $holo: linear-gradient(
       text-align: center;
 
       h1 {
-        filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.8));
+        filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.8));
       }
     }
   }

@@ -23,7 +23,7 @@ import {
   Video,
   Hoverable,
   Form,
-  SliderButton
+  SliderButton,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -55,7 +55,11 @@ const BottleDistribution = ({
   <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
-        <div key={index} className="lootbottle-container" onClick={() => handleClickBottle?.(index)}>
+        <div
+          key={index}
+          className="lootbottle-container"
+          onClick={() => handleClickBottle?.(index)}
+        >
           <LootBottle
             size="lg"
             rarity={rarity}
@@ -64,10 +68,10 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
               opacity:
                 highlightBottleNumberIndex === undefined ||
-                  highlightBottleNumberIndex !== index
+                highlightBottleNumberIndex !== index
                   ? 0.2
                   : 1,
-              ...(handleClickBottle ? { cursor: 'pointer' } : {})
+              ...(handleClickBottle ? { cursor: "pointer" } : {}),
             }}
           />
           <Text
@@ -84,19 +88,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottleNumberIndex === index
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottleNumberIndex === index
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottleNumberIndex === index
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottleNumberIndex === index
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -115,7 +119,7 @@ interface IReferralDetailsModal {
   activeReferrerReferralsCount: number;
   inactiveReferrerReferralsCount: number;
   nextInactiveReferral?: Referral;
-  isMobile?: boolean
+  isMobile?: boolean;
 }
 
 const ReferralDetailsModal = ({
@@ -125,10 +129,9 @@ const ReferralDetailsModal = ({
   activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
-  isMobile
+  isMobile,
 }: IReferralDetailsModal) => {
-
-  const tooltipStyle = isMobile ? "frosted" : "solid"
+  const tooltipStyle = isMobile ? "frosted" : "solid";
 
   return (
     <>
@@ -138,8 +141,13 @@ const ReferralDetailsModal = ({
       <div className="referral-details-container">
         <LabelledValue
           label={
-            <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles.">
-              <Text className="helper-label" size="xs">Active Referrals <InfoCircle />
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
+            >
+              <Text className="helper-label" size="xs">
+                Active Referrals <InfoCircle />
               </Text>
             </Hoverable>
           }
@@ -148,8 +156,13 @@ const ReferralDetailsModal = ({
         </LabelledValue>
         <LabelledValue
           label={
-            <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The amount of Loot Bottles you have earned from referring users with your link.">
-              <Text className="helper-label" size="xs">Total Bottles earned from your link <InfoCircle />
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+            >
+              <Text className="helper-label" size="xs">
+                Total Bottles earned from your link <InfoCircle />
               </Text>
             </Hoverable>
           }
@@ -157,8 +170,13 @@ const ReferralDetailsModal = ({
           {totalBottles}
         </LabelledValue>
       </div>
-      <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The amount of Loot Bottles you have earned through your referral link based on their rarity.">
-        <Text className="helper-label" size="xs">Bottle Distribution <InfoCircle />
+      <Hoverable
+        style={{ minWidth: 250 }}
+        tooltipStyle={tooltipStyle}
+        tooltipContent="The amount of Loot Bottles you have earned through your referral link based on their rarity."
+      >
+        <Text className="helper-label" size="xs">
+          Bottle Distribution <InfoCircle />
         </Text>
       </Hoverable>
       <BottleDistribution numberPosition="relative" bottles={bottles} />
@@ -212,7 +230,10 @@ const ReferralDetailsModal = ({
                 />
 
                 <Text size="xs">Claimed</Text>
-                <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
                   <InfoCircle />
                 </Hoverable>
               </div>
@@ -239,7 +260,10 @@ const ReferralDetailsModal = ({
                   }}
                 />
                 <Text size="xs">Unclaimed</Text>
-                <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
                   <InfoCircle />
                 </Hoverable>
               </div>
@@ -266,7 +290,10 @@ const ReferralDetailsModal = ({
                 style={{ display: "flex", gap: "0.5em" }}
               >
                 <Text size="xs">Until Next Claim</Text>
-                <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
                   <InfoCircle />
                 </Hoverable>
               </div>
@@ -286,7 +313,7 @@ const ReferralDetailsModal = ({
         </div>
       </div>
     </>
-  )
+  );
 };
 
 interface IBottlesDetailsModal {
@@ -317,8 +344,14 @@ const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <Hoverable style={{ minWidth: 250 }} tooltipStyle={isMobile ? "frosted" : "solid"} tooltipContent="The amount of Loot Bottles you have earned since you last checked this page.">
-      <Text size="sm">Bottles earned since last checked <InfoCircle /></Text>
+    <Hoverable
+      style={{ minWidth: 250 }}
+      tooltipStyle={isMobile ? "frosted" : "solid"}
+      tooltipContent="The amount of Loot Bottles you have earned since you last checked this page."
+    >
+      <Text size="sm">
+        Bottles earned since last checked <InfoCircle />
+      </Text>
     </Hoverable>
     <div>
       {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
@@ -465,7 +498,7 @@ interface IStakingNowModal {
     maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
   ratios: StakingRatioRes | null;
-  isMobile: boolean
+  isMobile: boolean;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -482,8 +515,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -493,7 +526,7 @@ const StakeNowModal = ({
   stakeTokens,
   testStakeTokens,
   ratios,
-  isMobile
+  isMobile,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -550,27 +583,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-        if (dec === undefined) {
-          return setInput({
-            ...token,
-            amount: `${unpaddedWhole}`,
-          });
-        }
-
-        const limitedDecimals = dec.slice(0 - token.decimals);
-
+      if (dec === undefined) {
         return setInput({
           ...token,
-          amount: [whole, limitedDecimals].join("."),
+          amount: `${unpaddedWhole}`,
         });
-      };
+      }
+
+      const limitedDecimals = dec.slice(0 - token.decimals);
+
+      return setInput({
+        ...token,
+        amount: [whole, limitedDecimals].join("."),
+      });
+    };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -635,7 +668,7 @@ const StakeNowModal = ({
     if (!stakeTokens) return;
     if (!canStake) return;
 
-    setButtonText('PROCESSING...')
+    setButtonText("PROCESSING...");
 
     try {
       await stakeTokens(
@@ -654,7 +687,7 @@ const StakeNowModal = ({
       );
     } catch (e) {
       // Expect error on fail
-      setButtonText('SLIDE TO STAKE')
+      setButtonText("SLIDE TO STAKE");
       console.log(e);
       return;
     }
@@ -664,9 +697,9 @@ const StakeNowModal = ({
     "fluid" | "base" | ""
   >("");
 
-  const tooltipStyle = isMobile ? "frosted" : "solid"
+  const tooltipStyle = isMobile ? "frosted" : "solid";
 
-  const [buttonText, setButtonText] = useState("SLIDE TO STAKE")
+  const [buttonText, setButtonText] = useState("SLIDE TO STAKE");
 
   return (
     <>
@@ -709,10 +742,14 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
-              gap: "0.5em"
+              gap: "0.5em",
             }}
           >
-            <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake.">
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake."
+            >
               <Text prominent code className="helper-label">
                 STAKE AMOUNT <InfoCircle />
               </Text>
@@ -856,7 +893,11 @@ const StakeNowModal = ({
         </div>
         {/* Duration */}
         <div className="duration-column">
-          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days.">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days."
+          >
             <Text prominent code className="helper-label">
               DURATION <InfoCircle />
             </Text>
@@ -870,7 +911,11 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
-          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The end date of staking, when you can reclaim your provided liquidity.">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+          >
             <Text code className="helper-label">
               END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
@@ -901,7 +946,11 @@ const StakeNowModal = ({
           }}
         />
         <div className="power-column">
-          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1.">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1."
+          >
             <Text size="xs" code className="helper-label">
               DAY 1 POWER <InfoCircle />
             </Text>
@@ -941,7 +990,11 @@ const StakeNowModal = ({
           <ArrowRight />
         </div>
         <div className="power-column rhs">
-          <Hoverable style={{ minWidth: 250 }} tooltipStyle={tooltipStyle} tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier.">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier."
+          >
             <Text size="xs" className="helper-label" code>
               DAY 31 POWER <InfoCircle />
             </Text>
@@ -1080,31 +1133,33 @@ const tutorialContent: {
   },
 };
 
-const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModal?: () => void }) => {
+const TutorialModal = ({
+  isMobile,
+  closeModal,
+}: {
+  isMobile?: boolean;
+  closeModal?: () => void;
+}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const Navigation = () => {
-    return <div
-      className="tutorial-nav"
-    >
-      <GeneralButton
-        icon={<ArrowLeft />}
-        layout="before"
-        handleClick={() => {
-          setCurrentSlide(currentSlide - 1);
-        }}
-        type="transparent"
-        disabled={currentSlide === 0}
-      >
-        PREV
-      </GeneralButton>
-      <div className="tutorial-nav-status">
-        <Text size="md">
-          {currentSlide + 1} / 5
-        </Text>
-      </div>
-      {
-        currentSlide !== 4 ? (
+    return (
+      <div className="tutorial-nav">
+        <GeneralButton
+          icon={<ArrowLeft />}
+          layout="before"
+          handleClick={() => {
+            setCurrentSlide(currentSlide - 1);
+          }}
+          type="transparent"
+          disabled={currentSlide === 0}
+        >
+          PREV
+        </GeneralButton>
+        <div className="tutorial-nav-status">
+          <Text size="md">{currentSlide + 1} / 5</Text>
+        </div>
+        {currentSlide !== 4 ? (
           <GeneralButton
             icon={<ArrowRight />}
             layout="after"
@@ -1116,18 +1171,20 @@ const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModa
           >
             Next
           </GeneralButton>
-        ) : !isMobile && (
-          <GeneralButton
-            type="primary"
-            handleClick={closeModal}
-            className="start-earning-button"
-          >
-            START EARNING
-          </GeneralButton>
-        )
-      }
-    </div>
-  }
+        ) : (
+          !isMobile && (
+            <GeneralButton
+              type="primary"
+              handleClick={closeModal}
+              className="start-earning-button"
+            >
+              START EARNING
+            </GeneralButton>
+          )
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -1147,9 +1204,9 @@ const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModa
             justifyContent: "center",
             height: "100%",
             width: "100%",
-            maxWidth: !isMobile ? 635 : 'unset',
+            maxWidth: !isMobile ? 635 : "unset",
             gap: "1em",
-            marginTop: isMobile ? 0 : '1em'
+            marginTop: isMobile ? 0 : "1em",
           }}
         >
           <Video
@@ -1157,12 +1214,13 @@ const TutorialModal = ({ isMobile, closeModal }: { isMobile?: boolean, closeModa
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
-            style={{ maxWidth: '100%' }}
+            style={{ maxWidth: "100%" }}
           />
-          <Display size="xxs" style={{ margin: 0, textAlign: 'center' }}>
+          <Display size="xxs" style={{ margin: 0, textAlign: "center" }}>
             {tutorialContent[currentSlide].title}
           </Display>
           {tutorialContent[currentSlide].desc}
