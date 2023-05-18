@@ -67,8 +67,8 @@ func handleTransfer(network_ network.BlockchainNetwork, transactionHash ethereum
 		senderAddress_    = ethereum.AddressFromString(transfer.SenderAddress)
 		recipientAddress_ = ethereum.AddressFromString(transfer.RecipientAddress)
 
-		senderAddress    = worker.LookupFeeSwitch(senderAddress_, network)
-		recipientAddress = worker.LookupFeeSwitch(recipientAddress_, network)
+		senderAddress, _    = worker.LookupFeeSwitch(senderAddress_, network)
+		recipientAddress, _ = worker.LookupFeeSwitch(recipientAddress_, network)
 	)
 
 	transfer.SenderAddress = senderAddress.String()

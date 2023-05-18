@@ -12,7 +12,6 @@ import (
 	lib "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib"
 	ethConvert "github.com/fluidity-money/fluidity-app/cmd/microservice-ethereum-block-fluid-transfers-amqp/lib/ethereum"
 
-	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
@@ -21,8 +20,6 @@ import (
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	worker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
-
-	ethTypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 const (
@@ -74,20 +71,10 @@ func main() {
 		delay   = intFromEnvOrFatal(EnvRetryDelay)
 	)
 
-	transferLogTopic, err := convertAddressToBytes(common.TransferLogTopic)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Could not parse Hex TransferLogTopicAddr!"
-			k.Payload = err
-		})
-	}
-
 	ethQueue.BlockHeaders(func(header ethereum.BlockHeader) {
 		var (
 			blockHash   = header.BlockHash
 			blockNumber = header.Number
-			blockBloom  = ethTypes.BytesToBloom(header.Bloom)
 			baseFee     = header.BaseFee
 		)
 
@@ -101,23 +88,9 @@ func main() {
 			Transactions: make([]types.Transaction, 0),
 		}
 
-		if !blockBloom.Test(transferLogTopic) {
-
-			log.Debug(func(k *log.Log) {
-				k.Format("Block %v did NOT contain transfer ABI topic", blockHash)
-			})
-
-			queue.SendMessage(workerQueue.TopicEthereumBlockLogs, amqpBlock)
-
-			return
-		}
 
 		// Block contains log with ABI hash in its topics
 		// Guaranteed to be signature - Order dependent
-
-		log.Debug(func(k *log.Log) {
-			k.Format("Block %v contains transfer ABI topic", blockHash.String())
-		})
 
 		block, err := lib.GetBlockFromHash(gethHttpApi, blockHash.String(), retries, delay)
 
