@@ -232,7 +232,7 @@ func main() {
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
 
 			for _, transfer := range transfers {
-				fee, emission, err := applications.GetApplicationFee(
+				feeData, emission, err := applications.GetApplicationFee(
 					transfer,
 					gethClient,
 					contractAddress,
@@ -240,6 +240,8 @@ func main() {
 					*convertedReceipt,
 					transaction.Data,
 				)
+
+				fee := feeData.Fee
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
