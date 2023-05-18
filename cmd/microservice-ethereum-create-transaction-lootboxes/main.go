@@ -5,10 +5,15 @@
 package main
 
 import (
+	"context"
 	"math"
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
+	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -16,11 +21,53 @@ import (
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	winners_queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/util"
+)
+
+const (
+	// EnvTokensList to relate the received token names to a contract address
+	// of the form ADDR1:TOKEN1:DECIMALS1,ADDR2:TOKEN2:DECIMALS2,...
+	EnvTokensList = "FLU_ETHEREUM_TOKENS_LIST"
+	// EnvGethHttpUrl to use when performing RPC requests
+	EnvGethHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 )
 
 func main() {
+	var (
+		ethereumTokensList_ = util.GetEnvOrFatal(EnvTokensList)
+		gethHttpUrl         = util.GetEnvOrFatal(EnvGethHttpUrl)
+
+		volume misc.BigInt
+	)
+
+	tokensList := util.GetTokensListBase(ethereumTokensList_)
+
+	// tokensMap to look up a token's address using its short name
+	tokensMap := make(map[string]common.Address)
+	for _, token := range tokensList {
+		var (
+			tokenAddress = token.TokenAddress
+			tokenName    = token.TokenName
+		)
+
+		tokensMap[tokenName] = common.HexToAddress(tokenAddress)
+	}
+
+	ethClient, err := ethclient.Dial(gethHttpUrl)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to connect to Geth Websocket!"
+			k.Payload = err
+		})
+	}
+
+	defer ethClient.Close()
+
 	winners_queue.WinnersEthereum(func(winner winners_queue.Winner) {
 		var (
 			network           = winner.Network
@@ -31,6 +78,9 @@ func main() {
 			rewardTier        = winner.RewardTier
 			applicationString = winner.Application
 			logIndex          = winner.SendTransactionLogIndex
+
+			tokenDecimals  = tokenDetails.TokenDecimals
+			tokenShortName = tokenDetails.TokenShortName
 		)
 
 		// don't track fluidification
@@ -55,10 +105,78 @@ func main() {
 			})
 		}
 
-		// fetch volume of sending transaction
-		// transaction hash and log index guarantee uniqueness
 		sendTransaction := user_actions.GetUserActionByLogIndex(network, transactionHash, logIndex)
-		volume := sendTransaction.Amount
+
+		if sendTransaction == nil {
+			// not a Transfer event, so look up and classify the application used
+
+			// fetch parameters to call GetApplicationFee
+			receipt, err := libEthereum.GetReceipt(ethClient, ethereum.HashFromString(transactionHash))
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to fetch receipt for transaction %s!",
+						transactionHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			if len(receipt.Logs) < int(logIndex.Int64()) {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Not enough logs to look up by log index! Expected at least %v, got %v!",
+						logIndex.String(),
+						len(receipt.Logs),
+					)
+				})
+			}
+
+			log_ := receipt.Logs[logIndex.Int64()]
+
+			applicationTransfer := worker.EthereumApplicationTransfer{
+				TransactionHash: ethereum.HashFromString(transactionHash),
+				Log: log_,
+				Application: application,
+			}
+
+			fluidTokenContract := tokensMap[tokenShortName]
+			
+			transaction, _, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to fetch transaction %s!",
+						transactionHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			inputData := transaction.Data()
+
+			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, *receipt, inputData)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to get fee data for transaction %s!",
+						transactionHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			// volume is a uint256, so no denom
+			volume = misc.NewBigIntFromInt(*feeData.Volume.Num())
+		} else {
+			volume = sendTransaction.Amount
+		}
 
 		// Calculate lootboxes earned from transaction
 		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
