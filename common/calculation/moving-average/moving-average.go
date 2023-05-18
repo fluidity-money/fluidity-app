@@ -10,35 +10,89 @@ package moving_average
 import (
 	"fmt"
 	"math/big"
+	"math"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/state"
 )
 
-// BufferSize to use when storing the ring buffer
-const BufferSize = 500
+// DefaultBufferSize to use when storing the ring buffer
+const DefaultBufferSize = 500
 
-// StoreValue by remembering a rational number in Redis
+// StoreValue by storing the value as-is in redis
 func StoreValue(key string, x interface{}) {
 	state.LPush(key, x)
 }
 
+// CalculateMovingAverageAndSumMaybePop with the limit given, by getting
+// a range over each item then popping anything that exceeds the limit if
+// the flag is set
+func CalculateMovingAverageAndSumMaybePop(key string, limit int, shouldPopIfExcess bool) (average int, sum int, err error) {
+	listLength_ := state.LLen(key)
+
+	if listLength_ > math.MaxInt {
+		return 0, 0, fmt.Errorf(
+			"key list %#v length too large: %v",
+			key,
+			listLength_,
+		)
+	}
+
+	listLength := int(listLength_)
+
+	shouldPop := listLength > limit && shouldPopIfExcess
+
+	// should only pop if there's excess and the argument is set
+
+	if shouldPop {
+		state.RPopCount(key, listLength - limit)
+	}
+
+	valuesBytes := state.LRange(key, 0, int64(limit))
+
+	// avoid dividing by zero if no bytes are stored
+	if listLength == 0 {
+		return 0, 0, nil
+	}
+
+	for _, valueBytes := range valuesBytes {
+		s := string(valueBytes)
+
+		value, err := strconv.Atoi(s)
+
+		if err != nil {
+			return 0, 0, fmt.Errorf(
+				"failed to convert %#v to an int for an average conversion from Redis! %v",
+				s,
+				err,
+			)
+		}
+
+		average += value
+
+		sum += value
+	}
+
+	amount := average / listLength
+
+	return amount, sum, nil
+}
+
 // CalculateMovingAverage by taking the key given and calculating the
 // current moving average by scanning the current list
-func CalculateMovingAverage(key string) (*int, error) {
+func CalculateMovingAverage(key string) (int, error) {
 
-	valuesBytes := state.LRange(key, 0, BufferSize)
+	valuesBytes := state.LRange(key, 0, DefaultBufferSize)
 
 	valuesBytesLen := len(valuesBytes)
 
-	if valuesBytesLen > BufferSize {
+	if valuesBytesLen > DefaultBufferSize {
 		state.Rpop(key)
 	}
 
 	// avoid dividing by zero if no bytes are stored
 	if valuesBytesLen == 0 {
-		zero := 0
-		return &zero, nil
+		return 0, nil
 	}
 
 	var average int
@@ -50,7 +104,7 @@ func CalculateMovingAverage(key string) (*int, error) {
 		value, err := strconv.Atoi(s)
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return 0, fmt.Errorf(
 				"failed to convert %#v to an int for an average conversion from Redis! %v",
 				s,
 				err,
@@ -62,18 +116,18 @@ func CalculateMovingAverage(key string) (*int, error) {
 
 	amount := average / valuesBytesLen
 
-	return &amount, nil
+	return amount, nil
 }
 
 func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 
-	valuesBytes := state.LRange(key, 0, BufferSize)
+	valuesBytes := state.LRange(key, 0, DefaultBufferSize)
 
 	valuesBytesLen := len(valuesBytes)
 
 	valuesBytesLenRat := new(big.Rat).SetInt64(int64(valuesBytesLen))
 
-	if valuesBytesLen > BufferSize {
+	if valuesBytesLen > DefaultBufferSize {
 		state.Rpop(key)
 	}
 
@@ -108,7 +162,7 @@ func CalculateMovingAverageRat(key string) (*big.Rat, error) {
 
 // StoreAndCalculate the moving average by storing the amount then doing
 // the calculation
-func StoreAndCalculate(key string, x int) (*int, error) {
+func StoreAndCalculate(key string, x int) (int, error) {
 	StoreValue(key, x)
 	return CalculateMovingAverage(key)
 }

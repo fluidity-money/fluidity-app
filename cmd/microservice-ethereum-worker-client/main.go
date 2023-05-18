@@ -122,10 +122,11 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 
 		log.App(func(k *log.Log) {
 			k.Format(
-				"Transaction hash %#v with transaction from %#v to %#v has won: %#v won %s,%#v won %s",
+				"Transaction hash %#v with transaction from %#v to %#v and application %v has won: %#v won %s,%#v won %s",
 				announcementTransactionHash,
 				fromAddress,
 				toAddress,
+				application.String(),
 				fromAddress,
 				formatPayouts(fromWinAmounts),
 				toAddress,
