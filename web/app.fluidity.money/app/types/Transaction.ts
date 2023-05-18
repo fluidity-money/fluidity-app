@@ -1,3 +1,6 @@
+import type { Rarity } from "@fluidity-money/surfing";
+import type { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
+
 type Transaction = {
   sender: string;
   receiver: string;
@@ -12,6 +15,7 @@ type Transaction = {
   logo: string;
   provider: string;
   swapType?: "in" | "out";
+  lootBottles?: BottleTiers;
 };
 
 export default Transaction;

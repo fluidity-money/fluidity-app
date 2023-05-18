@@ -25,6 +25,7 @@ import {
   TabButton,
   toSignificantDecimals,
   useViewport,
+  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -37,7 +38,7 @@ import {
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
-import { addDecimalToBn, Token, trimAddress } from "~/util";
+import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
@@ -841,13 +842,16 @@ const MyMultiplier = ({
                 }}
               >
                 <Text prominent code>
-                  ${addDecimalToBn(amount, 6)} FOR {durationDays} DAYS
+                  {numberToMonetaryString(getUsdFromTokenAmount(amount, 6))} FOR{" "}
+                  {Math.floor(durationDays)} DAYS
                 </Text>
                 <ProgressBar
                   value={stakedDays}
-                  max={durationDays}
+                  max={Math.floor(durationDays)}
                   rounded
-                  color={durationDays === stakedDays ? "holo" : "gray"}
+                  color={
+                    stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                  }
                   size="sm"
                 />
               </div>

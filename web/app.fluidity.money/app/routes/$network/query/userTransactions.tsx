@@ -17,6 +17,12 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { getTokenForNetwork } from "~/util";
+import {
+  translateRewardTierToRarity,
+  useLootboxesByTxHash,
+} from "~/queries/useLootBottles";
+import { Rarity } from "@fluidity-money/surfing";
+import { BottleTiers } from "./dashboard/airdrop";
 
 type UserTransaction = {
   sender: string;
@@ -106,6 +112,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       ...pendingWinnersMap,
       ...winnersMap,
     };
+
+    const sendTransactions = Object.keys(jointWinnersMap);
+
+    const { data: lootbottlesData, errors: lootbottlesErr } =
+      await useLootboxesByTxHash(sendTransactions);
+
+    if (!lootbottlesData || lootbottlesErr) {
+      captureException(new Error(`Could not fetch Lootbottles`), {
+        tags: {
+          section: "dashboard",
+        },
+      });
+      return Error("Server could not fulfill request");
+    }
 
     // payoutsMap looks up if a transaction was a payout transaction
     const winnersPayoutAddrs = winnersData.winners.map(
@@ -230,6 +250,45 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const defaultLogo = "/assets/tokens/usdt.svg";
 
+    const lootbottlesMap = lootbottlesData.lootbox.reduce(
+      (map, { txHash, rewardTier, lootboxCount }) => {
+        if (!txHash) return map;
+
+        if (!map[txHash]) {
+          return {
+            ...map,
+            [txHash]: {
+              [Rarity.Common]: 0,
+              [Rarity.Uncommon]: 0,
+              [Rarity.Rare]: 0,
+              [Rarity.UltraRare]: 0,
+              [Rarity.Legendary]: 0,
+              [translateRewardTierToRarity(rewardTier)]: lootboxCount,
+            },
+          };
+        }
+
+        return {
+          ...map,
+          [txHash]: {
+            ...map[txHash],
+            [translateRewardTierToRarity(rewardTier)]:
+              map[txHash][translateRewardTierToRarity(rewardTier)] +
+              lootboxCount,
+          },
+        };
+      },
+      {} as {
+        [txHash: string]: BottleTiers;
+      }
+    );
+
+    Object.entries(lootbottlesMap).forEach(([txHash, bottles]) => {
+      if (!Object.values(bottles).some((amt: number) => !!Math.floor(amt))) {
+        delete lootbottlesMap[txHash];
+      }
+    });
+
     const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
       const swapType =
         tx.sender === MintAddress
@@ -266,6 +325,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               : (winner as Winner)?.solana_application
             : "Fluidity") ?? "Fluidity",
         swapType,
+        lootBottles: lootbottlesMap[tx.hash],
       };
     });
 
