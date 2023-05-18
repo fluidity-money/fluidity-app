@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { isFirefox } from "react-device-detect";
 import styles from "./Video.module.scss";
 
-interface IPropsVideo {
+interface IPropsVideo extends React.HTMLAttributes<HTMLVideoElement> {
   src: string;
   type: "fill" | "fit" | "contain" | "cover" | "reduce" | "none";
   loop: boolean;
@@ -45,8 +45,8 @@ export const Video = ({
   scale = 1,
   opacity = 1,
   margin = `0px 0px 0px 0px`,
-  onEnded = () => {},
-  onLoad = () => {},
+  onEnded = () => { },
+  onLoad = () => { },
   className,
   width = "dynamic",
   height = 900,

@@ -261,7 +261,19 @@
 }
 .transaction-table > thead > tr.highlighted-row,
 .transaction-table > tbody > tr.airdrop-row.highlighted-row {
-  background: linear-gradient(90deg, #f3b8d8 0%, #b793e9 15.1%, #9fd4f3 26.04%, #ffd2c4 36.46%, #fbf3f3 46.88%, #d9abdf 57.29%, #af9ce3 72.4%, #aae4e1 85.42%, #c6ead0 93.23%, #fdb5e4 100%);
+  background: linear-gradient(
+    90deg,
+    #f3b8d8 0%,
+    #b793e9 15.1%,
+    #9fd4f3 26.04%,
+    #ffd2c4 36.46%,
+    #fbf3f3 46.88%,
+    #d9abdf 57.29%,
+    #af9ce3 72.4%,
+    #aae4e1 85.42%,
+    #c6ead0 93.23%,
+    #fdb5e4 100%
+  );
 }
 .transaction-table > thead > tr.highlighted-row td,
 .transaction-table > tbody > tr.airdrop-row.highlighted-row td {

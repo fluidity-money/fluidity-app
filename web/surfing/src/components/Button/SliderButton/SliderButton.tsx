@@ -3,7 +3,7 @@ import styles from './SliderButton.module.scss'
 import { ArrowRight } from '~/lib'
 import { useEffect, useRef, useState } from 'react'
 
-interface ISliderButton {
+interface ISliderButton extends React.HTMLAttributes<HTMLDivElement> {
   onSlideComplete: () => void
   children: React.ReactNode
   disabled?: boolean
@@ -12,7 +12,9 @@ interface ISliderButton {
 export const SliderButton: React.FC<ISliderButton> = ({
   children,
   onSlideComplete,
-  disabled = false
+  disabled = false,
+  style = {},
+  ...props
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const x = useMotionValue(0)
@@ -29,7 +31,7 @@ export const SliderButton: React.FC<ISliderButton> = ({
   const arrowOpacity = useTransform(x, [0, (width || 0) - 64], [1, 0])
 
   return (
-    <motion.div className={`${styles.SliderButton} ${disabled ? styles.disabled : ''}`} ref={containerRef} style={dragComplete ? { background: 'white' } : {}}>
+    <motion.div className={`${styles.SliderButton} ${disabled ? styles.disabled : ''}`} ref={containerRef} style={dragComplete ? { background: 'white', ...style } : style}>
       <motion.div
         className={styles.draggable}
         drag="x"

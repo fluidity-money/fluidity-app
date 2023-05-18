@@ -49,7 +49,7 @@ import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
-import Table, { IRow } from "~/components/Table";
+import Table from "~/components/Table";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: april 19th, 2023
@@ -825,7 +825,7 @@ interface IMyMultiplier {
   stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
-  isMobile: boolean;
+  isMobile?: boolean;
 }
 
 // export type StakingEvent = {
@@ -857,7 +857,12 @@ const MyMultiplier = ({
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
     >
       {isMobile && (
-        <BloomEffect color="#d9abdf" width={20} className="mx-bloom" />
+        <BloomEffect
+          color="#d9abdf"
+          width={20}
+          className="mx-bloom"
+          type="static"
+        />
       )}
       <div>
         <LabelledValue
@@ -938,19 +943,17 @@ const MyMultiplier = ({
   );
 };
 
-interface IAirdropRankRow extends IRow<AirdropLeaderboardEntry> {
-  isMobile?: boolean;
-}
-
-const AirdropRankRow: IAirdropRankRow = ({
-  data,
-  index,
-  isMobile = false,
-}: {
+interface IAirdropRankRow {
   data: AirdropLeaderboardEntry;
   index: number;
   isMobile?: boolean;
-}) => {
+}
+
+const AirdropRankRow: React.FC<IAirdropRankRow> = ({
+  data,
+  index,
+  isMobile = false,
+}: IAirdropRankRow) => {
   const { address } = useContext(FluidityFacadeContext);
   // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
