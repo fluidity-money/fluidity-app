@@ -236,7 +236,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     Object.entries(lootbottlesMap).forEach(([txHash, bottles]) => {
-      if (!Object.values(bottles).some((amt: number) => !!Math.floor(amt))) {
+      if (Object.values(bottles).every((amt: number) => amt < 0.1)) {
         delete lootbottlesMap[txHash];
       }
     });
