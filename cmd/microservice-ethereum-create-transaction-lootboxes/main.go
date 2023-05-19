@@ -41,7 +41,8 @@ func main() {
 		ethereumTokensList_ = util.GetEnvOrFatal(EnvTokensList)
 		gethHttpUrl         = util.GetEnvOrFatal(EnvGethHttpUrl)
 
-		volume misc.BigInt
+		volumeBigInt misc.BigInt
+		volume *big.Rat
 	)
 
 	tokensList := util.GetTokensListBase(ethereumTokensList_)
@@ -172,14 +173,42 @@ func main() {
 				})
 			}
 
-			// volume is a uint256, so no denom
-			volume = misc.NewBigIntFromInt(*feeData.Volume.Num())
+			// keep volume as is to do calculations with
+			volume = new(big.Rat).Set(feeData.Volume)
+
+			// volumeBigInt_ to convert to the database BigInt
+			// volumeBigInt_ = (volumeRat * 10^decimals * denominator)::BigInt / denominator
+			// this is to convert to a BigInt without losing decimal places that are relevant to the token amount
+			// e.g. 1234567/100000 with 6 decimals should be adjusted to 12345670
+			volumeBigInt_ := new(big.Rat).Set(feeData.Volume)
+
+			decimalsAdjusted := math.Pow10(tokenDecimals)
+			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+			// get denominator
+			denom := new(big.Int).Set(volumeBigInt_.Denom())
+			// multiply by decimals
+			volumeBigInt_ = volumeBigInt_.Mul(volumeBigInt_, decimalsRat)
+			// multiply by denom to get number as an int
+			volumeBigInt_ = volumeBigInt_.Mul(volumeBigInt_, new(big.Rat).SetInt(denom))
+			// convert to int
+			volumeBigIntNum := volumeBigInt_.Num()
+
+			// divide by original denom, losing any extra precision
+			volumeBigIntNum = volumeBigIntNum.Quo(volumeBigIntNum, denom)
+			volumeBigInt = misc.NewBigIntFromInt(*volumeBigIntNum)
+			
 		} else {
-			volume = sendTransaction.Amount
+			volumeBigInt = sendTransaction.Amount
+			// adjust to USD
+			volume = new(big.Rat).SetInt(&sendTransaction.Amount.Int)
+			decimalsAdjusted := math.Pow10(tokenDecimals)
+			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+			volume = volume.Quo(volume, decimalsRat)
 		}
 
 		// Calculate lootboxes earned from transaction
-		// ((volume / (10 ^ token_decimals)) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
+		// ((volume) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
 		lootboxCount := new(big.Rat).Mul(
 			volumeLiquidityMultiplier(
 				volume,
@@ -208,7 +237,7 @@ func main() {
 			Source:          lootboxes.Transaction,
 			TransactionHash: transactionHash,
 			AwardedTime:     awardedTime,
-			Volume:          volume,
+			Volume:          volumeBigInt,
 			RewardTier:      rewardTier,
 			LootboxCount:    lootboxCountFloat,
 			Application:     application,
@@ -218,13 +247,9 @@ func main() {
 	})
 }
 
-func volumeLiquidityMultiplier(volume misc.BigInt, tokenDecimals int, address string, time time.Time) *big.Rat {
-	volumeLiquidityNum := new(big.Rat).SetInt(&volume.Int)
-
-	tokenDecimalsRat := new(big.Rat).SetFloat64(math.Pow10(tokenDecimals) * 3)
-	volumeLiquidityDenom := new(big.Rat).Inv(tokenDecimalsRat)
-
-	volumeLiquidityRat := new(big.Rat).Mul(volumeLiquidityNum, volumeLiquidityDenom)
+func volumeLiquidityMultiplier(volume *big.Rat, tokenDecimals int, address string, time time.Time) *big.Rat {
+	three := big.NewRat(3, 1)
+	volumeLiquidityRat := new(big.Rat).Quo(volume, three)
 
 	liquidityMultiplier := new(big.Rat).SetFloat64(database.Calculate_A_Y(address, time))
 
