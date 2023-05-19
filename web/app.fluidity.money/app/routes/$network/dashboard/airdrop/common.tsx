@@ -567,6 +567,22 @@ const StakeNowModal = ({
   const [stakeErr, setStakeErr] = useState("");
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
 
+  const calculateRatio = (fluidTokenRatio: number) => {
+    const baseTokenRatio = 1 - fluidTokenRatio;
+
+    const baseMultiplier = fluidTokenRatio / baseTokenRatio;
+
+    return `${baseMultiplier.toFixed(2)} : 1`;
+  };
+
+  const ratio = !tokenRatios
+    ? ""
+    : calculateRatio(
+      baseToken.symbol === "USDC"
+        ? tokenRatios.fusdcUsdcRatio.toNumber() / 1e12
+        : tokenRatios.fusdcWethRatio.toNumber() / 1e12
+    );
+
   useEffect(() => {
     const setRatio = async () => {
       const stakingRatios = (await getRatios?.()) ?? null;
@@ -944,8 +960,7 @@ const StakeNowModal = ({
             {addDecimalToBn(baseToken.userTokenBalance, baseToken.decimals)}
           </Text>
           <Text prominent>
-            {fluidToken.symbol}/{baseToken.symbol} ratio:{" "}
-            {tokenRatios?.fusdcUsdcRatio.toString()}
+            {fluidToken.symbol}/{baseToken.symbol} ratio: {ratio}
           </Text>
         </div>
         {/* Arrow */}
@@ -986,6 +1001,7 @@ const StakeNowModal = ({
             <Text prominent code>
               SLIPPAGE % <InfoCircle />
               <input
+                style={{ width: "4em" }}
                 type="number"
                 pattern="[0-9]"
                 min={1}

@@ -343,8 +343,6 @@ export type StakingRatioRes = {
   fusdcWethRatio: BigNumber;
   fusdcUsdcSpread: BigNumber;
   fusdcWethSpread: BigNumber;
-  fusdcUsdcLiquidity: BigNumber;
-  fusdcWethLiquidity: BigNumber;
 };
 
 export const getTokenStakingRatio = async (
@@ -360,9 +358,7 @@ export const getTokenStakingRatio = async (
         `Could not instantiate Staking Contract at ${stakingAddr}`
       );
 
-    const ratios = await stakingContract.ratios();
-
-    return ratios;
+    return stakingContract.ratios();
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return undefined;
