@@ -12,6 +12,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
@@ -110,28 +111,30 @@ var erc20Abi ethAbi.ABI
 
 // GetDodoV2Fees calculates fees from DODOSwap, consisting of LiquidityPool (lp) Fees taken from the
 // contract, and Maintenance Fees (mt) sent to the _MAINTAINER_, if any
-func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("Not enough log topics passed!")
+		return feeData, fmt.Errorf("Not enough log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != dodoV2DODOSwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := dodoV2SwapAbi.Unpack("DODOSwap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 6 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			6,
 			len(unpacked),
@@ -143,7 +146,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(swapAmounts_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -154,7 +157,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	addresses, err := ethereum.CoerceBoundContractResultsToAddresses(addresses_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to addresses! %v",
 			err,
 		)
@@ -192,7 +195,13 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
+	}
+
+	if toTokenIsFluid {
+		feeData.Volume = new(big.Rat).Set(toAmount)
+	} else {
+		feeData.Volume = new(big.Rat).Set(fromAmount)
 	}
 
 	// Find lpFeeRate via call to contract
@@ -201,7 +210,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	lpFeeRate_, err := ethereum.StaticCall(client, contractAddress, dodoV2SwapAbi, "_LP_FEE_RATE_")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to fetch fees! %v",
 			err,
 		)
@@ -232,7 +241,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	})
 
 	if swapLogTxIndex == len(txLogs) {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to find matching log from txHash (%v) at Index (%v)!",
 			txHash.String(),
 			swapLogBlockIndex,
@@ -240,7 +249,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	}
 
 	if swapLogTxIndex == 0 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"found index too small to find matching transfer for DODO (%v)! %v",
 			txHash.String(),
 			err,
@@ -262,14 +271,14 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		unpacked, err = erc20Abi.Unpack("Transfer", prevTransferLog.Data)
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Failed to unpack transfer log data! %v",
 				err,
 			)
 		}
 
 		if len(unpacked) != 1 {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Unpacked the wrong number of values! Expected %v, got %v",
 				1,
 				len(unpacked),
@@ -279,7 +288,7 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 		mtToTokenFee, err = ethereum.CoerceBoundContractResultsToRat(unpacked)
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Failed to coerce transfer log data to rat! %v",
 				err,
 			)
@@ -293,8 +302,11 @@ func GetDodoV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fluidFee.Quo(fluidFee, decimalsRat)
+	feeData.Volume.Quo(feeData.Volume, decimalsRat)
 
-	return fluidFee, nil
+	feeData.Fee = fluidFee
+
+	return feeData, nil
 }
 
 // DODO calculates fees via dynamic maintenance (mt) and static (lp) fees

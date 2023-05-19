@@ -60,9 +60,9 @@ func TestGetCurveSwapFee(t *testing.T) {
 	assert.NoError(t, err)
 
 	// nil transfer fails
-	fees, err := GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err := GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	transfer.Log.Topics = []ethTypes.Hash{
 		ethTypes.HashFromString(""),
@@ -72,22 +72,22 @@ func TestGetCurveSwapFee(t *testing.T) {
 	}
 
 	// nil data fails with no error (wrong topic)
-	fees, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Nil(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// fluid -> other successful
 	transfer.Log.Data = *dataBlob
 	transfer.Log.Topics[0] = ethTypes.HashFromString(curveTokenExchangeLogTopic)
-	fees, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, big.NewRat(2771439, 2500000000), fees)
+	assert.Equal(t, big.NewRat(2771439, 2500000000), feeData.Fee)
 
 	// other -> other successful
 	fluidTokenAddr = common.HexToAddress("0x6B175474E89094C44Da98b954EedeAC495271d0F")
-	fees, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Nil(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// bad RPC responses
 	// bad swap fee response
@@ -98,8 +98,8 @@ func TestGetCurveSwapFee(t *testing.T) {
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
-	fees, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
-	assert.Nil(t, fees)
+	feeData, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	assert.Nil(t, feeData.Fee)
 	assert.Error(t, err)
 
 	// bad coins response
@@ -112,8 +112,8 @@ func TestGetCurveSwapFee(t *testing.T) {
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
-	fees, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
-	assert.Nil(t, fees)
+	feeData, err = GetCurveSwapFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	assert.Nil(t, feeData.Fee)
 	assert.Error(t, err)
 }
 
