@@ -25,11 +25,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // Normalise addresses
   const address = address_.toLocaleLowerCase();
 
-  // Limit for internal testing
-  if (!useSplitExperiment("lootbox-referrals", true, { user: address })) {
-    throw new Error("Unauthorised");
-  }
-
   // Check valid addresses
   if (!validAddress(address, network)) {
     throw new Error("Invalid Address");
