@@ -21,6 +21,7 @@ import {
   Tooltip,
   TabButton,
   LootBottle,
+  toSignificantDecimals,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -344,27 +345,27 @@ export default function Home() {
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({
-            sender,
-            receiver,
-          }: {
-            sender: string;
-            receiver: string;
-          }) => [sender, receiver].includes(address),
-          name: "MY DASHBOARD",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({
+          sender,
+          receiver,
+        }: {
+          sender: string;
+          receiver: string;
+        }) => [sender, receiver].includes(address),
+        name: "MY DASHBOARD",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   const {
     totalPrizePool,
@@ -522,7 +523,7 @@ export default function Home() {
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
                   ([rarity, quantity]: [string, number], index) => {
-                    if (!Math.floor(quantity)) return <></>;
+                    if (quantity < 0.1) return <></>;
 
                     return (
                       <div key={index} className="lootbottle-container">
@@ -538,7 +539,7 @@ export default function Home() {
                             textTransform: "capitalize",
                           }}
                         >
-                          {Math.floor(quantity)}
+                          {toSignificantDecimals(quantity, 1)}
                         </Text>
                       </div>
                     );
@@ -609,8 +610,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
+                      ? "Weekly available rewards"
+                      : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -620,9 +621,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
+                        ({ network: rewardNetwork }) =>
+                          rewardNetwork === network
+                      )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
