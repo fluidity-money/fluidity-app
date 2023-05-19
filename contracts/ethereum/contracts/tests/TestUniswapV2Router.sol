@@ -45,7 +45,7 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         address[] calldata /* _path */,
         address /* _to */,
         uint /* _deadline */
-    ) external returns (uint[] memory amounts) {
+    ) external returns (uint[] memory /* amounts */) {
         ++x;
         revert("test client");
     }

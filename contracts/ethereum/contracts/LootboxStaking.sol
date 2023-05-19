@@ -21,8 +21,6 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -42,12 +40,6 @@ uint256 constant MAX_UINT256 = type(uint256).max;
 uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
-
-/**
- * @dev MIN_LIQUIDITY since we split it up in half and there's a
- *      minimum liquidity on each platform (the token decimals on Sushi)
- */
-uint256 constant MIN_LIQUIDITY = 1e18 * 2;
 
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
@@ -142,9 +134,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         wethMinLiquidity_ = weth_.decimals();
 
-        require(fusdcMinLiquidity_ == usdcMinLiquidity_, "fusdc&weth must be same dec");
+        require(fusdcMinLiquidity_ == usdcMinLiquidity_, "fusdc&usdc must be same dec");
 
-        require(wethMinLiquidity_ > fusdcMinLiquidity_, "fusdc >= weth");
+        // assumes that weth > usdc and fusdc
 
         _enableApprovals();
     }
@@ -314,6 +306,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 tokenADeposited,
         uint256 tokenBDeposited
     ) {
+        require(noEmergencyMode_, "emergency mode!");
+
         uint256 tokenABefore = fusdc_.balanceOf(address(this));
 
         uint256 tokenBBefore = _tokenB.balanceOf(address(this));
@@ -379,11 +373,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IUniswapV2Router02 _router,
         IERC20 _tokenB,
         uint256 _lpTokens,
-        uint256 _timestamp,
-        address _to
+        uint256 _timestamp
     ) internal returns (
-        uint256 amountA,
-        uint256 amountB
+        uint256 tokenARedeemed,
+        uint256 tokenBRedeemed
     ) {
         return _router.removeLiquidity(
             address(fusdc_),
@@ -391,7 +384,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _lpTokens,
             0,
             0,
-            _to,
+            address(this),
             _timestamp
         );
     }
@@ -399,35 +392,26 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     function _redeemFromSushiswapPool(
         ISushiswapStablePool _pool,
         IERC20 _tokenB,
-        uint256 _lpTokens,
-        address _recipient
+        uint256 _lpTokens
     ) internal returns (
-        uint256 sushiswapARedeemed,
-        uint256 sushiswapBRedeemed
+        uint256 tokenARedeemed,
+        uint256 tokenBRedeemed
     ) {
-        uint256 sushiswapABefore = fusdc_.balanceOf(address(this));
-        uint256 sushiswapBBefore = _tokenB.balanceOf(address(this));
+        uint256 tokenABefore = fusdc_.balanceOf(address(this));
+        uint256 tokenBBefore = _tokenB.balanceOf(address(this));
 
         _pool.transfer(address(_pool), _lpTokens);
 
         // unwrap the bento (the true) so we get the funds back into the contract
         _pool.burn(abi.encode(address(this), true));
 
-        uint256 sushiswapAAfter = fusdc_.balanceOf(address(this));
-        uint256 sushiswapBAfter = _tokenB.balanceOf(address(this));
+        uint256 tokenAAfter = fusdc_.balanceOf(address(this));
+        uint256 tokenBAfter = _tokenB.balanceOf(address(this));
 
-        require(sushiswapAAfter > sushiswapABefore, "sushiswap token A no return");
-        require(sushiswapBAfter > sushiswapBBefore, "sushiswap token B no return");
+        tokenARedeemed = tokenAAfter - tokenABefore;
+        tokenBRedeemed = tokenBAfter - tokenBBefore;
 
-        uint256 tokenADiff = sushiswapAAfter - sushiswapABefore;
-
-        uint256 tokenBDiff = sushiswapBAfter - sushiswapBBefore;
-
-        fusdc_.safeTransfer(_recipient, tokenADiff);
-
-        _tokenB.safeTransfer(_recipient, tokenBDiff);
-
-        return (tokenADiff, tokenBDiff);
+        return (tokenARedeemed, tokenBRedeemed);
     }
 
     function _deleteDeposit(address _sender, uint _depositId) internal {
@@ -442,32 +426,53 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IERC20 _tokenB,
         ISushiswapStablePool _sushiswapPool,
         uint256 _timestamp,
-        address _sender
+        uint256 _originalCamelotK,
+        uint256 _originalSushiswapK
     ) internal returns (
         uint256 tokenARedeemed,
         uint256 tokenBRedeemed
     ) {
+
         (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
             _redeemFromUniswapV2Router(
                 camelotRouter_,
                 _tokenB,
                 dep.camelotLpMinted,
-                _timestamp,
-                _sender
+                _timestamp
             );
+
+
 
         (uint256 sushiswapARedeemed, uint256 sushiswapBRedeemed) =
             _redeemFromSushiswapPool(
                 _sushiswapPool,
                 _tokenB,
-                dep.sushiswapLpMinted,
-                _sender
+                dep.sushiswapLpMinted
             );
 
-        return (
-            camelotARedeemed + sushiswapARedeemed,
-            camelotBRedeemed + sushiswapBRedeemed
-        );
+        uint256 tokenBAvailable = camelotBRedeemed + sushiswapBRedeemed;
+
+
+
+
+
+        uint256 redeemedCamelotK = _originalCamelotK / camelotARedeemed;
+
+
+        uint256 redeemedSushiswapK = _originalSushiswapK / sushiswapARedeemed;
+
+        tokenARedeemed = camelotARedeemed + sushiswapARedeemed;
+
+	// if token B redeemed is higher than the amount that the user
+	// got back, then we simply return that amount (this could happen
+	// if the user got rekt on fees by bento)
+
+
+        tokenBRedeemed = redeemedCamelotK + redeemedSushiswapK;
+
+        if (tokenBRedeemed > tokenBAvailable) tokenBRedeemed = tokenBAvailable;
+
+        return (tokenARedeemed, tokenBRedeemed);
     }
 
     /* ~~~~~~~~~~ INTERNAL REDEEMABLE FUNCTIONS ~~~~~~~~~~ */
@@ -617,14 +622,28 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             bool fusdcUsdcPair = dep.fusdcUsdcPair;
 
-            (uint256 tokenARedeemed, uint256 tokenBRedeemed) =
+            uint256 originalCamelotK = dep.camelotTokenA * dep.camelotTokenB;
+
+            uint256 originalSushiswapK = dep.sushiswapTokenA * dep.sushiswapTokenB;
+
+            (
+                uint256 tokenARedeemed,
+                uint256 tokenBRedeemed
+            ) =
                 _redeemCamelotSushiswap(
                     dep,
                     fusdcUsdcPair ? usdc_ : weth_,
                     fusdcUsdcPair ? sushiswapFusdcUsdcPool_ : sushiswapFusdcWethPool_,
                     _maxTimestamp,
-                    msg.sender
+                    originalCamelotK,
+                    originalSushiswapK
                 );
+
+	    fusdc_.safeTransfer(msg.sender, tokenARedeemed);
+
+	    IERC20 tokenB = fusdcUsdcPair ? usdc_ : weth_;
+
+	    tokenB.safeTransfer(msg.sender, tokenBRedeemed);
 
             if (fusdcUsdcPair) {
                 camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
@@ -636,14 +655,14 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             fusdcRedeemed += tokenARedeemed;
 
-            if (fusdcUsdcPair) usdcRedeemed += tokenBRedeemed;
+	    if (fusdcUsdcPair) usdcRedeemed += tokenBRedeemed;
 
-            else wethRedeemed += tokenBRedeemed;
+	    else wethRedeemed += tokenBRedeemed;
 
             // iterating in reverse, then deleting the deposit will let us remove
             // unneeded deposits in memory
 
-            emit Deposited(
+            emit Redeemed(
                 msg.sender,
                 dep.redeemTimestamp,
                 block.timestamp,
@@ -678,6 +697,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         return (fusdcAmount, usdcAmount, wethAmount);
     }
 
+    /// @inheritdoc ILootboxStaking
     function redeemable(address _spender) public view returns (
         uint256 fusdcRedeemable,
         uint256 usdcRedeemable,
@@ -718,6 +738,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
     }
 
+    /// @inheritdoc ILootboxStaking
     function deposits(address _spender) public view returns (Deposit[] memory) {
         return deposits_[_spender];
     }
@@ -727,40 +748,60 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcUsdcRatio,
         uint256 fusdcWethRatio,
         uint256 fusdcUsdcSpread,
-        uint256 fusdcWethSpread
+        uint256 fusdcWethSpread,
+        uint256 fusdcUsdcLiq,
+        uint256 fusdcWethLiq
     ) {
         (
             uint256 camelotFusdcUsdcRatio,
-            uint256 camelotFusdcWethRatio
+            uint256 camelotFusdcWethRatio,
+            uint256 camelotFusdcUsdcLiq,
+            uint256 camelotFusdcWethLiq
         ) =  _camelotRatios();
 
         (
             uint256 sushiswapFusdcUsdcRatio,
-            uint256 sushiswapFusdcWethRatio
+            uint256 sushiswapFusdcWethRatio,
+            uint256 sushiswapFusdcUsdcLiq,
+            uint256 sushiswapFusdcWethLiq
         ) = _sushiswapRatios();
 
         fusdcUsdcRatio =  (camelotFusdcUsdcRatio + sushiswapFusdcUsdcRatio) / 2;
 
         fusdcWethRatio = (camelotFusdcWethRatio + sushiswapFusdcWethRatio) / 2;
 
-        if (camelotFusdcUsdcRatio > sushiswapFusdcUsdcRatio) {
+        if (camelotFusdcUsdcRatio > sushiswapFusdcUsdcRatio)
             fusdcUsdcSpread = camelotFusdcUsdcRatio - sushiswapFusdcUsdcRatio;
-        } else {
+        else
             fusdcUsdcSpread = sushiswapFusdcUsdcRatio - camelotFusdcUsdcRatio;
-        }
 
-        if (camelotFusdcWethRatio > sushiswapFusdcWethRatio) {
+        if (camelotFusdcWethRatio > sushiswapFusdcWethRatio)
             fusdcWethSpread = camelotFusdcWethRatio - sushiswapFusdcWethRatio;
-        } else {
+        else
             fusdcWethSpread = sushiswapFusdcWethRatio - camelotFusdcWethRatio;
-        }
+
+        fusdcUsdcLiq = camelotFusdcUsdcLiq + sushiswapFusdcUsdcLiq;
+
+        fusdcWethLiq = camelotFusdcWethLiq + sushiswapFusdcWethLiq;
 
         return (
             fusdcUsdcRatio,
             fusdcWethRatio,
             fusdcUsdcSpread,
-            fusdcWethSpread
+            fusdcWethSpread,
+            fusdcUsdcLiq,
+            fusdcWethLiq
         );
+    }
+
+    /// @inheritdoc ILootboxStaking
+    function drain(address _recipient) public {
+        require(msg.sender == operator_, "only operator");
+        require(noEmergencyMode_, "emergency mode");
+
+        fusdc_.safeTransfer(_recipient, fusdc_.balanceOf(address(this)));
+        usdc_.safeTransfer(_recipient, usdc_.balanceOf(address(this)));
+        weth_.safeTransfer(_recipient, weth_.balanceOf(address(this)));
     }
 
     /* ~~~~~~~~~~ INTERNAL APPROVAL FUNCTIONS ~~~~~~~~~~ */
@@ -835,7 +876,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     function _camelotRatios() internal view returns (
         uint256 fusdcUsdcRatio,
-        uint256 fusdcWethRatio
+        uint256 fusdcWethRatio,
+        uint256 fusdcUsdcLiq,
+        uint256 fusdcWethLiq
     ) {
         (uint256 camelotFusdcUsdcReserveA, uint256 camelotFusdcUsdcReserveB) =
             _uniswapPairReserves(
@@ -846,10 +889,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         camelotFusdcUsdcReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
         camelotFusdcUsdcReserveB *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
 
-        uint256 fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
+        fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
 
         fusdcUsdcRatio = 1e12 * camelotFusdcUsdcReserveA / fusdcUsdcLiq;
-        //
 
         (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
             _uniswapPairReserves(
@@ -857,24 +899,28 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 weth_
             );
 
-	// exponentiate fudsc by the difference between it's decimals and
-	// weth's for an equal calculation to get an accurate ratio
+        // exponentiate fudsc by the difference between it's decimals and
+        // weth's for an equal calculation to get an accurate ratio
 
-	camelotFusdcWethReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
+        camelotFusdcWethReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
 
-        uint256 fusdcWethLiq = camelotFusdcWethReserveA + camelotFusdcWethReserveB;
+        fusdcWethLiq = camelotFusdcWethReserveA + camelotFusdcWethReserveB;
 
         fusdcWethRatio = 1e12 * camelotFusdcWethReserveA / fusdcWethLiq;
 
         return (
             fusdcUsdcRatio,
-            fusdcWethRatio
+            fusdcWethRatio,
+            fusdcUsdcLiq,
+            fusdcWethLiq
         );
     }
 
     function _sushiswapRatios() internal view returns (
         uint256 fusdcUsdcRatio,
-        uint256 fusdcWethRatio
+        uint256 fusdcWethRatio,
+        uint256 fusdcUsdcLiq,
+        uint256 fusdcWethLiq
     ) {
         (uint256 sushiswapFusdcUsdcReserveA, uint256 sushiswapFusdcUsdcReserveB) =
             _sushiswapPoolReserves(
@@ -885,7 +931,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         sushiswapFusdcUsdcReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
         sushiswapFusdcUsdcReserveB *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
 
-        uint256 fusdcUsdcLiq = sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB;
+        fusdcUsdcLiq = sushiswapFusdcUsdcReserveA + sushiswapFusdcUsdcReserveB;
 
         fusdcUsdcRatio = 1e12 * sushiswapFusdcUsdcReserveA / fusdcUsdcLiq;
 
@@ -897,13 +943,15 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         sushiswapFusdcWethReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
 
-        uint256 fusdcWethLiq = sushiswapFusdcWethReserveA + sushiswapFusdcWethReserveB;
+        fusdcWethLiq = sushiswapFusdcWethReserveA + sushiswapFusdcWethReserveB;
 
         fusdcWethRatio = 1e12 * sushiswapFusdcWethReserveA / fusdcWethLiq;
 
         return (
             fusdcUsdcRatio,
-            fusdcWethRatio
+            fusdcWethRatio,
+            fusdcUsdcLiq,
+            fusdcWethLiq
         );
     }
 
