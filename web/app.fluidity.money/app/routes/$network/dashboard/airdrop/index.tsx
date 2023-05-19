@@ -1,5 +1,4 @@
 import type { LoaderFunction } from "@remix-run/node";
-import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
@@ -211,7 +210,6 @@ const Airdrop = () => {
     : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
-  const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
   const [stakes, setStakes] = useState<
     Array<{ amount: BN; durationDays: number; depositDate: Date }>
   >([]);
@@ -256,11 +254,6 @@ const Airdrop = () => {
     (async () => {
       const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
       setStakes(stakingDeposits);
-    })();
-
-    (async () => {
-      const stakingRatios = (await getStakingRatios?.()) ?? null;
-      setTokenRatios(stakingRatios);
     })();
   }, [address]);
 
@@ -421,7 +414,7 @@ const Airdrop = () => {
                 )}
                 stakeTokens={stakeTokens}
                 testStakeTokens={testStakeTokens}
-                ratios={tokenRatios}
+                getRatios={getStakingRatios}
                 isMobile={isMobile}
               />
               <Heading as="h3">My Staking Stats</Heading>
@@ -477,7 +470,7 @@ const Airdrop = () => {
           )}
           stakeTokens={stakeTokens}
           testStakeTokens={testStakeTokens}
-          ratios={tokenRatios}
+          getRatios={getStakingRatios}
           isMobile={isMobile}
         />
       </CardModal>
@@ -891,7 +884,9 @@ const MyMultiplier = ({
                   }}
                 >
                   <Text prominent code>
-                    {numberToMonetaryString(getUsdFromTokenAmount(amount, 6))}{" "}
+                    {numberToMonetaryString(
+                      2 * getUsdFromTokenAmount(amount, 6)
+                    )}{" "}
                     FOR {Math.floor(durationDays)} DAYS
                   </Text>
                   <ProgressBar

@@ -403,6 +403,7 @@ const StakingStatsModal = ({
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
           {numberToMonetaryString(
+            2 *
             getUsdFromTokenAmount(
               stakes.reduce((sum, { amount }) => sum.add(amount), new BN(0)),
               6
@@ -521,7 +522,7 @@ interface IStakingNowModal {
     slippage: BN,
     maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
-  ratios: StakingRatioRes | null;
+  getRatios?: () => Promise<StakingRatioRes | undefined>;
   isMobile: boolean;
 }
 
@@ -549,7 +550,7 @@ const StakeNowModal = ({
   baseTokens,
   stakeTokens,
   testStakeTokens,
-  ratios,
+  getRatios,
   isMobile,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
@@ -564,6 +565,21 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
   const [slippage, setSlippage] = useState(5);
   const [stakeErr, setStakeErr] = useState("");
+  const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
+
+  useEffect(() => {
+    const setRatio = async () => {
+      const stakingRatios = (await getRatios?.()) ?? null;
+      setTokenRatios(stakingRatios);
+    };
+
+    setRatio();
+    const setRatioId = setInterval(setRatio, 10 * 1000);
+
+    return () => {
+      clearInterval(setRatioId);
+    };
+  }, []);
 
   const minDurationDays = 31;
   const maxDurationDays = 365;
@@ -676,15 +692,30 @@ const StakeNowModal = ({
       return true;
     } catch (e) {
       // Expect error on fail
-      const errMsgMatchReason = /reason="[a-z :_]+/i;
+      console.log(e);
+      const errMsgMatchReason = /reason="[a-z0-9 :_]+/i;
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);
 
-      console.log(stakingError);
       if (stakingError === "insufficient allowance") {
         setStakeErr("");
         return true;
+      }
+
+      if (stakingError === "ERC20: transfer amount exceeds allowance") {
+        setStakeErr("");
+        return true;
+      }
+
+      if (stakingError === "CamelotRouter: INSUFFICIENT_A_AMOUNT") {
+        setStakeErr("Insufficient Base Tokens");
+        return false;
+      }
+
+      if (stakingError === "CamelotRouter: INSUFFICIENT_B_AMOUNT") {
+        setStakeErr("Insufficient Fluid Tokens");
+        return false;
       }
 
       if (stakingError) {
@@ -914,7 +945,7 @@ const StakeNowModal = ({
           </Text>
           <Text prominent>
             {fluidToken.symbol}/{baseToken.symbol} ratio:{" "}
-            {ratios?.fusdcUsdcRatio.toString()}
+            {tokenRatios?.fusdcUsdcRatio.toString()}
           </Text>
         </div>
         {/* Arrow */}
