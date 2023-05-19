@@ -71,8 +71,8 @@ export const generateRewardTweet = (
     typeof reward === "number"
       ? numberToMonetaryString(reward)
       : reward[0] === "$"
-        ? reward
-        : `$${reward}`;
+      ? reward
+      : `$${reward}`;
 
   tweetQueries["text"] = (() => {
     switch (action) {
