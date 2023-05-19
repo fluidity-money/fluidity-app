@@ -384,7 +384,13 @@ const EthereumFacade = ({
   const getStakingDeposits = async (
     address: string
   ): Promise<
-    Array<{ amount: BN; durationDays: number; depositDate: Date }> | undefined
+    | Array<{
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }>
+    | undefined
   > => {
     const signer = provider?.getSigner();
 
@@ -408,13 +414,20 @@ const EthereumFacade = ({
         sushiswapLpMinted,
         redeemTimestamp,
         depositTimestamp,
+        camelotTokenA,
+        sushiswapTokenA,
       }) => {
         const camelotLp = new BN(camelotLpMinted.toString());
         const sushiswapLp = new BN(sushiswapLpMinted.toString());
         const totalLp = camelotLp.add(sushiswapLp);
 
+        const camelotToken = new BN(camelotTokenA.toString());
+        const sushiswapToken = new BN(sushiswapTokenA.toString());
+        const totalToken = camelotToken.add(sushiswapToken);
+
         return {
-          amount: totalLp,
+          fluidAmount: totalLp,
+          baseAmount: totalToken,
           durationDays: redeemTimestamp.toNumber() / 24 / 60 / 60,
           depositDate: new Date(depositTimestamp.toNumber() * 1000),
         };

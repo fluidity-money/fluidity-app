@@ -1,5 +1,4 @@
 import type { LoaderFunction } from "@remix-run/node";
-import type { StakingRatioRes } from "~/util/chainUtils/ethereum/transaction";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
@@ -99,6 +98,8 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   bottlesCount: 0,
   liquidityMultiplier: 0,
   stakes: [],
+  wethPrice: 0,
+  usdcPrice: 0,
   loaded: false,
 };
 
@@ -191,7 +192,13 @@ const Airdrop = () => {
   };
 
   const {
-    airdrop: { bottleTiers, liquidityMultiplier, bottlesCount },
+    airdrop: {
+      bottleTiers,
+      liquidityMultiplier,
+      bottlesCount,
+      wethPrice,
+      usdcPrice,
+    },
     referrals: {
       numActiveReferreeReferrals,
       numActiveReferrerReferrals,
@@ -213,9 +220,13 @@ const Airdrop = () => {
     : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
-  const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
   const [stakes, setStakes] = useState<
-    Array<{ amount: BN; durationDays: number; depositDate: Date }>
+    Array<{
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
   >([]);
 
   const closeModal = () => {
@@ -258,11 +269,6 @@ const Airdrop = () => {
     (async () => {
       const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
       setStakes(stakingDeposits);
-    })();
-
-    (async () => {
-      const stakingRatios = (await getStakingRatios?.()) ?? null;
-      setTokenRatios(stakingRatios);
     })();
   }, [address]);
 
@@ -385,6 +391,8 @@ const Airdrop = () => {
                 seeStakeNow={() => setCurrentModal("stake-now")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                wethPrice={wethPrice}
+                usdcPrice={1}
                 isMobile
               />
             </>
@@ -425,13 +433,17 @@ const Airdrop = () => {
                 )}
                 stakeTokens={stakeTokens}
                 testStakeTokens={testStakeTokens}
-                ratios={tokenRatios}
+                getRatios={getStakingRatios}
                 isMobile={isMobile}
+                wethPrice={wethPrice}
+                usdcPrice={usdcPrice}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
                 liqudityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                wethPrice={wethPrice}
+                usdcPrice={usdcPrice}
               />
             </>
           )}
@@ -481,7 +493,9 @@ const Airdrop = () => {
           )}
           stakeTokens={stakeTokens}
           testStakeTokens={testStakeTokens}
-          ratios={tokenRatios}
+          getRatios={getStakingRatios}
+          wethPrice={wethPrice}
+          usdcPrice={usdcPrice}
           isMobile={isMobile}
         />
       </CardModal>
@@ -493,6 +507,8 @@ const Airdrop = () => {
         <StakingStatsModal
           liqudityMultiplier={liquidityMultiplier}
           stakes={stakes}
+          wethPrice={wethPrice}
+          usdcPrice={usdcPrice}
         />
       </CardModal>
       <CardModal
@@ -567,6 +583,8 @@ const Airdrop = () => {
               seeStakeNow={() => setCurrentModal("stake-now")}
               liquidityMultiplier={liquidityMultiplier}
               stakes={stakes}
+              wethPrice={wethPrice}
+              usdcPrice={usdcPrice}
             />
           </div>
           <BottleProgress bottles={bottleTiers} />
@@ -822,36 +840,28 @@ const MultiplierTasks = () => {
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
-  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
+  stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
+  wethPrice: number;
+  usdcPrice: number;
   isMobile?: boolean;
 }
-
-// export type StakingEvent = {
-//   amount: number;
-//   durationDays: number;
-//   multiplier: number;
-//   insertedDate: string;
-// };
 
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
   liquidityMultiplier,
   stakes,
+  wethPrice,
+  usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
-  // If user has no stakes, render a dummy empty stake in the UI
-  if (stakes.length === 0) {
-    const emptyStake = {
-      amount: new BN(0),
-      durationDays: 0,
-      depositDate: new Date(),
-    };
-    stakes.push(emptyStake);
-  }
-
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
@@ -887,45 +897,71 @@ const MyMultiplier = ({
       </GeneralButton>
       {!isMobile && (
         <div id="mx-my-stakes">
-          {stakes.map(({ amount, durationDays, depositDate }) => {
-            const stakedDays = dayDifference(new Date(), new Date(depositDate));
-            const multiplier = stakingLiquidityMultiplierEq(
-              stakedDays,
-              durationDays
-            );
+          {stakes.map(
+            ({ fluidAmount, baseAmount, durationDays, depositDate }) => {
+              const stakedDays = dayDifference(
+                new Date(),
+                new Date(depositDate)
+              );
+              const multiplier = stakingLiquidityMultiplierEq(
+                stakedDays,
+                durationDays
+              );
 
-            return (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: "0.5em",
-                  }}
-                >
-                  <Text prominent code>
-                    {numberToMonetaryString(getUsdFromTokenAmount(amount, 6))}{" "}
-                    FOR {Math.floor(durationDays)} DAYS
-                  </Text>
-                  <ProgressBar
-                    value={stakedDays}
-                    max={Math.floor(durationDays)}
-                    rounded
-                    color={
-                      stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                    }
-                    size="sm"
-                  />
-                </div>
-                <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-                  <Text holo bold prominent>
-                    {multiplier}X
-                  </Text>
-                </div>
-              </>
-            );
-          })}
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+              return (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.5em",
+                    }}
+                  >
+                    <Text prominent code>
+                      {numberToMonetaryString(fluidUsd + baseUsd)} FOR{" "}
+                      {Math.floor(durationDays)} DAYS
+                    </Text>
+                    <ProgressBar
+                      value={stakedDays}
+                      max={Math.floor(durationDays)}
+                      rounded
+                      color={
+                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                      }
+                      size="sm"
+                    />
+                  </div>
+                  <div
+                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
+                  >
+                    <Text holo bold prominent>
+                      {multiplier}X
+                    </Text>
+                  </div>
+                </>
+              );
+            }
+          )}
         </div>
       )}
       <GeneralButton

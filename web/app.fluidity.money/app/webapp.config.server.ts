@@ -86,6 +86,11 @@ const OptionsSchema = z.object({
       arbitrum: z.string(),
       solana: z.string(),
     }),
+    eac_aggregator_proxy: z.object({
+      ethereum: z.string(),
+      arbitrum: z.string(),
+      solana: z.string(),
+    }),
   }),
 });
 
