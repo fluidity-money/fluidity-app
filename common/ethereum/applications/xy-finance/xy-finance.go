@@ -12,6 +12,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
@@ -221,21 +222,23 @@ var xyFeeTable = map[int]xyFee{
 // FeeRates, MinFee and MaxFee are calculated on and depending on the target chain, and is
 // approximated via `xyFeeTable`
 // xyFeeTable is sourced here: https://docs.xy.finance/products/x-swap/fee-structure
-func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != xyFinanceSourceChainSwap {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := xyFinanceAbi.Unpack("SourceChainSwap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack SourceChainSwap log data! %v",
 			err,
 		)
@@ -243,7 +246,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	expectedUnpackedLen := 8
 	if len(unpacked) < expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -255,7 +258,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	fromTokenAmount, err := ethereum.CoerceBoundContractResultsToRat(fromTokenAmount_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap amount to rat! %v",
 			err,
 		)
@@ -266,7 +269,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	addresses, err := ethereum.CoerceBoundContractResultsToAddresses(addresses_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce tokenAddresses to addresses! %v",
 			err,
 		)
@@ -293,6 +296,13 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		transferHasFluidToken = fromTokenIsFluid || (toToken == fluidTokenContract)
 	)
 
+	if fromTokenIsFluid {
+		feeData.Volume = new(big.Rat).Set(fromTokenAmount)
+	} else {
+		// assumed that both tokens are stable, so this is similar
+		feeData.Volume = new(big.Rat).Set(fromTokenAmount)
+	}
+
 	if !transferHasFluidToken {
 		log.App(func(k *log.Log) {
 			k.Format(
@@ -302,7 +312,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	contractAddr_ := transfer.Log.Address
@@ -312,7 +322,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	isCrosschainSwap_, err := ethereum.StaticCall(client, contractAddr, xyFinanceAbi, "proxies", dex)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to request whether dex is proxy! %v",
 			err,
 		)
@@ -321,7 +331,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	isCrosschainSwap, casted := isCrosschainSwap_[0].(bool)
 
 	if !casted {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to assert type bool from proxies %v! %v",
 			isCrosschainSwap_,
 			err,
@@ -338,7 +348,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// Get all logs in transaction
@@ -359,7 +369,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	// assert corresponding TargetChainSwap exists
 	if firstTargetChainSwapLogTxIndex >= len(txLogs) {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to find corresponding TargetChainSwap log from txHash (%v) at Index (%v)! %v",
 			txHash.String(),
 			firstTargetChainSwapLogTxIndex,
@@ -373,7 +383,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	unpacked, err = xyFinanceAbi.Unpack("TargetChainSwap", targetChainSwapTransferLog.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack SourceChainSwap log data! %v",
 			err,
 		)
@@ -381,7 +391,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	expectedUnpackedLen = 7
 	if len(unpacked) < expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -394,7 +404,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	targetChainId, err := ethereum.CoerceBoundContractResultsToUint8(targetChainId_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce targetChainId to uint8! %v",
 			err,
 		)
@@ -404,10 +414,12 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	// usdToTokenRatio is defined as Token/USD
 	usdToTokenRatio := big.NewRat(1, 1)
 
+	var decimalsAdjusted float64
+
 	switch true {
 	case fromTokenIsFluid:
 		// Assuming Fluid is a stable coin, USD = Fluid x 1eDecimals
-		decimalsAdjusted := math.Pow10(tokenDecimals)
+		decimalsAdjusted = math.Pow10(tokenDecimals)
 		usdToTokenRatio = new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	case fromTokenIsSupported(fromToken):
@@ -425,7 +437,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// Calculate USD Fee from fromTokenAmount
@@ -435,7 +447,12 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 		targetChainId,
 	)
 
-	return feeUsd, nil
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+	
+	feeData.Fee = feeUsd
+	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
+
+	return feeData, nil
 }
 
 // fromTokenIsSupported checks if fromToken is part of Day 1 supported Eth tokens

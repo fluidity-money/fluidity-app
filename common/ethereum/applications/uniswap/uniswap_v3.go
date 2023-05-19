@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -115,30 +116,31 @@ var uniswapV3PairAbi ethAbi.ABI
 
 // GetUniswapV3Fees returns Uniswap V3's fee of the amount swapped.
 // The fee is dependent on the pool being swapped on
-func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != uniswapV3SwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := uniswapV3PairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 5 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 5, got %v",
 			len(unpacked),
 		)
@@ -147,7 +149,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -160,7 +162,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "token0")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token0 address! %v",
 			err,
 		)
@@ -169,7 +171,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token0addr, err := ethereum.CoerceBoundContractResultsToAddress(token0addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token0 address! %v",
 			err,
 		)
@@ -178,7 +180,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token1addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "token1")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token1 address! %v",
 			err,
 		)
@@ -187,7 +189,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token1addr, err := ethereum.CoerceBoundContractResultsToAddress(token1addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token1 address! %v",
 			err,
 		)
@@ -196,7 +198,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	poolFee_, err := ethereum.StaticCall(client, contractAddr, uniswapV3PairAbi, "fee")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get pool fee! %v",
 			err,
 		)
@@ -207,7 +209,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	poolFee = new(big.Rat).Mul(poolFee, big.NewRat(1, 1000000))
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce pool fee! %v",
 			err,
 		)
@@ -247,7 +249,7 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 
 	case token0IsFluid && amount0IsNeg:
 		fluidTransferAmount = new(big.Rat).Mul(amount0, big.NewRat(-1, 1))
@@ -274,13 +276,18 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		feeMultiplier = new(big.Rat).Sub(invPoolFee, big.NewRat(1, 1))
 	}
 
-	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
+	fee := new(big.Rat).Set(fluidTransferAmount)
+	fee = fee.Mul(fee, feeMultiplier)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fee.Quo(fee, decimalsRat)
+	fluidTransferAmount.Quo(fluidTransferAmount, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+	feeData.Volume = fluidTransferAmount
+
+	return feeData, nil
 }

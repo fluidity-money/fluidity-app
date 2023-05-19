@@ -15,6 +15,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -98,29 +99,30 @@ const apeswapPairAbiString = `[
 
 var apeswapPairAbi ethAbi.ABI
 
-func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
 
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("Not enough log topics passed!")
+		return feeData, fmt.Errorf("Not enough log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != apeswapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 	// decode the amount of each token in the log
 	unpacked, err := apeswapPairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 4, got %v",
 			len(unpacked),
 		)
@@ -129,7 +131,7 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -144,7 +146,7 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token0_, err := ethereum.StaticCall(client, pairAddr, apeswapPairAbi, "token0")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token0! %v",
 			err,
 		)
@@ -153,7 +155,7 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token0, err := ethereum.CoerceBoundContractResultsToAddress(token0_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token0 %v! %v",
 			token0_,
 			err,
@@ -164,7 +166,7 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token1_, err := ethereum.StaticCall(client, pairAddr, apeswapPairAbi, "token1")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token1! %v",
 			err,
 		)
@@ -173,7 +175,7 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token1, err := ethereum.CoerceBoundContractResultsToAddress(token1_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token1 %v! %v",
 			token1_,
 			err,
@@ -217,14 +219,18 @@ func GetApeswapFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
+
+	feeData.Volume = new(big.Rat).Set(fluidTokens)
 
 	// multiply by fee percent
 	feeAmount := new(big.Rat).Mul(fluidTokens, feePercent)
 
 	// adjust for token decimals
 	feeAmount.Quo(feeAmount, decimalsRat)
+	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
+	feeData.Fee = feeAmount
 
-	return feeAmount, nil
+	return feeData, nil
 }

@@ -66,9 +66,9 @@ func TestGetGTrade_v6_1SwapFee(t *testing.T) {
 	assert.NoError(t, err)
 
 	// nil transfer fails
-	fees, err := GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
+	feeData, err := GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	transfer.Log.Topics = []ethTypes.Hash{
 		ethTypes.HashFromString(""),
@@ -113,13 +113,13 @@ func TestGetGTrade_v6_1SwapFee(t *testing.T) {
 		transferLog2,
 	)
 
-	fees, err = GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
+	feeData, err = GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
 	assert.NoError(t, err)
-	assert.Equal(t, big.NewRat(6174090953184000000, 1000000000000000000), fees)
+	assert.Equal(t, big.NewRat(6174090953184000000, 1000000000000000000), feeData.Fee)
 
 	// Non-Fluid transfer
 	fluidTokenAddr = common.HexToAddress("0x6B175474E89094C44Da98b954EedeAC495271d0F")
-	fees, err = GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
+	feeData, err = GetGtradeV6_1Fees(transfer, client, fluidTokenAddr, tokenDecimals, txReceipt)
 	assert.Nil(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 }

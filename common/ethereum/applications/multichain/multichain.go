@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -86,21 +87,23 @@ var anyswapERC20Abi ethAbi.ABI
 // So far we only track outgoing swaps on each chain, to avoid double-rewarding, and so we properly
 // track the receiving pool
 // Fees are calculated as 0.1% for stablecoin swaps, clamped between $40 and $1000 USD
-func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != multichainLogAnySwapOut {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := multichainAbi.Unpack("LogAnySwapOut", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack LogAnySwapOut log data! %v",
 			err,
 		)
@@ -108,7 +111,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 
 	expectedUnpackedLen := 3
 	if len(unpacked) != expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -118,7 +121,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 	swapData, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap data to rats! %v",
 			err,
 		)
@@ -140,7 +143,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 	swappedTokenAddress_, err := ethereum.StaticCall(client, anyTokenAddress, anyswapERC20Abi, "underlying")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get swappedToken address! %v",
 			err,
 		)
@@ -149,7 +152,7 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 	swappedTokenAddress, err := ethereum.CoerceBoundContractResultsToAddress(swappedTokenAddress_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce %v to address! %v",
 			swappedTokenAddress_,
 			err,
@@ -166,8 +169,10 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
+
+	feeData.Volume = new(big.Rat).Set(amount)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -178,7 +183,9 @@ func GetMultichainAnySwapFees(transfer worker.EthereumApplicationTransfer, clien
 		decimalsRat,
 	)
 
-	return fluidFee, nil
+	feeData.Fee = fluidFee
+
+	return feeData, nil
 }
 
 // calculateMulticoinSwapFee takes 0.1% per transaction of stable-coins, with a minimum fee of $40,
