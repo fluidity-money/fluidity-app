@@ -169,6 +169,8 @@ const ReferralModal = ({
         <Text size="sm">
           Share to: &nbsp;
           <a
+            target="_blank"
+            rel="noreferrer"
             href={generateReferralTweet(
               `https://airdrop.fluidity.money/${referralCode}`
             )}
