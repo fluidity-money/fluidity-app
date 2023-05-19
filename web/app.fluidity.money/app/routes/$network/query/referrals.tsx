@@ -111,6 +111,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   // Create new referral code
+  console.log(`${url.origin}/${network}/query/referralCode`);
   const { success, msg } = await jsonPost<
     AddReferralCodeBody,
     AddReferralCodeData
