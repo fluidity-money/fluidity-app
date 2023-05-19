@@ -14,6 +14,4 @@ Medium
 **Telegram**
 {% endembed %}
 
-{% embed url="https://twitter.com/fluiditymoney" %}
-**Twitter**
-{% endembed %}
+{% embed url="https://twitter.com/fluiditylabs" %}
