@@ -98,6 +98,8 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   bottlesCount: 0,
   liquidityMultiplier: 0,
   stakes: [],
+  wethPrice: 0,
+  usdcPrice: 0,
   loaded: false,
 };
 
@@ -147,16 +149,14 @@ const Airdrop = () => {
   );
 
   const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
     }`
   );
 
   const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
     address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
-          leaderboardFilterIndex === 0 ? "24" : "all"
-        }&address=${address}`
+      ? `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+      }&address=${address}`
       : ""
   );
 
@@ -190,7 +190,13 @@ const Airdrop = () => {
   };
 
   const {
-    airdrop: { bottleTiers, liquidityMultiplier, bottlesCount },
+    airdrop: {
+      bottleTiers,
+      liquidityMultiplier,
+      bottlesCount,
+      wethPrice,
+      usdcPrice,
+    },
     referrals: {
       numActiveReferreeReferrals,
       numActiveReferrerReferrals,
@@ -213,7 +219,12 @@ const Airdrop = () => {
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [stakes, setStakes] = useState<
-    Array<{ amount: BN; durationDays: number; depositDate: Date }>
+    Array<{
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
   >([]);
 
   const closeModal = () => {
@@ -264,9 +275,8 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         <TabButton size="small" onClick={() => setCurrentModal(null)}>
           Airdrop Dashboard
@@ -308,9 +318,8 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${
-            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-          }`}
+          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+            }`}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -378,6 +387,8 @@ const Airdrop = () => {
                 seeStakeNow={() => setCurrentModal("stake-now")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                wethPrice={wethPrice}
+                usdcPrice={1}
                 isMobile
               />
             </>
@@ -420,11 +431,15 @@ const Airdrop = () => {
                 testStakeTokens={testStakeTokens}
                 getRatios={getStakingRatios}
                 isMobile={isMobile}
+                wethPrice={wethPrice}
+                usdcPrice={usdcPrice}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
                 liqudityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                wethPrice={wethPrice}
+                usdcPrice={usdcPrice}
               />
             </>
           )}
@@ -475,6 +490,8 @@ const Airdrop = () => {
           stakeTokens={stakeTokens}
           testStakeTokens={testStakeTokens}
           getRatios={getStakingRatios}
+          wethPrice={wethPrice}
+          usdcPrice={usdcPrice}
           isMobile={isMobile}
         />
       </CardModal>
@@ -486,6 +503,8 @@ const Airdrop = () => {
         <StakingStatsModal
           liqudityMultiplier={liquidityMultiplier}
           stakes={stakes}
+          wethPrice={wethPrice}
+          usdcPrice={usdcPrice}
         />
       </CardModal>
       <CardModal
@@ -560,6 +579,8 @@ const Airdrop = () => {
               seeStakeNow={() => setCurrentModal("stake-now")}
               liquidityMultiplier={liquidityMultiplier}
               stakes={stakes}
+              wethPrice={wethPrice}
+              usdcPrice={usdcPrice}
             />
           </div>
           <BottleProgress bottles={bottleTiers} />
@@ -707,8 +728,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  console.log("TODO REDIRECT");
-                }
+                console.log("TODO REDIRECT");
+              }
               : seeBottlesDetails
           }
           style={{
@@ -815,24 +836,26 @@ const MultiplierTasks = () => {
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
-  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
+  stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
+  wethPrice: number;
+  usdcPrice: number;
   isMobile?: boolean;
 }
-
-// export type StakingEvent = {
-//   amount: number;
-//   durationDays: number;
-//   multiplier: number;
-//   insertedDate: string;
-// };
 
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
   liquidityMultiplier,
   stakes,
+  wethPrice,
+  usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
   return (
@@ -870,47 +893,71 @@ const MyMultiplier = ({
       </GeneralButton>
       {!isMobile && (
         <div id="mx-my-stakes">
-          {stakes.map(({ amount, durationDays, depositDate }) => {
-            const stakedDays = dayDifference(new Date(), new Date(depositDate));
-            const multiplier = stakingLiquidityMultiplierEq(
-              stakedDays,
-              durationDays
-            );
+          {stakes.map(
+            ({ fluidAmount, baseAmount, durationDays, depositDate }) => {
+              const stakedDays = dayDifference(
+                new Date(),
+                new Date(depositDate)
+              );
+              const multiplier = stakingLiquidityMultiplierEq(
+                stakedDays,
+                durationDays
+              );
 
-            return (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: "0.5em",
-                  }}
-                >
-                  <Text prominent code>
-                    {numberToMonetaryString(
-                      2 * getUsdFromTokenAmount(amount, 6)
-                    )}{" "}
-                    FOR {Math.floor(durationDays)} DAYS
-                  </Text>
-                  <ProgressBar
-                    value={stakedDays}
-                    max={Math.floor(durationDays)}
-                    rounded
-                    color={
-                      stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                    }
-                    size="sm"
-                  />
-                </div>
-                <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-                  <Text holo bold prominent>
-                    {multiplier}X
-                  </Text>
-                </div>
-              </>
-            );
-          })}
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                  0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+              return (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.5em",
+                    }}
+                  >
+                    <Text prominent code>
+                      {numberToMonetaryString(fluidUsd + baseUsd)} FOR{" "}
+                      {Math.floor(durationDays)} DAYS
+                    </Text>
+                    <ProgressBar
+                      value={stakedDays}
+                      max={Math.floor(durationDays)}
+                      rounded
+                      color={
+                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                      }
+                      size="sm"
+                    />
+                  </div>
+                  <div
+                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
+                  >
+                    <Text holo bold prominent>
+                      {multiplier}X
+                    </Text>
+                  </div>
+                </>
+              );
+            }
+          )}
         </div>
       )}
       <GeneralButton
@@ -945,9 +992,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
-        address === user ? "highlighted-row" : ""
-      }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
+        }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -966,8 +1012,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -982,8 +1028,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -998,8 +1044,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1014,8 +1060,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1030,8 +1076,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >

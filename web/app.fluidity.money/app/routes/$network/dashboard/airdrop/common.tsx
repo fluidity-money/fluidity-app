@@ -38,6 +38,8 @@ import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 
+const MAX_EPOCH_DAYS = 31;
+
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
   showBottleNumbers?: boolean;
@@ -70,7 +72,7 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
               opacity:
                 highlightBottleNumberIndex === undefined ||
-                highlightBottleNumberIndex !== index
+                  highlightBottleNumberIndex !== index
                   ? 0.2
                   : 1,
               ...(handleClickBottle ? { cursor: "pointer" } : {}),
@@ -90,19 +92,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottleNumberIndex === index
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottleNumberIndex === index
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottleNumberIndex === index
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottleNumberIndex === index
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -367,11 +369,21 @@ const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
 
 interface IStakingStatsModal {
   liqudityMultiplier: number;
-  stakes: Array<{ amount: BN; durationDays: number; depositDate: Date }>;
+  stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }>;
+  wethPrice: number;
+  usdcPrice: number;
 }
+
 const StakingStatsModal = ({
   liqudityMultiplier,
   stakes,
+  wethPrice,
+  usdcPrice,
 }: IStakingStatsModal) => {
   const canWithdraw = stakes.some(({ durationDays, depositDate }) => {
     const stakedDays = dayDifference(new Date(), depositDate);
@@ -403,11 +415,28 @@ const StakingStatsModal = ({
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
           {numberToMonetaryString(
-            2 *
-              getUsdFromTokenAmount(
-                stakes.reduce((sum, { amount }) => sum.add(amount), new BN(0)),
-                6
-              )
+            stakes.reduce((sum, { fluidAmount, baseAmount }) => {
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                  0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+              return sum + fluidUsd + baseUsd;
+            }, 0)
           )}
         </LabelledValue>
       </div>
@@ -416,87 +445,110 @@ const StakingStatsModal = ({
           Withdraw
         </GeneralButton>
         <div>
-          {stakes.map(({ amount, durationDays, depositDate }, i) => {
-            const stakedDays = dayDifference(new Date(), depositDate);
-            const multiplier = stakingLiquidityMultiplierEq(
-              stakedDays,
-              durationDays
-            );
+          {stakes.map(
+            ({ fluidAmount, baseAmount, durationDays, depositDate }, i) => {
+              const stakedDays = dayDifference(new Date(), depositDate);
+              const multiplier = stakingLiquidityMultiplierEq(
+                stakedDays,
+                durationDays
+              );
 
-            const endDate = new Date(depositDate);
-            endDate.setDate(endDate.getDate() + durationDays);
+              const endDate = new Date(depositDate);
+              endDate.setDate(endDate.getDate() + durationDays);
 
-            return (
-              <div
-                key={`stake-${i}`}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 3fr 1fr",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "1em",
-                }}
-              >
-                {/* Dates */}
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                  0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+              return (
                 <div
+                  key={`stake-${i}`}
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.5em",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 3fr 1fr",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "1em",
                   }}
                 >
-                  <Text>Start Date</Text>
-                  <Text prominent>
-                    {depositDate.toLocaleDateString("en-US")}
-                  </Text>
-
-                  <Text>End Date</Text>
-                  <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    gap: "0.5em",
-                  }}
-                >
-                  <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
-                    {numberToMonetaryString(getUsdFromTokenAmount(amount, 6))}
-                  </Heading>
-                  <ProgressBar
-                    value={stakedDays}
-                    max={Math.floor(durationDays)}
-                    rounded
-                    color={
-                      stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                    }
-                    size="sm"
-                  />
+                  {/* Dates */}
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
+                      flexDirection: "column",
+                      gap: "0.5em",
                     }}
                   >
-                    <Text prominent>{multiplier}x Multiplier</Text>
+                    <Text>Start Date</Text>
                     <Text prominent>
-                      {Math.max(0, Math.floor(durationDays - stakedDays))} Days
-                      Left
+                      {depositDate.toLocaleDateString("en-US")}
                     </Text>
+
+                    <Text>End Date</Text>
+                    <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.5em",
+                    }}
+                  >
+                    <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
+                      {numberToMonetaryString(fluidUsd + baseUsd)}
+                    </Heading>
+                    <ProgressBar
+                      value={stakedDays}
+                      max={Math.floor(durationDays)}
+                      rounded
+                      color={
+                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                      }
+                      size="sm"
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text prominent>{multiplier}x Multiplier</Text>
+                      <Text prominent>
+                        {Math.max(0, Math.floor(durationDays - stakedDays))}{" "}
+                        Days Left
+                      </Text>
+                    </div>
+                  </div>
+                  <div
+                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
+                  >
+                    <Text>Staked For</Text>
+                    <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
+                      {Math.floor(durationDays)}
+                    </Heading>
+                    <Text>Days</Text>
                   </div>
                 </div>
-                <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-                  <Text>Staked For</Text>
-                  <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
-                    {Math.floor(durationDays)}
-                  </Heading>
-                  <Text>Days</Text>
-                </div>
-              </div>
-            );
-          })}
+              );
+            }
+          )}
         </div>
       </div>
     </div>
@@ -506,6 +558,8 @@ const StakingStatsModal = ({
 interface IStakingNowModal {
   fluidTokens: Array<AugmentedToken>;
   baseTokens: Array<AugmentedToken>;
+  // getRatios calls `deposit()` in Staking Contract
+  // May return undefined if contract errors, or signer not found
   stakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
@@ -514,6 +568,10 @@ interface IStakingNowModal {
     slippage: BN,
     maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
+
+  // getRatios simulates `deposit()` in Staking Contract
+  // Used to determine if current inputs will succeed
+  // May return undefined if contract errors, or signer not found
   testStakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
@@ -522,8 +580,14 @@ interface IStakingNowModal {
     slippage: BN,
     maxTimestamp: BN
   ) => Promise<StakingDepositsRes | undefined>;
+
+  // getRatios calls `ratios()` in Staking Contract
+  // Used to estimate accepted Base / Fluid token amounts
+  // May return undefined if contract errors, or signer not found
   getRatios?: () => Promise<StakingRatioRes | undefined>;
   isMobile: boolean;
+  wethPrice: number;
+  usdcPrice: number;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -540,8 +604,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -552,6 +616,8 @@ const StakeNowModal = ({
   testStakeTokens,
   getRatios,
   isMobile,
+  wethPrice,
+  usdcPrice,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -565,23 +631,38 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
   const [slippage, setSlippage] = useState(5);
   const [stakeErr, setStakeErr] = useState("");
+
+  // tokenRatios is the proportion of base tokens in the pool,
+  // and maximum base token spread, to the factor of 12
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
 
-  const calculateRatio = (fluidTokenRatio: number) => {
-    const baseTokenRatio = 1 - fluidTokenRatio;
+  // Convert proportion of Base Tokens in Pool to Fluid:Base Token ratio
+  // `prop` = base / (base + fluid)
+  const calculateRatioFromProportion = (baseTokenProp: number) => {
+    // `prop` * fluid == (1 - `prop`) * base
+    const baseTokenRatio = 1 - baseTokenProp;
 
-    const baseMultiplier = fluidTokenRatio / baseTokenRatio;
+    // 1 fluid == ((1 - `prop`) / `prop`) * base
+    const baseMultiplier = baseTokenRatio / baseTokenProp;
 
-    return `${baseMultiplier.toFixed(2)} : 1`;
+    return baseMultiplier;
   };
 
+  // tokenRatios has factor of 12 in contract to avoid decimals
   const ratio = !tokenRatios
-    ? ""
-    : calculateRatio(
-        baseToken.symbol === "USDC"
-          ? tokenRatios.fusdcUsdcRatio.toNumber() / 1e12
-          : tokenRatios.fusdcWethRatio.toNumber() / 1e12
-      );
+    ? 0
+    : calculateRatioFromProportion(
+      baseToken.symbol === "USDC"
+        ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+          tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+        1e12
+        : (tokenRatios.fusdcWethRatio.toNumber() -
+          tokenRatios.fusdcWethSpread.toNumber() / 2) /
+        1e12
+    );
+
+  const fluidUsdMultiplier = usdcPrice;
+  const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
 
   useEffect(() => {
     const setRatio = async () => {
@@ -589,6 +670,7 @@ const StakeNowModal = ({
       setTokenRatios(stakingRatios);
     };
 
+    // Call `getRatios` immediately, then call every 10 seconds
     setRatio();
     const setRatioId = setInterval(setRatio, 10 * 1000);
 
@@ -639,43 +721,78 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-      if (dec === undefined) {
+        if (dec === undefined) {
+          return setInput({
+            ...token,
+            amount: `${unpaddedWhole}`,
+          });
+        }
+
+        const limitedDecimals = dec.slice(0 - token.decimals);
+
         return setInput({
           ...token,
-          amount: `${unpaddedWhole}`,
+          amount: [whole, limitedDecimals].join("."),
         });
-      }
-
-      const limitedDecimals = dec.slice(0 - token.decimals);
-
-      return setInput({
-        ...token,
-        amount: [whole, limitedDecimals].join("."),
-      });
-    };
+      };
 
   const inputMaxBalance = () => {
-    setFluidToken({
-      ...fluidToken,
-      amount: addDecimalToBn(
-        snapToValidValue(fluidToken.userTokenBalance.toString(), fluidToken),
-        fluidToken.decimals
-      ),
-    });
+    const maxFluidToken = snapToValidValue(
+      fluidToken.userTokenBalance.toString(),
+      fluidToken
+    );
+
+    const maxBaseToken = snapToValidValue(
+      baseToken.userTokenBalance.toString(),
+      baseToken
+    );
+
+    const matchingBaseTokenUsd =
+      getUsdFromTokenAmount(maxFluidToken, fluidToken.decimals, usdcPrice) *
+      ratio;
+
+    const maxBaseTokenUsd = getUsdFromTokenAmount(
+      maxBaseToken,
+      baseToken.decimals,
+      baseUsdMultiplier
+    );
+
+    // Enough Base tokens to match Max Fluid balance
+    if (maxBaseTokenUsd >= matchingBaseTokenUsd) {
+      setFluidToken({
+        ...fluidToken,
+        amount: addDecimalToBn(maxFluidToken, fluidToken.decimals),
+      });
+
+      setBaseToken({
+        ...baseToken,
+        amount: (matchingBaseTokenUsd / baseUsdMultiplier)
+          .toFixed(baseToken.decimals)
+          .replace(/\.0+$/, ""),
+      });
+
+      return;
+    }
+
+    const matchingFluidTokenUsd = maxBaseTokenUsd * (1 / ratio);
 
     setBaseToken({
       ...baseToken,
-      amount: addDecimalToBn(
-        snapToValidValue(baseToken.userTokenBalance.toString(), baseToken),
-        baseToken.decimals
-      ),
+      amount: addDecimalToBn(maxBaseToken, baseToken.decimals),
+    });
+
+    setFluidToken({
+      ...fluidToken,
+      amount: (matchingFluidTokenUsd / fluidUsdMultiplier)
+        .toFixed(fluidToken.decimals)
+        .replace(/\.0+$/, ""),
     });
   };
 
@@ -701,43 +818,37 @@ const StakeNowModal = ({
           ? snapToValidValue(baseToken.amount, baseToken)
           : new BN(0),
         new BN(slippage),
-        new BN(0) // 30 Minutes after now
+        new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
 
       setStakeErr("");
       return true;
     } catch (e) {
       // Expect error on fail
-      console.log(e);
       const errMsgMatchReason = /reason="[a-z0-9 :_]+/i;
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);
 
-      if (stakingError === "insufficient allowance") {
-        setStakeErr("");
-        return true;
+      switch (stakingError) {
+        case "insufficient allowance":
+        case "ERC20: transfer amount exceeds allowance": {
+          setStakeErr("");
+          return true;
+        }
+        case "CamelotRouter: INSUFFICIENT_A_AMOUNT": {
+          setStakeErr("Insufficient Base Tokens");
+          return false;
+        }
+        case "CamelotRouter: INSUFFICIENT_B_AMOUNT": {
+          setStakeErr("Insufficient Fluid Tokens");
+          return false;
+        }
+        default: {
+          setStakeErr(stakingError ?? "Unknown Error - Try again later");
+          return false;
+        }
       }
-
-      if (stakingError === "ERC20: transfer amount exceeds allowance") {
-        setStakeErr("");
-        return true;
-      }
-
-      if (stakingError === "CamelotRouter: INSUFFICIENT_A_AMOUNT") {
-        setStakeErr("Insufficient Base Tokens");
-        return false;
-      }
-
-      if (stakingError === "CamelotRouter: INSUFFICIENT_B_AMOUNT") {
-        setStakeErr("Insufficient Fluid Tokens");
-        return false;
-      }
-
-      if (stakingError) {
-        setStakeErr(stakingError);
-      }
-      return false;
     }
   };
 
@@ -760,12 +871,11 @@ const StakeNowModal = ({
           ? snapToValidValue(baseToken.amount, baseToken)
           : new BN(0),
         new BN(slippage),
-        new BN(0)
+        new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
     } catch (e) {
       // Expect error on fail
       setButtonText("SLIDE TO STAKE");
-      console.log(e);
       return;
     }
   };
@@ -960,7 +1070,8 @@ const StakeNowModal = ({
             {addDecimalToBn(baseToken.userTokenBalance, baseToken.decimals)}
           </Text>
           <Text prominent>
-            {fluidToken.symbol}/{baseToken.symbol} ratio: {ratio}
+            {fluidToken.symbol}/{baseToken.symbol} ratio:{" "}
+            {ratio ? `1 : ${toSignificantDecimals(ratio, 2)}` : "Loading..."}
           </Text>
         </div>
         {/* Arrow */}
@@ -997,23 +1108,17 @@ const StakeNowModal = ({
               <InfoCircle />
             </Text>
           </Hoverable>
-          <div>
-            <Text prominent code>
-              SLIPPAGE % <InfoCircle />
-              <input
-                style={{ width: "4em" }}
-                type="number"
-                pattern="[0-9]"
-                min={1}
-                value={slippage}
-                max={50}
-                step="1"
-                onChange={(e) =>
-                  setSlippage(Math.floor(e.target.valueAsNumber))
-                }
-              />
-            </Text>
-          </div>
+          <Text prominent code>
+            SLIPPAGE % <InfoCircle />
+          </Text>
+          <input
+            className={"staking-modal-token-input"}
+            pattern="[0-9]"
+            min={1}
+            value={slippage}
+            max={50}
+            onChange={(e) => setSlippage(Math.floor(e.target.valueAsNumber))}
+          />
         </div>
         <div
           style={{
@@ -1039,8 +1144,9 @@ const StakeNowModal = ({
             className="power-text"
           >
             {toSignificantDecimals(
-              (2 * parseFloat(fluidToken.amount) || 0) *
-                stakingLiquidityMultiplierEq(1, stakingDuration),
+              ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
+                (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
+              stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1074,13 +1180,14 @@ const StakeNowModal = ({
             tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier."
           >
             <Text size="xs" className="helper-label" code>
-              DAY 31 POWER <InfoCircle />
+              DAY {MAX_EPOCH_DAYS} POWER <InfoCircle />
             </Text>
           </Hoverable>
           <Text prominent holo size="xl" className="power-text">
             {toSignificantDecimals(
-              (2 * parseFloat(fluidToken.amount) || 0) *
-                stakingLiquidityMultiplierEq(31, stakingDuration),
+              ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
+                (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1096,7 +1203,7 @@ const StakeNowModal = ({
             <Text size="xs" style={{ color: "black" }}>
               @ MULTIPLIER{" "}
               {toSignificantDecimals(
-                stakingLiquidityMultiplierEq(31, stakingDuration)
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration)
               )}
               X
             </Text>
@@ -1297,9 +1404,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />

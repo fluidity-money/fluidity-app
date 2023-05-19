@@ -48,7 +48,13 @@ export interface IFluidityFacade {
   getStakingDeposits?: (
     address: string
   ) => Promise<
-    Array<{ amount: BN; durationDays: number; depositDate: Date }> | undefined
+    | Array<{
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
+    | undefined
   >;
 
   testStakeTokens?: (

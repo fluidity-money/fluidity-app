@@ -66,12 +66,26 @@ const fluidAssetOf = (tokens: Token[], assetToken: Token): Token | undefined =>
     ? assetToken
     : tokens.find(({ isFluidOf }) => isFluidOf === assetToken.address);
 
-const getUsdFromTokenAmount = (amount: BN, decimalsOrToken: number | Token) => {
+const getUsdFromTokenAmount = (
+  amount: BN,
+  decimalsOrToken: number | Token,
+  usdPrice: number = 1
+) => {
   const decimals =
     typeof decimalsOrToken === "number"
       ? decimalsOrToken
       : decimalsOrToken.decimals;
-  return amount.div(new BN(10).pow(new BN(decimals - 2))).toNumber() / 100;
+
+  const decimalsAdjDecs = 2;
+  const decimalsBn = new BN(10).pow(new BN(decimals - decimalsAdjDecs));
+
+  const usdPriceAdjDecs = 2;
+  const usdPriceBn = new BN(usdPrice * 10 ** usdPriceAdjDecs);
+
+  return (
+    amount.mul(usdPriceBn).div(decimalsBn).toNumber() /
+    10 ** (decimalsAdjDecs + usdPriceAdjDecs)
+  );
 };
 
 const getTokenAmountFromUsd = (usd: BN, { decimals }: Token) =>
