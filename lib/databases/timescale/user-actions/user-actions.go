@@ -385,7 +385,7 @@ func GetUserActions(f func(userAction UserAction)) {
 }
 
 // GetUserActionByLogIndex to find a user action in a transaction that has the given log index
-func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash string, logIndex misc.BigInt) user_actions.UserAction {
+func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash string, logIndex misc.BigInt) *user_actions.UserAction {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -440,6 +440,10 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil 
+		}
+
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 			k.Format(
@@ -452,5 +456,5 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 		})
 	}
 
-	return userAction
+	return &userAction
 }

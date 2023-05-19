@@ -152,7 +152,7 @@ func TestIntegrations(t *testing.T) {
 			convertedReceipt = common.ConvertGethReceipt(*txReceipt)
 		}
 
-		fees, emission, err := applications.GetApplicationFee(
+		feeData, emission, err := applications.GetApplicationFee(
 			transfer,
 			client,
 			fluidAddress,
@@ -173,7 +173,7 @@ func TestIntegrations(t *testing.T) {
 		// correct fees
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
 		assert.True(t, ok)
-		assert.Equal(t, expectedFeesRat, fees)
+		assert.Equal(t, expectedFeesRat, feeData.Fee)
 
 		// correct emission
 		assert.Equal(t, event.ExpectedEmission, emission)

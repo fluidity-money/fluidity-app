@@ -27,28 +27,35 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
 
   try {
-    const { data: leaderboardData, errors: leaderboardErrors } = await (() => {
-      switch (true) {
-        case address && useAll:
-          return useAirdropLeaderboardByUserAllTime(address);
-        case !address && useAll:
-          return useAirdropLeaderboardAllTime();
-        case address && use24Hours:
-          return useAirdropLeaderboardByUser24Hours(address);
-        case !address && use24Hours:
-        default:
-          return useAirdropLeaderboard24Hours();
-      }
-    })();
+    const { data: leaderboardData, errors: leaderboardErrors } =
+      await (async () => {
+        switch (true) {
+          case address && useAll: {
+            const res = await useAirdropLeaderboardByUserAllTime(address);
+            return { ...res, data: res.data?.airdrop_leaderboard };
+          }
+          case !address && useAll: {
+            const res = await useAirdropLeaderboardAllTime();
+            return { ...res, data: res.data?.airdrop_leaderboard };
+          }
+          case address && use24Hours: {
+            const res = await useAirdropLeaderboardByUser24Hours(address);
+            return { ...res, data: res.data?.airdrop_leaderboard_24_hours };
+          }
+          case !address && use24Hours:
+          default: {
+            const res = await useAirdropLeaderboard24Hours();
+            return { ...res, data: res.data?.airdrop_leaderboard_24_hours };
+          }
+        }
+      })();
 
-    if (!leaderboardData) throw leaderboardErrors;
+    if (!leaderboardData || leaderboardErrors) throw leaderboardErrors;
 
-    const leaderboard = leaderboardData.airdrop_leaderboard.map(
-      (leaderboardRow, i) => ({
-        ...leaderboardRow,
-        rank: i + 1,
-      })
-    );
+    const leaderboard = leaderboardData.map((leaderboardRow, i) => ({
+      ...leaderboardRow,
+      rank: i + 1,
+    }));
 
     return json({
       leaderboard,

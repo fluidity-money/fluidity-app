@@ -43,18 +43,18 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	assert.NoError(t, err)
 
 	// nil transfer fails
-	fees, err := GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err := GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// fails without proper rpc responses
 	transfer.Log.Data = *dataBlob
 	transfer.Log.Topics = []ethereum.Hash{
 		ethereum.HashFromString(uniswapV2SwapLogTopic),
 	}
-	fees, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// add the "token0" call to the client
 	callMethods["token0()"] = map[string]interface{}{
@@ -71,17 +71,17 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	r, ok := new(big.Rat).SetString("4976280438497449851783/500000000000000000000")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 
 	tokenDecimals = 6
 	r, ok = new(big.Rat).SetString("9934320933/997000000")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
+	feeData, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 
 	// transfer 333,333,333
 	err = dataBlob.UnmarshalJSON([]byte(dataBlobB64_2))
@@ -91,9 +91,9 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	r, ok = new(big.Rat).SetString("999999999/1000000000")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
+	feeData, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 
 	// transfer 333,333,333 the other way
 	err = dataBlob.UnmarshalJSON([]byte(dataBlobB64_3))
@@ -103,9 +103,9 @@ func TestGetUniswapV2Fees(t *testing.T) {
 	r, ok = new(big.Rat).SetString("39893259/39880000")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetUniswapV2Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 }
 
 func TestGetUniswapV3Fees(t *testing.T) {
@@ -135,18 +135,18 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	assert.NoError(t, err)
 
 	// nil transfer fails
-	fees, err := GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err := GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// fails without proper rpc responses
 	transfer.Log.Data = *dataBlob
 	transfer.Log.Topics = []ethereum.Hash{
 		ethereum.HashFromString(uniswapV3SwapLogTopic),
 	}
-	fees, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// add the "token0" call to the client
 	callMethods["token0()"] = map[string]interface{}{
@@ -166,17 +166,17 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	r, ok := new(big.Rat).SetString("71/100")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 
 	tokenDecimals = 6
 	r, ok = new(big.Rat).SetString("1774825271/2499750000")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
+	feeData, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 
 	// transfer 333,333,333
 	err = dataBlob.UnmarshalJSON([]byte(dataBlobB64_2))
@@ -186,7 +186,7 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	r, ok = new(big.Rat).SetString("333333333/10000000000")
 	assert.True(t, ok)
 
-	fees, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
+	feeData, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, r, fees)
+	assert.Equal(t, r, feeData.Fee)
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -146,30 +147,32 @@ var camelotPairAbi ethAbi.ABI
 // GetCamelotFees returns Camelot V2's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != camelotSwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := camelotPairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 4, got %v",
 			len(unpacked),
 		)
@@ -178,7 +181,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -191,7 +194,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token0addr_, err := ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token0")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token0 address! %v",
 			err,
 		)
@@ -200,7 +203,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token0addr, err := ethereum.CoerceBoundContractResultsToAddress(token0addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token0 address! %v",
 			err,
 		)
@@ -209,7 +212,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token1addr_, err := ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token1")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token1 address! %v",
 			err,
 		)
@@ -218,7 +221,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token1addr, err := ethereum.CoerceBoundContractResultsToAddress(token1addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token1 address! %v",
 			err,
 		)
@@ -268,7 +271,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 
 	case fluidIndex0 && amount0IsZero:
 		inTokenIsFluid = false
@@ -278,7 +281,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token1FeePercent")
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Failed to get token1 fee percent! %v",
 				err,
 			)
@@ -292,7 +295,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token0FeePercent")
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Failed to get token0 fee percent! %v",
 				err,
 			)
@@ -306,7 +309,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token1FeePercent")
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Failed to get token1 fee percent! %v",
 				err,
 			)
@@ -320,7 +323,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		feeNumerator_, err = ethereum.StaticCall(client, contractAddr, camelotPairAbi, "token0FeePercent")
 
 		if err != nil {
-			return nil, fmt.Errorf(
+			return feeData, fmt.Errorf(
 				"Failed to get token0 fee percent! %v",
 				err,
 			)
@@ -329,8 +332,10 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 
 	feeNumerator, err := ethereum.CoerceBoundContractResultsToUInt16(feeNumerator_)
 
+	feeData.Volume = new(big.Rat).Set(fluidTransferAmount)
+
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce fee numerator! %v",
 			err,
 		)
@@ -339,7 +344,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	feeDenominator_, err := ethereum.StaticCall(client, contractAddr, camelotPairAbi, "FEE_DENOMINATOR")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get fee denominator! %v",
 			err,
 		)
@@ -348,14 +353,14 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	feeDenominator, err := ethereum.CoerceBoundContractResultsToInt(feeDenominator_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce fee denominator! %v",
 			err,
 		)
 	}
 
 	if feeDenominator.Sign() == 0 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Got a fee denominator of 0!",
 		)
 	}
@@ -377,6 +382,9 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fee.Quo(fee, decimalsRat)
+	feeData.Volume.Quo(feeData.Volume, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+
+	return feeData, nil
 }
