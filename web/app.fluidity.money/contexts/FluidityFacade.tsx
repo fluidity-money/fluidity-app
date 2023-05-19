@@ -45,15 +45,13 @@ export interface IFluidityFacade {
 
   getStakingRatios?: () => Promise<StakingRatioRes | undefined>;
 
-  getStakingDeposits?: (
-    address: string
-  ) => Promise<
+  getStakingDeposits?: (address: string) => Promise<
     | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }>
     | undefined
   >;
 

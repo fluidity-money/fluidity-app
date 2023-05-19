@@ -272,9 +272,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -385,11 +385,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }>
     | undefined
   > => {
     const signer = provider?.getSigner();

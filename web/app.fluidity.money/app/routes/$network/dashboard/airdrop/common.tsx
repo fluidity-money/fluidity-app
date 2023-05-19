@@ -72,7 +72,7 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
               opacity:
                 highlightBottleNumberIndex === undefined ||
-                  highlightBottleNumberIndex !== index
+                highlightBottleNumberIndex !== index
                   ? 0.2
                   : 1,
               ...(handleClickBottle ? { cursor: "pointer" } : {}),
@@ -92,19 +92,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottleNumberIndex === index
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottleNumberIndex === index
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottleNumberIndex === index
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottleNumberIndex === index
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -431,7 +431,7 @@ const StakingStatsModal = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -471,7 +471,7 @@ const StakingStatsModal = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -604,8 +604,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -652,14 +652,14 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      baseToken.symbol === "USDC"
-        ? (tokenRatios.fusdcUsdcRatio.toNumber() -
-          tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
-        1e12
-        : (tokenRatios.fusdcWethRatio.toNumber() -
-          tokenRatios.fusdcWethSpread.toNumber() / 2) /
-        1e12
-    );
+        baseToken.symbol === "USDC"
+          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+              1e12
+          : (tokenRatios.fusdcWethRatio.toNumber() -
+              tokenRatios.fusdcWethSpread.toNumber() / 2) /
+              1e12
+      );
 
   const fluidUsdMultiplier = usdcPrice;
   const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
@@ -721,27 +721,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-        if (dec === undefined) {
-          return setInput({
-            ...token,
-            amount: `${unpaddedWhole}`,
-          });
-        }
-
-        const limitedDecimals = dec.slice(0 - token.decimals);
-
+      if (dec === undefined) {
         return setInput({
           ...token,
-          amount: [whole, limitedDecimals].join("."),
+          amount: `${unpaddedWhole}`,
         });
-      };
+      }
+
+      const limitedDecimals = dec.slice(0 - token.decimals);
+
+      return setInput({
+        ...token,
+        amount: [whole, limitedDecimals].join("."),
+      });
+    };
 
   const inputMaxBalance = () => {
     const maxFluidToken = snapToValidValue(
@@ -1146,7 +1146,7 @@ const StakeNowModal = ({
             {toSignificantDecimals(
               ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
                 (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
-              stakingLiquidityMultiplierEq(1, stakingDuration),
+                stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1187,7 +1187,7 @@ const StakeNowModal = ({
             {toSignificantDecimals(
               ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
                 (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1404,8 +1404,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />

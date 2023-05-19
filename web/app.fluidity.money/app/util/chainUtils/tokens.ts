@@ -69,7 +69,7 @@ const fluidAssetOf = (tokens: Token[], assetToken: Token): Token | undefined =>
 const getUsdFromTokenAmount = (
   amount: BN,
   decimalsOrToken: number | Token,
-  usdPrice: number = 1
+  usdPrice = 1
 ) => {
   const decimals =
     typeof decimalsOrToken === "number"
