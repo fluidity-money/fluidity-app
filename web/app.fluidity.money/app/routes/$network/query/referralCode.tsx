@@ -1,6 +1,5 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 
-import { useSplitExperiment } from "~/util/split";
 import { json } from "@remix-run/node";
 import {
   addReferralCode,
@@ -87,11 +86,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 
     // Normalise addresses
     const address = address_.toLocaleLowerCase();
-
-    // Limit for internal testing
-    if (!useSplitExperiment("lootbox-referrals", true, { user: address })) {
-      throw new Error("Unauthorised");
-    }
 
     // Check valid addresses
     if (!validAddress(address, network)) {
