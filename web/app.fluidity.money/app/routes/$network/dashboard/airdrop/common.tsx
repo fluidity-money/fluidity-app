@@ -70,7 +70,7 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
               opacity:
                 highlightBottleNumberIndex === undefined ||
-                highlightBottleNumberIndex !== index
+                  highlightBottleNumberIndex !== index
                   ? 0.2
                   : 1,
               ...(handleClickBottle ? { cursor: "pointer" } : {}),
@@ -90,19 +90,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottleNumberIndex === index
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottleNumberIndex === index
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottleNumberIndex === index
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottleNumberIndex === index
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -539,8 +539,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -607,27 +607,27 @@ const StakeNowModal = ({
       token: StakingAugmentedToken,
       setInput: (token: StakingAugmentedToken) => void
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+        const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
 
-      if (dec === undefined) {
+        if (dec === undefined) {
+          return setInput({
+            ...token,
+            amount: `${unpaddedWhole}`,
+          });
+        }
+
+        const limitedDecimals = dec.slice(0 - token.decimals);
+
         return setInput({
           ...token,
-          amount: `${unpaddedWhole}`,
+          amount: [whole, limitedDecimals].join("."),
         });
-      }
-
-      const limitedDecimals = dec.slice(0 - token.decimals);
-
-      return setInput({
-        ...token,
-        amount: [whole, limitedDecimals].join("."),
-      });
-    };
+      };
 
   const inputMaxBalance = () => {
     setFluidToken({
@@ -669,7 +669,7 @@ const StakeNowModal = ({
           ? snapToValidValue(baseToken.amount, baseToken)
           : new BN(0),
         new BN(slippage),
-        new BN(Math.floor(new Date().getMilliseconds() / 1000) + 30 * 60) // 30 Minutes after now
+        new BN(0) // 30 Minutes after now
       );
 
       setStakeErr("");
@@ -680,6 +680,12 @@ const StakeNowModal = ({
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);
+
+      console.log(stakingError);
+      if (stakingError === "insufficient allowance") {
+        setStakeErr("");
+        return true;
+      }
 
       if (stakingError) {
         setStakeErr(stakingError);
@@ -707,7 +713,7 @@ const StakeNowModal = ({
           ? snapToValidValue(baseToken.amount, baseToken)
           : new BN(0),
         new BN(slippage),
-        new BN(Math.floor(new Date().getMilliseconds() / 1000) + 30 * 60) // 30 Minutes after now
+        new BN(0)
       );
     } catch (e) {
       // Expect error on fail
@@ -986,8 +992,8 @@ const StakeNowModal = ({
             className="power-text"
           >
             {toSignificantDecimals(
-              (parseFloat(fluidToken.amount) || 0) *
-                stakingLiquidityMultiplierEq(1, stakingDuration),
+              (2 * parseFloat(fluidToken.amount) || 0) *
+              stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1026,8 +1032,8 @@ const StakeNowModal = ({
           </Hoverable>
           <Text prominent holo size="xl" className="power-text">
             {toSignificantDecimals(
-              (parseFloat(fluidToken.amount) || 0) *
-                stakingLiquidityMultiplierEq(1, stakingDuration),
+              (2 * parseFloat(fluidToken.amount) || 0) *
+              stakingLiquidityMultiplierEq(31, stakingDuration),
               1
             )}
           </Text>
@@ -1055,7 +1061,11 @@ const StakeNowModal = ({
         style={{ width: "100%" }}
         onSlideComplete={() => handleStake()}
       >
-        <Text prominent={buttonText === "SLIDE TO STAKE"}>{buttonText}</Text>
+        <Text
+          style={{ color: buttonText === "SLIDE TO STAKE" ? "white" : "black" }}
+        >
+          {buttonText}
+        </Text>
       </SliderButton>
       <Text
         style={{
@@ -1240,9 +1250,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
