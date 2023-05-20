@@ -1027,19 +1027,11 @@ const StakeNowModal = ({
                 step="any"
               />
               <div
+                className="staking-modal-token-insufficient"
                 style={{
                   display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
                     ? "flex"
                     : "none",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "absolute",
-                  right: "12px",
-                  bottom: "-0.5em",
-                  background: "black",
-                  padding: "0.2em 2em 0.2em 2em",
-                  borderRadius: "12px",
-                  border: "1px solid red",
                 }}
               >
                 <Text prominent size="xxs">
@@ -1110,19 +1102,11 @@ const StakeNowModal = ({
                 step="any"
               />
               <div
+                className="staking-modal-token-insufficient"
                 style={{
-                  display: baseTokenAmount.gt(baseToken.userTokenBalance)
+                  display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
                     ? "flex"
                     : "none",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "absolute",
-                  right: "12px",
-                  bottom: "-0.5em",
-                  background: "black",
-                  padding: "0.2em 2em 0.2em 2em",
-                  borderRadius: "12px",
-                  border: "1px solid red",
                 }}
               >
                 <Text prominent size="xxs">
