@@ -6,7 +6,7 @@ import { useNavigate, useLoaderData, useFetcher } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import config from "~/webapp.config.server";
 import { networkMapper } from "~/util";
-import { generateTweet } from "~/util/tweeter";
+import { generateRewardTweet } from "~/util/tweeter";
 import {
   Display,
   GeneralButton,
@@ -258,7 +258,7 @@ const NetworkPage = () => {
 
               {!!projectedWinningsData.data && (
                 <a
-                  href={generateTweet(projectedWin)}
+                  href={generateRewardTweet(projectedWin)}
                   rel="noopener noreferrer"
                   target="_blank"
                 >

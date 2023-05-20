@@ -4,6 +4,7 @@ import { ArrowLeft } from "./ArrowLeft";
 import { TriangleDown } from "./TriangleDown";
 import { ArrowDown } from "./ArrowDown";
 import { ArrowUp } from "./ArrowUp";
+import { CopyIcon } from "./Copy";
 import { Trophy } from "./Trophy";
 import { Twitter } from "./Twitter";
 import { DashboardIcon } from "./Dashboard";
@@ -24,6 +25,7 @@ export {
   ArrowDown,
   ArrowUp,
   ArrowTopRight,
+  CopyIcon,
   TriangleDown,
   Trophy,
   Twitter,

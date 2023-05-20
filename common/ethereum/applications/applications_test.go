@@ -27,50 +27,50 @@ func TestGetApplicationFee(t *testing.T) {
 		inputData          misc.Blob
 	)
 
-	fee, emission, err := GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err := GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationUniswapV2
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationBalancerV2
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationOneInchLPV1
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationMooniswap
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationOneInchFixedRateSwap
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationCurve
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 
 	transfer.Application = ApplicationMultichain
-	fee, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, fee)
+	feeData, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
+	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
 }

@@ -9,14 +9,18 @@ import { Tooltip } from "components";
 import styles from "./Hoverable.module.scss";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface IHoverable extends React.HTMLAttributes<HTMLElement> {
+interface IHoverable
+  extends React.HTMLAttributes<HTMLElement> {
   tooltipContent: React.ReactNode;
+  tooltipStyle?: "frosted" | "solid"
 }
 
 const Hoverable = ({
   children,
-  className='',
+  className = '',
   tooltipContent,
+  tooltipStyle,
+  style = {},
   ...props
 }: IHoverable) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -68,7 +72,12 @@ const Hoverable = ({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            <Tooltip>{tooltipContent}</Tooltip>
+            <Tooltip
+              type={tooltipStyle === "frosted" ? "frosted" : "opaque"}
+              style={{ ...style, ...(tooltipStyle === "solid" ? { backgroundColor: 'black' } : {}) }}
+            >
+              {tooltipContent}
+            </Tooltip>
           </motion.div>
         )}
       </AnimatePresence>

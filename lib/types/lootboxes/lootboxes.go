@@ -25,7 +25,7 @@ type Lootbox struct {
 	// AwardedTime of the winning transaction
 	AwardedTime time.Time `json:"awarded_time"`
 
-	// Volume that was swapped or sent
+	// Volume that was swapped or sent in native token units
 	// Volume of 0 indicates no transaction attached
 	Volume misc.BigInt `json:"volume"`
 

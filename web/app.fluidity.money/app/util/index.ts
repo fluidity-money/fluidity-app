@@ -7,3 +7,4 @@ export * from "./chainUtils/links";
 export * from "./chainUtils/addresses";
 export * from "./converters";
 export * from "./sync";
+export * from "./clientActions";

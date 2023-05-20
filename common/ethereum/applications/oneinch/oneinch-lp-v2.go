@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -118,24 +119,26 @@ var oneInchLiquidityPoolV2Abi ethAbi.ABI
 
 // GetOneInchLPFees implements 1InchLPv1.0/1.1 fee structure.
 // Fees are split into static fees and slippage fees, controlled by 1Inch governance
-func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed")
+		return feeData, fmt.Errorf("No log topics passed")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	// ignore v1 swaps
 	if logTopic == oneInchLPV1SwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	if logTopic != oneInchLPV2SwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	if len(transfer.Log.Topics) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"topics contain the wrong number of values (Expected 4, got %v)! TxHash: %v",
 			len(transfer.Log.Topics),
 			transfer.TransactionHash,
@@ -147,14 +150,14 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	unpacked, err := oneInchLiquidityPoolV2Abi.Unpack("Swapped", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 6 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"unpacked the wrong number of values (Expected 6, got %v)! TxHash: %v",
 			len(unpacked),
 			transfer.TransactionHash,
@@ -166,7 +169,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(swapAmounts_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -187,6 +190,8 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		// swap logs
 		// amount is the initial number of Token0
 		amount = swapAmounts[0]
+		// result is the resulting amount of Token1
+		result = swapAmounts[1]
 		// srcAdditionBalance is amount inside Token0 pool prior to swap
 		srcAdditionBalance = swapAmounts[2]
 		// dstRemovalBalance is amount inside Token1 pool prior to swap
@@ -209,13 +214,19 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
+	}
+
+	if srcTokenIsFluid {
+		feeData.Volume = amount
+	} else {
+		feeData.Volume = result
 	}
 
 	staticFeeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "fee")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to call \"fee\" from contract %v! %v",
 			contractAddr.String(),
 			err,
@@ -225,7 +236,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	staticFeeNum, err := ethereum.CoerceBoundContractResultsToRat(staticFeeNum_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to coerce fee to Rat! (%v) %v",
 			staticFeeNum_,
 			err,
@@ -235,7 +246,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	slippageFeeNum_, err := ethereum.StaticCall(client, contractAddr, oneInchLiquidityPoolV2Abi, "slippageFee")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to call \"slippageFee\" from contract %v! %v",
 			contractAddr.String(),
 			err,
@@ -245,7 +256,7 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	slippageFeeNum, err := ethereum.CoerceBoundContractResultsToRat(slippageFeeNum_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to coerce slippageFee to Rat! (%v) %v",
 			slippageFeeNum_,
 			err,
@@ -260,7 +271,10 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	fluidFee.Quo(fluidFee, decimalsRat)
 
-	return fluidFee, nil
+	feeData.Fee = new(big.Rat).Set(fluidFee)
+	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
+
+	return feeData, nil
 }
 
 func calculateStaticFee(amount, staticFeeRate *big.Rat) *big.Rat {

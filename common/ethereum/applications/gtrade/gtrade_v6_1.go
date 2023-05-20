@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -125,23 +126,26 @@ var erc20Abi ethAbi.ABI
 // (which may be negative in cases of rewards), and ClosingFee.
 // These fees are transferred to the Pool 'Manager', as well as the token
 // We find and add these transfers to calculate the fees
-func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+// TODO does not calculate fluid volume
+func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != gtradeV6_1FeesChargedLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := gtradeV6_1PairAbi.Unpack("FeesCharged", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
@@ -149,7 +153,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 
 	expectedUnpackedLen := 7
 	if len(unpacked) != expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -163,7 +167,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	storageT_, err := ethereum.StaticCall(client, contractAddr, gtradeV6_1PairAbi, "storageT")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get storageT address! %v",
 			err,
 		)
@@ -172,7 +176,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	storageT, err := ethereum.CoerceBoundContractResultsToAddress(storageT_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce storageT address! %v",
 			err,
 		)
@@ -199,7 +203,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 
 	// assert corresponding last fee swap exists
 	if secondFeeTransferLogTxIndex >= len(txLogs) {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"failed to find enough transfer logs from txHash (%v) for feesCharged (%v)! %v",
 			txHash.String(),
 			transfer.TransactionHash,
@@ -213,7 +217,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	unpacked, err = erc20Abi.Unpack("Transfer", firstFeeTransferLog.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack Transfer log data! %v",
 			err,
 		)
@@ -221,7 +225,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 
 	expectedUnpackedLen = 1
 	if len(unpacked) != expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -238,13 +242,13 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// Check Sender is GTrade Storage
 	sender := ethCommon.HexToAddress(firstFeeTransferLog.Topics[1].String())
 	if sender != storageT {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unexpected Sender (%v) in GTrade Fee Transfer (Expected %v)",
 			sender.String(),
 			storageT.String(),
@@ -256,7 +260,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	firstFee, err := ethereum.CoerceBoundContractResultsToRat(feeBuffer)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce firstFee to rat! %v",
 			err,
 		)
@@ -268,7 +272,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	unpacked, err = erc20Abi.Unpack("Transfer", secondFeeTransferLog.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack SourceChainSwap log data! %v",
 			err,
 		)
@@ -277,7 +281,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	expectedUnpackedLen = 1
 
 	if len(unpacked) != expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -294,13 +298,13 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// Check Sender is GTrade Storage
 	sender = ethCommon.HexToAddress(secondFeeTransferLog.Topics[1].String())
 	if sender != storageT {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unexpected Sender (%v) in GTrade Fee Transfer (Expected %v)",
 			sender.String(),
 			storageT.String(),
@@ -312,7 +316,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 	secondFee, err := ethereum.CoerceBoundContractResultsToRat(feeBuffer)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce secondFee to rat! %v",
 			err,
 		)
@@ -326,5 +330,7 @@ func GetGtradeV6_1Fees(transfer worker.EthereumApplicationTransfer, client *ethc
 
 	fee.Quo(fee, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+
+	return feeData, nil
 }

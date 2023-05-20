@@ -1,12 +1,20 @@
 import { gql, jsonPost } from "~/util";
 
-const queryByAddress = gql`
+export type Referral = {
+  active: boolean;
+  createdTime: string;
+  progress: number;
+  referee: string;
+  referrer: string;
+};
+
+const QUERY_BY_ADDRESS = gql`
   query getInactiveReferralByAddress($referrer: String!, $referee: String!) {
     lootbox_referrals(
       where: { referrer: { _eq: $referrer }, referee: { _eq: $referee } }
     ) {
       active
-      created_time
+      createdTime: created_time
       progress
       referee
       referrer
@@ -14,7 +22,7 @@ const queryByAddress = gql`
   }
 `;
 
-const queryInactiveByAddress = gql`
+const QUERY_INACTIVE_BY_ADDRESS = gql`
   query getInactiveReferralByAddress($address: String!) {
     lootbox_referrals(
       where: { referrer: { _eq: $address }, active: { _eq: false } }
@@ -22,21 +30,13 @@ const queryInactiveByAddress = gql`
       limit: 1
     ) {
       active
-      created_time
+      createdTime: created_time
       progress
       referee
       referrer
     }
   }
 `;
-
-export type Referral = {
-  active: boolean;
-  created_time: string;
-  progress: number;
-  referee: string;
-  referrer: string;
-};
 
 type ReferralsByAddressBody = {
   query: string;
@@ -67,7 +67,7 @@ const useReferralByAddress = (referrer: string, referee: string) => {
   };
 
   const body = {
-    query: queryByAddress,
+    query: QUERY_BY_ADDRESS,
     variables,
   };
 
@@ -88,7 +88,7 @@ const useInactiveReferralByAddress = (address: string) => {
   };
 
   const body = {
-    query: queryInactiveByAddress,
+    query: QUERY_INACTIVE_BY_ADDRESS,
     variables,
   };
 

@@ -11,9 +11,11 @@ import (
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethClient "github.com/ethereum/go-ethereum/ethclient"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
@@ -284,6 +286,33 @@ func StaticCall(client *ethClient.Client, address ethCommon.Address, abi ethAbi.
 	}
 
 	return results, nil
+}
+
+func GetReceipt(gethClient *ethClient.Client, transactionHash ethereum.Hash) (*ethereum.Receipt, error) {
+	txReceipt, err := gethClient.TransactionReceipt(
+		context.Background(),
+		common.HexToHash(transactionHash.String()),
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to get the transaction receipt for Fluid transfer %#v! %w",
+			transactionHash.String(),
+			err,
+		)
+	}
+
+	if txReceipt == nil {
+		return nil, fmt.Errorf(
+			"Receipt for fluid transfer %v was nil! %w",
+			transactionHash,
+			err,
+		)
+	}
+
+	convertedReceipt := ConvertGethReceipt(*txReceipt)
+
+	return &convertedReceipt, nil
 }
 
 // CalculateEffectiveGasPrice with baseFeePerGas + min(maxFeePerGas -

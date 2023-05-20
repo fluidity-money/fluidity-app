@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -101,30 +102,31 @@ var uniswapV2PairAbi ethAbi.ABI
 // GetUniswapFees returns Uniswap V2's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != uniswapV2SwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := uniswapV2PairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 4, got %v",
 			len(unpacked),
 		)
@@ -133,7 +135,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -146,7 +148,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token0addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token0")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token0 address! %v",
 			err,
 		)
@@ -155,7 +157,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token0addr, err := ethereum.CoerceBoundContractResultsToAddress(token0addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token0 address! %v",
 			err,
 		)
@@ -164,7 +166,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token1addr_, err := ethereum.StaticCall(client, contractAddr, uniswapV2PairAbi, "token1")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token1 address! %v",
 			err,
 		)
@@ -173,7 +175,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	token1addr, err := ethereum.CoerceBoundContractResultsToAddress(token1addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token1 address! %v",
 			err,
 		)
@@ -220,7 +222,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 
 	case fluidIndex0 && amount0IsZero:
 		inTokenIsFluid = false
@@ -249,13 +251,18 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		feeMultiplier = big.NewRat(3, 997)
 	}
 
-	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
+	fee := new(big.Rat).Set(fluidTransferAmount)
+	fee = fee.Mul(fee, feeMultiplier)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fee.Quo(fee, decimalsRat)
+	fluidTransferAmount.Quo(fluidTransferAmount, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+	feeData.Volume = fluidTransferAmount
+
+	return feeData, nil
 }
