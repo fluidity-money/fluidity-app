@@ -37,6 +37,7 @@ import { dayDifference } from ".";
 import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
+import { TransactionResponse } from "~/util/chainUtils/instructions";
 
 const MAX_EPOCH_DAYS = 31;
 
@@ -383,7 +384,6 @@ interface IStakingStatsModal {
 }
 
 const StakingStatsModal = ({
-  liqudityMultiplier,
   stakes,
   wethPrice,
   usdcPrice,
@@ -392,6 +392,35 @@ const StakingStatsModal = ({
     const stakedDays = dayDifference(new Date(), depositDate);
     return durationDays - stakedDays <= 0;
   });
+
+  const sumLiquidityMultiplier = stakes.reduce(
+    (sum, { fluidAmount, baseAmount, durationDays, depositDate }) => {
+      const fluidDecimals = 6;
+      const fluidUsd = getUsdFromTokenAmount(
+        fluidAmount,
+        fluidDecimals,
+        usdcPrice
+      );
+
+      const wethDecimals = 18;
+      const usdcDecimals = 6;
+
+      // If converting base amount by weth decimals (18) is smaller than $0.01,
+      // then tentatively assume Token amount is USDC
+      // A false hit would be a USDC deposit >= $100,000
+      const baseUsd =
+        getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
+          ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+          : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+      const stakedDays = dayDifference(new Date(), new Date(depositDate));
+
+      const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
+
+      return sum + (fluidUsd + baseUsd) * multiplier;
+    },
+    0
+  );
 
   return (
     <div
@@ -411,7 +440,7 @@ const StakingStatsModal = ({
         <LabelledValue
           label={<Text size="sm">Total Liquidity Multiplier</Text>}
         >
-          <Text holo>{liqudityMultiplier.toLocaleString()}x</Text>
+          <Text holo>{toSignificantDecimals(sumLiquidityMultiplier, 1)}x</Text>
         </LabelledValue>
         <LabelledValue label={<Text size="sm">My Stakes</Text>}>
           {stakes.length}
@@ -443,11 +472,23 @@ const StakingStatsModal = ({
           )}
         </LabelledValue>
       </div>
-      <div style={{ position: "relative", border: "1px gray", width: "100%" }}>
+      <div
+        style={{
+          position: "relative",
+          border: "1px gray",
+          width: "100%",
+        }}
+      >
         <GeneralButton disabled={!canWithdraw} style={{ right: "0" }}>
           Withdraw
         </GeneralButton>
-        <div>
+        <div
+          style={{
+            paddingTop: "1em",
+            overflowY: "scroll",
+            maxHeight: "50vh",
+          }}
+        >
           {stakes.map(
             ({ fluidAmount, baseAmount, durationDays, depositDate }, i) => {
               const stakedDays = dayDifference(new Date(), depositDate);
@@ -479,76 +520,91 @@ const StakingStatsModal = ({
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
               return (
-                <div
-                  key={`stake-${i}`}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 3fr 1fr",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "1em",
-                  }}
-                >
-                  {/* Dates */}
+                <>
                   <div
+                    key={`stake-${i}`}
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "0.5em",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 3fr 1fr",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "1em",
                     }}
                   >
-                    <Text>Start Date</Text>
-                    <Text prominent>
-                      {depositDate.toLocaleDateString("en-US")}
-                    </Text>
-
-                    <Text>End Date</Text>
-                    <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
-                    }}
-                  >
-                    <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
-                      {numberToMonetaryString(fluidUsd + baseUsd)}
-                    </Heading>
-                    <ProgressBar
-                      value={stakedDays}
-                      max={Math.floor(durationDays)}
-                      rounded
-                      color={
-                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                      }
-                      size="sm"
-                    />
+                    {/* Dates */}
                     <div
                       style={{
                         display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "space-between",
+                        flexDirection: "column",
+                        gap: "0.5em",
                       }}
                     >
-                      <Text prominent>{multiplier}x Multiplier</Text>
+                      <Text>Start Date</Text>
                       <Text prominent>
-                        {Math.max(0, Math.floor(durationDays - stakedDays))}{" "}
-                        Days Left
+                        {depositDate.toLocaleDateString("en-US")}
                       </Text>
+
+                      <Text>End Date</Text>
+                      <Text prominent>
+                        {endDate.toLocaleDateString("en-US")}
+                      </Text>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                        gap: "0.5em",
+                      }}
+                    >
+                      <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
+                        {numberToMonetaryString(fluidUsd + baseUsd)}
+                      </Heading>
+                      <ProgressBar
+                        value={stakedDays}
+                        max={Math.floor(durationDays)}
+                        rounded
+                        color={
+                          stakedDays >= Math.floor(durationDays)
+                            ? "holo"
+                            : "gray"
+                        }
+                        size="sm"
+                      />
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Text prominent>
+                          {toSignificantDecimals(multiplier, 1)}x Multiplier
+                        </Text>
+                        <Text prominent>
+                          {Math.max(0, Math.floor(durationDays - stakedDays))}{" "}
+                          Days Left
+                        </Text>
+                      </div>
+                    </div>
+                    <div
+                      style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
+                    >
+                      <Text>Staked For</Text>
+                      <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
+                        {Math.floor(durationDays)}
+                      </Heading>
+                      <Text>Days</Text>
                     </div>
                   </div>
                   <div
-                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                  >
-                    <Text>Staked For</Text>
-                    <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
-                      {Math.floor(durationDays)}
-                    </Heading>
-                    <Text>Days</Text>
-                  </div>
-                </div>
+                    style={{
+                      width: "100%",
+                      border: "1px solid gray",
+                      margin: "1em 0 1em 0",
+                    }}
+                  />
+                </>
               );
             }
           )}
@@ -570,7 +626,7 @@ interface IStakingNowModal {
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ) => Promise<StakingDepositsRes | undefined>;
+  ) => Promise<TransactionResponse | undefined>;
 
   // getRatios simulates `deposit()` in Staking Contract
   // Used to determine if current inputs will succeed
@@ -878,10 +934,10 @@ const StakeNowModal = ({
     if (!stakeTokens) return;
     if (!canStake) return;
 
-    setButtonText("PROCESSING...");
+    setStakingState("staking");
 
     try {
-      await stakeTokens(
+      const receipt = await stakeTokens(
         new BN(daysToSeconds(stakingDuration)),
         baseToken.symbol === "USDC" ? baseTokenAmount : new BN(0),
         fluidToken.symbol === "fUSDC" ? fluidTokenAmount : new BN(0),
@@ -889,9 +945,20 @@ const StakeNowModal = ({
         new BN(slippage),
         new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
+
+      if (receipt) {
+        const success = await receipt.confirmTx();
+
+        if (!success) {
+          throw Error("Failed to Deposit - Try again later!");
+        }
+
+        setStakingState("complete");
+      }
     } catch (e) {
       // Expect error on fail
-      setButtonText("SLIDE TO STAKE");
+      setStakingState("ready");
+      setStakeErr(e as string);
       return;
     }
   };
@@ -902,7 +969,20 @@ const StakeNowModal = ({
 
   const tooltipStyle = isMobile ? "frosted" : "solid";
 
-  const [buttonText, setButtonText] = useState("SLIDE TO STAKE");
+  const [stakingState, setStakingState] = useState<
+    "ready" | "staking" | "complete"
+  >("ready");
+  const buttonText = (() => {
+    switch (stakingState) {
+      case "staking":
+        return "PROCESSING...";
+      case "complete":
+        return "SUCCESS! - STAKE MORE?";
+      case "ready":
+      default:
+        return "SLIDE TO STAKE";
+    }
+  })();
 
   return (
     <>
@@ -1276,17 +1356,28 @@ const StakeNowModal = ({
           </Card>
         </div>
       </div>
-      <SliderButton
-        disabled={!canStake}
-        style={{ width: "100%" }}
-        onSlideComplete={() => handleStake()}
-      >
-        <Text
-          style={{ color: buttonText === "SLIDE TO STAKE" ? "white" : "black" }}
+      {stakingState === "complete" ? (
+        <GeneralButton
+          className={"staking-modal-complete"}
+          handleClick={() => setStakingState("ready")}
         >
           {buttonText}
-        </Text>
-      </SliderButton>
+        </GeneralButton>
+      ) : (
+        <SliderButton
+          disabled={!canStake}
+          style={{ width: "100%" }}
+          onSlideComplete={() => handleStake()}
+        >
+          <Text
+            style={{
+              color: stakingState === "staking" ? "black" : "white",
+            }}
+          >
+            {buttonText}
+          </Text>
+        </SliderButton>
+      )}
       <Text
         style={{
           textAlign: "center",

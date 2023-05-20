@@ -856,12 +856,40 @@ interface IMyMultiplier {
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
-  liquidityMultiplier,
   stakes,
   wethPrice,
   usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
+  const sumLiquidityMultiplier = stakes.reduce(
+    (sum, { fluidAmount, baseAmount, durationDays, depositDate }) => {
+      const fluidDecimals = 6;
+      const fluidUsd = getUsdFromTokenAmount(
+        fluidAmount,
+        fluidDecimals,
+        usdcPrice
+      );
+
+      const wethDecimals = 18;
+      const usdcDecimals = 6;
+
+      // If converting base amount by weth decimals (18) is smaller than $0.01,
+      // then tentatively assume Token amount is USDC
+      // A false hit would be a USDC deposit >= $100,000
+      const baseUsd =
+        getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
+          ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+          : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+      const stakedDays = dayDifference(new Date(), new Date(depositDate));
+
+      const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
+
+      return sum + (fluidUsd + baseUsd) * multiplier;
+    },
+    0
+  );
+
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
@@ -881,7 +909,7 @@ const MyMultiplier = ({
           label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
         >
           <Text size="xxl" holo>
-            {liquidityMultiplier.toLocaleString()}x
+            {toSignificantDecimals(sumLiquidityMultiplier, 1)}x
           </Text>
         </LabelledValue>
       </div>
@@ -955,7 +983,7 @@ const MyMultiplier = ({
                     style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
                   >
                     <Text holo bold prominent>
-                      {multiplier}X
+                      {toSignificantDecimals(multiplier, 1)}X
                     </Text>
                   </div>
                 </>
