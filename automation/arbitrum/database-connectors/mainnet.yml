@@ -23,3 +23,9 @@ SERVICES:
       DOCKER_IMAGE: connector-common-lootboxes-timescale
       DOCKERFILE_PATH: ./cmd/connector-common-lootboxes-timescale
       ENV_FLU_WORKER_ID: arbitrum-connector-common-lootboxes-timescale
+
+  - CONNECTORS_ETH_LINKED_ADDRESS_TIMESCALE:
+      SERVICE_NAME: connector-ethereum-linked-addresses-timescale-arbitrum
+      DOCKER_IMAGE: connector-ethereum-linked-addresses-timescale
+      DOCKERFILE_PATH: ./cmd/connector-ethereum-linked-addresses-timescale
+      ENV_FLU_WORKER_ID: arbitrum-connector-ethereum-linked-addresses-timescale

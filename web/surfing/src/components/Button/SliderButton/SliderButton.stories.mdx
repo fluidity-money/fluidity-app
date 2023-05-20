@@ -1,19 +1,24 @@
 import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
 
 import { SliderButton } from "./";
+import Text from "../../Text";
 
 <Meta
     title="Button/SliderButton"
     component={SliderButton}
 />
 
-export const Template = (props) => <div>Hello world</div>
+export const Template = (props) => <SliderButton {...props} />
 
 <Canvas columns={1} withSource="open" withToolbar >
-    <Title>Form</Title>
-    <Subtitle>For forming things</Subtitle>
+    <Title>Slider Button</Title>
+    <Subtitle>For confirming extra special things</Subtitle>
     <Story
-        name="Card Carousel"
+        name="Slider Button"
+        args={{
+            children: <Text prominent>SLIDE TO STAKE</Text>,
+            onSlideComplete: () => { return },
+        }}
     >
         {Template.bind({})}
     </Story>

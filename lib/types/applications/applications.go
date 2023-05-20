@@ -4,7 +4,10 @@
 
 package applications
 
-import "fmt"
+import (
+	"fmt"
+	"math/big"
+)
 
 // applications contains types relevant to supporting events generated
 // via interaction with external applications
@@ -39,6 +42,13 @@ type UtilityName string
 
 // UtilityFluid is the special utility name for the fluid token itself
 var UtilityFluid UtilityName = "FLUID"
+
+type ApplicationFeeData = struct {
+	// Fee for the fee paid to the application (in USD)
+	Fee    *big.Rat `json:"fee"`
+	// Volume for the amount of fluid token used (in USD)
+	Volume *big.Rat `json:"volume"`
+}
 
 func (app Application) String() string {
 	return applicationNames[app]

@@ -11,10 +11,11 @@ const swipePower = (offset: number, velocity: number) => {
   return Math.abs(offset) * velocity;
 };
 
-interface IHeroCarousel {
+interface IHeroCarousel extends React.HTMLAttributes<HTMLDivElement> {
   children: ReactElement<ICard>[];
   title: string;
   onSlideChange?: (i: number) => void;
+  controlledIndex?: number;
 }
 
 /**
@@ -25,11 +26,13 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
   children,
   title,
   onSlideChange,
+  controlledIndex = 0,
+  ...props
 }) => {
   const slides = children.length;
   if (slides < 2) return null;
 
-  const [[slide, direction], setSlide] = useState([0, 0]);
+  const [[slide, direction], setSlide] = useState([controlledIndex, 0]);
 
   const paginate = (dir: number) => {
     setSlide(([slide, direction]) => [
@@ -37,6 +40,16 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
       dir,
     ]);
   };
+
+  // This block calcs the diff between the new index and the curr and paginates until they match
+  useEffect(() => {
+    const diff = controlledIndex - slide;
+    if (diff === 0) return
+    const dir = diff > 0 ? 1 : -1;
+    for (let i = 0; i < Math.abs(diff); i++) {
+      paginate(dir);
+    }
+  }, [controlledIndex])
 
   const prevSlideIndex = slide - 1;
   const nextSlideIndex = slide + 1;
@@ -50,7 +63,7 @@ const HeroCarousel: React.FC<IHeroCarousel> = ({
   }, [slide])
 
   return (
-    <div className={styles.HeroCarousel}>
+    <div {...props} className={styles.HeroCarousel}>
       <div className={styles.nav}>
         <motion.div
           animate={{

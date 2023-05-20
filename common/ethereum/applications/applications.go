@@ -6,10 +6,11 @@ package applications
 
 import (
 	"fmt"
-	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/apeswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/camelot"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/chronos"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/gtrade"
@@ -17,10 +18,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/camelot"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/chronos"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	libEthereum "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -54,83 +54,84 @@ const (
 	ApplicationChronos
 )
 
+
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
-// returns nil, nil in the case where the application event is legitimate, but doesn't involve
+// returns (feeData wiht Fee set to nil, ni) in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt, inputData misc.Blob) (*big.Rat, worker.EthereumAppFees, error) {
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt, inputData misc.Blob) (applications.ApplicationFeeData, worker.EthereumAppFees, error) {
 	var (
-		fee      *big.Rat
+		feeData  applications.ApplicationFeeData
 		emission worker.EthereumAppFees
 		err      error
 	)
 
 	switch transfer.Application {
 	case ApplicationUniswapV3:
-		fee, err = uniswap.GetUniswapV3Fees(
+		feeData, err = uniswap.GetUniswapV3Fees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.UniswapV3 += util.MaybeRatToFloat(fee)
+		emission.UniswapV3 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationUniswapV2:
-		fee, err = uniswap.GetUniswapV2Fees(
+		feeData, err = uniswap.GetUniswapV2Fees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.UniswapV2 += util.MaybeRatToFloat(fee)
+		emission.UniswapV2 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationBalancerV2:
-		fee, err = balancer.GetBalancerFees(
+		feeData, err = balancer.GetBalancerFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.BalancerV2 += util.MaybeRatToFloat(fee)
+		emission.BalancerV2 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationOneInchLPV2:
-		fee, err = oneinch.GetOneInchLPFees(
+		feeData, err = oneinch.GetOneInchLPFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.OneInchV2 += util.MaybeRatToFloat(fee)
+		emission.OneInchV2 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationOneInchLPV1:
-		fee, err = oneinch.GetOneInchLPFees(
+		feeData, err = oneinch.GetOneInchLPFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.OneInchV1 += util.MaybeRatToFloat(fee)
+		emission.OneInchV1 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationMooniswap:
-		fee, err = oneinch.GetMooniswapV1Fees(
+		feeData, err = oneinch.GetMooniswapV1Fees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.Mooniswap += util.MaybeRatToFloat(fee)
+		emission.Mooniswap += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationOneInchFixedRateSwap:
-		fee, err = oneinch.GetFixedRateSwapFees(
+		feeData, err = oneinch.GetFixedRateSwapFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.OneInchFixedRate += util.MaybeRatToFloat(fee)
+		emission.OneInchFixedRate += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationDodoV2:
-		fee, err = dodo.GetDodoV2Fees(
+		feeData, err = dodo.GetDodoV2Fees(
 			transfer,
 			client,
 			fluidTokenContract,
@@ -138,27 +139,27 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			txReceipt,
 		)
 
-		emission.DodoV2 += util.MaybeRatToFloat(fee)
+		emission.DodoV2 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationCurve:
-		fee, err = curve.GetCurveSwapFees(
+		feeData, err = curve.GetCurveSwapFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.Curve += util.MaybeRatToFloat(fee)
+		emission.Curve += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationMultichain:
-		fee, err = multichain.GetMultichainAnySwapFees(
+		feeData, err = multichain.GetMultichainAnySwapFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.Multichain += util.MaybeRatToFloat(fee)
+		emission.Multichain += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationXyFinance:
-		fee, err = xy_finance.GetXyFinanceSwapFees(
+		feeData, err = xy_finance.GetXyFinanceSwapFees(
 			transfer,
 			client,
 			fluidTokenContract,
@@ -166,18 +167,18 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			txReceipt,
 		)
 
-		emission.XyFinance += util.MaybeRatToFloat(fee)
+		emission.XyFinance += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationApeswap:
-		fee, err = apeswap.GetApeswapFees(
+		feeData, err = apeswap.GetApeswapFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.Apeswap += util.MaybeRatToFloat(fee)
+		emission.Apeswap += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationSaddle:
-		fee, err = saddle.GetSaddleFees(
+		feeData, err = saddle.GetSaddleFees(
 			transfer,
 			client,
 			fluidTokenContract,
@@ -185,9 +186,9 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			txReceipt,
 		)
 
-		emission.Saddle += util.MaybeRatToFloat(fee)
+		emission.Saddle += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationGTradeV6_1:
-		fee, err = gtrade.GetGtradeV6_1Fees(
+		feeData, err = gtrade.GetGtradeV6_1Fees(
 			transfer,
 			client,
 			fluidTokenContract,
@@ -195,32 +196,32 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			txReceipt,
 		)
 
-		emission.GTradeV6_1 += util.MaybeRatToFloat(fee)
+		emission.GTradeV6_1 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationMeson:
-		fee, err = meson.GetMesonFees(
+		feeData, err = meson.GetMesonFees(
 			transfer,
 			inputData,
 		)
 
-		emission.Meson += util.MaybeRatToFloat(fee)
+		emission.Meson += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationCamelot:
-		fee, err = camelot.GetCamelotFees(
+		feeData, err = camelot.GetCamelotFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.Camelot += util.MaybeRatToFloat(fee)
+		emission.Camelot += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationChronos:
-		fee, err = chronos.GetChronosFees(
+		feeData, err = chronos.GetChronosFees(
 			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
 		)
 
-		emission.Chronos += util.MaybeRatToFloat(fee)
+		emission.Chronos += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(
@@ -229,7 +230,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 	}
 
-	return fee, emission, err
+	return feeData, emission, err
 }
 
 // GetApplicationTransferParties to find the parties considered for payout from an application interaction.

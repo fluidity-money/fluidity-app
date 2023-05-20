@@ -1,6 +1,5 @@
 import type { ActionFunction } from "@remix-run/node";
 
-import { useSplitExperiment } from "~/util/split";
 import { addReferral } from "~/queries/addReferral";
 import { json } from "@remix-run/node";
 import { chainType } from "~/util/chainUtils/chains";
@@ -34,11 +33,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 
     // Normalise addresses
     const referee = referee_.toLocaleLowerCase();
-
-    // Limit for internal testing
-    if (!useSplitExperiment("lootbox-referrals", true, { user: referee })) {
-      throw new Error("Unauthorised");
-    }
 
     // Check valid addresses
     if (!validAddress(referee, network)) {

@@ -1,8 +1,8 @@
 import type { LoaderFunction } from "@remix-run/node";
-import type { StakingEvent } from "../../query/dashboard/airdrop";
 
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { stakingLiquidityMultiplierEq } from "./common";
+import { useLoaderData } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -21,8 +21,8 @@ import {
   Provider,
   CardModal,
   Rarity,
-  AnchorButton,
   TabButton,
+  BloomEffect,
   toSignificantDecimals,
   useViewport,
   numberToMonetaryString,
@@ -37,8 +37,8 @@ import {
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect } from "react";
-import { Token, trimAddress } from "~/util";
+import { useContext, useState, useEffect, useRef } from "react";
+import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
@@ -48,7 +48,7 @@ import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
-import Table, { IRow } from "~/components/Table";
+import Table from "~/components/Table";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: april 19th, 2023
@@ -98,6 +98,8 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   bottlesCount: 0,
   liquidityMultiplier: 0,
   stakes: [],
+  wethPrice: 0,
+  usdcPrice: 0,
   loaded: false,
 };
 
@@ -131,11 +133,16 @@ const Airdrop = () => {
 
   const showAirdrop = showExperiment("enable-airdrop-page");
 
-  const navigate = useNavigate();
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
-
-  const { address, balance, stakeTokens } = useContext(FluidityFacadeContext);
+  const {
+    address,
+    balance,
+    stakeTokens,
+    getStakingDeposits,
+    testStakeTokens,
+    getStakingRatios,
+  } = useContext(FluidityFacadeContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
@@ -185,7 +192,13 @@ const Airdrop = () => {
   };
 
   const {
-    airdrop: { bottleTiers, liquidityMultiplier, stakes, bottlesCount },
+    airdrop: {
+      bottleTiers,
+      liquidityMultiplier,
+      bottlesCount,
+      wethPrice,
+      usdcPrice,
+    },
     referrals: {
       numActiveReferreeReferrals,
       numActiveReferrerReferrals,
@@ -207,12 +220,25 @@ const Airdrop = () => {
     : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const [stakes, setStakes] = useState<
+    Array<{
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
+  >([]);
 
   const closeModal = () => {
     setCurrentModal(null);
   };
 
-  // const [ stakes, setStakes ] = useState<Array<>>([])
+  useEffect(() => {
+    // If we change page on mobile, reset the scroll position
+    if (!isMobile) return;
+
+    window.scrollTo(0, 0);
+  }, [isMobile, currentModal]);
 
   // get token data once user is connected
   useEffect(() => {
@@ -239,18 +265,23 @@ const Airdrop = () => {
         }))
       );
     })();
+
+    (async () => {
+      const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+      setStakes(stakingDeposits);
+    })();
   }, [address]);
+
+  const leaderboardRef = useRef<HTMLDivElement>(null);
 
   const Header = () => {
     return (
       <div
-        className="pad-main"
-        style={{ display: "flex", gap: "2em", marginBottom: "2em" }}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("staking-stats")}
-        >
+        <TabButton size="small" onClick={() => setCurrentModal(null)}>
           Airdrop Dashboard
         </TabButton>
         <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
@@ -259,7 +290,12 @@ const Airdrop = () => {
         <TabButton
           size="small"
           onClick={() => {
-            if (!isMobile) navigate("#leaderboard");
+            if (!isMobile) {
+              leaderboardRef.current?.scrollIntoView({
+                block: "start",
+                behavior: "smooth",
+              });
+            }
             setCurrentModal("leaderboard");
           }}
         >
@@ -284,26 +320,36 @@ const Airdrop = () => {
     return (
       <>
         <Header />
-        <div
-          className="pad-main"
+        <motion.div
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "2em",
+            gap:
+              currentModal === "tutorial" || currentModal === "leaderboard"
+                ? "0.5em"
+                : "2em",
           }}
+          key={`airdrop-mobile-${currentModal}`}
         >
           {currentModal === null && (
             <>
-              <Heading as="h3" className={"no-margin"}>
-                Welcome to Fluidity&apos;s Airdrop Event!
-              </Heading>
               <div>
+                <Heading
+                  as="h3"
+                  style={{ marginBottom: "0.5em" }}
+                  className={"no-margin"}
+                >
+                  Welcome to Fluidity&apos;s Airdrop Event!
+                </Heading>
                 <Text>
-                  Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                  vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                  metus, ac convallis lectus porttitor et. Donec maximus gravida
-                  mauris, eget tempor felis tristique sit amet. Pellentesque at
-                  hendrerit nibh, eu porttitor dui.
+                  Fluidify your assets, transact them, and boost your rewards by
+                  using your Fluid Assets on partnered protocols and staking
+                  liquidity right here on Fluidity! Keep an eye on the
+                  leaderboard as you compete with fellow Fluiders for the top
+                  spot. Future Fluid Governance Tokens await!
                   <LinkButton
                     size="medium"
                     type="external"
@@ -315,14 +361,29 @@ const Airdrop = () => {
                   </LinkButton>
                 </Text>
               </div>
-              <BottleProgress bottles={bottleTiers} isMobile />
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "1em",
+                }}
+              >
+                <BottleProgress bottles={bottleTiers} isMobile />
+                <TextButton className="bottles-earned-button">
+                  Bottles Earned Since Last Checked <ArrowRight />
+                </TextButton>
+              </div>
               <AirdropStats
                 seeReferralsDetails={() => setCurrentModal("referral-details")}
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
+                seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
                 epochDays={epochDays}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
+                isMobile
               />
               <MultiplierTasks />
               <MyMultiplier
@@ -330,11 +391,17 @@ const Airdrop = () => {
                 seeStakeNow={() => setCurrentModal("stake-now")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                wethPrice={wethPrice}
+                usdcPrice={1}
+                isMobile
               />
             </>
           )}
           {currentModal === "tutorial" && (
             <>
+              <Heading as="h3" className="no-margin">
+                Airdrop Tutorial
+              </Heading>
               <TutorialModal isMobile />
             </>
           )}
@@ -345,12 +412,16 @@ const Airdrop = () => {
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
+                userAddress={address || ""}
+                isMobile
               />
             </>
           )}
           {currentModal === "stake-now" && (
             <>
-              <Heading as="h3">Stake Now</Heading>
+              <Heading as="h3" className="no-margin">
+                Stake Now
+              </Heading>
 
               <StakeNowModal
                 fluidTokens={tokens.filter((tok) =>
@@ -360,16 +431,23 @@ const Airdrop = () => {
                   (tok) =>
                     !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
                 )}
-                stakeToken={stakeTokens}
+                stakeTokens={stakeTokens}
+                testStakeTokens={testStakeTokens}
+                getRatios={getStakingRatios}
+                isMobile={isMobile}
+                wethPrice={wethPrice}
+                usdcPrice={usdcPrice}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
                 liqudityMultiplier={liquidityMultiplier}
                 stakes={stakes}
+                wethPrice={wethPrice}
+                usdcPrice={usdcPrice}
               />
             </>
           )}
-        </div>
+        </motion.div>
       </>
     );
 
@@ -380,19 +458,23 @@ const Airdrop = () => {
         id="referral-details"
         visible={currentModal === "referral-details"}
         closeModal={closeModal}
+        style={{ gap: "1em" }}
       >
         <ReferralDetailsModal
           bottles={bottleTiers}
+          totalBottles={bottlesCount}
           activeReferrerReferralsCount={numActiveReferrerReferrals}
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
           nextInactiveReferral={inactiveReferrals[0]}
+          isMobile={isMobile}
         />
       </CardModal>
       <CardModal
         id="bottles-details"
         visible={currentModal === "bottles-details"}
         closeModal={closeModal}
+        style={{ gap: "1em" }}
       >
         <BottlesDetailsModal bottles={bottleTiers} />
       </CardModal>
@@ -400,6 +482,7 @@ const Airdrop = () => {
         id="stake-now"
         visible={currentModal === "stake-now"}
         closeModal={closeModal}
+        style={{ gap: "2em" }}
       >
         <StakeNowModal
           fluidTokens={tokens.filter((tok) =>
@@ -408,7 +491,12 @@ const Airdrop = () => {
           baseTokens={tokens.filter(
             (tok) => !Object.prototype.hasOwnProperty.call(tok, "isFluidOf")
           )}
-          stakeToken={stakeTokens}
+          stakeTokens={stakeTokens}
+          testStakeTokens={testStakeTokens}
+          getRatios={getStakingRatios}
+          wethPrice={wethPrice}
+          usdcPrice={usdcPrice}
+          isMobile={isMobile}
         />
       </CardModal>
       <CardModal
@@ -419,6 +507,8 @@ const Airdrop = () => {
         <StakingStatsModal
           liqudityMultiplier={liquidityMultiplier}
           stakes={stakes}
+          wethPrice={wethPrice}
+          usdcPrice={usdcPrice}
         />
       </CardModal>
       <CardModal
@@ -426,7 +516,7 @@ const Airdrop = () => {
         visible={currentModal === "tutorial"}
         closeModal={closeModal}
       >
-        <TutorialModal />
+        <TutorialModal closeModal={closeModal} />
       </CardModal>
 
       {/* Page Content */}
@@ -435,8 +525,9 @@ const Airdrop = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.5fr 1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: "10%",
+            maxWidth: 1200,
           }}
         >
           <div
@@ -444,21 +535,31 @@ const Airdrop = () => {
               display: "flex",
               flexDirection: "column",
               gap: "2em",
+              zIndex: 100,
             }}
           >
-            <Heading className={"no-margin"}>
-              Welcome to Fluidity&apos;s Airdrop Event!
-            </Heading>
             <div>
-              <Text>
-                Vestibulum lobortis egestas luctus. Donec euismod nisi eu arcu
-                vulputate, in pharetra nisl porttitor. Morbi aliquet vulputate
-                metus, ac convallis lectus porttitor et. Donec maximus gravida
-                mauris, eget tempor felis tristique sit amet. Pellentesque at
-                hendrerit nibh, eu porttitor dui.
+              <Heading
+                as="h2"
+                className={"no-margin"}
+                style={{ marginBottom: "0.5em" }}
+              >
+                Welcome to Fluidity&apos;s Airdrop Event!
+              </Heading>
+              <Text style={{ fontSize: 14 }}>
+                Fluidify your assets, transact them, and boost your rewards by
+                using your Fluid Assets on partnered protocols and staking
+                liquidity right here on Fluidity! Keep an eye on the leaderboard
+                as you compete with fellow Fluiders for the top spot. Future
+                Fluid Governance Tokens await!
                 <LinkButton
                   size="medium"
                   type="external"
+                  style={{
+                    display: "inline-flex",
+                    textDecoration: "underline",
+                    textUnderlineOffset: 2,
+                  }}
                   handleClick={() => {
                     return;
                   }}
@@ -470,6 +571,7 @@ const Airdrop = () => {
             <AirdropStats
               seeReferralsDetails={() => setCurrentModal("referral-details")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
+              seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
               epochMax={epochDaysTotal}
               epochDays={epochDays}
               activatedReferrals={numActiveReferrerReferrals}
@@ -481,23 +583,39 @@ const Airdrop = () => {
               seeStakeNow={() => setCurrentModal("stake-now")}
               liquidityMultiplier={liquidityMultiplier}
               stakes={stakes}
+              wethPrice={wethPrice}
+              usdcPrice={usdcPrice}
             />
           </div>
           <BottleProgress bottles={bottleTiers} />
         </div>
       </div>
       <div
-        style={{ display: "flex", justifyContent: "center", padding: "1em" }}
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "2em",
+          marginBottom: "3em",
+        }}
       >
-        <AnchorButton
+        <GeneralButton
+          type="transparent"
+          icon={
+            <span style={{ fill: "none", transform: "rotate(90deg)" }}>
+              <ArrowRight />
+            </span>
+          }
           onClick={() => {
-            navigate("#leaderboard");
+            leaderboardRef.current?.scrollIntoView({
+              block: "start",
+              behavior: "smooth",
+            });
           }}
         >
           LEADERBOARD
-        </AnchorButton>
+        </GeneralButton>
       </div>
-      <div className="pad-main" id="#leaderboard">
+      <div className="pad-main" id="#leaderboard" ref={leaderboardRef}>
         <Card
           className="leaderboard-container"
           type="transparent"
@@ -510,6 +628,7 @@ const Airdrop = () => {
             data={leaderboardRows}
             filterIndex={leaderboardFilterIndex}
             setFilterIndex={setLeaderboardFilterIndex}
+            userAddress={address || ""}
           />
         </Card>
       </div>
@@ -520,33 +639,50 @@ const Airdrop = () => {
 interface IAirdropStats {
   seeReferralsDetails: () => void;
   seeBottlesDetails: () => void;
+  seeLeaderboardMobile?: () => void;
   epochDays: number;
   epochMax: number;
   activatedReferrals: number;
   totalBottles: number;
+  isMobile?: boolean;
 }
 
 const AirdropStats = ({
   seeReferralsDetails,
   seeBottlesDetails,
+  seeLeaderboardMobile,
   epochDays,
   epochMax,
   activatedReferrals,
   totalBottles,
+  isMobile,
 }: IAirdropStats) => {
   return (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "1em",
-      }}
+      className="airdrop-stats"
+      style={
+        isMobile
+          ? { flexWrap: "wrap-reverse", flexDirection: "row-reverse" }
+          : {}
+      }
     >
-      <div>
-        <LabelledValue label="EPOCH DAYS LEFT">
-          {epochMax - epochDays}
+      {isMobile && (
+        <div
+          className="airdrop-stats-item see-the-leaderboard-button"
+          onClick={() => {
+            seeLeaderboardMobile?.();
+          }}
+        >
+          <Text prominent size="xs">
+            SEE THE LEADERBOARD
+          </Text>
+        </div>
+      )}
+      <div className="airdrop-stats-item">
+        <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
+          <Text prominent size="xl">
+            {epochMax - epochDays}
+          </Text>
         </LabelledValue>
         <div
           style={{
@@ -565,28 +701,46 @@ const AirdropStats = ({
           <Text>{Math.floor((epochDays / epochMax) * 100)}%</Text>
         </div>
       </div>
-      <div>
-        <LabelledValue label="REFERRALS">{activatedReferrals}</LabelledValue>
-        <LinkButton
-          color="gray"
-          size="small"
-          type="internal"
-          handleClick={seeReferralsDetails}
-        >
-          SEE DETAILS
-        </LinkButton>
-      </div>
-      <div>
-        <LabelledValue label="MY TOTAL BOTTLES">
-          {toSignificantDecimals(totalBottles)}
+      <div className="airdrop-stats-item">
+        <LabelledValue label={<Text size="xs">REFERRALS</Text>}>
+          <Text prominent size="xl">
+            {activatedReferrals}
+          </Text>
         </LabelledValue>
         <LinkButton
           color="gray"
           size="small"
           type="internal"
-          handleClick={seeBottlesDetails}
+          handleClick={seeReferralsDetails}
+          style={{
+            marginLeft: -6,
+          }}
         >
           SEE DETAILS
+        </LinkButton>
+      </div>
+      <div className="airdrop-stats-item">
+        <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
+          <Text prominent size="xl">
+            {toSignificantDecimals(totalBottles, 0)}
+          </Text>
+        </LabelledValue>
+        <LinkButton
+          color="gray"
+          size="small"
+          type="internal"
+          handleClick={
+            isMobile
+              ? () => {
+                  console.log("TODO REDIRECT");
+                }
+              : seeBottlesDetails
+          }
+          style={{
+            marginLeft: -6,
+          }}
+        >
+          {isMobile ? "SEE TX HISTORY" : "SEE DETAILS"}
         </LinkButton>
       </div>
     </div>
@@ -594,14 +748,15 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [tasks, setTasks] = useState<"1x" | "2x">("1x");
+  const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
   const providers: Provider[] = [
     "Uniswap",
     "Sushiswap",
     "Camelot",
     "Saddle",
-    "Curve",
+    "Chronos",
+    "Kyber",
   ];
   return (
     <Card fill color="holo" rounded className="multiplier-tasks">
@@ -609,20 +764,21 @@ const MultiplierTasks = () => {
         <Text style={{ color: "black" }} bold size="md">
           Multiplier Tasks
         </Text>
-        <Text style={{ color: "black" }}>
+        <Text size="xs" style={{ color: "black" }}>
           Perform displayed tasks to earn the respective multipliers.
         </Text>
       </div>
       <div
         className="multiplier-tasks-multiplier"
         onClick={() => {
-          setTasks((prev) => (prev === "1x" ? "2x" : "1x"));
+          setTasks((prev) => (prev === "1x" ? "6x" : "1x"));
         }}
+        style={{ transform: "scale(0.6)" }}
       >
         <Form.Toggle
           color="black"
           direction="vertical"
-          checked={tasks === "2x"}
+          checked={tasks === "6x"}
         />
         <TextButton style={{ textDecorationThickness: "3px" }}>
           <motion.div
@@ -637,65 +793,64 @@ const MultiplierTasks = () => {
           </motion.div>
         </TextButton>
       </div>
-      <div className="multiplier-tasks-tasks">
-        {tasks === "1x" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-          >
-            <Text style={{ color: "black" }}>
-              Perform any type of fAsset transactions{" "}
-              <b>in any on-chain protocol</b>, including sending{" "}
-              <b>with any wallet</b>.
-            </Text>
-          </motion.div>
-        )}
-        {tasks === "2x" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1em",
-            }}
-          >
-            {providers.map((provider, i) => {
-              return (
-                <a
-                  key={`airdrop-mx-provider-` + i}
-                  style={{
-                    cursor: "pointer",
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "32px",
-                    backgroundColor: "black",
-                    padding: "8px",
-                  }}
-                  href="#"
-                >
-                  <ProviderIcon
-                    provider={provider}
-                    style={{ height: "100%" }}
-                  />
-                </a>
-              );
-            })}
-          </motion.div>
-        )}
-      </div>
+      {tasks === "1x" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+          className="multiplier-tasks-tasks"
+        >
+          <Text size="xs" style={{ color: "black" }}>
+            Perform any type of fAsset transactions{" "}
+            <b>in any on-chain protocol</b>, including sending{" "}
+            <b>with any wallet</b>.
+          </Text>
+        </motion.div>
+      )}
+      {tasks === "6x" && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+          className="multiplier-tasks-tasks"
+        >
+          {providers.map((provider, i) => {
+            return (
+              <a
+                key={`airdrop-mx-provider-` + i}
+                style={{
+                  cursor: "pointer",
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "32px",
+                  backgroundColor: "black",
+                  padding: "6px",
+                }}
+                href="#"
+              >
+                <ProviderIcon provider={provider} style={{ height: "100%" }} />
+              </a>
+            );
+          })}
+        </motion.div>
+      )}
     </Card>
   );
 };
 
 interface IMyMultiplier {
   liquidityMultiplier: number;
-  stakes: Array<StakingEvent>;
+  stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }>;
   seeMyStakingStats: () => void;
   seeStakeNow: () => void;
+  wethPrice: number;
+  usdcPrice: number;
+  isMobile?: boolean;
 }
 
 const MyMultiplier = ({
@@ -703,17 +858,28 @@ const MyMultiplier = ({
   seeStakeNow,
   liquidityMultiplier,
   stakes,
+  wethPrice,
+  usdcPrice,
+  isMobile = false,
 }: IMyMultiplier) => {
   return (
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "2em",
-      }}
+      className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
     >
+      {isMobile && (
+        <BloomEffect
+          color="#d9abdf"
+          width={20}
+          className="mx-bloom"
+          type="static"
+        />
+      )}
       <div>
-        <LabelledValue label="MY TOTAL LIQUIDITY MULTIPLIER">
+        <LabelledValue
+          align={isMobile ? "center" : "left"}
+          className="mx-my-multiplier"
+          label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
+        >
           <Text size="xxl" holo>
             {liquidityMultiplier.toLocaleString()}x
           </Text>
@@ -725,69 +891,87 @@ const MyMultiplier = ({
         size="small"
         type="secondary"
         handleClick={seeMyStakingStats}
-        style={{
-          width: "100%",
-          gridArea: "2 / 1",
-          boxSizing: "border-box",
-          alignSelf: "end",
-        }}
+        id="mx-see-my-staking-stats"
       >
         MY STAKING STATS
       </GeneralButton>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto max-content",
-          alignContent: "start",
-          gap: "1em",
-          gridColumn: "2 / 3",
-          gridRow: "1 / 3",
-        }}
-      >
-        {stakes.map(({ amount, durationDays, multiplier, insertedDate }) => {
-          const stakedDays = dayDifference(new Date(), new Date(insertedDate));
+      {!isMobile && (
+        <div id="mx-my-stakes">
+          {stakes.map(
+            ({ fluidAmount, baseAmount, durationDays, depositDate }) => {
+              const stakedDays = dayDifference(
+                new Date(),
+                new Date(depositDate)
+              );
+              const multiplier = stakingLiquidityMultiplierEq(
+                stakedDays,
+                durationDays
+              );
 
-          return (
-            <>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: "0.5em",
-                }}
-              >
-                <Text>
-                  {numberToMonetaryString(amount)} FOR {durationDays} DAYS
-                </Text>
-                <ProgressBar
-                  value={stakedDays}
-                  max={durationDays}
-                  rounded
-                  color={durationDays === stakedDays ? "holo" : "gray"}
-                  size="sm"
-                />
-              </div>
-              <div style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}>
-                <Text holo bold prominent>
-                  {multiplier}X
-                </Text>
-              </div>
-            </>
-          );
-        })}
-      </div>
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+              return (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "0.5em",
+                    }}
+                  >
+                    <Text prominent code>
+                      {numberToMonetaryString(fluidUsd + baseUsd)} FOR{" "}
+                      {Math.floor(durationDays)} DAYS
+                    </Text>
+                    <ProgressBar
+                      value={stakedDays}
+                      max={Math.floor(durationDays)}
+                      rounded
+                      color={
+                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                      }
+                      size="sm"
+                    />
+                  </div>
+                  <div
+                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
+                  >
+                    <Text holo bold prominent>
+                      {multiplier}X
+                    </Text>
+                  </div>
+                </>
+              );
+            }
+          )}
+        </div>
+      )}
       <GeneralButton
+        icon={isMobile ? <ArrowRight /> : undefined}
+        layout={"after"}
         buttontype="text"
         size="medium"
         version="primary"
         handleClick={seeStakeNow}
-        style={{
-          width: "100%",
-          boxSizing: "border-box",
-          gridColumn: "1 / 3",
-          gridRow: "3 / 4",
-        }}
+        id="mx-stake-now-button"
       >
         STAKE NOW
       </GeneralButton>
@@ -795,18 +979,26 @@ const MyMultiplier = ({
   );
 };
 
-const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
-  data,
-  index,
-}: {
+interface IAirdropRankRow {
   data: AirdropLeaderboardEntry;
   index: number;
-}) => {
+  isMobile?: boolean;
+}
+
+const AirdropRankRow: React.FC<IAirdropRankRow> = ({
+  data,
+  index,
+  isMobile = false,
+}: IAirdropRankRow) => {
+  const { address } = useContext(FluidityFacadeContext);
+  // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
   return (
     <motion.tr
-      className="airdrop-row"
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+        address === user ? "highlighted-row" : ""
+      }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -820,27 +1012,82 @@ const AirdropRankRow: IRow<AirdropLeaderboardEntry> = ({
     >
       {/* Rank */}
       <td>
-        <Text prominent>{rank}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {rank === -1 ? "???" : rank}
+        </Text>
       </td>
 
       {/* User */}
       <td>
-        <Text prominent>{trimAddress(user)}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {address === user ? "ME" : trimAddress(user)}
+        </Text>
       </td>
 
       {/* Bottles */}
       <td>
-        <Text prominent>{toSignificantDecimals(bottles, 2)}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {toSignificantDecimals(bottles, 0)}
+        </Text>
       </td>
 
       {/* Multiplier */}
       <td>
-        <Text prominent>{liquidityMultiplier.toLocaleString()}x</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {liquidityMultiplier.toLocaleString()}x
+        </Text>
       </td>
 
       {/* Referrals */}
       <td>
-        <Text prominent>{referralCount}</Text>
+        <Text
+          prominent
+          style={
+            address === user
+              ? {
+                  color: "black",
+                }
+              : {}
+          }
+        >
+          {referralCount}
+        </Text>
       </td>
     </motion.tr>
   );
@@ -851,6 +1098,8 @@ interface IAirdropLeaderboard {
   data: Array<AirdropLeaderboardEntry>;
   filterIndex: number;
   setFilterIndex: (index: number) => void;
+  userAddress: string;
+  isMobile?: boolean;
 }
 
 const Leaderboard = ({
@@ -858,36 +1107,56 @@ const Leaderboard = ({
   data,
   filterIndex,
   setFilterIndex,
+  userAddress,
+  isMobile = false,
 }: IAirdropLeaderboard) => {
-  console.log("HELOOOOOOOO", filterIndex);
+  // This adds a dummy user entry to the leaderboard if the user's address isn't found
+  if (loaded && !data.find((entry) => entry.user === userAddress)) {
+    const userEntry = {
+      user: userAddress,
+      rank: -1,
+      referralCount: 0,
+      liquidityMultiplier: 0,
+      bottles: 0,
+      highestRewardTier: 0,
+    };
+
+    data.push(userEntry);
+  }
+
   return (
     <>
-      <div className="leaderboard-header">
-        <Heading as="h3">Leaderboard</Heading>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Text prominent style={{ display: "flex", whiteSpace: "nowrap" }}>
+      <div className={`leaderboard-header ${isMobile ? "airdrop-mobile" : ""}`}>
+        <div className="leaderboard-header-text">
+          <Heading as="h3">Leaderboard</Heading>
+          <Text prominent>
             This leaderboard shows your rank among other users{" "}
-            {filterIndex === 0 ? " per " : " for "}
+            {filterIndex === 0 ? " per" : " for"}
+            &nbsp;
             {filterIndex === 0 ? (
-              <ul style={{ margin: 0 }}> 24 HOURS</ul>
+              <span className="airdrop-ldb-time-filter">24 HOURS</span>
             ) : (
-              <ul style={{ margin: 0 }}> ALL TIME</ul>
+              <span className="airdrop-ldb-time-filter">ALL TIME</span>
             )}
           </Text>
-          <div style={{ display: "flex", gap: "1em" }}>
-            <GeneralButton
-              type={filterIndex === 0 ? "primary" : "secondary"}
-              handleClick={() => setFilterIndex(0)}
-            >
+        </div>
+        <div className="leaderboard-header-filters">
+          <GeneralButton
+            type={filterIndex === 0 ? "primary" : "secondary"}
+            handleClick={() => setFilterIndex(0)}
+          >
+            <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
-            </GeneralButton>
-            <GeneralButton
-              type={filterIndex === 1 ? "primary" : "secondary"}
-              handleClick={() => setFilterIndex(1)}
-            >
+            </Text>
+          </GeneralButton>
+          <GeneralButton
+            type={filterIndex === 1 ? "primary" : "secondary"}
+            handleClick={() => setFilterIndex(1)}
+          >
+            <Text code size="sm" style={{ color: "inherit" }}>
               ALL TIME
-            </GeneralButton>
-          </div>
+            </Text>
+          </GeneralButton>
         </div>
       </div>
       <Table
@@ -900,12 +1169,22 @@ const Leaderboard = ({
           { name: "REFERRALS" },
         ]}
         pagination={{
+          paginate: false,
           page: 1,
           rowsPerPage: 11,
         }}
         count={0}
         data={data}
-        renderRow={AirdropRankRow}
+        renderRow={(data) => (
+          <AirdropRankRow
+            data={data.data}
+            index={data.index}
+            isMobile={isMobile}
+          />
+        )}
+        freezeRow={(data) => {
+          return data.user === userAddress;
+        }}
         onFilter={() => true}
         activeFilterIndex={0}
         filters={[]}
@@ -930,10 +1209,19 @@ const BottleProgress = ({
   };
 
   return (
-    <div>
+    <div
+      style={{
+        maxWidth: isMobile ? "100%" : 450,
+        display: "flex",
+        flexDirection: "column",
+        gap: "1em",
+      }}
+    >
       <HeroCarousel
         title="BOTTLES I'VE EARNED"
         onSlideChange={handleHeroPageChange}
+        controlledIndex={imgIndex}
+        style={isMobile ? { flexDirection: "column-reverse", gap: "2em" } : {}}
       >
         <Card type="frosted" fill shimmer rounded>
           <img src="/images/hero/common.png" />
@@ -952,20 +1240,35 @@ const BottleProgress = ({
         </Card>
       </HeroCarousel>
       <BottleDistribution
+        handleClickBottle={(index) => {
+          setImgIndex(index);
+        }}
+        style={{
+          height: !isMobile ? 100 : "auto",
+          overflowX: isMobile ? "scroll" : "visible",
+        }}
+        numberPosition={isMobile ? "relative" : "absolute"}
         bottles={bottles}
-        isMobile={isMobile}
         showBottleNumbers={showBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
-      <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
-        <Form.Toggle
-          checked={showBottleNumbers}
-          onClick={() =>
-            setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
-          }
-        />
-        <Text prominent={true}>ALWAYS SHOW BOTTLE NUMBERS</Text>
-      </div>
+      {!isMobile && (
+        <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
+          <Form.Toggle
+            checked={showBottleNumbers}
+            onClick={() =>
+              setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
+            }
+            style={{
+              opacity: showBottleNumbers ? 1 : 0.3,
+            }}
+          />
+
+          <Text size="sm" prominent={showBottleNumbers}>
+            ALWAYS SHOW BOTTLE NUMBERS
+          </Text>
+        </div>
+      )}
     </div>
   );
 };

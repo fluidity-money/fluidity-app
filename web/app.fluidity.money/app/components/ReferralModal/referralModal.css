@@ -3,18 +3,23 @@
   top: 0;
   left: 0;
   width: 100vw;
-  max-width: 600px;
+  max-width: 550px;
   padding: 0;
+  backdrop-filter: blur(20px) !important;
 }
 
 .referrals-content {
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 50px;
-  min-height: 300px;
-  gap: 2em;
+  padding: 30px;
+  gap: 1em;
   text-align: center;
+}
+
+.referrals-inner-content {
+  min-height: 250px;
+  padding: 50px 50px 30px 50px;
 }
 
 @media (max-width: 850px) {
@@ -54,7 +59,7 @@
 .referrals-inner-switcher {
   width: 100%;
   position: absolute;
-  top: -32px;
+  top: -24px;
   display: flex;
   justify-content: center;
   gap: 4em;
@@ -65,20 +70,28 @@
   padding-right: 2em;
 }
 
+.spread {
+  width: 70%;
+}
+
 .spread-center {
   display: flex;
   width: 100%;
-  justify-content: space-evenly;
+  justify-content: space-between;
 }
 
 .how-it-works-infobox {
   display: flex;
   width: 100%;
+  align-items: flex-start;
   flex-direction: row;
   justify-content: space-between;
+  padding: 0;
+  padding-bottom: 10px;
 }
 
 .how-it-works-infobox > * {
+  height: 100%;
   flex: 1;
   text-align: center;
   align-self: center;
@@ -95,6 +108,7 @@
 
 .single-line {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
@@ -104,6 +118,7 @@
 .how-it-works-warning-container {
   display: flex;
   align-items: center;
+  gap: 1em;
 }
 
 .how-it-works-warning-text {

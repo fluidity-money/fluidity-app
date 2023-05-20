@@ -6,6 +6,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
@@ -162,28 +163,30 @@ var saddleSwapAbi ethAbi.ABI
 
 var erc20Abi ethAbi.ABI
 
-func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (*big.Rat, error) {
+func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethTypes.Receipt) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("Not enough log topics passed!")
+		return feeData, fmt.Errorf("Not enough log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != saddleTokenSwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := saddleSwapAbi.Unpack("TokenSwap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			4,
 			len(unpacked),
@@ -193,7 +196,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	data, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -222,7 +225,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to fetch saddle token data for sold index %d! %v",
 			idSold,
 			err,
@@ -238,7 +241,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to fetch saddle token data for bought index %d! %v",
 			idBought,
 			err,
@@ -250,7 +253,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	addresses, err := ethereum.CoerceBoundContractResultsToAddresses(addresses_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to addresses! %v",
 			err,
 		)
@@ -270,7 +273,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	decimals_, err := ethereum.StaticCall(
@@ -281,7 +284,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to call the decimals method on the underlying token %s! %v",
 			addresses[1].String(),
 			err,
@@ -291,7 +294,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	decimals, err := ethereum.CoerceBoundContractResultsToUint8(decimals_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token decimals to uint8! %v",
 			err,
 		)
@@ -312,7 +315,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to fetch saddle swap info! %v",
 			err,
 		)
@@ -321,7 +324,7 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	swapFee, err := ethereum.CoerceBoundContractResultsToRat(res[4:5])
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token decimals to uint8! %v",
 			err,
 		)
@@ -336,14 +339,20 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	if tokenInIsFluid {
 		// swap fees are taken from the out token, which we don't know the price of
 		// instead just estimate it, since we assume the in and out tokens are worth about the same
+		feeData.Volume = new(big.Rat).Set(tokenSold)
+
 		fee := new(big.Rat).Mul(tokenSold, swapFeeAdjusted)
 
 		fluidDecimals := ethereum.BigPow(ten, tokenDecimals)
 
 		fee.Quo(fee, fluidDecimals)
+		feeData.Volume.Quo(feeData.Volume, fluidDecimals)
+		feeData.Fee = fee
 
-		return fee, nil
+		return feeData, nil
 	}
+
+	feeData.Volume = new(big.Rat).Set(tokenBought)
 
 	// otherwise, calculate the original amount bought and then calculate the fee based on that
 
@@ -363,6 +372,9 @@ func GetSaddleFees(transfer worker.EthereumApplicationTransfer, client *ethclien
 	tokenDecimalsScale := ethereum.BigPow(ten, tokenDecimals)
 
 	feeUsd := new(big.Rat).Quo(fee, tokenDecimalsScale)
+	feeData.Volume.Quo(feeData.Volume, tokenDecimalsScale)
 
-	return feeUsd, nil
+	feeData.Fee = feeUsd
+
+	return feeData, nil
 }

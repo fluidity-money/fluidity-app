@@ -1,4 +1,9 @@
-import { useState } from "react";
+import type {
+  StakingRatioRes,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
+
+import { useState, useEffect } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -10,78 +15,98 @@ import {
   ArrowRight,
   Display,
   LootBottle,
-  numberToMonetaryString,
   InfoCircle,
   TokenIcon,
   toSignificantDecimals,
   ArrowLeft,
   Heading,
   Video,
+  Hoverable,
+  Form,
+  numberToMonetaryString,
+  SliderButton,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
+  getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
 
 import { Referral } from "~/queries";
-import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
+import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface IBottleDistribution {
+const MAX_EPOCH_DAYS = 31;
+
+interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
   showBottleNumbers?: boolean;
   highlightBottleNumberIndex?: number;
-  isMobile?: boolean;
+  numberPosition?: "absolute" | "relative";
+  handleClickBottle?: (index: number) => void;
 }
 
 const BottleDistribution = ({
   bottles,
   showBottleNumbers = true,
   highlightBottleNumberIndex,
-  isMobile = false,
+  numberPosition = "absolute",
+  handleClickBottle,
+  ...props
 }: IBottleDistribution) => (
-  <div
-    className="bottle-distribution-container"
-    style={
-      isMobile
-        ? {
-            maxWidth: "100%",
-            overflowX: "scroll",
-            height: 160,
-          }
-        : {}
-    }
-  >
+  <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
       return (
-        <div key={index} className="lootbottle-container">
+        <div
+          key={index}
+          className="lootbottle-container"
+          onClick={() => handleClickBottle?.(index)}
+        >
           <LootBottle
             size="lg"
             rarity={rarity}
             quantity={quantity}
             style={{
               marginBottom: "0.6em",
+              opacity:
+                highlightBottleNumberIndex === undefined ||
+                highlightBottleNumberIndex !== index
+                  ? 0.2
+                  : 1,
+              ...(handleClickBottle ? { cursor: "pointer" } : {}),
             }}
           />
-          <Text style={{ whiteSpace: "nowrap" }}>{rarity.toUpperCase()}</Text>
           <Text
-            prominent
-            style={{
-              position: "absolute",
-              bottom: "120px",
-              zIndex: "5",
-              ...(showBottleNumbers
-                ? highlightBottleNumberIndex === index
-                  ? {
-                      fontSize: "2em",
-                    }
-                  : {}
-                : highlightBottleNumberIndex === index
-                ? { fontSize: "2em" }
-                : { display: "none" }),
-            }}
+            size="sm"
+            style={{ whiteSpace: "nowrap", textTransform: "capitalize" }}
+          >
+            {rarity.replace("_", " ")}
+          </Text>
+          <Text
+            prominent={
+              highlightBottleNumberIndex === undefined ||
+              highlightBottleNumberIndex === index
+            }
+            style={
+              numberPosition === "absolute"
+                ? {
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottleNumberIndex === index
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottleNumberIndex === index
+                      ? { fontSize: "2.5em" }
+                      : { display: "none" }),
+                  }
+                : { fontSize: "1em" }
+            }
           >
             {toSignificantDecimals(quantity)}
           </Text>
@@ -93,104 +118,216 @@ const BottleDistribution = ({
 
 interface IReferralDetailsModal {
   bottles: BottleTiers;
+  totalBottles: number;
   activeRefereeReferralsCount: number;
   activeReferrerReferralsCount: number;
   inactiveReferrerReferralsCount: number;
   nextInactiveReferral?: Referral;
+  isMobile?: boolean;
 }
 
 const ReferralDetailsModal = ({
   bottles,
+  totalBottles,
   activeRefereeReferralsCount,
   activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
-}: IReferralDetailsModal) => (
-  <>
-    <Display size="xxxs">My Referral Link</Display>
-    <div className="referral-details-container">
-      <LabelledValue label={<Text size="sm">Active Referrals</Text>}>
-        {activeRefereeReferralsCount}
-      </LabelledValue>
-      <LabelledValue
-        label={<Text size="sm">Total Bottles earned from your link</Text>}
-      >
-        1,051
-      </LabelledValue>
-    </div>
-    <Text size="sm">Bottle Distribution</Text>
-    <BottleDistribution bottles={bottles} />
-    <div
-      style={{
-        width: "100%",
-        borderBottom: "1px solid white",
-        margin: "1em 0",
-      }}
-    />
-    <Display size="xxxs">Links I&apos;ve Clicked</Display>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "auto auto auto auto",
-        gap: "1em",
-        paddingBottom: "1em",
-      }}
-    >
-      <LabelledValue label="Total Clicked">
-        {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
-      </LabelledValue>
-      <div>
-        <LabelledValue label="Claimed">
-          {activeReferrerReferralsCount}
-        </LabelledValue>
-        <Text>{activeReferrerReferralsCount * 10} BOTTLES</Text>
-      </div>
-      <div>
-        <LabelledValue label="Unclaimed">
-          {inactiveReferrerReferralsCount}
-        </LabelledValue>
-        <LinkButton
-          handleClick={() => {
-            return;
-          }}
-          color="gray"
-          size="small"
-          type="internal"
+  isMobile,
+}: IReferralDetailsModal) => {
+  const tooltipStyle = isMobile ? "frosted" : "solid";
+
+  return (
+    <>
+      <Display className="no-margin" size="xxxs">
+        My Referral Link
+      </Display>
+      <div className="referral-details-container">
+        <LabelledValue
+          label={
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
+            >
+              <Text className="helper-label" size="xs">
+                Active Referrals <InfoCircle />
+              </Text>
+            </Hoverable>
+          }
         >
-          START CLAIMING
-        </LinkButton>
+          {activeRefereeReferralsCount}
+        </LabelledValue>
+        <LabelledValue
+          label={
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+            >
+              <Text className="helper-label" size="xs">
+                Total Bottles earned from your link <InfoCircle />
+              </Text>
+            </Hoverable>
+          }
+        >
+          {totalBottles}
+        </LabelledValue>
       </div>
-      {nextInactiveReferral && (
+      <Hoverable
+        style={{ minWidth: 250 }}
+        tooltipStyle={tooltipStyle}
+        tooltipContent="The amount of Loot Bottles you have earned through your referral link based on their rarity."
+      >
+        <Text className="helper-label" size="xs">
+          Bottle Distribution <InfoCircle />
+        </Text>
+      </Hoverable>
+      <BottleDistribution numberPosition="relative" bottles={bottles} />
+      <div
+        style={{
+          width: "100%",
+          borderBottom: "1px solid white",
+        }}
+      />
+      <Display className="no-margin" size="xxxs">
+        Links I&apos;ve Clicked
+      </Display>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "auto auto auto auto",
+          gap: "3em",
+          paddingBottom: "1em",
+        }}
+      >
+        <LabelledValue
+          label={
+            <div
+              className="helper-label"
+              style={{ display: "flex", gap: "0.5em" }}
+            >
+              <Text size="xs">Total Clicked</Text>
+              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
+                <InfoCircle />
+              </Hoverable>
+            </div>
+          }
+        >
+          {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
+        </LabelledValue>
         <div>
-          <LabelledValue label="Until Next Claim">
-            {nextInactiveReferral.progress}/10
+          <LabelledValue
+            label={
+              <div
+                className="helper-label"
+                style={{ display: "flex", gap: "0.5em" }}
+              >
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 100,
+                    backgroundColor: "#2af73b",
+                    marginTop: 2,
+                  }}
+                />
+
+                <Text size="xs">Claimed</Text>
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
+                  <InfoCircle />
+                </Hoverable>
+              </div>
+            }
+          >
+            {activeReferrerReferralsCount}
+          </LabelledValue>
+          <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
+        </div>
+        <div>
+          <LabelledValue
+            label={
+              <div
+                className="helper-label"
+                style={{ display: "flex", gap: "0.5em" }}
+              >
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 100,
+                    backgroundColor: "red",
+                    marginTop: 2,
+                  }}
+                />
+                <Text size="xs">Unclaimed</Text>
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
+                  <InfoCircle />
+                </Hoverable>
+              </div>
+            }
+          >
+            {inactiveReferrerReferralsCount}
+          </LabelledValue>
+          <LinkButton
+            handleClick={() => {
+              return;
+            }}
+            color="gray"
+            size="small"
+            type="internal"
+          >
+            START CLAIMING
+          </LinkButton>
+        </div>
+        <div>
+          <LabelledValue
+            label={
+              <div
+                className="helper-label"
+                style={{ display: "flex", gap: "0.5em" }}
+              >
+                <Text size="xs">Until Next Claim</Text>
+                <Hoverable
+                  style={{ marginTop: -2 }}
+                  tooltipContent="Lorem ipsum"
+                >
+                  <InfoCircle />
+                </Hoverable>
+              </div>
+            }
+          >
+            {nextInactiveReferral?.progress || 0}/10
           </LabelledValue>
           <ProgressBar
-            value={nextInactiveReferral.progress}
+            value={nextInactiveReferral?.progress || 0}
             max={10}
             size="sm"
             color="holo"
+            style={{
+              marginTop: 6,
+            }}
           />
         </div>
-      )}
-    </div>
-  </>
-);
+      </div>
+    </>
+  );
+};
 
 interface IBottlesDetailsModal {
   bottles: BottleTiers;
+  isMobile?: boolean;
 }
 
-const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "1em",
-      alignItems: "center",
-    }}
-  >
-    <BottleDistribution bottles={bottles} />
+const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
+  <>
+    <BottleDistribution numberPosition="relative" bottles={bottles} />
     <GeneralButton
       icon={<ArrowRight />}
       layout="after"
@@ -198,6 +335,9 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         return;
       }}
       type="transparent"
+      style={{
+        alignSelf: "center",
+      }}
     >
       SEE YOUR LOOTBOTTLE TX HISTORY
     </GeneralButton>
@@ -208,29 +348,61 @@ const BottlesDetailsModal = ({ bottles }: IBottlesDetailsModal) => (
         margin: "1em 0",
       }}
     />
-    <LabelledValue
-      label={<Text size="sm">Bottles earned since last checked</Text>}
+    <Hoverable
+      style={{ minWidth: 250 }}
+      tooltipStyle={isMobile ? "frosted" : "solid"}
+      tooltipContent="The amount of Loot Bottles you have earned since you last checked this page."
     >
+      <Text size="sm">
+        Bottles earned since last checked <InfoCircle />
+      </Text>
+    </Hoverable>
+    <div>
+      {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
       <LootBottle size="lg" rarity="legendary"></LootBottle>
-    </LabelledValue>
-  </div>
+      <Text prominent size="lg">
+        x22
+      </Text>
+    </div>
+  </>
 );
 
 interface IStakingStatsModal {
   liqudityMultiplier: number;
-  stakes: Array<StakingEvent>;
+  stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }>;
+  wethPrice: number;
+  usdcPrice: number;
 }
+
 const StakingStatsModal = ({
   liqudityMultiplier,
   stakes,
+  wethPrice,
+  usdcPrice,
 }: IStakingStatsModal) => {
+  const canWithdraw = stakes.some(({ durationDays, depositDate }) => {
+    const stakedDays = dayDifference(new Date(), depositDate);
+    return durationDays - stakedDays <= 0;
+  });
+
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "1em",
+      }}
+    >
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "auto auto auto",
-          gap: "1em",
+          gap: "2em",
         }}
       >
         <LabelledValue
@@ -243,45 +415,75 @@ const StakingStatsModal = ({
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
           {numberToMonetaryString(
-            stakes.reduce((sum, { amount }) => sum + amount, 0)
+            stakes.reduce((sum, { fluidAmount, baseAmount }) => {
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+              return sum + fluidUsd + baseUsd;
+            }, 0)
           )}
         </LabelledValue>
       </div>
-      <div style={{ position: "relative", border: "1px gray" }}>
-        <div
-          style={{
-            position: "absolute",
-            top: "-24px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <GeneralButton> Select All</GeneralButton>
-          <GeneralButton> Withdraw</GeneralButton>
-        </div>
+      <div style={{ position: "relative", border: "1px gray", width: "100%" }}>
+        <GeneralButton disabled={!canWithdraw} style={{ right: "0" }}>
+          Withdraw
+        </GeneralButton>
         <div>
           {stakes.map(
-            (
-              {
-                amount,
-                durationDays,
-                multiplier,
-                insertedDate: insertedDateStr,
-              },
-              i
-            ) => {
-              const insertedDate = new Date(insertedDateStr);
-              const stakedDays = dayDifference(new Date(), insertedDate);
+            ({ fluidAmount, baseAmount, durationDays, depositDate }, i) => {
+              const stakedDays = dayDifference(new Date(), depositDate);
+              const multiplier = stakingLiquidityMultiplierEq(
+                stakedDays,
+                durationDays
+              );
 
-              const endDate = new Date(insertedDate);
+              const endDate = new Date(depositDate);
               endDate.setDate(endDate.getDate() + durationDays);
+
+              const fluidDecimals = 6;
+              const fluidUsd = getUsdFromTokenAmount(
+                fluidAmount,
+                fluidDecimals,
+                usdcPrice
+              );
+
+              const wethDecimals = 18;
+              const usdcDecimals = 6;
+
+              // If converting base amount by weth decimals (18) is smaller than $0.01,
+              // then tentatively assume Token amount is USDC
+              // A false hit would be a USDC deposit >= $100,000
+              const baseUsd =
+                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
+                0.01
+                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
               return (
                 <div
                   key={`stake-${i}`}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "0.2 0.6 0.1 0.1",
+                    gridTemplateColumns: "1fr 3fr 1fr",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "1em",
                   }}
                 >
                   {/* Dates */}
@@ -289,13 +491,12 @@ const StakingStatsModal = ({
                     style={{
                       display: "flex",
                       flexDirection: "column",
-                      alignItems: "flex-start",
                       gap: "0.5em",
                     }}
                   >
                     <Text>Start Date</Text>
                     <Text prominent>
-                      {insertedDate.toLocaleDateString("en-US")}
+                      {depositDate.toLocaleDateString("en-US")}
                     </Text>
 
                     <Text>End Date</Text>
@@ -309,12 +510,16 @@ const StakingStatsModal = ({
                       gap: "0.5em",
                     }}
                   >
-                    <Heading as="h3">{numberToMonetaryString(amount)}</Heading>
+                    <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
+                      {numberToMonetaryString(fluidUsd + baseUsd)}
+                    </Heading>
                     <ProgressBar
                       value={stakedDays}
-                      max={durationDays}
+                      max={Math.floor(durationDays)}
                       rounded
-                      color={durationDays === stakedDays ? "holo" : "gray"}
+                      color={
+                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
+                      }
                       size="sm"
                     />
                     <div
@@ -326,7 +531,8 @@ const StakingStatsModal = ({
                     >
                       <Text prominent>{multiplier}x Multiplier</Text>
                       <Text prominent>
-                        {durationDays - stakedDays} Days Left
+                        {Math.max(0, Math.floor(durationDays - stakedDays))}{" "}
+                        Days Left
                       </Text>
                     </div>
                   </div>
@@ -334,11 +540,10 @@ const StakingStatsModal = ({
                     style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
                   >
                     <Text>Staked For</Text>
-                    <Heading as="h2">{durationDays}</Heading>
+                    <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
+                      {Math.floor(durationDays)}
+                    </Heading>
                     <Text>Days</Text>
-                  </div>
-                  <div>
-                    <input type="checkbox" />
                   </div>
                 </div>
               );
@@ -346,20 +551,43 @@ const StakingStatsModal = ({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
 interface IStakingNowModal {
   fluidTokens: Array<AugmentedToken>;
   baseTokens: Array<AugmentedToken>;
-  stakeToken?: (
+  // getRatios calls `deposit()` in Staking Contract
+  // May return undefined if contract errors, or signer not found
+  stakeTokens?: (
     lockDurationSeconds: BN,
     usdcAmt: BN,
     fusdc: BN,
     wethAmt: BN,
-    slippage: BN
-  ) => void;
+    slippage: BN,
+    maxTimestamp: BN
+  ) => Promise<StakingDepositsRes | undefined>;
+
+  // getRatios simulates `deposit()` in Staking Contract
+  // Used to determine if current inputs will succeed
+  // May return undefined if contract errors, or signer not found
+  testStakeTokens?: (
+    lockDurationSeconds: BN,
+    usdcAmt: BN,
+    fusdc: BN,
+    wethAmt: BN,
+    slippage: BN,
+    maxTimestamp: BN
+  ) => Promise<StakingDepositsRes | undefined>;
+
+  // getRatios calls `ratios()` in Staking Contract
+  // Used to estimate accepted Base / Fluid token amounts
+  // May return undefined if contract errors, or signer not found
+  getRatios?: () => Promise<StakingRatioRes | undefined>;
+  isMobile: boolean;
+  wethPrice: number;
+  usdcPrice: number;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -371,14 +599,25 @@ export const stakingLiquidityMultiplierEq = (
   stakedDays: number,
   totalStakedDays: number
 ) =>
-  (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-  (396 * totalStakedDays) / 133225 -
-  31 / 365;
+  Math.max(
+    0,
+    Math.min(
+      1,
+      (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
+    )
+  );
 
 const StakeNowModal = ({
   fluidTokens,
   baseTokens,
-  stakeToken,
+  stakeTokens,
+  testStakeTokens,
+  getRatios,
+  isMobile,
+  wethPrice,
+  usdcPrice,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -390,9 +629,63 @@ const StakeNowModal = ({
   });
 
   const [stakingDuration, setStakingDuration] = useState(31);
+  const [slippage, setSlippage] = useState(5);
+  const [stakeErr, setStakeErr] = useState("");
+
+  // tokenRatios is the proportion of base tokens in the pool,
+  // and maximum base token spread, to the factor of 12
+  const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
+
+  // Convert proportion of Base Tokens in Pool to Fluid:Base Token ratio
+  // `prop` = base / (base + fluid)
+  const calculateRatioFromProportion = (baseTokenProp: number) => {
+    // `prop` * fluid == (1 - `prop`) * base
+    const baseTokenRatio = 1 - baseTokenProp;
+
+    // 1 fluid == ((1 - `prop`) / `prop`) * base
+    const baseMultiplier = baseTokenRatio / baseTokenProp;
+
+    return baseMultiplier;
+  };
+
+  // tokenRatios has factor of 12 in contract to avoid decimals
+  const ratio = !tokenRatios
+    ? 0
+    : calculateRatioFromProportion(
+        baseToken.symbol === "USDC"
+          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+              1e12
+          : (tokenRatios.fusdcWethRatio.toNumber() -
+              tokenRatios.fusdcWethSpread.toNumber() / 2) /
+              1e12
+      );
+
+  const fluidUsdMultiplier = usdcPrice;
+  const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
+
+  useEffect(() => {
+    const setRatio = async () => {
+      const stakingRatios = (await getRatios?.()) ?? null;
+      setTokenRatios(stakingRatios);
+    };
+
+    // Call `getRatios` immediately, then call every 10 seconds
+    setRatio();
+    const setRatioId = setInterval(setRatio, 10 * 1000);
+
+    return () => {
+      clearInterval(setRatioId);
+    };
+  }, []);
+
+  const minDurationDays = 31;
+  const maxDurationDays = 365;
 
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
+
+  const daysToSeconds = (days: number) => days * 24 * 60 * 60;
 
   const parseSwapInputToTokenAmount = (
     input: string,
@@ -451,68 +744,175 @@ const StakeNowModal = ({
     };
 
   const inputMaxBalance = () => {
-    setFluidToken({
-      ...fluidToken,
-      amount: addDecimalToBn(
-        snapToValidValue(fluidToken.userTokenBalance.toString(), fluidToken),
-        fluidToken.decimals
-      ),
-    });
+    const maxFluidToken = snapToValidValue(
+      fluidToken.userTokenBalance.toString(),
+      fluidToken
+    );
+
+    const maxBaseToken = snapToValidValue(
+      baseToken.userTokenBalance.toString(),
+      baseToken
+    );
+
+    const matchingBaseTokenUsd =
+      getUsdFromTokenAmount(maxFluidToken, fluidToken.decimals, usdcPrice) *
+      ratio;
+
+    const maxBaseTokenUsd = getUsdFromTokenAmount(
+      maxBaseToken,
+      baseToken.decimals,
+      baseUsdMultiplier
+    );
+
+    // Enough Base tokens to match Max Fluid balance
+    if (maxBaseTokenUsd >= matchingBaseTokenUsd) {
+      setFluidToken({
+        ...fluidToken,
+        amount: addDecimalToBn(maxFluidToken, fluidToken.decimals),
+      });
+
+      setBaseToken({
+        ...baseToken,
+        amount: (matchingBaseTokenUsd / baseUsdMultiplier)
+          .toFixed(baseToken.decimals)
+          .replace(/\.0+$/, ""),
+      });
+
+      return;
+    }
+
+    const matchingFluidTokenUsd = maxBaseTokenUsd * (1 / ratio);
 
     setBaseToken({
       ...baseToken,
-      amount: addDecimalToBn(
-        snapToValidValue(baseToken.userTokenBalance.toString(), baseToken),
-        baseToken.decimals
-      ),
+      amount: addDecimalToBn(maxBaseToken, baseToken.decimals),
+    });
+
+    setFluidToken({
+      ...fluidToken,
+      amount: (matchingFluidTokenUsd / fluidUsdMultiplier)
+        .toFixed(fluidToken.decimals)
+        .replace(/\.0+$/, ""),
     });
   };
 
-  const canStake = () => false;
+  const [canStake, setCanStake] = useState(false);
 
-  const handleStake = async () => {
-    if (!stakeToken) return;
-    if (!canStake()) return;
+  useEffect(() => {
+    (async () => {
+      setCanStake(await testStake());
+    })();
+  }, [baseToken, fluidToken, slippage]);
 
+  const testStake = async (): Promise<boolean> => {
     try {
-      // await stakeToken();
+      await testStakeTokens?.(
+        new BN(daysToSeconds(stakingDuration)),
+        baseToken.symbol === "USDC"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        fluidToken.symbol === "fUSDC"
+          ? snapToValidValue(fluidToken.amount, fluidToken)
+          : new BN(0),
+        baseToken.symbol === "wETH"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        new BN(slippage),
+        new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
+      );
+
+      setStakeErr("");
+      return true;
     } catch (e) {
       // Expect error on fail
-      console.log(e);
+      const errMsgMatchReason = /reason="[a-z0-9 :_]+/i;
+      const stakingError = (e as { message: string }).message
+        .match(errMsgMatchReason)?.[0]
+        .slice(8);
+
+      switch (stakingError) {
+        case "insufficient allowance":
+        case "ERC20: transfer amount exceeds allowance": {
+          setStakeErr("");
+          return true;
+        }
+        case "CamelotRouter: INSUFFICIENT_A_AMOUNT": {
+          setStakeErr("Insufficient Base Tokens");
+          return false;
+        }
+        case "CamelotRouter: INSUFFICIENT_B_AMOUNT": {
+          setStakeErr("Insufficient Fluid Tokens");
+          return false;
+        }
+        default: {
+          setStakeErr(stakingError ?? "Unknown Error - Try again later");
+          return false;
+        }
+      }
+    }
+  };
+
+  const handleStake = async () => {
+    if (!stakeTokens) return;
+    if (!canStake) return;
+
+    setButtonText("PROCESSING...");
+
+    try {
+      await stakeTokens(
+        new BN(daysToSeconds(stakingDuration)),
+        baseToken.symbol === "USDC"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        fluidToken.symbol === "fUSDC"
+          ? snapToValidValue(fluidToken.amount, fluidToken)
+          : new BN(0),
+        baseToken.symbol === "wETH"
+          ? snapToValidValue(baseToken.amount, baseToken)
+          : new BN(0),
+        new BN(slippage),
+        new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
+      );
+    } catch (e) {
+      // Expect error on fail
+      setButtonText("SLIDE TO STAKE");
       return;
     }
   };
 
   const [showTokenSelector, setShowTokenSelector] = useState<
     "fluid" | "base" | ""
-  >("base");
+  >("");
+
+  const tooltipStyle = isMobile ? "frosted" : "solid";
+
+  const [buttonText, setButtonText] = useState("SLIDE TO STAKE");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "2em",
-      }}
-    >
+    <>
       <Card
         type="opaque"
         rounded
         color="holo"
         fill
         style={{
-          color: "black",
           textAlign: "center",
+          marginTop: "1em",
+          padding: "0.5em",
+          borderRadius: "0.5em",
         }}
       >
-        👀 TIP: Stake over 31 days for more rewards in future epochs & events!
-        🌊
+        <Text style={{ color: "black" }} size="sm">
+          👀 TIP: Stake over 31 days for more rewards in future epochs & events!
+          🌊
+        </Text>
       </Card>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "2fr 1fr 2fr",
-          gap: "1em",
+          gridTemplateColumns: "auto auto 160px",
+          columnGap: "4em",
+          rowGap: "2em",
         }}
       >
         {/* Staking Amount */}
@@ -529,30 +929,35 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
+              gap: "0.5em",
             }}
           >
-            <Text prominent code>
-              STAKE AMOUNT <InfoCircle />
-            </Text>
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake."
+            >
+              <Text prominent code className="helper-label">
+                STAKE AMOUNT <InfoCircle />
+              </Text>
+            </Hoverable>
             <GeneralButton
-              type="secondary"
+              type="transparent"
               size="small"
               handleClick={() => inputMaxBalance()}
+              style={{
+                padding: "0.5em 1em",
+                borderRadius: "100px",
+              }}
             >
-              Max
+              <Text size="sm">MAX</Text>
             </GeneralButton>
           </div>
           {showTokenSelector === "fluid" ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1em",
-                background: "black",
-              }}
-            >
+            <div className="staking-modal-token-selector">
               {fluidTokens.map((token) => (
-                <div
+                <button
+                  style={{ background: "none", border: "none" }}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (fluidToken.symbol != token.symbol) {
@@ -569,12 +974,15 @@ const StakeNowModal = ({
                     token={token.symbol}
                     className={"staking-modal-token-icon"}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <div onClick={() => setShowTokenSelector("fluid")}>
+              <div
+                onClick={() => setShowTokenSelector("fluid")}
+                style={{ height: 60 }}
+              >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={fluidToken.symbol}
@@ -599,17 +1007,15 @@ const StakeNowModal = ({
               />
             </div>
           )}
+          <Text>
+            {fluidToken.symbol} Balance:{" "}
+            {addDecimalToBn(fluidToken.userTokenBalance, fluidToken.decimals)}
+          </Text>
           {showTokenSelector === "base" ? (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "1em",
-                background: "black",
-              }}
-            >
+            <div className="staking-modal-token-selector">
               {baseTokens.map((token) => (
-                <div
+                <button
+                  style={{ background: "none", border: "none" }}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (baseToken.symbol != token.symbol) {
@@ -626,12 +1032,15 @@ const StakeNowModal = ({
                     key={token.symbol}
                     token={token.symbol}
                   />
-                </div>
+                </button>
               ))}
             </div>
           ) : (
             <div className={"staking-modal-input-container"}>
-              <div onClick={() => setShowTokenSelector("base")}>
+              <div
+                onClick={() => setShowTokenSelector("base")}
+                style={{ height: 60 }}
+              >
                 <TokenIcon
                   className={"staking-modal-token-icon"}
                   token={baseToken.symbol}
@@ -656,100 +1065,173 @@ const StakeNowModal = ({
               />
             </div>
           )}
+          <Text>
+            {baseToken.symbol} Balance:{" "}
+            {addDecimalToBn(baseToken.userTokenBalance, baseToken.decimals)}
+          </Text>
+          <Text prominent>
+            {fluidToken.symbol}/{baseToken.symbol} ratio:{" "}
+            {ratio ? `1 : ${toSignificantDecimals(ratio, 2)}` : "Loading..."}
+          </Text>
         </div>
         {/* Arrow */}
-        <div>
+        <div className="staking-modal-arrow-container">
           <ArrowRight />
         </div>
         {/* Duration */}
-        <div>
-          <Text prominent code>
-            DURATION <InfoCircle />
-          </Text>
-          <Display>
+        <div className="duration-column">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days."
+          >
+            <Text prominent code className="helper-label">
+              DURATION <InfoCircle />
+            </Text>
+          </Hoverable>
+          <Display className="no-margin">
             {stakingDuration} D{/* Scrollbar */}
           </Display>
-          <input
-            type="range"
-            min={31}
-            value={stakingDuration}
-            max={365}
-            step="1"
-            onChange={(e) => setStakingDuration(e.target.valueAsNumber)}
+          <Form.Slider
+            min={minDurationDays}
+            max={maxDurationDays}
+            step={1}
+            valueCallback={(value: number) => setStakingDuration(value)}
           />
-          <div>
-            <Text>
-              END: <Text>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+          >
+            <Text code className="helper-label">
+              END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
               <InfoCircle />
             </Text>
-          </div>
+          </Hoverable>
+          <Text prominent code>
+            SLIPPAGE % <InfoCircle />
+          </Text>
+          <input
+            className={"staking-modal-token-input"}
+            pattern="[0-9]"
+            min={1}
+            value={slippage}
+            max={50}
+            onChange={(e) => setSlippage(Math.floor(e.target.valueAsNumber))}
+          />
         </div>
-      </div>
-      <div style={{ border: "1px white dashed" }} />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr 2fr",
-          gap: "1em",
-        }}
-      >
-        <div>
-          <LabelledValue
-            label={
-              <Text code>
-                DAY 1 POWER <InfoCircle />
-              </Text>
-            }
+        <div
+          style={{
+            width: "100%",
+            borderBottom: "1px solid white",
+            gridColumn: "1 / span 3",
+          }}
+        />
+        <div className="power-column">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1."
+          >
+            <Text size="xs" code className="helper-label">
+              DAY 1 POWER <InfoCircle />
+            </Text>
+          </Hoverable>
+          <Text
+            prominent
+            holo={stakingDuration === maxDurationDays}
+            size="xxl"
+            className="power-text"
           >
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(1, stakingDuration)
+              ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
+                (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
+                stakingLiquidityMultiplierEq(1, stakingDuration),
+              1
             )}
-          </LabelledValue>
-          <Text prominent code>
-            @ MULTIPLIER{" "}
-            {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(1, stakingDuration)
-            )}
-            X
           </Text>
+          {stakingLiquidityMultiplierEq(1, stakingDuration) < 1 ? (
+            <Text size="xs" prominent code>
+              @ MULTIPLIER{" "}
+              {toSignificantDecimals(
+                stakingLiquidityMultiplierEq(1, stakingDuration)
+              )}
+              X
+            </Text>
+          ) : (
+            <Card
+              type="opaque"
+              color="holo"
+              style={{ padding: "4px 8px 4px 8px", borderRadius: 4 }}
+            >
+              <Text size="xs" style={{ color: "black" }}>
+                @ MULTIPLIER 1X
+              </Text>
+            </Card>
+          )}
         </div>
-        <div>
+        <div className="staking-modal-arrow-container">
           <ArrowRight />
         </div>
-        <div>
-          <LabelledValue
-            label={
-              <Text code>
-                DAY 31 POWER <InfoCircle />
-              </Text>
-            }
+        <div className="power-column rhs">
+          <Hoverable
+            style={{ minWidth: 250 }}
+            tooltipStyle={tooltipStyle}
+            tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier."
           >
+            <Text size="xs" className="helper-label" code>
+              DAY {MAX_EPOCH_DAYS} POWER <InfoCircle />
+            </Text>
+          </Hoverable>
+          <Text prominent holo size="xl" className="power-text">
             {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration)
+              ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
+                (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              1
             )}
-          </LabelledValue>
+          </Text>
           <Card
             type="opaque"
             color="holo"
-            style={{ padding: "4px 8px 4px 8px", color: "black" }}
+            style={{
+              padding: "4px 8px 4px 8px",
+              borderRadius: 4,
+              whiteSpace: "nowrap",
+            }}
           >
-            @ MULTIPLIER{" "}
-            {toSignificantDecimals(
-              stakingLiquidityMultiplierEq(31, stakingDuration)
-            )}
-            X
+            <Text size="xs" style={{ color: "black" }}>
+              @ MULTIPLIER{" "}
+              {toSignificantDecimals(
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration)
+              )}
+              X
+            </Text>
           </Card>
         </div>
       </div>
-      <GeneralButton
-        type="secondary"
-        disabled={!canStake()}
-        style={{ width: "95%" }}
-        handleClick={() => handleStake()}
+      <SliderButton
+        disabled={!canStake}
+        style={{ width: "100%" }}
+        onSlideComplete={() => handleStake()}
       >
-        Stake
-      </GeneralButton>
-    </div>
+        <Text
+          style={{ color: buttonText === "SLIDE TO STAKE" ? "white" : "black" }}
+        >
+          {buttonText}
+        </Text>
+      </SliderButton>
+      <Text
+        style={{
+          textAlign: "center",
+          display: stakeErr ? "false" : "",
+          color: "red",
+          textTransform: "capitalize",
+        }}
+      >
+        {stakeErr}
+      </Text>
+    </>
   );
 };
 
@@ -765,12 +1247,12 @@ const tutorialContent: {
   "0": {
     title: "WHAT ARE LOOT BOTTLES?",
     desc: "Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ",
-    image: "REFERRALS",
+    image: "WHAT_ARE_LOOT_BOTTLES",
   },
   "1": {
     title: "HOW TO EARN LOOT BOTTLES?",
     desc: "To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ",
-    image: "REFERRALS",
+    image: "HOW_TO_EARN",
   },
   "2": {
     title: "MULTIPLIERS",
@@ -791,11 +1273,11 @@ const tutorialContent: {
         >
           <Text prominent code holo>
             <Display style={{ margin: 0, textAlign: "right" }} size="xs">
-              2x
+              6x
             </Display>
           </Text>
           <Text size="md" holo>
-            Transacting fAssets using our supported DEXs
+            Transacting fAssets using our Boosted Protocols
           </Text>
           <LootBottle
             size="sm"
@@ -841,11 +1323,62 @@ const tutorialContent: {
   },
 };
 
-const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
+const TutorialModal = ({
+  isMobile,
+  closeModal,
+}: {
+  isMobile?: boolean;
+  closeModal?: () => void;
+}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const Navigation = () => {
+    return (
+      <div className="tutorial-nav">
+        <GeneralButton
+          icon={<ArrowLeft />}
+          layout="before"
+          handleClick={() => {
+            setCurrentSlide(currentSlide - 1);
+          }}
+          type="transparent"
+          disabled={currentSlide === 0}
+        >
+          PREV
+        </GeneralButton>
+        <div className="tutorial-nav-status">
+          <Text size="md">{currentSlide + 1} / 5</Text>
+        </div>
+        {currentSlide !== 4 ? (
+          <GeneralButton
+            icon={<ArrowRight />}
+            layout="after"
+            handleClick={() => {
+              setCurrentSlide(currentSlide + 1);
+            }}
+            type="transparent"
+            disabled={currentSlide === 4}
+          >
+            Next
+          </GeneralButton>
+        ) : (
+          !isMobile && (
+            <GeneralButton
+              type="primary"
+              handleClick={closeModal}
+              className="start-earning-button"
+            >
+              START EARNING
+            </GeneralButton>
+          )
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
+      {isMobile && <Navigation />}
       <AnimatePresence mode="wait">
         <motion.div
           key={`tutorial-slide-${currentSlide}`}
@@ -861,58 +1394,29 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
             justifyContent: "center",
             height: "100%",
             width: "100%",
+            maxWidth: !isMobile ? 635 : "unset",
             gap: "1em",
+            marginTop: isMobile ? 0 : "1em",
           }}
         >
           <Video
             type="cover"
-            width={isMobile ? 550 : 1270 / 2}
-            height={isMobile ? 550 : 460 / 2}
+            width={isMobile ? 550 : 635}
+            height={isMobile ? 550 : 230}
             loop
             src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
               tutorialContent[currentSlide].image
             }.mp4`}
             className="tutorial-image"
+            style={{ maxWidth: "100%" }}
           />
-          <Display size="xxs" style={{ margin: 0 }}>
+          <Display size="xxs" style={{ margin: 0, textAlign: "center" }}>
             {tutorialContent[currentSlide].title}
           </Display>
           {tutorialContent[currentSlide].desc}
         </motion.div>
       </AnimatePresence>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "1em",
-        }}
-      >
-        <GeneralButton
-          icon={<ArrowLeft />}
-          layout="before"
-          handleClick={() => {
-            setCurrentSlide(currentSlide - 1);
-          }}
-          type="transparent"
-          disabled={currentSlide === 0}
-        >
-          PREV
-        </GeneralButton>
-        {currentSlide + 1} / 5
-        <GeneralButton
-          icon={<ArrowRight />}
-          layout="after"
-          handleClick={() => {
-            setCurrentSlide(currentSlide + 1);
-          }}
-          type="transparent"
-          disabled={currentSlide === 4}
-        >
-          Next
-        </GeneralButton>
-      </div>
+      {!isMobile && <Navigation />}
     </>
   );
 };
