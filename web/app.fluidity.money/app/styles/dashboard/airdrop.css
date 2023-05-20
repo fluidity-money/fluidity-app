@@ -70,7 +70,7 @@
 }
 
 .staking-modal-input-container {
-  border: 1px solid gray;
+  border: 2px solid gray;
   display: flex;
   padding: 5px;
   border-radius: 5em 14px 14px 5em;
@@ -92,6 +92,19 @@
   text-align: right;
   box-sizing: border-box;
   padding-right: 5px;
+}
+
+.staking-modal-token-insufficient {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 12px;
+  bottom: -0.5em;
+  background: black;
+  padding: 0.2em 2em 0.2em 2em;
+  border-radius: 12px;
+  border: 1px solid red;
 }
 
 .staking-modal-token-selector {

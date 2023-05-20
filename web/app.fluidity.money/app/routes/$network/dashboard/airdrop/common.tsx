@@ -3,7 +3,7 @@ import type {
   StakingDepositsRes,
 } from "~/util/chainUtils/ethereum/transaction";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -39,6 +39,9 @@ import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 
 const MAX_EPOCH_DAYS = 31;
+
+const MIN_STAKING_DAYS = 31;
+const MAX_STAKING_DAYS = 365;
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -679,9 +682,6 @@ const StakeNowModal = ({
     };
   }, []);
 
-  const minDurationDays = 31;
-  const maxDurationDays = 365;
-
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + stakingDuration);
 
@@ -719,29 +719,45 @@ const StakeNowModal = ({
   const handleChangeStakingInput =
     (
       token: StakingAugmentedToken,
-      setInput: (token: StakingAugmentedToken) => void
+      setInput: (token: StakingAugmentedToken) => void,
+      otherToken: StakingAugmentedToken,
+      setOtherInput: (token: StakingAugmentedToken) => void,
+      conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
     (e) => {
       const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
       const [whole, dec] = numericChars.split(".");
 
-      const unpaddedWhole = whole === "" ? "" : parseInt(whole) || 0;
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-      if (dec === undefined) {
-        return setInput({
-          ...token,
-          amount: `${unpaddedWhole}`,
-        });
-      }
-
-      const limitedDecimals = dec.slice(0 - token.decimals);
-
-      return setInput({
+      setInput({
         ...token,
-        amount: [whole, limitedDecimals].join("."),
+        amount: tokenAmtStr,
+      });
+
+      if (!tokenAmtStr) return;
+
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
       });
     };
+
+  const fluidTokenAmount = useMemo(
+    () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
+    [fluidToken]
+  );
+
+  const baseTokenAmount = useMemo(
+    () => parseSwapInputToTokenAmount(baseToken.amount, baseToken),
+    [baseToken]
+  );
 
   const inputMaxBalance = () => {
     const maxFluidToken = snapToValidValue(
@@ -806,17 +822,19 @@ const StakeNowModal = ({
 
   const testStake = async (): Promise<boolean> => {
     try {
+      if (fluidTokenAmount.gte(fluidToken.userTokenBalance)) {
+        throw Error('reason="Insufficient Fluid Funds"');
+      }
+
+      if (baseTokenAmount.gte(baseToken.userTokenBalance)) {
+        throw Error('reason="Insufficient Base Funds"');
+      }
+
       await testStakeTokens?.(
         new BN(daysToSeconds(stakingDuration)),
-        baseToken.symbol === "USDC"
-          ? snapToValidValue(baseToken.amount, baseToken)
-          : new BN(0),
-        fluidToken.symbol === "fUSDC"
-          ? snapToValidValue(fluidToken.amount, fluidToken)
-          : new BN(0),
-        baseToken.symbol === "wETH"
-          ? snapToValidValue(baseToken.amount, baseToken)
-          : new BN(0),
+        baseToken.symbol === "USDC" ? baseTokenAmount : new BN(0),
+        fluidToken.symbol === "fUSDC" ? fluidTokenAmount : new BN(0),
+        baseToken.symbol === "wETH" ? baseTokenAmount : new BN(0),
         new BN(slippage),
         new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
@@ -831,6 +849,10 @@ const StakeNowModal = ({
         .slice(8);
 
       switch (stakingError) {
+        case "not enough liquidity": {
+          setStakeErr("");
+          return false;
+        }
         case "insufficient allowance":
         case "ERC20: transfer amount exceeds allowance": {
           setStakeErr("");
@@ -861,15 +883,9 @@ const StakeNowModal = ({
     try {
       await stakeTokens(
         new BN(daysToSeconds(stakingDuration)),
-        baseToken.symbol === "USDC"
-          ? snapToValidValue(baseToken.amount, baseToken)
-          : new BN(0),
-        fluidToken.symbol === "fUSDC"
-          ? snapToValidValue(fluidToken.amount, fluidToken)
-          : new BN(0),
-        baseToken.symbol === "wETH"
-          ? snapToValidValue(baseToken.amount, baseToken)
-          : new BN(0),
+        baseToken.symbol === "USDC" ? baseTokenAmount : new BN(0),
+        fluidToken.symbol === "fUSDC" ? fluidTokenAmount : new BN(0),
+        baseToken.symbol === "wETH" ? baseTokenAmount : new BN(0),
         new BN(slippage),
         new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
@@ -978,7 +994,15 @@ const StakeNowModal = ({
               ))}
             </div>
           ) : (
-            <div className={"staking-modal-input-container"}>
+            <div
+              className={"staking-modal-input-container"}
+              style={{
+                position: "relative",
+                borderColor: fluidTokenAmount.gt(fluidToken.userTokenBalance)
+                  ? "red"
+                  : "inherit",
+              }}
+            >
               <div
                 onClick={() => setShowTokenSelector("fluid")}
                 style={{ height: 60 }}
@@ -992,19 +1016,28 @@ const StakeNowModal = ({
                 className={"staking-modal-token-input"}
                 min={""}
                 value={fluidToken.amount}
-                onBlur={(e) =>
-                  setFluidToken({
-                    ...fluidToken,
-                    amount: addDecimalToBn(
-                      snapToValidValue(e.target.value, fluidToken),
-                      fluidToken.decimals
-                    ),
-                  })
-                }
-                onChange={handleChangeStakingInput(fluidToken, setFluidToken)}
+                onChange={handleChangeStakingInput(
+                  fluidToken,
+                  setFluidToken,
+                  baseToken,
+                  setBaseToken,
+                  ratio
+                )}
                 placeholder="0"
                 step="any"
               />
+              <div
+                className="staking-modal-token-insufficient"
+                style={{
+                  display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
+                    ? "flex"
+                    : "none",
+                }}
+              >
+                <Text prominent size="xxs">
+                  INSUFFICIENT FUNDS
+                </Text>
+              </div>
             </div>
           )}
           <Text>
@@ -1036,7 +1069,15 @@ const StakeNowModal = ({
               ))}
             </div>
           ) : (
-            <div className={"staking-modal-input-container"}>
+            <div
+              className={"staking-modal-input-container"}
+              style={{
+                position: "relative",
+                borderColor: baseTokenAmount.gt(baseToken.userTokenBalance)
+                  ? "red"
+                  : "inherit",
+              }}
+            >
               <div
                 onClick={() => setShowTokenSelector("base")}
                 style={{ height: 60 }}
@@ -1050,19 +1091,28 @@ const StakeNowModal = ({
                 className={"staking-modal-token-input"}
                 min={""}
                 value={baseToken.amount}
-                onBlur={(e) =>
-                  setBaseToken({
-                    ...baseToken,
-                    amount: addDecimalToBn(
-                      snapToValidValue(e.target.value, baseToken),
-                      baseToken.decimals
-                    ),
-                  })
-                }
-                onChange={handleChangeStakingInput(baseToken, setBaseToken)}
+                onChange={handleChangeStakingInput(
+                  baseToken,
+                  setBaseToken,
+                  fluidToken,
+                  setFluidToken,
+                  1 / ratio
+                )}
                 placeholder="0"
                 step="any"
               />
+              <div
+                className="staking-modal-token-insufficient"
+                style={{
+                  display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
+                    ? "flex"
+                    : "none",
+                }}
+              >
+                <Text prominent size="xxs">
+                  INSUFFICIENT FUNDS
+                </Text>
+              </div>
             </div>
           )}
           <Text>
@@ -1093,8 +1143,8 @@ const StakeNowModal = ({
             {stakingDuration} D{/* Scrollbar */}
           </Display>
           <Form.Slider
-            min={minDurationDays}
-            max={maxDurationDays}
+            min={MIN_STAKING_DAYS}
+            max={MAX_STAKING_DAYS}
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
@@ -1139,13 +1189,21 @@ const StakeNowModal = ({
           </Hoverable>
           <Text
             prominent
-            holo={stakingDuration === maxDurationDays}
+            holo={stakingDuration >= MAX_STAKING_DAYS}
             size="xxl"
             className="power-text"
           >
             {toSignificantDecimals(
-              ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
-                (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
+              ((getUsdFromTokenAmount(
+                fluidTokenAmount,
+                fluidToken.decimals,
+                usdcPrice
+              ) || 0) +
+                (getUsdFromTokenAmount(
+                  baseTokenAmount,
+                  baseToken.decimals,
+                  baseUsdMultiplier
+                ) || 0)) *
                 stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
@@ -1185,8 +1243,16 @@ const StakeNowModal = ({
           </Hoverable>
           <Text prominent holo size="xl" className="power-text">
             {toSignificantDecimals(
-              ((parseFloat(fluidToken.amount) * fluidUsdMultiplier || 0) +
-                (parseFloat(baseToken.amount) * baseUsdMultiplier || 0)) *
+              ((getUsdFromTokenAmount(
+                fluidTokenAmount,
+                fluidToken.decimals,
+                usdcPrice
+              ) || 0) +
+                (getUsdFromTokenAmount(
+                  baseTokenAmount,
+                  baseToken.decimals,
+                  baseUsdMultiplier
+                ) || 0)) *
                 stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
