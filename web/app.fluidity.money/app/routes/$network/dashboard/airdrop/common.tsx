@@ -212,9 +212,6 @@ const ReferralDetailsModal = ({
               style={{ display: "flex", gap: "0.5em" }}
             >
               <Text size="xs">Total Clicked</Text>
-              <Hoverable style={{ marginTop: -2 }} tooltipContent="Lorem ipsum">
-                <InfoCircle />
-              </Hoverable>
             </div>
           }
         >
@@ -239,8 +236,9 @@ const ReferralDetailsModal = ({
 
                 <Text size="xs">Claimed</Text>
                 <Hoverable
-                  style={{ marginTop: -2 }}
-                  tooltipContent="Lorem ipsum"
+                  style={{ minWidth: 250 }}
+                  tooltipStyle={tooltipStyle}
+                  tooltipContent="Number of referrals (and Loot Bottles!) you've claimed."
                 >
                   <InfoCircle />
                 </Hoverable>
@@ -269,8 +267,9 @@ const ReferralDetailsModal = ({
                 />
                 <Text size="xs">Unclaimed</Text>
                 <Hoverable
-                  style={{ marginTop: -2 }}
-                  tooltipContent="Lorem ipsum"
+                  style={{ minWidth: 250 }}
+                  tooltipStyle={tooltipStyle}
+                  tooltipContent="Number of referrals you have left to claim."
                 >
                   <InfoCircle />
                 </Hoverable>
@@ -299,8 +298,9 @@ const ReferralDetailsModal = ({
               >
                 <Text size="xs">Until Next Claim</Text>
                 <Hoverable
-                  style={{ marginTop: -2 }}
-                  tooltipContent="Lorem ipsum"
+                  style={{ minWidth: 250 }}
+                  tooltipStyle={tooltipStyle}
+                  tooltipContent="Number of Loot Bottles to earn before the next referral activates."
                 >
                   <InfoCircle />
                 </Hoverable>
@@ -327,16 +327,23 @@ const ReferralDetailsModal = ({
 interface IBottlesDetailsModal {
   bottles: BottleTiers;
   isMobile?: boolean;
+  network: string;
+  navigate: (path: string) => void;
 }
 
-const BottlesDetailsModal = ({ bottles, isMobile }: IBottlesDetailsModal) => (
+const BottlesDetailsModal = ({
+  navigate,
+  network,
+  bottles,
+  isMobile,
+}: IBottlesDetailsModal) => (
   <>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
     <GeneralButton
       icon={<ArrowRight />}
       layout="after"
       handleClick={() => {
-        return;
+        navigate(`/${network}/dashboard/rewards`);
       }}
       type="transparent"
       style={{
@@ -486,6 +493,7 @@ const StakingStatsModal = ({
           style={{
             paddingTop: "1em",
             overflowY: "scroll",
+            overflowX: "hidden",
             maxHeight: "50vh",
           }}
         >
