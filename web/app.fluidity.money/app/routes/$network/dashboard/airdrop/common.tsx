@@ -573,7 +573,9 @@ const StakingStatsModal = ({
                       />
                       <div
                         style={{
+                          width: "100%",
                           display: "flex",
+                          flexWrap: "wrap",
                           flexDirection: "row",
                           justifyContent: "space-between",
                         }}
