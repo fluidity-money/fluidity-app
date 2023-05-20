@@ -410,25 +410,29 @@ const EthereumFacade = ({
 
     return stakingDeposits.map(
       ({
-        camelotLpMinted,
-        sushiswapLpMinted,
         redeemTimestamp,
         depositTimestamp,
         camelotTokenA,
         sushiswapTokenA,
+        camelotTokenB,
+        sushiswapTokenB,
       }) => {
-        const camelotLp = new BN(camelotLpMinted.toString());
-        const sushiswapLp = new BN(sushiswapLpMinted.toString());
-        const totalLp = camelotLp.add(sushiswapLp);
+        const fluidAmount = new BN(
+          camelotTokenA.add(sushiswapTokenA).toString()
+        );
 
-        const camelotToken = new BN(camelotTokenA.toString());
-        const sushiswapToken = new BN(sushiswapTokenA.toString());
-        const totalToken = camelotToken.add(sushiswapToken);
+        const baseAmount = new BN(
+          camelotTokenB.add(sushiswapTokenB).toString()
+        );
 
         return {
-          fluidAmount: totalLp,
-          baseAmount: totalToken,
-          durationDays: redeemTimestamp.toNumber() / 24 / 60 / 60,
+          fluidAmount,
+          baseAmount,
+          durationDays:
+            (redeemTimestamp.toNumber() - depositTimestamp.toNumber()) /
+            24 /
+            60 /
+            60,
           depositDate: new Date(depositTimestamp.toNumber() * 1000),
         };
       }

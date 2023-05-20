@@ -432,6 +432,8 @@
   align-self: end;
 }
 .airdrop-my-multiplier #mx-my-stakes {
+  max-height: 12em;
+  overflow-y: scroll;
   display: grid;
   grid-template-columns: auto max-content;
   align-content: start;
