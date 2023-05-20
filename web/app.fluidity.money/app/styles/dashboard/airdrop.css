@@ -127,6 +127,10 @@
   stroke: white;
 }
 
+.staking-modal-complete {
+  width: 95%;
+}
+
 .duration-column {
   width: 100%;
   display: flex;

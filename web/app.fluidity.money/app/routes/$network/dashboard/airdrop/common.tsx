@@ -37,6 +37,7 @@ import { dayDifference } from ".";
 import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
+import { TransactionResponse } from "~/util/chainUtils/instructions";
 
 const MAX_EPOCH_DAYS = 31;
 
@@ -626,7 +627,7 @@ interface IStakingNowModal {
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ) => Promise<StakingDepositsRes | undefined>;
+  ) => Promise<TransactionResponse | undefined>;
 
   // getRatios simulates `deposit()` in Staking Contract
   // Used to determine if current inputs will succeed
@@ -934,10 +935,10 @@ const StakeNowModal = ({
     if (!stakeTokens) return;
     if (!canStake) return;
 
-    setButtonText("PROCESSING...");
+    setStakingState("staking");
 
     try {
-      await stakeTokens(
+      const receipt = await stakeTokens(
         new BN(daysToSeconds(stakingDuration)),
         baseToken.symbol === "USDC" ? baseTokenAmount : new BN(0),
         fluidToken.symbol === "fUSDC" ? fluidTokenAmount : new BN(0),
@@ -945,9 +946,20 @@ const StakeNowModal = ({
         new BN(slippage),
         new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
+
+      if (receipt) {
+        const success = await receipt.confirmTx();
+
+        if (!success) {
+          throw Error("Failed to Deposit - Try again later!");
+        }
+
+        setStakingState("complete");
+      }
     } catch (e) {
       // Expect error on fail
-      setButtonText("SLIDE TO STAKE");
+      setStakingState("ready");
+      setStakeErr(e as string);
       return;
     }
   };
@@ -958,7 +970,20 @@ const StakeNowModal = ({
 
   const tooltipStyle = isMobile ? "frosted" : "solid";
 
-  const [buttonText, setButtonText] = useState("SLIDE TO STAKE");
+  const [stakingState, setStakingState] = useState<
+    "ready" | "staking" | "complete"
+  >("ready");
+  const buttonText = (() => {
+    switch (stakingState) {
+      case "staking":
+        return "PROCESSING...";
+      case "complete":
+        return "SUCCESS! - STAKE MORE?";
+      case "ready":
+      default:
+        return "SLIDE TO STAKE";
+    }
+  })();
 
   return (
     <>
@@ -1332,17 +1357,28 @@ const StakeNowModal = ({
           </Card>
         </div>
       </div>
-      <SliderButton
-        disabled={!canStake}
-        style={{ width: "100%" }}
-        onSlideComplete={() => handleStake()}
-      >
-        <Text
-          style={{ color: buttonText === "SLIDE TO STAKE" ? "white" : "black" }}
+      {stakingState === "complete" ? (
+        <GeneralButton
+          className={"staking-modal-complete"}
+          handleClick={() => setStakingState("ready")}
         >
           {buttonText}
-        </Text>
-      </SliderButton>
+        </GeneralButton>
+      ) : (
+        <SliderButton
+          disabled={!canStake}
+          style={{ width: "100%" }}
+          onSlideComplete={() => handleStake()}
+        >
+          <Text
+            style={{
+              color: stakingState === "staking" ? "black" : "white",
+            }}
+          >
+            {buttonText}
+          </Text>
+        </SliderButton>
+      )}
       <Text
         style={{
           textAlign: "center",

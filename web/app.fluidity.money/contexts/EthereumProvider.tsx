@@ -493,7 +493,7 @@ const EthereumFacade = ({
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ): Promise<StakingDepositsRes | undefined> => {
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -519,7 +519,7 @@ const EthereumFacade = ({
       }
     );
 
-    return makeStakingDeposit(
+    const stakingDepositRes = await makeStakingDeposit(
       signer,
       usdcToken,
       fusdcToken,
@@ -533,6 +533,13 @@ const EthereumFacade = ({
       slippage,
       maxTimestamp
     );
+
+    return stakingDepositRes
+      ? {
+          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+          txHash: stakingDepositRes.hash,
+        }
+      : undefined;
   };
 
   return (
