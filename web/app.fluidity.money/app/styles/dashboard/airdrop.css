@@ -70,7 +70,7 @@
 }
 
 .staking-modal-input-container {
-  border: 1px solid gray;
+  border: 2px solid gray;
   display: flex;
   padding: 5px;
   border-radius: 5em 14px 14px 5em;

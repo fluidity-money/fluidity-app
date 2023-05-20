@@ -219,7 +219,7 @@ const Airdrop = () => {
     ? userLeaderboardRows.concat(globalLeaderboardRows)
     : globalLeaderboardRows;
 
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const [currentModal, setCurrentModal] = useState<string | null>("stake-now");
   const [stakes, setStakes] = useState<
     Array<{
       fluidAmount: BN;
