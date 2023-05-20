@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -167,6 +167,8 @@ const Airdrop = () => {
   );
 
   const { width } = useViewport();
+
+  const navigate = useNavigate();
 
   const mobileBreakpoint = 768;
 
@@ -476,7 +478,11 @@ const Airdrop = () => {
         closeModal={closeModal}
         style={{ gap: "1em" }}
       >
-        <BottlesDetailsModal bottles={bottleTiers} />
+        <BottlesDetailsModal
+          bottles={bottleTiers}
+          navigate={navigate}
+          network={network}
+        />
       </CardModal>
       <CardModal
         id="stake-now"
@@ -1237,7 +1243,7 @@ const BottleProgress = ({
   isMobile?: boolean;
 }) => {
   const [imgIndex, setImgIndex] = useState(0);
-  const [showBottleNumbers, setShowBottleNumbers] = useState(false);
+  const [showBottleNumbers, setShowBottleNumbers] = useState(true);
 
   const handleHeroPageChange = (index: number) => {
     setImgIndex(index);
