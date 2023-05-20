@@ -49,7 +49,7 @@ func TestCalculateMovingAverage(t *testing.T) {
 	// no values
 	average, err := CalculateMovingAverage(key)
 	assert.NoError(t, err)
-	assert.Equal(t, 0, *average)
+	assert.Equal(t, 0, average)
 
 	// only zeros
 	StoreValue(key, 0)
@@ -58,7 +58,7 @@ func TestCalculateMovingAverage(t *testing.T) {
 
 	average, err = CalculateMovingAverage(key)
 	assert.NoError(t, err)
-	assert.Equal(t, 0, *average)
+	assert.Equal(t, 0, average)
 
 	// real values
 	runningTotal := 0
@@ -73,27 +73,27 @@ func TestCalculateMovingAverage(t *testing.T) {
 
 	average, err = CalculateMovingAverage(key)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedAverage, *average)
+	assert.Equal(t, expectedAverage, average)
 
 	// >500 values
-	for i := 100; i < BufferSize+1; i++ {
+	for i := 100; i < DefaultBufferSize+1; i++ {
 		StoreValue(key, i)
 		valuesStored += 1
 
 		// don't include the rightmost value
-		if i <= BufferSize {
+		if i <= DefaultBufferSize {
 			runningTotal += i
 		}
 	}
 
-	expectedAverage = runningTotal / (BufferSize + 1)
+	expectedAverage = runningTotal / (DefaultBufferSize + 1)
 
 	average, err = CalculateMovingAverage(key)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedAverage, *average)
+	assert.Equal(t, expectedAverage, average)
 
-	// check that we've removed one value when we have >(BufferSize + 1)
-	assert.EqualValues(t, BufferSize+1, state.LLen(key))
+	// check that we've removed one value when we have >(DefaultBufferSize + 1)
+	assert.EqualValues(t, DefaultBufferSize+1, state.LLen(key))
 
 	// invalid values
 	StoreValue(key, "not an int")
@@ -101,7 +101,7 @@ func TestCalculateMovingAverage(t *testing.T) {
 	average, err = CalculateMovingAverage(key)
 
 	assert.Error(t, err)
-	assert.Nil(t, average)
+	assert.Equal(t, 0, average)
 }
 
 // helpers to reduce verbosity
@@ -155,24 +155,24 @@ func TestCalculateMovingAverageRat(t *testing.T) {
 	assert.Equal(t, expectedAverage, average)
 
 	// >500 values
-	for i := 100; i < BufferSize+1; i++ {
+	for i := 100; i < DefaultBufferSize+1; i++ {
 		StoreValue(key, ratFromInt(i).String())
 		valuesStored += 1
 
 		// don't include the rightmost value
-		if i <= BufferSize {
+		if i <= DefaultBufferSize {
 			runningTotal.Add(runningTotal, ratFromInt(i))
 		}
 	}
 
-	expectedAverage = runningTotal.Quo(runningTotal, ratFromInt(BufferSize+1))
+	expectedAverage = runningTotal.Quo(runningTotal, ratFromInt(DefaultBufferSize+1))
 
 	average, err = CalculateMovingAverageRat(key)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedAverage, average)
 
-	// check that we've removed one value when we have >(BufferSize + 1)
-	assert.EqualValues(t, BufferSize+1, state.LLen(key))
+	// check that we've removed one value when we have >(DefaultBufferSize + 1)
+	assert.EqualValues(t, DefaultBufferSize+1, state.LLen(key))
 
 	// invalid values
 	StoreValue(key, "not a rat")
@@ -196,12 +196,12 @@ func TestStoreAndCalculate(t *testing.T) {
 
 	result, err := StoreAndCalculate(key, value)
 	assert.NoError(t, err)
-	assert.Equal(t, value, *result)
+	assert.Equal(t, value, result)
 
 	// average is still the same
 	result, err = StoreAndCalculate(key, value)
 	assert.NoError(t, err)
-	assert.Equal(t, value, *result)
+	assert.Equal(t, value, result)
 }
 
 func TestStoreAndCalculateRat(t *testing.T) {

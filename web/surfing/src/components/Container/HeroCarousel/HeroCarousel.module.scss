@@ -1,11 +1,11 @@
 .HeroCarousel {
   position: relative;
   width: 100%;
-  padding: 1em 0;
   box-sizing: border-box;
   overflow: visible;
   display: flex;
   flex-direction: column;
+  gap: 1em;
   align-items: center;
 
   .nav {
@@ -22,7 +22,6 @@
   }
 
   .deck {
-    margin-top: 1em;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(50, 20%);

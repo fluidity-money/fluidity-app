@@ -86,6 +86,11 @@ const OptionsSchema = z.object({
       arbitrum: z.string(),
       solana: z.string(),
     }),
+    eac_aggregator_proxy: z.object({
+      ethereum: z.string(),
+      arbitrum: z.string(),
+      solana: z.string(),
+    }),
   }),
 });
 
@@ -135,6 +140,27 @@ const getColors = async () => {
     {}
   );
 };
+
+// choose a random entry from a comma-separated string
+const randomFromCommaSeparated = (s: string) => {
+  const split = s.split(",");
+  return split[Math.floor(Math.random() * split.length)];
+};
+
+// use a random driver for RPC to mitigate crashes
+// from an unreliable endpoint
+options.drivers = Object.fromEntries(
+  Object.entries(options.drivers).map(([name, drivers]) => [
+    name,
+    drivers.map((driver) => ({
+      ...driver,
+      rpc: {
+        http: randomFromCommaSeparated(driver.rpc.http),
+        ws: randomFromCommaSeparated(driver.rpc.ws),
+      },
+    })),
+  ])
+);
 
 export const colors = getColors();
 export default options;

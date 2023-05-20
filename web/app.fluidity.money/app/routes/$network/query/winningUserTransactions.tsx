@@ -12,6 +12,12 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
+import {
+  translateRewardTierToRarity,
+  useLootboxesByTxHash,
+} from "~/queries/useLootBottles";
+import { Rarity } from "@fluidity-money/surfing";
+import { BottleTiers } from "./dashboard/airdrop";
 
 type UserTransaction = {
   sender: string;
@@ -108,13 +114,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       .filter((entry) => entry.isFluidOf !== undefined)
       .map((entry) => entry.symbol);
 
-    const { data: userTransactionsData, errors: userTransactionsErr } =
-      await useUserTransactionsByTxHash(
-        network,
-        winnerAddrs,
-        [],
-        ethereumTokens
-      );
+    const [
+      { data: userTransactionsData, errors: userTransactionsErr },
+      { data: lootbottlesData, errors: lootbottlesErr },
+    ] = await Promise.all([
+      useUserTransactionsByTxHash(network, winnerAddrs, [], ethereumTokens),
+      useLootboxesByTxHash(winnerAddrs),
+    ]);
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -127,6 +133,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           },
         }
       );
+      return Error("Server could not fulfill request");
+    }
+
+    if (!lootbottlesData || lootbottlesErr) {
+      captureException(new Error(`Could not fetch Lootbottles`), {
+        tags: {
+          section: "dashboard",
+        },
+      });
       return Error("Server could not fulfill request");
     }
 
@@ -193,6 +208,45 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       {} as Record<string, Array<UserTransaction>>
     );
 
+    const lootbottlesMap = lootbottlesData.lootbox.reduce(
+      (map, { txHash, rewardTier, lootboxCount }) => {
+        if (!txHash) return map;
+
+        if (!map[txHash]) {
+          return {
+            ...map,
+            [txHash]: {
+              [Rarity.Common]: 0,
+              [Rarity.Uncommon]: 0,
+              [Rarity.Rare]: 0,
+              [Rarity.UltraRare]: 0,
+              [Rarity.Legendary]: 0,
+              [translateRewardTierToRarity(rewardTier)]: lootboxCount,
+            },
+          };
+        }
+
+        return {
+          ...map,
+          [txHash]: {
+            ...map[txHash],
+            [translateRewardTierToRarity(rewardTier)]:
+              map[txHash][translateRewardTierToRarity(rewardTier)] +
+              lootboxCount,
+          },
+        };
+      },
+      {} as {
+        [txHash: string]: BottleTiers;
+      }
+    );
+
+    Object.entries(lootbottlesMap).forEach(([txHash, bottles]) => {
+      if (Object.values(bottles).every((amt: number) => amt < 0.1)) {
+        delete lootbottlesMap[txHash];
+      }
+    });
+
     const mergedTransactions: Transaction[] = winners
       .filter(({ send_transaction_hash: hash }) => !!transactionMap[hash])
       .map((winner) => {
@@ -225,6 +279,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
+          lootBottles: lootbottlesMap[tx.hash],
         };
       });
 

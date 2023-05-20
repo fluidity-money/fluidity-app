@@ -385,7 +385,7 @@ func GetUserActions(f func(userAction UserAction)) {
 }
 
 // GetUserActionByLogIndex to find a user action in a transaction that has the given log index
-func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash string, logIndex misc.BigInt) user_actions.UserAction {
+func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash string, logIndex misc.BigInt) *user_actions.UserAction {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -440,12 +440,21 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 	)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil 
+		}
+
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Message = "Failed to scan a user action row filtered by log index!"
+			k.Format(
+				"Failed to scan a user action row filtered by network %v, transaction hash %v and log index %v!",
+				network,
+				transactionHash,
+				logIndex.String(),
+			)
 			k.Payload = err
 		})
 	}
 
-	return userAction
+	return &userAction
 }

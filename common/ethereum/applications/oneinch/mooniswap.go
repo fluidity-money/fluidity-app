@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -87,21 +88,23 @@ var mooniswapPoolV1Abi ethAbi.ABI
 // GetMooniswapFees returns Mooniswap's fee of 0.3% of the amount swapped.
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed")
+		return feeData, fmt.Errorf("No log topics passed")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != mooniswapSwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if topics := len(transfer.Log.Topics); topics != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"unexpected mooniswap swap log topic length! Expected 4, got %v",
 			topics,
 		)
@@ -110,14 +113,14 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 	unpacked, err := mooniswapPoolV1Abi.Unpack("Swapped", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 6 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 6, got %v",
 			len(unpacked),
 		)
@@ -129,7 +132,7 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(swapAmounts_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -170,7 +173,7 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// if trading x fUSDC -> y Token B
@@ -185,6 +188,8 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 		fluidTransferAmount = result
 	}
 
+	feeData.Volume = new(big.Rat).Set(fluidTransferAmount)
+
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
 
 	// adjust by decimals to get the price in USD
@@ -192,6 +197,9 @@ func GetMooniswapV1Fees(transfer worker.EthereumApplicationTransfer, client *eth
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fee.Quo(fee, decimalsRat)
+	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+
+	return feeData, nil
 }

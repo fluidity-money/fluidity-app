@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -90,21 +91,23 @@ var curveAbi ethAbi.ABI
 
 // GetCurveSwapFees calculates fees from Swapping TokenA and TokenB performed by a pool's exchange()
 // All tokens in a pool are stable relative to each other, so slippage and token exchange rates are negligible
-func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("Not enough log topics passed!")
+		return feeData, fmt.Errorf("Not enough log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != curveTokenExchangeLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := curveAbi.Unpack("TokenExchange", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack TokenExchange log data! %v",
 			err,
 		)
@@ -112,7 +115,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	expectedUnpackedLen := 4
 	if len(unpacked) != expectedUnpackedLen {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected %v, got %v",
 			expectedUnpackedLen,
 			len(unpacked),
@@ -122,7 +125,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	tokenExchangeData, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -146,7 +149,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	soldCoinAddress_, err := ethereum.StaticCall(client, contractAddress, curveAbi, "coins", sold_id.Num())
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get sold coins address! %v",
 			err,
 		)
@@ -155,7 +158,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	soldCoinAddress, err := ethereum.CoerceBoundContractResultsToAddress(soldCoinAddress_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce %v to address! %v",
 			soldCoinAddress_,
 			err,
@@ -168,7 +171,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	boughtCoinAddress_, err := ethereum.StaticCall(client, contractAddress, curveAbi, "coins", bought_id.Num())
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get bought coin address! %v",
 			err,
 		)
@@ -177,7 +180,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	boughtCoinAddress, err := ethereum.CoerceBoundContractResultsToAddress(boughtCoinAddress_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce %v to address! %v",
 			boughtCoinAddress_,
 			err,
@@ -195,7 +198,13 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
+	}
+
+	if soldTokenIsFluid {
+		feeData.Volume = new(big.Rat).Set(tokens_sold)
+	} else {
+		feeData.Volume = new(big.Rat).Set(tokens_bought)
 	}
 
 	// Get current fee rate
@@ -207,7 +216,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to retrieve fees! %v",
 			err,
 		)
@@ -216,7 +225,7 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	curveFeeNum, err := ethereum.CoerceBoundContractResultsToRat(curveFeeNum_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce %v to rat! %v",
 			curveFeeNum_,
 			err,
@@ -241,8 +250,11 @@ func GetCurveSwapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	decimalsRat = new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fluidFee.Quo(fluidFee, decimalsRat)
+	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
 
-	return fluidFee, nil
+	feeData.Fee = fluidFee
+
+	return feeData, nil
 }
 
 // calculateCurveSwapFee returns the fee derived either from soldAmount * feeRate

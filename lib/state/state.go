@@ -436,7 +436,42 @@ func LPopCount(key string, count int) [][]byte {
 			k.Context = Context
 
 			k.Format(
-				"Failed to lpop with a count from key %#v!",
+				"Failed to lpop with a count of %v from key %#v!",
+				count,
+				key,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	byteResults := make([][]byte, len(result))
+
+	for i, result := range result {
+		byteResults[i] = []byte(result)
+	}
+
+	return byteResults
+}
+
+func RPopCount(key string, count int) [][]byte {
+	redisClient := client()
+
+	stringSliceCmd := redisClient.RPopCount(
+		context.Background(),
+		key,
+		count,
+	)
+
+	result, err := stringSliceCmd.Result()
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to rpop with a count of %v from key %#v!",
+				count,
 				key,
 			)
 

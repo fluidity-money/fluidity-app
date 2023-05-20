@@ -15,6 +15,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -113,19 +114,21 @@ var balancerV2PoolAbi ethAbi.ABI
 // input token is the fluid token, or an approximation based on the swap percentage if the
 // output token is the fluid token. This method generalises for Balancer's different pools
 // (stable, weighted, etc.)
-func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed")
+		return feeData, fmt.Errorf("No log topics passed")
 	}
 
 	topic := transfer.Log.Topics[0]
 
 	if topic.String() != balancerSwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	if len(transfer.Log.Topics) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Wrong number of log topics! Expected 4, got %v",
 			len(transfer.Log.Topics),
 		)
@@ -144,14 +147,14 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	unpacked, err := balancerV2PoolAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 2 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 2, got %v",
 			len(unpacked),
 		)
@@ -160,7 +163,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -177,7 +180,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	pool_, err := ethereum.StaticCall(client, vaultAddr, balancerV2VaultAbi, "getPool", idBytes)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to fetch pool! %v",
 			err,
 		)
@@ -188,7 +191,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	poolAddr, err := ethereum.CoerceBoundContractResultsToAddress(poolAddr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce pooladdr %v! %v",
 			poolAddr_,
 			err,
@@ -199,7 +202,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	swapPercentage, err := ethereum.StaticCall(client, poolAddr, balancerV2PoolAbi, "getSwapFeePercentage")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get swapPercentage! %v",
 			err,
 		)
@@ -208,7 +211,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 	swapRat, err := ethereum.CoerceBoundContractResultsToRat(swapPercentage)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swapPercentage %v! %v",
 			swapPercentage,
 			err,
@@ -233,16 +236,23 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 
 	switch true {
 	case tokenIn == fluidContractAddress:
+		fee := new(big.Rat).Set(amountIn)
+
 		// get the exact value based on the inputted fluid tokens
 		// fee = amountIn * swapPercentage / tokenDecimals
-		amountIn = amountIn.Mul(amountIn, swapRat)
+		fee = fee.Mul(fee, swapRat)
+		fee = fee.Quo(fee, decimalsRat)
 		amountIn = amountIn.Quo(amountIn, decimalsRat)
-		return amountIn, nil
+
+		feeData.Fee = fee
+		feeData.Volume = amountIn
+		return feeData, nil
 
 	case tokenOut == fluidContractAddress:
 		// get the approximated value based on the received fluid tokens
 		// fee ~= amountOut * (1 / (1 - swapPercentage)) - 1
 		// estimated the same way as Uniswap, but with a generalised swap percentage
+		fee := new(big.Rat).Set(amountOut)
 
 		// 1
 		bigOne := big.NewRat(1, 1)
@@ -257,12 +267,16 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		outFeePercentage := new(big.Rat).Sub(reciprocal, bigOne)
 
 		// approx. fee
-		amountOut.Mul(amountOut, outFeePercentage)
+		fee.Mul(fee, outFeePercentage)
 
 		// adjust for token decimals
-		amountOut.Quo(amountOut, decimalsRat)
+		fee.Quo(fee, decimalsRat)
+		amountOut = amountOut.Quo(amountOut, decimalsRat)
 
-		return amountOut, nil
+		feeData.Fee = fee 
+		feeData.Volume = amountOut
+
+		return feeData, nil
 
 	default:
 		// could be a multi-token pool swap that doesn't involve the fluid token
@@ -273,7 +287,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 }
 
