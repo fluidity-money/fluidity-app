@@ -856,7 +856,6 @@ interface IMyMultiplier {
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
-  liquidityMultiplier,
   stakes,
   wethPrice,
   usdcPrice,

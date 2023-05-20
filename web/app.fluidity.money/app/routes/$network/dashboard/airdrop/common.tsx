@@ -384,7 +384,6 @@ interface IStakingStatsModal {
 }
 
 const StakingStatsModal = ({
-  liqudityMultiplier,
   stakes,
   wethPrice,
   usdcPrice,
