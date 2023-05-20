@@ -750,7 +750,7 @@ const AirdropStats = ({
 const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
-  const providerLinks: Provider[] = [
+  const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
     {
       provider: "Sushiswap",
