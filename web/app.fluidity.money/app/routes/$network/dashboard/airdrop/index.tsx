@@ -750,14 +750,21 @@ const AirdropStats = ({
 const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
-  const providers: Provider[] = [
-    "Uniswap",
-    "Sushiswap",
-    "Camelot",
-    "Saddle",
-    "Chronos",
-    "Kyber",
+  const providerLinks: Provider[] = [
+    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    {
+      provider: "Sushiswap",
+      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+    },
+    { provider: "Camelot", link: "https://app.camelot.exchange/" },
+    { provider: "Saddle", link: "https://saddle.exchange/#/" },
+    { provider: "Chronos", link: "https://app.chronos.exchange/" },
+    {
+      provider: "Kyber",
+      link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
+    },
   ];
+
   return (
     <Card fill color="holo" rounded className="multiplier-tasks">
       <div className="multiplier-tasks-header">
@@ -814,7 +821,7 @@ const MultiplierTasks = () => {
           exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
           className="multiplier-tasks-tasks"
         >
-          {providers.map((provider, i) => {
+          {providerLinks.map(({ provider, link }, i) => {
             return (
               <a
                 key={`airdrop-mx-provider-` + i}
@@ -826,7 +833,7 @@ const MultiplierTasks = () => {
                   backgroundColor: "black",
                   padding: "6px",
                 }}
-                href="#"
+                href={link}
               >
                 <ProviderIcon provider={provider} style={{ height: "100%" }} />
               </a>
