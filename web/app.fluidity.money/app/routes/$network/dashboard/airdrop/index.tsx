@@ -938,8 +938,11 @@ const MyMultiplier = ({
       </GeneralButton>
       {!isMobile && (
         <div id="mx-my-stakes">
-          {stakes.map(
-            ({ fluidAmount, baseAmount, durationDays, depositDate }) => {
+          {stakes
+            .map((stake) => {
+              const { fluidAmount, baseAmount, durationDays, depositDate } =
+                stake;
+
               const stakedDays = dayDifference(
                 new Date(),
                 new Date(depositDate)
@@ -968,6 +971,29 @@ const MyMultiplier = ({
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
+              return {
+                stake,
+                stakedDays,
+                multiplier,
+                fluidUsd,
+                baseUsd,
+              };
+            })
+            .sort((a, b) => {
+              const stakeAVal = (a.fluidUsd + a.baseUsd) * a.multiplier;
+              const stakeBVal = (b.fluidUsd + b.baseUsd) * b.multiplier;
+
+              // Sort Descending
+              return stakeBVal > stakeAVal
+                ? 1
+                : stakeBVal === stakeAVal
+                ? 0
+                : -1;
+            })
+            .slice(0, 3)
+            .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
+              const { durationDays } = stake;
+
               return (
                 <>
                   <div
@@ -983,12 +1009,10 @@ const MyMultiplier = ({
                       {Math.floor(durationDays)} DAYS
                     </Text>
                     <ProgressBar
-                      value={stakedDays}
-                      max={Math.floor(durationDays)}
+                      value={multiplier}
+                      max={1}
                       rounded
-                      color={
-                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                      }
+                      color={multiplier === 1 ? "holo" : "gray"}
                       size="sm"
                     />
                   </div>
@@ -1001,8 +1025,7 @@ const MyMultiplier = ({
                   </div>
                 </>
               );
-            }
-          )}
+            })}
         </div>
       )}
       <GeneralButton
