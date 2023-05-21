@@ -922,8 +922,6 @@ const StakeNowModal = ({
         new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
 
-      console.log(receipt);
-
       if (receipt) {
         const success = await receipt.confirmTx();
 
