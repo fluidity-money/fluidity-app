@@ -1479,7 +1479,25 @@ const tutorialContent: {
   },
   "4": {
     title: "LEARN MORE",
-    desc: "To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.",
+    desc: <Text size="md">
+      To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post: <LinkButton
+        size="medium"
+        type="external"
+        style={{
+          display: "inline-flex",
+          textDecoration: "underline",
+          textUnderlineOffset: 2,
+        }}
+        handleClick={() => {
+          window.open(
+            "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+            "_blank"
+          );
+        }}
+      >
+        LEARN MORE
+      </LinkButton>
+    </Text>,
     image: "AIRDROP_DEEP_DIVE",
   },
 };

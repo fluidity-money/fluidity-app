@@ -341,7 +341,10 @@ const Airdrop = () => {
                       textUnderlineOffset: 2,
                     }}
                     handleClick={() => {
-                      return;
+                      window.open(
+                        "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                        "_blank"
+                      );
                     }}
                   >
                     Learn more
@@ -552,7 +555,10 @@ const Airdrop = () => {
                     textUnderlineOffset: 2,
                   }}
                   handleClick={() => {
-                    return;
+                    window.open(
+                      "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                      "_blank"
+                    );
                   }}
                 >
                   Learn more
