@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -28,6 +28,7 @@ import { dayDifference } from ".";
 import { Referral } from "~/queries";
 import { BottleTiers, StakingEvent } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 
 interface IBottleDistribution {
   bottles: BottleTiers;
@@ -924,6 +925,94 @@ const TutorialModal = ({ isMobile }: { isMobile?: boolean }) => {
   );
 };
 
+const TestnetRewardsModal = ({isMobile}: {isMobile: boolean}) => {
+  const {confirmAccountOwnership, signOwnerAddress, address: signerAddress} = useContext(FluidityFacadeContext)
+  const [address, setAddress] = useState("");
+  const [ropstenAddress, setRopstenAddress] = useState("");
+  const [signature, setSignature] = useState("");
+  const [manualSignature, setManualSignature] = useState("");
+  const [finalised, setFinalised] = useState(false);
+
+  if (!confirmAccountOwnership || !signOwnerAddress)
+    return;
+
+  if (finalised) {
+    return (
+      <div>
+        <Heading>Claim Testnet Rewards</Heading>
+        <Text prominent size="md">
+        Congratulations! You have successfully confirmed your ownership of the testnet address {ropstenAddress}. If this address participated in the Fluidity Ropsten testnet, you will receive free loot bottles during the Fluidity Airdrop!
+        </Text>
+      </div>
+    )
+  }
+
+  if (!signature || !address) {
+    return (
+      <div>
+        <Heading>Claim Testnet Rewards</Heading>
+        <Text prominent size="md">
+          If you participated in Fluidity's Ropsten testnet, you are eligible for free bottles! To begin, switch your wallet to the address that you used on Ropsten. Then, enter your <strong>mainnet</strong> address in the box below. <strong>Ensure you don't change the active network away from Arbitrum!</strong>. Click the button to prompt a signature from your wallet. If you have already generated a signature previously, enter it in the signature box, as well as the address.
+        </Text>
+
+        <Heading>ADDRESS</Heading>
+        <input value={address} onChange={v => setAddress(v.target.value)}>
+        </input>
+        <GeneralButton
+          layout="after"
+          handleClick={() => {
+            setRopstenAddress(signerAddress ?? "");
+            signOwnerAddress(address).then(sig => setSignature(sig ?? ""))
+          }}
+          type="transparent"
+        >
+          Confirm Owner Address
+        </GeneralButton>
+        <Heading>SIGNATURE</Heading>
+        <input value={manualSignature} onChange={v => setManualSignature(v.target.value)}>
+        </input>
+        <GeneralButton
+          layout="after"
+          handleClick={() => {
+            setSignature(manualSignature)
+          }}
+          type="transparent"
+        >
+          Confirm signature
+        </GeneralButton>
+      </div>
+    )
+  } else {
+    return (
+    <div>
+        <Heading>Claim Testnet Rewards</Heading>
+        <Heading>SIGNATURE</Heading>
+        <input value={signature} disabled={true}></input>
+        {signerAddress?.toLowerCase() === address.toLowerCase() ? 
+        <><Text prominent size="md">
+        Click to confirm your ownership of the testnet address {ropstenAddress}            
+        </Text>
+        <GeneralButton
+          layout="after"
+          handleClick={() => {
+            confirmAccountOwnership(signature, address).then(() => setFinalised(true))
+          }}
+          type="transparent"
+        >
+          Confirm Account Ownership 
+        </GeneralButton>
+          
+        </>: <>
+        <Text prominent size="md">
+          Change your wallet account to {address} to finalise confirmation. Currently signed in as {signerAddress}
+        </Text>
+        </>
+        }
+    </div>
+    )
+  }
+}
+
 export {
   BottleDistribution,
   TutorialModal,
@@ -931,4 +1020,5 @@ export {
   StakingStatsModal,
   BottlesDetailsModal,
   ReferralDetailsModal,
+  TestnetRewardsModal,
 };
