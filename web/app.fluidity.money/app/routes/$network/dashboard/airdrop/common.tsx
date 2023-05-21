@@ -1588,7 +1588,7 @@ const TutorialModal = ({
   );
 };
 
-const TestnetRewardsModal = ({isMobile}: {isMobile: boolean}) => {
+const TestnetRewardsModal = () => {
   const {confirmAccountOwnership, signOwnerAddress, address: signerAddress} = useContext(FluidityFacadeContext)
   const [address, setAddress] = useState("");
   const [ropstenAddress, setRopstenAddress] = useState("");
@@ -1597,7 +1597,7 @@ const TestnetRewardsModal = ({isMobile}: {isMobile: boolean}) => {
   const [finalised, setFinalised] = useState(false);
 
   if (!confirmAccountOwnership || !signOwnerAddress)
-    return;
+    return <></>;
 
   if (finalised) {
     return (

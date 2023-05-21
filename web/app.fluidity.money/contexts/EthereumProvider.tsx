@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { confirmAccountOwnership_, signOwnerAddress, signOwnerAddress_, StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
+import { confirmAccountOwnership_, signOwnerAddress_, StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -44,7 +44,6 @@ import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
-import {Signature} from "ethers";
 
 type OKXWallet = {
   isOkxWallet: boolean;
