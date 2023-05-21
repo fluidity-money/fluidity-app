@@ -894,6 +894,17 @@ const MyMultiplier = ({
     0
   );
 
+  // if there are no stakes, this renders an empty stake on the dashboard which is A PART OF THE DESIGN SPEC
+  if (stakes.length === 0)
+    stakes = [
+      {
+        fluidAmount: new BN(0),
+        baseAmount: new BN(0),
+        durationDays: 0,
+        depositDate: new Date(),
+      },
+    ];
+
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
