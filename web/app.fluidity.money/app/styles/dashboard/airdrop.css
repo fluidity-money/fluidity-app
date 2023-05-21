@@ -408,13 +408,14 @@
 .airdrop-header {
   display: flex;
   gap: 2em;
-  margin-bottom: 2em;
+  padding-bottom: 2em;
   white-space: nowrap;
 }
 .airdrop-header.airdrop-mobile {
   max-width: 100%;
   box-sizing: border-box;
-  margin-bottom: 1em;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.5em;
   overflow-x: scroll;
 }
 

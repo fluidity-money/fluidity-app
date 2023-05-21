@@ -455,13 +455,15 @@ $holo: linear-gradient(
 .airdrop-header {
   display: flex;
   gap: 2em;
-  margin-bottom: 2em;
+  padding-bottom: 2em;
   white-space: nowrap;
 
   &.airdrop-mobile {
     max-width: 100%;
     box-sizing: border-box;
-    margin-bottom: 1em;
+    // both margin and padding required here to make the scrollbar render nicely inbetween
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
     overflow-x: scroll;
   }
 }

@@ -261,10 +261,10 @@ const Airdrop = () => {
         className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
           }`}
       >
-        <TabButton size="small" onClick={() => setCurrentModal(null)}>
+        <TabButton size="small" onClick={() => setCurrentModal(null)} groupId="airdrop" isSelected={isMobile ? currentModal === null : true}>
           Airdrop Dashboard
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
+        <TabButton size="small" onClick={() => setCurrentModal("tutorial")} groupId="airdrop" isSelected={isMobile && currentModal === "tutorial"}>
           Airdrop Tutorial
         </TabButton>
         <TabButton
@@ -278,16 +278,19 @@ const Airdrop = () => {
             }
             setCurrentModal("leaderboard");
           }}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "leaderboard"}
         >
           Leaderboard
         </TabButton>
         <TabButton
           size="small"
           onClick={() => setCurrentModal("referral-details")}
+          groupId="airdrop" isSelected={isMobile && currentModal === "referral-details"}
         >
           Referrals
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
+        <TabButton size="small" onClick={() => setCurrentModal("stake-now")} groupId="airdrop" isSelected={isMobile && currentModal === "stake-now"}>
           Stake
         </TabButton>
       </div>
