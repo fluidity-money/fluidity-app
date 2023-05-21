@@ -3,8 +3,8 @@ DOCKERFILE_PATH: ./cmd/microservice-ethereum-create-transaction-lootboxes
 ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
 ENV_FLU_DEBUG: true
 ENV_FLU_SILENT: false
-SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ethereum/token_list
-SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/ethereum/http_url
+SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/arbitrum/token_list
+SECRET_FLU_ETHEREUM_HTTP_URL: /fluidity/arbitrum/http_url
 
 SERVICES:
   - CREATE_TRANSACTION_LOOTBOXES:
