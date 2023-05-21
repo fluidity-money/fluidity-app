@@ -45,6 +45,7 @@ import {
   ChainName,
   BurgerMenu,
   Referral,
+  CardModal
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -420,40 +421,34 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      <Modal id="referral-modal" visible={referralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setReferralModalVisibility(false)}
-          style={{
-            background: "none",
+      <CardModal
+        id="referral-modal"
+        visible={referralModalVisibility}
+        closeModal={() => setReferralModalVisibility(false)}
+        cardPositionStyle={{
+          position: "absolute",
+          top: "1em",
+          right: isTablet ? "20px" : "60px",
+          maxWidth: 550
+        }}
+      >
+        <ReferralModal
+          connected={!!connected}
+          network={network}
+          connectWallet={() => {
+            setReferralModalVisibility(false);
+            setWalletModalVisibility(true);
           }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "1em",
-              right: isTablet ? "20px" : "60px",
-            }}
-          >
-            <ReferralModal
-              connected={!!connected}
-              network={network}
-              connectWallet={() => {
-                setReferralModalVisibility(false);
-                setWalletModalVisibility(true);
-              }}
-              referrerClaimed={numActiveReferrerReferrals}
-              refereeClaimed={numActiveReferreeReferrals}
-              refereeUnclaimed={numInactiveReferreeReferrals}
-              progress={inactiveReferrals[0]?.progress || 0}
-              progressReq={10}
-              referralCode={referralCode}
-              loaded={referralCountLoaded}
-              closeModal={() => setReferralModalVisibility(false)}
-            />
-          </div>
-        </div>
-      </Modal>
+          referrerClaimed={numActiveReferrerReferrals}
+          refereeClaimed={numActiveReferreeReferrals}
+          refereeUnclaimed={numInactiveReferreeReferrals}
+          progress={inactiveReferrals[0]?.progress || 0}
+          progressReq={10}
+          referralCode={referralCode}
+          loaded={referralCountLoaded}
+          closeModal={() => setReferralModalVisibility(false)}
+        />
+      </CardModal>
 
       {/* Accept Referral Modal */}
       <Modal id="accept-referral-modal" visible={acceptReferralModalVisibility}>

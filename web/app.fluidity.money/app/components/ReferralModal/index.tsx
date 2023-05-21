@@ -54,16 +54,7 @@ const ReferralModal = ({
   const referralsEmoji = referrerClaimed ? "🎉" : "😔";
 
   return (
-    <Card
-      onClick={(e: MouseEvent) => {
-        e.stopPropagation();
-      }}
-      className="referrals-container"
-      type="frosted"
-      border="solid"
-      color="holo"
-      rounded
-    >
+    <>
       <div className="referrals-content">
         <div className="referrals-header">
           {/* Help Button */}
@@ -228,7 +219,7 @@ const ReferralModal = ({
           />
         )}
       </Card>
-    </Card>
+    </>
   );
 };
 
