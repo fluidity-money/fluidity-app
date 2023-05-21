@@ -251,7 +251,7 @@ export default function MobileModal({
                                 index === 0 ? "./" : (key as unknown as string)
                               }
                             >
-                              <Text prominent={active} style={{ fill: 'currentColor' }}>
+                              <Text prominent={active} className="mobile-modal-text-link">
                                 {icon} {name}
                               </Text>
                             </Link>

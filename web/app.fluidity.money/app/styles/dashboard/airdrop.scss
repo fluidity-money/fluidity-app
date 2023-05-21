@@ -465,3 +465,58 @@ $holo: linear-gradient(
     overflow-x: scroll;
   }
 }
+
+.stake-confirm-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  grid-column: 1 / 4;
+}
+
+.airdrop-stake-container {
+  display: grid;
+  grid-template-columns: auto auto 160px;
+  column-gap: 4em;
+  row-gap: 2em;
+  max-width: 500px;
+
+
+  &.airdrop-mobile {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1em;
+
+
+    .airdrop-stake-inputs-column {
+      grid-column: 1 / 3;
+    }
+
+    .staking-modal-input-container {
+      max-width: unset;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .stake-confirm-column {
+      grid-column: 1/3;
+    }
+
+    .duration-column {
+      grid-column: 1 / 3;
+      width: 100%;
+      gap: 0.5em;
+      align-items: flex-start;
+
+      .duration-col-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+      }
+
+      .slippage-tooltip {
+        margin-top: 1em;
+      }
+    }
+  }
+}
