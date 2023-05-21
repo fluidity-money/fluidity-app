@@ -12,7 +12,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -137,7 +136,7 @@ func main() {
 				})
 			}
 
-			receipt, err := bind.WaitMined(context.Background(), ethClient, transaction)
+			receipt_, err := bind.WaitMined(context.Background(), ethClient, transaction)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -149,6 +148,8 @@ func main() {
 					k.Payload = err
 				})
 			}
+
+			receipt := libEthereum.ConvertGethReceipt(*receipt_)
 
 			if len(receipt.Logs) < int(logIndex.Int64()) {
 				log.Fatal(func(k *log.Log) {
@@ -172,7 +173,7 @@ func main() {
 			
 			inputData := transaction.Data()
 
-			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, *receipt, inputData)
+			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
