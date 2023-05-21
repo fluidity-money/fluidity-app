@@ -158,37 +158,36 @@ const ReferralModal = ({
               prominent
               size={"sm"}
             >
-              <Twitter style={{ height: "1em", fill: "currentColor" }} /> TWITTER
+              <Twitter style={{ height: "1em", fill: "currentColor", translate: '0 2px', marginRight: 2 }} />TWITTER
             </Text>
           </TextButton>
         </Text>
       </div>
 
       {/* How It Works Divider / Links*/}
-      <Card
-        type="transparent"
+      <div
         className="referrals-inner-box"
-        border="solid"
-        color="white"
-        rounded
       >
         <div className="referrals-inner-switcher">
+          <div className="referrals-inner-divider" />
           <GeneralButton
-            type={showHowItWorks ? "primary" : "secondary"}
+            type={showHowItWorks ? "primary" : "transparent"}
             buttontype={"text"}
             handleClick={() => setShowHowItWorks(true)}
-            size={"medium"}
+            size={"small"}
           >
-            How It Works
+            <Text size="sm" code style={{ color: 'inherit' }}>How It Works</Text>
           </GeneralButton>
+          <div className="referrals-inner-divider" />
           <GeneralButton
-            type={!showHowItWorks ? "primary" : "secondary"}
+            type={!showHowItWorks ? "primary" : "transparent"}
             buttontype={"text"}
             handleClick={() => setShowHowItWorks(false)}
-            size={"medium"}
+            size={"small"}
           >
-            Links I&apos;ve Clicked
+            <Text size="md" code style={{ color: 'inherit' }}>Links I&apos;ve Clicked</Text>
           </GeneralButton>
+          <div className="referrals-inner-divider" />
         </div>
         {/*Contents*/}
         {showHowItWorks ? (
@@ -203,7 +202,7 @@ const ReferralModal = ({
             navigate={navigate}
           />
         )}
-      </Card>
+      </div>
     </>
   );
 };

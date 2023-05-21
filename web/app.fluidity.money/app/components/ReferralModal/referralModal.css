@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 2.5em;
+  gap: 2em;
   padding: 2em 0;
   text-align: center;
 }
@@ -43,11 +43,24 @@
 
 .referrals-inner-switcher {
   width: 100%;
-  position: absolute;
-  top: -24px;
-  display: flex;
-  justify-content: center;
-  gap: 4em;
+  display: grid;
+  grid-template-columns: 1fr max-content 2em max-content 1fr;
+  align-items: end;
+}
+
+.referrals-inner-divider {
+  height: 50%;
+  border-top: 1px solid white;
+}
+
+.referrals-inner-divider:first-child {
+  border-left: 1px solid white;
+  border-top-left-radius: 100px;
+}
+
+.referrals-inner-divider:last-child {
+  border-right: 1px solid white;
+  border-top-right-radius: 100px;
 }
 
 .referrals-inner-switcher > button {
