@@ -70,7 +70,7 @@
 }
 
 .staking-modal-input-container {
-  border: 1px solid gray;
+  border: 2px solid gray;
   display: flex;
   padding: 5px;
   border-radius: 5em 14px 14px 5em;
@@ -94,6 +94,19 @@
   padding-right: 5px;
 }
 
+.staking-modal-token-insufficient {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 12px;
+  bottom: -0.5em;
+  background: black;
+  padding: 0.2em 2em 0.2em 2em;
+  border-radius: 12px;
+  border: 1px solid red;
+}
+
 .staking-modal-token-selector {
   display: flex;
   align-items: center;
@@ -112,6 +125,10 @@
 }
 .staking-modal-arrow-container path {
   stroke: white;
+}
+
+.staking-modal-complete {
+  width: 95%;
 }
 
 .duration-column {
@@ -419,6 +436,8 @@
   align-self: end;
 }
 .airdrop-my-multiplier #mx-my-stakes {
+  max-height: 12em;
+  overflow-y: scroll;
   display: grid;
   grid-template-columns: auto max-content;
   align-content: start;

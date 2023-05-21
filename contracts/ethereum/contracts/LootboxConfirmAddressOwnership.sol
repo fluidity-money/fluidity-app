@@ -15,20 +15,6 @@ contract LootboxConfirmAddressOwnership is ILootboxConfirmAddressOwnership {
     // address => owner
     mapping(address => address) private addresses_;
 
-    bytes32 private domainSeperator_;
-
-    constructor(string memory id) {
-        domainSeperator_ = keccak256(
-            abi.encode(
-                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-                keccak256(bytes(id)),
-                keccak256("1"),
-                block.chainid,
-                address(this)
-            )
-        );
-    }
-
     function confirmSame(address addr) public {
         require(addr == msg.sender, "wrong address");
 
@@ -36,12 +22,20 @@ contract LootboxConfirmAddressOwnership is ILootboxConfirmAddressOwnership {
 
         addresses_[addr] = addr;
 
-        emit AddressConfirmed(addr, addr);
     }
 
     function confirm(address addr, address owner, uint8 _v, bytes32 _r, bytes32 _s) public {
         address recoveredAddress = ecrecover(
-            keccak256(getPayload(addr, owner)),
+            keccak256(
+                abi.encodePacked(
+                    "\x19Ethereum Signed Message:\n32",
+                    keccak256(abi.encodePacked(
+                        "fluidity.lootbox.confirm.address.ownership",
+                        addr,
+                        owner
+                    ))
+                )
+            ),
             _v,
             _r,
             _s
@@ -55,19 +49,5 @@ contract LootboxConfirmAddressOwnership is ILootboxConfirmAddressOwnership {
         addresses_[recoveredAddress] = owner;
 
         emit AddressConfirmed(addr, owner);
-    }
-
-    function getPayload(address addr, address owner) public view returns (bytes memory) {
-        return abi.encodePacked(
-            "\x19\x01",
-            domainSeperator_,
-            keccak256(
-                abi.encode(
-                    CONFIRM_SELECTOR,
-                    addr,
-                    owner
-                )
-            )
-        );
     }
 }

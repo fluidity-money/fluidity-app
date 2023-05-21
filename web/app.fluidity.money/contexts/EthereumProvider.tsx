@@ -410,25 +410,29 @@ const EthereumFacade = ({
 
     return stakingDeposits.map(
       ({
-        camelotLpMinted,
-        sushiswapLpMinted,
         redeemTimestamp,
         depositTimestamp,
         camelotTokenA,
         sushiswapTokenA,
+        camelotTokenB,
+        sushiswapTokenB,
       }) => {
-        const camelotLp = new BN(camelotLpMinted.toString());
-        const sushiswapLp = new BN(sushiswapLpMinted.toString());
-        const totalLp = camelotLp.add(sushiswapLp);
+        const fluidAmount = new BN(
+          camelotTokenA.add(sushiswapTokenA).toString()
+        );
 
-        const camelotToken = new BN(camelotTokenA.toString());
-        const sushiswapToken = new BN(sushiswapTokenA.toString());
-        const totalToken = camelotToken.add(sushiswapToken);
+        const baseAmount = new BN(
+          camelotTokenB.add(sushiswapTokenB).toString()
+        );
 
         return {
-          fluidAmount: totalLp,
-          baseAmount: totalToken,
-          durationDays: redeemTimestamp.toNumber() / 24 / 60 / 60,
+          fluidAmount,
+          baseAmount,
+          durationDays:
+            (redeemTimestamp.toNumber() - depositTimestamp.toNumber()) /
+            24 /
+            60 /
+            60,
           depositDate: new Date(depositTimestamp.toNumber() * 1000),
         };
       }
@@ -489,7 +493,7 @@ const EthereumFacade = ({
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ): Promise<StakingDepositsRes | undefined> => {
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -515,7 +519,7 @@ const EthereumFacade = ({
       }
     );
 
-    return makeStakingDeposit(
+    const stakingDepositRes = await makeStakingDeposit(
       signer,
       usdcToken,
       fusdcToken,
@@ -529,6 +533,13 @@ const EthereumFacade = ({
       slippage,
       maxTimestamp
     );
+
+    return stakingDepositRes
+      ? {
+          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+          txHash: stakingDepositRes.hash,
+        }
+      : undefined;
   };
 
   return (
