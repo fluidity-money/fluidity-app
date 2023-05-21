@@ -7,6 +7,7 @@ import type {
 import type BN from "bn.js";
 
 import { createContext } from "react";
+import {ContractInterface, Signer} from "ethers";
 
 export interface IFluidityFacade {
   swap: (
@@ -72,6 +73,15 @@ export interface IFluidityFacade {
     slippage: BN,
     maxTimestamp: BN
   ) => Promise<TransactionResponse | undefined>;
+  
+  signOwnerAddress?: (
+    ownerAddress: string
+  ) => Promise<string | undefined>
+
+  confirmAccountOwnership?: (
+    signature: string,
+    address: string,
+  ) => Promise<void>
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({
