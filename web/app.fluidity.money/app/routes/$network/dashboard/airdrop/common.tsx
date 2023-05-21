@@ -112,7 +112,7 @@ const BottleDistribution = ({
                 : { fontSize: "1em" }
             }
           >
-            {toSignificantDecimals(quantity)}
+            {Math.floor(quantity * 10) / 10}
           </Text>
         </div>
       );
@@ -395,35 +395,45 @@ const StakingStatsModal = ({
   wethPrice,
   usdcPrice,
 }: IStakingStatsModal) => {
-  const canWithdraw = stakes.some(({ durationDays, depositDate }) => {
-    const stakedDays = dayDifference(new Date(), depositDate);
-    return durationDays - stakedDays <= 0;
+  const augmentedStakes = stakes.map((stake) => {
+    const { fluidAmount, baseAmount, durationDays, depositDate } = stake;
+
+    const stakedDays = dayDifference(new Date(), new Date(depositDate));
+    const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
+
+    const fluidDecimals = 6;
+    const fluidUsd = getUsdFromTokenAmount(
+      fluidAmount,
+      fluidDecimals,
+      usdcPrice
+    );
+
+    const wethDecimals = 18;
+    const usdcDecimals = 6;
+
+    // If converting base amount by weth decimals (18) is smaller than $0.01,
+    // then tentatively assume Token amount is USDC
+    // A false hit would be a USDC deposit >= $100,000
+    const baseUsd =
+      getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
+        ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+        : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+    return {
+      stake,
+      stakedDays,
+      multiplier,
+      fluidUsd,
+      baseUsd,
+    };
   });
 
-  const sumLiquidityMultiplier = stakes.reduce(
-    (sum, { fluidAmount, baseAmount, durationDays, depositDate }) => {
-      const fluidDecimals = 6;
-      const fluidUsd = getUsdFromTokenAmount(
-        fluidAmount,
-        fluidDecimals,
-        usdcPrice
-      );
+  const canWithdraw = augmentedStakes.some(({ stake, stakedDays }) => {
+    return stake.durationDays - stakedDays <= 0;
+  });
 
-      const wethDecimals = 18;
-      const usdcDecimals = 6;
-
-      // If converting base amount by weth decimals (18) is smaller than $0.01,
-      // then tentatively assume Token amount is USDC
-      // A false hit would be a USDC deposit >= $100,000
-      const baseUsd =
-        getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
-          ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-          : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
-
-      const stakedDays = dayDifference(new Date(), new Date(depositDate));
-
-      const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
-
+  const sumLiquidityMultiplier = augmentedStakes.reduce(
+    (sum, { multiplier, fluidUsd, baseUsd }) => {
       return sum + (fluidUsd + baseUsd) * multiplier;
     },
     0
@@ -454,26 +464,7 @@ const StakingStatsModal = ({
         </LabelledValue>
         <LabelledValue label={<Text size="sm">Total Amount Staked</Text>}>
           {numberToMonetaryString(
-            stakes.reduce((sum, { fluidAmount, baseAmount }) => {
-              const fluidDecimals = 6;
-              const fluidUsd = getUsdFromTokenAmount(
-                fluidAmount,
-                fluidDecimals,
-                usdcPrice
-              );
-
-              const wethDecimals = 18;
-              const usdcDecimals = 6;
-
-              // If converting base amount by weth decimals (18) is smaller than $0.01,
-              // then tentatively assume Token amount is USDC
-              // A false hit would be a USDC deposit >= $100,000
-              const baseUsd =
-                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
-                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
-
+            augmentedStakes.reduce((sum, { fluidUsd, baseUsd }) => {
               return sum + fluidUsd + baseUsd;
             }, 0)
           )}
@@ -497,35 +488,12 @@ const StakingStatsModal = ({
             maxHeight: "50vh",
           }}
         >
-          {stakes.map(
-            ({ fluidAmount, baseAmount, durationDays, depositDate }, i) => {
-              const stakedDays = dayDifference(new Date(), depositDate);
-              const multiplier = stakingLiquidityMultiplierEq(
-                stakedDays,
-                durationDays
-              );
+          {augmentedStakes.map(
+            ({ stake, stakedDays, fluidUsd, baseUsd, multiplier }, i) => {
+              const { durationDays, depositDate } = stake;
 
               const endDate = new Date(depositDate);
               endDate.setDate(endDate.getDate() + durationDays);
-
-              const fluidDecimals = 6;
-              const fluidUsd = getUsdFromTokenAmount(
-                fluidAmount,
-                fluidDecimals,
-                usdcPrice
-              );
-
-              const wethDecimals = 18;
-              const usdcDecimals = 6;
-
-              // If converting base amount by weth decimals (18) is smaller than $0.01,
-              // then tentatively assume Token amount is USDC
-              // A false hit would be a USDC deposit >= $100,000
-              const baseUsd =
-                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
-                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
               return (
                 <>
@@ -569,14 +537,10 @@ const StakingStatsModal = ({
                         {numberToMonetaryString(fluidUsd + baseUsd)}
                       </Heading>
                       <ProgressBar
-                        value={stakedDays}
-                        max={Math.floor(durationDays)}
+                        value={multiplier}
+                        max={1}
                         rounded
-                        color={
-                          stakedDays >= Math.floor(durationDays)
-                            ? "holo"
-                            : "gray"
-                        }
+                        color={multiplier === 1 ? "holo" : "gray"}
                         size="sm"
                       />
                       <div
@@ -888,15 +852,15 @@ const StakeNowModal = ({
 
   const testStake = async (): Promise<boolean> => {
     try {
-      if (fluidTokenAmount.gte(fluidToken.userTokenBalance)) {
+      if (fluidTokenAmount.gt(fluidToken.userTokenBalance)) {
         throw Error('reason="Insufficient Fluid Funds"');
       }
 
-      if (baseTokenAmount.gte(baseToken.userTokenBalance)) {
+      if (baseTokenAmount.gt(baseToken.userTokenBalance)) {
         throw Error('reason="Insufficient Base Funds"');
       }
 
-      await testStakeTokens?.(
+      const res = await testStakeTokens?.(
         new BN(daysToSeconds(stakingDuration)),
         baseToken.symbol === "USDC" ? baseTokenAmount : new BN(0),
         fluidToken.symbol === "fUSDC" ? fluidTokenAmount : new BN(0),
@@ -904,6 +868,8 @@ const StakeNowModal = ({
         new BN(slippage),
         new BN(Math.floor(new Date().valueOf() / 1000) + 30 * 60) // 30 Minutes after now
       );
+
+      if (!res) return false;
 
       setStakeErr("");
       return true;
@@ -966,10 +932,11 @@ const StakeNowModal = ({
         setStakingState("complete");
       }
     } catch (e) {
-      // Expect error on fail
+      setStakeErr(
+        typeof e === "object" ? "User Rejected Transaction" : (e as string)
+      );
+    } finally {
       setStakingState("ready");
-      setStakeErr(e as string);
-      return;
     }
   };
 

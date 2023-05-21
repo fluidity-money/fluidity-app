@@ -527,11 +527,7 @@ export default function Home() {
 
                     return (
                       <div key={index} className="lootbottle-container">
-                        <LootBottle
-                          size="sm"
-                          rarity={rarity}
-                          quantity={quantity}
-                        />
+                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
                         <Text
                           size="sm"
                           style={{

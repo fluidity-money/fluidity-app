@@ -30,7 +30,7 @@ export const useAirdropStatsByAddress = async (address: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
-    address: `0x${"0".repeat(24)}${address.slice(2)}`,
+    address,
     now: new Date().toISOString(),
   };
   const body = {
