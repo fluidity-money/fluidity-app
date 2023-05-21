@@ -10,7 +10,9 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -112,7 +114,30 @@ func main() {
 			// not a Transfer event, so look up and classify the application used
 
 			// fetch parameters to call GetApplicationFee
-			receipt, err := libEthereum.GetReceipt(ethClient, ethereum.HashFromString(transactionHash))
+			// wait for transaction to be mined before fetching receipt
+			transaction, isPending, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to fetch transaction by hash %s!",
+						transactionHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			if isPending {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Transaction %s is pending - waiting to be mined",
+						transactionHash,
+					)
+				})
+			}
+
+			receipt, err := bind.WaitMined(context.Background(), ethClient, transaction)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -145,19 +170,6 @@ func main() {
 
 			fluidTokenContract := tokensMap[tokenShortName]
 			
-			transaction, _, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to fetch transaction %s!",
-						transactionHash,
-					)
-
-					k.Payload = err
-				})
-			}
-
 			inputData := transaction.Data()
 
 			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, *receipt, inputData)
