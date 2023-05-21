@@ -1615,7 +1615,7 @@ const TestnetRewardsModal = () => {
       <div>
         <Heading>Claim Testnet Rewards</Heading>
         <Text prominent size="md">
-          If you participated in Fluidity's Ropsten testnet, you are eligible for free bottles! To begin, switch your wallet to the address that you used on Ropsten. Then, enter your <strong>mainnet</strong> address in the box below. <strong>Ensure you don't change the active network away from Arbitrum!</strong>. Click the button to prompt a signature from your wallet. If you have already generated a signature previously, enter it in the signature box, as well as the address.
+          If you participated in Fluidity&#39;s Ropsten testnet, you are eligible for free bottles! To begin, switch your wallet to the address that you used on Ropsten. Then, enter your <strong>mainnet</strong> address in the box below. <strong>Ensure you don&#39;t change the active network away from Arbitrum!</strong>. Click the button to prompt a signature from your wallet. If you have already generated a signature previously, enter it in the signature box, as well as the address.
         </Text>
 
         <Heading>ADDRESS</Heading>

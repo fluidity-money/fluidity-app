@@ -7,7 +7,6 @@ import type {
 import type BN from "bn.js";
 
 import { createContext } from "react";
-import {ContractInterface, Signer} from "ethers";
 
 export interface IFluidityFacade {
   swap: (
