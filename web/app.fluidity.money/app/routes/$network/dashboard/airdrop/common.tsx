@@ -112,7 +112,7 @@ const BottleDistribution = ({
                 : { fontSize: "1em" }
             }
           >
-            {toSignificantDecimals(quantity)}
+            {Math.floor(quantity * 10) / 10}
           </Text>
         </div>
       );
