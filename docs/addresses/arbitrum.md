@@ -71,8 +71,10 @@
 
 ### LootboxStaking
 
-| Description    | Address                                    |
-| -------------- | ------------------------------------------ |
-| Implementation | 0xe95E8C4Ad64015046807272E492588119929E97b |
-| Proxy          | 0x770f77A67d9B1fC26B80447c666f8a9aECA47C82 |
-| ProxyAdmin     | 0x80d82aF50EF0277b7A888616a7CE9F2D2F39DAe2 |
+| Description             | Address                                    |
+| ----------------------- | ------------------------------------------ |
+| Implementation          | 0xe95E8C4Ad64015046807272E492588119929E97b |
+| Proxy                   | 0x770f77A67d9B1fC26B80447c666f8a9aECA47C82 |
+| ProxyAdmin              | 0x80d82aF50EF0277b7A888616a7CE9F2D2F39DAe2 |
+| Camelot fUSDC/USDC pair | 0x1Cb94adFd3314d48Ca8145b2c6983419257c0486 |
+| Camelot fUSDC/WETH pair | 0x85DF70e1636D28AB29bB81dF93B68834F4308750 |
