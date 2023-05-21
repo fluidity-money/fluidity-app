@@ -82,9 +82,9 @@ func TestGetBalancerFees(t *testing.T) {
 	assert.NoError(t, err)
 
 	// nil transfer fails
-	fees, err := GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err := GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Error(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	transfer.Log.Topics = []ethTypes.Hash{
 		ethTypes.HashFromString(""),
@@ -94,28 +94,28 @@ func TestGetBalancerFees(t *testing.T) {
 	}
 
 	// nil data fails with no error (topics don't match)
-	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Nil(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// fluid -> other successful
 	transfer.Log.Data = *dataBlob
 	transfer.Log.Topics[0] = ethTypes.HashFromString(balancerSwapLogTopic)
-	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, big.NewRat(25, 1), fees)
+	assert.Equal(t, big.NewRat(25, 1), feeData.Fee)
 
 	// other -> fluid successful
 	transfer.Log.Topics[2] = ethTypes.HashFromString("0x2")
-	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.NoError(t, err)
-	assert.Equal(t, big.NewRat(7340032, 309375), fees)
+	assert.Equal(t, big.NewRat(7340032, 309375), feeData.Fee)
 
 	// other -> other successful
 	transfer.Log.Topics[3] = ethTypes.HashFromString("0x3")
-	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	feeData, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
 	assert.Nil(t, err)
-	assert.Nil(t, fees)
+	assert.Nil(t, feeData.Fee)
 
 	// bad RPC responses
 	// bad swap fee response
@@ -125,8 +125,8 @@ func TestGetBalancerFees(t *testing.T) {
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
-	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
-	assert.Nil(t, fees)
+	feeData, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	assert.Nil(t, feeData.Fee)
 	assert.Error(t, err)
 
 	// bad pool response
@@ -136,7 +136,7 @@ func TestGetBalancerFees(t *testing.T) {
 	client, err = testUtils.MockRpcClient(rpcMethods, callMethods)
 	assert.NoError(t, err)
 
-	fees, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
-	assert.Nil(t, fees)
+	feeData, err = GetBalancerFees(transfer, client, fluidTokenAddr, tokenDecimals)
+	assert.Nil(t, feeData.Fee)
 	assert.Error(t, err)
 }

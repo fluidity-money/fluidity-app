@@ -38,6 +38,7 @@ import {
   WalletIcon,
   TabButton,
   LootBottle,
+  toSignificantDecimals,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -522,15 +523,11 @@ export default function Rewards() {
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
                   ([rarity, quantity]: [string, number], index) => {
-                    if (!Math.floor(quantity)) return <></>;
+                    if (quantity < 0.1) return <></>;
 
                     return (
                       <div key={index} className="lootbottle-container">
-                        <LootBottle
-                          size="sm"
-                          rarity={rarity}
-                          quantity={quantity}
-                        />
+                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
                         <Text
                           size="sm"
                           style={{
@@ -538,7 +535,7 @@ export default function Rewards() {
                             textTransform: "capitalize",
                           }}
                         >
-                          {Math.floor(quantity)}
+                          {toSignificantDecimals(quantity, 1)}
                         </Text>
                       </div>
                     );

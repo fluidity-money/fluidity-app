@@ -182,11 +182,6 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "depositTimestamp",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "redeemTimestamp",
             "type": "uint256"
           },
@@ -224,6 +219,11 @@
             "internalType": "bool",
             "name": "fusdcUsdcPair",
             "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "depositTimestamp",
+            "type": "uint256"
           }
         ],
         "internalType": "struct ILootboxStaking.Deposit[]",
@@ -256,16 +256,6 @@
       {
         "internalType": "uint256",
         "name": "fusdcWethSpread",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "fusdcUsdcLiquidity",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "fusdcWethLiquidity",
         "type": "uint256"
       }
     ],

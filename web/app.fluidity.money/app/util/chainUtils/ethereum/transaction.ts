@@ -343,8 +343,6 @@ export type StakingRatioRes = {
   fusdcWethRatio: BigNumber;
   fusdcUsdcSpread: BigNumber;
   fusdcWethSpread: BigNumber;
-  fusdcUsdcLiquidity: BigNumber;
-  fusdcWethLiquidity: BigNumber;
 };
 
 export const getTokenStakingRatio = async (
@@ -360,9 +358,7 @@ export const getTokenStakingRatio = async (
         `Could not instantiate Staking Contract at ${stakingAddr}`
       );
 
-    const ratios = await stakingContract.ratios();
-
-    return ratios;
+    return stakingContract.ratios();
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
     return undefined;
@@ -502,6 +498,40 @@ export const makeStakingDeposit = async (
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
     return undefined;
+  }
+};
+
+export const getWethUsdPrice = async (
+  provider: JsonRpcProvider,
+  eacAggregatorProxyAddr: string,
+  eacAggregatorProxyAbi: ContractInterface
+): Promise<number> => {
+  try {
+    const eacAggregatorProxyContract = new Contract(
+      eacAggregatorProxyAddr,
+      eacAggregatorProxyAbi,
+      provider
+    );
+
+    if (!eacAggregatorProxyContract)
+      throw new Error(
+        `Could not instantiate EACAggregator at ${eacAggregatorProxyAddr}`
+      );
+
+    const wethUsdValue_ =
+      await eacAggregatorProxyContract.callStatic.latestAnswer();
+
+    const wethUsdValue = new BN(wethUsdValue_.toString());
+
+    // Convert to cents, for more accurate calculations
+    const CENT_DECIMALS = new BN(6);
+
+    const decimalsBn = new BN(10).pow(CENT_DECIMALS);
+
+    return wethUsdValue.div(decimalsBn).toNumber() / 100;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
   }
 };
 

@@ -78,9 +78,7 @@ const ReferralModal = ({
           >
             ?
           </GeneralButton>
-          <Text bold size="lg">
-            REFERRAL SYSTEM
-          </Text>
+          <Text size="md">REFERRAL SYSTEM</Text>
           <GeneralButton
             type={"secondary"}
             buttontype={"text"}
@@ -108,7 +106,7 @@ const ReferralModal = ({
                 style={{
                   paddingLeft: "0.5em",
                   paddingRight: "0.5em",
-                  textDecoration: "underline dotted",
+                  textDecoration: "underline dashed",
                   textUnderlineOffset: "0.25em",
                 }}
               >
@@ -169,6 +167,8 @@ const ReferralModal = ({
         <Text size="sm">
           Share to: &nbsp;
           <a
+            target="_blank"
+            rel="noreferrer"
             href={generateReferralTweet(
               `https://airdrop.fluidity.money/${referralCode}`
             )}
@@ -178,11 +178,11 @@ const ReferralModal = ({
               prominent
               size={"sm"}
               style={{
-                textDecoration: "underline dotted",
+                textDecoration: "underline dashed",
                 textUnderlineOffset: "0.25em",
               }}
             >
-              <Twitter /> TWITTER
+              <Twitter style={{ height: "1em" }} /> TWITTER
             </Text>
           </a>
         </Text>
@@ -317,7 +317,7 @@ const LinksClickedContent = ({
     <GeneralButton
       layout="after"
       size="large"
-      type="secondary"
+      type="transparent"
       icon={<ArrowRight />}
       handleClick={() => navigate(`/${network}/dashboard/airdrop`)}
     >
@@ -330,7 +330,7 @@ const LinksClickedContent = ({
           Claimed
           <div className="dot green" />
         </Text>
-        <Display size={"xs"} style={{ margin: 0 }}>
+        <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {claimed}
         </Display>
         <Text size="md" code>
@@ -343,7 +343,7 @@ const LinksClickedContent = ({
           Unclaimed
           <div className="dot red" />
         </Text>
-        <Display size={"xs"} style={{ margin: 0 }}>
+        <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {unclaimed}
         </Display>
         <LinkButton
@@ -359,7 +359,7 @@ const LinksClickedContent = ({
 
       <div className="statistics-set">
         <Text size="lg">Until Next Claim</Text>
-        <Display size={"xs"} style={{ margin: 0 }}>
+        <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {progress}/{progressReq}
         </Display>
         <ProgressBar value={progress} max={progressReq} />

@@ -161,7 +161,7 @@ export default function IndexPage() {
     },
     {
       name: "ARB",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
+      icon: <img src="/assets/chains/arbIcon.svg" />,
     },
     {
       name: "SOL",

@@ -375,3 +375,8 @@ ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
 solana = ""
 
+[contract.eac_aggregator_proxy]
+ethereum = ""
+arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
+solana = ""
+

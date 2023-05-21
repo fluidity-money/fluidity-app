@@ -72,6 +72,7 @@ func InsertWinner(winner Winner) {
 				solana_winning_owner_address,
 				winning_amount,
 				awarded_time,
+				send_transaction_log_index,
 				token_short_name,
 				token_decimals,
 				reward_type,
@@ -81,6 +82,7 @@ func InsertWinner(winner Winner) {
 			TableWinners,
 		)
 
+	// log index always 0 on solana
 	case network.NetworkSolana:
 		statementText = fmt.Sprintf(
 			`INSERT INTO %s (
@@ -91,6 +93,7 @@ func InsertWinner(winner Winner) {
 				solana_winning_owner_address,
 				winning_amount,
 				awarded_time,
+				send_transaction_log_index,
 				token_short_name,
 				token_decimals,
 				reward_type,
@@ -114,7 +117,8 @@ func InsertWinner(winner Winner) {
 			$9,
 			$10,
 			$11,
-			$12
+			$12,
+			$13
 		);`
 
 	_, err := timescaleClient.Exec(
@@ -126,6 +130,7 @@ func InsertWinner(winner Winner) {
 		winner.SolanaWinnerOwnerAddress,
 		winner.WinningAmount,
 		winner.AwardedTime,
+		winner.SendTransactionLogIndex,
 		tokenShortName,
 		tokenDecimals,
 		winner.RewardType,
@@ -155,6 +160,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 			awarded_time,
 			token_short_name,
 			token_decimals,
+			send_transaction_log_index,
 			solana_winning_owner_address,
 			reward_type,
 			ethereum_application,
@@ -207,6 +213,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 			&winner.AwardedTime,
 			&winner.TokenDetails.TokenShortName,
 			&winner.TokenDetails.TokenDecimals,
+			&winner.SendTransactionLogIndex,
 			&solanaWinnerOwnerAddress,
 			&winner.RewardType,
 			&applicationSolana,
