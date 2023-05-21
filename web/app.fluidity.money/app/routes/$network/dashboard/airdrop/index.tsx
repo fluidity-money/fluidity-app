@@ -148,18 +148,10 @@ const Airdrop = () => {
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
-  const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
+  const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"
-    }`
-  );
-
-  const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
-          leaderboardFilterIndex === 0 ? "24" : "all"
-        }&address=${address}`
-      : ""
+    }&address=${address ?? ""}`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
@@ -181,11 +173,7 @@ const Airdrop = () => {
     },
     airdropLeaderboard: {
       ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
-      ...globalAirdropLeaderboardData,
-    },
-    userAirdropLeaderboard: {
-      ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
-      ...userAirdropLeaderboardData,
+      ...airdropLeaderboardData,
     },
     referrals: {
       ...SAFE_DEFAULT_REFERRALS,
@@ -208,18 +196,10 @@ const Airdrop = () => {
       inactiveReferrals,
     },
     airdropLeaderboard: {
-      leaderboard: globalLeaderboardRows,
-      loaded: globalLeaderboardLoaded,
-    },
-    userAirdropLeaderboard: {
-      leaderboard: userLeaderboardRows,
-      loaded: userLeaderboardLoaded,
+      leaderboard: leaderboardRows,
+      loaded: leaderboardLoaded,
     },
   } = data;
-
-  const leaderboardRows = userLeaderboardLoaded
-    ? userLeaderboardRows.concat(globalLeaderboardRows)
-    : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [stakes, setStakes] = useState<
@@ -410,7 +390,7 @@ const Airdrop = () => {
           {currentModal === "leaderboard" && (
             <>
               <Leaderboard
-                loaded={globalLeaderboardLoaded}
+                loaded={leaderboardLoaded}
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
@@ -630,7 +610,7 @@ const Airdrop = () => {
           color="white"
         >
           <Leaderboard
-            loaded={globalLeaderboardLoaded}
+            loaded={leaderboardLoaded}
             data={leaderboardRows}
             filterIndex={leaderboardFilterIndex}
             setFilterIndex={setLeaderboardFilterIndex}
@@ -1175,7 +1155,11 @@ const Leaderboard = ({
   isMobile = false,
 }: IAirdropLeaderboard) => {
   // This adds a dummy user entry to the leaderboard if the user's address isn't found
-  if (loaded && !data.find((entry) => entry.user === userAddress)) {
+  if (
+    loaded &&
+    userAddress &&
+    !data.find((entry) => entry.user === userAddress)
+  ) {
     const userEntry = {
       user: userAddress,
       rank: -1,
