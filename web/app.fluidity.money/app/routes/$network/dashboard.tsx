@@ -431,6 +431,8 @@ export default function Dashboard() {
           right: isTablet ? "20px" : "60px",
           maxWidth: 550
         }}
+        color="holo"
+        style={{ padding: 0 }}
       >
         <ReferralModal
           connected={!!connected}

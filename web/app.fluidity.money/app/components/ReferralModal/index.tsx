@@ -15,6 +15,8 @@ import {
   Hoverable,
   ProgressBar,
   CopyIcon,
+  TextButton,
+  useViewport
 } from "@fluidity-money/surfing";
 import { highlightText } from "~/util";
 import { generateReferralTweet } from "~/util/tweeter";
@@ -53,12 +55,18 @@ const ReferralModal = ({
 
   const referralsEmoji = referrerClaimed ? "🎉" : "😔";
 
+  const mobileBreakpoint = 768;
+  const { width } = useViewport();
+
+
+  const isMobile = width < mobileBreakpoint;
+
   return (
     <>
       <div className="referrals-content">
         <div className="referrals-header">
           {/* Help Button */}
-          <GeneralButton
+          {/* <GeneralButton
             type={"secondary"}
             buttontype={"text"}
             handleClick={() =>
@@ -68,45 +76,25 @@ const ReferralModal = ({
             border="box"
           >
             ?
-          </GeneralButton>
-          <Text size="md">REFERRAL SYSTEM</Text>
-          <GeneralButton
-            type={"secondary"}
-            buttontype={"text"}
-            handleClick={closeModal}
-            size={"small"}
-            border="box"
-          >
-            X
-          </GeneralButton>
+          </GeneralButton> */}
+          <Text size="sm">REFERRAL SYSTEM</Text>
         </div>
 
         <div>
           <Heading as={"h5"} className="referrals-heading">
-            YOU HAVE {referrerClaimed}
+            YOU HAVE {referrerClaimed}&nbsp;
             <Hoverable
-              tooltipContent={
-                <div className="referral-hover-comp">
-                  <Text prominent>
-                    Active Referrals are Referrals that have earned 10 Lootboxes
-                  </Text>
-                </div>
-              }
+              style={{ minWidth: 250 }}
+              tooltipStyle={isMobile ? 'frosted' : 'solid'}
+              tooltipContent={<Text size="xs">Active Referrals are Referrals that have earned 10 Lootboxes</Text>}
             >
-              <ul
-                style={{
-                  paddingLeft: "0.5em",
-                  paddingRight: "0.5em",
-                  textDecoration: "underline dashed",
-                  textUnderlineOffset: "0.25em",
-                }}
-              >
+              <TextButton style={{ textDecorationThickness: 1, textUnderlineOffset: 5 }}>
                 ACTIVE REFERRALS
-              </ul>
-            </Hoverable>{" "}
-            {referralsEmoji}
+              </TextButton>
+            </Hoverable>
+            &nbsp;{referralsEmoji}
           </Heading>
-          <Text size="md">Send more of your link to earn more rewards!</Text>
+          <Text size="sm">Send more of your link to earn more rewards!</Text>
         </div>
 
         {!connected ? (
@@ -118,25 +106,25 @@ const ReferralModal = ({
             Connect Wallet
           </GeneralButton>
         ) : loaded ? (
-          <>
+          <div className="referrals-copy-group">
             <Card
               component="button"
               type="transparent"
               border="dashed"
-              color="white"
+              color="gray"
               rounded
               onClick={highlightText}
             >
               <Text
+                className="referrals-copyable-link"
                 code
-                prominent
               >{`https://airdrop.fluidity.money/${referralCode}`}</Text>
             </Card>
 
             {/* Copy Button */}
             <GeneralButton
-              className={"spread"}
-              type={"secondary"}
+              className={"referrals-copy-button"}
+              type={"transparent"}
               buttontype={"icon before"}
               handleClick={() => {
                 navigator.clipboard.writeText(
@@ -144,12 +132,12 @@ const ReferralModal = ({
                 );
                 setLinkCopied(true);
               }}
-              size={"large"}
+              size={"medium"}
               icon={<CopyIcon />}
             >
-              {!linkCopied ? "Copy Link" : "Link Copied!"}
+              <Text size="lg" prominent bold style={{ color: 'inherit' }}>{!linkCopied ? "Copy Link" : "Link Copied!"}</Text>
             </GeneralButton>
-          </>
+          </div>
         ) : (
           <LoadingDots />
         )}
@@ -157,25 +145,22 @@ const ReferralModal = ({
         {/*Share Button*/}
         <Text size="sm">
           Share to: &nbsp;
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={generateReferralTweet(
-              `https://airdrop.fluidity.money/${referralCode}`
-            )}
+          <TextButton
+            style={{ color: 'white' }}
+            onClick={() => {
+              window.open(generateReferralTweet(
+                `https://airdrop.fluidity.money/${referralCode}`
+              ))
+            }}
           >
             <Text
               code
               prominent
               size={"sm"}
-              style={{
-                textDecoration: "underline dashed",
-                textUnderlineOffset: "0.25em",
-              }}
             >
-              <Twitter style={{ height: "1em" }} /> TWITTER
+              <Twitter style={{ height: "1em", fill: "currentColor" }} /> TWITTER
             </Text>
-          </a>
+          </TextButton>
         </Text>
       </div>
 
