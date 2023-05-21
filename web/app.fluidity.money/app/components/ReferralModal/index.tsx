@@ -208,17 +208,17 @@ const ReferralModal = ({
 };
 
 const HowItWorksContent = () => (
-  <div className="referrals-content referrals-inner-content">
+  <div className="referrals-inner-content">
     <div className="spread-center">
       <div className="single-line">
         <img style={{ width: "1.25em" }} src={"/images/icons/circle1.svg"} />
-        <Text prominent size="md">
+        <Text prominent size="sm">
           Copy Your Link.
         </Text>
       </div>
       <div className="single-line">
         <img style={{ width: "1.25em" }} src={"/images/icons/circle2.svg"} />
-        <Text prominent size="md">
+        <Text prominent size="sm">
           Share it with your friends.
         </Text>
       </div>
@@ -226,42 +226,40 @@ const HowItWorksContent = () => (
     <Card
       rounded
       type="transparent"
-      color="holo"
+      color="gray"
       border="dashed"
       className="how-it-works-infobox"
     >
       {/* How it works Box Left*/}
-      <div>
-        <Text prominent size="lg" className="single-line">
-          <ul>You Get</ul> 💸
-        </Text>
-        <Text prominent size="md">
-          <strong>10% of their airdrop</strong>
-          <br />
-          earnings throughout
-          <br />
-          the entire Epoch.
+      <div className="how-it-works-half">
+        <div className="how-it-works-title">
+          <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+            YOU GET
+          </Text>
+          &nbsp;💸
+        </div>
+        <Text prominent size="sm">
+          <strong>10% of their airdrop</strong> earnings throughout the entire Epoch.
         </Text>
       </div>
       {/* How it works Box Right*/}
-      <div>
-        <Text prominent size="lg" className="single-line">
-          🍾<ul>They Get</ul>
-        </Text>
-        <Text prominent size="md">
-          <strong>10 Loot Bottles,</strong>
-          <br />
-          not affected by
-          <br />
-          your 10% reward.
+      <div className="how-it-works-half">
+        <div className="how-it-works-title">
+          🍾&nbsp;
+          <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+            THEY GET
+          </Text>
+        </div>
+        <Text prominent size="sm">
+          <strong>10 Loot Bottles,</strong>&nbsp;not affected by your 10% reward.
         </Text>
       </div>
     </Card>
     <div className="how-it-works-warning-container">
       <img style={{ width: "50px" }} src="/images/icons/circleInfo.svg" />
-      <Text prominent size="md" className="how-it-works-warning-text">
+      <Text prominent size="sm" className="how-it-works-warning-text">
         They will have to earn 10 Loot Boxes for each referral in order to claim
-        their reward and activate yours
+        their reward and activate yours.
       </Text>
     </div>
   </div>

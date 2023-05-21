@@ -8,8 +8,13 @@
 }
 
 .referrals-inner-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2em;
+  padding: 2em 4em;
+  width: min-content;
   min-height: 250px;
-  padding: 50px 50px 30px 50px;
 }
 
 @media (max-width: 850px) {
@@ -75,24 +80,29 @@
 }
 
 .how-it-works-infobox {
-  display: flex;
-  width: 100%;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 200px 200px;
   padding: 0;
-  padding-bottom: 10px;
-}
-
-.how-it-works-infobox > * {
-  height: 100%;
-  flex: 1;
-  text-align: center;
+  width: auto;
   align-self: center;
 }
 
+.how-it-works-half {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: center;
+  text-align: center;
+  padding: 1em;
+}
+
+.how-it-works-title {
+  display: flex;
+  flex-direction: row;
+}
+
 .how-it-works-infobox > :first-child {
-  border-right: dashed white;
+  border-right: dashed rgba(255, 255, 255, 0.2) 1px;
 }
 
 .single-line {
