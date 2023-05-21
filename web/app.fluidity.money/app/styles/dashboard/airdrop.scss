@@ -180,7 +180,7 @@ $holo: linear-gradient(
   color: black;
   display: grid;
   box-sizing: border-box;
-  grid-template-columns: 180px 64px auto;
+  grid-template-columns: 180px 64px 250px;
   gap: 0.5em;
   max-width: 100%;
 
@@ -217,7 +217,7 @@ $holo: linear-gradient(
   }
 }
 
-@container main (width < 1200px) {
+@media (max-width: 1200px) {
   .multiplier-tasks {
     grid-template-columns: auto min-content;
     grid-template-rows: min-content min-content;
