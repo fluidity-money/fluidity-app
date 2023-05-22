@@ -28,8 +28,8 @@ func GetLatestUnclaimedReferrals(address ethereum.Address, limit int) []Referral
 			referrer,
 			referee,
 			created_time,
-			progress,
-			active
+			active,
+			progress
 
 		FROM %v
 		WHERE referee = $1
@@ -99,8 +99,8 @@ func GetClaimedReferrals(address ethereum.Address) []Referral {
 			referrer,
 			referee,
 			created_time,
-			progress,
-			active
+			active,
+			progress
 
 		FROM %v
 		WHERE referee = $1

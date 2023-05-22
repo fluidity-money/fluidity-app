@@ -33,6 +33,7 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
+  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
@@ -306,6 +307,9 @@ const Airdrop = () => {
         <TabButton size="small" onClick={() => setCurrentModal("stake")} groupId="airdrop" isSelected={isMobile && currentModal === "stake"}>
           Stake
         </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("testnet-rewards")}>
+          Claim Testnet Rewards 
+        </TabButton>
       </div>
     );
   };
@@ -450,6 +454,14 @@ const Airdrop = () => {
               />
             </>
           )}
+          {currentModal === "testnet-rewards" && (
+            <>
+              <Heading as="h3" className="no-margin">
+                Claim Testnet Rewards 
+              </Heading>
+              <TestnetRewardsModal />
+            </>
+          )}
         </motion.div>
       </>
     );
@@ -524,6 +536,13 @@ const Airdrop = () => {
         closeModal={closeModal}
       >
         <TutorialModal closeModal={closeModal} />
+      </CardModal>
+      <CardModal
+        id="testnet-rewards"
+        visible={currentModal === "testnet-rewards"}
+        closeModal={closeModal}
+      >
+        <TestnetRewardsModal/>
       </CardModal>
 
       {/* Page Content */}
