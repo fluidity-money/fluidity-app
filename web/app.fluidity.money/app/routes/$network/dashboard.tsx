@@ -166,35 +166,35 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-    {
-      airdrop: {
-        name: "airdrop",
-        path: (network: string) => `/${network}/dashboard/airdrop`,
-        icon: <AirdropIcon />,
-      },
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
     },
-    {
-      home: {
-        name: "dashboard",
-        path: (network: string) => `/${network}/dashboard/home`,
-        icon: <DashboardIcon />,
-      },
+  },
+  {
+    home: {
+      name: "dashboard",
+      path: (network: string) => `/${network}/dashboard/home`,
+      icon: <DashboardIcon />,
     },
-    {
-      rewards: {
-        name: "rewards",
-        path: (network: string) => `/${network}/dashboard/rewards`,
-        icon: <Trophy />,
-      },
+  },
+  {
+    rewards: {
+      name: "rewards",
+      path: (network: string) => `/${network}/dashboard/rewards`,
+      icon: <Trophy />,
     },
-    {
-      assets: {
-        name: "assets",
-        path: (network: string) => `/${network}/dashboard/assets`,
-        icon: <AssetsIcon />,
-      },
+  },
+  {
+    assets: {
+      name: "assets",
+      path: (network: string) => `/${network}/dashboard/assets`,
+      icon: <AssetsIcon />,
     },
-  ];
+  },
+];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   ethereum: {
@@ -420,9 +420,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
@@ -508,8 +508,9 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}

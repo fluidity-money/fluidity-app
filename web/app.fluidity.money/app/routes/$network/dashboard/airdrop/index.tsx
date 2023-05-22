@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
-import { BottleSection, stakingLiquidityMultiplierEq } from "./common";
+import { stakingLiquidityMultiplierEq } from "./common";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -51,6 +51,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
+import { HowItWorksContent } from "~/components/ReferralModal";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: may 22nd, 2023
@@ -163,7 +164,8 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}`
   );
 
@@ -216,6 +218,7 @@ const Airdrop = () => {
       numActiveReferrerReferrals,
       numInactiveReferreeReferrals,
       inactiveReferrals,
+      referralCode,
     },
     airdropLeaderboard: {
       leaderboard: leaderboardRows,
@@ -232,14 +235,6 @@ const Airdrop = () => {
   const [currentModal, setCurrentModal] = useState<string | null>(
     location.hash.replace("#", "") || null
   );
-
-  useEffect(() => {
-    if (!currentModal) {
-      navigate(location.pathname, { replace: true });
-      return;
-    }
-    navigate(`#${currentModal}`, { replace: true });
-  }, [currentModal]);
 
   useEffect(() => {
     if (location.hash.replace("#", "") === currentModal) return;
@@ -313,8 +308,9 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         <TabButton
           size="small"
@@ -382,16 +378,19 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-                currentModal === "leaderboard" ||
-                currentModal === "stake"
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
+                : currentModal === "referrals"
+                ? "1em"
                 : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
@@ -457,7 +456,14 @@ const Airdrop = () => {
               />
               <MultiplierTasks />
               <MyMultiplier
-                seeMyStakingStats={() => setCurrentModal("staking-stats")}
+                seeMyStakingStats={() => {
+                  setCurrentModal("stake");
+                  // would just useRef here but the ref doesn't exist at this point
+                  // timeout is needed to counterract the scroll to top
+                  setTimeout(() => {
+                    window.scrollTo(0, 1000);
+                  }, 500);
+                }}
                 seeStakeNow={() => setCurrentModal("stake")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
@@ -526,11 +532,25 @@ const Airdrop = () => {
               <Heading as="h3" className="no-margin">
                 My Referral Link
               </Heading>
-              <BottleSection
-                totalBottles={bottlesCount}
-                activeReferrerReferralsCount={numActiveReferreeReferrals}
-                tooltipStyle={"frosted"}
+              <ReferralDetailsModal
+                referralCode={referralCode}
+                bottles={referralBottleTiers}
+                totalBottles={referralBottlesCount}
+                activeReferrerReferralsCount={numActiveReferrerReferrals}
+                activeRefereeReferralsCount={numActiveReferreeReferrals}
+                inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
+                nextInactiveReferral={inactiveReferrals[0]}
+                isMobile
+                showCopyGroup
               />
+              <div
+                style={{
+                  width: "100%",
+                  borderBottom: "1px solid grey",
+                }}
+              />
+              <Display size="xxxs">How It Works</Display>
+              <HowItWorksContent isMobile />
             </>
           )}
           {currentModal === "testnet-rewards" && (
@@ -841,8 +861,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                console.log("TODO REDIRECT");
-              }
+                  console.log("TODO REDIRECT");
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1081,7 +1101,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1101,8 +1121,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                  ? 0
-                  : -1;
+                ? 0
+                : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1174,8 +1194,9 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
-        }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+        address === user ? "highlighted-row" : ""
+      }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1194,8 +1215,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1210,8 +1231,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1226,8 +1247,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1242,8 +1263,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1258,8 +1279,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
