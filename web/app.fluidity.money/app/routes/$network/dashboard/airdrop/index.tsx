@@ -533,14 +533,14 @@ const Airdrop = () => {
               />
             </>
           )}
-          {currentModal === "testnet-rewards" && (
+          {/*{currentModal === "testnet-rewards" && (
             <>
               <Heading as="h3" className="no-margin">
                 Claim Testnet Rewards
               </Heading>
               <TestnetRewardsModal />
             </>
-          )}
+          )}*/}
         </motion.div>
       </>
     );
@@ -620,13 +620,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      <CardModal
+      {/*<CardModal
         id="testnet-rewards"
         visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
-      </CardModal>
+      </CardModal>*/}
 
       {/* Page Content */}
       <Header />
