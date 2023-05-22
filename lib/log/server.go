@@ -152,7 +152,10 @@ func startLoggingServer(debugEnabled, dieFast, silentEnabled bool, processInvoca
 
 			now := time.Now()
 
-			if !silentEnabled {
+			// log messages if we're not in silent mode, or if this log is fatal
+			shouldLog := !silentEnabled || shouldExit
+
+			if shouldLog {
 				printLoggingMessage(
 					loggingStream,
 					now,
