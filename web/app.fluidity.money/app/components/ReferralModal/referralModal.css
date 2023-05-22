@@ -177,3 +177,13 @@
 .links-clicked-content {
   width: 100%;
 }
+
+.referrals-inner-content.airdrop-mobile {
+  padding: 0;
+  width: 100%;
+}
+
+.airdrop-mobile > .how-it-works-infobox {
+  max-width: 100%;
+  grid-template-columns: 1fr 1fr;
+}

@@ -39,6 +39,7 @@ import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { CopyGroup } from "~/components/ReferralModal";
 
 const MAX_EPOCH_DAYS = 31;
 
@@ -94,19 +95,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottle
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottle
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottle
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -127,6 +128,7 @@ interface IReferralDetailsModal {
   nextInactiveReferral?: Referral;
   isMobile?: boolean;
   tooltipStyle?: "solid" | "frosted";
+  showCopyGroup?: boolean;
 }
 
 const BottleSection = ({
@@ -176,19 +178,25 @@ const ReferralDetailsModal = ({
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
   isMobile,
+  showCopyGroup = false,
 }: IReferralDetailsModal) => {
   const tooltipStyle = isMobile ? "frosted" : "solid";
 
   return (
     <>
-      <Display className="no-margin" size="xxxs">
-        My Referral Link
-      </Display>
+      {!isMobile && (
+        <Display className="no-margin" size="xxxs">
+          My Referral Link
+        </Display>
+      )}
       <BottleSection
         totalBottles={totalBottles}
         activeRefereeReferralsCount={activeRefereeReferralsCount}
         tooltipStyle={tooltipStyle}
       />
+      {
+        showCopyGroup && <CopyGroup referralCode={"test"} />
+      }
       <Hoverable
         style={{ minWidth: 250 }}
         tooltipStyle={tooltipStyle}
@@ -198,21 +206,21 @@ const ReferralDetailsModal = ({
           Bottle Distribution <InfoCircle />
         </Text>
       </Hoverable>
-      <BottleDistribution numberPosition="relative" bottles={bottles} />
+      <BottleDistribution numberPosition="relative" bottles={bottles} style={isMobile ? { overflowX: 'scroll' } : {}} />
       <div
         style={{
           width: "100%",
-          borderBottom: "1px solid white",
+          borderBottom: "1px solid grey",
         }}
       />
-      <Display className="no-margin" size="xxxs">
+      <Display className={isMobile ? '' : "no-margin"} size="xxxs">
         Links I&apos;ve Clicked
       </Display>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "auto auto auto auto",
-          gap: "3em",
+          gridTemplateColumns: isMobile ? "1fr 1fr" : "auto auto auto auto",
+          gap: isMobile ? "1em" : "3em",
           paddingBottom: "1em",
         }}
       >
@@ -649,8 +657,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -701,14 +709,14 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        baseToken.symbol === "USDC"
-          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
-              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
-              1e12
-          : (tokenRatios.fusdcWethRatio.toNumber() -
-              tokenRatios.fusdcWethSpread.toNumber() / 2) /
-              1e12
-      );
+      baseToken.symbol === "USDC"
+        ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+          tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+        1e12
+        : (tokenRatios.fusdcWethRatio.toNumber() -
+          tokenRatios.fusdcWethSpread.toNumber() / 2) /
+        1e12
+    );
 
   const fluidUsdMultiplier = usdcPrice;
   const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
@@ -770,31 +778,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const tokenAmtStr =
-        dec !== undefined
-          ? [whole, dec.slice(0 - token.decimals)].join(".")
-          : whole ?? "0";
+        const tokenAmtStr =
+          dec !== undefined
+            ? [whole, dec.slice(0 - token.decimals)].join(".")
+            : whole ?? "0";
 
-      setInput({
-        ...token,
-        amount: tokenAmtStr,
-      });
+        setInput({
+          ...token,
+          amount: tokenAmtStr,
+        });
 
-      if (!lockRatio) return;
-      if (!tokenAmtStr) return;
+        if (!lockRatio) return;
+        if (!tokenAmtStr) return;
 
-      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-      setOtherInput({
-        ...otherToken,
-        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-      });
-    };
+        setOtherInput({
+          ...otherToken,
+          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+        });
+      };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1009,9 +1017,8 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         {/* Staking Amount */}
         <div
@@ -1337,7 +1344,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(1, stakingDuration),
+              stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1388,7 +1395,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1640,9 +1647,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
