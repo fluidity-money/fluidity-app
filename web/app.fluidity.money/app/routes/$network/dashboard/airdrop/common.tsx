@@ -76,7 +76,7 @@ const BottleDistribution = ({
               marginBottom: "0.6em",
               opacity:
                 highlightBottleNumberIndex === undefined ||
-                highlightBottleNumberIndex !== index
+                  highlightBottleNumberIndex !== index
                   ? 0.2
                   : 1,
               ...(handleClickBottle ? { cursor: "pointer" } : {}),
@@ -96,19 +96,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottleNumberIndex === index
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottleNumberIndex === index
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottleNumberIndex === index
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottleNumberIndex === index
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -637,8 +637,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -685,14 +685,14 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        baseToken.symbol === "USDC"
-          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
-              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
-              1e12
-          : (tokenRatios.fusdcWethRatio.toNumber() -
-              tokenRatios.fusdcWethSpread.toNumber() / 2) /
-              1e12
-      );
+      baseToken.symbol === "USDC"
+        ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+          tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+        1e12
+        : (tokenRatios.fusdcWethRatio.toNumber() -
+          tokenRatios.fusdcWethSpread.toNumber() / 2) /
+        1e12
+    );
 
   const fluidUsdMultiplier = usdcPrice;
   const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
@@ -754,30 +754,30 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const tokenAmtStr =
-        dec !== undefined
-          ? [whole, dec.slice(0 - token.decimals)].join(".")
-          : whole ?? "0";
+        const tokenAmtStr =
+          dec !== undefined
+            ? [whole, dec.slice(0 - token.decimals)].join(".")
+            : whole ?? "0";
 
-      setInput({
-        ...token,
-        amount: tokenAmtStr,
-      });
+        setInput({
+          ...token,
+          amount: tokenAmtStr,
+        });
 
-      if (!tokenAmtStr) return;
+        if (!tokenAmtStr) return;
 
-      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-      setOtherInput({
-        ...otherToken,
-        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-      });
-    };
+        setOtherInput({
+          ...otherToken,
+          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+        });
+      };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -963,33 +963,31 @@ const StakeNowModal = ({
 
   return (
     <>
-      <Card
-        type="opaque"
-        rounded
-        color="holo"
-        fill
-        style={{
-          textAlign: "center",
-          marginTop: "1em",
-          padding: "0.5em",
-          borderRadius: "0.5em",
-        }}
-      >
-        <Text style={{ color: "black" }} size="sm">
-          👀 TIP: Stake over 31 days for more rewards in future epochs & events!
-          🌊
-        </Text>
-      </Card>
+      {!isMobile &&
+        <Card
+          type="opaque"
+          rounded
+          color="holo"
+          fill
+          style={{
+            textAlign: "center",
+            marginTop: "1em",
+            padding: "0.5em",
+            borderRadius: "0.5em",
+          }}
+        >
+          <Text style={{ color: "black" }} size="sm">
+            👀 TIP: Stake over 31 days for more rewards in future epochs & events!
+            🌊
+          </Text>
+        </Card>
+      }
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto auto 160px",
-          columnGap: "4em",
-          rowGap: "2em",
-        }}
+        className={`airdrop-stake-container ${isMobile ? 'airdrop-mobile' : ''}`}
       >
         {/* Staking Amount */}
         <div
+          className="airdrop-stake-inputs-column"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -1010,7 +1008,7 @@ const StakeNowModal = ({
               tooltipStyle={tooltipStyle}
               tooltipContent="How many fUSDC/USDC or fUSDC/wETH you want to stake."
             >
-              <Text prominent code className="helper-label">
+              <Text prominent={!isMobile} code className="helper-label">
                 STAKE AMOUNT <InfoCircle />
               </Text>
             </Hoverable>
@@ -1182,20 +1180,34 @@ const StakeNowModal = ({
           </Text>
         </div>
         {/* Arrow */}
-        <div className="staking-modal-arrow-container">
-          <ArrowRight />
-        </div>
+        {!isMobile &&
+          <div className="staking-modal-arrow-container">
+            <ArrowRight />
+          </div>
+        }
         {/* Duration */}
         <div className="duration-column">
-          <Hoverable
-            style={{ minWidth: 250 }}
-            tooltipStyle={tooltipStyle}
-            tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days."
-          >
-            <Text prominent code className="helper-label">
-              DURATION <InfoCircle />
-            </Text>
-          </Hoverable>
+          <div className="duration-col-header">
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The duration for how long you want to stake your liquidity, ranging from a minimum of 31 days to a maximum of 365 days."
+            >
+              <Text prominent={!isMobile} code className="helper-label">
+                DURATION <InfoCircle />
+              </Text>
+            </Hoverable>
+            {isMobile && <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+            >
+              <Text code className="helper-label">
+                END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+                <InfoCircle />
+              </Text>
+            </Hoverable>}
+          </div>
           <Display className="no-margin">
             {stakingDuration} D{/* Scrollbar */}
           </Display>
@@ -1205,19 +1217,28 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
+          {!isMobile &&
+            <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={tooltipStyle}
+              tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+            >
+              <Text code className="helper-label">
+                END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+                <InfoCircle />
+              </Text>
+            </Hoverable>
+          }
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+            tooltipContent="Your accepted % for slippage."
+            className="slippage-tooltip"
           >
-            <Text code className="helper-label">
-              END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
-              <InfoCircle />
+            <Text prominent={!isMobile} code className="helper-label">
+              SLIPPAGE % <InfoCircle />
             </Text>
           </Hoverable>
-          <Text prominent code>
-            SLIPPAGE % <InfoCircle />
-          </Text>
           <input
             className={"staking-modal-token-input"}
             pattern="[0-9]"
@@ -1227,13 +1248,15 @@ const StakeNowModal = ({
             onChange={(e) => setSlippage(Math.floor(e.target.valueAsNumber))}
           />
         </div>
-        <div
-          style={{
-            width: "100%",
-            borderBottom: "1px solid white",
-            gridColumn: "1 / span 3",
-          }}
-        />
+        {!isMobile &&
+          <div
+            style={{
+              width: "100%",
+              borderBottom: "1px solid white",
+              gridColumn: "1 / span 3",
+            }}
+          />
+        }
         <div className="power-column">
           <Hoverable
             style={{ minWidth: 250 }}
@@ -1261,7 +1284,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(1, stakingDuration),
+              stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1285,9 +1308,11 @@ const StakeNowModal = ({
             </Card>
           )}
         </div>
-        <div className="staking-modal-arrow-container">
-          <ArrowRight />
-        </div>
+        {!isMobile &&
+          <div className="staking-modal-arrow-container">
+            <ArrowRight />
+          </div>
+        }
         <div className="power-column rhs">
           <Hoverable
             style={{ minWidth: 250 }}
@@ -1310,7 +1335,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1332,39 +1357,41 @@ const StakeNowModal = ({
             </Text>
           </Card>
         </div>
-      </div>
-      {stakingState === "complete" ? (
-        <GeneralButton
-          className={"staking-modal-complete"}
-          handleClick={() => setStakingState("ready")}
-        >
-          {buttonText}
-        </GeneralButton>
-      ) : (
-        <SliderButton
-          disabled={!canStake}
-          style={{ width: "100%" }}
-          onSlideComplete={() => handleStake()}
-        >
+        <div className="stake-confirm-column">
+          {stakingState === "complete" ? (
+            <GeneralButton
+              className={"staking-modal-complete"}
+              handleClick={() => setStakingState("ready")}
+            >
+              {buttonText}
+            </GeneralButton>
+          ) : (
+            <SliderButton
+              disabled={!canStake}
+              style={{ width: "100%" }}
+              onSlideComplete={() => handleStake()}
+            >
+              <Text
+                style={{
+                  color: stakingState === "staking" ? "black" : "white",
+                }}
+              >
+                {buttonText}
+              </Text>
+            </SliderButton>
+          )}
           <Text
             style={{
-              color: stakingState === "staking" ? "black" : "white",
+              textAlign: "center",
+              display: stakeErr ? "false" : "",
+              color: "red",
+              textTransform: "capitalize",
             }}
           >
-            {buttonText}
+            {stakeErr}
           </Text>
-        </SliderButton>
-      )}
-      <Text
-        style={{
-          textAlign: "center",
-          display: stakeErr ? "false" : "",
-          color: "red",
-          textTransform: "capitalize",
-        }}
-      >
-        {stakeErr}
-      </Text>
+        </div>
+      </div>
     </>
   );
 };
@@ -1452,7 +1479,25 @@ const tutorialContent: {
   },
   "4": {
     title: "LEARN MORE",
-    desc: "To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post.",
+    desc: <Text size="md">
+      To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post: <LinkButton
+        size="medium"
+        type="external"
+        style={{
+          display: "inline-flex",
+          textDecoration: "underline",
+          textUnderlineOffset: 2,
+        }}
+        handleClick={() => {
+          window.open(
+            "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+            "_blank"
+          );
+        }}
+      >
+        LEARN MORE
+      </LinkButton>
+    </Text>,
     image: "AIRDROP_DEEP_DIVE",
   },
 };
@@ -1538,9 +1583,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />

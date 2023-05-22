@@ -122,9 +122,8 @@ export default function MobileModal({
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, type: "tween" }}
           exit={{ opacity: 0, x: "75%" }}
-          className={`mobile-modal-container  ${
-            isOpen === true ? "show-modal" : "hide-modal"
-          }`}
+          className={`mobile-modal-container  ${isOpen === true ? "show-modal" : "hide-modal"
+            }`}
         >
           {/* Navigation at top of modal */}
           <nav id="mobile-top-navbar" className={"pad-main"}>
@@ -191,7 +190,7 @@ export default function MobileModal({
                       connectedWalletModalVisibility &&
                         setconnectedWalletModalVisibility(false);
                     }}
-                    // className="connect-wallet-btn"
+                  // className="connect-wallet-btn"
                   />
                 ) : (
                   <GeneralButton
@@ -200,7 +199,7 @@ export default function MobileModal({
                     handleClick={() =>
                       connecting ? null : setWalletModalVisibility(true)
                     }
-                    // className="connect-wallet-btn"
+                  // className="connect-wallet-btn"
                   >
                     {connecting ? `Connecting...` : `Connect Wallet`}
                   </GeneralButton>
@@ -252,7 +251,7 @@ export default function MobileModal({
                                 index === 0 ? "./" : (key as unknown as string)
                               }
                             >
-                              <Text prominent={active}>
+                              <Text prominent={active} className="mobile-modal-text-link">
                                 {icon} {name}
                               </Text>
                             </Link>
