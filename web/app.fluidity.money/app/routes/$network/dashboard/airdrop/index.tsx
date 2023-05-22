@@ -33,7 +33,7 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
-  TestnetRewardsModal,
+//  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
