@@ -9,7 +9,7 @@ export type Referral = {
 };
 
 const QUERY_BY_ADDRESS = gql`
-  query getInactiveReferralByAddress($referrer: String!, $referee: String!) {
+  query getReferralByAddress($referrer: String!, $referee: String!) {
     lootbox_referrals(
       where: { referrer: { _eq: $referrer }, referee: { _eq: $referee } }
     ) {
@@ -25,8 +25,8 @@ const QUERY_BY_ADDRESS = gql`
 const QUERY_INACTIVE_BY_ADDRESS = gql`
   query getInactiveReferralByAddress($address: String!) {
     lootbox_referrals(
-      where: { referrer: { _eq: $address }, active: { _eq: false } }
-      order_by: { created_time: desc }
+      where: { referee: { _eq: $address }, active: { _eq: false } }
+      order_by: { created_time: asc }
       limit: 1
     ) {
       active
@@ -76,8 +76,8 @@ const useReferralByAddress = (referrer: string, referee: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
@@ -97,8 +97,8 @@ const useInactiveReferralByAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
