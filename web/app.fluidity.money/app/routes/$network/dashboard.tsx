@@ -466,7 +466,7 @@ export default function Dashboard() {
       </CardModal>
 
       {/* Accept Referral Modal */}
-      <CardModal id="accept-referral-modal" visible={true} closeModal={() => setAcceptReferralModalVisibility(false)}>
+      <CardModal id="accept-referral-modal" visible={acceptReferralModalVisibility} closeModal={() => setAcceptReferralModalVisibility(false)}>
         <AcceptReferralModal
           network={network}
           referralCode={clickedReferralCode}
