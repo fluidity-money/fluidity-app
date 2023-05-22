@@ -152,7 +152,8 @@ const ReferralModal = ({
               tooltipStyle={isMobile ? "frosted" : "solid"}
               tooltipContent={
                 <Text size="xs">
-                  Active Referrals are Referrals that have earned 10 Loot Bottles
+                  Active Referrals are Referrals that have earned 10 Loot
+                  Bottles
                 </Text>
               }
             >
