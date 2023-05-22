@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import { motion } from "framer-motion";
-import type { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes, forwardRef } from "react";
 
 import styles from "./TabButton.module.scss";
 
@@ -14,18 +14,21 @@ interface ITabButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   groupId?: string;
 }
 
-const TabButton = ({
+type IRef = HTMLButtonElement;
+
+const TabButton = forwardRef<IRef, ITabButtonProps>(({
   children,
   size,
   className,
   isSelected = false,
   groupId,
   ...props
-}: ITabButtonProps) => {
+}, ref) => {
   const classProps = className || "";
 
   return (
     <button
+      ref={ref}
       className={`${styles.button} ${styles[size]} ${classProps} ${isSelected ? styles.selected : ""}`}
       {...props}
     >
@@ -38,6 +41,6 @@ const TabButton = ({
       )}
     </button>
   );
-};
+});
 
 export default TabButton;

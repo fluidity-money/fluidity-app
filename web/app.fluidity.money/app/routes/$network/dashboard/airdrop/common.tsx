@@ -39,6 +39,7 @@ import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { CopyGroup } from "~/components/ReferralModal";
 
 const MAX_EPOCH_DAYS = 31;
 
@@ -127,6 +128,8 @@ interface IReferralDetailsModal {
   nextInactiveReferral?: Referral;
   isMobile?: boolean;
   tooltipStyle?: "solid" | "frosted";
+  showCopyGroup?: boolean;
+  referralCode?: string;
 }
 
 const BottleSection = ({
@@ -172,23 +175,29 @@ const ReferralDetailsModal = ({
   bottles,
   totalBottles,
   activeRefereeReferralsCount,
-  activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
   isMobile,
+  referralCode,
+  showCopyGroup = false,
 }: IReferralDetailsModal) => {
   const tooltipStyle = isMobile ? "frosted" : "solid";
 
   return (
     <>
-      <Display className="no-margin" size="xxxs">
-        My Referral Link
-      </Display>
+      {!isMobile && (
+        <Display className="no-margin" size="xxxs">
+          My Referral Link
+        </Display>
+      )}
       <BottleSection
         totalBottles={totalBottles}
         activeRefereeReferralsCount={activeRefereeReferralsCount}
         tooltipStyle={tooltipStyle}
       />
+      {showCopyGroup && referralCode && (
+        <CopyGroup referralCode={referralCode} />
+      )}
       <Hoverable
         style={{ minWidth: 250 }}
         tooltipStyle={tooltipStyle}
@@ -198,21 +207,25 @@ const ReferralDetailsModal = ({
           Bottle Distribution <InfoCircle />
         </Text>
       </Hoverable>
-      <BottleDistribution numberPosition="relative" bottles={bottles} />
+      <BottleDistribution
+        numberPosition="relative"
+        bottles={bottles}
+        style={isMobile ? { overflowX: "scroll" } : {}}
+      />
       <div
         style={{
           width: "100%",
-          borderBottom: "1px solid white",
+          borderBottom: "1px solid grey",
         }}
       />
-      <Display className="no-margin" size="xxxs">
+      <Display className={isMobile ? "" : "no-margin"} size="xxxs">
         Links I&apos;ve Clicked
       </Display>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "auto auto auto auto",
-          gap: "3em",
+          gridTemplateColumns: isMobile ? "1fr 1fr" : "auto auto auto auto",
+          gap: isMobile ? "1em" : "3em",
           paddingBottom: "1em",
         }}
       >
@@ -226,7 +239,7 @@ const ReferralDetailsModal = ({
             </div>
           }
         >
-          {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
+          {activeRefereeReferralsCount + inactiveReferrerReferralsCount}
         </LabelledValue>
         <div>
           <LabelledValue
@@ -256,9 +269,9 @@ const ReferralDetailsModal = ({
               </div>
             }
           >
-            {activeReferrerReferralsCount}
+            {activeRefereeReferralsCount}
           </LabelledValue>
-          <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
+          <Text size="xs">{activeRefereeReferralsCount * 5} BOTTLES</Text>
         </div>
         <div>
           <LabelledValue
@@ -346,7 +359,6 @@ const BottlesDetailsModal = ({
   navigate,
   network,
   bottles,
-  isMobile,
 }: IBottlesDetailsModal) => (
   <>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
@@ -363,29 +375,6 @@ const BottlesDetailsModal = ({
     >
       SEE YOUR LOOTBOTTLE TX HISTORY
     </GeneralButton>
-    <div
-      style={{
-        width: "100%",
-        borderBottom: "1px solid white",
-        margin: "1em 0",
-      }}
-    />
-    <Hoverable
-      style={{ minWidth: 250 }}
-      tooltipStyle={isMobile ? "frosted" : "solid"}
-      tooltipContent="The amount of Loot Bottles you have earned since you last checked this page."
-    >
-      <Text size="sm">
-        Bottles earned since last checked <InfoCircle />
-      </Text>
-    </Hoverable>
-    <div>
-      {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
-      <LootBottle size="lg" rarity="legendary"></LootBottle>
-      <Text prominent size="lg">
-        x22
-      </Text>
-    </div>
   </>
 );
 
@@ -1525,7 +1514,7 @@ const tutorialContent: {
   },
   "3": {
     title: "REFERRALS",
-    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions. ",
+    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 5 Loot Bottles after performing certain actions. ",
     image: "REFERRALS",
   },
   "4": {
