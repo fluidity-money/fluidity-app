@@ -364,12 +364,12 @@ const Airdrop = () => {
   }, [localShouldShowBottleNumbers]);
 
   useEffect(() => {
-    if (!window || !localCookieConsent) return
-    if (localShouldShowTutorial === undefined) return
-    window.localStorage.setItem('airdropHasVisited', 'true')
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowTutorial === undefined) return;
+    window.localStorage.setItem("airdropHasVisited", "true");
 
-    const urlParams = new URLSearchParams(window.location.search)
-    const hasUrlParams = urlParams.toString().length > 0
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasUrlParams = urlParams.toString().length > 0;
 
     if (localShouldShowTutorial && !isMobile && !hasUrlParams) {
       setTimeout(() => {

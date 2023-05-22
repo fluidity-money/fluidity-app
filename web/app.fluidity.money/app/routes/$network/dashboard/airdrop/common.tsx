@@ -665,7 +665,7 @@ const StakeNowModal = ({
   });
 
   const [stakingDuration, setStakingDuration] = useState(31);
-  const [slippage, setSlippage] = useState(5);
+  const [slippage, setSlippage] = useState(15);
   const [stakeErr, setStakeErr] = useState("");
 
   // tokenRatios is the proportion of base tokens in the pool,
@@ -926,6 +926,10 @@ const StakeNowModal = ({
     if (!canStake) return;
 
     setStakingState("staking");
+
+    const testRes = await testStake();
+
+    if (!testRes) return;
 
     try {
       const receipt = await stakeTokens(
