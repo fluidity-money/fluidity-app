@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
-import { stakingLiquidityMultiplierEq } from "./common";
+import { BottleSection, stakingLiquidityMultiplierEq } from "./common";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -230,6 +230,23 @@ const Airdrop = () => {
 
   const location = useLocation();
 
+  const [currentModal, setCurrentModal] = useState<string | null>(
+    location.hash.replace("#", "") || null
+  );
+
+  useEffect(() => {
+    if (!currentModal) {
+      navigate(location.pathname, { replace: true });
+      return;
+    }
+    navigate(`#${currentModal}`, { replace: true });
+  }, [currentModal]);
+
+  useEffect(() => {
+    if (location.hash.replace("#", "") === currentModal) return;
+    setCurrentModal(location.hash.replace("#", "") || null);
+  }, [location.hash]);
+
   const [stakes, setStakes] = useState<
     Array<{
       fluidAmount: BN;
@@ -256,8 +273,6 @@ const Airdrop = () => {
       }))
     );
   };
-
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
 
   useEffect(() => {
     if (!currentModal) {
@@ -506,6 +521,18 @@ const Airdrop = () => {
                 stakes={stakes}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+              />
+            </>
+          )}
+          {currentModal === "referrals" && (
+            <>
+              <Heading as="h3" className="no-margin">
+                My Referral Link
+              </Heading>
+              <BottleSection
+                totalBottles={bottlesCount}
+                activeReferrerReferralsCount={numActiveReferreeReferrals}
+                tooltipStyle={"frosted"}
               />
             </>
           )}

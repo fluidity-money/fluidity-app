@@ -24,6 +24,7 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
+  LinkVerticalIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -125,7 +126,47 @@ interface IReferralDetailsModal {
   inactiveReferrerReferralsCount: number;
   nextInactiveReferral?: Referral;
   isMobile?: boolean;
+  tooltipStyle?: "solid" | "frosted";
 }
+
+const BottleSection = ({
+  tooltipStyle,
+  activeRefereeReferralsCount,
+  totalBottles,
+}: Partial<IReferralDetailsModal>) => (
+  <div className="referral-details-container">
+    <LabelledValue
+      label={
+        <Hoverable
+          style={{ minWidth: 250 }}
+          tooltipStyle={tooltipStyle}
+          tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
+        >
+          <Text className="helper-label" size="xs">
+            Active Referrals <InfoCircle />
+          </Text>
+        </Hoverable>
+      }
+    >
+      {activeRefereeReferralsCount}
+    </LabelledValue>
+    <LabelledValue
+      label={
+        <Hoverable
+          style={{ minWidth: 250 }}
+          tooltipStyle={tooltipStyle}
+          tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+        >
+          <Text className="helper-label" size="xs">
+            Total Bottles earned from your link <InfoCircle />
+          </Text>
+        </Hoverable>
+      }
+    >
+      {Math.round((totalBottles || 0) * 100) / 100}
+    </LabelledValue>
+  </div>
+);
 
 const ReferralDetailsModal = ({
   bottles,
@@ -143,38 +184,11 @@ const ReferralDetailsModal = ({
       <Display className="no-margin" size="xxxs">
         My Referral Link
       </Display>
-      <div className="referral-details-container">
-        <LabelledValue
-          label={
-            <Hoverable
-              style={{ minWidth: 250 }}
-              tooltipStyle={tooltipStyle}
-              tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
-            >
-              <Text className="helper-label" size="xs">
-                Active Referrals <InfoCircle />
-              </Text>
-            </Hoverable>
-          }
-        >
-          {activeRefereeReferralsCount}
-        </LabelledValue>
-        <LabelledValue
-          label={
-            <Hoverable
-              style={{ minWidth: 250 }}
-              tooltipStyle={tooltipStyle}
-              tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
-            >
-              <Text className="helper-label" size="xs">
-                Total Bottles earned from your link <InfoCircle />
-              </Text>
-            </Hoverable>
-          }
-        >
-          {Math.round(totalBottles * 100) / 100}
-        </LabelledValue>
-      </div>
+      <BottleSection
+        totalBottles={totalBottles}
+        activeRefereeReferralsCount={activeRefereeReferralsCount}
+        tooltipStyle={tooltipStyle}
+      />
       <Hoverable
         style={{ minWidth: 250 }}
         tooltipStyle={tooltipStyle}
@@ -304,7 +318,7 @@ const ReferralDetailsModal = ({
               </div>
             }
           >
-            {nextInactiveReferral?.progress || 0}/10
+            {toSignificantDecimals(nextInactiveReferral?.progress || 0, 2)}/10
           </LabelledValue>
           <ProgressBar
             value={nextInactiveReferral?.progress || 0}
@@ -668,6 +682,9 @@ const StakeNowModal = ({
   // and maximum base token spread, to the factor of 12
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
 
+  // Force recommended token ratio
+  const [lockRatio, setLockRatio] = useState(true);
+
   // Convert proportion of Base Tokens in Pool to Fluid:Base Token ratio
   // `prop` = base / (base + fluid)
   const calculateRatioFromProportion = (baseTokenProp: number) => {
@@ -768,6 +785,7 @@ const StakeNowModal = ({
         amount: tokenAmtStr,
       });
 
+      if (!lockRatio) return;
       if (!tokenAmtStr) return;
 
       const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
@@ -851,6 +869,10 @@ const StakeNowModal = ({
 
   const testStake = async (): Promise<boolean> => {
     try {
+      if (!(fluidToken.amount && fluidToken.amount)) {
+        throw Error('reason="not enough liquidity"');
+      }
+
       if (fluidTokenAmount.gt(fluidToken.userTokenBalance)) {
         throw Error('reason="Insufficient Fluid Funds"');
       }
@@ -1006,7 +1028,7 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
-              gap: "0.5em",
+              gap: "1em",
             }}
           >
             <Hoverable
@@ -1018,17 +1040,35 @@ const StakeNowModal = ({
                 STAKE AMOUNT <InfoCircle />
               </Text>
             </Hoverable>
-            <GeneralButton
-              type="transparent"
-              size="small"
-              handleClick={() => inputMaxBalance()}
-              style={{
-                padding: "0.5em 1em",
-                borderRadius: "100px",
-              }}
-            >
-              <Text size="sm">MAX</Text>
-            </GeneralButton>
+            <div className="airdrop-stake-buttons">
+              <Hoverable
+                style={{ minWidth: 200 }}
+                tooltipStyle={tooltipStyle}
+                tooltipContent="Enforce recommended token ratio."
+              >
+                <GeneralButton
+                  type={lockRatio ? "primary" : "transparent"}
+                  size="small"
+                  handleClick={() => setLockRatio(!lockRatio)}
+                  style={{
+                    width: "2px",
+                    padding: "0.5em 0.5em",
+                  }}
+                  icon={<LinkVerticalIcon />}
+                ></GeneralButton>
+              </Hoverable>
+              <GeneralButton
+                type="transparent"
+                size="small"
+                handleClick={() => inputMaxBalance()}
+                style={{
+                  padding: "0.5em 1em",
+                  borderRadius: "100px",
+                }}
+              >
+                <Text size="sm">MAX</Text>
+              </GeneralButton>
+            </div>
           </div>
           {showTokenSelector === "fluid" ? (
             <div className="staking-modal-token-selector">
@@ -1165,7 +1205,7 @@ const StakeNowModal = ({
               <div
                 className="staking-modal-token-insufficient"
                 style={{
-                  display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
+                  display: baseTokenAmount.gt(baseToken.userTokenBalance)
                     ? "flex"
                     : "none",
                 }}
@@ -1733,6 +1773,7 @@ const TestnetRewardsModal = () => {
 export {
   BottleDistribution,
   TutorialModal,
+  BottleSection,
   StakeNowModal,
   StakingStatsModal,
   BottlesDetailsModal,

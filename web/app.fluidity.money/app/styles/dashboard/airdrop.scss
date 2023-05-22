@@ -310,7 +310,7 @@ $holo: linear-gradient(
   padding: 0;
   gap: 0.5em;
   .leaderboard-header {
-    padding: 0 25px;
+    padding: 0 20px;
     flex-direction: column;
     align-items: flex-start;
     margin: 0;
@@ -482,6 +482,28 @@ $holo: linear-gradient(
   column-gap: 4em;
   row-gap: 2em;
   max-width: 500px;
+
+  .airdrop-stake-buttons {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .staking-modal-token-insufficient {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    bottom: -0.5em;
+    background: black;
+    padding: 0.2em 2em 0.2em 2em;
+    border-radius: 12px;
+    border: 1px solid red;
+  }
+
+  .staking-modal-complete {
+    width: 95%;
+  }
 
   &.airdrop-mobile {
     grid-template-columns: 1fr 1fr;

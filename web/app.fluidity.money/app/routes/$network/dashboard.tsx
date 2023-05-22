@@ -162,10 +162,10 @@ type LoaderData = {
 const NAVIGATION_MAP: {
   [key: string]: { name: string; icon: JSX.Element };
 }[] = [
+  { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
   { home: { name: "dashboard", icon: <DashboardIcon /> } },
   { rewards: { name: "rewards", icon: <Trophy /> } },
   { assets: { name: "assets", icon: <AssetsIcon /> } },
-  { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
 ];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
@@ -465,25 +465,17 @@ export default function Dashboard() {
       </CardModal>
 
       {/* Accept Referral Modal */}
-      <Modal id="accept-referral-modal" visible={acceptReferralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setAcceptReferralModalVisibility(false)}
-          style={{
-            background: isMobile ? "black" : "#030303cc",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <AcceptReferralModal
-            network={network}
-            referralCode={clickedReferralCode}
-            referrer={referralAddress}
-            closeModal={() => setAcceptReferralModalVisibility(false)}
-          />
-        </div>
-      </Modal>
+      <CardModal
+        id="accept-referral-modal"
+        visible={acceptReferralModalVisibility}
+        closeModal={() => setAcceptReferralModalVisibility(false)}
+      >
+        <AcceptReferralModal
+          network={network}
+          referralCode={clickedReferralCode}
+          referrer={referralAddress}
+        />
+      </CardModal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>

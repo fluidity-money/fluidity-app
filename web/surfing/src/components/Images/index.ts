@@ -19,6 +19,7 @@ import { CaretLeft } from "./CaretLeft";
 import { CaretRight } from "./CaretRight";
 import { Referral } from "./Referral";
 import { AirdropIcon } from "./Airdrop";
+import { LinkVerticalIcon } from "./LinkVertical";
 
 export {
   AirdropIcon,
@@ -42,4 +43,5 @@ export {
   CaretLeft,
   CaretRight,
   Referral,
+  LinkVerticalIcon,
 };
