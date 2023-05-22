@@ -976,7 +976,7 @@ const StakeNowModal = ({
 
   const [showTokenSelector, setShowTokenSelector] = useState<
     "fluid" | "base" | ""
-  >("");
+  >("base");
 
   const tooltipStyle = isMobile ? "frosted" : "solid";
 
@@ -1303,7 +1303,6 @@ const StakeNowModal = ({
             value={slippage}
             max={50}
             onChange={(e) => {
-              console.log(e.currentTarget.value);
               setSlippage(Math.floor(parseInt(e.target.value) || 0));
             }}
           />

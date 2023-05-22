@@ -278,7 +278,7 @@ const Airdrop = () => {
 
   useEffect(() => {
     if (!currentModal) {
-      navigate(location.pathname, { replace: true });
+      navigate(`${location.pathname}${location.search}`, { replace: true });
       return;
     }
     navigate(`#${currentModal}`, { replace: true });

@@ -21,7 +21,11 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 
 type IMobileModal = {
-  navigationMap: Array<{ name: string; icon: JSX.Element }>;
+  navigationMap: Array<{
+    name: string;
+    path: (network: string) => string;
+    icon: JSX.Element;
+  }>;
   activeIndex: number;
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
@@ -122,9 +126,8 @@ export default function MobileModal({
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, type: "tween" }}
           exit={{ opacity: 0, x: "75%" }}
-          className={`mobile-modal-container  ${
-            isOpen === true ? "show-modal" : "hide-modal"
-          }`}
+          className={`mobile-modal-container  ${isOpen === true ? "show-modal" : "hide-modal"
+            }`}
         >
           {/* Navigation at top of modal */}
           <nav id="mobile-top-navbar" className={"pad-main"}>
@@ -191,7 +194,7 @@ export default function MobileModal({
                       connectedWalletModalVisibility &&
                         setconnectedWalletModalVisibility(false);
                     }}
-                    // className="connect-wallet-btn"
+                  // className="connect-wallet-btn"
                   />
                 ) : (
                   <GeneralButton
@@ -200,7 +203,7 @@ export default function MobileModal({
                     handleClick={() =>
                       connecting ? null : setWalletModalVisibility(true)
                     }
-                    // className="connect-wallet-btn"
+                  // className="connect-wallet-btn"
                   >
                     {connecting ? `Connecting...` : `Connect Wallet`}
                   </GeneralButton>
@@ -220,49 +223,40 @@ export default function MobileModal({
                   {navigationMap
                     .filter(({ name }) => name !== "Assets" || showAssets)
                     .filter(({ name }) => name !== "Airdrop" || showAirdrop)
-                    .map(
-                      (
-                        obj: { name: string; icon: JSX.Element },
-                        index: number
-                      ) => {
-                        const key = Object.values(obj)[0];
-                        const { name, icon } = obj;
-                        const active = index === activeIndex;
+                    .map((obj, index) => {
+                      const key = Object.values(obj)[0];
+                      const { name, icon, path } = obj;
+                      const active = index === activeIndex;
 
-                        return (
-                          <li
-                            key={key as unknown as string}
-                            onClick={() => {
-                              //delay to show page change and allow loading
-                              setTimeout(() => {
-                                setIsOpen(false);
-                              }, 800);
-                            }}
-                          >
-                            {index === activeIndex ? (
-                              <motion.div
-                                className={"active"}
-                                layoutId="active"
-                              />
-                            ) : (
-                              <div />
-                            )}
-                            <Link
-                              to={
-                                index === 0 ? "./" : (key as unknown as string)
-                              }
+                      return (
+                        <li
+                          key={key as unknown as string}
+                          onClick={() => {
+                            //delay to show page change and allow loading
+                            setTimeout(() => {
+                              setIsOpen(false);
+                            }, 800);
+                          }}
+                        >
+                          {index === activeIndex ? (
+                            <motion.div
+                              className={"active"}
+                              layoutId="active"
+                            />
+                          ) : (
+                            <div />
+                          )}
+                          <Link to={path(network)}>
+                            <Text
+                              prominent={active}
+                              className="mobile-modal-text-link"
                             >
-                              <Text
-                                prominent={active}
-                                className="mobile-modal-text-link"
-                              >
-                                {icon} {name}
-                              </Text>
-                            </Link>
-                          </li>
-                        );
-                      }
-                    )}
+                              {icon} {name}
+                            </Text>
+                          </Link>
+                        </li>
+                      );
+                    })}
                 </ul>
               </nav>
             </section>
