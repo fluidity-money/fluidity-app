@@ -152,7 +152,7 @@ const ReferralModal = ({
               tooltipStyle={isMobile ? "frosted" : "solid"}
               tooltipContent={
                 <Text size="xs">
-                  Active Referrals are Referrals that have earned 10 Lootboxes
+                  Active Referrals are Referrals that have earned 10 Loot Bottles
                 </Text>
               }
             >
@@ -286,7 +286,7 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
           </Text>
         </div>
         <Text prominent size="sm">
-          <strong>10 Loot Bottles,</strong>
+          <strong>5 Loot Bottles,</strong>
           <br />
           not affected by your 10% reward.
         </Text>
@@ -298,7 +298,7 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
         src="/images/icons/circleInfo.svg"
       />
       <Text prominent size="sm" className="how-it-works-warning-text">
-        They will have to earn 10 Loot Boxes for each referral in order to claim
+        They will have to earn 5 Loot Boxes for each referral in order to claim
         their reward and activate yours.
       </Text>
     </div>
