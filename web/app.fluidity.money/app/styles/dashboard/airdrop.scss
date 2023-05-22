@@ -501,6 +501,10 @@ $holo: linear-gradient(
     border: 1px solid red;
   }
 
+  .staking-modal-complete {
+    width: 95%;
+  }
+
   &.airdrop-mobile {
     grid-template-columns: 1fr 1fr;
     column-gap: 1em;
