@@ -128,7 +128,45 @@ interface IReferralDetailsModal {
   inactiveReferrerReferralsCount: number;
   nextInactiveReferral?: Referral;
   isMobile?: boolean;
+  tooltipStyle?: "solid" | "frosted"
 }
+
+const BottleSection = ({
+  tooltipStyle,
+  activeRefereeReferralsCount,
+  totalBottles,
+}: Partial<IReferralDetailsModal>) => <div className="referral-details-container">
+    <LabelledValue
+      label={
+        <Hoverable
+          style={{ minWidth: 250 }}
+          tooltipStyle={tooltipStyle}
+          tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
+        >
+          <Text className="helper-label" size="xs">
+            Active Referrals <InfoCircle />
+          </Text>
+        </Hoverable>
+      }
+    >
+      {activeRefereeReferralsCount}
+    </LabelledValue>
+    <LabelledValue
+      label={
+        <Hoverable
+          style={{ minWidth: 250 }}
+          tooltipStyle={tooltipStyle}
+          tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+        >
+          <Text className="helper-label" size="xs">
+            Total Bottles earned from your link <InfoCircle />
+          </Text>
+        </Hoverable>
+      }
+    >
+      {totalBottles}
+    </LabelledValue>
+  </div>
 
 const ReferralDetailsModal = ({
   bottles,
@@ -146,38 +184,11 @@ const ReferralDetailsModal = ({
       <Display className="no-margin" size="xxxs">
         My Referral Link
       </Display>
-      <div className="referral-details-container">
-        <LabelledValue
-          label={
-            <Hoverable
-              style={{ minWidth: 250 }}
-              tooltipStyle={tooltipStyle}
-              tooltipContent="The amount of users who have used your referral link and are earning Loot Bottles."
-            >
-              <Text className="helper-label" size="xs">
-                Active Referrals <InfoCircle />
-              </Text>
-            </Hoverable>
-          }
-        >
-          {activeRefereeReferralsCount}
-        </LabelledValue>
-        <LabelledValue
-          label={
-            <Hoverable
-              style={{ minWidth: 250 }}
-              tooltipStyle={tooltipStyle}
-              tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
-            >
-              <Text className="helper-label" size="xs">
-                Total Bottles earned from your link <InfoCircle />
-              </Text>
-            </Hoverable>
-          }
-        >
-          {totalBottles}
-        </LabelledValue>
-      </div>
+      <BottleSection
+        totalBottles={totalBottles}
+        activeRefereeReferralsCount={activeRefereeReferralsCount}
+        tooltipStyle={tooltipStyle}
+      />
       <Hoverable
         style={{ minWidth: 250 }}
         tooltipStyle={tooltipStyle}
@@ -307,7 +318,7 @@ const ReferralDetailsModal = ({
               </div>
             }
           >
-            {nextInactiveReferral?.progress || 0}/10
+            {toSignificantDecimals(nextInactiveReferral?.progress || 0, 2)}/10
           </LabelledValue>
           <ProgressBar
             value={nextInactiveReferral?.progress || 0}
@@ -1602,6 +1613,7 @@ const TutorialModal = ({
 export {
   BottleDistribution,
   TutorialModal,
+  BottleSection,
   StakeNowModal,
   StakingStatsModal,
   BottlesDetailsModal,

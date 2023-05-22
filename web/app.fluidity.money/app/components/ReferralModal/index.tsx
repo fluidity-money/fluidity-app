@@ -58,7 +58,6 @@ const ReferralModal = ({
   const mobileBreakpoint = 768;
   const { width } = useViewport();
 
-
   const isMobile = width < mobileBreakpoint;
 
   return (

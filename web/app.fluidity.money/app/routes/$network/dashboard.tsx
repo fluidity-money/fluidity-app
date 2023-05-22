@@ -162,10 +162,10 @@ type LoaderData = {
 const NAVIGATION_MAP: {
   [key: string]: { name: string; icon: JSX.Element };
 }[] = [
+    { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
     { home: { name: "dashboard", icon: <DashboardIcon /> } },
     { rewards: { name: "rewards", icon: <Trophy /> } },
     { assets: { name: "assets", icon: <AssetsIcon /> } },
-    { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
   ];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
