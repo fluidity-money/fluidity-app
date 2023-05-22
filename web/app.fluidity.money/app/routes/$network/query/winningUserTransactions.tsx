@@ -170,7 +170,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-              (currency === "DAI" || currency === "fDAI")
+            (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -250,8 +250,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           tx.sender === MintAddress
             ? "in"
             : tx.receiver === MintAddress
-              ? "out"
-              : undefined;
+            ? "out"
+            : undefined;
 
         const isSend = tx.sender === winner.winning_address;
 

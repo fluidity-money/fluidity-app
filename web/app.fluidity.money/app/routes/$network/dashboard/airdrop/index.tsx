@@ -33,7 +33,7 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
-  TestnetRewardsModal,
+  //  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
@@ -164,7 +164,8 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}`
   );
 
@@ -302,71 +303,85 @@ const Airdrop = () => {
     fetchUserStakes(address);
   }, [address]);
 
-  const [localCookieConsent, setLocalCookieConsent] = useState<boolean | undefined>(
-    false
-  );
-  const [localBottleCount, setLocalBottleCount] = useState<number | undefined>(undefined)
-  const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] = useState<boolean | undefined>(undefined)
-  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<boolean | undefined>(undefined)
+  const [localCookieConsent, setLocalCookieConsent] = useState<
+    boolean | undefined
+  >(false);
+
+  const setLocalBottleCount = useState<number | undefined>(undefined)[1];
+
+  const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
+    useState<boolean | undefined>(undefined);
+  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+    boolean | undefined
+  >(undefined);
 
   useEffect(() => {
-    if (!window) return
-    const cookieConsent = window.localStorage.getItem('cookieConsent')
+    if (!window) return;
+    const cookieConsent = window.localStorage.getItem("cookieConsent");
 
-    if (cookieConsent === 'false') {
-      setLocalCookieConsent(false)
-      return
+    if (cookieConsent === "false") {
+      setLocalCookieConsent(false);
+      return;
     } else {
-      setLocalCookieConsent(true)
+      setLocalCookieConsent(true);
     }
 
-    const airdropHasVisited = window.localStorage.getItem('airdropHasVisited')
-    const airdropBottleCount = window.localStorage.getItem('airdropBottleCount')
-    const airdropShouldShowBottleNumbers = window.localStorage.getItem('airdropShouldShowBottleNumbers')
+    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    const airdropBottleCount =
+      window.localStorage.getItem("airdropBottleCount");
+    const airdropShouldShowBottleNumbers = window.localStorage.getItem(
+      "airdropShouldShowBottleNumbers"
+    );
 
     if (airdropBottleCount) {
-      setLocalBottleCount(parseInt(airdropBottleCount))
+      setLocalBottleCount(parseInt(airdropBottleCount));
     } else {
-      setLocalBottleCount(0)
+      setLocalBottleCount(0);
     }
 
     if (airdropShouldShowBottleNumbers) {
-      setLocalShouldShowBottleNumbers(airdropShouldShowBottleNumbers === 'true')
+      setLocalShouldShowBottleNumbers(
+        airdropShouldShowBottleNumbers === "true"
+      );
     } else {
-      setLocalShouldShowBottleNumbers(true)
+      setLocalShouldShowBottleNumbers(true);
     }
 
     if (airdropHasVisited) {
-      setLocalShouldShowTutorial(false)
+      setLocalShouldShowTutorial(false);
     } else {
-      setLocalShouldShowTutorial(true)
+      setLocalShouldShowTutorial(true);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if (!window || !localCookieConsent) return
-    if (localShouldShowBottleNumbers === undefined) return
-    window.localStorage.setItem('airdropShouldShowBottleNumbers', localShouldShowBottleNumbers.toString())
-  }, [localShouldShowBottleNumbers])
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowBottleNumbers === undefined) return;
+    window.localStorage.setItem(
+      "airdropShouldShowBottleNumbers",
+      localShouldShowBottleNumbers.toString()
+    );
+  }, [localShouldShowBottleNumbers]);
 
   useEffect(() => {
-    if (!window || !localCookieConsent) return
-    if (localShouldShowTutorial === undefined) return
-    window.localStorage.setItem('airdropHasVisited', 'true')
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowTutorial === undefined) return;
+    window.localStorage.setItem("airdropHasVisited", "true");
     if (localShouldShowTutorial && !isMobile) {
       setTimeout(() => {
-        setCurrentModal('tutorial')
-      }, 2000)
+        setCurrentModal("tutorial");
+      }, 2000);
     }
-  }, [localShouldShowTutorial])
+  }, [localShouldShowTutorial]);
 
   const leaderboardRef = useRef<HTMLDivElement>(null);
 
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         <TabButton
           size="small"
@@ -417,12 +432,6 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("testnet-rewards")}
-        >
-          Claim Testnet Rewards
-        </TabButton>
       </div>
     );
   };
@@ -434,19 +443,20 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-                currentModal === "leaderboard" ||
-                currentModal === "stake"
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                  ? "1em"
-                  : "2em",
+                ? "1em"
+                : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -494,10 +504,16 @@ const Airdrop = () => {
                   gap: "1em",
                 }}
               >
-                <BottleProgress bottles={bottleTiers} isMobile shouldShowBottleNumbers={localShouldShowBottleNumbers === undefined ? true : localShouldShowBottleNumbers} setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers} />
-                <TextButton className="bottles-earned-button">
-                  Bottles Earned Since Last Checked <ArrowRight />
-                </TextButton>
+                <BottleProgress
+                  bottles={bottleTiers}
+                  isMobile
+                  shouldShowBottleNumbers={
+                    localShouldShowBottleNumbers === undefined
+                      ? true
+                      : localShouldShowBottleNumbers
+                  }
+                  setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+                />
               </div>
               <AirdropStats
                 seeReferralsDetails={() => setCurrentModal("referrals")}
@@ -507,6 +523,8 @@ const Airdrop = () => {
                 epochDays={epochDays}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
+                network={network}
+                navigate={navigate}
                 isMobile
               />
               <MultiplierTasks />
@@ -608,14 +626,14 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {currentModal === "testnet-rewards" && (
+          {/*{currentModal === "testnet-rewards" && (
             <>
               <Heading as="h3" className="no-margin">
                 Claim Testnet Rewards
               </Heading>
               <TestnetRewardsModal />
             </>
-          )}
+          )}*/}
         </motion.div>
       </>
     );
@@ -695,13 +713,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      <CardModal
+      {/*<CardModal
         id="testnet-rewards"
         visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
-      </CardModal>
+      </CardModal>*/}
 
       {/* Page Content */}
       <Header />
@@ -763,6 +781,8 @@ const Airdrop = () => {
               epochDays={epochDays}
               activatedReferrals={numActiveReferrerReferrals}
               totalBottles={bottlesCount}
+              network={network}
+              navigate={navigate}
             />
             <MultiplierTasks />
             <MyMultiplier
@@ -774,7 +794,15 @@ const Airdrop = () => {
               usdcPrice={usdcPrice}
             />
           </div>
-          <BottleProgress shouldShowBottleNumbers={localShouldShowBottleNumbers === undefined ? true : localShouldShowBottleNumbers} setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers} bottles={bottleTiers} />
+          <BottleProgress
+            shouldShowBottleNumbers={
+              localShouldShowBottleNumbers === undefined
+                ? true
+                : localShouldShowBottleNumbers
+            }
+            setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+            bottles={bottleTiers}
+          />
         </div>
       </div>
       <div
@@ -828,6 +856,8 @@ interface IAirdropStats {
   epochMax: number;
   activatedReferrals: number;
   totalBottles: number;
+  network: string;
+  navigate: (path: string) => void;
   isMobile?: boolean;
 }
 
@@ -839,6 +869,8 @@ const AirdropStats = ({
   epochMax,
   activatedReferrals,
   totalBottles,
+  network,
+  navigate,
   isMobile,
 }: IAirdropStats) => {
   return (
@@ -916,8 +948,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                console.log("TODO REDIRECT");
-              }
+                  navigate(`/${network}/dashboard/rewards`);
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1156,7 +1188,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1176,8 +1208,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                  ? 0
-                  : -1;
+                ? 0
+                : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1249,8 +1281,9 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
-        }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+        address === user ? "highlighted-row" : ""
+      }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1269,8 +1302,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1285,8 +1318,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1301,8 +1334,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1317,8 +1350,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1333,8 +1366,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1515,9 +1548,7 @@ const BottleProgress = ({
         <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
           <Form.Toggle
             checked={shouldShowBottleNumbers}
-            onClick={() =>
-              setShouldShowBottleNumbers(!shouldShowBottleNumbers)
-            }
+            onClick={() => setShouldShowBottleNumbers(!shouldShowBottleNumbers)}
             style={{
               opacity: shouldShowBottleNumbers ? 1 : 0.3,
             }}
