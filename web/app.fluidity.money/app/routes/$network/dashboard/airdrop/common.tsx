@@ -895,8 +895,6 @@ const StakeNowModal = ({
       setStakeErr("");
       return true;
     } catch (e) {
-      console.error(e);
-
       // Expect error on fail
       const errMsgMatchReason = /reason="[a-z0-9 :_]+/i;
       const stakingError = (e as { message: string }).message
@@ -961,8 +959,6 @@ const StakeNowModal = ({
 
       stakeCallback();
     } catch (e) {
-      console.error(e);
-
       setStakeErr(
         typeof e === "object" ? "User Rejected Transaction" : (e as string)
       );
@@ -1299,7 +1295,6 @@ const StakeNowModal = ({
             value={slippage}
             max={50}
             onChange={(e) => {
-              console.log(e.currentTarget.value);
               setSlippage(Math.floor(parseInt(e.target.value) || 0));
             }}
           />
