@@ -69,8 +69,8 @@ const useActiveReferralCountByReferrerAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-      }
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
       : {}
   );
 };
@@ -90,8 +90,8 @@ const useActiveReferralCountByRefereeAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-      }
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
       : {}
   );
 };
@@ -111,8 +111,8 @@ const useInactiveReferralCountByRefereeAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-      }
+          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+        }
       : {}
   );
 };
