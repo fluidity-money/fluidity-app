@@ -69,7 +69,7 @@ func main() {
 		// number of referrals to update
 		maxUnclaimedReferrals := math.Floor(lootboxCount/float64(lootboxReferralAmount)) + 2
 
-		unclaimedReferrals := referrals.GetLatestUnclaimedReferrals(
+		unclaimedReferrals := referrals.GetEarliestUnclaimedReferrals(
 			ethereum.AddressFromString(address),
 			int(maxUnclaimedReferrals),
 		)
