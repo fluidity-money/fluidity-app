@@ -298,7 +298,7 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
         src="/images/icons/circleInfo.svg"
       />
       <Text prominent size="sm" className="how-it-works-warning-text">
-        They will have to earn 5 Loot Boxes for each referral in order to claim
+        They will have to earn 5 Loot Bottles for each referral in order to claim
         their reward and activate yours.
       </Text>
     </div>
