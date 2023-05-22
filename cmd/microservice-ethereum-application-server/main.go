@@ -273,6 +273,12 @@ func main() {
 					ApplicationFee: fee,
 				}
 
+				// if there's a utility but no fee, the event is from a protocol
+				// but not one that's decoded by GetApplicationFee
+				if fee == nil {
+					decorator.Application = applications.ApplicationNone
+				}
+
 				sender, recipient, err := applications.GetApplicationTransferParties(
 					transaction,
 					transfer,
