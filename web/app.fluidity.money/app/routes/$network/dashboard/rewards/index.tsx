@@ -47,7 +47,6 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -164,8 +163,6 @@ export default function Rewards() {
   const { connected, address, tokens, addToken } = useContext(
     FluidityFacadeContext
   );
-
-  const { showExperiment } = useContext(SplitContext);
 
   const userRewardsData = useFetcher();
 
