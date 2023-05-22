@@ -185,8 +185,14 @@ func main() {
 				})
 			}
 
+			volume = new(big.Rat)
+
+			if feeData.Volume != nil {
+				volume = volume.Set(feeData.Volume)
+			}
+
 			// keep volume as is to do calculations with
-			volume = new(big.Rat).Set(feeData.Volume)
+
 
 			// volumeBigInt_ to convert to the database BigInt
 			// volumeBigInt_ = (volumeRat * 10^decimals * denominator)::BigInt / denominator
