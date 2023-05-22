@@ -175,7 +175,6 @@ const ReferralDetailsModal = ({
   bottles,
   totalBottles,
   activeRefereeReferralsCount,
-  activeReferrerReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
   isMobile,
@@ -240,7 +239,7 @@ const ReferralDetailsModal = ({
             </div>
           }
         >
-          {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
+          {activeRefereeReferralsCount + inactiveReferrerReferralsCount}
         </LabelledValue>
         <div>
           <LabelledValue
@@ -270,9 +269,9 @@ const ReferralDetailsModal = ({
               </div>
             }
           >
-            {activeReferrerReferralsCount}
+            {activeRefereeReferralsCount}
           </LabelledValue>
-          <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
+          <Text size="xs">{activeRefereeReferralsCount * 5} BOTTLES</Text>
         </div>
         <div>
           <LabelledValue
