@@ -219,6 +219,7 @@ const Airdrop = () => {
       numActiveReferrerReferrals,
       numInactiveReferreeReferrals,
       inactiveReferrals,
+      referralCode,
     },
     airdropLeaderboard: {
       leaderboard: leaderboardRows,
@@ -235,14 +236,6 @@ const Airdrop = () => {
   const [currentModal, setCurrentModal] = useState<string | null>(
     location.hash.replace("#", "") || null
   );
-
-  useEffect(() => {
-    if (!currentModal) {
-      navigate(location.pathname, { replace: true });
-      return;
-    }
-    navigate(`#${currentModal}`, { replace: true });
-  }, [currentModal]);
 
   useEffect(() => {
     if (location.hash.replace("#", "") === currentModal) return;
@@ -539,7 +532,7 @@ const Airdrop = () => {
                 My Referral Link
               </Heading>
               <ReferralDetailsModal
-
+                referralCode={referralCode}
                 bottles={referralBottleTiers}
                 totalBottles={referralBottlesCount}
                 activeReferrerReferralsCount={numActiveReferrerReferrals}

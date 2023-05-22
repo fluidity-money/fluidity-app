@@ -129,6 +129,7 @@ interface IReferralDetailsModal {
   isMobile?: boolean;
   tooltipStyle?: "solid" | "frosted";
   showCopyGroup?: boolean;
+  referralCode?: string;
 }
 
 const BottleSection = ({
@@ -178,6 +179,7 @@ const ReferralDetailsModal = ({
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
   isMobile,
+  referralCode,
   showCopyGroup = false,
 }: IReferralDetailsModal) => {
   const tooltipStyle = isMobile ? "frosted" : "solid";
@@ -195,7 +197,7 @@ const ReferralDetailsModal = ({
         tooltipStyle={tooltipStyle}
       />
       {
-        showCopyGroup && <CopyGroup referralCode={"test"} />
+        showCopyGroup && referralCode && <CopyGroup referralCode={referralCode} />
       }
       <Hoverable
         style={{ minWidth: 250 }}

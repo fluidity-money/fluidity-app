@@ -33,6 +33,7 @@ export type AirdropLoaderData = {
   wethPrice: number;
   usdcPrice: number;
   loaded: boolean;
+  referralCode?: string;
 };
 
 const EPOCH_DAYS_TOTAL = 31;
