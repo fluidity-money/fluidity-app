@@ -197,6 +197,8 @@ func main() {
 				})
 			}
 
+			//
+
 			volume = new(big.Rat).Set(feeDataVolume)
 
 			// volumeBigInt_ to convert to the database BigInt
