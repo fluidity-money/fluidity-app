@@ -522,3 +522,13 @@ $holo: linear-gradient(
     }
   }
 }
+
+.scroll-to-leaderboard-button {
+  svg {
+    transform: rotate(90deg);
+
+    path {
+      fill: none;
+    }
+  }
+}

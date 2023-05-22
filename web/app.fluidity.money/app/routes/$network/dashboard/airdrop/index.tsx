@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -200,7 +200,19 @@ const Airdrop = () => {
     },
   } = data;
 
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const location = useLocation();
+
+
+  const [currentModal, setCurrentModal] = useState<string | null>(location.hash.replace("#", "") || null);
+
+  useEffect(() => {
+    if (!currentModal) {
+      navigate(location.pathname, { replace: true });
+      return
+    }
+    navigate(`#${currentModal}`, { replace: true });
+  }, [currentModal])
+
   const [stakes, setStakes] = useState<
     Array<{
       fluidAmount: BN;
@@ -275,8 +287,9 @@ const Airdrop = () => {
                 block: "start",
                 behavior: "smooth",
               });
+            } else {
+              setCurrentModal("leaderboard");
             }
-            setCurrentModal("leaderboard");
           }}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "leaderboard"}
@@ -285,12 +298,12 @@ const Airdrop = () => {
         </TabButton>
         <TabButton
           size="small"
-          onClick={() => setCurrentModal("referral-details")}
-          groupId="airdrop" isSelected={isMobile && currentModal === "referral-details"}
+          onClick={() => setCurrentModal("referrals")}
+          groupId="airdrop" isSelected={isMobile && currentModal === "referrals"}
         >
           Referrals
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake-now")} groupId="airdrop" isSelected={isMobile && currentModal === "stake-now"}>
+        <TabButton size="small" onClick={() => setCurrentModal("stake")} groupId="airdrop" isSelected={isMobile && currentModal === "stake"}>
           Stake
         </TabButton>
       </div>
@@ -310,7 +323,7 @@ const Airdrop = () => {
             display: "flex",
             flexDirection: "column",
             gap:
-              currentModal === "tutorial" || currentModal === "leaderboard" || currentModal === "stake-now"
+              currentModal === "tutorial" || currentModal === "leaderboard" || currentModal === "stake"
                 ? "0.5em"
                 : "2em",
           }}
@@ -366,7 +379,7 @@ const Airdrop = () => {
                 </TextButton>
               </div>
               <AirdropStats
-                seeReferralsDetails={() => setCurrentModal("referral-details")}
+                seeReferralsDetails={() => setCurrentModal("referrals")}
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
                 seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
@@ -378,7 +391,7 @@ const Airdrop = () => {
               <MultiplierTasks />
               <MyMultiplier
                 seeMyStakingStats={() => setCurrentModal("staking-stats")}
-                seeStakeNow={() => setCurrentModal("stake-now")}
+                seeStakeNow={() => setCurrentModal("stake")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
                 wethPrice={wethPrice}
@@ -407,7 +420,7 @@ const Airdrop = () => {
               />
             </>
           )}
-          {currentModal === "stake-now" && (
+          {currentModal === "stake" && (
             <>
               <Heading as="h3" className="no-margin">
                 Stake Now
@@ -446,7 +459,7 @@ const Airdrop = () => {
       {/* Modals */}
       <CardModal
         id="referral-details"
-        visible={currentModal === "referral-details"}
+        visible={currentModal === "referrals"}
         closeModal={closeModal}
         style={{ gap: "1em" }}
       >
@@ -473,8 +486,8 @@ const Airdrop = () => {
         />
       </CardModal>
       <CardModal
-        id="stake-now"
-        visible={currentModal === "stake-now"}
+        id="stake"
+        visible={currentModal === "stake"}
         closeModal={closeModal}
         style={{ gap: "2em" }}
       >
@@ -566,7 +579,7 @@ const Airdrop = () => {
               </Text>
             </div>
             <AirdropStats
-              seeReferralsDetails={() => setCurrentModal("referral-details")}
+              seeReferralsDetails={() => setCurrentModal("referrals")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
               seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
               epochMax={epochDaysTotal}
@@ -577,7 +590,7 @@ const Airdrop = () => {
             <MultiplierTasks />
             <MyMultiplier
               seeMyStakingStats={() => setCurrentModal("staking-stats")}
-              seeStakeNow={() => setCurrentModal("stake-now")}
+              seeStakeNow={() => setCurrentModal("stake")}
               liquidityMultiplier={liquidityMultiplier}
               stakes={stakes}
               wethPrice={wethPrice}
@@ -598,10 +611,9 @@ const Airdrop = () => {
         <GeneralButton
           type="transparent"
           icon={
-            <span style={{ fill: "none", transform: "rotate(90deg)" }}>
-              <ArrowRight />
-            </span>
+            <ArrowRight />
           }
+          className="scroll-to-leaderboard-button"
           onClick={() => {
             leaderboardRef.current?.scrollIntoView({
               block: "start",

@@ -465,4 +465,11 @@
   margin-top: 1em;
 }
 
+.scroll-to-leaderboard-button svg {
+  transform: rotate(90deg);
+}
+.scroll-to-leaderboard-button svg path {
+  fill: none;
+}
+
 /*# sourceMappingURL=airdrop.css.map */
