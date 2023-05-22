@@ -286,7 +286,7 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
           </Text>
         </div>
         <Text prominent size="sm">
-          <strong>10 Loot Bottles,</strong>
+          <strong>5 Loot Bottles,</strong>
           <br />
           not affected by your 10% reward.
         </Text>
