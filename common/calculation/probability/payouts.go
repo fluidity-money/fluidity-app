@@ -60,7 +60,7 @@ func CalculatePayoutsSplit(sourcePayouts map[applications.UtilityName][]worker.P
 
 		// 80%
 		fromAmountNative.Sub(payoutNative, &toAmountNative.Int)
-		fromAmountUsd = payoutUsd - fromAmountUsd
+		fromAmountUsd = payoutUsd - toAmountUsd
 
 		toAmounts[utility] = worker.Payout{
 			Native: toAmountNative,

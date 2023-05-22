@@ -11,7 +11,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -36,8 +35,8 @@ var (
 
 // ethereumUniqueTransfer identifies a transfer uniquely
 type ethereumUniqueTransfer struct {
-	transactionHash ethereum.Hash
-	logIndex        misc.BigInt
+	transactionHash string
+	logIndex        string
 }
 
 func main() {
@@ -84,7 +83,7 @@ func mergePayouts(source map[applications.UtilityName]worker.Payout, dest map[ap
 // processAnnouncements to handle fluid transfer or application-based win
 // announcements and determine their winning status
 func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAmqpQueueName string, network_ network.BlockchainNetwork) {
-	var winAnnouncements map[ethereumUniqueTransfer]worker.EthereumWinnerAnnouncement
+	winAnnouncements := make(map[ethereumUniqueTransfer]worker.EthereumWinnerAnnouncement)
 
 	for _, announcement := range announcements {
 
@@ -159,8 +158,8 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		})
 
 		id := ethereumUniqueTransfer{
-			transactionHash: announcementTransactionHash,
-			logIndex:        *logIndex,
+			transactionHash: announcementTransactionHash.String(),
+			logIndex:        logIndex.String(),
 		}
 
 		winAnnouncement, exists := winAnnouncements[id]
@@ -184,6 +183,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 		mergePayouts(fromWinAmounts, winAnnouncement.FromWinAmount)
 		mergePayouts(toWinAmounts, winAnnouncement.ToWinAmount)
 
+		winAnnouncements[id] = winAnnouncement
 	}
 
 	if len(winAnnouncements) > 0 {
