@@ -19,7 +19,7 @@ const (
 
 type Referral = types.Referral
 
-// GetLatestUnclaimedReferrals by referee, sorted by date, limited by number
+// GetEarliestUnclaimedReferrals by referee, sorted by earliest first, limited by number
 func GetEarliestUnclaimedReferrals(address ethereum.Address, limit int) []Referral {
 	timescaleClient := timescale.Client()
 
