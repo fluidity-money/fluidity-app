@@ -230,20 +230,22 @@ const Airdrop = () => {
 
   const location = useLocation();
 
-  const [currentModal, setCurrentModal] = useState<string | null>(location.hash.replace("#", "") || null);
+  const [currentModal, setCurrentModal] = useState<string | null>(
+    location.hash.replace("#", "") || null
+  );
 
   useEffect(() => {
     if (!currentModal) {
       navigate(location.pathname, { replace: true });
-      return
+      return;
     }
     navigate(`#${currentModal}`, { replace: true });
-  }, [currentModal])
+  }, [currentModal]);
 
   useEffect(() => {
-    if (location.hash.replace("#", "") === currentModal) return
-    setCurrentModal(location.hash.replace("#", "") || null)
-  }, [location.hash])
+    if (location.hash.replace("#", "") === currentModal) return;
+    setCurrentModal(location.hash.replace("#", "") || null);
+  }, [location.hash]);
 
   const [stakes, setStakes] = useState<
     Array<{
@@ -522,20 +524,18 @@ const Airdrop = () => {
               />
             </>
           )}
-          {
-            currentModal === "referrals" && (
-              <>
-                <Heading as="h3" className="no-margin">
-                  My Referral Link
-                </Heading>
-                <BottleSection
-                  totalBottles={bottlesCount}
-                  activeReferrerReferralsCount={numActiveReferreeReferrals}
-                  tooltipStyle={"frosted"}
-                />
-              </>
-            )
-          }
+          {currentModal === "referrals" && (
+            <>
+              <Heading as="h3" className="no-margin">
+                My Referral Link
+              </Heading>
+              <BottleSection
+                totalBottles={bottlesCount}
+                activeReferrerReferralsCount={numActiveReferreeReferrals}
+                tooltipStyle={"frosted"}
+              />
+            </>
+          )}
           {currentModal === "testnet-rewards" && (
             <>
               <Heading as="h3" className="no-margin">

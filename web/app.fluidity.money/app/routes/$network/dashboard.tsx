@@ -162,11 +162,11 @@ type LoaderData = {
 const NAVIGATION_MAP: {
   [key: string]: { name: string; icon: JSX.Element };
 }[] = [
-    { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
-    { home: { name: "dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "rewards", icon: <Trophy /> } },
-    { assets: { name: "assets", icon: <AssetsIcon /> } },
-  ];
+  { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
+  { home: { name: "dashboard", icon: <DashboardIcon /> } },
+  { rewards: { name: "rewards", icon: <Trophy /> } },
+  { assets: { name: "assets", icon: <AssetsIcon /> } },
+];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   ethereum: {
@@ -465,12 +465,15 @@ export default function Dashboard() {
       </CardModal>
 
       {/* Accept Referral Modal */}
-      <CardModal id="accept-referral-modal" visible={acceptReferralModalVisibility} closeModal={() => setAcceptReferralModalVisibility(false)}>
+      <CardModal
+        id="accept-referral-modal"
+        visible={acceptReferralModalVisibility}
+        closeModal={() => setAcceptReferralModalVisibility(false)}
+      >
         <AcceptReferralModal
           network={network}
           referralCode={clickedReferralCode}
           referrer={referralAddress}
-          closeModal={() => setAcceptReferralModalVisibility(false)}
         />
       </CardModal>
 

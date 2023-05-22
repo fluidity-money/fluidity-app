@@ -126,14 +126,15 @@ interface IReferralDetailsModal {
   inactiveReferrerReferralsCount: number;
   nextInactiveReferral?: Referral;
   isMobile?: boolean;
-  tooltipStyle?: "solid" | "frosted"
+  tooltipStyle?: "solid" | "frosted";
 }
 
 const BottleSection = ({
   tooltipStyle,
   activeRefereeReferralsCount,
   totalBottles,
-}: Partial<IReferralDetailsModal>) => <div className="referral-details-container">
+}: Partial<IReferralDetailsModal>) => (
+  <div className="referral-details-container">
     <LabelledValue
       label={
         <Hoverable
@@ -165,6 +166,7 @@ const BottleSection = ({
       {Math.round((totalBottles || 0) * 100) / 100}
     </LabelledValue>
   </div>
+);
 
 const ReferralDetailsModal = ({
   bottles,

@@ -19,14 +19,12 @@ import {
 } from "@fluidity-money/surfing";
 
 type IAcceptReferraModal = {
-  closeModal: () => void;
   network: string;
   referralCode: string;
   referrer: string;
 };
 
 const AcceptReferralModal = ({
-  closeModal,
   network,
   referralCode,
   referrer,
@@ -64,9 +62,7 @@ const AcceptReferralModal = ({
     <>
       <div className="referrals-content" style={{ padding: 0 }}>
         <div className="referrals-header">
-          <Text size="sm">
-            ACCEPT REFERRAL
-          </Text>
+          <Text size="sm">ACCEPT REFERRAL</Text>
         </div>
 
         <Heading as={"h4"} className="referrals-heading">
@@ -83,25 +79,39 @@ const AcceptReferralModal = ({
           {/* How it works Box Left*/}
           <div className="how-it-works-half">
             <div className="how-it-works-title">
-              <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+              <Text
+                code
+                size="md"
+                className="single-line"
+                style={{ textDecoration: "underline" }}
+              >
                 YOU GET
               </Text>
               &nbsp;💸
             </div>
             <Text prominent size="sm">
-              <strong>10% of their airdrop</strong><br />earnings throughout the entire Epoch.
+              <strong>10% of their airdrop</strong>
+              <br />
+              earnings throughout the entire Epoch.
             </Text>
           </div>
           {/* How it works Box Right*/}
           <div className="how-it-works-half">
             <div className="how-it-works-title">
               🍾&nbsp;
-              <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+              <Text
+                code
+                size="md"
+                className="single-line"
+                style={{ textDecoration: "underline" }}
+              >
                 THEY GET
               </Text>
             </div>
             <Text prominent size="sm">
-              <strong>10 Loot Bottles,</strong><br />not affected by your 10% reward.
+              <strong>10 Loot Bottles,</strong>
+              <br />
+              not affected by your 10% reward.
             </Text>
           </div>
         </Card>
