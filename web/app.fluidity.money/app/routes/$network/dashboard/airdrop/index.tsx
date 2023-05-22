@@ -33,7 +33,7 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
-  TestnetRewardsModal,
+  //  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
@@ -440,9 +440,6 @@ const Airdrop = () => {
                 }}
               >
                 <BottleProgress bottles={bottleTiers} isMobile />
-                <TextButton className="bottles-earned-button">
-                  Bottles Earned Since Last Checked <ArrowRight />
-                </TextButton>
               </div>
               <AirdropStats
                 seeReferralsDetails={() => setCurrentModal("referrals")}
@@ -452,6 +449,8 @@ const Airdrop = () => {
                 epochDays={epochDays}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
+                network={network}
+                navigate={navigate}
                 isMobile
               />
               <MultiplierTasks />
@@ -553,14 +552,14 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {currentModal === "testnet-rewards" && (
+          {/*{currentModal === "testnet-rewards" && (
             <>
               <Heading as="h3" className="no-margin">
                 Claim Testnet Rewards
               </Heading>
               <TestnetRewardsModal />
             </>
-          )}
+          )}*/}
         </motion.div>
       </>
     );
@@ -640,13 +639,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      <CardModal
+      {/*<CardModal
         id="testnet-rewards"
         visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
-      </CardModal>
+      </CardModal>*/}
 
       {/* Page Content */}
       <Header />
@@ -708,6 +707,8 @@ const Airdrop = () => {
               epochDays={epochDays}
               activatedReferrals={numActiveReferrerReferrals}
               totalBottles={bottlesCount}
+              network={network}
+              navigate={navigate}
             />
             <MultiplierTasks />
             <MyMultiplier
@@ -773,6 +774,8 @@ interface IAirdropStats {
   epochMax: number;
   activatedReferrals: number;
   totalBottles: number;
+  network: string;
+  navigate: (path: string) => void;
   isMobile?: boolean;
 }
 
@@ -784,6 +787,8 @@ const AirdropStats = ({
   epochMax,
   activatedReferrals,
   totalBottles,
+  network,
+  navigate,
   isMobile,
 }: IAirdropStats) => {
   return (
@@ -861,7 +866,7 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  console.log("TODO REDIRECT");
+                  navigate(`/${network}/dashboard/rewards`);
                 }
               : seeBottlesDetails
           }
