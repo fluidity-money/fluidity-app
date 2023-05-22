@@ -462,7 +462,14 @@ const Airdrop = () => {
               />
               <MultiplierTasks />
               <MyMultiplier
-                seeMyStakingStats={() => setCurrentModal("staking-stats")}
+                seeMyStakingStats={() => {
+                  setCurrentModal("stake")
+                  // would just useRef here but the ref doesn't exist at this point
+                  // timeout is needed to counterract the scroll to top
+                  setTimeout(() => {
+                    window.scrollTo(0, 1000);
+                  }, 500);
+                }}
                 seeStakeNow={() => setCurrentModal("stake")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
