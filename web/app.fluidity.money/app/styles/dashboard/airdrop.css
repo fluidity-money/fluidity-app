@@ -450,6 +450,9 @@
   border-radius: 12px;
   border: 1px solid red;
 }
+.airdrop-stake-container .staking-modal-complete {
+  width: 95%;
+}
 .airdrop-stake-container.airdrop-mobile {
   grid-template-columns: 1fr 1fr;
   column-gap: 1em;

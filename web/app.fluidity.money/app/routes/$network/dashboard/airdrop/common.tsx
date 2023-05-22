@@ -856,6 +856,10 @@ const StakeNowModal = ({
 
   const testStake = async (): Promise<boolean> => {
     try {
+      if (!(fluidToken.amount && fluidToken.amount)) {
+        throw Error('reason="not enough liquidity"');
+      }
+
       if (fluidTokenAmount.gt(fluidToken.userTokenBalance)) {
         throw Error('reason="Insufficient Fluid Funds"');
       }
@@ -1024,16 +1028,22 @@ const StakeNowModal = ({
               </Text>
             </Hoverable>
             <div className="airdrop-stake-buttons">
-              <GeneralButton
-                type={lockRatio ? "primary" : "transparent"}
-                size="small"
-                handleClick={() => setLockRatio(!lockRatio)}
-                style={{
-                  width: "2px",
-                  padding: "0.5em 0.5em",
-                }}
-                icon={<LinkVerticalIcon />}
-              ></GeneralButton>
+              <Hoverable
+                style={{ minWidth: 200 }}
+                tooltipStyle={tooltipStyle}
+                tooltipContent="Enforce recommended token ratio."
+              >
+                <GeneralButton
+                  type={lockRatio ? "primary" : "transparent"}
+                  size="small"
+                  handleClick={() => setLockRatio(!lockRatio)}
+                  style={{
+                    width: "2px",
+                    padding: "0.5em 0.5em",
+                  }}
+                  icon={<LinkVerticalIcon />}
+                ></GeneralButton>
+              </Hoverable>
               <GeneralButton
                 type="transparent"
                 size="small"

@@ -100,7 +100,7 @@ func main() {
 					AwardedTime:     currTime,
 					Volume:          misc.BigIntFromUint64(0),
 					RewardTier:      0,
-					LootboxCount:    10,
+					LootboxCount:    5,
 					Application:     applications.ApplicationNone,
 				}
 
