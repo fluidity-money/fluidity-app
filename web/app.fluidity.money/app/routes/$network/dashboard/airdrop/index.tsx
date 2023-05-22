@@ -33,10 +33,8 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
-  //  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
-import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
 import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
@@ -143,10 +141,6 @@ const Airdrop = () => {
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
-
-  const { showExperiment } = useContext(SplitContext);
-
-  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
@@ -303,6 +297,81 @@ const Airdrop = () => {
     fetchUserStakes(address);
   }, [address]);
 
+  const [localCookieConsent, setLocalCookieConsent] = useState<
+    boolean | undefined
+  >(false);
+
+  const setLocalBottleCount = useState<number | undefined>(undefined)[1];
+
+  const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
+    useState<boolean | undefined>(undefined);
+  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+    boolean | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (!window) return;
+    const cookieConsent = window.localStorage.getItem("cookieConsent");
+
+    if (cookieConsent === "false") {
+      setLocalCookieConsent(false);
+      return;
+    } else {
+      setLocalCookieConsent(true);
+    }
+
+    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    const airdropBottleCount =
+      window.localStorage.getItem("airdropBottleCount");
+    const airdropShouldShowBottleNumbers = window.localStorage.getItem(
+      "airdropShouldShowBottleNumbers"
+    );
+
+    if (airdropBottleCount) {
+      setLocalBottleCount(parseInt(airdropBottleCount));
+    } else {
+      setLocalBottleCount(0);
+    }
+
+    if (airdropShouldShowBottleNumbers) {
+      setLocalShouldShowBottleNumbers(
+        airdropShouldShowBottleNumbers === "true"
+      );
+    } else {
+      setLocalShouldShowBottleNumbers(true);
+    }
+
+    if (airdropHasVisited) {
+      setLocalShouldShowTutorial(false);
+    } else {
+      setLocalShouldShowTutorial(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowBottleNumbers === undefined) return;
+    window.localStorage.setItem(
+      "airdropShouldShowBottleNumbers",
+      localShouldShowBottleNumbers.toString()
+    );
+  }, [localShouldShowBottleNumbers]);
+
+  useEffect(() => {
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowTutorial === undefined) return;
+    window.localStorage.setItem("airdropHasVisited", "true");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasUrlParams = urlParams.toString().length > 0;
+
+    if (localShouldShowTutorial && !isMobile && !hasUrlParams) {
+      setTimeout(() => {
+        setCurrentModal("tutorial");
+      }, 2000);
+    }
+  }, [localShouldShowTutorial]);
+
   const leaderboardRef = useRef<HTMLDivElement>(null);
 
   const Header = () => {
@@ -361,17 +430,9 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("testnet-rewards")}
-        >
-          Claim Testnet Rewards
-        </TabButton>
       </div>
     );
   };
-
-  if (!showAirdrop) return null;
 
   if (isMobile)
     return (
@@ -439,7 +500,16 @@ const Airdrop = () => {
                   gap: "1em",
                 }}
               >
-                <BottleProgress bottles={bottleTiers} isMobile />
+                <BottleProgress
+                  bottles={bottleTiers}
+                  isMobile
+                  shouldShowBottleNumbers={
+                    localShouldShowBottleNumbers === undefined
+                      ? true
+                      : localShouldShowBottleNumbers
+                  }
+                  setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+                />
               </div>
               <AirdropStats
                 seeReferralsDetails={() => setCurrentModal("referrals")}
@@ -720,7 +790,15 @@ const Airdrop = () => {
               usdcPrice={usdcPrice}
             />
           </div>
-          <BottleProgress bottles={bottleTiers} />
+          <BottleProgress
+            shouldShowBottleNumbers={
+              localShouldShowBottleNumbers === undefined
+                ? true
+                : localShouldShowBottleNumbers
+            }
+            setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+            bottles={bottleTiers}
+          />
         </div>
       </div>
       <div
@@ -1404,12 +1482,15 @@ const Leaderboard = ({
 const BottleProgress = ({
   bottles,
   isMobile,
+  shouldShowBottleNumbers,
+  setShouldShowBottleNumbers,
 }: {
   bottles: BottleTiers;
   isMobile?: boolean;
+  shouldShowBottleNumbers: boolean;
+  setShouldShowBottleNumbers: (shouldShow: boolean) => void;
 }) => {
   const [imgIndex, setImgIndex] = useState(0);
-  const [showBottleNumbers, setShowBottleNumbers] = useState(true);
 
   const handleHeroPageChange = (index: number) => {
     setImgIndex(index);
@@ -1456,22 +1537,20 @@ const BottleProgress = ({
         }}
         numberPosition={isMobile ? "relative" : "absolute"}
         bottles={bottles}
-        showBottleNumbers={showBottleNumbers}
+        showBottleNumbers={shouldShowBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
       {!isMobile && (
         <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
           <Form.Toggle
-            checked={showBottleNumbers}
-            onClick={() =>
-              setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
-            }
+            checked={shouldShowBottleNumbers}
+            onClick={() => setShouldShowBottleNumbers(!shouldShowBottleNumbers)}
             style={{
-              opacity: showBottleNumbers ? 1 : 0.3,
+              opacity: shouldShowBottleNumbers ? 1 : 0.3,
             }}
           />
 
-          <Text size="sm" prominent={showBottleNumbers}>
+          <Text size="sm" prominent={shouldShowBottleNumbers}>
             ALWAYS SHOW BOTTLE NUMBERS
           </Text>
         </div>
