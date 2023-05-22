@@ -8,7 +8,7 @@
 
 import * as hre from "hardhat";
 
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 
 import { expect } from "chai";
 
@@ -21,6 +21,7 @@ import {
   CAMELOT_FUSDC_USDC_PAIR,
   CAMELOT_FUSDC_WETH_PAIR,
   SUSHISWAP_FUSDC_USDC_POOL,
+  SUSHISWAP_TRIDENT_ROUTER,
   USUAL_LOOTBOX_STAKING,
   SUSHISWAP_FUSDC_WETH_POOL } from "./arbitrum-constants";
 
@@ -94,16 +95,40 @@ describe("LootboxStaking deployed infra", async () => {
       SUSHISWAP_FUSDC_WETH_POOL
     );
 
+    context.sushiswapTridentRouter = await hre.ethers.getContractAt(
+        "TestSushiswapTridentRouter",
+        SUSHISWAP_TRIDENT_ROUTER
+    );
+
+    await hre.network.provider.request({
+      method: "hardhat_setBalance",
+      params: [
+        stakingSignerAddress,
+        ethers.constants.MaxUint256.toHexString()
+      ]
+    });
+
     const spendableEth = ethers.constants.WeiPerEther;
 
     await weth.deposit({ value: spendableEth });
 
-    await weth.connect(stakingSigner).approve(staking.address, MaxUint256);
+    await weth.transfer(stakingSignerAddress, spendableEth);
 
     expect(await weth.balanceOf(stakingSignerAddress)).to.be.equal(spendableEth);
 
-    // transfer transfer the staking signer as much usdc as we can drain
-    // from the designated account
+    // set the usdc holder's balance to the max uint256
+
+    await hre.network.provider.request({
+      method: "hardhat_setStorageAt",
+      params: [
+        USDC_ADDR, // usdc addr
+        // balances slot in arb1 usdc
+        "0x2cbeea4754db4a62ba37c8dc51b3b78b45db22693f7bbad15c81ebcb017e1ae2",
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" // max uint256
+      ]
+    });
+
+    expect(await usdc.balanceOf(USDC_HOLDER)).to.be.equal(MaxUint256);
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -112,45 +137,39 @@ describe("LootboxStaking deployed infra", async () => {
 
     const usdcSigner = await hre.ethers.getSigner(USDC_HOLDER);
 
-    const usdcSignerAddress = await usdcSigner.getAddress();
+    // transfer the usdc holder's balance to the stakingSigner spender
 
-    // setting the balance of this account that we're impersonating to
-    // the max should be fine
+    await usdc.connect(usdcSigner).transfer(stakingSignerAddress, MaxUint256);
 
-    await hre.network.provider.request({
-      method: "hardhat_setBalance",
-      params: [
-        usdcSignerAddress,
-        ethers.constants.MaxUint256.toHexString()
-      ]
-    });
+    console.log("done sending amount to the staking signer");
 
     // move some funds into fusdc on the stakingSigner and approve
     // everything else
 
-    const usdcSignerBalance = await usdc.balanceOf(usdcSignerAddress);
+    const token0 = fusdc.connect(stakingSigner);
 
-    await usdc.connect(usdcSigner).transfer(stakingSignerAddress, usdcSignerBalance);
+    const token1 = usdc.connect(stakingSigner);
 
-    const spendableUsdc = usdcSignerBalance.div(2);
+    const token2 = weth.connect(stakingSigner);
 
-    await usdc.connect(stakingSigner).approve(staking.address, MaxUint256);
+    context.token0 = token0;
 
-    await fusdc.erc20In(spendableUsdc);
+    context.token1 = token1;
 
-    await fusdc.transfer(stakingSignerAddress, spendableUsdc);
+    context.token2 = token2;
 
-    await fusdc.connect(stakingSigner).approve(staking.address, MaxUint256);
+    await token2.approve(staking.address, MaxUint256);
 
-    context.token0 = fusdc.connect(stakingSigner);
+    await token1.approve(staking.address, MaxUint256);
 
-    context.token1 = usdc.connect(stakingSigner);
+    await token1.approve(token0.address, MaxUint256);
 
-    context.token2 = weth.connect(stakingSigner);
+    // avoiding the supply cap
 
-    expect(await fusdc.balanceOf(stakingSignerAddress))
-      .to.be.equal(spendableUsdc);
+    await token0.erc20In(BigNumber.from("1000000000000"));
+
+    await token0.approve(staking.address, MaxUint256);
   });
 
-  LootboxTests(context);
+  LootboxTests(context, BigNumber.from(1e6));
 });

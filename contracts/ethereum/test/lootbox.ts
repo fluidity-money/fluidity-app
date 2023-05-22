@@ -129,3 +129,23 @@ export const deployPool = async (
     addr
   );
 };
+
+export const pickRandomBalance = async (
+  token: ethers.Contract,
+  minimumAmount: BigNumberish
+): Promise<BigNumber> => {
+  const signerAddr = await token.signer.getAddress();
+  const bal = await token.balanceOf(signerAddr);
+
+  if (bal.lt(minimumAmount))
+    throw new Error(`minimum amount ${minimumAmount} > balance ${bal}!`);
+
+  if (bal.eq(ethers.constants.Zero))
+    throw new Error(`balance for ${signerAddr} is 0!`);
+
+  // take a random number where (minimumAmount < x > bal)
+
+  return ethers.BigNumber.from(ethers.utils.randomBytes(32))
+    .mod(bal.add(minimumAmount))
+    .sub(minimumAmount);
+};

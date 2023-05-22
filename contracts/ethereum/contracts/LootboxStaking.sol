@@ -368,10 +368,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         // return the amount that we deposited
 
-        require(tokenABefore + 1 > tokenAAfter, "token A not drained");
-
-        require(tokenBBefore + 1 > tokenBAfter, "token B not drained");
-
         tokenADeposited = dep.camelotTokenA + dep.sushiswapTokenA;
 
         tokenBDeposited = dep.camelotTokenB + dep.sushiswapTokenB;

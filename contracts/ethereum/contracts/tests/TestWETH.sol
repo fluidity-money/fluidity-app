@@ -23,6 +23,11 @@ contract TestWETH is IWETH {
     revert("test impl");
   }
 
+  function transfer(address /* y */, uint256 /* z */) external returns (bool) {
+      ++x;
+      revert("test impl");
+  }
+
   function balanceOf(address /* y */) external view returns (uint256) {
     return x;
   }

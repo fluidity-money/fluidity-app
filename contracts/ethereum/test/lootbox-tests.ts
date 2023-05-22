@@ -13,11 +13,10 @@ import {
   expectWithinSlippage,
   deposit,
   redeem,
+  pickRandomBalance,
   expectDeposited } from "./lootbox";
 
 const MaxUint256 = ethers.constants.MaxUint256;
-
-const MINIMUM_DEPOSIT = BigNumber.from("10").pow(18).mul(2);
 
 const slippage = 10;
 
@@ -27,6 +26,7 @@ export type lootboxTestsArgs = {
   token0: ethers.Contract,
   token1: ethers.Contract,
   token2: ethers.Contract,
+  sushiswapTridentRouter: ethers.Contract,
   sushiswapToken1Pool: ethers.Contract,
   sushiswapToken2Pool: ethers.Contract,
   staking: ethers.Contract,
@@ -35,30 +35,30 @@ export type lootboxTestsArgs = {
   camelotToken2Pair: ethers.Contract
 };
 
-const LootboxTests = async (args: lootboxTestsArgs) => {
+const LootboxTests = async (
+  args: lootboxTestsArgs,
+  minimumDeposit: BigNumber
+) => {
   it("should lock up 2000000 test token 1 and 2000000 test token 2", async() => {
-    const { stakingSigner, token0, stakingSignerAddress, staking } = args;
+    const { stakingSigner, staking } = args;
 
-    const depositToken = MINIMUM_DEPOSIT;
-
-    console.log(`staking signer fusdc bal: ${await token0.balanceOf(stakingSignerAddress)}`);
+    const fusdcDeposit = 2000000;
+    const usdcDeposit = 2000000;
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
       8640000,
-      depositToken,
-      depositToken,
+      fusdcDeposit,
+      usdcDeposit,
       0,
       slippage
     );
 
-    expectWithinSlippage(depositToken, fusdc, slippage);
+    expectWithinSlippage(fusdcDeposit, fusdc, slippage);
 
-    expectWithinSlippage(depositToken, usdc, slippage);
+    expectWithinSlippage(usdcDeposit, usdc, slippage);
 
-    expectWithinSlippage(depositToken, weth, slippage);
-
-    await expectDeposited(staking, fusdc, usdc, weth);
+    await expectDeposited(staking, fusdcDeposit, usdcDeposit, weth);
 
     await advanceTime(hre, 8640005);
 
@@ -83,8 +83,11 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
       staking,
     } = args;
 
-    const depositFusdc = MINIMUM_DEPOSIT;
-    const depositUsdc = MINIMUM_DEPOSIT;
+    const depositFusdc = await pickRandomBalance(token0, minimumDeposit);
+    const depositUsdc = await pickRandomBalance(token1, minimumDeposit);
+
+    console.log(`depositing fusdc: ${depositFusdc}`);
+    console.log(`depositing usdc: ${depositUsdc}`);
 
     expectDeposited(staking, 0, 0, 0);
 
@@ -208,14 +211,14 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
   });
 
   it("should fail to redeem weth early", async () => {
-    const { stakingSigner, staking } = args;
+    const { stakingSigner, staking, token0, token2 } = args;
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
       9999999,
-      MINIMUM_DEPOSIT,
+      await pickRandomBalance(token0, minimumDeposit),
       0,
-      MINIMUM_DEPOSIT,
+      await pickRandomBalance(token2, minimumDeposit),
       slippage
     );
 
@@ -241,13 +244,16 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
     async () => {
       const {
         stakingSigner,
-        staking
+        staking,
+        token0,
+        token1,
+        token2
       } = args;
 
       await expectDeposited(staking, 0, 0, 0);
 
-      const depositFusdc = MINIMUM_DEPOSIT;
-      const depositWeth = MINIMUM_DEPOSIT;
+      const depositFusdc = await pickRandomBalance(token0, minimumDeposit);
+      const depositWeth = await pickRandomBalance(token2, minimumDeposit);
 
       const [ fusdc, _usdc, weth ] = await deposit(
         staking,
@@ -262,7 +268,7 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
 
       expectWithinSlippage(depositWeth, weth, slippage);
 
-      const depositUsdc = MINIMUM_DEPOSIT;
+      const depositUsdc = await pickRandomBalance(token1, minimumDeposit);
 
       const [ fusdc1, usdc ] = await deposit(
         staking,
@@ -311,13 +317,11 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
 
       const timestamp = await getLatestTimestamp(hre);
 
-      const depositAmount = MINIMUM_DEPOSIT.mul(1000);
-
       const [ fusdcDeposited, usdcDeposited ] = await deposit(
         staking,
         8640000,
-        depositAmount,
-        depositAmount,
+        await pickRandomBalance(token0, minimumDeposit), // fusdc amount
+        await pickRandomBalance(token1, minimumDeposit), // usdc amount
         0,
         slippage
       );
@@ -334,9 +338,13 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
             ? [token0.address, token1.address]
             : [token1.address, token0.address];
 
+        const fusdcAvailable = await pickRandomBalance(token0, minimumDeposit);
+
+        const usdcAvailable = await pickRandomBalance(token1, minimumDeposit);
+
         await camelotRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-          MINIMUM_DEPOSIT, // amount in
-          MINIMUM_DEPOSIT.div(2), // amount out min
+          fusdcAvailable, // amount in
+          usdcAvailable, // amount out min
           path, // path
           stakingSignerAddress, // to
           ethers.constants.AddressZero, // referrer
@@ -361,6 +369,66 @@ const LootboxTests = async (args: lootboxTestsArgs) => {
       expect(stakingUsdcAfter).to.be.gt(stakingUsdcBefore);
     }
   );
+
+  it("should support taking fees from sushiswap trades", async () => {
+      const {
+        stakingSigner,
+        stakingSignerAddress,
+        token0,
+        token1,
+        sushiswapTridentRouter,
+        sushiswapToken1Pool,
+        staking
+      } = args;
+
+      const depositFusdc = await pickRandomBalance(token0, minimumDeposit);
+
+      const depositUsdc = await pickRandomBalance(token1, minimumDeposit);
+
+      const [ fusdcDeposited, usdcDeposited ] = await deposit(
+        staking,
+        8640000,
+        depositFusdc,
+        depositUsdc,
+        0,
+        slippage
+      );
+
+      // randomly pick which swap to make and just keep going back and
+      // forth, swapping the tokens accordingly, to collect fees
+
+      const stakingFusdcBefore = await token0.balanceOf(staking.address);
+      const stakingUsdcBefore = await token1.balanceOf(staking.address);
+
+      for (let i = 0; i < 10; i++) {
+        const tokenIn = i % 2 ? token0 : token1;
+
+        await sushiswapTridentRouter.exactInputWithNativeToken({
+          amountIn: minimumDeposit, // amount in
+          amountOutMinimum: minimumDeposit.div(2), // amount out min
+          pool: sushiswapToken1Pool,
+          data: ethers.utils.defaultAbiCoder.encode(
+            [ "address", "address", "bool" ],
+            [ tokenIn.address, stakingSignerAddress, true ]
+          )
+        });
+      }
+
+      await advanceTime(hre, 8640004);
+
+      await sendEmptyTransaction(stakingSigner);
+
+      const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking);
+
+      expectWithinSlippage(fusdcRedeemed, fusdcDeposited, 10);
+
+      expectWithinSlippage(usdcRedeemed, usdcDeposited, 10);
+
+      const stakingFusdcAfter = await token0.balanceOf(staking.address);
+      const stakingUsdcAfter = await token1.balanceOf(staking.address);
+
+      expect(stakingFusdcAfter).to.be.gte(stakingFusdcBefore);
+      expect(stakingUsdcAfter).to.be.gt(stakingUsdcBefore);});
 };
 
 export default LootboxTests;

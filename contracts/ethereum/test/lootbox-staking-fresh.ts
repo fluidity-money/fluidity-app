@@ -15,7 +15,8 @@ import {
   CAMELOT_FACTORY,
   CAMELOT_ROUTER,
   SUSHISWAP_MASTER_DEPLOYER,
-  SUSHISWAP_BENTO_BOX } from "./arbitrum-constants";
+  SUSHISWAP_BENTO_BOX,
+  SUSHISWAP_TRIDENT_ROUTER } from "./arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
 
@@ -102,6 +103,11 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
     const sushiswapMasterDeployer = await hre.ethers.getContractAt(
       "TestSushiswapMasterDeployer",
       SUSHISWAP_MASTER_DEPLOYER
+    );
+
+    context.sushiswapTridentRouter = await hre.ethers.getContractAt(
+        "TestSushiswapTridentRouter",
+        SUSHISWAP_TRIDENT_ROUTER
     );
 
     const sushiswapToken1Pool = await deployPool(
