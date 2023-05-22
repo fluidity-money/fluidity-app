@@ -185,12 +185,16 @@ func main() {
 				})
 			}
 
-			var feeDataVolume *big.Rat
+			feeDataVolume := feeData.Volume
 
-			if feeData.Volume != nil {
-				feeDataVolume = feeData.Volume
-			} else {
-				feeDataVolume = new(big.Rat).SetInt64(0)
+			if feeDataVolume == nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Fee data volume for send transaction %v, winner transaction hash %v is nil!",
+						sendTransaction.TransactionHash,
+						transactionHash,
+					)
+				})
 			}
 
 			volume = new(big.Rat).Set(feeDataVolume)
