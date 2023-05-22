@@ -24,6 +24,8 @@ interface ILootboxStaking {
         uint256 sushiswapTokenB;
 
         bool fusdcUsdcPair;
+
+        uint256 depositTimestamp;
     }
 
     event Deposited(
@@ -74,26 +76,6 @@ interface ILootboxStaking {
         uint256 fusdcRedeemed,
         uint256 usdcRedeemed,
         uint256 wethRedeemed
-    );
-
-    /**
-     * @notice deposited amount provided by the sender address
-     * @param _spender that should be checked
-     */
-    function deposited(address _spender) external view returns (
-        uint256 fusdcAmount,
-        uint256 usdcAmount,
-        uint256 wethAmount
-    );
-
-    /**
-     * @notice reedemable amounts by a spender given
-     * @param _spender that should be checked
-     */
-    function redeemable(address _spender) external view returns (
-        uint256 fusdcRedeemable,
-        uint256 usdcRedeemable,
-        uint256 wethRedeemable
     );
 
     /**

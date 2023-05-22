@@ -3,6 +3,8 @@ import "@nomiclabs/hardhat-waffle";
 
 import "@openzeppelin/hardhat-upgrades";
 
+import * as tdly from "@tenderly/hardhat-tenderly";
+
 import "hardhat-dependency-compiler";
 
 import "hardhat-docgen";
@@ -243,9 +245,11 @@ if (enableArbitrum)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
-      blockNumber: 88934647,
+      blockNumber: 92931847,
     },
   };
+
+tdly.setup();
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

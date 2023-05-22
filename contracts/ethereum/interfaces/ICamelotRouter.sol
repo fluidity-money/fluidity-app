@@ -7,7 +7,7 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-interface IUniswapV2Router02 {
+interface ICamelotRouter {
     function addLiquidity(
         address _tokenA,
         address _tokenB,
@@ -29,11 +29,12 @@ interface IUniswapV2Router02 {
         uint _deadline
     ) external returns (uint amountA, uint amountB);
 
-    function swapExactTokensForTokens(
+    function swapExactTokensForTokensSupportingFeeOnTransferTokens(
         uint _amountIn,
         uint _amountOutMin,
         address[] calldata _path,
         address _to,
+        address _referrer,
         uint _deadline
-    ) external returns (uint[] memory amounts);
+    ) external;
 }
