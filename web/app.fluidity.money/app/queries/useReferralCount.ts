@@ -13,9 +13,9 @@ const queryActiveByReferrerAddress = gql`
 `;
 
 const queryActiveByRefereeAddress = gql`
-  query getClaimedReferrerReferralCount($address: String!) {
+  query getClaimedReferreeReferralCount($address: String!) {
     lootbox_referrals_aggregate(
-      where: { referrer: { _eq: $address }, active: { _eq: true } }
+      where: { referee: { _eq: $address }, active: { _eq: true } }
     ) {
       aggregate {
         count
@@ -69,8 +69,8 @@ const useActiveReferralCountByReferrerAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
@@ -90,8 +90,8 @@ const useActiveReferralCountByRefereeAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };
@@ -111,8 +111,8 @@ const useInactiveReferralCountByRefereeAddress = (address: string) => {
     body,
     process.env.FLU_HASURA_SECRET
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {}
   );
 };

@@ -354,7 +354,7 @@ const LinksClickedContent = ({
           {claimed}
         </Display>
         <Text size="sm" code>
-          {claimed * progressReq} BOTTLES
+          {claimed * 5} BOTTLES
         </Text>
       </div>
 
