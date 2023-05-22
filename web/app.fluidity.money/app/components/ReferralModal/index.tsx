@@ -1,3 +1,5 @@
+import type { NavigateFunction } from "@remix-run/react";
+
 import { useNavigate } from "@remix-run/react";
 import { useState } from "react";
 import {
@@ -12,10 +14,16 @@ import {
   LoadingDots,
   Hoverable,
   ProgressBar,
+  CopyIcon,
+  TextButton,
+  useViewport,
 } from "@fluidity-money/surfing";
+import { highlightText } from "~/util";
+import { generateReferralTweet } from "~/util/tweeter";
 
 type IReferraModal = {
   connected: boolean;
+  network: string;
   connectWallet: () => void;
   closeModal: () => void;
   referrerClaimed: number;
@@ -29,6 +37,7 @@ type IReferraModal = {
 
 const ReferralModal = ({
   connected,
+  network,
   connectWallet,
   closeModal,
   referrerClaimed,
@@ -46,62 +55,51 @@ const ReferralModal = ({
 
   const referralsEmoji = referrerClaimed ? "🎉" : "😔";
 
+  const mobileBreakpoint = 768;
+  const { width } = useViewport();
+
+  const isMobile = width < mobileBreakpoint;
+
   return (
-    <Card
-      onClick={(e: MouseEvent) => {
-        e.stopPropagation();
-      }}
-      className="referrals-container"
-      type="frosted"
-      border="solid"
-      color="holo"
-      rounded
-    >
+    <>
       <div className="referrals-content">
         <div className="referrals-header">
           {/* Help Button */}
-          <GeneralButton
+          {/* <GeneralButton
             type={"secondary"}
             buttontype={"text"}
-            handleClick={() => navigate("./")}
-            size={"medium"}
+            handleClick={() =>
+              navigate(`/${network}/dashboard/airdrop#tutorial`)
+            }
+            size={"small"}
             border="box"
           >
             ?
-          </GeneralButton>
-          <Text bold size="lg">
-            REFERRAL SYSTEM
-          </Text>
-          <GeneralButton
-            type={"secondary"}
-            buttontype={"text"}
-            handleClick={closeModal}
-            size={"medium"}
-            border="box"
-          >
-            X
-          </GeneralButton>
+          </GeneralButton> */}
+          <Text size="sm">REFERRAL SYSTEM</Text>
         </div>
 
         <div>
           <Heading as={"h5"} className="referrals-heading">
-            YOU HAVE {referrerClaimed}
+            YOU HAVE {referrerClaimed}&nbsp;
             <Hoverable
+              style={{ minWidth: 250 }}
+              tooltipStyle={isMobile ? "frosted" : "solid"}
               tooltipContent={
-                <div className="referral-hover-comp">
-                  <Text prominent>
-                    Active Referrals are Referrals that have earned 10 Lootboxes
-                  </Text>
-                </div>
+                <Text size="xs">
+                  Active Referrals are Referrals that have earned 10 Lootboxes
+                </Text>
               }
             >
-              <ul style={{ paddingLeft: "0.5em", paddingRight: "0.5em" }}>
+              <TextButton
+                style={{ textDecorationThickness: 1, textUnderlineOffset: 5 }}
+              >
                 ACTIVE REFERRALS
-              </ul>
-            </Hoverable>{" "}
-            {referralsEmoji}
+              </TextButton>
+            </Hoverable>
+            &nbsp;{referralsEmoji}
           </Heading>
-          <Text size="lg">Send more of your link to earn more rewards!</Text>
+          <Text size="sm">Send more of your link to earn more rewards!</Text>
         </div>
 
         {!connected ? (
@@ -113,22 +111,25 @@ const ReferralModal = ({
             Connect Wallet
           </GeneralButton>
         ) : loaded ? (
-          <>
+          <div className="referrals-copy-group">
             <Card
               component="button"
               type="transparent"
-              disabled={linkCopied}
               border="dashed"
-              color="white"
+              color="gray"
               rounded
+              onClick={highlightText}
             >
-              {`https://airdrop.fluidity.money/${referralCode}`}
+              <Text
+                className="referrals-copyable-link"
+                code
+              >{`https://airdrop.fluidity.money/${referralCode}`}</Text>
             </Card>
 
             {/* Copy Button */}
             <GeneralButton
-              className={"spread"}
-              type={"secondary"}
+              className={"referrals-copy-button"}
+              type={"transparent"}
               buttontype={"icon before"}
               handleClick={() => {
                 navigator.clipboard.writeText(
@@ -136,52 +137,72 @@ const ReferralModal = ({
                 );
                 setLinkCopied(true);
               }}
-              size={"large"}
-              icon={<img src="/images/icons/copy.svg" />}
+              size={"medium"}
+              icon={<CopyIcon />}
             >
-              {!linkCopied ? "Copy Link" : "Link Copied!"}
+              <Text size="lg" prominent bold style={{ color: "inherit" }}>
+                {!linkCopied ? "Copy Link" : "Link Copied!"}
+              </Text>
             </GeneralButton>
-          </>
+          </div>
         ) : (
           <LoadingDots />
         )}
 
         {/*Share Button*/}
-        <Text size="lg">
+        <Text size="sm">
           Share to: &nbsp;
-          <a href="https://twitter.com">
-            <Text code prominent>
-              <Twitter /> TWITTER
+          <TextButton
+            style={{ color: "white" }}
+            onClick={() => {
+              window.open(
+                generateReferralTweet(
+                  `https://airdrop.fluidity.money/${referralCode}`
+                )
+              );
+            }}
+          >
+            <Text code prominent size={"sm"}>
+              <Twitter
+                style={{
+                  height: "1em",
+                  fill: "currentColor",
+                  translate: "0 2px",
+                  marginRight: 2,
+                }}
+              />
+              TWITTER
             </Text>
-          </a>
+          </TextButton>
         </Text>
       </div>
 
       {/* How It Works Divider / Links*/}
-      <Card
-        type="transparent"
-        className="referrals-inner-box"
-        border="solid"
-        color="white"
-        rounded
-      >
+      <div className="referrals-inner-box">
         <div className="referrals-inner-switcher">
+          <div className="referrals-inner-divider" />
           <GeneralButton
-            type={showHowItWorks ? "primary" : "secondary"}
+            type={showHowItWorks ? "primary" : "transparent"}
             buttontype={"text"}
             handleClick={() => setShowHowItWorks(true)}
-            size={"large"}
+            size={"small"}
           >
-            How It Works
+            <Text size="sm" code style={{ color: "inherit" }}>
+              How It Works
+            </Text>
           </GeneralButton>
+          <div className="referrals-inner-divider" />
           <GeneralButton
-            type={!showHowItWorks ? "primary" : "secondary"}
+            type={!showHowItWorks ? "primary" : "transparent"}
             buttontype={"text"}
             handleClick={() => setShowHowItWorks(false)}
-            size={"large"}
+            size={"small"}
           >
-            Links I&apos;ve Clicked
+            <Text size="md" code style={{ color: "inherit" }}>
+              Links I&apos;ve Clicked
+            </Text>
           </GeneralButton>
+          <div className="referrals-inner-divider" />
         </div>
         {/*Contents*/}
         {showHowItWorks ? (
@@ -192,64 +213,83 @@ const ReferralModal = ({
             unclaimed={refereeUnclaimed}
             progress={progress}
             progressReq={progressReq}
+            network={network}
+            navigate={navigate}
+            closeModal={closeModal}
           />
         )}
-      </Card>
-    </Card>
+      </div>
+    </>
   );
 };
 
 const HowItWorksContent = () => (
-  <div className="referrals-content">
+  <div className="referrals-inner-content">
     <div className="spread-center">
-      <Circle1 />
-      <Text prominent size="lg">
-        Copy Your Link.
-      </Text>
-      <Circle2 />
-      <Text prominent size="lg">
-        2. Share it with your friends.
-      </Text>
+      <div className="single-line">
+        <img style={{ width: "1.25em" }} src={"/images/icons/circle1.svg"} />
+        <Text prominent size="sm">
+          Copy Your Link.
+        </Text>
+      </div>
+      <div className="single-line">
+        <img style={{ width: "1.25em" }} src={"/images/icons/circle2.svg"} />
+        <Text prominent size="sm">
+          Share it with your friends.
+        </Text>
+      </div>
     </div>
     <Card
       rounded
       type="transparent"
-      color="holo"
+      color="gray"
       border="dashed"
       className="how-it-works-infobox"
     >
       {/* How it works Box Left*/}
-      <div>
-        <Text prominent size="xl" className="single-line">
-          <ul>You Get</ul> 💸
-        </Text>
-        <Text prominent size="lg">
+      <div className="how-it-works-half">
+        <div className="how-it-works-title">
+          <Text
+            code
+            size="md"
+            className="single-line"
+            style={{ textDecoration: "underline" }}
+          >
+            YOU GET
+          </Text>
+          &nbsp;💸
+        </div>
+        <Text prominent size="sm">
           <strong>10% of their airdrop</strong>
           <br />
-          earnings throughout
-          <br />
-          the entire Epoch.
+          earnings throughout the entire Epoch.
         </Text>
       </div>
       {/* How it works Box Right*/}
-      <div>
-        <Text prominent size="xl" className="single-line">
-          🍾<ul>They Get</ul>
-        </Text>
-        <Text prominent size="lg">
+      <div className="how-it-works-half">
+        <div className="how-it-works-title">
+          🍾&nbsp;
+          <Text
+            code
+            size="md"
+            className="single-line"
+            style={{ textDecoration: "underline" }}
+          >
+            THEY GET
+          </Text>
+        </div>
+        <Text prominent size="sm">
           <strong>10 Loot Bottles,</strong>
           <br />
-          not affected by
-          <br />
-          your 10% reward.
+          not affected by your 10% reward.
         </Text>
       </div>
     </Card>
     <div className="how-it-works-warning-container">
-      <CircleInfo />
-      <Text prominent size="md" className="how-it-works-warning-text">
+      <img style={{ width: "50px" }} src="/images/icons/circleInfo.svg" />
+      <Text prominent size="sm" className="how-it-works-warning-text">
         They will have to earn 10 Loot Boxes for each referral in order to claim
-        their reward and activate yours
+        their reward and activate yours.
       </Text>
     </div>
   </div>
@@ -260,6 +300,9 @@ type ILinksClickedContent = {
   unclaimed: number;
   progress: number;
   progressReq: number;
+  network: string;
+  navigate: NavigateFunction;
+  closeModal: () => void;
 };
 
 const LinksClickedContent = ({
@@ -267,105 +310,77 @@ const LinksClickedContent = ({
   unclaimed,
   progress,
   progressReq,
+  network,
+  navigate,
+  closeModal,
 }: ILinksClickedContent) => (
-  <div className="referrals-content">
-    <Text size="md" prominent>
+  <div className="referrals-inner-content links-clicked-content">
+    <Text size="sm" prominent>
       In order to claim your referral rewards, you must earn 10 Loot Bottles for{" "}
       <strong style={{ color: "yellow" }}>each</strong> unclaimed referral.
     </Text>
     <GeneralButton
       layout="after"
-      size="large"
-      type="secondary"
+      size="small"
+      type="transparent"
       icon={<ArrowRight />}
+      handleClick={() => {
+        navigate(`/${network}/dashboard/airdrop`);
+        closeModal();
+      }}
     >
-      Go to Fluidity Airdrop Page
+      <Text style={{ color: "inherit" }} code size="sm">
+        Go to Fluidity Airdrop Page
+      </Text>
     </GeneralButton>
 
     <div className="links-clicked-stats">
       <div className="statistics-set">
-        <Text size="lg" className="single-line">
+        <Text size="sm" className="single-line">
           Claimed
           <div className="dot green" />
         </Text>
-        <Display size={"xs"} style={{ margin: 0 }}>
+        <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {claimed}
         </Display>
-        <Text size="md" code>
+        <Text size="sm" code>
           {claimed * progressReq} BOTTLES
         </Text>
       </div>
 
       <div className="statistics-set">
-        <Text size="lg" className="single-line">
+        <Text size="sm" className="single-line">
           Unclaimed
           <div className="dot red" />
         </Text>
-        <Display size={"xs"} style={{ margin: 0 }}>
+        <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {unclaimed}
         </Display>
-        <LinkButton size="small" type="internal" handleClick={() => 1}>
+        <LinkButton
+          size="small"
+          type="internal"
+          handleClick={() =>
+            navigate(`/${network}/dashboard/airdrop#referrals`)
+          }
+        >
           Start Claiming
         </LinkButton>
       </div>
 
       <div className="statistics-set">
-        <Text size="lg">Until Next Claim</Text>
-        <Display size={"xs"} style={{ margin: 0 }}>
+        <Text size="sm">Until Next Claim</Text>
+        <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {progress}/{progressReq}
         </Display>
-        <ProgressBar value={progress} max={progressReq} />
+        <ProgressBar
+          size="sm"
+          value={progress}
+          max={progressReq}
+          style={{ marginTop: 10 }}
+        />
       </div>
     </div>
   </div>
-);
-
-const Circle1 = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 14 14"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M7.07038 4.384C7.07038 4.699 6.92638 4.924 6.62938 4.924H5.60338V5.599H6.62038C6.81838 5.599 6.96238 5.563 7.05238 5.482V10H7.80838V3.7H7.07038V4.384Z"
-      fill="white"
-    />
-    <circle cx="7" cy="7" r="6.5" stroke="#D9D9D9" />
-  </svg>
-);
-
-const Circle2 = () => (
-  <svg
-    width="14"
-    height="19"
-    viewBox="0 0 14 19"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4.7898 13H9.1278V12.307H5.8338L7.7238 10.705C8.4708 10.066 9.0828 9.472 9.0828 8.527C9.0828 7.393 8.2908 6.646 6.9318 6.646C5.6628 6.646 4.8258 7.492 4.8258 8.68V8.842H5.5818V8.725C5.5818 7.861 6.1218 7.321 6.9318 7.321C7.7688 7.321 8.3088 7.771 8.3088 8.563C8.3088 9.247 7.8228 9.733 7.2378 10.237L4.7898 12.361V13Z"
-      fill="white"
-    />
-    <circle cx="7" cy="10" r="6.5" stroke="#D9D9D9" />
-  </svg>
-);
-
-const CircleInfo = () => (
-  <svg
-    width="27"
-    height="27"
-    viewBox="0 0 27 27"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M8.42526 14.91L8.54526 10H7.66526L7.79526 14.91H8.42526ZM7.53526 16.5C7.53526 16.84 7.77526 17.06 8.10526 17.06C8.43526 17.06 8.67526 16.84 8.67526 16.5C8.67526 16.16 8.43526 15.94 8.10526 15.94C7.77526 15.94 7.53526 16.16 7.53526 16.5Z"
-      fill="#FDF76B"
-    />
-    <circle cx="8" cy="14" r="7.5" stroke="#FDF76B" />
-  </svg>
 );
 
 export default ReferralModal;

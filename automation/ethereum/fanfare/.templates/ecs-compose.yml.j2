@@ -1,0 +1,20 @@
+version: '3'
+services:
+  {{ CONFIG.SERVICE_NAME }}:
+    container_name: {{ CONFIG.SERVICE_NAME }}
+    {% if 'DOCKERFILE_PATH' in CONFIG %}
+    image: {{ CONFIG.AWS_ACCOUNT_ID }}.dkr.ecr.{{ CONFIG.AWS_REGION }}.amazonaws.com/{{ CONFIG.DOCKER_IMAGE }}:{{ CONFIG.DOCKER_TAG }}
+    {% else %}
+    image: {{ CONFIG.DOCKER_IMAGE }}:{{ CONFIG.DOCKER_TAG }}
+    {% endif %}
+    ports: 
+      - 80:80
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: {{ CONFIG.LOG_GROUP }}
+        awslogs-region: {{ CONFIG.AWS_REGION }}
+        awslogs-stream-prefix: {{ CONFIG.SERVICE_NAME }}
+    {% block environmentvariables %}
+      
+    {% endblock %}

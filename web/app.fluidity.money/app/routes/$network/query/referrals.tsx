@@ -110,6 +110,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     } satisfies ReferralCountLoaderData);
   }
 
+  // Production website (behind Cloudfront)
+  // changes protocol to HTTP
+  // Change back to HTTPS
+  if (process.env.NODE_ENV === "production") {
+    url.protocol = "https:";
+  }
+
   // Create new referral code
   const { success, msg } = await jsonPost<
     AddReferralCodeBody,

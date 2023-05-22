@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/referrals"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -99,7 +100,8 @@ func main() {
 					AwardedTime:     currTime,
 					Volume:          misc.BigIntFromUint64(0),
 					RewardTier:      0,
-					LootboxCount:    10,
+					LootboxCount:    5,
+					Application:     applications.ApplicationNone,
 				}
 
 				go queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)

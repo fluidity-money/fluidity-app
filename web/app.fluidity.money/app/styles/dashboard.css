@@ -346,6 +346,7 @@ main > footer > section > a {
 
 .transaction-table > tbody > tr > td:last-child {
   text-align: right;
+  justify-content: flex-end;
 }
 
 .table-address {
@@ -361,6 +362,19 @@ main > footer > section > a {
 
 .table-address > span:hover {
   color: white;
+}
+
+.table-bottle {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+}
+
+.lootbottle-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .pagination {
@@ -955,4 +969,8 @@ main > footer > section > a {
 
 .no-margin {
   margin: 0;
+}
+
+.mobile-modal-text-link > svg {
+  fill: currentColor;
 }

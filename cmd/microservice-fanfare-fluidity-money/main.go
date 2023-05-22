@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"net/http"
 	"net/url"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -183,13 +184,13 @@ func main() {
 				}
 
 				notification := websocketNotification{
-						Type:            notificationType,
-						Source:          senderAddress,
-						Destination:     recipientAddress,
-						Amount:          amount.FloatString(2),
-						Token:           tokenShortName,
-						TransactionHash: transactionHash,
-					}
+					Type:            notificationType,
+					Source:          senderAddress,
+					Destination:     recipientAddress,
+					Amount:          amount.FloatString(2),
+					Token:           tokenShortName,
+					TransactionHash: transactionHash,
+				}
 
 				if senderBroadcast != nil {
 					senderBroadcast.BroadcastJson(notification)
@@ -244,6 +245,8 @@ func main() {
 
 				broadcast = newBroadcast
 
+				outgoing <- []byte(`"ok"`)
+
 			case message := <-broadcastMessages:
 				outgoing <- message
 
@@ -259,6 +262,10 @@ func main() {
 				return
 			}
 		}
+	})
+
+	web.Endpoint("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "ok")
 	})
 
 	web.Listen()

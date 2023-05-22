@@ -27,31 +27,74 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
 
   try {
-    const { data: leaderboardData, errors: leaderboardErrors } = await (() => {
-      switch (true) {
-        case address && useAll:
-          return useAirdropLeaderboardByUserAllTime(address);
-        case !address && useAll:
-          return useAirdropLeaderboardAllTime();
-        case address && use24Hours:
-          return useAirdropLeaderboardByUser24Hours(address);
-        case !address && use24Hours:
-        default:
-          return useAirdropLeaderboard24Hours();
-      }
-    })();
+    const { data: globalLeaderboardData, errors: globalLeaderboardErrors } =
+      await (async () => {
+        switch (useAll) {
+          case true: {
+            const res = await useAirdropLeaderboardAllTime();
+            return { ...res, data: res.data?.airdrop_leaderboard };
+          }
+          case false:
+          default: {
+            const res = await useAirdropLeaderboard24Hours();
+            return { ...res, data: res.data?.airdrop_leaderboard_24_hours };
+          }
+        }
+      })();
 
-    if (!leaderboardData) throw leaderboardErrors;
+    if (!globalLeaderboardData || globalLeaderboardErrors)
+      throw globalLeaderboardErrors;
 
-    const leaderboard = leaderboardData.airdrop_leaderboard.map(
-      (leaderboardRow, i) => ({
-        ...leaderboardRow,
-        rank: i + 1,
-      })
-    );
+    const leaderboard = globalLeaderboardData.map((leaderboardRow, i) => ({
+      ...leaderboardRow,
+      rank: i + 1,
+    }));
+
+    if (
+      !address ||
+      leaderboard.find(({ user: rowAddress }) => rowAddress === address)
+    ) {
+      return json({
+        leaderboard,
+        loaded: true,
+      } satisfies AirdropLeaderboardLoaderData);
+    }
+
+    const { data: userLeaderboardData, errors: userLeaderboardErrors } =
+      await (async () => {
+        switch (useAll) {
+          case true: {
+            const res = await useAirdropLeaderboardByUserAllTime(address);
+            return { ...res, data: res.data?.airdrop_leaderboard };
+          }
+          case false:
+          default: {
+            const res = await useAirdropLeaderboardByUser24Hours(address);
+            return { ...res, data: res.data?.airdrop_leaderboard_24_hours };
+          }
+        }
+      })();
+
+    if (!userLeaderboardData || userLeaderboardErrors)
+      throw userLeaderboardErrors;
+
+    const jointLeaderboardData = (
+      userLeaderboardData.length
+        ? userLeaderboardData.map((e) => ({ ...e, rank: -1 }))
+        : [
+            {
+              user: address,
+              rank: -1,
+              liquidityMultiplier: 0,
+              referralCount: 0,
+              bottles: 0,
+              highestRewardTier: 0,
+            } satisfies AirdropLeaderboardEntry,
+          ]
+    ).concat(leaderboard);
 
     return json({
-      leaderboard,
+      leaderboard: jointLeaderboardData,
       loaded: true,
     } satisfies AirdropLeaderboardLoaderData);
   } catch (err) {

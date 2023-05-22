@@ -166,6 +166,8 @@ func main() {
 			transfersInBlock += len(transfers.Transfers)
 		}
 
+		movingAverageKey := createMovingAverageKey(dbNetwork, tokenName)
+
 		secondsSinceLastBlockRat := new(big.Rat).SetFloat64(secondsSinceLastBlock)
 
 		secondsSinceLastEpochFloat := secondsSinceLastBlock * float64(epochBlocks)
@@ -182,31 +184,40 @@ func main() {
 
 		emission.SecondsSinceLastBlock = uint64(secondsSinceLastBlock)
 
-		addBtx(
-			dbNetwork,
-			blockNumber.Uint64(),
-			tokenName,
-			transfersInBlock,
-		)
+		// add the transaction count in the block that just came in without
+		// recording the block, assuming that things are coming in linearly -
+		// this can create issues if infra is having partial downtime and is
+		// coming from a backlog
 
-		averageTransfersInBlock, _, atxBlocks, atxTxCounts := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
+		addBtx(movingAverageKey, transfersInBlock)
+
+		// if this is set, then any excess items in the list should be popped
+
+		shouldAverageTransfersScanPopExcess := atxBufferSize > epochBlocks
+
+		averageTransfersInBlock, _ := computeTransactionsSumAndAverage(
+			movingAverageKey,
 			atxBufferSize,
+			shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
-			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v",
+			"Computed average transactions (atx) for the network %v, token name %v, atx buffer size %v is %v, key %v",
 			dbNetwork,
 			tokenName,
 			atxBufferSize,
 			averageTransfersInBlock,
+			movingAverageKey,
 		)
 
-		_, transfersInEpoch, _, _ := computeTransactionsSumAndAverage(
-			dbNetwork,
-			tokenName,
+		// the average transfers scan pop excess check is
+		// inverted so we can remove items if the epoch size is
+		// larger than the atx buffer size
+
+		_, transfersInEpoch := computeTransactionsSumAndAverage(
+			movingAverageKey,
 			epochBlocks,
+			!shouldAverageTransfersScanPopExcess,
 		)
 
 		log.Debugf(
@@ -220,11 +231,6 @@ func main() {
 		emission.AtxBufferSize = atxBufferSize
 
 		emission.TransfersInBlock = transfersInBlock
-
-		emission.TransfersPast = concatenatePastTransfers(
-			atxBlocks,
-			atxTxCounts,
-		)
 
 		emission.AverageTransfersInBlock = float64(averageTransfersInBlock)
 
@@ -526,6 +532,14 @@ func main() {
 				)
 
 				for _, payoutDetails := range payouts {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Transaction with hash %v, log index %v had application %v",
+							transactionHash,
+							logIndex,
+							application.String(),
+						)
+					})
 					// create announcement and container
 					announcement := worker.EthereumAnnouncement{
 						TransactionHash: transactionHash,

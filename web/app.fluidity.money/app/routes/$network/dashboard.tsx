@@ -30,6 +30,7 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
+  AirdropIcon,
   AssetsIcon,
   Text,
   Heading,
@@ -44,6 +45,7 @@ import {
   ChainName,
   BurgerMenu,
   Referral,
+  CardModal,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -160,10 +162,10 @@ type LoaderData = {
 const NAVIGATION_MAP: {
   [key: string]: { name: string; icon: JSX.Element };
 }[] = [
-  { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-  { rewards: { name: "Rewards", icon: <Trophy /> } },
-  { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+  { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
+  { home: { name: "dashboard", icon: <DashboardIcon /> } },
+  { rewards: { name: "rewards", icon: <Trophy /> } },
+  { assets: { name: "assets", icon: <AssetsIcon /> } },
 ];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
@@ -263,6 +265,18 @@ export default function Dashboard() {
     // closes modal if screen size becomes too large for mobile menu
     !closeMobileModal && setOpenMobModal(false);
   }, [closeMobileModal]);
+
+  const airdropMobileBreakpoint = 768;
+
+  useEffect(() => {
+    // if the referral modal is open and the screen size changes, close the modal and redirect to the mobile page
+    if (!referralModalVisibility) return;
+
+    if (width <= airdropMobileBreakpoint && width > 0) {
+      setReferralModalVisibility(false);
+      navigate(`/${network}/dashboard/airdrop#referrals`);
+    }
+  }, [width]);
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
@@ -419,60 +433,49 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      <Modal id="referral-modal" visible={referralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setReferralModalVisibility(false)}
-          style={{
-            background: "none",
+      <CardModal
+        id="referral-modal"
+        visible={referralModalVisibility}
+        closeModal={() => setReferralModalVisibility(false)}
+        cardPositionStyle={{
+          position: "absolute",
+          top: "1em",
+          right: isTablet ? "20px" : "60px",
+          width: 500,
+        }}
+        color="holo"
+        style={{ padding: 0, width: "100%" }}
+      >
+        <ReferralModal
+          connected={!!connected}
+          network={network}
+          connectWallet={() => {
+            setReferralModalVisibility(false);
+            setWalletModalVisibility(true);
           }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "1em",
-              right: isTablet ? "20px" : "60px",
-            }}
-          >
-            <ReferralModal
-              connected={!!connected}
-              connectWallet={() => {
-                setReferralModalVisibility(false);
-                setWalletModalVisibility(true);
-              }}
-              referrerClaimed={numActiveReferrerReferrals}
-              refereeClaimed={numActiveReferreeReferrals}
-              refereeUnclaimed={numInactiveReferreeReferrals}
-              progress={inactiveReferrals[0]?.progress || 0}
-              progressReq={10}
-              referralCode={referralCode}
-              loaded={referralCountLoaded}
-              closeModal={() => setReferralModalVisibility(false)}
-            />
-          </div>
-        </div>
-      </Modal>
+          referrerClaimed={numActiveReferrerReferrals}
+          refereeClaimed={numActiveReferreeReferrals}
+          refereeUnclaimed={numInactiveReferreeReferrals}
+          progress={inactiveReferrals[0]?.progress || 0}
+          progressReq={10}
+          referralCode={referralCode}
+          loaded={referralCountLoaded}
+          closeModal={() => setReferralModalVisibility(false)}
+        />
+      </CardModal>
 
       {/* Accept Referral Modal */}
-      <Modal id="accept-referral-modal" visible={acceptReferralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setAcceptReferralModalVisibility(false)}
-          style={{
-            background: isMobile ? "black" : "#030303cc",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <AcceptReferralModal
-            network={network}
-            referralCode={clickedReferralCode}
-            referrer={referralAddress}
-            closeModal={() => setAcceptReferralModalVisibility(false)}
-          />
-        </div>
-      </Modal>
+      <CardModal
+        id="accept-referral-modal"
+        visible={acceptReferralModalVisibility}
+        closeModal={() => setAcceptReferralModalVisibility(false)}
+      >
+        <AcceptReferralModal
+          network={network}
+          referralCode={clickedReferralCode}
+          referrer={referralAddress}
+        />
+      </CardModal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
@@ -637,7 +640,7 @@ export default function Dashboard() {
                 size="small"
                 layout="before"
                 handleClick={() => {
-                  isMobile || isTablet
+                  width < airdropMobileBreakpoint
                     ? navigate(`/${network}/dashboard/airdrop#referrals`)
                     : setReferralModalVisibility(true);
                 }}

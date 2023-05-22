@@ -4,6 +4,7 @@ import { ArrowLeft } from "./ArrowLeft";
 import { TriangleDown } from "./TriangleDown";
 import { ArrowDown } from "./ArrowDown";
 import { ArrowUp } from "./ArrowUp";
+import { CopyIcon } from "./Copy";
 import { Trophy } from "./Trophy";
 import { Twitter } from "./Twitter";
 import { DashboardIcon } from "./Dashboard";
@@ -17,13 +18,17 @@ import { InfoCircle } from "./InfoCircle";
 import { CaretLeft } from "./CaretLeft";
 import { CaretRight } from "./CaretRight";
 import { Referral } from "./Referral";
+import { AirdropIcon } from "./Airdrop";
+import { LinkVerticalIcon } from "./LinkVertical";
 
 export {
+  AirdropIcon,
   ArrowRight,
   ArrowLeft,
   ArrowDown,
   ArrowUp,
   ArrowTopRight,
+  CopyIcon,
   TriangleDown,
   Trophy,
   Twitter,
@@ -38,4 +43,5 @@ export {
   CaretLeft,
   CaretRight,
   Referral,
+  LinkVerticalIcon,
 };

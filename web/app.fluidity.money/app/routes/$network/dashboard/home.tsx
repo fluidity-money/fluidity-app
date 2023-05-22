@@ -20,6 +20,8 @@ import {
   useViewport,
   Tooltip,
   TabButton,
+  LootBottle,
+  toSignificantDecimals,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -300,35 +302,46 @@ export default function Home() {
   const isMobile = width < 500 && width > 0;
   const isSmallMobile = width < 375;
 
-  const txTableColumns = isSmallMobile
-    ? [{ name: "ACTIVITY" }, { name: "VALUE" }]
-    : isMobile
-    ? [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }]
-    : isTablet
-    ? [
-        { name: "ACTIVITY" },
-        { name: "VALUE" },
-        { name: "REWARD" },
-        { name: "ACCOUNT" },
-      ]
-    : [
-        {
-          name: "ACTIVITY",
-        },
-        {
-          name: "VALUE",
-        },
-        {
-          name: "REWARD",
-        },
-        {
-          name: "ACCOUNT",
-        },
-        {
-          name: "TIME",
-          alignRight: true,
-        },
-      ];
+  const txTableColumns = (() => {
+    switch (true) {
+      case isSmallMobile:
+        return [{ name: "ACTIVITY" }, { name: "VALUE" }];
+      case isMobile:
+        return [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }];
+      case isTablet && showExperiment("enable-airdrop-page"):
+        return [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "BOTTLES" },
+          { name: "ACCOUNT" },
+        ];
+      case isTablet:
+        return [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "ACCOUNT" },
+        ];
+      case showExperiment("enable-airdrop-page"):
+        return [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "BOTTLES" },
+          { name: "ACCOUNT" },
+          { name: "TIME", alignRight: true },
+        ];
+      default:
+        return [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "ACCOUNT" },
+          { name: "TIME", alignRight: true },
+        ];
+    }
+  })();
 
   const txTableFilters = address
     ? [
@@ -446,6 +459,7 @@ export default function Home() {
         rewardHash,
         currency,
         logo,
+        lootBottles,
       } = data;
 
       return (
@@ -501,6 +515,38 @@ export default function Home() {
               )}
             </td>
           )}
+
+          {/* Bottles */}
+          {showExperiment("enable-airdrop-page") &&
+            !isMobile &&
+            (lootBottles ? (
+              <td className="table-bottle">
+                {Object.entries(lootBottles).map(
+                  ([rarity, quantity]: [string, number], index) => {
+                    if (quantity < 0.1) return <></>;
+
+                    return (
+                      <div key={index} className="lootbottle-container">
+                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
+                        <Text
+                          size="sm"
+                          style={{
+                            whiteSpace: "nowrap",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {toSignificantDecimals(quantity, 1)}
+                        </Text>
+                      </div>
+                    );
+                  }
+                )}
+              </td>
+            ) : (
+              <td>
+                <Text>-</Text>
+              </td>
+            ))}
 
           {/* Account */}
           {!isSmallMobile && (

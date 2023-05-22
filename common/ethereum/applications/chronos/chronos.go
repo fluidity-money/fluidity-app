@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -140,30 +141,32 @@ var (
 // GetChronosFees returns Chronos' fee based on fees given by Chronos' pair factory
 // If the token swapped from was the fluid token, get the exact amount,
 // otherwise approximate the cost based on the received amount of the fluid token
-func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (*big.Rat, error) {
+func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	// decode the amount of each token in the log
 	// doesn't contain addresses, as they're indexed
 	if len(transfer.Log.Topics) < 1 {
-		return nil, fmt.Errorf("No log topics passed!")
+		return feeData, fmt.Errorf("No log topics passed!")
 	}
 
 	logTopic := transfer.Log.Topics[0].String()
 
 	if logTopic != chronosSwapLogTopic {
-		return nil, nil
+		return feeData, nil
 	}
 
 	unpacked, err := chronosPairAbi.Unpack("Swap", transfer.Log.Data)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to unpack swap log data! %v",
 			err,
 		)
 	}
 
 	if len(unpacked) != 4 {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Unpacked the wrong number of values! Expected 4, got %v",
 			len(unpacked),
 		)
@@ -172,7 +175,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	swapAmounts, err := ethereum.CoerceBoundContractResultsToRats(unpacked)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce swap log data to rats! %v",
 			err,
 		)
@@ -187,7 +190,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token0addr_, err := ethereum.StaticCall(client, contractAddr, chronosPairAbi, "token0")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token0 address! %v",
 			err,
 		)
@@ -196,7 +199,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token0addr, err := ethereum.CoerceBoundContractResultsToAddress(token0addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token0 address! %v",
 			err,
 		)
@@ -205,7 +208,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token1addr_, err := ethereum.StaticCall(client, contractAddr, chronosPairAbi, "token1")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get token1 address! %v",
 			err,
 		)
@@ -214,7 +217,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	token1addr, err := ethereum.CoerceBoundContractResultsToAddress(token1addr_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce token1 address! %v",
 			err,
 		)
@@ -262,7 +265,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 
 	case fluidIndex0 && amount0IsZero:
 		inTokenIsFluid = false
@@ -281,11 +284,13 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		fluidTransferAmount = amount1out
 	}
 
+	feeData.Volume = fluidTransferAmount
+
 	// figure out whether our pair is stable
 	stable_, err := ethereum.StaticCall(client, contractAddr, chronosPairAbi, "isStable")
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get pair isStable! %v",
 			err,
 		)
@@ -294,7 +299,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	stable, err := ethereum.CoerceBoundContractResultsToBool(stable_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce isStable bool! %v",
 			err,
 		)
@@ -304,7 +309,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	feeNumerator_, err := ethereum.StaticCall(client, factoryAddr, chronosPairFactoryAbi, "getFee", stable)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get pair fee numerator! %v",
 			err,
 		)
@@ -313,7 +318,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	feeNumerator, err := ethereum.CoerceBoundContractResultsToInt(feeNumerator_)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to coerce pair fee numerator! %v",
 			err,
 		)
@@ -329,13 +334,17 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1,1),feeMultiplier))
 	}
 
-	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)
+	fee := new(big.Rat).Set(fluidTransferAmount)
+	fee = fee.Mul(fee, feeMultiplier)
 
 	// adjust by decimals to get the price in USD
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	fee.Quo(fee, decimalsRat)
+	feeData.Volume.Quo(feeData.Volume, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+
+	return feeData, nil
 }

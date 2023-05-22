@@ -19,14 +19,12 @@ import {
 } from "@fluidity-money/surfing";
 
 type IAcceptReferraModal = {
-  closeModal: () => void;
   network: string;
   referralCode: string;
   referrer: string;
 };
 
 const AcceptReferralModal = ({
-  closeModal,
   network,
   referralCode,
   referrer,
@@ -61,35 +59,10 @@ const AcceptReferralModal = ({
   };
 
   return (
-    <Card
-      className="referrals-container"
-      type="frosted"
-      color="holo"
-      border="solid"
-      rounded
-    >
-      <div className="referrals-content">
+    <>
+      <div className="referrals-content" style={{ padding: 0 }}>
         <div className="referrals-header">
-          {/* Help Button */}
-          <GeneralButton
-            type={"secondary"}
-            handleClick={() => navigate("./")}
-            size={"medium"}
-            border="box"
-          >
-            ?
-          </GeneralButton>
-          <Text bold size="lg">
-            ACCEPT REFERRAL
-          </Text>
-          <GeneralButton
-            type={"secondary"}
-            handleClick={closeModal}
-            size={"medium"}
-            border="box"
-          >
-            X
-          </GeneralButton>
+          <Text size="sm">ACCEPT REFERRAL</Text>
         </div>
 
         <Heading as={"h4"} className="referrals-heading">
@@ -99,32 +72,46 @@ const AcceptReferralModal = ({
         <Card
           rounded
           type="transparent"
-          color="holo"
+          color="gray"
           border="dashed"
           className="how-it-works-infobox"
         >
           {/* How it works Box Left*/}
-          <div>
-            <Text prominent size="xl" className="single-line">
-              <ul>You Get</ul> 💸
-            </Text>
-            <Text prominent size="lg">
-              <strong>10 Loot Bottles</strong>
+          <div className="how-it-works-half">
+            <div className="how-it-works-title">
+              <Text
+                code
+                size="md"
+                className="single-line"
+                style={{ textDecoration: "underline" }}
+              >
+                YOU GET
+              </Text>
+              &nbsp;💸
+            </div>
+            <Text prominent size="sm">
+              <strong>10% of their airdrop</strong>
               <br />
-              on activating their referral
+              earnings throughout the entire Epoch.
             </Text>
           </div>
           {/* How it works Box Right*/}
-          <div>
-            <Text prominent size="xl" className="single-line">
-              🍾<ul>They Get</ul>
-            </Text>
-            <Text prominent size="lg">
-              <strong>10% of your airdrop</strong>
+          <div className="how-it-works-half">
+            <div className="how-it-works-title">
+              🍾&nbsp;
+              <Text
+                code
+                size="md"
+                className="single-line"
+                style={{ textDecoration: "underline" }}
+              >
+                THEY GET
+              </Text>
+            </div>
+            <Text prominent size="sm">
+              <strong>10 Loot Bottles,</strong>
               <br />
-              earnings throughout
-              <br />
-              the entire Epoch.
+              not affected by your 10% reward.
             </Text>
           </div>
         </Card>
@@ -136,11 +123,15 @@ const AcceptReferralModal = ({
         >
           {!acceptedReferral ? "ACCEPT REFERRAL" : "ACCEPTED!"}
         </GeneralButton>
-        <LinkButton size="large" type="internal" handleClick={() => 1}>
+        <LinkButton
+          size="medium"
+          type="internal"
+          handleClick={() => navigate(`/${network}/dashboard/airdrop#tutorial`)}
+        >
           Learn more
         </LinkButton>
       </div>
-    </Card>
+    </>
   );
 };
 

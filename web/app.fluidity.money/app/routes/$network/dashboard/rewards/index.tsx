@@ -37,6 +37,8 @@ import {
   Display,
   WalletIcon,
   TabButton,
+  LootBottle,
+  toSignificantDecimals,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -45,6 +47,7 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -162,6 +165,8 @@ export default function Rewards() {
     FluidityFacadeContext
   );
 
+  const { showExperiment } = useContext(SplitContext);
+
   const userRewardsData = useFetcher();
 
   const userTransactionsData = useFetcher();
@@ -230,32 +235,34 @@ export default function Rewards() {
   }, [connected]);
 
   const { width } = useViewport();
-  const mobileView = width <= 500 && width > 0;
+  const isMobile = width <= 500 && width > 0;
+  const isTablet = width < 850 && width > 0;
 
-  const tableBreakpoint = 850;
-
-  const txTableColumns =
-    width > 0 && width < tableBreakpoint
-      ? [{ name: "ACTIVITY" }, { name: "REWARD" }]
-      : [
-          {
-            name: "ACTIVITY",
-          },
-          {
-            name: "VALUE",
-          },
-          {
-            name: "REWARD",
-          },
-          {
-            name: "WINNER",
-          },
-          {
-            name: "REWARDED TIME",
-            alignRight: true,
-          },
+  const txTableColumns = (() => {
+    switch (true) {
+      case isTablet && showExperiment("enable-airdrop-page"):
+        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "BOTTLES" }];
+      case isTablet:
+        return [{ name: "ACTIVITY" }, { name: "REWARD" }];
+      case showExperiment("enable-airdrop-page"):
+        return [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "BOTTLES" },
+          { name: "WINNER" },
+          { name: "REWARDED TIME", alignRight: true },
         ];
-
+      default:
+        return [
+          { name: "ACTIVITY" },
+          { name: "VALUE" },
+          { name: "REWARD" },
+          { name: "WINNER" },
+          { name: "REWARDED TIME", alignRight: true },
+        ];
+    }
+  })();
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
   const txTableFilters = address
@@ -427,6 +434,7 @@ export default function Rewards() {
         rewardHash,
         logo,
         currency,
+        lootBottles,
       } = data;
 
       const toolTip = useToolTip();
@@ -475,7 +483,7 @@ export default function Rewards() {
           </td>
 
           {/* Value */}
-          {width > tableBreakpoint && (
+          {!isTablet && (
             <td>
               <Text>
                 {value.toLocaleString("en-US", {
@@ -509,8 +517,39 @@ export default function Rewards() {
             )}
           </td>
 
+          {/* Bottles */}
+          {showExperiment("enable-airdrop-page") &&
+            (lootBottles ? (
+              <td className="table-bottle">
+                {Object.entries(lootBottles).map(
+                  ([rarity, quantity]: [string, number], index) => {
+                    if (quantity < 0.1) return <></>;
+
+                    return (
+                      <div key={index} className="lootbottle-container">
+                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
+                        <Text
+                          size="sm"
+                          style={{
+                            whiteSpace: "nowrap",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {toSignificantDecimals(quantity, 1)}
+                        </Text>
+                      </div>
+                    );
+                  }
+                )}
+              </td>
+            ) : (
+              <td>
+                <Text>-</Text>
+              </td>
+            ))}
+
           {/* Winner */}
-          {width > tableBreakpoint && (
+          {!isTablet && (
             <td>
               <a
                 className="table-address"
@@ -526,7 +565,7 @@ export default function Rewards() {
           )}
 
           {/* Time */}
-          {width > tableBreakpoint && (
+          {!isTablet && (
             <td>
               <Text>{transactionTimeLabel(timestamp)}</Text>
             </td>
@@ -538,16 +577,14 @@ export default function Rewards() {
   const SpendToEarnCTA = () => {
     return (
       <CardCarousel
-        size={mobileView ? "compact" : "normal"}
+        size={isMobile ? "compact" : "normal"}
         type="transparent"
         color="white"
         fill
         border="solid"
       >
-        <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
-          <div
-            className={`rewards-cta-providers ${mobileView ? "compact" : ""}`}
-          >
+        <CardCarousel.Slide className={isMobile ? "compactSlide" : ""}>
+          <div className={`rewards-cta-providers ${isMobile ? "compact" : ""}`}>
             <a
               onClick={(e) => {
                 e?.stopPropagation();
@@ -573,12 +610,10 @@ export default function Rewards() {
             </a>
           </div>
           <Display size="xxxs">Spend To Earn</Display>
-          {!mobileView && <Text>Use Fluid Assets to generate yield.</Text>}
+          {!isMobile && <Text>Use Fluid Assets to generate yield.</Text>}
         </CardCarousel.Slide>
-        <CardCarousel.Slide className={mobileView ? "compactSlide" : ""}>
-          <div
-            className={`rewards-cta-providers ${mobileView ? "compact" : ""}`}
-          >
+        <CardCarousel.Slide className={isMobile ? "compactSlide" : ""}>
+          <div className={`rewards-cta-providers ${isMobile ? "compact" : ""}`}>
             <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
               {/* <BloomEffect type="static" color={"red"} width={80}/> */}
               <ProviderIcon provider="Sushiswap" />
@@ -597,7 +632,7 @@ export default function Rewards() {
             </a>
           </div>
           <Display size="xxxs">Swap To Earn</Display>
-          {!mobileView && <Text>Swap Fluid Assets to generate yield.</Text>}
+          {!isMobile && <Text>Swap Fluid Assets to generate yield.</Text>}
         </CardCarousel.Slide>
       </CardCarousel>
     );
@@ -633,7 +668,7 @@ export default function Rewards() {
 
       {/* Heading & Filters */}
       <div className="reward-ceiling">
-        <Heading className="reward-performance" as={mobileView ? "h3" : "h2"}>
+        <Heading className="reward-performance" as={isMobile ? "h3" : "h2"}>
           {activeTableFilterIndex ? "My" : "Global"} Reward Performance
         </Heading>
 

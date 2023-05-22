@@ -1,8 +1,23 @@
 .bottle-distribution-container {
-  display: flex;
-  gap: 2em;
-  justify-content: space-between;
+  display: grid;
+  width: 100%;
+  gap: 1em;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   align-items: flex-end;
+
+  svg {
+    aspect-ratio: 1/1;
+  }
+}
+
+.helper-label {
+  svg {
+    fill: none;
+    stroke: none;
+    path {
+      fill: currentColor;
+    }
+  }
 }
 
 .lootbottle-container {
@@ -16,7 +31,7 @@
 
 .referral-details-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: auto auto;
   gap: 1em;
   padding-bottom: 1em;
 }
@@ -24,19 +39,58 @@
 .leaderboard-container {
   width: 100%;
   padding: 0;
-  margin: 2em 0;
 }
 
 .tutorial-slide-container {
   max-width: 100%;
-  width: 500px;
   height: auto;
+  padding-bottom: 1em;
 
   .tutorial-image {
-    margin-top: 1em;
     object-fit: cover;
     object-position: center;
     border-radius: 5px;
+  }
+
+  svg {
+    aspect-ratio: 1/1;
+  }
+}
+
+$holo: linear-gradient(
+  90deg,
+  #f3b8d8 0%,
+  #b793e9 15.1%,
+  #9fd4f3 26.04%,
+  #ffd2c4 36.46%,
+  #fbf3f3 46.88%,
+  #d9abdf 57.29%,
+  #af9ce3 72.4%,
+  #aae4e1 85.42%,
+  #c6ead0 93.23%,
+  #fdb5e4 100%
+);
+
+.tutorial-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+
+  .tutorial-nav-status {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  button {
+    svg {
+      path {
+        fill: none !important;
+        stroke: currentColor;
+      }
+    }
   }
 }
 
@@ -45,10 +99,12 @@
   display: flex;
   padding: 5px;
   border-radius: 5em 14px 14px 5em;
+  max-width: 260px;
 }
 
 .staking-modal-token-icon {
-  width: 64px;
+  width: 60px;
+  cursor: pointer;
 }
 
 .staking-modal-token-input {
@@ -58,6 +114,60 @@
   color: white;
   font-size: 2em;
   outline: none;
+  text-align: right;
+  box-sizing: border-box;
+  padding-right: 5px;
+}
+
+.staking-modal-token-selector {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  justify-content: center;
+  height: 72px;
+}
+
+.staking-modal-arrow-container {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  svg {
+    transform: scale(2);
+  }
+  path {
+    stroke: white;
+  }
+}
+
+.duration-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1em;
+
+  h1 {
+    white-space: nowrap;
+    overflow: visible;
+  }
+
+  input {
+  }
+}
+
+.power-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  &.rhs {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .power-text {
+    font-size: 3em;
+  }
 }
 
 .pad-main {
@@ -70,8 +180,9 @@
   color: black;
   display: grid;
   box-sizing: border-box;
-  grid-template-columns: 2.2fr 1fr 5fr;
-  gap: 2em;
+  grid-template-columns: 180px 64px 250px;
+  gap: 0.5em;
+  max-width: 100%;
 
   .multiplier-tasks-header {
     display: flex;
@@ -89,18 +200,24 @@
     align-items: center;
     cursor: pointer;
     grid-column: 2 / 3;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .multiplier-tasks-tasks {
     grid-column: 3/4;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
+    width: 100%;
+    gap: 6px;
+
+    a {
+      text-align: center;
+    }
   }
 }
 
-@container main (width < 1200px) {
+@media (max-width: 1200px) {
   .multiplier-tasks {
     grid-template-columns: auto min-content;
     grid-template-rows: min-content min-content;
@@ -118,35 +235,320 @@
     .multiplier-tasks-tasks {
       grid-column: 1 / 3;
       grid-row: 2 / 3;
+      justify-content: center;
     }
   }
 }
 
 .leaderboard-header {
   padding: 2em 2em 0 2em;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: space-between;
+  margin-bottom: 1em;
+  box-sizing: border-box;
+  max-width: 100%;
+
+  .leaderboard-header-text {
+    .airdrop-ldb-time-filter {
+      text-decoration: underline;
+    }
+  }
+  .leaderboard-header-filters {
+    display: flex;
+    gap: 1em;
+
+    button {
+      padding: 0.5em 1em;
+    }
+  }
+  h3 {
+    margin: 0;
+    margin-bottom: 0.5em;
+  }
 }
 
 .transactions-header {
-  padding-left: 2em;
-  padding-right: 2em;
+  display: none;
 }
 
-th,
-td {
-  padding-left: 2em !important;
-  padding-right: 2em !important;
-}
+.transaction-table > thead > tr,
+.transaction-table > tbody > tr.airdrop-row {
+  th,
+  td {
+    padding-left: 2em;
+    padding-right: 2em;
+    &:last-child {
+      padding-right: 4em;
+    }
+    &:first-child {
+      padding-left: 4em;
+    }
+  }
 
-.airdrop-row {
   td {
     background-color: transparent !important;
-    border-bottom: 1px solid white !important;
+    border-bottom: 1px solid white;
   }
+
   &:last-of-type {
     td {
       border-bottom: none !important;
     }
   }
-  border: 1px solid white !important;
-  margin: 0;
+
+  &.highlighted-row {
+    td {
+      border: none !important;
+    }
+    background: $holo;
+  }
+}
+
+.airdrop-leaderboard-mobile {
+  padding: 0;
+  gap: 0.5em;
+  .leaderboard-header {
+    padding: 0 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+
+    .leaderboard-header-filters {
+      align-self: center;
+      gap: 2em;
+    }
+  }
+
+  .transaction-table > thead > tr,
+  .transaction-table > tbody > tr.airdrop-row {
+    td,
+    th {
+      padding: 0.5em;
+
+      &:first-child {
+        padding-left: 1em;
+      }
+      &:last-child {
+        padding-right: 1em;
+      }
+    }
+
+    td {
+      border-bottom: 1px solid #404040;
+    }
+
+    th {
+      font-size: 12px;
+    }
+  }
+}
+
+.bottles-earned-button {
+  margin-bottom: 0.5em;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+
+  svg {
+    fill: none;
+    stroke: currentColor;
+  }
+}
+
+.airdrop-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2em;
+  flex-wrap: wrap;
+}
+
+.airdrop-stats-item {
+  flex-grow: 1;
+}
+
+.see-the-leaderboard-button {
+  align-self: flex-start;
+  justify-self: flex-end;
+  flex-grow: 1;
+  flex-shrink: 0;
+  padding: 1em;
+  border: 1px solid white;
+  border-radius: 0.5em;
+  height: 100%;
+  flex-basis: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.airdrop-my-multiplier {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+
+  svg,
+  path {
+    fill: none !important;
+    stroke: currentColor !important;
+  }
+
+  &.airdrop-mobile {
+    .mx-bloom {
+      z-index: -1;
+      opacity: 0.5;
+      margin-top: -85px;
+    }
+
+    grid-template-columns: 1fr;
+    gap: 1em;
+
+    #mx-see-my-staking-stats,
+    #mx-my-stakes,
+    #mx-stake-now-button {
+      grid-area: unset;
+    }
+
+    #mx-stake-now-button {
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .mx-my-multiplier {
+      text-align: center;
+
+      h1 {
+        filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.8));
+      }
+    }
+  }
+
+  #mx-see-my-staking-stats {
+    width: 100%;
+    grid-area: 2 / 1;
+    box-sizing: border-box;
+    align-self: end;
+  }
+
+  #mx-my-stakes {
+    display: grid;
+    grid-template-columns: auto max-content;
+    align-content: start;
+    gap: 1em;
+    grid-column: 2 / 3;
+    grid-row: 1 / 3;
+  }
+
+  #mx-stake-now-button {
+    width: 100%;
+    box-sizing: border-box;
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+  }
+}
+
+.airdrop-header {
+  display: flex;
+  gap: 2em;
+  padding-bottom: 2em;
+  white-space: nowrap;
+
+  &.airdrop-mobile {
+    max-width: 100%;
+    box-sizing: border-box;
+    // both margin and padding required here to make the scrollbar render nicely inbetween
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    overflow-x: scroll;
+  }
+}
+
+.stake-confirm-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  grid-column: 1 / 4;
+}
+
+.airdrop-stake-container {
+  display: grid;
+  grid-template-columns: auto auto 160px;
+  column-gap: 4em;
+  row-gap: 2em;
+  max-width: 500px;
+
+  .airdrop-stake-buttons {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .staking-modal-token-insufficient {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    bottom: -0.5em;
+    background: black;
+    padding: 0.2em 2em 0.2em 2em;
+    border-radius: 12px;
+    border: 1px solid red;
+  }
+
+  .staking-modal-complete {
+    width: 95%;
+  }
+
+  &.airdrop-mobile {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1em;
+
+    .airdrop-stake-inputs-column {
+      grid-column: 1 / 3;
+    }
+
+    .staking-modal-input-container {
+      max-width: unset;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .stake-confirm-column {
+      grid-column: 1/3;
+    }
+
+    .duration-column {
+      grid-column: 1 / 3;
+      width: 100%;
+      gap: 0.5em;
+      align-items: flex-start;
+
+      .duration-col-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+      }
+
+      .slippage-tooltip {
+        margin-top: 1em;
+      }
+    }
+  }
+}
+
+.scroll-to-leaderboard-button {
+  svg {
+    transform: rotate(90deg);
+
+    path {
+      fill: none;
+    }
+  }
 }

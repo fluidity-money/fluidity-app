@@ -16,6 +16,7 @@ import (
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -108,14 +109,17 @@ var mesonAbi ethAbi.ABI
 
 // GetMesonFees returns meson's LP and Service Fees as reported by
 // the encoded swap
-func GetMesonFees(transfer worker.EthereumApplicationTransfer, inputData misc.Blob) (*big.Rat, error) {
+// TODO does not calculate fluid volume
+func GetMesonFees(transfer worker.EthereumApplicationTransfer, inputData misc.Blob) (applications.ApplicationFeeData, error) {
+	var feeData applications.ApplicationFeeData
+
 	fee := new(big.Rat)
 
 	// check the transaction function
 	method, err := mesonAbi.MethodById(inputData)
 
 	if err != nil {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to get method from inputData! %v",
 			err,
 		)
@@ -129,14 +133,14 @@ func GetMesonFees(transfer worker.EthereumApplicationTransfer, inputData misc.Bl
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// make sure the input is correct len
 	enoughBytes := len(inputData) >= EncodedSwapStart+EncodedSwapSize
 
 	if !enoughBytes {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Not enough bytes in input data! needed %v but got %v!",
 			EncodedSwapStart+EncodedSwapSize,
 			len(inputData),
@@ -161,7 +165,7 @@ func GetMesonFees(transfer worker.EthereumApplicationTransfer, inputData misc.Bl
 			)
 		})
 
-		return nil, nil
+		return feeData, nil
 	}
 
 	// get the salt bytes
@@ -174,7 +178,7 @@ func GetMesonFees(transfer worker.EthereumApplicationTransfer, inputData misc.Bl
 	ServiceFeeWaiveMaskInt, success := new(big.Int).SetString(ServiceFeeWaiveMask, 0)
 
 	if !success {
-		return nil, fmt.Errorf(
+		return feeData, fmt.Errorf(
 			"Failed to convert Service Fee Waiver bitmask to bigInt %v",
 			ServiceFeeWaiveMask,
 		)
@@ -216,7 +220,9 @@ func GetMesonFees(transfer worker.EthereumApplicationTransfer, inputData misc.Bl
 	// adjust for token decimals
 	fee.Quo(fee, decimalsRat)
 
-	return fee, nil
+	feeData.Fee = fee
+
+	return feeData, nil
 }
 
 // Extend byte slice to 8 bytes

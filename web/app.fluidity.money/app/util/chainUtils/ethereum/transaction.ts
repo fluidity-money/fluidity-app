@@ -6,6 +6,58 @@ import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
 
+export type ContractToken = {
+  address: string;
+  ABI: ContractInterface;
+  symbol: string;
+  isFluidOf: boolean;
+};
+
+export const signOwnerAddress_ = async (
+  owner: string,
+  signer: Signer,
+  contractAddress: string,
+  ABI: ContractInterface
+) => {
+  const contract = getContract(ABI, contractAddress, signer);
+  if (!contract) throw new Error("Invalid contract provided!");
+
+  const address = await signer.getAddress();
+  const msg = await signer.signMessage(
+    utils.arrayify(
+      utils.keccak256(
+        utils.solidityPack(
+          ["string", "address", "address"],
+          ["fluidity.lootbox.confirm.address.ownership", address, owner]
+        )
+      )
+    )
+  );
+
+  return msg;
+};
+
+export const confirmAccountOwnership_ = async (
+  signature: string,
+  address: string,
+  signer: Signer,
+  contractAddress: string,
+  ABI: ContractInterface
+) => {
+  const contract = getContract(ABI, contractAddress, signer);
+  if (!contract) throw new Error("Invalid contract provided!");
+
+  const owner = await signer.getAddress();
+  const { v, r, s } = utils.splitSignature(signature);
+
+  try {
+    await contract.confirm(address, owner, v, r, s);
+    console.log("Confirmation transaction successful!");
+  } catch (error) {
+    console.error("Error confirming ownership:", error);
+  }
+};
+
 export const getContract = (
   ABI: ContractInterface,
   address: string,
@@ -59,13 +111,6 @@ export const getUsdAmountMinted = async (
   const decimals = (await contract.decimals()).toString();
 
   return Number(utils.formatUnits(amount, decimals));
-};
-
-export type ContractToken = {
-  address: string;
-  ABI: ContractInterface;
-  symbol: string;
-  isFluidOf: boolean;
 };
 
 const makeContractSwap = async (
@@ -338,11 +383,44 @@ export const getUserDegenScore = async (
   }
 };
 
-export type StakingDepositsRes = {
-  fusdcAmount: BN;
-  usdcAmount: BN;
-  wethAmount: BN;
+export type StakingRatioRes = {
+  fusdcUsdcRatio: BigNumber;
+  fusdcWethRatio: BigNumber;
+  fusdcUsdcSpread: BigNumber;
+  fusdcWethSpread: BigNumber;
 };
+
+export const getTokenStakingRatio = async (
+  provider: JsonRpcProvider,
+  stakingAbi: ContractInterface,
+  stakingAddr: string
+) => {
+  try {
+    const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    return stakingContract.ratios();
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return undefined;
+  }
+};
+
+export type StakingDepositsRes = Array<{
+  depositTimestamp: BigNumber;
+  redeemTimestamp: BigNumber;
+  camelotLpMinted: BigNumber;
+  camelotTokenA: BigNumber;
+  camelotTokenB: BigNumber;
+  sushiswapLpMinted: BigNumber;
+  sushiswapTokenA: BigNumber;
+  sushiswapTokenB: BigNumber;
+  fusdcUsdcPair: boolean;
+}>;
 
 export const getUserStakingDeposits = async (
   provider: JsonRpcProvider,
@@ -353,13 +431,12 @@ export const getUserStakingDeposits = async (
   try {
     const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
 
-    console.log(stakingContract);
     if (!stakingContract)
       throw new Error(
         `Could not instantiate Staking Contract at ${stakingAddr}`
       );
 
-    const deposits = await stakingContract.callStatic.deposited(userAddr);
+    const deposits = await stakingContract.deposits(userAddr);
 
     return deposits;
   } catch (error) {
@@ -368,6 +445,33 @@ export const getUserStakingDeposits = async (
   }
 };
 
+// Call Static Stake tokens - For Error Checking
+export const testMakeStakingDeposit = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  lockDurationSeconds: BN,
+  usdcAmt: BN,
+  fusdcAmt: BN,
+  wethAmt: BN,
+  slippage: BN,
+  maxTimestamp: BN
+) => {
+  const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+  if (!stakingContract)
+    throw new Error(`Could not instantiate Staking Contract at ${stakingAddr}`);
+
+  // call deposit
+  return await stakingContract.callStatic.deposit(
+    lockDurationSeconds.toString(),
+    fusdcAmt.toString(),
+    usdcAmt.toString(),
+    wethAmt.toString(),
+    slippage.toString(),
+    maxTimestamp.toString()
+  );
+};
 // Stake tokens
 export const makeStakingDeposit = async (
   signer: Signer,
@@ -380,8 +484,9 @@ export const makeStakingDeposit = async (
   usdcAmt: BN,
   fusdcAmt: BN,
   wethAmt: BN,
-  slippage: BN
-): Promise<StakingDepositsRes | undefined> => {
+  slippage: BN,
+  maxTimestamp: BN
+) => {
   try {
     const stakingContract = getContract(stakingAbi, stakingAddr, signer);
 
@@ -418,20 +523,7 @@ export const makeStakingDeposit = async (
         const amtString = amt.toString();
 
         if (allowance.lt(amtString)) {
-          // some tokens (USDT) will revert if approving from nonzero -> nonzero,
-          // to prevent reordering attacks
-          if (!allowance.isZero()) {
-            const zeroApproval = await tokenContract.approve(
-              stakingAddr,
-              constants.Zero
-            );
-            await zeroApproval.wait();
-          }
-
-          const approval = await tokenContract.approve(
-            stakingAddr,
-            constants.MaxUint256
-          );
+          const approval = await tokenContract.approve(stakingAddr, amtString);
 
           // `.wait()` to handle errors
           await approval.wait();
@@ -441,15 +533,50 @@ export const makeStakingDeposit = async (
 
     // call deposit
     return await stakingContract.deposit(
-      utils.parseUnits(lockDurationSeconds.toString()),
-      utils.parseUnits(fusdcAmt.toString()),
-      utils.parseUnits(usdcAmt.toString()),
-      utils.parseUnits(wethAmt.toString()),
-      utils.parseUnits(slippage.toString())
+      lockDurationSeconds.toString(),
+      fusdcAmt.toString(),
+      usdcAmt.toString(),
+      wethAmt.toString(),
+      slippage.toString(),
+      maxTimestamp.toString()
     );
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
     return undefined;
+  }
+};
+
+export const getWethUsdPrice = async (
+  provider: JsonRpcProvider,
+  eacAggregatorProxyAddr: string,
+  eacAggregatorProxyAbi: ContractInterface
+): Promise<number> => {
+  try {
+    const eacAggregatorProxyContract = new Contract(
+      eacAggregatorProxyAddr,
+      eacAggregatorProxyAbi,
+      provider
+    );
+
+    if (!eacAggregatorProxyContract)
+      throw new Error(
+        `Could not instantiate EACAggregator at ${eacAggregatorProxyAddr}`
+      );
+
+    const wethUsdValue_ =
+      await eacAggregatorProxyContract.callStatic.latestAnswer();
+
+    const wethUsdValue = new BN(wethUsdValue_.toString());
+
+    // Convert to cents, for more accurate calculations
+    const CENT_DECIMALS = new BN(6);
+
+    const decimalsBn = new BN(10).pow(CENT_DECIMALS);
+
+    return wethUsdValue.div(decimalsBn).toNumber() / 100;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return 0;
   }
 };
 

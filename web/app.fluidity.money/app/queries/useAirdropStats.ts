@@ -29,7 +29,10 @@ const queryAirdropStatsByAddress = gql`
 export const useAirdropStatsByAddress = async (address: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
-  const variables = { address, now: new Date().toISOString() };
+  const variables = {
+    address,
+    now: new Date().toISOString(),
+  };
   const body = {
     variables,
     query: queryAirdropStatsByAddress,

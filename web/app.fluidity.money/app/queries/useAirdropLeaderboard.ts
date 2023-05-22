@@ -84,6 +84,13 @@ type AirdropLeaderboardResponse = {
   errors?: unknown;
 };
 
+type AirdropLeaderboard24HoursResponse = {
+  data?: {
+    airdrop_leaderboard_24_hours: Array<AirdropLeaderboardEntry>;
+  };
+  errors?: unknown;
+};
+
 export const useAirdropLeaderboardByUserAllTime = (address: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
@@ -126,11 +133,10 @@ export const useAirdropLeaderboardByUser24Hours = (address: string) => {
     variables,
   };
 
-  return jsonPost<AirdropLeaderboardByUserBody, AirdropLeaderboardResponse>(
-    url,
-    body,
-    headers
-  );
+  return jsonPost<
+    AirdropLeaderboardByUserBody,
+    AirdropLeaderboard24HoursResponse
+  >(url, body, headers);
 };
 
 export const useAirdropLeaderboard24Hours = () => {
@@ -139,7 +145,7 @@ export const useAirdropLeaderboard24Hours = () => {
     query: query24Hours,
   };
 
-  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
+  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboard24HoursResponse>(
     url,
     body,
     headers

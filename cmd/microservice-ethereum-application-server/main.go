@@ -5,8 +5,6 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -19,7 +17,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
@@ -44,32 +41,6 @@ const (
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
 
-func getReceipt(gethClient *ethclient.Client, transactionHash ethereum.Hash) (*ethereum.Receipt, error) {
-	txReceipt, err := gethClient.TransactionReceipt(
-		context.Background(),
-		common.HexToHash(transactionHash.String()),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Failed to get the transaction receipt for Fluid transfer %#v! %w",
-			transactionHash.String(),
-			err,
-		)
-	}
-
-	if txReceipt == nil {
-		return nil, fmt.Errorf(
-			"Receipt for fluid transfer %v was nil! %w",
-			transactionHash,
-			err,
-		)
-	}
-
-	convertedReceipt := libEthereum.ConvertGethReceipt(*txReceipt)
-
-	return &convertedReceipt, nil
-}
 
 // appsListFromEnvOrFatal parses a list of `app:address:address,app:address:address` into a map of {address => app}
 func appsListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.Application {
@@ -245,7 +216,7 @@ func main() {
 				})
 			}
 
-			convertedReceipt, err := getReceipt(gethClient, transactionHash)
+			convertedReceipt, err := libEthereum.GetReceipt(gethClient, transactionHash)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -261,7 +232,7 @@ func main() {
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
 
 			for _, transfer := range transfers {
-				fee, emission, err := applications.GetApplicationFee(
+				feeData, emission, err := applications.GetApplicationFee(
 					transfer,
 					gethClient,
 					contractAddress,
@@ -269,6 +240,8 @@ func main() {
 					*convertedReceipt,
 					transaction.Data,
 				)
+
+				fee := feeData.Fee
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -298,6 +271,12 @@ func main() {
 					Application:    transfer.Application,
 					UtilityName:    utility,
 					ApplicationFee: fee,
+				}
+
+				// if there's a utility but no fee, the event is from a protocol
+				// but not one that's decoded by GetApplicationFee
+				if fee == nil {
+					decorator.Application = applications.ApplicationNone
 				}
 
 				sender, recipient, err := applications.GetApplicationTransferParties(
@@ -358,7 +337,7 @@ func main() {
 
 				decoratedTransaction.Transaction = transaction
 
-				receipt, err := getReceipt(gethClient, transactionHash)
+				receipt, err := libEthereum.GetReceipt(gethClient, transactionHash)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -401,6 +380,21 @@ func main() {
 			BlockTime:             blockLog.BlockTime,
 			BlockNumber:           blockLog.BlockNumber,
 			DecoratedTransactions: decoratedTransactions,
+		}
+
+		for transactionHash, decoratedTransaction := range decoratedTransactions {
+			for i, transfer := range decoratedTransaction.Transfers {
+				if transfer.Decorator != nil {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"For transaction hash %v, transfer with index %v had application %v!",
+							transactionHash,
+							i,
+							transfer.Decorator.Application.String(),
+						)
+					})
+				}
+			}
 		}
 
 		// send to server
