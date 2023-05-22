@@ -61,13 +61,7 @@ const AcceptReferralModal = ({
   };
 
   return (
-    <Card
-      className="referrals-container"
-      type="frosted"
-      color="holo"
-      border="solid"
-      rounded
-    >
+    <>
       <div className="referrals-content">
         <div className="referrals-header">
           {/* Help Button */}
@@ -144,7 +138,7 @@ const AcceptReferralModal = ({
           Learn more
         </LinkButton>
       </div>
-    </Card>
+    </>
   );
 };
 

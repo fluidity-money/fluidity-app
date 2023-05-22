@@ -12,6 +12,7 @@ interface ICardModal extends ICard {
   visible: boolean
   closeModal: () => void
   children: React.ReactNode
+  cardPositionStyle?: React.CSSProperties
 }
 
 export const CardModal: React.FC<ICardModal> = ({
@@ -19,32 +20,39 @@ export const CardModal: React.FC<ICardModal> = ({
   visible,
   closeModal,
   children,
-  type="frosted",
-  border="solid",
+  type = "frosted",
+  border = "solid",
+  cardPositionStyle,
   ...props
 }) => {
   const ref = useRef(null);
 
-  useClickOutside(ref, () => { 
-    closeModal() 
+  useClickOutside(ref, () => {
+    closeModal()
   });
 
   return (
     <AnimatePresence>
       <Modal id={id} visible={visible}>
-        <motion.div className={styles.backdrop} 
+        <motion.div className={styles.backdrop}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
           <motion.div
             key="id"
-            className={styles.anim}
             ref={ref}
-            initial={{ opacity: 0, y: 'calc(-50% + 50px)', x: '-50%' }}
-            animate={{ opacity: 1, y: '-50%', x: '-50%' }}
-            exit={{ opacity: 0, y: 'calc(-50% - 50px)', x: '-50%' }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
             transition={{ duration: 0.3 }}
+            style={cardPositionStyle || {
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              translateX: '-50%',
+              translateY: '-50%',
+            }}
           >
             <Card
               type={type}

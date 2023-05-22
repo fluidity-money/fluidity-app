@@ -970,3 +970,7 @@ main > footer > section > a {
 .no-margin {
   margin: 0;
 }
+
+.mobile-modal-text-link > svg {
+  fill: currentColor;
+}
