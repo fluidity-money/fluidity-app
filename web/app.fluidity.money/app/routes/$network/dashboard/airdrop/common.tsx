@@ -360,7 +360,6 @@ const BottlesDetailsModal = ({
   navigate,
   network,
   bottles,
-  isMobile,
 }: IBottlesDetailsModal) => (
   <>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
@@ -377,29 +376,6 @@ const BottlesDetailsModal = ({
     >
       SEE YOUR LOOTBOTTLE TX HISTORY
     </GeneralButton>
-    <div
-      style={{
-        width: "100%",
-        borderBottom: "1px solid white",
-        margin: "1em 0",
-      }}
-    />
-    <Hoverable
-      style={{ minWidth: 250 }}
-      tooltipStyle={isMobile ? "frosted" : "solid"}
-      tooltipContent="The amount of Loot Bottles you have earned since you last checked this page."
-    >
-      <Text size="sm">
-        Bottles earned since last checked <InfoCircle />
-      </Text>
-    </Hoverable>
-    <div>
-      {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
-      <LootBottle size="lg" rarity="legendary"></LootBottle>
-      <Text prominent size="lg">
-        x22
-      </Text>
-    </div>
   </>
 );
 
