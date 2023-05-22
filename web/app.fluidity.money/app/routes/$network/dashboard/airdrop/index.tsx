@@ -361,12 +361,6 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("testnet-rewards")}
-        >
-          Claim Testnet Rewards
-        </TabButton>
       </div>
     );
   };
