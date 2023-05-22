@@ -149,18 +149,10 @@ const Airdrop = () => {
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
-  const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
+  const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"
-    }`
-  );
-
-  const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
-          leaderboardFilterIndex === 0 ? "24" : "all"
-        }&address=${address}`
-      : ""
+    }&address=${address ?? ""}`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
@@ -182,11 +174,7 @@ const Airdrop = () => {
     },
     airdropLeaderboard: {
       ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
-      ...globalAirdropLeaderboardData,
-    },
-    userAirdropLeaderboard: {
-      ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
-      ...userAirdropLeaderboardData,
+      ...airdropLeaderboardData,
     },
     referrals: {
       ...SAFE_DEFAULT_REFERRALS,
@@ -209,18 +197,10 @@ const Airdrop = () => {
       inactiveReferrals,
     },
     airdropLeaderboard: {
-      leaderboard: globalLeaderboardRows,
-      loaded: globalLeaderboardLoaded,
-    },
-    userAirdropLeaderboard: {
-      leaderboard: userLeaderboardRows,
-      loaded: userLeaderboardLoaded,
+      leaderboard: leaderboardRows,
+      loaded: leaderboardLoaded,
     },
   } = data;
-
-  const leaderboardRows = userLeaderboardLoaded
-    ? userLeaderboardRows.concat(globalLeaderboardRows)
-    : globalLeaderboardRows;
 
   const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [stakes, setStakes] = useState<
@@ -414,7 +394,7 @@ const Airdrop = () => {
           {currentModal === "leaderboard" && (
             <>
               <Leaderboard
-                loaded={globalLeaderboardLoaded}
+                loaded={leaderboardLoaded}
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
@@ -649,7 +629,7 @@ const Airdrop = () => {
           color="white"
         >
           <Leaderboard
-            loaded={globalLeaderboardLoaded}
+            loaded={leaderboardLoaded}
             data={leaderboardRows}
             filterIndex={leaderboardFilterIndex}
             setFilterIndex={setLeaderboardFilterIndex}
@@ -957,8 +937,11 @@ const MyMultiplier = ({
       </GeneralButton>
       {!isMobile && (
         <div id="mx-my-stakes">
-          {stakes.map(
-            ({ fluidAmount, baseAmount, durationDays, depositDate }) => {
+          {stakes
+            .map((stake) => {
+              const { fluidAmount, baseAmount, durationDays, depositDate } =
+                stake;
+
               const stakedDays = dayDifference(
                 new Date(),
                 new Date(depositDate)
@@ -987,6 +970,29 @@ const MyMultiplier = ({
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
+              return {
+                stake,
+                stakedDays,
+                multiplier,
+                fluidUsd,
+                baseUsd,
+              };
+            })
+            .sort((a, b) => {
+              const stakeAVal = (a.fluidUsd + a.baseUsd) * a.multiplier;
+              const stakeBVal = (b.fluidUsd + b.baseUsd) * b.multiplier;
+
+              // Sort Descending
+              return stakeBVal > stakeAVal
+                ? 1
+                : stakeBVal === stakeAVal
+                ? 0
+                : -1;
+            })
+            .slice(0, 3)
+            .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
+              const { durationDays } = stake;
+
               return (
                 <>
                   <div
@@ -1002,12 +1008,10 @@ const MyMultiplier = ({
                       {Math.floor(durationDays)} DAYS
                     </Text>
                     <ProgressBar
-                      value={stakedDays}
-                      max={Math.floor(durationDays)}
+                      value={multiplier}
+                      max={1}
                       rounded
-                      color={
-                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                      }
+                      color={multiplier === 1 ? "holo" : "gray"}
                       size="sm"
                     />
                   </div>
@@ -1020,8 +1024,7 @@ const MyMultiplier = ({
                   </div>
                 </>
               );
-            }
-          )}
+            })}
         </div>
       )}
       <GeneralButton
@@ -1171,7 +1174,11 @@ const Leaderboard = ({
   isMobile = false,
 }: IAirdropLeaderboard) => {
   // This adds a dummy user entry to the leaderboard if the user's address isn't found
-  if (loaded && !data.find((entry) => entry.user === userAddress)) {
+  if (
+    loaded &&
+    userAddress &&
+    !data.find((entry) => entry.user === userAddress)
+  ) {
     const userEntry = {
       user: userAddress,
       rank: -1,

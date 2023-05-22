@@ -43,7 +43,7 @@ func main() {
 		gethHttpUrl         = util.GetEnvOrFatal(EnvGethHttpUrl)
 
 		volumeBigInt misc.BigInt
-		volume *big.Rat
+		volume       *big.Rat
 	)
 
 	tokensList := util.GetTokensListBase(ethereumTokensList_)
@@ -151,26 +151,25 @@ func main() {
 
 			receipt := libEthereum.ConvertGethReceipt(*receipt_)
 
-			if len(receipt.Logs) < int(logIndex.Int64()) {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Not enough logs to look up by log index! Expected at least %v, got %v!",
-						logIndex.String(),
-						len(receipt.Logs),
-					)
-				})
+			// look up log by index
+			var logIndexInReceipt int
+			for i, receipt := range receipt.Logs {
+				if receipt.Index.Int64() == logIndex.Int64() {
+					logIndexInReceipt = i
+					break
+				}
 			}
 
-			log_ := receipt.Logs[logIndex.Int64()]
+			log_ := receipt.Logs[logIndexInReceipt]
 
 			applicationTransfer := worker.EthereumApplicationTransfer{
 				TransactionHash: ethereum.HashFromString(transactionHash),
-				Log: log_,
-				Application: application,
+				Log:             log_,
+				Application:     application,
 			}
 
 			fluidTokenContract := tokensMap[tokenShortName]
-			
+
 			inputData := transaction.Data()
 
 			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
@@ -210,7 +209,7 @@ func main() {
 			// divide by original denom, losing any extra precision
 			volumeBigIntNum = volumeBigIntNum.Quo(volumeBigIntNum, denom)
 			volumeBigInt = misc.NewBigIntFromInt(*volumeBigIntNum)
-			
+
 		} else {
 			volumeBigInt = sendTransaction.Amount
 			// adjust to USD
