@@ -24,6 +24,7 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
+  LinkVerticalIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -668,6 +669,9 @@ const StakeNowModal = ({
   // and maximum base token spread, to the factor of 12
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
 
+  // Force recommended token ratio
+  const [lockRatio, setLockRatio] = useState(true);
+
   // Convert proportion of Base Tokens in Pool to Fluid:Base Token ratio
   // `prop` = base / (base + fluid)
   const calculateRatioFromProportion = (baseTokenProp: number) => {
@@ -768,6 +772,7 @@ const StakeNowModal = ({
         amount: tokenAmtStr,
       });
 
+      if (!lockRatio) return;
       if (!tokenAmtStr) return;
 
       const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
@@ -1006,7 +1011,7 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
-              gap: "0.5em",
+              gap: "1em",
             }}
           >
             <Hoverable
@@ -1018,17 +1023,29 @@ const StakeNowModal = ({
                 STAKE AMOUNT <InfoCircle />
               </Text>
             </Hoverable>
-            <GeneralButton
-              type="transparent"
-              size="small"
-              handleClick={() => inputMaxBalance()}
-              style={{
-                padding: "0.5em 1em",
-                borderRadius: "100px",
-              }}
-            >
-              <Text size="sm">MAX</Text>
-            </GeneralButton>
+            <div className="airdrop-stake-buttons">
+              <GeneralButton
+                type={lockRatio ? "primary" : "transparent"}
+                size="small"
+                handleClick={() => setLockRatio(!lockRatio)}
+                style={{
+                  width: "2px",
+                  padding: "0.5em 0.5em",
+                }}
+                icon={<LinkVerticalIcon />}
+              ></GeneralButton>
+              <GeneralButton
+                type="transparent"
+                size="small"
+                handleClick={() => inputMaxBalance()}
+                style={{
+                  padding: "0.5em 1em",
+                  borderRadius: "100px",
+                }}
+              >
+                <Text size="sm">MAX</Text>
+              </GeneralButton>
+            </div>
           </div>
           {showTokenSelector === "fluid" ? (
             <div className="staking-modal-token-selector">
@@ -1165,7 +1182,7 @@ const StakeNowModal = ({
               <div
                 className="staking-modal-token-insufficient"
                 style={{
-                  display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
+                  display: baseTokenAmount.gt(baseToken.userTokenBalance)
                     ? "flex"
                     : "none",
                 }}

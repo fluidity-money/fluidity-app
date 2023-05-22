@@ -483,6 +483,24 @@ $holo: linear-gradient(
   row-gap: 2em;
   max-width: 500px;
 
+  .airdrop-stake-buttons {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .staking-modal-token-insufficient {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    bottom: -0.5em;
+    background: black;
+    padding: 0.2em 2em 0.2em 2em;
+    border-radius: 12px;
+    border: 1px solid red;
+  }
+
   &.airdrop-mobile {
     grid-template-columns: 1fr 1fr;
     column-gap: 1em;
