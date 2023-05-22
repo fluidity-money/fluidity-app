@@ -16,7 +16,7 @@ import {
   ProgressBar,
   CopyIcon,
   TextButton,
-  useViewport
+  useViewport,
 } from "@fluidity-money/surfing";
 import { highlightText } from "~/util";
 import { generateReferralTweet } from "~/util/tweeter";
@@ -58,7 +58,6 @@ const ReferralModal = ({
   const mobileBreakpoint = 768;
   const { width } = useViewport();
 
-
   const isMobile = width < mobileBreakpoint;
 
   return (
@@ -85,10 +84,16 @@ const ReferralModal = ({
             YOU HAVE {referrerClaimed}&nbsp;
             <Hoverable
               style={{ minWidth: 250 }}
-              tooltipStyle={isMobile ? 'frosted' : 'solid'}
-              tooltipContent={<Text size="xs">Active Referrals are Referrals that have earned 10 Lootboxes</Text>}
+              tooltipStyle={isMobile ? "frosted" : "solid"}
+              tooltipContent={
+                <Text size="xs">
+                  Active Referrals are Referrals that have earned 10 Lootboxes
+                </Text>
+              }
             >
-              <TextButton style={{ textDecorationThickness: 1, textUnderlineOffset: 5 }}>
+              <TextButton
+                style={{ textDecorationThickness: 1, textUnderlineOffset: 5 }}
+              >
                 ACTIVE REFERRALS
               </TextButton>
             </Hoverable>
@@ -135,7 +140,9 @@ const ReferralModal = ({
               size={"medium"}
               icon={<CopyIcon />}
             >
-              <Text size="lg" prominent bold style={{ color: 'inherit' }}>{!linkCopied ? "Copy Link" : "Link Copied!"}</Text>
+              <Text size="lg" prominent bold style={{ color: "inherit" }}>
+                {!linkCopied ? "Copy Link" : "Link Copied!"}
+              </Text>
             </GeneralButton>
           </div>
         ) : (
@@ -146,28 +153,32 @@ const ReferralModal = ({
         <Text size="sm">
           Share to: &nbsp;
           <TextButton
-            style={{ color: 'white' }}
+            style={{ color: "white" }}
             onClick={() => {
-              window.open(generateReferralTweet(
-                `https://airdrop.fluidity.money/${referralCode}`
-              ))
+              window.open(
+                generateReferralTweet(
+                  `https://airdrop.fluidity.money/${referralCode}`
+                )
+              );
             }}
           >
-            <Text
-              code
-              prominent
-              size={"sm"}
-            >
-              <Twitter style={{ height: "1em", fill: "currentColor", translate: '0 2px', marginRight: 2 }} />TWITTER
+            <Text code prominent size={"sm"}>
+              <Twitter
+                style={{
+                  height: "1em",
+                  fill: "currentColor",
+                  translate: "0 2px",
+                  marginRight: 2,
+                }}
+              />
+              TWITTER
             </Text>
           </TextButton>
         </Text>
       </div>
 
       {/* How It Works Divider / Links*/}
-      <div
-        className="referrals-inner-box"
-      >
+      <div className="referrals-inner-box">
         <div className="referrals-inner-switcher">
           <div className="referrals-inner-divider" />
           <GeneralButton
@@ -176,7 +187,9 @@ const ReferralModal = ({
             handleClick={() => setShowHowItWorks(true)}
             size={"small"}
           >
-            <Text size="sm" code style={{ color: 'inherit' }}>How It Works</Text>
+            <Text size="sm" code style={{ color: "inherit" }}>
+              How It Works
+            </Text>
           </GeneralButton>
           <div className="referrals-inner-divider" />
           <GeneralButton
@@ -185,7 +198,9 @@ const ReferralModal = ({
             handleClick={() => setShowHowItWorks(false)}
             size={"small"}
           >
-            <Text size="md" code style={{ color: 'inherit' }}>Links I&apos;ve Clicked</Text>
+            <Text size="md" code style={{ color: "inherit" }}>
+              Links I&apos;ve Clicked
+            </Text>
           </GeneralButton>
           <div className="referrals-inner-divider" />
         </div>
@@ -234,25 +249,39 @@ const HowItWorksContent = () => (
       {/* How it works Box Left*/}
       <div className="how-it-works-half">
         <div className="how-it-works-title">
-          <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+          <Text
+            code
+            size="md"
+            className="single-line"
+            style={{ textDecoration: "underline" }}
+          >
             YOU GET
           </Text>
           &nbsp;💸
         </div>
         <Text prominent size="sm">
-          <strong>10% of their airdrop</strong><br />earnings throughout the entire Epoch.
+          <strong>10% of their airdrop</strong>
+          <br />
+          earnings throughout the entire Epoch.
         </Text>
       </div>
       {/* How it works Box Right*/}
       <div className="how-it-works-half">
         <div className="how-it-works-title">
           🍾&nbsp;
-          <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+          <Text
+            code
+            size="md"
+            className="single-line"
+            style={{ textDecoration: "underline" }}
+          >
             THEY GET
           </Text>
         </div>
         <Text prominent size="sm">
-          <strong>10 Loot Bottles,</strong><br />not affected by your 10% reward.
+          <strong>10 Loot Bottles,</strong>
+          <br />
+          not affected by your 10% reward.
         </Text>
       </div>
     </Card>
@@ -296,11 +325,13 @@ const LinksClickedContent = ({
       type="transparent"
       icon={<ArrowRight />}
       handleClick={() => {
-        navigate(`/${network}/dashboard/airdrop`)
-        closeModal()
+        navigate(`/${network}/dashboard/airdrop`);
+        closeModal();
       }}
     >
-      <Text style={{ color: 'inherit' }} code size="sm">Go to Fluidity Airdrop Page</Text>
+      <Text style={{ color: "inherit" }} code size="sm">
+        Go to Fluidity Airdrop Page
+      </Text>
     </GeneralButton>
 
     <div className="links-clicked-stats">
@@ -341,7 +372,12 @@ const LinksClickedContent = ({
         <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {progress}/{progressReq}
         </Display>
-        <ProgressBar size="sm" value={progress} max={progressReq} style={{ marginTop: 10 }} />
+        <ProgressBar
+          size="sm"
+          value={progress}
+          max={progressReq}
+          style={{ marginTop: 10 }}
+        />
       </div>
     </div>
   </div>
