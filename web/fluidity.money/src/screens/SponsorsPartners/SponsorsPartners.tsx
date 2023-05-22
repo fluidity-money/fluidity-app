@@ -249,9 +249,8 @@ const SponsorsPartners = () => {
     <div className={`${styles.container} bg-dark`}>
       <Heading
         as="h1"
-        className={`${styles.SPtext} ${
-          width <= mobileBreakpoint ? styles.mobile : ""
-        }`}
+        className={`${styles.SPtext} ${width <= mobileBreakpoint ? styles.mobile : ""
+          }`}
       >
         {"Partners & Investors"}
       </Heading>

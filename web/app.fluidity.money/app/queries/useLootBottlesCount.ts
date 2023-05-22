@@ -8,7 +8,7 @@ const QUERY_REFERRALS_BY_ADDRESS = gql`
       ${Rarity.Common}: tier1
       ${Rarity.Uncommon}: tier2
       ${Rarity.Rare}: tier3
-      ${Rarity.UltraRare}: tier4 
+      ${Rarity.UltraRare}: tier4
       ${Rarity.Legendary}: tier5
     }
   }

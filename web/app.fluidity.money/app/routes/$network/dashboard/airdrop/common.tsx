@@ -158,10 +158,10 @@ const BottleSection = ({
         <Hoverable
           style={{ minWidth: 250 }}
           tooltipStyle={tooltipStyle}
-          tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+          tooltipContent="The amount of Loot Bottles you have earned from referring users with your link, and Loot Bottles you have claimed by clicking on links and performing the claim task."
         >
           <Text className="helper-label" size="xs">
-            Total Bottles earned from your link <InfoCircle />
+            Total Bottles earned from Clicked Links & Your Link <InfoCircle />
           </Text>
         </Hoverable>
       }
