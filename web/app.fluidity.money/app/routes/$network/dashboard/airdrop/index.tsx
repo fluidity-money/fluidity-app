@@ -302,12 +302,24 @@ const Airdrop = () => {
     fetchUserStakes(address);
   }, [address]);
 
+  const [localCookieConsent, setLocalCookieConsent] = useState<boolean | undefined>(
+    false
+  );
   const [localBottleCount, setLocalBottleCount] = useState<number | undefined>(undefined)
   const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] = useState<boolean | undefined>(undefined)
   const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<boolean | undefined>(undefined)
 
   useEffect(() => {
     if (!window) return
+    const cookieConsent = window.localStorage.getItem('cookieConsent')
+
+    if (cookieConsent === 'false') {
+      setLocalCookieConsent(false)
+      return
+    } else {
+      setLocalCookieConsent(true)
+    }
+
     const airdropHasVisited = window.localStorage.getItem('airdropHasVisited')
     const airdropBottleCount = window.localStorage.getItem('airdropBottleCount')
     const airdropShouldShowBottleNumbers = window.localStorage.getItem('airdropShouldShowBottleNumbers')
@@ -332,13 +344,13 @@ const Airdrop = () => {
   }, [])
 
   useEffect(() => {
-    if (!window) return
+    if (!window || !localCookieConsent) return
     if (localShouldShowBottleNumbers === undefined) return
     window.localStorage.setItem('airdropShouldShowBottleNumbers', localShouldShowBottleNumbers.toString())
   }, [localShouldShowBottleNumbers])
 
   useEffect(() => {
-    if (!window) return
+    if (!window || !localCookieConsent) return
     if (localShouldShowTutorial === undefined) return
     window.localStorage.setItem('airdropHasVisited', 'true')
     if (localShouldShowTutorial && !isMobile) {
