@@ -266,11 +266,13 @@ export default function Dashboard() {
     !closeMobileModal && setOpenMobModal(false);
   }, [closeMobileModal]);
 
+  const airdropMobileBreakpoint = 768;
+
   useEffect(() => {
     // if the referral modal is open and the screen size changes, close the modal and redirect to the mobile page
     if (!referralModalVisibility) return
 
-    const airdropMobileBreakpoint = 768;
+
     if (width <= airdropMobileBreakpoint && width > 0) {
       setReferralModalVisibility(false)
       navigate(`/${network}/dashboard/airdrop#referrals`)
@@ -440,7 +442,7 @@ export default function Dashboard() {
           position: "absolute",
           top: "1em",
           right: isTablet ? "20px" : "60px",
-          width: 550
+          width: 500
         }}
         color="holo"
         style={{ padding: 0, width: '100%' }}
@@ -646,7 +648,7 @@ export default function Dashboard() {
                 size="small"
                 layout="before"
                 handleClick={() => {
-                  isMobile || isTablet
+                  width < airdropMobileBreakpoint
                     ? navigate(`/${network}/dashboard/airdrop#referrals`)
                     : setReferralModalVisibility(true);
                 }}

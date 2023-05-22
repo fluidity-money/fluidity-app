@@ -200,6 +200,7 @@ const ReferralModal = ({
             progressReq={progressReq}
             network={network}
             navigate={navigate}
+            closeModal={closeModal}
           />
         )}
       </div>
@@ -239,7 +240,7 @@ const HowItWorksContent = () => (
           &nbsp;💸
         </div>
         <Text prominent size="sm">
-          <strong>10% of their airdrop</strong> earnings throughout the entire Epoch.
+          <strong>10% of their airdrop</strong><br />earnings throughout the entire Epoch.
         </Text>
       </div>
       {/* How it works Box Right*/}
@@ -251,7 +252,7 @@ const HowItWorksContent = () => (
           </Text>
         </div>
         <Text prominent size="sm">
-          <strong>10 Loot Bottles,</strong>&nbsp;not affected by your 10% reward.
+          <strong>10 Loot Bottles,</strong><br />not affected by your 10% reward.
         </Text>
       </div>
     </Card>
@@ -272,6 +273,7 @@ type ILinksClickedContent = {
   progressReq: number;
   network: string;
   navigate: NavigateFunction;
+  closeModal: () => void;
 };
 
 const LinksClickedContent = ({
@@ -281,38 +283,42 @@ const LinksClickedContent = ({
   progressReq,
   network,
   navigate,
+  closeModal,
 }: ILinksClickedContent) => (
-  <div className="referrals-content referrals-inner-content">
-    <Text size="md" prominent>
+  <div className="referrals-inner-content links-clicked-content">
+    <Text size="sm" prominent>
       In order to claim your referral rewards, you must earn 10 Loot Bottles for{" "}
       <strong style={{ color: "yellow" }}>each</strong> unclaimed referral.
     </Text>
     <GeneralButton
       layout="after"
-      size="large"
+      size="small"
       type="transparent"
       icon={<ArrowRight />}
-      handleClick={() => navigate(`/${network}/dashboard/airdrop`)}
+      handleClick={() => {
+        navigate(`/${network}/dashboard/airdrop`)
+        closeModal()
+      }}
     >
-      Go to Fluidity Airdrop Page
+      <Text style={{ color: 'inherit' }} code size="sm">Go to Fluidity Airdrop Page</Text>
     </GeneralButton>
 
     <div className="links-clicked-stats">
       <div className="statistics-set">
-        <Text size="lg" className="single-line">
+        <Text size="sm" className="single-line">
           Claimed
           <div className="dot green" />
         </Text>
         <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {claimed}
         </Display>
-        <Text size="md" code>
+        <Text size="sm" code>
           {claimed * progressReq} BOTTLES
         </Text>
       </div>
 
       <div className="statistics-set">
-        <Text size="lg" className="single-line">
+        <Text size="sm" className="single-line">
           Unclaimed
           <div className="dot red" />
         </Text>
@@ -331,11 +337,11 @@ const LinksClickedContent = ({
       </div>
 
       <div className="statistics-set">
-        <Text size="lg">Until Next Claim</Text>
+        <Text size="sm">Until Next Claim</Text>
         <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
           {progress}/{progressReq}
         </Display>
-        <ProgressBar value={progress} max={progressReq} />
+        <ProgressBar size="sm" value={progress} max={progressReq} style={{ marginTop: 10 }} />
       </div>
     </div>
   </div>
