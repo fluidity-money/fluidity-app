@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -149,8 +149,7 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}`
   );
 
@@ -201,7 +200,19 @@ const Airdrop = () => {
     },
   } = data;
 
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const location = useLocation();
+
+
+  const [currentModal, setCurrentModal] = useState<string | null>(location.hash.replace("#", "") || null);
+
+  useEffect(() => {
+    if (!currentModal) {
+      navigate(location.pathname, { replace: true });
+      return
+    }
+    navigate(`#${currentModal}`, { replace: true });
+  }, [currentModal])
+
   const [stakes, setStakes] = useState<
     Array<{
       fluidAmount: BN;
@@ -259,14 +270,13 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
-        <TabButton size="small" onClick={() => setCurrentModal(null)}>
+        <TabButton size="small" onClick={() => setCurrentModal(null)} groupId="airdrop" isSelected={isMobile ? currentModal === null : true}>
           Airdrop Dashboard
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
+        <TabButton size="small" onClick={() => setCurrentModal("tutorial")} groupId="airdrop" isSelected={isMobile && currentModal === "tutorial"}>
           Airdrop Tutorial
         </TabButton>
         <TabButton
@@ -277,19 +287,23 @@ const Airdrop = () => {
                 block: "start",
                 behavior: "smooth",
               });
+            } else {
+              setCurrentModal("leaderboard");
             }
-            setCurrentModal("leaderboard");
           }}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "leaderboard"}
         >
           Leaderboard
         </TabButton>
         <TabButton
           size="small"
-          onClick={() => setCurrentModal("referral-details")}
+          onClick={() => setCurrentModal("referrals")}
+          groupId="airdrop" isSelected={isMobile && currentModal === "referrals"}
         >
           Referrals
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
+        <TabButton size="small" onClick={() => setCurrentModal("stake")} groupId="airdrop" isSelected={isMobile && currentModal === "stake"}>
           Stake
         </TabButton>
       </div>
@@ -303,14 +317,13 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${
-            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-          }`}
+          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+            }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
-              currentModal === "tutorial" || currentModal === "leaderboard"
+              currentModal === "tutorial" || currentModal === "leaderboard" || currentModal === "stake"
                 ? "0.5em"
                 : "2em",
           }}
@@ -335,8 +348,16 @@ const Airdrop = () => {
                   <LinkButton
                     size="medium"
                     type="external"
+                    style={{
+                      display: "inline-flex",
+                      textDecoration: "underline",
+                      textUnderlineOffset: 2,
+                    }}
                     handleClick={() => {
-                      return;
+                      window.open(
+                        "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                        "_blank"
+                      );
                     }}
                   >
                     Learn more
@@ -358,7 +379,7 @@ const Airdrop = () => {
                 </TextButton>
               </div>
               <AirdropStats
-                seeReferralsDetails={() => setCurrentModal("referral-details")}
+                seeReferralsDetails={() => setCurrentModal("referrals")}
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
                 seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
@@ -370,7 +391,7 @@ const Airdrop = () => {
               <MultiplierTasks />
               <MyMultiplier
                 seeMyStakingStats={() => setCurrentModal("staking-stats")}
-                seeStakeNow={() => setCurrentModal("stake-now")}
+                seeStakeNow={() => setCurrentModal("stake")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
                 wethPrice={wethPrice}
@@ -399,7 +420,7 @@ const Airdrop = () => {
               />
             </>
           )}
-          {currentModal === "stake-now" && (
+          {currentModal === "stake" && (
             <>
               <Heading as="h3" className="no-margin">
                 Stake Now
@@ -438,7 +459,7 @@ const Airdrop = () => {
       {/* Modals */}
       <CardModal
         id="referral-details"
-        visible={currentModal === "referral-details"}
+        visible={currentModal === "referrals"}
         closeModal={closeModal}
         style={{ gap: "1em" }}
       >
@@ -465,8 +486,8 @@ const Airdrop = () => {
         />
       </CardModal>
       <CardModal
-        id="stake-now"
-        visible={currentModal === "stake-now"}
+        id="stake"
+        visible={currentModal === "stake"}
         closeModal={closeModal}
         style={{ gap: "2em" }}
       >
@@ -547,7 +568,10 @@ const Airdrop = () => {
                     textUnderlineOffset: 2,
                   }}
                   handleClick={() => {
-                    return;
+                    window.open(
+                      "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                      "_blank"
+                    );
                   }}
                 >
                   Learn more
@@ -555,7 +579,7 @@ const Airdrop = () => {
               </Text>
             </div>
             <AirdropStats
-              seeReferralsDetails={() => setCurrentModal("referral-details")}
+              seeReferralsDetails={() => setCurrentModal("referrals")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
               seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
               epochMax={epochDaysTotal}
@@ -566,7 +590,7 @@ const Airdrop = () => {
             <MultiplierTasks />
             <MyMultiplier
               seeMyStakingStats={() => setCurrentModal("staking-stats")}
-              seeStakeNow={() => setCurrentModal("stake-now")}
+              seeStakeNow={() => setCurrentModal("stake")}
               liquidityMultiplier={liquidityMultiplier}
               stakes={stakes}
               wethPrice={wethPrice}
@@ -587,10 +611,9 @@ const Airdrop = () => {
         <GeneralButton
           type="transparent"
           icon={
-            <span style={{ fill: "none", transform: "rotate(90deg)" }}>
-              <ArrowRight />
-            </span>
+            <ArrowRight />
           }
+          className="scroll-to-leaderboard-button"
           onClick={() => {
             leaderboardRef.current?.scrollIntoView({
               block: "start",
@@ -718,8 +741,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  console.log("TODO REDIRECT");
-                }
+                console.log("TODO REDIRECT");
+              }
               : seeBottlesDetails
           }
           style={{
@@ -883,6 +906,17 @@ const MyMultiplier = ({
     0
   );
 
+  // if there are no stakes, this renders an empty stake on the dashboard which is A PART OF THE DESIGN SPEC
+  if (stakes.length === 0)
+    stakes = [
+      {
+        fluidAmount: new BN(0),
+        baseAmount: new BN(0),
+        durationDays: 0,
+        depositDate: new Date(),
+      },
+    ];
+
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
@@ -947,7 +981,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
+                  0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -967,8 +1001,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                ? 0
-                : -1;
+                  ? 0
+                  : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1040,9 +1074,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
-        address === user ? "highlighted-row" : ""
-      }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
+        }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1061,8 +1094,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1077,8 +1110,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1093,8 +1126,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1109,8 +1142,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1125,8 +1158,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >

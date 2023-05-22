@@ -13,6 +13,7 @@
   padding: 10px 4px;
   gap: 12px;
   cursor: pointer;
+  position: relative;
 
   &:hover:enabled {
     color: map-get($text, 'prominent');
@@ -45,6 +46,10 @@
     border-radius: 0px;
     cursor: default;
   }
+
+  &.selected {
+    color: white;
+  }
 }
 
 .default {
@@ -61,4 +66,12 @@
   font-size: 16px;
   line-height: 120%;
   letter-spacing: 0.01em;
+}
+
+.underline {
+  width: calc(100% - 8px);
+  position: absolute;
+  bottom: 1px;
+  left: 4px;
+  border-bottom: 1px solid white;
 }
