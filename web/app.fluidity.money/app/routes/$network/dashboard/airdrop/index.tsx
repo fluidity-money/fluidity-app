@@ -49,10 +49,11 @@ import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
+import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 
 const EPOCH_DAYS_TOTAL = 31;
-// temp: april 19th, 2023
-const EPOCH_START_DATE = new Date(2023, 3, 20);
+// temp: may 22nd, 2023
+const EPOCH_START_DATE = new Date(2023, 4, 22);
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
@@ -117,6 +118,18 @@ const SAFE_DEFAULT_REFERRALS: ReferralCountLoaderData = {
   loaded: false,
 };
 
+const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
+  bottleTiers: {
+    [Rarity.Common]: 0,
+    [Rarity.Uncommon]: 0,
+    [Rarity.Rare]: 0,
+    [Rarity.UltraRare]: 0,
+    [Rarity.Legendary]: 0,
+  },
+  bottlesCount: 0,
+  loaded: false,
+};
+
 const Airdrop = () => {
   const {
     epochDaysTotal,
@@ -158,6 +171,11 @@ const Airdrop = () => {
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
 
+  const { data: referralLootboxData } =
+    useCache<ReferralBottlesCountLoaderData>(
+      address ? `/${network}/query/referralBottles?address=${address}` : ""
+    );
+
   const { width } = useViewport();
 
   const navigate = useNavigate();
@@ -179,6 +197,10 @@ const Airdrop = () => {
       ...SAFE_DEFAULT_REFERRALS,
       ...referralData,
     },
+    referralBottles: {
+      ...SAFE_DEFAULT_REFERRAL_LOOTBOTTLES,
+      ...referralLootboxData,
+    },
   };
 
   const {
@@ -199,9 +221,13 @@ const Airdrop = () => {
       leaderboard: leaderboardRows,
       loaded: leaderboardLoaded,
     },
+    referralBottles: {
+      bottleTiers: referralBottleTiers,
+      bottlesCount: referralBottlesCount,
+      loaded: referralBottlesLoaded,
+    },
   } = data;
 
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
   const [stakes, setStakes] = useState<
     Array<{
       fluidAmount: BN;
@@ -210,6 +236,26 @@ const Airdrop = () => {
       depositDate: Date;
     }>
   >([]);
+
+  const fetchUserStakes = async (address: string) => {
+    const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+    setStakes(stakingDeposits);
+  };
+
+  const fetchUserTokenBalance = async () => {
+    const userTokenBalance = await Promise.all(
+      tokens.map(async ({ address }) => (await balance?.(address)) || new BN(0))
+    );
+
+    return setTokens(
+      tokens.map((token, i) => ({
+        ...token,
+        userTokenBalance: userTokenBalance[i],
+      }))
+    );
+  };
+
+  const [currentModal, setCurrentModal] = useState<string | null>(null);
 
   const closeModal = () => {
     setCurrentModal(null);
@@ -233,25 +279,9 @@ const Airdrop = () => {
       );
     }
 
-    (async () => {
-      const userTokenBalance = await Promise.all(
-        tokens.map(
-          async ({ address }) => (await balance?.(address)) || new BN(0)
-        )
-      );
+    fetchUserTokenBalance();
 
-      return setTokens(
-        tokens.map((token, i) => ({
-          ...token,
-          userTokenBalance: userTokenBalance[i],
-        }))
-      );
-    })();
-
-    (async () => {
-      const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
-      setStakes(stakingDeposits);
-    })();
+    fetchUserStakes(address);
   }, [address]);
 
   const leaderboardRef = useRef<HTMLDivElement>(null);
@@ -419,6 +449,10 @@ const Airdrop = () => {
                 isMobile={isMobile}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+                stakeCallback={() => {
+                  fetchUserStakes(address ?? "");
+                  fetchUserTokenBalance();
+                }}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
@@ -443,8 +477,8 @@ const Airdrop = () => {
         style={{ gap: "1em" }}
       >
         <ReferralDetailsModal
-          bottles={bottleTiers}
-          totalBottles={bottlesCount}
+          bottles={referralBottleTiers}
+          totalBottles={referralBottlesCount}
           activeReferrerReferralsCount={numActiveReferrerReferrals}
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
@@ -483,6 +517,10 @@ const Airdrop = () => {
           wethPrice={wethPrice}
           usdcPrice={usdcPrice}
           isMobile={isMobile}
+          stakeCallback={() => {
+            fetchUserStakes(address ?? "");
+            fetchUserTokenBalance();
+          }}
         />
       </CardModal>
       <CardModal
@@ -708,7 +746,7 @@ const AirdropStats = ({
       <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
           <Text prominent size="xl">
-            {toSignificantDecimals(totalBottles, 0)}
+            {Math.round(totalBottles * 100) / 100}
           </Text>
         </LabelledValue>
         <LinkButton
@@ -1322,6 +1360,6 @@ const BottleProgress = ({
 };
 
 export const dayDifference = (date1: Date, date2: Date) =>
-  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
+  Math.round(Math.abs(date1.valueOf() - date2.valueOf()) / 1000 / 60 / 60 / 24);
 
 export default Airdrop;

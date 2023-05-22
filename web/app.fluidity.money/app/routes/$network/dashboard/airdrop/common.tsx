@@ -62,6 +62,10 @@ const BottleDistribution = ({
 }: IBottleDistribution) => (
   <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
+      const highlightBottle =
+        highlightBottleNumberIndex === undefined ||
+        highlightBottleNumberIndex === index;
+
       return (
         <div
           key={index}
@@ -74,11 +78,7 @@ const BottleDistribution = ({
             quantity={quantity}
             style={{
               marginBottom: "0.6em",
-              opacity:
-                highlightBottleNumberIndex === undefined ||
-                highlightBottleNumberIndex !== index
-                  ? 0.2
-                  : 1,
+              opacity: !highlightBottle ? 0.2 : 1,
               ...(handleClickBottle ? { cursor: "pointer" } : {}),
             }}
           />
@@ -89,10 +89,7 @@ const BottleDistribution = ({
             {rarity.replace("_", " ")}
           </Text>
           <Text
-            prominent={
-              highlightBottleNumberIndex === undefined ||
-              highlightBottleNumberIndex === index
-            }
+            prominent={highlightBottle}
             style={
               numberPosition === "absolute"
                 ? {
@@ -100,19 +97,19 @@ const BottleDistribution = ({
                     bottom: "100px",
                     zIndex: "5",
                     ...(showBottleNumbers
-                      ? highlightBottleNumberIndex === index
+                      ? highlightBottle
                         ? {
                             fontSize: "2.5em",
                           }
                         : {}
-                      : highlightBottleNumberIndex === index
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
                   }
                 : { fontSize: "1em" }
             }
           >
-            {Math.floor(quantity * 10) / 10}
+            {Math.round(quantity * 100) / 100}
           </Text>
         </div>
       );
@@ -175,7 +172,7 @@ const ReferralDetailsModal = ({
             </Hoverable>
           }
         >
-          {totalBottles}
+          {Math.round(totalBottles * 100) / 100}
         </LabelledValue>
       </div>
       <Hoverable
@@ -621,6 +618,7 @@ interface IStakingNowModal {
   isMobile: boolean;
   wethPrice: number;
   usdcPrice: number;
+  stakeCallback: () => void;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -651,6 +649,7 @@ const StakeNowModal = ({
   isMobile,
   wethPrice,
   usdcPrice,
+  stakeCallback,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -891,11 +890,15 @@ const StakeNowModal = ({
           return true;
         }
         case "CamelotRouter: INSUFFICIENT_A_AMOUNT": {
-          setStakeErr("Insufficient Base Tokens");
+          setStakeErr(
+            "Insufficient Base Tokens - Increase Slippage or Set Custom Amount"
+          );
           return false;
         }
         case "CamelotRouter: INSUFFICIENT_B_AMOUNT": {
-          setStakeErr("Insufficient Fluid Tokens");
+          setStakeErr(
+            "Insufficient Fluid Tokens - Increase Slippage or Set Custom Amount"
+          );
           return false;
         }
         default: {
@@ -931,11 +934,12 @@ const StakeNowModal = ({
 
         setStakingState("complete");
       }
+
+      stakeCallback();
     } catch (e) {
       setStakeErr(
         typeof e === "object" ? "User Rejected Transaction" : (e as string)
       );
-    } finally {
       setStakingState("ready");
     }
   };
@@ -1220,11 +1224,14 @@ const StakeNowModal = ({
           </Text>
           <input
             className={"staking-modal-token-input"}
-            pattern="[0-9]"
+            pattern="[0-9]*"
             min={1}
             value={slippage}
             max={50}
-            onChange={(e) => setSlippage(Math.floor(e.target.valueAsNumber))}
+            onChange={(e) => {
+              console.log(e.currentTarget.value);
+              setSlippage(Math.floor(parseInt(e.target.value) || 0));
+            }}
           />
         </div>
         <div
@@ -1336,7 +1343,17 @@ const StakeNowModal = ({
       {stakingState === "complete" ? (
         <GeneralButton
           className={"staking-modal-complete"}
-          handleClick={() => setStakingState("ready")}
+          handleClick={() => {
+            setFluidToken({
+              ...fluidToken,
+              amount: "0",
+            });
+            setBaseToken({
+              ...baseToken,
+              amount: "0",
+            });
+            setStakingState("ready");
+          }}
         >
           {buttonText}
         </GeneralButton>
