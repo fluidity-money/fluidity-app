@@ -370,7 +370,7 @@ const LinksClickedContent = ({
       <div className="statistics-set">
         <Text size="sm">Until Next Claim</Text>
         <Display size={"xs"} style={{ margin: "0.2em 0 0.2em 0" }}>
-          {progress}/{progressReq}
+          {Math.floor(progress * 10) / 10}/{progressReq}
         </Display>
         <ProgressBar
           size="sm"
