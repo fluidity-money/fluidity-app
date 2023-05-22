@@ -37,67 +37,69 @@ type IReferraModal = {
 
 const CopyGroup = ({ referralCode }: { referralCode: string }) => {
   const [linkCopied, setLinkCopied] = useState(false);
-  return <div className="referrals-copy-group">
-    <Card
-      component="button"
-      type="transparent"
-      border="dashed"
-      color="gray"
-      rounded
-      onClick={highlightText}
-    >
-      <Text
-        className="referrals-copyable-link"
-        code
-      >{`https://airdrop.fluidity.money/${referralCode}`}</Text>
-    </Card>
-
-    {/* Copy Button */}
-    <GeneralButton
-      className={"referrals-copy-button"}
-      type={"transparent"}
-      buttontype={"icon before"}
-      handleClick={() => {
-        navigator.clipboard.writeText(
-          `https://airdrop.fluidity.money/${referralCode}`
-        );
-        setLinkCopied(true);
-      }}
-      size={"medium"}
-      icon={<CopyIcon />}
-    >
-      <Text size="lg" prominent bold style={{ color: "inherit" }}>
-        {!linkCopied ? "Copy Link" : "Link Copied!"}
-      </Text>
-    </GeneralButton>
-    {/*Share Button*/}
-    <Text size="sm">
-      Share to: &nbsp;
-      <TextButton
-        style={{ color: "white", marginTop: '1.5em' }}
-        onClick={() => {
-          window.open(
-            generateReferralTweet(
-              `https://airdrop.fluidity.money/${referralCode}`
-            )
-          );
-        }}
+  return (
+    <div className="referrals-copy-group">
+      <Card
+        component="button"
+        type="transparent"
+        border="dashed"
+        color="gray"
+        rounded
+        onClick={highlightText}
       >
-        <Text code prominent size={"sm"}>
-          <Twitter
-            style={{
-              height: "1em",
-              fill: "currentColor",
-              translate: "0 2px",
-              marginRight: 2,
-            }}
-          />
-          TWITTER
+        <Text
+          className="referrals-copyable-link"
+          code
+        >{`https://airdrop.fluidity.money/${referralCode}`}</Text>
+      </Card>
+
+      {/* Copy Button */}
+      <GeneralButton
+        className={"referrals-copy-button"}
+        type={"transparent"}
+        buttontype={"icon before"}
+        handleClick={() => {
+          navigator.clipboard.writeText(
+            `https://airdrop.fluidity.money/${referralCode}`
+          );
+          setLinkCopied(true);
+        }}
+        size={"medium"}
+        icon={<CopyIcon />}
+      >
+        <Text size="lg" prominent bold style={{ color: "inherit" }}>
+          {!linkCopied ? "Copy Link" : "Link Copied!"}
         </Text>
-      </TextButton>
-    </Text>
-  </div>
-}
+      </GeneralButton>
+      {/*Share Button*/}
+      <Text size="sm">
+        Share to: &nbsp;
+        <TextButton
+          style={{ color: "white", marginTop: "1.5em" }}
+          onClick={() => {
+            window.open(
+              generateReferralTweet(
+                `https://airdrop.fluidity.money/${referralCode}`
+              )
+            );
+          }}
+        >
+          <Text code prominent size={"sm"}>
+            <Twitter
+              style={{
+                height: "1em",
+                fill: "currentColor",
+                translate: "0 2px",
+                marginRight: 2,
+              }}
+            />
+            TWITTER
+          </Text>
+        </TextButton>
+      </Text>
+    </div>
+  );
+};
 
 const ReferralModal = ({
   connected,
@@ -227,7 +229,9 @@ const ReferralModal = ({
 };
 
 const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
-  <div className={`referrals-inner-content ${isMobile ? 'airdrop-mobile' : ''}`}>
+  <div
+    className={`referrals-inner-content ${isMobile ? "airdrop-mobile" : ""}`}
+  >
     <div className="spread-center">
       <div className="single-line">
         <img style={{ width: "1.25em" }} src={"/images/icons/circle1.svg"} />
@@ -289,7 +293,10 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
       </div>
     </Card>
     <div className="how-it-works-warning-container">
-      <img style={{ width: isMobile ? "auto" : "50px" }} src="/images/icons/circleInfo.svg" />
+      <img
+        style={{ width: isMobile ? "auto" : "50px" }}
+        src="/images/icons/circleInfo.svg"
+      />
       <Text prominent size="sm" className="how-it-works-warning-text">
         They will have to earn 10 Loot Boxes for each referral in order to claim
         their reward and activate yours.
@@ -387,4 +394,4 @@ const LinksClickedContent = ({
 );
 
 export default ReferralModal;
-export { CopyGroup, HowItWorksContent }
+export { CopyGroup, HowItWorksContent };
