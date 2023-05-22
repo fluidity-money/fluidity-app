@@ -134,7 +134,7 @@ interface IReferralDetailsModal {
 
 const BottleSection = ({
   tooltipStyle,
-  activeRefereeReferralsCount,
+  activeReferrerReferralsCount,
   totalBottles,
 }: Partial<IReferralDetailsModal>) => (
   <div className="referral-details-container">
@@ -151,7 +151,7 @@ const BottleSection = ({
         </Hoverable>
       }
     >
-      {activeRefereeReferralsCount}
+      {activeReferrerReferralsCount}
     </LabelledValue>
     <LabelledValue
       label={
@@ -174,6 +174,7 @@ const BottleSection = ({
 const ReferralDetailsModal = ({
   bottles,
   totalBottles,
+  activeReferrerReferralsCount,
   activeRefereeReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
@@ -192,7 +193,7 @@ const ReferralDetailsModal = ({
       )}
       <BottleSection
         totalBottles={totalBottles}
-        activeRefereeReferralsCount={activeRefereeReferralsCount}
+        activeReferrerReferralsCount={activeReferrerReferralsCount}
         tooltipStyle={tooltipStyle}
       />
       {showCopyGroup && referralCode && (
