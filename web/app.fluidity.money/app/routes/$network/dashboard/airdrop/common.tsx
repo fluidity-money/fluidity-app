@@ -2,8 +2,7 @@ import type {
   StakingRatioRes,
   StakingDepositsRes,
 } from "~/util/chainUtils/ethereum/transaction";
-
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -25,6 +24,7 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
+  LinkVerticalIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -38,6 +38,7 @@ import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
+import FluidityFacadeContext from "contexts/FluidityFacade";
 
 const MAX_EPOCH_DAYS = 31;
 
@@ -62,6 +63,10 @@ const BottleDistribution = ({
 }: IBottleDistribution) => (
   <div className="bottle-distribution-container" {...props}>
     {Object.entries(bottles).map(([rarity, quantity], index) => {
+      const highlightBottle =
+        highlightBottleNumberIndex === undefined ||
+        highlightBottleNumberIndex === index;
+
       return (
         <div
           key={index}
@@ -74,11 +79,7 @@ const BottleDistribution = ({
             quantity={quantity}
             style={{
               marginBottom: "0.6em",
-              opacity:
-                highlightBottleNumberIndex === undefined ||
-                  highlightBottleNumberIndex !== index
-                  ? 0.2
-                  : 1,
+              opacity: !highlightBottle ? 0.2 : 1,
               ...(handleClickBottle ? { cursor: "pointer" } : {}),
             }}
           />
@@ -89,30 +90,27 @@ const BottleDistribution = ({
             {rarity.replace("_", " ")}
           </Text>
           <Text
-            prominent={
-              highlightBottleNumberIndex === undefined ||
-              highlightBottleNumberIndex === index
-            }
+            prominent={highlightBottle}
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottleNumberIndex === index
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottleNumberIndex === index
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottle
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
-            {Math.floor(quantity * 10) / 10}
+            {Math.round(quantity * 100) / 100}
           </Text>
         </div>
       );
@@ -164,7 +162,7 @@ const BottleSection = ({
         </Hoverable>
       }
     >
-      {totalBottles}
+      {Math.round((totalBottles || 0) * 100) / 100}
     </LabelledValue>
   </div>
 
@@ -632,6 +630,7 @@ interface IStakingNowModal {
   isMobile: boolean;
   wethPrice: number;
   usdcPrice: number;
+  stakeCallback: () => void;
 }
 
 type StakingAugmentedToken = AugmentedToken & {
@@ -648,8 +647,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -662,6 +661,7 @@ const StakeNowModal = ({
   isMobile,
   wethPrice,
   usdcPrice,
+  stakeCallback,
 }: IStakingNowModal) => {
   const [fluidToken, setFluidToken] = useState<StakingAugmentedToken>({
     ...fluidTokens[0],
@@ -680,6 +680,9 @@ const StakeNowModal = ({
   // and maximum base token spread, to the factor of 12
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
 
+  // Force recommended token ratio
+  const [lockRatio, setLockRatio] = useState(true);
+
   // Convert proportion of Base Tokens in Pool to Fluid:Base Token ratio
   // `prop` = base / (base + fluid)
   const calculateRatioFromProportion = (baseTokenProp: number) => {
@@ -696,14 +699,14 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      baseToken.symbol === "USDC"
-        ? (tokenRatios.fusdcUsdcRatio.toNumber() -
-          tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
-        1e12
-        : (tokenRatios.fusdcWethRatio.toNumber() -
-          tokenRatios.fusdcWethSpread.toNumber() / 2) /
-        1e12
-    );
+        baseToken.symbol === "USDC"
+          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+              1e12
+          : (tokenRatios.fusdcWethRatio.toNumber() -
+              tokenRatios.fusdcWethSpread.toNumber() / 2) /
+              1e12
+      );
 
   const fluidUsdMultiplier = usdcPrice;
   const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
@@ -765,30 +768,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const tokenAmtStr =
-          dec !== undefined
-            ? [whole, dec.slice(0 - token.decimals)].join(".")
-            : whole ?? "0";
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-        setInput({
-          ...token,
-          amount: tokenAmtStr,
-        });
+      setInput({
+        ...token,
+        amount: tokenAmtStr,
+      });
 
-        if (!tokenAmtStr) return;
+      if (!lockRatio) return;
+      if (!tokenAmtStr) return;
 
-        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-        setOtherInput({
-          ...otherToken,
-          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-        });
-      };
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+      });
+    };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -902,11 +906,15 @@ const StakeNowModal = ({
           return true;
         }
         case "CamelotRouter: INSUFFICIENT_A_AMOUNT": {
-          setStakeErr("Insufficient Base Tokens");
+          setStakeErr(
+            "Insufficient Base Tokens - Increase Slippage or Set Custom Amount"
+          );
           return false;
         }
         case "CamelotRouter: INSUFFICIENT_B_AMOUNT": {
-          setStakeErr("Insufficient Fluid Tokens");
+          setStakeErr(
+            "Insufficient Fluid Tokens - Increase Slippage or Set Custom Amount"
+          );
           return false;
         }
         default: {
@@ -942,11 +950,12 @@ const StakeNowModal = ({
 
         setStakingState("complete");
       }
+
+      stakeCallback();
     } catch (e) {
       setStakeErr(
         typeof e === "object" ? "User Rejected Transaction" : (e as string)
       );
-    } finally {
       setStakingState("ready");
     }
   };
@@ -974,7 +983,7 @@ const StakeNowModal = ({
 
   return (
     <>
-      {!isMobile &&
+      {!isMobile && (
         <Card
           type="opaque"
           rounded
@@ -988,13 +997,15 @@ const StakeNowModal = ({
           }}
         >
           <Text style={{ color: "black" }} size="sm">
-            👀 TIP: Stake over 31 days for more rewards in future epochs & events!
-            🌊
+            👀 TIP: Stake over 31 days for more rewards in future epochs &
+            events! 🌊
           </Text>
         </Card>
-      }
+      )}
       <div
-        className={`airdrop-stake-container ${isMobile ? 'airdrop-mobile' : ''}`}
+        className={`airdrop-stake-container ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         {/* Staking Amount */}
         <div
@@ -1011,7 +1022,7 @@ const StakeNowModal = ({
               justifyContent: "space-between",
               flexDirection: "row",
               alignItems: "center",
-              gap: "0.5em",
+              gap: "1em",
             }}
           >
             <Hoverable
@@ -1023,17 +1034,29 @@ const StakeNowModal = ({
                 STAKE AMOUNT <InfoCircle />
               </Text>
             </Hoverable>
-            <GeneralButton
-              type="transparent"
-              size="small"
-              handleClick={() => inputMaxBalance()}
-              style={{
-                padding: "0.5em 1em",
-                borderRadius: "100px",
-              }}
-            >
-              <Text size="sm">MAX</Text>
-            </GeneralButton>
+            <div className="airdrop-stake-buttons">
+              <GeneralButton
+                type={lockRatio ? "primary" : "transparent"}
+                size="small"
+                handleClick={() => setLockRatio(!lockRatio)}
+                style={{
+                  width: "2px",
+                  padding: "0.5em 0.5em",
+                }}
+                icon={<LinkVerticalIcon />}
+              ></GeneralButton>
+              <GeneralButton
+                type="transparent"
+                size="small"
+                handleClick={() => inputMaxBalance()}
+                style={{
+                  padding: "0.5em 1em",
+                  borderRadius: "100px",
+                }}
+              >
+                <Text size="sm">MAX</Text>
+              </GeneralButton>
+            </div>
           </div>
           {showTokenSelector === "fluid" ? (
             <div className="staking-modal-token-selector">
@@ -1170,7 +1193,7 @@ const StakeNowModal = ({
               <div
                 className="staking-modal-token-insufficient"
                 style={{
-                  display: fluidTokenAmount.gt(fluidToken.userTokenBalance)
+                  display: baseTokenAmount.gt(baseToken.userTokenBalance)
                     ? "flex"
                     : "none",
                 }}
@@ -1191,11 +1214,11 @@ const StakeNowModal = ({
           </Text>
         </div>
         {/* Arrow */}
-        {!isMobile &&
+        {!isMobile && (
           <div className="staking-modal-arrow-container">
             <ArrowRight />
           </div>
-        }
+        )}
         {/* Duration */}
         <div className="duration-column">
           <div className="duration-col-header">
@@ -1208,16 +1231,19 @@ const StakeNowModal = ({
                 DURATION <InfoCircle />
               </Text>
             </Hoverable>
-            {isMobile && <Hoverable
-              style={{ minWidth: 250 }}
-              tooltipStyle={tooltipStyle}
-              tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
-            >
-              <Text code className="helper-label">
-                END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
-                <InfoCircle />
-              </Text>
-            </Hoverable>}
+            {isMobile && (
+              <Hoverable
+                style={{ minWidth: 250 }}
+                tooltipStyle={tooltipStyle}
+                tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
+              >
+                <Text code className="helper-label">
+                  END:{" "}
+                  <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+                  <InfoCircle />
+                </Text>
+              </Hoverable>
+            )}
           </div>
           <Display className="no-margin">
             {stakingDuration} D{/* Scrollbar */}
@@ -1228,18 +1254,19 @@ const StakeNowModal = ({
             step={1}
             valueCallback={(value: number) => setStakingDuration(value)}
           />
-          {!isMobile &&
+          {!isMobile && (
             <Hoverable
               style={{ minWidth: 250 }}
               tooltipStyle={tooltipStyle}
               tooltipContent="The end date of staking, when you can reclaim your provided liquidity."
             >
               <Text code className="helper-label">
-                END: <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
+                END:{" "}
+                <Text prominent>{endDate.toLocaleDateString("en-US")}</Text>{" "}
                 <InfoCircle />
               </Text>
             </Hoverable>
-          }
+          )}
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
@@ -1252,14 +1279,17 @@ const StakeNowModal = ({
           </Hoverable>
           <input
             className={"staking-modal-token-input"}
-            pattern="[0-9]"
+            pattern="[0-9]*"
             min={1}
             value={slippage}
             max={50}
-            onChange={(e) => setSlippage(Math.floor(e.target.valueAsNumber))}
+            onChange={(e) => {
+              console.log(e.currentTarget.value);
+              setSlippage(Math.floor(parseInt(e.target.value) || 0));
+            }}
           />
         </div>
-        {!isMobile &&
+        {!isMobile && (
           <div
             style={{
               width: "100%",
@@ -1267,7 +1297,7 @@ const StakeNowModal = ({
               gridColumn: "1 / span 3",
             }}
           />
-        }
+        )}
         <div className="power-column">
           <Hoverable
             style={{ minWidth: 250 }}
@@ -1295,7 +1325,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(1, stakingDuration),
+                stakingLiquidityMultiplierEq(1, stakingDuration),
               1
             )}
           </Text>
@@ -1319,11 +1349,11 @@ const StakeNowModal = ({
             </Card>
           )}
         </div>
-        {!isMobile &&
+        {!isMobile && (
           <div className="staking-modal-arrow-container">
             <ArrowRight />
           </div>
-        }
+        )}
         <div className="power-column rhs">
           <Hoverable
             style={{ minWidth: 250 }}
@@ -1346,7 +1376,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1490,25 +1520,29 @@ const tutorialContent: {
   },
   "4": {
     title: "LEARN MORE",
-    desc: <Text size="md">
-      To learn more about the Airdrop and Fluidity, check out the Airdrop announcement post: <LinkButton
-        size="medium"
-        type="external"
-        style={{
-          display: "inline-flex",
-          textDecoration: "underline",
-          textUnderlineOffset: 2,
-        }}
-        handleClick={() => {
-          window.open(
-            "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
-            "_blank"
-          );
-        }}
-      >
-        LEARN MORE
-      </LinkButton>
-    </Text>,
+    desc: (
+      <Text size="md">
+        To learn more about the Airdrop and Fluidity, check out the Airdrop
+        announcement post:{" "}
+        <LinkButton
+          size="medium"
+          type="external"
+          style={{
+            display: "inline-flex",
+            textDecoration: "underline",
+            textUnderlineOffset: 2,
+          }}
+          handleClick={() => {
+            window.open(
+              "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+              "_blank"
+            );
+          }}
+        >
+          LEARN MORE
+        </LinkButton>
+      </Text>
+    ),
     image: "AIRDROP_DEEP_DIVE",
   },
 };
@@ -1594,8 +1628,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1610,6 +1645,119 @@ const TutorialModal = ({
   );
 };
 
+const TestnetRewardsModal = () => {
+  const {
+    confirmAccountOwnership,
+    signOwnerAddress,
+    address: signerAddress,
+  } = useContext(FluidityFacadeContext);
+  const [address, setAddress] = useState("");
+  const [ropstenAddress, setRopstenAddress] = useState("");
+  const [signature, setSignature] = useState("");
+  const [manualSignature, setManualSignature] = useState("");
+  const [finalised, setFinalised] = useState(false);
+
+  if (!confirmAccountOwnership || !signOwnerAddress) return <></>;
+
+  if (finalised) {
+    return (
+      <div>
+        <Heading>Claim Testnet Rewards</Heading>
+        <Text prominent size="md">
+          Congratulations! You have successfully confirmed your ownership of the
+          testnet address {ropstenAddress}. If this address participated in the
+          Fluidity Ropsten testnet, you will receive free loot bottles during
+          the Fluidity Airdrop!
+        </Text>
+      </div>
+    );
+  }
+
+  if (!signature || !address) {
+    return (
+      <div>
+        <Heading>Claim Testnet Rewards</Heading>
+        <Text prominent size="md">
+          If you participated in Fluidity&#39;s Ropsten testnet, you are
+          eligible for free bottles! To begin, switch your wallet to the address
+          that you used on Ropsten. Then, enter your <strong>mainnet</strong>{" "}
+          address in the box below.{" "}
+          <strong>
+            Ensure you don&#39;t change the active network away from Arbitrum!
+          </strong>
+          . Click the button to prompt a signature from your wallet. If you have
+          already generated a signature previously, enter it in the signature
+          box, as well as the address.
+        </Text>
+
+        <Heading>ADDRESS</Heading>
+        <input
+          value={address}
+          onChange={(v) => setAddress(v.target.value)}
+        ></input>
+        <GeneralButton
+          layout="after"
+          handleClick={() => {
+            setRopstenAddress(signerAddress ?? "");
+            signOwnerAddress(address).then((sig) => setSignature(sig ?? ""));
+          }}
+          type="transparent"
+        >
+          Confirm Owner Address
+        </GeneralButton>
+        <Heading>SIGNATURE</Heading>
+        <input
+          value={manualSignature}
+          onChange={(v) => setManualSignature(v.target.value)}
+        ></input>
+        <GeneralButton
+          layout="after"
+          handleClick={() => {
+            setSignature(manualSignature);
+          }}
+          type="transparent"
+        >
+          Confirm signature
+        </GeneralButton>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <Heading>Claim Testnet Rewards</Heading>
+        <Heading>SIGNATURE</Heading>
+        <input value={signature} disabled={true}></input>
+        {signerAddress?.toLowerCase() === address.toLowerCase() ? (
+          <>
+            <Text prominent size="md">
+              Click to confirm your ownership of the testnet address{" "}
+              {ropstenAddress}
+            </Text>
+            <GeneralButton
+              layout="after"
+              handleClick={() => {
+                confirmAccountOwnership(signature, address).then(() =>
+                  setFinalised(true)
+                );
+              }}
+              type="transparent"
+            >
+              Confirm Account Ownership
+            </GeneralButton>
+          </>
+        ) : (
+          <>
+            <Text prominent size="md">
+              Change your wallet account to {address} to finalise confirmation.
+              Currently signed in as {signerAddress}
+            </Text>
+          </>
+        )}
+      </div>
+    );
+  }
+};
+
 export {
   BottleDistribution,
   TutorialModal,
@@ -1618,4 +1766,5 @@ export {
   StakingStatsModal,
   BottlesDetailsModal,
   ReferralDetailsModal,
+  TestnetRewardsModal,
 };

@@ -33,6 +33,7 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
+  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
 import { SplitContext } from "contexts/SplitProvider";
@@ -49,10 +50,11 @@ import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
+import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 
 const EPOCH_DAYS_TOTAL = 31;
-// temp: april 19th, 2023
-const EPOCH_START_DATE = new Date(2023, 3, 20);
+// temp: may 22nd, 2023
+const EPOCH_START_DATE = new Date(2023, 4, 22);
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
@@ -117,6 +119,18 @@ const SAFE_DEFAULT_REFERRALS: ReferralCountLoaderData = {
   loaded: false,
 };
 
+const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
+  bottleTiers: {
+    [Rarity.Common]: 0,
+    [Rarity.Uncommon]: 0,
+    [Rarity.Rare]: 0,
+    [Rarity.UltraRare]: 0,
+    [Rarity.Legendary]: 0,
+  },
+  bottlesCount: 0,
+  loaded: false,
+};
+
 const Airdrop = () => {
   const {
     epochDaysTotal,
@@ -149,13 +163,19 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
+
+  const { data: referralLootboxData } =
+    useCache<ReferralBottlesCountLoaderData>(
+      address ? `/${network}/query/referralBottles?address=${address}` : ""
+    );
 
   const { width } = useViewport();
 
@@ -178,6 +198,10 @@ const Airdrop = () => {
       ...SAFE_DEFAULT_REFERRALS,
       ...referralData,
     },
+    referralBottles: {
+      ...SAFE_DEFAULT_REFERRAL_LOOTBOTTLES,
+      ...referralLootboxData,
+    },
   };
 
   const {
@@ -198,10 +222,13 @@ const Airdrop = () => {
       leaderboard: leaderboardRows,
       loaded: leaderboardLoaded,
     },
+    referralBottles: {
+      bottleTiers: referralBottleTiers,
+      bottlesCount: referralBottlesCount,
+    },
   } = data;
 
   const location = useLocation();
-
 
   const [currentModal, setCurrentModal] = useState<string | null>(location.hash.replace("#", "") || null);
 
@@ -227,6 +254,32 @@ const Airdrop = () => {
     }>
   >([]);
 
+  const fetchUserStakes = async (address: string) => {
+    const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+    setStakes(stakingDeposits);
+  };
+
+  const fetchUserTokenBalance = async () => {
+    const userTokenBalance = await Promise.all(
+      tokens.map(async ({ address }) => (await balance?.(address)) || new BN(0))
+    );
+
+    return setTokens(
+      tokens.map((token, i) => ({
+        ...token,
+        userTokenBalance: userTokenBalance[i],
+      }))
+    );
+  };
+
+  useEffect(() => {
+    if (!currentModal) {
+      navigate(location.pathname, { replace: true });
+      return;
+    }
+    navigate(`#${currentModal}`, { replace: true });
+  }, [currentModal]);
+
   const closeModal = () => {
     setCurrentModal(null);
   };
@@ -249,25 +302,9 @@ const Airdrop = () => {
       );
     }
 
-    (async () => {
-      const userTokenBalance = await Promise.all(
-        tokens.map(
-          async ({ address }) => (await balance?.(address)) || new BN(0)
-        )
-      );
+    fetchUserTokenBalance();
 
-      return setTokens(
-        tokens.map((token, i) => ({
-          ...token,
-          userTokenBalance: userTokenBalance[i],
-        }))
-      );
-    })();
-
-    (async () => {
-      const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
-      setStakes(stakingDeposits);
-    })();
+    fetchUserStakes(address);
   }, [address]);
 
   const leaderboardRef = useRef<HTMLDivElement>(null);
@@ -275,13 +312,24 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
-        <TabButton size="small" onClick={() => setCurrentModal(null)} groupId="airdrop" isSelected={isMobile ? currentModal === null : true}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal(null)}
+          groupId="airdrop"
+          isSelected={isMobile ? currentModal === null : true}
+        >
           Airdrop Dashboard
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("tutorial")} groupId="airdrop" isSelected={isMobile && currentModal === "tutorial"}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("tutorial")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "tutorial"}
+        >
           Airdrop Tutorial
         </TabButton>
         <TabButton
@@ -304,12 +352,24 @@ const Airdrop = () => {
         <TabButton
           size="small"
           onClick={() => setCurrentModal("referrals")}
-          groupId="airdrop" isSelected={isMobile && currentModal === "referrals"}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "referrals"}
         >
           Referrals
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake")} groupId="airdrop" isSelected={isMobile && currentModal === "stake"}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("stake")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "stake"}
+        >
           Stake
+        </TabButton>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("testnet-rewards")}
+        >
+          Claim Testnet Rewards
         </TabButton>
       </div>
     );
@@ -322,13 +382,16 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
-              currentModal === "tutorial" || currentModal === "leaderboard" || currentModal === "stake"
+              currentModal === "tutorial" ||
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
                 : "2em",
           }}
@@ -445,6 +508,10 @@ const Airdrop = () => {
                 isMobile={isMobile}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+                stakeCallback={() => {
+                  fetchUserStakes(address ?? "");
+                  fetchUserTokenBalance();
+                }}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
@@ -469,6 +536,14 @@ const Airdrop = () => {
               </>
             )
           }
+          {currentModal === "testnet-rewards" && (
+            <>
+              <Heading as="h3" className="no-margin">
+                Claim Testnet Rewards
+              </Heading>
+              <TestnetRewardsModal />
+            </>
+          )}
         </motion.div>
       </>
     );
@@ -483,8 +558,8 @@ const Airdrop = () => {
         style={{ gap: "1em" }}
       >
         <ReferralDetailsModal
-          bottles={bottleTiers}
-          totalBottles={bottlesCount}
+          bottles={referralBottleTiers}
+          totalBottles={referralBottlesCount}
           activeReferrerReferralsCount={numActiveReferrerReferrals}
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
@@ -523,6 +598,10 @@ const Airdrop = () => {
           wethPrice={wethPrice}
           usdcPrice={usdcPrice}
           isMobile={isMobile}
+          stakeCallback={() => {
+            fetchUserStakes(address ?? "");
+            fetchUserTokenBalance();
+          }}
         />
       </CardModal>
       <CardModal
@@ -543,6 +622,13 @@ const Airdrop = () => {
         closeModal={closeModal}
       >
         <TutorialModal closeModal={closeModal} />
+      </CardModal>
+      <CardModal
+        id="testnet-rewards"
+        visible={currentModal === "testnet-rewards"}
+        closeModal={closeModal}
+      >
+        <TestnetRewardsModal />
       </CardModal>
 
       {/* Page Content */}
@@ -629,9 +715,7 @@ const Airdrop = () => {
       >
         <GeneralButton
           type="transparent"
-          icon={
-            <ArrowRight />
-          }
+          icon={<ArrowRight />}
           className="scroll-to-leaderboard-button"
           onClick={() => {
             leaderboardRef.current?.scrollIntoView({
@@ -750,7 +834,7 @@ const AirdropStats = ({
       <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
           <Text prominent size="xl">
-            {toSignificantDecimals(totalBottles, 0)}
+            {Math.round(totalBottles * 100) / 100}
           </Text>
         </LabelledValue>
         <LinkButton
@@ -760,8 +844,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                console.log("TODO REDIRECT");
-              }
+                  console.log("TODO REDIRECT");
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1000,7 +1084,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1020,8 +1104,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                  ? 0
-                  : -1;
+                ? 0
+                : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1093,8 +1177,9 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
-        }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+        address === user ? "highlighted-row" : ""
+      }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1113,8 +1198,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1129,8 +1214,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1145,8 +1230,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1161,8 +1246,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1177,8 +1262,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1374,6 +1459,6 @@ const BottleProgress = ({
 };
 
 export const dayDifference = (date1: Date, date2: Date) =>
-  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
+  Math.round(Math.abs(date1.valueOf() - date2.valueOf()) / 1000 / 60 / 60 / 24);
 
 export default Airdrop;
