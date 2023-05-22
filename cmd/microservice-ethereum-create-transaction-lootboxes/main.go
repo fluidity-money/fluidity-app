@@ -185,20 +185,21 @@ func main() {
 				})
 			}
 
-			volume = new(big.Rat)
+			var feeDataVolume *big.Rat
 
 			if feeData.Volume != nil {
-				volume = volume.Set(feeData.Volume)
+				feeDataVolume = feeDataVolume
+			} else {
+				feeDataVolume = new(big.Rat).SetInt64(0)
 			}
 
-			// keep volume as is to do calculations with
-
+			volume = new(big.Rat).Set(feeDataVolume)
 
 			// volumeBigInt_ to convert to the database BigInt
 			// volumeBigInt_ = (volumeRat * 10^decimals * denominator)::BigInt / denominator
 			// this is to convert to a BigInt without losing decimal places that are relevant to the token amount
 			// e.g. 1234567/100000 with 6 decimals should be adjusted to 12345670
-			volumeBigInt_ := new(big.Rat).Set(feeData.Volume)
+			volumeBigInt_ := new(big.Rat).Set(feeDataVolume)
 
 			decimalsAdjusted := math.Pow10(tokenDecimals)
 			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
