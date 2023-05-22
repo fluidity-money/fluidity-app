@@ -188,7 +188,7 @@ func main() {
 			var feeDataVolume *big.Rat
 
 			if feeData.Volume != nil {
-				feeDataVolume = feeDataVolume
+				feeDataVolume = feeData.Volume
 			} else {
 				feeDataVolume = new(big.Rat).SetInt64(0)
 			}
