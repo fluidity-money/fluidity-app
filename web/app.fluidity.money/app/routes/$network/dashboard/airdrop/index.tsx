@@ -235,40 +235,6 @@ const Airdrop = () => {
     location.hash.replace("#", "") || null
   );
 
-  const [localBottleCount, setLocalBottleCount] = useState<number | undefined>(undefined)
-  const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] = useState<boolean | undefined>(undefined)
-
-  useEffect(() => {
-    if (!window) return
-    const airdropHasVisited = window.localStorage.getItem('airdropHasVisited')
-    const airdropBottleCount = window.localStorage.getItem('airdropBottleCount')
-    const airdropShouldShowBottleNumbers = window.localStorage.getItem('airdropShouldShowBottleNumbers')
-
-    if (airdropBottleCount) {
-      setLocalBottleCount(parseInt(airdropBottleCount))
-    } else {
-      setLocalBottleCount(0)
-    }
-
-    if (airdropShouldShowBottleNumbers) {
-      setLocalShouldShowBottleNumbers(airdropShouldShowBottleNumbers === 'true')
-    } else {
-      setLocalShouldShowBottleNumbers(true)
-    }
-
-    if (!airdropHasVisited) {
-      window.localStorage.setItem('airdropHasVisited', 'true')
-      if (isMobile) return
-      setCurrentModal('tutorial')
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!window) return
-    if (localShouldShowBottleNumbers === undefined) return
-    window.localStorage.setItem('airdropShouldShowBottleNumbers', localShouldShowBottleNumbers.toString())
-  }, [localShouldShowBottleNumbers])
-
   useEffect(() => {
     if (location.hash.replace("#", "") === currentModal) return;
     setCurrentModal(location.hash.replace("#", "") || null);
@@ -335,6 +301,52 @@ const Airdrop = () => {
 
     fetchUserStakes(address);
   }, [address]);
+
+  const [localBottleCount, setLocalBottleCount] = useState<number | undefined>(undefined)
+  const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] = useState<boolean | undefined>(undefined)
+  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<boolean | undefined>(undefined)
+
+  useEffect(() => {
+    if (!window) return
+    const airdropHasVisited = window.localStorage.getItem('airdropHasVisited')
+    const airdropBottleCount = window.localStorage.getItem('airdropBottleCount')
+    const airdropShouldShowBottleNumbers = window.localStorage.getItem('airdropShouldShowBottleNumbers')
+
+    if (airdropBottleCount) {
+      setLocalBottleCount(parseInt(airdropBottleCount))
+    } else {
+      setLocalBottleCount(0)
+    }
+
+    if (airdropShouldShowBottleNumbers) {
+      setLocalShouldShowBottleNumbers(airdropShouldShowBottleNumbers === 'true')
+    } else {
+      setLocalShouldShowBottleNumbers(true)
+    }
+
+    if (airdropHasVisited) {
+      setLocalShouldShowTutorial(false)
+    } else {
+      setLocalShouldShowTutorial(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!window) return
+    if (localShouldShowBottleNumbers === undefined) return
+    window.localStorage.setItem('airdropShouldShowBottleNumbers', localShouldShowBottleNumbers.toString())
+  }, [localShouldShowBottleNumbers])
+
+  useEffect(() => {
+    if (!window) return
+    if (localShouldShowTutorial === undefined) return
+    window.localStorage.setItem('airdropHasVisited', 'true')
+    if (localShouldShowTutorial && !isMobile) {
+      setTimeout(() => {
+        setCurrentModal('tutorial')
+      }, 2000)
+    }
+  }, [localShouldShowTutorial])
 
   const leaderboardRef = useRef<HTMLDivElement>(null);
 
