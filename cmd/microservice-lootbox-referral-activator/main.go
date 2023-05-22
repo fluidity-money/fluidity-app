@@ -99,7 +99,7 @@ func main() {
 					TransactionHash: "",
 					AwardedTime:     currTime,
 					Volume:          misc.BigIntFromUint64(0),
-					RewardTier:      0,
+					RewardTier:      1,
 					LootboxCount:    5,
 					Application:     applications.ApplicationNone,
 				}

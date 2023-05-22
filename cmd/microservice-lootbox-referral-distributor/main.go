@@ -5,12 +5,12 @@
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/referrals"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
@@ -59,7 +59,7 @@ func main() {
 				TransactionHash: "",
 				AwardedTime:     awardedTime,
 				Volume:          misc.BigIntFromUint64(0),
-				RewardTier:      0,
+				RewardTier:      1,
 				LootboxCount:    referralLootboxCount,
 				Application:     applications.ApplicationNone,
 			}
