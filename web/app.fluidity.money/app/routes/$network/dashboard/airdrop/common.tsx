@@ -929,7 +929,7 @@ const StakeNowModal = ({
 
     const testRes = await testStake();
 
-    if (!testRes) return;
+    if (!testRes) return setStakingState("ready");
 
     try {
       const receipt = await stakeTokens(

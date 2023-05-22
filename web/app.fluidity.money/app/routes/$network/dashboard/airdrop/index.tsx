@@ -33,10 +33,8 @@ import {
   ReferralDetailsModal,
   StakeNowModal,
   StakingStatsModal,
-  //  TestnetRewardsModal,
   TutorialModal,
 } from "./common";
-import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
 import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
@@ -143,10 +141,6 @@ const Airdrop = () => {
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
-
-  const { showExperiment } = useContext(SplitContext);
-
-  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
@@ -439,8 +433,6 @@ const Airdrop = () => {
       </div>
     );
   };
-
-  if (!showAirdrop) return null;
 
   if (isMobile)
     return (

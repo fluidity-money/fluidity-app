@@ -240,24 +240,14 @@ export default function Rewards() {
 
   const txTableColumns = (() => {
     switch (true) {
-      case isTablet && showExperiment("enable-airdrop-page"):
-        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "BOTTLES" }];
       case isTablet:
-        return [{ name: "ACTIVITY" }, { name: "REWARD" }];
-      case showExperiment("enable-airdrop-page"):
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
-          { name: "WINNER" },
-          { name: "REWARDED TIME", alignRight: true },
-        ];
+        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "BOTTLES" }];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
+          { name: "BOTTLES" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -518,35 +508,34 @@ export default function Rewards() {
           </td>
 
           {/* Bottles */}
-          {showExperiment("enable-airdrop-page") &&
-            (lootBottles ? (
-              <td className="table-bottle">
-                {Object.entries(lootBottles).map(
-                  ([rarity, quantity]: [string, number], index) => {
-                    if (quantity < 0.1) return <></>;
+          {lootBottles ? (
+            <td className="table-bottle">
+              {Object.entries(lootBottles).map(
+                ([rarity, quantity]: [string, number], index) => {
+                  if (quantity < 0.1) return <></>;
 
-                    return (
-                      <div key={index} className="lootbottle-container">
-                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
-                        <Text
-                          size="sm"
-                          style={{
-                            whiteSpace: "nowrap",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {toSignificantDecimals(quantity, 1)}
-                        </Text>
-                      </div>
-                    );
-                  }
-                )}
-              </td>
-            ) : (
-              <td>
-                <Text>-</Text>
-              </td>
-            ))}
+                  return (
+                    <div key={index} className="lootbottle-container">
+                      <LootBottle size="sm" rarity={rarity} quantity={1000} />
+                      <Text
+                        size="sm"
+                        style={{
+                          whiteSpace: "nowrap",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {toSignificantDecimals(quantity, 1)}
+                      </Text>
+                    </div>
+                  );
+                }
+              )}
+            </td>
+          ) : (
+            <td>
+              <Text>-</Text>
+            </td>
+          )}
 
           {/* Winner */}
           {!isTablet && (

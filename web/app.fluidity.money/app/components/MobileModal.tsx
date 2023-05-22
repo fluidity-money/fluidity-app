@@ -62,7 +62,6 @@ export default function MobileModal({
 
   const { showExperiment } = useContext(SplitContext);
   const showAssets = showExperiment("enable-assets-page");
-  const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
@@ -223,7 +222,6 @@ export default function MobileModal({
                 <ul>
                   {navigationMap
                     .filter(({ name }) => name !== "Assets" || showAssets)
-                    .filter(({ name }) => name !== "Airdrop" || showAirdrop)
                     .map((obj, index) => {
                       const key = Object.values(obj)[0];
                       const { name, icon, path } = obj;
