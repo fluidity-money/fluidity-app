@@ -45,7 +45,7 @@ import {
   ChainName,
   BurgerMenu,
   Referral,
-  CardModal
+  CardModal,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -162,11 +162,11 @@ type LoaderData = {
 const NAVIGATION_MAP: {
   [key: string]: { name: string; icon: JSX.Element };
 }[] = [
-    { home: { name: "dashboard", icon: <DashboardIcon /> } },
-    { rewards: { name: "rewards", icon: <Trophy /> } },
-    { assets: { name: "assets", icon: <AssetsIcon /> } },
-    { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
-  ];
+  { home: { name: "dashboard", icon: <DashboardIcon /> } },
+  { rewards: { name: "rewards", icon: <Trophy /> } },
+  { assets: { name: "assets", icon: <AssetsIcon /> } },
+  { airdrop: { name: "airdrop", icon: <AirdropIcon /> } },
+];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   ethereum: {
@@ -270,14 +270,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     // if the referral modal is open and the screen size changes, close the modal and redirect to the mobile page
-    if (!referralModalVisibility) return
-
+    if (!referralModalVisibility) return;
 
     if (width <= airdropMobileBreakpoint && width > 0) {
-      setReferralModalVisibility(false)
-      navigate(`/${network}/dashboard/airdrop#referrals`)
+      setReferralModalVisibility(false);
+      navigate(`/${network}/dashboard/airdrop#referrals`);
     }
-  }, [width])
+  }, [width]);
 
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
@@ -393,9 +392,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
@@ -442,10 +441,10 @@ export default function Dashboard() {
           position: "absolute",
           top: "1em",
           right: isTablet ? "20px" : "60px",
-          width: 500
+          width: 500,
         }}
         color="holo"
-        style={{ padding: 0, width: '100%' }}
+        style={{ padding: 0, width: "100%" }}
       >
         <ReferralModal
           connected={!!connected}
@@ -489,8 +488,9 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}

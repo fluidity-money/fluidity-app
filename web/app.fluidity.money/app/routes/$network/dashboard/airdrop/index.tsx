@@ -225,7 +225,6 @@ const Airdrop = () => {
     referralBottles: {
       bottleTiers: referralBottleTiers,
       bottlesCount: referralBottlesCount,
-      loaded: referralBottlesLoaded,
     },
   } = data;
 
