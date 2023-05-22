@@ -466,25 +466,14 @@ export default function Dashboard() {
       </CardModal>
 
       {/* Accept Referral Modal */}
-      <Modal id="accept-referral-modal" visible={acceptReferralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setAcceptReferralModalVisibility(false)}
-          style={{
-            background: isMobile ? "black" : "#030303cc",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <AcceptReferralModal
-            network={network}
-            referralCode={clickedReferralCode}
-            referrer={referralAddress}
-            closeModal={() => setAcceptReferralModalVisibility(false)}
-          />
-        </div>
-      </Modal>
+      <CardModal id="accept-referral-modal" visible={true} closeModal={() => setAcceptReferralModalVisibility(false)}>
+        <AcceptReferralModal
+          network={network}
+          referralCode={clickedReferralCode}
+          referrer={referralAddress}
+          closeModal={() => setAcceptReferralModalVisibility(false)}
+        />
+      </CardModal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>

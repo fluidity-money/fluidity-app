@@ -62,28 +62,11 @@ const AcceptReferralModal = ({
 
   return (
     <>
-      <div className="referrals-content">
+      <div className="referrals-content" style={{ padding: 0 }}>
         <div className="referrals-header">
-          {/* Help Button */}
-          <GeneralButton
-            type={"secondary"}
-            handleClick={() => navigate("./")}
-            size={"small"}
-            border="box"
-          >
-            ?
-          </GeneralButton>
-          <Text bold size="lg">
+          <Text size="sm">
             ACCEPT REFERRAL
           </Text>
-          <GeneralButton
-            type={"secondary"}
-            handleClick={closeModal}
-            size={"small"}
-            border="box"
-          >
-            X
-          </GeneralButton>
         </div>
 
         <Heading as={"h4"} className="referrals-heading">
@@ -93,32 +76,32 @@ const AcceptReferralModal = ({
         <Card
           rounded
           type="transparent"
-          color="holo"
+          color="gray"
           border="dashed"
           className="how-it-works-infobox"
         >
           {/* How it works Box Left*/}
-          <div>
-            <Text prominent size="lg" className="single-line">
-              <ul>You Get</ul> 💸
-            </Text>
-            <Text prominent size="md">
-              <strong>10 Loot Bottles</strong>
-              <br />
-              on activating their referral
+          <div className="how-it-works-half">
+            <div className="how-it-works-title">
+              <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+                YOU GET
+              </Text>
+              &nbsp;💸
+            </div>
+            <Text prominent size="sm">
+              <strong>10% of their airdrop</strong><br />earnings throughout the entire Epoch.
             </Text>
           </div>
           {/* How it works Box Right*/}
-          <div>
-            <Text prominent size="lg" className="single-line">
-              🍾<ul>They Get</ul>
-            </Text>
-            <Text prominent size="md">
-              <strong>10% of your airdrop</strong>
-              <br />
-              earnings throughout
-              <br />
-              the entire Epoch.
+          <div className="how-it-works-half">
+            <div className="how-it-works-title">
+              🍾&nbsp;
+              <Text code size="md" className="single-line" style={{ textDecoration: 'underline' }}>
+                THEY GET
+              </Text>
+            </div>
+            <Text prominent size="sm">
+              <strong>10 Loot Bottles,</strong><br />not affected by your 10% reward.
             </Text>
           </div>
         </Card>
