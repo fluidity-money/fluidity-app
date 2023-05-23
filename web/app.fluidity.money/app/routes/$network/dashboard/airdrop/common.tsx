@@ -901,7 +901,7 @@ const StakeNowModal = ({
       return true;
     } catch (e) {
       // Expect error on fail
-      const errMsgMatchReason = /reason="[a-z0-9 :_\(\)]+/i;
+      const errMsgMatchReason = /reason="[a-z0-9 :_()]+/i;
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);
