@@ -372,7 +372,13 @@ func main() {
 
 			transferCountRat := big.NewRat(int64(transferCount), 1)
 
-			feePerTransfer := new(big.Rat).Quo(transactionFeeNormal, transferCountRat)
+			feePerTransfer := new(big.Rat)
+
+			// if transfer count rat == 0
+			if transferCountRat.Cmp(new(big.Rat)) != 0 {
+				feePerTransfer.Quo(transactionFeeNormal, transferCountRat)
+			}
+
 			// for each fluid transfer, calculate the actual fee and chances
 
 			for _, transfer := range transaction.Transfers {
