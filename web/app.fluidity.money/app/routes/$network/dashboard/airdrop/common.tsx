@@ -41,10 +41,15 @@ import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
 
+// Epoch length
 const MAX_EPOCH_DAYS = 31;
 
+// Minimum/Maximum staking duration
 const MIN_STAKING_DAYS = 31;
 const MAX_STAKING_DAYS = 365;
+
+// Minimum amount of Fluid USDC deposit
+const MINIMUM_FLUID_LIQUIDITY_USD = 10;
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -859,8 +864,18 @@ const StakeNowModal = ({
 
   const testStake = async (): Promise<boolean> => {
     try {
-      if (!(fluidToken.amount && fluidToken.amount)) {
+      if (!(fluidToken.amount && baseToken.amount)) {
         throw Error('reason="not enough liquidity"');
+      }
+
+      if (
+        getUsdFromTokenAmount(
+          fluidTokenAmount,
+          fluidToken.decimals,
+          fluidUsdMultiplier
+        ) < MINIMUM_FLUID_LIQUIDITY_USD
+      ) {
+        throw Error('reason="not enough liquidity (At Least 10 fUSDC)"');
       }
 
       if (fluidTokenAmount.gt(fluidToken.userTokenBalance)) {
@@ -886,7 +901,7 @@ const StakeNowModal = ({
       return true;
     } catch (e) {
       // Expect error on fail
-      const errMsgMatchReason = /reason="[a-z0-9 :_]+/i;
+      const errMsgMatchReason = /reason="[a-z0-9 :_()]+/i;
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);

@@ -253,7 +253,7 @@ const stakingAbiString = `[
 			{ "indexed": false, "internalType": "uint256", "name": "usdcAmount", "type": "uint256" },
 			{ "indexed": false, "internalType": "uint256", "name": "wethAmount", "type": "uint256" }
 		],
-		"name": "Staked",
+		"name": "Deposited",
 		"type": "event"
 	}
 ]`
