@@ -29,12 +29,4 @@ interface ILootboxConfirmAddressOwnership {
      * @param _s signature s of the EIP712 payload, signed by `addr
      */
     function confirm(address addr, address owner, uint8 _v, bytes32 _r, bytes32 _s) external;
-
-    /**
-     * @notice gets the EIP712 payload to be signed
-     *
-     * @param addr the signing address
-     * @param owner the owning address
-     */
-    function getPayload(address addr, address owner) external view returns (bytes memory);
 }

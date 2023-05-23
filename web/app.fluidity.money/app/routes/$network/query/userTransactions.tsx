@@ -321,12 +321,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       
       const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
 
+      const winnerAddress = isFromPendingWin
+        ? ((winner as PendingWinner)?.address as unknown as string)
+        : ((winner as Winner)?.winning_address as unknown as string) ?? "";
+
+      const isSend = tx.sender === winnerAddress;
+
       return {
         sender: tx.sender,
         receiver: tx.receiver,
-        winner: isFromPendingWin
-          ? ((winner as PendingWinner)?.address as unknown as string)
-          : ((winner as Winner)?.winning_address as unknown as string) ?? "",
+        winner: winnerAddress ?? "",
         reward: winner
           ? (isFromPendingWin
               ? (winner as PendingWinner).win_amount
@@ -346,7 +350,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               : (winner as Winner)?.solana_application
             : "Fluidity") ?? "Fluidity",
         swapType,
-        lootBottles: lootbottlesMap[tx.hash],
+        lootBottles: isSend ? lootbottlesMap[tx.hash] : undefined,
       };
     });
 

@@ -13,6 +13,51 @@ export type ContractToken = {
   isFluidOf: boolean;
 };
 
+export const signOwnerAddress_ = async (
+  owner: string,
+  signer: Signer,
+  contractAddress: string,
+  ABI: ContractInterface
+) => {
+  const contract = getContract(ABI, contractAddress, signer);
+  if (!contract) throw new Error("Invalid contract provided!");
+
+  const address = await signer.getAddress();
+  const msg = await signer.signMessage(
+    utils.arrayify(
+      utils.keccak256(
+        utils.solidityPack(
+          ["string", "address", "address"],
+          ["fluidity.lootbox.confirm.address.ownership", address, owner]
+        )
+      )
+    )
+  );
+
+  return msg;
+};
+
+export const confirmAccountOwnership_ = async (
+  signature: string,
+  address: string,
+  signer: Signer,
+  contractAddress: string,
+  ABI: ContractInterface
+) => {
+  const contract = getContract(ABI, contractAddress, signer);
+  if (!contract) throw new Error("Invalid contract provided!");
+
+  const owner = await signer.getAddress();
+  const { v, r, s } = utils.splitSignature(signature);
+
+  try {
+    await contract.confirm(address, owner, v, r, s);
+    console.log("Confirmation transaction successful!");
+  } catch (error) {
+    console.error("Error confirming ownership:", error);
+  }
+};
+
 export const getContract = (
   ABI: ContractInterface,
   address: string,

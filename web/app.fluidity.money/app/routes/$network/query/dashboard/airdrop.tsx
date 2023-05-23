@@ -33,6 +33,7 @@ export type AirdropLoaderData = {
   wethPrice: number;
   usdcPrice: number;
   loaded: boolean;
+  referralCode?: string;
 };
 
 const EPOCH_DAYS_TOTAL = 31;
@@ -48,7 +49,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
-  const address = url.searchParams.get("address");
+  const address_ = url.searchParams.get("address");
+
+  const address = address_?.toLowerCase();
 
   if (!address || !network) throw new Error("Invalid Request");
 

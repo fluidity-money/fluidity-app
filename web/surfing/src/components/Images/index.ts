@@ -18,8 +18,11 @@ import { InfoCircle } from "./InfoCircle";
 import { CaretLeft } from "./CaretLeft";
 import { CaretRight } from "./CaretRight";
 import { Referral } from "./Referral";
+import { AirdropIcon } from "./Airdrop";
+import { LinkVerticalIcon } from "./LinkVertical";
 
 export {
+  AirdropIcon,
   ArrowRight,
   ArrowLeft,
   ArrowDown,
@@ -40,4 +43,5 @@ export {
   CaretLeft,
   CaretRight,
   Referral,
+  LinkVerticalIcon,
 };

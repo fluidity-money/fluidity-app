@@ -9,6 +9,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -31,6 +32,12 @@ var (
 	// transfer to prevent burning and minting
 	ethereumNullAddress = ethereum.AddressFromString("0000000000000000000000000000000000000000")
 )
+
+// ethereumUniqueTransfer identifies a transfer uniquely
+type ethereumUniqueTransfer struct {
+	transactionHash string
+	logIndex        string
+}
 
 func main() {
 	var (
@@ -57,10 +64,26 @@ func main() {
 	})
 }
 
+func mergePayouts(source map[applications.UtilityName]worker.Payout, dest map[applications.UtilityName]worker.Payout) {
+	for app, sourcePayout := range source {
+		// dest is passed by implicit reference !!
+		destPayout, exists := dest[app]
+
+		if !exists {
+			destPayout = sourcePayout
+		} else {
+			destPayout.Usd += sourcePayout.Usd
+			destPayout.Native.Add(&sourcePayout.Native.Int, &destPayout.Native.Int)
+		}
+
+		dest[app] = destPayout
+	}
+}
+
 // processAnnouncements to handle fluid transfer or application-based win
 // announcements and determine their winning status
 func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAmqpQueueName string, network_ network.BlockchainNetwork) {
-	var winAnnouncements []worker.EthereumWinnerAnnouncement
+	winAnnouncements := make(map[ethereumUniqueTransfer]worker.EthereumWinnerAnnouncement)
 
 	for _, announcement := range announcements {
 
@@ -134,24 +157,42 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			)
 		})
 
-		winAnnouncement := worker.EthereumWinnerAnnouncement{
-			Network:         network_,
-			TransactionHash: announcementTransactionHash,
-			LogIndex:        logIndex,
-			BlockNumber:     blockNumber,
-			FromAddress:     fromAddress,
-			FromWinAmount:   fromWinAmounts,
-			ToAddress:       toAddress,
-			ToWinAmount:     toWinAmounts,
-			TokenDetails:    tokenDetails,
-			Application:     application,
-			RewardTier:      winningBalls,
+		id := ethereumUniqueTransfer{
+			transactionHash: announcementTransactionHash.String(),
+			logIndex:        logIndex.String(),
 		}
 
-		winAnnouncements = append(winAnnouncements, winAnnouncement)
+		winAnnouncement, exists := winAnnouncements[id]
+
+		if !exists {
+			winAnnouncement = worker.EthereumWinnerAnnouncement{
+				Network:         network_,
+				TransactionHash: announcementTransactionHash,
+				LogIndex:        logIndex,
+				BlockNumber:     blockNumber,
+				FromAddress:     fromAddress,
+				FromWinAmount:   make(map[applications.UtilityName]worker.Payout),
+				ToAddress:       toAddress,
+				ToWinAmount:     make(map[applications.UtilityName]worker.Payout),
+				TokenDetails:    tokenDetails,
+				Application:     application,
+				RewardTier:      winningBalls,
+			}
+		}
+
+		mergePayouts(fromWinAmounts, winAnnouncement.FromWinAmount)
+		mergePayouts(toWinAmounts, winAnnouncement.ToWinAmount)
+
+		winAnnouncements[id] = winAnnouncement
 	}
 
 	if len(winAnnouncements) > 0 {
-		queue.SendMessage(rewardsAmqpQueueName, winAnnouncements)
+		var winAnnouncementsList []worker.EthereumWinnerAnnouncement
+
+		for _, announcement := range winAnnouncements {
+			winAnnouncementsList = append(winAnnouncementsList, announcement)
+		}
+
+		queue.SendMessage(rewardsAmqpQueueName, winAnnouncementsList)
 	}
 }

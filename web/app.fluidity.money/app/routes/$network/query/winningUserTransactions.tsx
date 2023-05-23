@@ -260,6 +260,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             ? "out"
             : undefined;
 
+        const isSend = tx.sender === winner.winning_address;
+
         return {
           sender: tx.sender,
           receiver: tx.receiver,
@@ -279,7 +281,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
-          lootBottles: lootbottlesMap[tx.hash],
+          lootBottles: isSend ? lootbottlesMap[tx.hash] : undefined,
         };
       });
 

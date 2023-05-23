@@ -1,5 +1,9 @@
-import type { StakingDepositsRes } from "~/util/chainUtils/ethereum/transaction";
 import type { ReactNode } from "react";
+import {
+  confirmAccountOwnership_,
+  signOwnerAddress_,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
@@ -41,6 +45,7 @@ import {
 
 import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
+import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
 
@@ -410,25 +415,29 @@ const EthereumFacade = ({
 
     return stakingDeposits.map(
       ({
-        camelotLpMinted,
-        sushiswapLpMinted,
         redeemTimestamp,
         depositTimestamp,
         camelotTokenA,
         sushiswapTokenA,
+        camelotTokenB,
+        sushiswapTokenB,
       }) => {
-        const camelotLp = new BN(camelotLpMinted.toString());
-        const sushiswapLp = new BN(sushiswapLpMinted.toString());
-        const totalLp = camelotLp.add(sushiswapLp);
+        const fluidAmount = new BN(
+          camelotTokenA.add(sushiswapTokenA).toString()
+        );
 
-        const camelotToken = new BN(camelotTokenA.toString());
-        const sushiswapToken = new BN(sushiswapTokenA.toString());
-        const totalToken = camelotToken.add(sushiswapToken);
+        const baseAmount = new BN(
+          camelotTokenB.add(sushiswapTokenB).toString()
+        );
 
         return {
-          fluidAmount: totalLp,
-          baseAmount: totalToken,
-          durationDays: redeemTimestamp.toNumber() / 24 / 60 / 60,
+          fluidAmount,
+          baseAmount,
+          durationDays:
+            (redeemTimestamp.toNumber() - depositTimestamp.toNumber()) /
+            24 /
+            60 /
+            60,
           depositDate: new Date(depositTimestamp.toNumber() * 1000),
         };
       }
@@ -489,7 +498,7 @@ const EthereumFacade = ({
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ): Promise<StakingDepositsRes | undefined> => {
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -515,7 +524,7 @@ const EthereumFacade = ({
       }
     );
 
-    return makeStakingDeposit(
+    const stakingDepositRes = await makeStakingDeposit(
       signer,
       usdcToken,
       fusdcToken,
@@ -529,6 +538,61 @@ const EthereumFacade = ({
       slippage,
       maxTimestamp
     );
+
+    return stakingDepositRes
+      ? {
+          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+          txHash: stakingDepositRes.hash,
+        }
+      : undefined;
+  };
+
+  // create a signature to say that `ownerAddress` owns the current address
+  const signOwnerAddress = async (ownerAddress: string) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
+    try {
+      const signature = await signOwnerAddress_(
+        ownerAddress,
+        signer,
+        lootboxOwnershipAddr,
+        LootboxOwnershipAbi
+      );
+      return signature;
+    } catch (e) {
+      console.log("failed to sign for account ownership", e);
+    }
+  };
+
+  // `confirm` that an account is owned by this account using a signature they have created
+  const confirmAccountOwnership = async (
+    signature: string,
+    address: string
+  ) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
+    try {
+      const result = await confirmAccountOwnership_(
+        signature,
+        address,
+        signer,
+        lootboxOwnershipAddr,
+        LootboxOwnershipAbi
+      );
+      console.log(result);
+    } catch (e) {
+      console.log("failed to confirm account ownership", e);
+    }
   };
 
   return (
@@ -553,6 +617,8 @@ const EthereumFacade = ({
         stakeTokens,
         testStakeTokens,
         getStakingRatios,
+        signOwnerAddress,
+        confirmAccountOwnership,
       }}
     >
       {children}

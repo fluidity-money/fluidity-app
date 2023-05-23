@@ -180,7 +180,7 @@ $holo: linear-gradient(
   color: black;
   display: grid;
   box-sizing: border-box;
-  grid-template-columns: 180px 64px auto;
+  grid-template-columns: 180px 64px 250px;
   gap: 0.5em;
   max-width: 100%;
 
@@ -217,7 +217,7 @@ $holo: linear-gradient(
   }
 }
 
-@container main (width < 1200px) {
+@media (max-width: 1200px) {
   .multiplier-tasks {
     grid-template-columns: auto min-content;
     grid-template-rows: min-content min-content;
@@ -310,7 +310,7 @@ $holo: linear-gradient(
   padding: 0;
   gap: 0.5em;
   .leaderboard-header {
-    padding: 0 25px;
+    padding: 0 20px;
     flex-direction: column;
     align-items: flex-start;
     margin: 0;
@@ -455,13 +455,100 @@ $holo: linear-gradient(
 .airdrop-header {
   display: flex;
   gap: 2em;
-  margin-bottom: 2em;
+  padding-bottom: 2em;
   white-space: nowrap;
 
   &.airdrop-mobile {
     max-width: 100%;
     box-sizing: border-box;
-    margin-bottom: 1em;
+    // both margin and padding required here to make the scrollbar render nicely inbetween
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
     overflow-x: scroll;
+  }
+}
+
+.stake-confirm-column {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  grid-column: 1 / 4;
+}
+
+.airdrop-stake-container {
+  display: grid;
+  grid-template-columns: auto auto 160px;
+  column-gap: 4em;
+  row-gap: 2em;
+  max-width: 500px;
+
+  .airdrop-stake-buttons {
+    display: flex;
+    gap: 0.5em;
+  }
+
+  .staking-modal-token-insufficient {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 12px;
+    bottom: -0.5em;
+    background: black;
+    padding: 0.2em 2em 0.2em 2em;
+    border-radius: 12px;
+    border: 1px solid red;
+  }
+
+  .staking-modal-complete {
+    width: 95%;
+  }
+
+  &.airdrop-mobile {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1em;
+
+    .airdrop-stake-inputs-column {
+      grid-column: 1 / 3;
+    }
+
+    .staking-modal-input-container {
+      max-width: unset;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .stake-confirm-column {
+      grid-column: 1/3;
+    }
+
+    .duration-column {
+      grid-column: 1 / 3;
+      width: 100%;
+      gap: 0.5em;
+      align-items: flex-start;
+
+      .duration-col-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 1em;
+      }
+
+      .slippage-tooltip {
+        margin-top: 1em;
+      }
+    }
+  }
+}
+
+.scroll-to-leaderboard-button {
+  svg {
+    transform: rotate(90deg);
+
+    path {
+      fill: none;
+    }
   }
 }

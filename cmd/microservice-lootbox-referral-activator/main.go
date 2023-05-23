@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/referrals"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -68,7 +69,7 @@ func main() {
 		// number of referrals to update
 		maxUnclaimedReferrals := math.Floor(lootboxCount/float64(lootboxReferralAmount)) + 2
 
-		unclaimedReferrals := referrals.GetLatestUnclaimedReferrals(
+		unclaimedReferrals := referrals.GetEarliestUnclaimedReferrals(
 			ethereum.AddressFromString(address),
 			int(maxUnclaimedReferrals),
 		)
@@ -98,8 +99,9 @@ func main() {
 					TransactionHash: "",
 					AwardedTime:     currTime,
 					Volume:          misc.BigIntFromUint64(0),
-					RewardTier:      0,
-					LootboxCount:    10,
+					RewardTier:      1,
+					LootboxCount:    5,
+					Application:     applications.ApplicationNone,
 				}
 
 				go queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)

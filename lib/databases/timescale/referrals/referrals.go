@@ -20,7 +20,7 @@ const (
 type Referral = types.Referral
 
 // GetLatestUnclaimedReferrals by referee, sorted by date, limited by number
-func GetLatestUnclaimedReferrals(address ethereum.Address, limit int) []Referral {
+func GetEarliestUnclaimedReferrals(address ethereum.Address, limit int) []Referral {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -28,13 +28,13 @@ func GetLatestUnclaimedReferrals(address ethereum.Address, limit int) []Referral
 			referrer,
 			referee,
 			created_time,
-			progress,
-			active
+			active,
+			progress
 
 		FROM %v
 		WHERE referee = $1
 		AND active = FALSE
-		ORDER BY created_time DESC
+		ORDER BY created_time ASC 
 		LIMIT $2`,
 
 		TableReferrals,
@@ -99,8 +99,8 @@ func GetClaimedReferrals(address ethereum.Address) []Referral {
 			referrer,
 			referee,
 			created_time,
-			progress,
-			active
+			active,
+			progress
 
 		FROM %v
 		WHERE referee = $1

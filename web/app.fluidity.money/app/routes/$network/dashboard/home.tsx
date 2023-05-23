@@ -308,35 +308,20 @@ export default function Home() {
         return [{ name: "ACTIVITY" }, { name: "VALUE" }];
       case isMobile:
         return [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }];
-      case isTablet && showExperiment("enable-airdrop-page"):
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
-          { name: "ACCOUNT" },
-        ];
       case isTablet:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
-          { name: "ACCOUNT" },
-        ];
-      case showExperiment("enable-airdrop-page"):
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
           { name: "BOTTLES" },
           { name: "ACCOUNT" },
-          { name: "TIME", alignRight: true },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
+          { name: "BOTTLES" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -517,8 +502,7 @@ export default function Home() {
           )}
 
           {/* Bottles */}
-          {showExperiment("enable-airdrop-page") &&
-            !isMobile &&
+          {!isMobile &&
             (lootBottles ? (
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
@@ -527,11 +511,7 @@ export default function Home() {
 
                     return (
                       <div key={index} className="lootbottle-container">
-                        <LootBottle
-                          size="sm"
-                          rarity={rarity}
-                          quantity={quantity}
-                        />
+                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
                         <Text
                           size="sm"
                           style={{

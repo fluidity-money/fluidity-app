@@ -30,6 +30,7 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
+  AirdropIcon,
   AssetsIcon,
   Text,
   Heading,
@@ -44,6 +45,7 @@ import {
   ChainName,
   BurgerMenu,
   Referral,
+  CardModal,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -158,12 +160,40 @@ type LoaderData = {
 };
 
 const NAVIGATION_MAP: {
-  [key: string]: { name: string; icon: JSX.Element };
+  [key: string]: {
+    name: string;
+    path: (network: string) => string;
+    icon: JSX.Element;
+  };
 }[] = [
-  { home: { name: "Dashboard", icon: <DashboardIcon /> } },
-  { rewards: { name: "Rewards", icon: <Trophy /> } },
-  { assets: { name: "Assets", icon: <AssetsIcon /> } },
-  { airdrop: { name: "Airdrop", icon: <Trophy /> } },
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
+    },
+  },
+  {
+    home: {
+      name: "dashboard",
+      path: (network: string) => `/${network}/dashboard/home`,
+      icon: <DashboardIcon />,
+    },
+  },
+  {
+    rewards: {
+      name: "rewards",
+      path: (network: string) => `/${network}/dashboard/rewards`,
+      icon: <Trophy />,
+    },
+  },
+  {
+    assets: {
+      name: "assets",
+      path: (network: string) => `/${network}/dashboard/assets`,
+      icon: <AssetsIcon />,
+    },
+  },
 ];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
@@ -217,7 +247,6 @@ export default function Dashboard() {
 
   const { showExperiment, client } = useContext(SplitContext);
   const showAssets = showExperiment("enable-assets-page");
-  const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
@@ -264,6 +293,18 @@ export default function Dashboard() {
     !closeMobileModal && setOpenMobModal(false);
   }, [closeMobileModal]);
 
+  const airdropMobileBreakpoint = 768;
+
+  useEffect(() => {
+    // if the referral modal is open and the screen size changes, close the modal and redirect to the mobile page
+    if (!referralModalVisibility) return;
+
+    if (width <= airdropMobileBreakpoint && width > 0) {
+      setReferralModalVisibility(false);
+      navigate(`/${network}/dashboard/airdrop#referrals`);
+    }
+  }, [width]);
+
   const matches = useMatches();
   const transitionPath = useTransition().location?.pathname;
   const currentPath = transitionPath || matches[matches.length - 1].pathname;
@@ -284,13 +325,11 @@ export default function Dashboard() {
   };
 
   const { data: referralsCountData } = useCache<ReferralCountLoaderData>(
-    showAirdrop && address
-      ? `/${network}/query/referrals?address=${address}`
-      : ""
+    address ? `/${network}/query/referrals?address=${address}` : ""
   );
 
   const { data: referralCodeData } = useCache<ReferralCodeLoaderData>(
-    showAirdrop && clickedReferralCode && address
+    clickedReferralCode && address
       ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
       : ""
   );
@@ -419,61 +458,49 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      <Modal id="referral-modal" visible={referralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setReferralModalVisibility(false)}
-          style={{
-            background: "none",
+      <CardModal
+        id="referral-modal"
+        visible={referralModalVisibility}
+        closeModal={() => setReferralModalVisibility(false)}
+        cardPositionStyle={{
+          position: "absolute",
+          top: "1em",
+          right: isTablet ? "20px" : "60px",
+          width: 500,
+        }}
+        color="holo"
+        style={{ padding: 0, width: "100%" }}
+      >
+        <ReferralModal
+          connected={!!connected}
+          network={network}
+          connectWallet={() => {
+            setReferralModalVisibility(false);
+            setWalletModalVisibility(true);
           }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "1em",
-              right: isTablet ? "20px" : "60px",
-            }}
-          >
-            <ReferralModal
-              connected={!!connected}
-              network={network}
-              connectWallet={() => {
-                setReferralModalVisibility(false);
-                setWalletModalVisibility(true);
-              }}
-              referrerClaimed={numActiveReferrerReferrals}
-              refereeClaimed={numActiveReferreeReferrals}
-              refereeUnclaimed={numInactiveReferreeReferrals}
-              progress={inactiveReferrals[0]?.progress || 0}
-              progressReq={10}
-              referralCode={referralCode}
-              loaded={referralCountLoaded}
-              closeModal={() => setReferralModalVisibility(false)}
-            />
-          </div>
-        </div>
-      </Modal>
+          referrerClaimed={numActiveReferrerReferrals}
+          refereeClaimed={numActiveReferreeReferrals}
+          refereeUnclaimed={numInactiveReferreeReferrals}
+          progress={inactiveReferrals[0]?.progress || 0}
+          progressReq={10}
+          referralCode={referralCode}
+          loaded={referralCountLoaded}
+          closeModal={() => setReferralModalVisibility(false)}
+        />
+      </CardModal>
 
       {/* Accept Referral Modal */}
-      <Modal id="accept-referral-modal" visible={acceptReferralModalVisibility}>
-        <div
-          className="cover"
-          onClick={() => setAcceptReferralModalVisibility(false)}
-          style={{
-            background: isMobile ? "black" : "#030303cc",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <AcceptReferralModal
-            network={network}
-            referralCode={clickedReferralCode}
-            referrer={referralAddress}
-            closeModal={() => setAcceptReferralModalVisibility(false)}
-          />
-        </div>
-      </Modal>
+      <CardModal
+        id="accept-referral-modal"
+        visible={acceptReferralModalVisibility}
+        closeModal={() => setAcceptReferralModalVisibility(false)}
+      >
+        <AcceptReferralModal
+          network={network}
+          referralCode={clickedReferralCode}
+          referrer={referralAddress}
+        />
+      </CardModal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
@@ -496,37 +523,33 @@ export default function Dashboard() {
         <ul>
           {NAVIGATION_MAP.filter((obj) =>
             showAssets ? true : Object.keys(obj)[0] !== "assets"
-          )
-            .filter((obj) =>
-              showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
-            )
-            .map((obj, index) => {
-              const key = Object.keys(obj)[0];
-              const { name, icon } = Object.values(obj)[0];
-              const active = index === activeIndex;
+          ).map((obj, index) => {
+            const key = Object.keys(obj)[0];
+            const { name, icon } = Object.values(obj)[0];
+            const active = index === activeIndex;
 
-              return (
-                <li key={key}>
-                  {index === activeIndex ? (
-                    <motion.div className={"active"} layoutId="active" />
-                  ) : (
-                    <div />
-                  )}
-                  <Link to={key}>
-                    <Text
-                      prominent={active}
-                      className={
-                        active
-                          ? "dashboard-navbar-active"
-                          : "dashboard-navbar-default"
-                      }
-                    >
-                      {icon} {name}
-                    </Text>
-                  </Link>
-                </li>
-              );
-            })}
+            return (
+              <li key={key}>
+                {index === activeIndex ? (
+                  <motion.div className={"active"} layoutId="active" />
+                ) : (
+                  <div />
+                )}
+                <Link to={key}>
+                  <Text
+                    prominent={active}
+                    className={
+                      active
+                        ? "dashboard-navbar-active"
+                        : "dashboard-navbar-default"
+                    }
+                  >
+                    {icon} {name}
+                  </Text>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Connect Wallet Button */}
@@ -632,21 +655,19 @@ export default function Dashboard() {
             )}
 
             {/* Referrals Button */}
-            {showExperiment("enable-airdrop-page") && (
-              <GeneralButton
-                type="transparent"
-                size="small"
-                layout="before"
-                handleClick={() => {
-                  isMobile || isTablet
-                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                    : setReferralModalVisibility(true);
-                }}
-                icon={<Referral />}
-              >
-                {isMobile ? "" : "Referral"}
-              </GeneralButton>
-            )}
+            <GeneralButton
+              type="transparent"
+              size="small"
+              layout="before"
+              handleClick={() => {
+                width < airdropMobileBreakpoint
+                  ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                  : setReferralModalVisibility(true);
+              }}
+              icon={<Referral />}
+            >
+              {isMobile ? "" : "Referral"}
+            </GeneralButton>
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
@@ -814,8 +835,8 @@ export default function Dashboard() {
         {openMobModal && (
           <MobileModal
             navigationMap={NAVIGATION_MAP.map((obj) => {
-              const { name, icon } = Object.values(obj)[0];
-              return { name, icon };
+              const { name, icon, path } = Object.values(obj)[0];
+              return { name, icon, path };
             })}
             activeIndex={activeIndex}
             chains={CHAIN_NAME_MAP}

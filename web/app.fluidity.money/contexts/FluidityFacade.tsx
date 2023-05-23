@@ -71,7 +71,14 @@ export interface IFluidityFacade {
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ) => Promise<StakingDepositsRes | undefined>;
+  ) => Promise<TransactionResponse | undefined>;
+
+  signOwnerAddress?: (ownerAddress: string) => Promise<string | undefined>;
+
+  confirmAccountOwnership?: (
+    signature: string,
+    address: string
+  ) => Promise<void>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

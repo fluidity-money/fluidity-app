@@ -10,6 +10,7 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -42,7 +43,7 @@ func main() {
 		gethHttpUrl         = util.GetEnvOrFatal(EnvGethHttpUrl)
 
 		volumeBigInt misc.BigInt
-		volume *big.Rat
+		volume       *big.Rat
 	)
 
 	tokensList := util.GetTokensListBase(ethereumTokensList_)
@@ -112,7 +113,30 @@ func main() {
 			// not a Transfer event, so look up and classify the application used
 
 			// fetch parameters to call GetApplicationFee
-			receipt, err := libEthereum.GetReceipt(ethClient, ethereum.HashFromString(transactionHash))
+			// wait for transaction to be mined before fetching receipt
+			transaction, isPending, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to fetch transaction by hash %s!",
+						transactionHash,
+					)
+
+					k.Payload = err
+				})
+			}
+
+			if isPending {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Transaction %s is pending - waiting to be mined",
+						transactionHash,
+					)
+				})
+			}
+
+			receipt_, err := bind.WaitMined(context.Background(), ethClient, transaction)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -125,42 +149,30 @@ func main() {
 				})
 			}
 
-			if len(receipt.Logs) < int(logIndex.Int64()) {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Not enough logs to look up by log index! Expected at least %v, got %v!",
-						logIndex.String(),
-						len(receipt.Logs),
-					)
-				})
+			receipt := libEthereum.ConvertGethReceipt(*receipt_)
+
+			// look up log by index
+			var logIndexInReceipt int
+			for i, receipt := range receipt.Logs {
+				if receipt.Index.Int64() == logIndex.Int64() {
+					logIndexInReceipt = i
+					break
+				}
 			}
 
-			log_ := receipt.Logs[logIndex.Int64()]
+			log_ := receipt.Logs[logIndexInReceipt]
 
 			applicationTransfer := worker.EthereumApplicationTransfer{
 				TransactionHash: ethereum.HashFromString(transactionHash),
-				Log: log_,
-				Application: application,
+				Log:             log_,
+				Application:     application,
 			}
 
 			fluidTokenContract := tokensMap[tokenShortName]
-			
-			transaction, _, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
-
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to fetch transaction %s!",
-						transactionHash,
-					)
-
-					k.Payload = err
-				})
-			}
 
 			inputData := transaction.Data()
 
-			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, *receipt, inputData)
+			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -173,14 +185,27 @@ func main() {
 				})
 			}
 
-			// keep volume as is to do calculations with
-			volume = new(big.Rat).Set(feeData.Volume)
+			feeDataVolume := feeData.Volume
+
+			if feeDataVolume == nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Fee data volume for send transaction %v, winner transaction hash %v is nil!",
+						sendTransaction.TransactionHash,
+						transactionHash,
+					)
+				})
+			}
+
+			//
+
+			volume = new(big.Rat).Set(feeDataVolume)
 
 			// volumeBigInt_ to convert to the database BigInt
 			// volumeBigInt_ = (volumeRat * 10^decimals * denominator)::BigInt / denominator
 			// this is to convert to a BigInt without losing decimal places that are relevant to the token amount
 			// e.g. 1234567/100000 with 6 decimals should be adjusted to 12345670
-			volumeBigInt_ := new(big.Rat).Set(feeData.Volume)
+			volumeBigInt_ := new(big.Rat).Set(feeDataVolume)
 
 			decimalsAdjusted := math.Pow10(tokenDecimals)
 			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
@@ -197,7 +222,7 @@ func main() {
 			// divide by original denom, losing any extra precision
 			volumeBigIntNum = volumeBigIntNum.Quo(volumeBigIntNum, denom)
 			volumeBigInt = misc.NewBigIntFromInt(*volumeBigIntNum)
-			
+
 		} else {
 			volumeBigInt = sendTransaction.Amount
 			// adjust to USD

@@ -47,7 +47,6 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -165,8 +164,6 @@ export default function Rewards() {
     FluidityFacadeContext
   );
 
-  const { showExperiment } = useContext(SplitContext);
-
   const userRewardsData = useFetcher();
 
   const userTransactionsData = useFetcher();
@@ -240,24 +237,14 @@ export default function Rewards() {
 
   const txTableColumns = (() => {
     switch (true) {
-      case isTablet && showExperiment("enable-airdrop-page"):
-        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "BOTTLES" }];
       case isTablet:
-        return [{ name: "ACTIVITY" }, { name: "REWARD" }];
-      case showExperiment("enable-airdrop-page"):
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
-          { name: "WINNER" },
-          { name: "REWARDED TIME", alignRight: true },
-        ];
+        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "BOTTLES" }];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
+          { name: "BOTTLES" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -518,39 +505,34 @@ export default function Rewards() {
           </td>
 
           {/* Bottles */}
-          {showExperiment("enable-airdrop-page") &&
-            (lootBottles ? (
-              <td className="table-bottle">
-                {Object.entries(lootBottles).map(
-                  ([rarity, quantity]: [string, number], index) => {
-                    if (quantity < 0.1) return <></>;
+          {lootBottles ? (
+            <td className="table-bottle">
+              {Object.entries(lootBottles).map(
+                ([rarity, quantity]: [string, number], index) => {
+                  if (quantity < 0.1) return <></>;
 
-                    return (
-                      <div key={index} className="lootbottle-container">
-                        <LootBottle
-                          size="sm"
-                          rarity={rarity}
-                          quantity={quantity}
-                        />
-                        <Text
-                          size="sm"
-                          style={{
-                            whiteSpace: "nowrap",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {toSignificantDecimals(quantity, 1)}
-                        </Text>
-                      </div>
-                    );
-                  }
-                )}
-              </td>
-            ) : (
-              <td>
-                <Text>-</Text>
-              </td>
-            ))}
+                  return (
+                    <div key={index} className="lootbottle-container">
+                      <LootBottle size="sm" rarity={rarity} quantity={1000} />
+                      <Text
+                        size="sm"
+                        style={{
+                          whiteSpace: "nowrap",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {toSignificantDecimals(quantity, 1)}
+                      </Text>
+                    </div>
+                  );
+                }
+              )}
+            </td>
+          ) : (
+            <td>
+              <Text>-</Text>
+            </td>
+          )}
 
           {/* Winner */}
           {!isTablet && (

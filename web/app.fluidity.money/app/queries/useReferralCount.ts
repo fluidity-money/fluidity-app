@@ -13,9 +13,9 @@ const queryActiveByReferrerAddress = gql`
 `;
 
 const queryActiveByRefereeAddress = gql`
-  query getClaimedReferrerReferralCount($address: String!) {
+  query getClaimedReferreeReferralCount($address: String!) {
     lootbox_referrals_aggregate(
-      where: { referrer: { _eq: $address }, active: { _eq: true } }
+      where: { referee: { _eq: $address }, active: { _eq: true } }
     ) {
       aggregate {
         count

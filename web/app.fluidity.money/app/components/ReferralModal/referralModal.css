@@ -1,25 +1,23 @@
-.referrals-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  max-width: 550px;
-  padding: 0;
-  backdrop-filter: blur(20px) !important;
-}
-
 .referrals-content {
   display: flex;
   align-items: center;
   flex-direction: column;
-  padding: 30px;
-  gap: 1em;
+  gap: 2em;
+  padding: 2em 0;
   text-align: center;
 }
 
 .referrals-inner-content {
-  min-height: 250px;
-  padding: 50px 50px 30px 50px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 2em;
+  padding-left: 4em;
+  padding-right: 4em;
+  padding-top: 2em;
+  padding-bottom: 3em;
+  width: min-content;
+  box-sizing: border-box;
 }
 
 @media (max-width: 850px) {
@@ -31,7 +29,7 @@
 .referrals-header {
   display: flex;
   width: 100%;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
@@ -41,37 +39,43 @@
   justify-content: center;
   align-items: center;
   margin: 0;
-}
-
-.referral-hover-comp {
-  padding: 0em 2em 0em 2em;
-  min-width: 100%;
-  width: 150px;
-  align-self: center;
+  margin-bottom: 0.5em;
 }
 
 .referrals-inner-box {
   position: relative;
   padding: 0;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .referrals-inner-switcher {
   width: 100%;
-  position: absolute;
-  top: -24px;
-  display: flex;
-  justify-content: center;
-  gap: 4em;
+  display: grid;
+  grid-template-columns: 1fr max-content 2em max-content 1fr;
+  align-items: end;
+}
+
+.referrals-inner-divider {
+  height: 50%;
+  border-top: 1px solid white;
+}
+
+.referrals-inner-divider:first-child {
+  border-left: 1px solid white;
+  border-top-left-radius: 100px;
+}
+
+.referrals-inner-divider:last-child {
+  border-right: 1px solid white;
+  border-top-right-radius: 100px;
 }
 
 .referrals-inner-switcher > button {
   padding-left: 2em;
   padding-right: 2em;
-}
-
-.spread {
-  width: 70%;
 }
 
 .spread-center {
@@ -81,29 +85,29 @@
 }
 
 .how-it-works-infobox {
-  display: flex;
-  width: 100%;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 200px 200px;
   padding: 0;
-  padding-bottom: 10px;
-}
-
-.how-it-works-infobox > * {
-  height: 100%;
-  flex: 1;
-  text-align: center;
+  width: auto;
   align-self: center;
 }
 
-/* .how-it-works-infobox:hover { */
-/*   background-color: white; */
-/*   color: black; */
-/* } */
+.how-it-works-half {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  align-items: center;
+  text-align: center;
+  padding: 1em;
+}
+
+.how-it-works-title {
+  display: flex;
+  flex-direction: row;
+}
 
 .how-it-works-infobox > :first-child {
-  border-right: dashed white;
+  border-right: dashed rgba(255, 255, 255, 0.2) 1px;
 }
 
 .single-line {
@@ -111,7 +115,6 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   gap: 0.5em;
 }
 
@@ -144,4 +147,43 @@
 
 .dot.green {
   background-color: #05ff00;
+}
+
+.referrals-copyable-link::selection {
+  color: black;
+  background: #accef7;
+}
+
+.referrals-copy-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: min-content;
+  box-sizing: border-box;
+  align-self: center;
+  align-items: center;
+}
+
+.referrals-copy-button {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 15px;
+}
+
+.referrals-copy-button svg {
+  transform: scale(1.2);
+}
+
+.links-clicked-content {
+  width: 100%;
+}
+
+.referrals-inner-content.airdrop-mobile {
+  padding: 0;
+  width: 100%;
+}
+
+.airdrop-mobile > .how-it-works-infobox {
+  max-width: 100%;
+  grid-template-columns: 1fr 1fr;
 }

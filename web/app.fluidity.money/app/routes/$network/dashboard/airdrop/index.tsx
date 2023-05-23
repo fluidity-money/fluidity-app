@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
 import { stakingLiquidityMultiplierEq } from "./common";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
@@ -35,7 +35,6 @@ import {
   StakingStatsModal,
   TutorialModal,
 } from "./common";
-import { SplitContext } from "contexts/SplitProvider";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
 import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
@@ -49,10 +48,12 @@ import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
+import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
+import { HowItWorksContent } from "~/components/ReferralModal";
 
 const EPOCH_DAYS_TOTAL = 31;
-// temp: april 19th, 2023
-const EPOCH_START_DATE = new Date(2023, 3, 20);
+// temp: may 22nd, 2023
+const EPOCH_START_DATE = new Date(2023, 4, 22);
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
@@ -117,6 +118,18 @@ const SAFE_DEFAULT_REFERRALS: ReferralCountLoaderData = {
   loaded: false,
 };
 
+const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
+  bottleTiers: {
+    [Rarity.Common]: 0,
+    [Rarity.Uncommon]: 0,
+    [Rarity.Rare]: 0,
+    [Rarity.UltraRare]: 0,
+    [Rarity.Legendary]: 0,
+  },
+  bottlesCount: 0,
+  loaded: false,
+};
+
 const Airdrop = () => {
   const {
     epochDaysTotal,
@@ -128,10 +141,6 @@ const Airdrop = () => {
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
-
-  const { showExperiment } = useContext(SplitContext);
-
-  const showAirdrop = showExperiment("enable-airdrop-page");
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
@@ -148,25 +157,24 @@ const Airdrop = () => {
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
-  const { data: globalAirdropLeaderboardData } = useCache<AirdropLoaderData>(
+  const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"
-    }`
-  );
-
-  const { data: userAirdropLeaderboardData } = useCache<AirdropLoaderData>(
-    address
-      ? `/${network}/query/dashboard/airdropLeaderboard?period=${
-          leaderboardFilterIndex === 0 ? "24" : "all"
-        }&address=${address}`
-      : ""
+    }&address=${address ?? ""}`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/referrals?address=${address}` : ""
   );
 
+  const { data: referralLootboxData } =
+    useCache<ReferralBottlesCountLoaderData>(
+      address ? `/${network}/query/referralBottles?address=${address}` : ""
+    );
+
   const { width } = useViewport();
+
+  const navigate = useNavigate();
 
   const mobileBreakpoint = 768;
 
@@ -179,15 +187,15 @@ const Airdrop = () => {
     },
     airdropLeaderboard: {
       ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
-      ...globalAirdropLeaderboardData,
-    },
-    userAirdropLeaderboard: {
-      ...SAFE_DEFAULT_AIRDROP_LEADERBOARD,
-      ...userAirdropLeaderboardData,
+      ...airdropLeaderboardData,
     },
     referrals: {
       ...SAFE_DEFAULT_REFERRALS,
       ...referralData,
+    },
+    referralBottles: {
+      ...SAFE_DEFAULT_REFERRAL_LOOTBOTTLES,
+      ...referralLootboxData,
     },
   };
 
@@ -204,22 +212,29 @@ const Airdrop = () => {
       numActiveReferrerReferrals,
       numInactiveReferreeReferrals,
       inactiveReferrals,
+      referralCode,
     },
     airdropLeaderboard: {
-      leaderboard: globalLeaderboardRows,
-      loaded: globalLeaderboardLoaded,
+      leaderboard: leaderboardRows,
+      loaded: leaderboardLoaded,
     },
-    userAirdropLeaderboard: {
-      leaderboard: userLeaderboardRows,
-      loaded: userLeaderboardLoaded,
+    referralBottles: {
+      bottleTiers: referralBottleTiers,
+      bottlesCount: referralBottlesCount,
     },
   } = data;
 
-  const leaderboardRows = userLeaderboardLoaded
-    ? userLeaderboardRows.concat(globalLeaderboardRows)
-    : globalLeaderboardRows;
+  const location = useLocation();
 
-  const [currentModal, setCurrentModal] = useState<string | null>(null);
+  const [currentModal, setCurrentModal] = useState<string | null>(
+    location.hash.replace("#", "") || null
+  );
+
+  useEffect(() => {
+    if (location.hash.replace("#", "") === currentModal) return;
+    setCurrentModal(location.hash.replace("#", "") || null);
+  }, [location.hash]);
+
   const [stakes, setStakes] = useState<
     Array<{
       fluidAmount: BN;
@@ -228,6 +243,32 @@ const Airdrop = () => {
       depositDate: Date;
     }>
   >([]);
+
+  const fetchUserStakes = async (address: string) => {
+    const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+    setStakes(stakingDeposits);
+  };
+
+  const fetchUserTokenBalance = async () => {
+    const userTokenBalance = await Promise.all(
+      tokens.map(async ({ address }) => (await balance?.(address)) || new BN(0))
+    );
+
+    return setTokens(
+      tokens.map((token, i) => ({
+        ...token,
+        userTokenBalance: userTokenBalance[i],
+      }))
+    );
+  };
+
+  useEffect(() => {
+    if (!currentModal) {
+      navigate(`${location.pathname}${location.search}`, { replace: true });
+      return;
+    }
+    navigate(`#${currentModal}`, { replace: true });
+  }, [currentModal]);
 
   const closeModal = () => {
     setCurrentModal(null);
@@ -251,26 +292,85 @@ const Airdrop = () => {
       );
     }
 
-    (async () => {
-      const userTokenBalance = await Promise.all(
-        tokens.map(
-          async ({ address }) => (await balance?.(address)) || new BN(0)
-        )
-      );
+    fetchUserTokenBalance();
 
-      return setTokens(
-        tokens.map((token, i) => ({
-          ...token,
-          userTokenBalance: userTokenBalance[i],
-        }))
-      );
-    })();
-
-    (async () => {
-      const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
-      setStakes(stakingDeposits);
-    })();
+    fetchUserStakes(address);
   }, [address]);
+
+  const [localCookieConsent, setLocalCookieConsent] = useState<
+    boolean | undefined
+  >(false);
+
+  const setLocalBottleCount = useState<number | undefined>(undefined)[1];
+
+  const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
+    useState<boolean | undefined>(undefined);
+  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+    boolean | undefined
+  >(undefined);
+
+  useEffect(() => {
+    if (!window) return;
+    const cookieConsent = window.localStorage.getItem("cookieConsent");
+
+    if (cookieConsent === "false") {
+      setLocalCookieConsent(false);
+      return;
+    } else {
+      setLocalCookieConsent(true);
+    }
+
+    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    const airdropBottleCount =
+      window.localStorage.getItem("airdropBottleCount");
+    const airdropShouldShowBottleNumbers = window.localStorage.getItem(
+      "airdropShouldShowBottleNumbers"
+    );
+
+    if (airdropBottleCount) {
+      setLocalBottleCount(parseInt(airdropBottleCount));
+    } else {
+      setLocalBottleCount(0);
+    }
+
+    if (airdropShouldShowBottleNumbers) {
+      setLocalShouldShowBottleNumbers(
+        airdropShouldShowBottleNumbers === "true"
+      );
+    } else {
+      setLocalShouldShowBottleNumbers(true);
+    }
+
+    if (airdropHasVisited) {
+      setLocalShouldShowTutorial(false);
+    } else {
+      setLocalShouldShowTutorial(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowBottleNumbers === undefined) return;
+    window.localStorage.setItem(
+      "airdropShouldShowBottleNumbers",
+      localShouldShowBottleNumbers.toString()
+    );
+  }, [localShouldShowBottleNumbers]);
+
+  useEffect(() => {
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowTutorial === undefined) return;
+    window.localStorage.setItem("airdropHasVisited", "true");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasUrlParams = urlParams.toString().length > 0;
+
+    if (localShouldShowTutorial && !isMobile && !hasUrlParams) {
+      setTimeout(() => {
+        setCurrentModal("tutorial");
+      }, 2000);
+    }
+  }, [localShouldShowTutorial]);
 
   const leaderboardRef = useRef<HTMLDivElement>(null);
 
@@ -281,10 +381,20 @@ const Airdrop = () => {
           isMobile ? "airdrop-mobile" : ""
         }`}
       >
-        <TabButton size="small" onClick={() => setCurrentModal(null)}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal(null)}
+          groupId="airdrop"
+          isSelected={isMobile ? currentModal === null : true}
+        >
           Airdrop Dashboard
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("tutorial")}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("tutorial")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "tutorial"}
+        >
           Airdrop Tutorial
         </TabButton>
         <TabButton
@@ -295,26 +405,34 @@ const Airdrop = () => {
                 block: "start",
                 behavior: "smooth",
               });
+            } else {
+              setCurrentModal("leaderboard");
             }
-            setCurrentModal("leaderboard");
           }}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "leaderboard"}
         >
           Leaderboard
         </TabButton>
         <TabButton
           size="small"
-          onClick={() => setCurrentModal("referral-details")}
+          onClick={() => setCurrentModal("referrals")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "referrals"}
         >
           Referrals
         </TabButton>
-        <TabButton size="small" onClick={() => setCurrentModal("stake-now")}>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("stake")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "stake"}
+        >
           Stake
         </TabButton>
       </div>
     );
   };
-
-  if (!showAirdrop) return null;
 
   if (isMobile)
     return (
@@ -328,8 +446,12 @@ const Airdrop = () => {
             display: "flex",
             flexDirection: "column",
             gap:
-              currentModal === "tutorial" || currentModal === "leaderboard"
+              currentModal === "tutorial" ||
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
+                : currentModal === "referrals"
+                ? "1em"
                 : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
@@ -353,8 +475,16 @@ const Airdrop = () => {
                   <LinkButton
                     size="medium"
                     type="external"
+                    style={{
+                      display: "inline-flex",
+                      textDecoration: "underline",
+                      textUnderlineOffset: 2,
+                    }}
                     handleClick={() => {
-                      return;
+                      window.open(
+                        "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                        "_blank"
+                      );
                     }}
                   >
                     Learn more
@@ -370,25 +500,40 @@ const Airdrop = () => {
                   gap: "1em",
                 }}
               >
-                <BottleProgress bottles={bottleTiers} isMobile />
-                <TextButton className="bottles-earned-button">
-                  Bottles Earned Since Last Checked <ArrowRight />
-                </TextButton>
+                <BottleProgress
+                  bottles={bottleTiers}
+                  isMobile
+                  shouldShowBottleNumbers={
+                    localShouldShowBottleNumbers === undefined
+                      ? true
+                      : localShouldShowBottleNumbers
+                  }
+                  setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+                />
               </div>
               <AirdropStats
-                seeReferralsDetails={() => setCurrentModal("referral-details")}
+                seeReferralsDetails={() => setCurrentModal("referrals")}
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
                 seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
                 epochDays={epochDays}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
+                network={network}
+                navigate={navigate}
                 isMobile
               />
               <MultiplierTasks />
               <MyMultiplier
-                seeMyStakingStats={() => setCurrentModal("staking-stats")}
-                seeStakeNow={() => setCurrentModal("stake-now")}
+                seeMyStakingStats={() => {
+                  setCurrentModal("stake");
+                  // would just useRef here but the ref doesn't exist at this point
+                  // timeout is needed to counterract the scroll to top
+                  setTimeout(() => {
+                    window.scrollTo(0, 1000);
+                  }, 500);
+                }}
+                seeStakeNow={() => setCurrentModal("stake")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
                 wethPrice={wethPrice}
@@ -408,7 +553,7 @@ const Airdrop = () => {
           {currentModal === "leaderboard" && (
             <>
               <Leaderboard
-                loaded={globalLeaderboardLoaded}
+                loaded={leaderboardLoaded}
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
@@ -417,7 +562,7 @@ const Airdrop = () => {
               />
             </>
           )}
-          {currentModal === "stake-now" && (
+          {currentModal === "stake" && (
             <>
               <Heading as="h3" className="no-margin">
                 Stake Now
@@ -437,6 +582,10 @@ const Airdrop = () => {
                 isMobile={isMobile}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+                stakeCallback={() => {
+                  fetchUserStakes(address ?? "");
+                  fetchUserTokenBalance();
+                }}
               />
               <Heading as="h3">My Staking Stats</Heading>
               <StakingStatsModal
@@ -447,6 +596,40 @@ const Airdrop = () => {
               />
             </>
           )}
+          {currentModal === "referrals" && (
+            <>
+              <Heading as="h3" className="no-margin">
+                My Referral Link
+              </Heading>
+              <ReferralDetailsModal
+                referralCode={referralCode}
+                bottles={referralBottleTiers}
+                totalBottles={referralBottlesCount}
+                activeReferrerReferralsCount={numActiveReferrerReferrals}
+                activeRefereeReferralsCount={numActiveReferreeReferrals}
+                inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
+                nextInactiveReferral={inactiveReferrals[0]}
+                isMobile
+                showCopyGroup
+              />
+              <div
+                style={{
+                  width: "100%",
+                  borderBottom: "1px solid grey",
+                }}
+              />
+              <Display size="xxxs">How It Works</Display>
+              <HowItWorksContent isMobile />
+            </>
+          )}
+          {/*{currentModal === "testnet-rewards" && (
+            <>
+              <Heading as="h3" className="no-margin">
+                Claim Testnet Rewards
+              </Heading>
+              <TestnetRewardsModal />
+            </>
+          )}*/}
         </motion.div>
       </>
     );
@@ -456,13 +639,13 @@ const Airdrop = () => {
       {/* Modals */}
       <CardModal
         id="referral-details"
-        visible={currentModal === "referral-details"}
+        visible={currentModal === "referrals"}
         closeModal={closeModal}
         style={{ gap: "1em" }}
       >
         <ReferralDetailsModal
-          bottles={bottleTiers}
-          totalBottles={bottlesCount}
+          bottles={referralBottleTiers}
+          totalBottles={referralBottlesCount}
           activeReferrerReferralsCount={numActiveReferrerReferrals}
           activeRefereeReferralsCount={numActiveReferreeReferrals}
           inactiveReferrerReferralsCount={numInactiveReferreeReferrals}
@@ -476,11 +659,15 @@ const Airdrop = () => {
         closeModal={closeModal}
         style={{ gap: "1em" }}
       >
-        <BottlesDetailsModal bottles={bottleTiers} />
+        <BottlesDetailsModal
+          bottles={bottleTiers}
+          navigate={navigate}
+          network={network}
+        />
       </CardModal>
       <CardModal
-        id="stake-now"
-        visible={currentModal === "stake-now"}
+        id="stake"
+        visible={currentModal === "stake"}
         closeModal={closeModal}
         style={{ gap: "2em" }}
       >
@@ -497,6 +684,10 @@ const Airdrop = () => {
           wethPrice={wethPrice}
           usdcPrice={usdcPrice}
           isMobile={isMobile}
+          stakeCallback={() => {
+            fetchUserStakes(address ?? "");
+            fetchUserTokenBalance();
+          }}
         />
       </CardModal>
       <CardModal
@@ -518,6 +709,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
+      {/*<CardModal
+        id="testnet-rewards"
+        visible={currentModal === "testnet-rewards"}
+        closeModal={closeModal}
+      >
+        <TestnetRewardsModal />
+      </CardModal>*/}
 
       {/* Page Content */}
       <Header />
@@ -561,7 +759,10 @@ const Airdrop = () => {
                     textUnderlineOffset: 2,
                   }}
                   handleClick={() => {
-                    return;
+                    window.open(
+                      "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                      "_blank"
+                    );
                   }}
                 >
                   Learn more
@@ -569,25 +770,35 @@ const Airdrop = () => {
               </Text>
             </div>
             <AirdropStats
-              seeReferralsDetails={() => setCurrentModal("referral-details")}
+              seeReferralsDetails={() => setCurrentModal("referrals")}
               seeBottlesDetails={() => setCurrentModal("bottles-details")}
               seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
               epochMax={epochDaysTotal}
               epochDays={epochDays}
               activatedReferrals={numActiveReferrerReferrals}
               totalBottles={bottlesCount}
+              network={network}
+              navigate={navigate}
             />
             <MultiplierTasks />
             <MyMultiplier
               seeMyStakingStats={() => setCurrentModal("staking-stats")}
-              seeStakeNow={() => setCurrentModal("stake-now")}
+              seeStakeNow={() => setCurrentModal("stake")}
               liquidityMultiplier={liquidityMultiplier}
               stakes={stakes}
               wethPrice={wethPrice}
               usdcPrice={usdcPrice}
             />
           </div>
-          <BottleProgress bottles={bottleTiers} />
+          <BottleProgress
+            shouldShowBottleNumbers={
+              localShouldShowBottleNumbers === undefined
+                ? true
+                : localShouldShowBottleNumbers
+            }
+            setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+            bottles={bottleTiers}
+          />
         </div>
       </div>
       <div
@@ -600,11 +811,8 @@ const Airdrop = () => {
       >
         <GeneralButton
           type="transparent"
-          icon={
-            <span style={{ fill: "none", transform: "rotate(90deg)" }}>
-              <ArrowRight />
-            </span>
-          }
+          icon={<ArrowRight />}
+          className="scroll-to-leaderboard-button"
           onClick={() => {
             leaderboardRef.current?.scrollIntoView({
               block: "start",
@@ -624,7 +832,7 @@ const Airdrop = () => {
           color="white"
         >
           <Leaderboard
-            loaded={globalLeaderboardLoaded}
+            loaded={leaderboardLoaded}
             data={leaderboardRows}
             filterIndex={leaderboardFilterIndex}
             setFilterIndex={setLeaderboardFilterIndex}
@@ -644,6 +852,8 @@ interface IAirdropStats {
   epochMax: number;
   activatedReferrals: number;
   totalBottles: number;
+  network: string;
+  navigate: (path: string) => void;
   isMobile?: boolean;
 }
 
@@ -655,6 +865,8 @@ const AirdropStats = ({
   epochMax,
   activatedReferrals,
   totalBottles,
+  network,
+  navigate,
   isMobile,
 }: IAirdropStats) => {
   return (
@@ -722,7 +934,7 @@ const AirdropStats = ({
       <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">MY TOTAL BOTTLES</Text>}>
           <Text prominent size="xl">
-            {toSignificantDecimals(totalBottles, 0)}
+            {Math.round(totalBottles * 100) / 100}
           </Text>
         </LabelledValue>
         <LinkButton
@@ -732,7 +944,7 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  console.log("TODO REDIRECT");
+                  navigate(`/${network}/dashboard/rewards`);
                 }
               : seeBottlesDetails
           }
@@ -750,14 +962,21 @@ const AirdropStats = ({
 const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
-  const providers: Provider[] = [
-    "Uniswap",
-    "Sushiswap",
-    "Camelot",
-    "Saddle",
-    "Chronos",
-    "Kyber",
+  const providerLinks: { provider: Provider; link: string }[] = [
+    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    {
+      provider: "Sushiswap",
+      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+    },
+    { provider: "Camelot", link: "https://app.camelot.exchange/" },
+    { provider: "Saddle", link: "https://saddle.exchange/#/" },
+    { provider: "Chronos", link: "https://app.chronos.exchange/" },
+    {
+      provider: "Kyber",
+      link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
+    },
   ];
+
   return (
     <Card fill color="holo" rounded className="multiplier-tasks">
       <div className="multiplier-tasks-header">
@@ -814,7 +1033,7 @@ const MultiplierTasks = () => {
           exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
           className="multiplier-tasks-tasks"
         >
-          {providers.map((provider, i) => {
+          {providerLinks.map(({ provider, link }, i) => {
             return (
               <a
                 key={`airdrop-mx-provider-` + i}
@@ -826,7 +1045,7 @@ const MultiplierTasks = () => {
                   backgroundColor: "black",
                   padding: "6px",
                 }}
-                href="#"
+                href={link}
               >
                 <ProviderIcon provider={provider} style={{ height: "100%" }} />
               </a>
@@ -856,12 +1075,51 @@ interface IMyMultiplier {
 const MyMultiplier = ({
   seeMyStakingStats,
   seeStakeNow,
-  liquidityMultiplier,
   stakes,
   wethPrice,
   usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
+  const sumLiquidityMultiplier = stakes.reduce(
+    (sum, { fluidAmount, baseAmount, durationDays, depositDate }) => {
+      const fluidDecimals = 6;
+      const fluidUsd = getUsdFromTokenAmount(
+        fluidAmount,
+        fluidDecimals,
+        usdcPrice
+      );
+
+      const wethDecimals = 18;
+      const usdcDecimals = 6;
+
+      // If converting base amount by weth decimals (18) is smaller than $0.01,
+      // then tentatively assume Token amount is USDC
+      // A false hit would be a USDC deposit >= $100,000
+      const baseUsd =
+        getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
+          ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
+          : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
+
+      const stakedDays = dayDifference(new Date(), new Date(depositDate));
+
+      const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
+
+      return sum + (fluidUsd + baseUsd) * multiplier;
+    },
+    0
+  );
+
+  // if there are no stakes, this renders an empty stake on the dashboard which is A PART OF THE DESIGN SPEC
+  if (stakes.length === 0)
+    stakes = [
+      {
+        fluidAmount: new BN(0),
+        baseAmount: new BN(0),
+        durationDays: 0,
+        depositDate: new Date(),
+      },
+    ];
+
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
@@ -881,7 +1139,7 @@ const MyMultiplier = ({
           label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
         >
           <Text size="xxl" holo>
-            {liquidityMultiplier.toLocaleString()}x
+            {toSignificantDecimals(sumLiquidityMultiplier, 1)}x
           </Text>
         </LabelledValue>
       </div>
@@ -897,8 +1155,11 @@ const MyMultiplier = ({
       </GeneralButton>
       {!isMobile && (
         <div id="mx-my-stakes">
-          {stakes.map(
-            ({ fluidAmount, baseAmount, durationDays, depositDate }) => {
+          {stakes
+            .map((stake) => {
+              const { fluidAmount, baseAmount, durationDays, depositDate } =
+                stake;
+
               const stakedDays = dayDifference(
                 new Date(),
                 new Date(depositDate)
@@ -927,6 +1188,29 @@ const MyMultiplier = ({
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
+              return {
+                stake,
+                stakedDays,
+                multiplier,
+                fluidUsd,
+                baseUsd,
+              };
+            })
+            .sort((a, b) => {
+              const stakeAVal = (a.fluidUsd + a.baseUsd) * a.multiplier;
+              const stakeBVal = (b.fluidUsd + b.baseUsd) * b.multiplier;
+
+              // Sort Descending
+              return stakeBVal > stakeAVal
+                ? 1
+                : stakeBVal === stakeAVal
+                ? 0
+                : -1;
+            })
+            .slice(0, 3)
+            .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
+              const { durationDays } = stake;
+
               return (
                 <>
                   <div
@@ -942,12 +1226,10 @@ const MyMultiplier = ({
                       {Math.floor(durationDays)} DAYS
                     </Text>
                     <ProgressBar
-                      value={stakedDays}
-                      max={Math.floor(durationDays)}
+                      value={multiplier}
+                      max={1}
                       rounded
-                      color={
-                        stakedDays >= Math.floor(durationDays) ? "holo" : "gray"
-                      }
+                      color={multiplier === 1 ? "holo" : "gray"}
                       size="sm"
                     />
                   </div>
@@ -955,13 +1237,12 @@ const MyMultiplier = ({
                     style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
                   >
                     <Text holo bold prominent>
-                      {multiplier}X
+                      {toSignificantDecimals(multiplier, 1)}X
                     </Text>
                   </div>
                 </>
               );
-            }
-          )}
+            })}
         </div>
       )}
       <GeneralButton
@@ -1111,7 +1392,11 @@ const Leaderboard = ({
   isMobile = false,
 }: IAirdropLeaderboard) => {
   // This adds a dummy user entry to the leaderboard if the user's address isn't found
-  if (loaded && !data.find((entry) => entry.user === userAddress)) {
+  if (
+    loaded &&
+    userAddress &&
+    !data.find((entry) => entry.user === userAddress)
+  ) {
     const userEntry = {
       user: userAddress,
       rank: -1,
@@ -1197,12 +1482,15 @@ const Leaderboard = ({
 const BottleProgress = ({
   bottles,
   isMobile,
+  shouldShowBottleNumbers,
+  setShouldShowBottleNumbers,
 }: {
   bottles: BottleTiers;
   isMobile?: boolean;
+  shouldShowBottleNumbers: boolean;
+  setShouldShowBottleNumbers: (shouldShow: boolean) => void;
 }) => {
   const [imgIndex, setImgIndex] = useState(0);
-  const [showBottleNumbers, setShowBottleNumbers] = useState(false);
 
   const handleHeroPageChange = (index: number) => {
     setImgIndex(index);
@@ -1249,22 +1537,20 @@ const BottleProgress = ({
         }}
         numberPosition={isMobile ? "relative" : "absolute"}
         bottles={bottles}
-        showBottleNumbers={showBottleNumbers}
+        showBottleNumbers={shouldShowBottleNumbers}
         highlightBottleNumberIndex={imgIndex}
       />
       {!isMobile && (
         <div style={{ display: "flex", flexDirection: "row", gap: "1em" }}>
           <Form.Toggle
-            checked={showBottleNumbers}
-            onClick={() =>
-              setShowBottleNumbers((showBottleNumbers) => !showBottleNumbers)
-            }
+            checked={shouldShowBottleNumbers}
+            onClick={() => setShouldShowBottleNumbers(!shouldShowBottleNumbers)}
             style={{
-              opacity: showBottleNumbers ? 1 : 0.3,
+              opacity: shouldShowBottleNumbers ? 1 : 0.3,
             }}
           />
 
-          <Text size="sm" prominent={showBottleNumbers}>
+          <Text size="sm" prominent={shouldShowBottleNumbers}>
             ALWAYS SHOW BOTTLE NUMBERS
           </Text>
         </div>
@@ -1274,6 +1560,6 @@ const BottleProgress = ({
 };
 
 export const dayDifference = (date1: Date, date2: Date) =>
-  Math.ceil(Math.abs(date1.getTime() - date2.getTime()) / 1000 / 60 / 60 / 24);
+  Math.round(Math.abs(date1.valueOf() - date2.valueOf()) / 1000 / 60 / 60 / 24);
 
 export default Airdrop;
