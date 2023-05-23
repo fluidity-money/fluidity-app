@@ -13,6 +13,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
@@ -183,7 +185,9 @@ type (
 
 // HashFromString, taking the string and making it lowercase then coercing
 func HashFromString(str string) Hash {
-	hash := strings.ToLower(str)
+	hashNormal := common.HexToHash(str)
+
+	hash := strings.ToLower(hashNormal.String())
 
 	return Hash{hash}
 }
@@ -191,7 +195,9 @@ func HashFromString(str string) Hash {
 // AddressFromString, taking the string and making it lowercase then
 // coercing
 func AddressFromString(str string) Address {
-	address := strings.ToLower(str)
+	addressNormal := common.HexToAddress(str)
+
+	address := strings.ToLower(addressNormal.String())
 
 	return Address{address}
 }
