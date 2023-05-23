@@ -21,7 +21,7 @@ import {
   Tooltip,
   TabButton,
   LootBottle,
-  toSignificantDecimals,
+  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -507,7 +507,7 @@ export default function Home() {
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
                   ([rarity, quantity]: [string, number], index) => {
-                    if (quantity < 0.1) return <></>;
+                    if (quantity <= 0.005) return <></>;
 
                     return (
                       <div key={index} className="lootbottle-container">
@@ -519,7 +519,7 @@ export default function Home() {
                             textTransform: "capitalize",
                           }}
                         >
-                          {toSignificantDecimals(quantity, 1)}
+                          {toDecimalPlaces(quantity, 2)}
                         </Text>
                       </div>
                     );
