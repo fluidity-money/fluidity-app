@@ -5,22 +5,23 @@
 package ethereum
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHashFromString(t *testing.T) {
-	str := "0xMixeDcAseString123"
+	str := "0xAaAaAaAa"
 	hash := HashFromString(str)
+	expectedHash := "0x00000000000000000000000000000000000000000000000000000000aaaaaaaa"
 
-	assert.Equal(t, strings.ToLower(str), hash.String())
+	assert.Equal(t, expectedHash, hash.String())
 }
 
 func TestAddressFromString(t *testing.T) {
-	str := "0xMixeDcAseString123"
+	str := "0xAaAaAaAa"
 	address := AddressFromString(str)
+	expectedAddres := "0x00000000000000000000000000000000aaaaaaaa"
 
-	assert.Equal(t, strings.ToLower(str), address.String())
+	assert.Equal(t, expectedAddres, address.String())
 }
