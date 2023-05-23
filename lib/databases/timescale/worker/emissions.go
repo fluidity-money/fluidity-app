@@ -158,6 +158,8 @@ func InsertEmissions(emission Emission) {
 			saddle_fee,
 			gtrade_v6_1_fee,
 			meson_fee,
+            camelot_fee,
+            chronos_fee,
 
 			saber_fee,
 			orca_fee,
@@ -287,37 +289,36 @@ func InsertEmissions(emission Emission) {
 			$70,
 			$71,
 			$72,
+            $73,
+            $74,
 
-			$73,
-			$74,
 			$75,
 			$76,
 			$77,
 			$78,
-
 			$79,
 			$80,
+
 			$81,
 			$82,
 			$83,
-
 			$84,
 			$85,
+
 			$86,
 			$87,
-
 			$88,
 			$89,
+
 			$90,
 			$91,
 			$92,
-
 			$93,
 			$94,
 
 			$95,
-
 			$96,
+
 			$97,
 
 			$98,
@@ -325,7 +326,10 @@ func InsertEmissions(emission Emission) {
 
 			$100,
 			$101,
-			$102
+
+			$102,
+			$103,
+			$104
 		);`,
 
 		TableEmissions,
@@ -421,6 +425,8 @@ func InsertEmissions(emission Emission) {
 		ethAppFees.Saddle,
 		ethAppFees.GTradeV6_1,
 		ethAppFees.Meson,
+		ethAppFees.Camelot,
+		ethAppFees.Chronos,
 
 		solAppFees.Saber,
 		solAppFees.Orca,
