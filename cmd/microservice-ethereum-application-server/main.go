@@ -252,10 +252,10 @@ func main() {
 
 				normalisedAddress := ethereum.AddressFromString(transfer.Log.Address.String())
 
-				utility, utilityFound := utilities[normalisedAddress]
+				utility, _ := utilities[normalisedAddress]
 
-				// we set the decorator if there's an app fee or a utility
-				if fee == nil && !utilityFound {
+				// we set the decorator if there's an app fee
+				if fee == nil {
 					log.App(func(k *log.Log) {
 						k.Format(
 							"Skipping an application transfer for transaction %#v and application %#v!",
@@ -271,12 +271,6 @@ func main() {
 					Application:    transfer.Application,
 					UtilityName:    utility,
 					ApplicationFee: fee,
-				}
-
-				// if there's a utility but no fee, the event is from a protocol
-				// but not one that's decoded by GetApplicationFee
-				if fee == nil {
-					decorator.Application = applications.ApplicationNone
 				}
 
 				sender, recipient, err := applications.GetApplicationTransferParties(
