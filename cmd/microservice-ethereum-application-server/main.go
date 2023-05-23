@@ -41,7 +41,6 @@ const (
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
 
-
 // appsListFromEnvOrFatal parses a list of `app:address:address,app:address:address` into a map of {address => app}
 func appsListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.Application {
 	applicationContracts_ := util.GetEnvOrFatal(EnvApplicationContracts)
@@ -379,12 +378,20 @@ func main() {
 		for transactionHash, decoratedTransaction := range decoratedTransactions {
 			for i, transfer := range decoratedTransaction.Transfers {
 				if transfer.Decorator != nil {
+					fee := "nil"
+
+					if transfer.Decorator.ApplicationFee != nil {
+						fee = transfer.Decorator.ApplicationFee.RatString()
+					}
+
 					log.Debug(func(k *log.Log) {
 						k.Format(
-							"For transaction hash %v, transfer with index %v had application %v!",
+							"For transaction hash %v, transfer with index %v had application %v, utility %v, fee %v!",
 							transactionHash,
 							i,
 							transfer.Decorator.Application.String(),
+							transfer.Decorator.UtilityName,
+							fee,
 						)
 					})
 				}
