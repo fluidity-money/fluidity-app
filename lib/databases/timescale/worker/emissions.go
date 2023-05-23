@@ -158,6 +158,8 @@ func InsertEmissions(emission Emission) {
 			saddle_fee,
 			gtrade_v6_1_fee,
 			meson_fee,
+            camelot_fee,
+            chronos_fee,
 
 			saber_fee,
 			orca_fee,
