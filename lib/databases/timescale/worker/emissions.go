@@ -425,6 +425,8 @@ func InsertEmissions(emission Emission) {
 		ethAppFees.Saddle,
 		ethAppFees.GTradeV6_1,
 		ethAppFees.Meson,
+		ethAppFees.Camelot,
+		ethAppFees.Chronos,
 
 		solAppFees.Saber,
 		solAppFees.Orca,
