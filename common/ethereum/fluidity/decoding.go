@@ -202,9 +202,9 @@ func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
 	)
 
 	switch eventSignature {
-	case StakingAbi.Events["Staked"].ID:
+	case StakingAbi.Events["Deposited"].ID:
 
-		decodedData, err := StakingAbi.Unpack("Staked", logData)
+		decodedData, err := StakingAbi.Unpack("Deposited", logData)
 
 		if err != nil {
 			return stakingEvent, fmt.Errorf(
