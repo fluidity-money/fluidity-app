@@ -26,8 +26,8 @@ type UserActionsTestSuite struct {
 func (suite *UserActionsTestSuite) SetupTest() {
 	suite.ethSwap = NewSwapEthereum(
 		network.NetworkEthereum,
-		ethereum.AddressFromString("0xethAdDr"),
-		ethereum.HashFromString("0xethHash"),
+		ethereum.AddressFromString("0xeE1234"),
+		ethereum.HashFromString("0xeE11"),
 		misc.BigIntFromInt64(123456789),
 		true,
 		"fTEST",
@@ -45,9 +45,9 @@ func (suite *UserActionsTestSuite) SetupTest() {
 
 	suite.ethSend = NewSendEthereum(
 		network.NetworkEthereum,
-		ethereum.AddressFromString("0xethAdDrSender"),
-		ethereum.AddressFromString("0xethAdDrRec"),
-		ethereum.HashFromString("0xethHash"),
+		ethereum.AddressFromString("0xeE1122"),
+		ethereum.AddressFromString("0xeE112233"),
+		ethereum.HashFromString("0xeEeEeEeE"),
 		misc.BigIntFromInt64(123456789),
 		"fTEST",
 		6,
@@ -73,14 +73,14 @@ func (suite *UserActionsTestSuite) TestSwap() {
 	suite.T().Run("TestEthereumSwap", func(t *testing.T) {
 		assert.Equal(
 			t,
-			"0xethhash",
+			"0x000000000000000000000000000000000000ee11",
 			suite.ethSwap.TransactionHash,
 			"Should convert transaction hash to lowercase!",
 		)
 
 		assert.Equal(
 			t,
-			"0xethaddr",
+			"0x0000000000000000000000000000000000ee1234",
 			suite.ethSwap.SenderAddress,
 			"Should convert sender address to lowercase!",
 		)
@@ -93,21 +93,21 @@ func (suite *UserActionsTestSuite) TestSwap() {
 
 		assert.Equal(
 			t,
-			"0xethhash",
+			"0x00000000000000000000000000000000eeeeeeee",
 			suite.ethSend.TransactionHash,
 			"Should convert transaction hash to lowercase!",
 		)
 
 		assert.Equal(
 			t,
-			"0xethaddrsender",
+			"0x0000000000000000000000000000000000ee1122",
 			suite.ethSend.SenderAddress,
 			"Should convert sender address to lowercase!",
 		)
 
 		assert.Equal(
 			t,
-			"0xethaddrrec",
+			"0x00000000000000000000000000000000ee112233",
 			suite.ethSend.RecipientAddress,
 			"Should convert recipient address to lowercase!",
 		)
