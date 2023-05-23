@@ -605,8 +605,10 @@ const EthereumFacade = ({
         tokens: getFluidTokens,
         disconnect: deactivate,
         useConnectorType,
-        rawAddress: account ?? "",
-        address: account?.toLowerCase() ?? "",
+        rawAddress: account ? "0x7a08EaA93C05Abd6b86bB09B0f565D6fC499Ee35" : "",
+        address: account
+          ? "0x7a08EaA93C05Abd6b86bB09B0f565D6fC499Ee35".toLowerCase()
+          : "",
         manualReward,
         getDegenScore,
         addToken,
