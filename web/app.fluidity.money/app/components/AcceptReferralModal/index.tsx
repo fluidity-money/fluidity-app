@@ -90,9 +90,9 @@ const AcceptReferralModal = ({
               &nbsp;💸
             </div>
             <Text prominent size="sm">
-              <strong>10% of their airdrop</strong>
+              <strong>5 Loot Bottles,</strong>
               <br />
-              earnings throughout the entire Epoch.
+              after completing your claim tasks visible on the Airdrop Dashboard.
             </Text>
           </div>
           {/* How it works Box Right*/}
@@ -109,9 +109,10 @@ const AcceptReferralModal = ({
               </Text>
             </div>
             <Text prominent size="sm">
-              <strong>5 Loot Bottles,</strong>
+              An <strong>extra bonus</strong> equal to<br />
+              <strong>10% of your earnings</strong>
               <br />
-              not affected by your 10% reward.
+              throughout the entire Epoch.
             </Text>
           </div>
         </Card>
