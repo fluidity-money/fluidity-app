@@ -34,7 +34,7 @@ func createLogData(lockupLength, usdAmount int32, lockedTimestamp int64) (misc.B
 	lockedTimestampData := zeroData[:64-len(lockedTimestampHex)] + lockedTimestampHex
 	usdAmountData := zeroData[:64-len(usdAmountHex)] + usdAmountHex
 
-	// fusdcAmount and wethAmount can be zero as they aren't read
+	// TODO requires fusdc/weth amount
 	logData_ := "0x" + lockupLengthData + lockedTimestampData + zeroData + usdAmountData + zeroData
 	logData, err := hexutil.Decode(logData_)
 

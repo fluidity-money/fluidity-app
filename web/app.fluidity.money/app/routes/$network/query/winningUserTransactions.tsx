@@ -49,13 +49,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
   try {
-    const { data: winnersData, errors: winnersErr } = address
-      ? await useUserRewardsByAddress(network ?? "", address)
-      : await useUserRewardsAll(network ?? "");
-
-    const { data: pendingWinnersData, errors: pendingWinnersErr } = address
-      ? await useUserPendingRewardsByAddress(network ?? "", address)
-      : await useUserPendingRewardsAll(network ?? "");
+    const [
+      { data: winnersData, errors: winnersErr },
+      { data: pendingWinnersData, errors: pendingWinnersErr },
+    ] = await Promise.all(
+      address
+        ? [
+            useUserRewardsByAddress(network ?? "", address),
+            useUserPendingRewardsByAddress(network ?? "", address),
+          ]
+        : [
+            useUserRewardsAll(network ?? ""),
+            useUserPendingRewardsAll(network ?? ""),
+          ]
+    );
 
     if (
       winnersErr ||
@@ -236,7 +243,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     );
 
     Object.entries(lootbottlesMap).forEach(([txHash, bottles]) => {
-      if (Object.values(bottles).every((amt: number) => amt < 0.1)) {
+      if (Object.values(bottles).every((amt: number) => amt <= 0.005)) {
         delete lootbottlesMap[txHash];
       }
     });
