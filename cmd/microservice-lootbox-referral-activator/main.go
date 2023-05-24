@@ -104,10 +104,10 @@ func main() {
 					Application:     applications.ApplicationNone,
 				}
 
-				go queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)
+				queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)
 			}
 
-			go referrals.UpdateReferral(referral)
+			referrals.UpdateReferral(referral)
 		}
 	})
 }
