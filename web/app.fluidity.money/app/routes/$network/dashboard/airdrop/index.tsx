@@ -138,6 +138,20 @@ const Airdrop = () => {
     network,
   } = useLoaderData<LoaderData>();
 
+  if (network !== "arbitrum") {
+    return (
+      <div className="pad-main">
+        <Heading as="h1" className="no-margin">
+          Airdrop
+        </Heading>
+        <Text>
+          The Fluidity Airdrop is currently only available on Arbitrum. Please
+          switch to the Arbitrum network to participate.
+        </Text>
+      </div>
+    );
+  }
+
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
@@ -1340,7 +1354,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
       </td>
 
       {/* Multiplier */}
-      <td>
+      <td
+      >
         <Text
           prominent
           style={
@@ -1351,7 +1366,7 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
               : {}
           }
         >
-          {liquidityMultiplier.toLocaleString()}x
+          {toSignificantDecimals(liquidityMultiplier,1)}x
         </Text>
       </td>
 

@@ -526,7 +526,25 @@ export default function Home() {
                   }
                 )}
               </td>
-            ) : (
+            ) : 
+              (reward > 0 && !data.swapType && data.sender === sender) ? (
+                <td className="table-bottle">
+                      <div key={index} className="lootbottle-container">
+                        <LootBottle size="sm" rarity={"legendary"} quantity={0} />
+                        <Text
+                          size="sm"
+                          style={{
+                            whiteSpace: "nowrap",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          ...
+                        </Text>
+                      </div>
+              </td>
+              )
+              :
+            (
               <td>
                 <Text>-</Text>
               </td>
