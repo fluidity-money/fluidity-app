@@ -547,7 +547,7 @@ export default function Rewards() {
           )
           :(
             <td>
-              <Text>-{data.swapType}</Text>
+              <Text>-</Text>
             </td>
           )}
 
