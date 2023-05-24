@@ -11,6 +11,7 @@ import (
 	"time"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	ethLogs "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -247,6 +248,8 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 			wethAmountInt      = decodedData[4].(*big.Int)
 		)
 
+		addressNormal := ethCommon.HexToAddress(addressString)
+
 		if !lockedTimestampInt.IsInt64() {
 			return stakingEvent, fmt.Errorf(
 				"Decoded a timestamp that was larger than int64! %v",
@@ -257,7 +260,7 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 		lockedTimestampInt64 := lockedTimestampInt.Int64()
 		lockedTimestamp := time.Unix(lockedTimestampInt64, 0)
 
-		stakingEvent.Address = ethereum.AddressFromString(addressString)
+		stakingEvent.Address = commonEth.ConvertGethAddress(addressNormal)
 		stakingEvent.InsertedDate = lockedTimestamp
 
 		usdcDecimals := math.Pow10(UsdcDecimals)
