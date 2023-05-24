@@ -1329,7 +1329,7 @@ const StakeNowModal = ({
             tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1."
           >
             <Text size="xs" code className="helper-label">
-              DAY 1 POWER <InfoCircle />
+              DAY 0 POWER <InfoCircle />
             </Text>
           </Hoverable>
           <Text
@@ -1349,7 +1349,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(1, stakingDuration),
+              stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1357,7 +1357,7 @@ const StakeNowModal = ({
             <Text size="xs" prominent code>
               @ MULTIPLIER{" "}
               {toSignificantDecimals(
-                stakingLiquidityMultiplierEq(1, stakingDuration)
+                stakingLiquidityMultiplierEq(0, stakingDuration)
               )}
               X
             </Text>
