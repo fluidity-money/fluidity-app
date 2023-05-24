@@ -40,6 +40,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 		senderWinAmount    = winner.FromWinAmount
 		recipientAddress   = winner.ToAddress
 		recipientWinAmount = winner.ToWinAmount
+		logIndex           = winner.LogIndex
 	)
 
 	statementText := fmt.Sprintf(
@@ -53,7 +54,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			utility_name,
 			block_number,
 			network,
-			reward_type
+			reward_type,
+			log_index
 		)
 
 		VALUES (
@@ -66,7 +68,8 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			$7,
 			$8,
 			$9,
-			$10
+			$10,
+			$11
 		);`,
 
 		TablePendingWinners,
@@ -91,6 +94,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			blockNumber,
 			network_,
 			"send",
+			logIndex,
 		)
 
 		if err != nil {
@@ -126,6 +130,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			blockNumber,
 			network_,
 			"receive",
+			logIndex,
 		)
 
 		if err != nil {
