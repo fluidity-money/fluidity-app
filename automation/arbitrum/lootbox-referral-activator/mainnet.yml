@@ -1,6 +1,8 @@
 DOCKER_IMAGE: microservice-lootbox-referral-activator
 DOCKERFILE_PATH: ./cmd/microservice-lootbox-referral-activator
 ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
+TASK_MIN_COUNT: 1
+ENV_FLU_AMQP_GOROUTINES_PER_QUEUE: 1
 
 SERVICES:
   - LOOTBOX_REFERRAL_ACTIVATOR:
