@@ -124,6 +124,12 @@ const shorthandAmountFormatter = (
     : "0";
 };
 
+const toDecimalPlaces = (num: number, decimals: number) => {
+  const factor = 10 ** decimals;
+
+  return Math.round(num * factor) / factor;
+};
+
 export {
   numberToCommaSeparated,
   numberToMonetaryString,
@@ -131,4 +137,5 @@ export {
   toSignificantDecimals,
   decimalTrim,
   shorthandAmountFormatter,
+  toDecimalPlaces,
 };

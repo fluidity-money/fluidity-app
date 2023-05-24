@@ -247,7 +247,6 @@ export default function Dashboard() {
 
   const { showExperiment, client } = useContext(SplitContext);
   const showAssets = showExperiment("enable-assets-page");
-  const showAirdrop = showExperiment("enable-airdrop-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
@@ -326,13 +325,11 @@ export default function Dashboard() {
   };
 
   const { data: referralsCountData } = useCache<ReferralCountLoaderData>(
-    showAirdrop && address
-      ? `/${network}/query/referrals?address=${address}`
-      : ""
+    address ? `/${network}/query/referrals?address=${address}` : ""
   );
 
   const { data: referralCodeData } = useCache<ReferralCodeLoaderData>(
-    showAirdrop && clickedReferralCode && address
+    clickedReferralCode && address
       ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
       : ""
   );
@@ -526,37 +523,33 @@ export default function Dashboard() {
         <ul>
           {NAVIGATION_MAP.filter((obj) =>
             showAssets ? true : Object.keys(obj)[0] !== "assets"
-          )
-            .filter((obj) =>
-              showAirdrop ? true : Object.keys(obj)[0] !== "airdrop"
-            )
-            .map((obj, index) => {
-              const key = Object.keys(obj)[0];
-              const { name, icon } = Object.values(obj)[0];
-              const active = index === activeIndex;
+          ).map((obj, index) => {
+            const key = Object.keys(obj)[0];
+            const { name, icon } = Object.values(obj)[0];
+            const active = index === activeIndex;
 
-              return (
-                <li key={key}>
-                  {index === activeIndex ? (
-                    <motion.div className={"active"} layoutId="active" />
-                  ) : (
-                    <div />
-                  )}
-                  <Link to={key}>
-                    <Text
-                      prominent={active}
-                      className={
-                        active
-                          ? "dashboard-navbar-active"
-                          : "dashboard-navbar-default"
-                      }
-                    >
-                      {icon} {name}
-                    </Text>
-                  </Link>
-                </li>
-              );
-            })}
+            return (
+              <li key={key}>
+                {index === activeIndex ? (
+                  <motion.div className={"active"} layoutId="active" />
+                ) : (
+                  <div />
+                )}
+                <Link to={key}>
+                  <Text
+                    prominent={active}
+                    className={
+                      active
+                        ? "dashboard-navbar-active"
+                        : "dashboard-navbar-default"
+                    }
+                  >
+                    {icon} {name}
+                  </Text>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Connect Wallet Button */}
@@ -662,21 +655,19 @@ export default function Dashboard() {
             )}
 
             {/* Referrals Button */}
-            {showExperiment("enable-airdrop-page") && (
-              <GeneralButton
-                type="transparent"
-                size="small"
-                layout="before"
-                handleClick={() => {
-                  width < airdropMobileBreakpoint
-                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                    : setReferralModalVisibility(true);
-                }}
-                icon={<Referral />}
-              >
-                {isMobile ? "" : "Referral"}
-              </GeneralButton>
-            )}
+            <GeneralButton
+              type="transparent"
+              size="small"
+              layout="before"
+              handleClick={() => {
+                width < airdropMobileBreakpoint
+                  ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                  : setReferralModalVisibility(true);
+              }}
+              icon={<Referral />}
+            >
+              {isMobile ? "" : "Referral"}
+            </GeneralButton>
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (

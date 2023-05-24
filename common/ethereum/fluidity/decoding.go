@@ -6,6 +6,7 @@ package fluidity
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 	"time"
 
@@ -188,7 +189,13 @@ func TryDecodeUnblockedRewardData(log typesEth.Log, token token_details.TokenDet
 	return rewardData, nil
 }
 
-func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
+const (
+	UsdcDecimals  = 6
+	FusdcDecimals = 6
+	WethDecimals  = 18
+)
+
+func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.StakingEvent, error) {
 	var (
 		logTopics = l.Topics
 		logData   = l.Data
@@ -202,9 +209,9 @@ func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
 	)
 
 	switch eventSignature {
-	case StakingAbi.Events["Staked"].ID:
+	case StakingAbi.Events["Deposited"].ID:
 
-		decodedData, err := StakingAbi.Unpack("Staked", logData)
+		decodedData, err := StakingAbi.Unpack("Deposited", logData)
 
 		if err != nil {
 			return stakingEvent, fmt.Errorf(
@@ -213,7 +220,7 @@ func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
 			)
 		}
 
-		// lockupLength, lockedTimestamp, fusdcAmount, usdAmount, wethAmount
+		// lockupLength, lockedTimestamp, fusdcAmount, usdcAmount, wethAmount
 		if dataLen := len(decodedData); dataLen != 5 {
 			return stakingEvent, fmt.Errorf(
 				"Unexpected number of log data! expected %d, got %d!",
@@ -235,7 +242,9 @@ func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
 			addressString      = logTopics[1].String()
 			lockupLengthInt    = decodedData[0].(*big.Int)
 			lockedTimestampInt = decodedData[1].(*big.Int)
-			usdAmountInt       = decodedData[3].(*big.Int)
+			fusdcAmountInt     = decodedData[2].(*big.Int)
+			usdcAmountInt      = decodedData[3].(*big.Int)
+			wethAmountInt      = decodedData[4].(*big.Int)
 		)
 
 		if !lockedTimestampInt.IsInt64() {
@@ -250,8 +259,44 @@ func TryDecodeStakingEventData(l ethLogs.Log) (ethereum.StakingEvent, error) {
 
 		stakingEvent.Address = ethereum.AddressFromString(addressString)
 		stakingEvent.InsertedDate = lockedTimestamp
-		stakingEvent.UsdAmount = misc.NewBigIntFromInt(*usdAmountInt)
-		stakingEvent.LockupLength = int(lockupLengthInt.Int64())
+
+		usdcDecimals := math.Pow10(UsdcDecimals)
+		fusdcDecimals := math.Pow10(FusdcDecimals)
+		wethDecimals := math.Pow10(WethDecimals)
+
+		usdcDecimalsRat := new(big.Rat).SetFloat64(usdcDecimals)
+		fusdcDecimalsRat := new(big.Rat).SetFloat64(fusdcDecimals)
+		wethDecimalsRat := new(big.Rat).SetFloat64(wethDecimals)
+
+		// fUSDC USD = fusdc / fusdc_decimals
+		fusdcRat := new(big.Rat).SetInt(fusdcAmountInt)
+		fusdcRat.Quo(fusdcRat, fusdcDecimalsRat)
+
+		// USDC USD = usdc / usdc_decimals
+		usdcRat := new(big.Rat).SetInt(usdcAmountInt)
+		usdcRat.Quo(usdcRat, usdcDecimalsRat)
+
+		// weth usd = (weth / weth_decimals) * (weth price usd)
+		wethRat := new(big.Rat).SetInt(wethAmountInt)
+		wethRat.Quo(wethRat, wethDecimalsRat)
+		wethRat.Mul(wethRat, wethPriceUsd)
+
+		sumUsd := new(big.Rat).Add(fusdcRat, usdcRat)
+		sumUsd = sumUsd.Add(sumUsd, wethRat)
+
+		// round to nearest whole
+
+		sumUsdInt := new(big.Int).Quo(sumUsd.Num(), sumUsd.Denom())
+
+		stakingEvent.UsdAmount = misc.NewBigIntFromInt(*sumUsdInt)
+
+		// convert lockup length (seconds) to days
+		lockupLengthSeconds := int(lockupLengthInt.Int64())
+		lockupLength := time.Duration(lockupLengthSeconds) * time.Second
+		lockupLengthDays := math.Floor(lockupLength.Hours() / 24)
+
+		// will always be an integer number of days (max lockup time is a year)
+		stakingEvent.LockupLength = int(lockupLengthDays)
 
 		return stakingEvent, nil
 	default:

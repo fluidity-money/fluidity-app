@@ -21,7 +21,7 @@ import {
   Tooltip,
   TabButton,
   LootBottle,
-  toSignificantDecimals,
+  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -308,35 +308,20 @@ export default function Home() {
         return [{ name: "ACTIVITY" }, { name: "VALUE" }];
       case isMobile:
         return [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }];
-      case isTablet && showExperiment("enable-airdrop-page"):
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
-          { name: "ACCOUNT" },
-        ];
       case isTablet:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
-          { name: "ACCOUNT" },
-        ];
-      case showExperiment("enable-airdrop-page"):
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "REWARD" },
           { name: "BOTTLES" },
           { name: "ACCOUNT" },
-          { name: "TIME", alignRight: true },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
+          { name: "BOTTLES" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -517,13 +502,12 @@ export default function Home() {
           )}
 
           {/* Bottles */}
-          {showExperiment("enable-airdrop-page") &&
-            !isMobile &&
+          {!isMobile &&
             (lootBottles ? (
               <td className="table-bottle">
                 {Object.entries(lootBottles).map(
                   ([rarity, quantity]: [string, number], index) => {
-                    if (quantity < 0.1) return <></>;
+                    if (quantity <= 0.005) return <></>;
 
                     return (
                       <div key={index} className="lootbottle-container">
@@ -535,7 +519,7 @@ export default function Home() {
                             textTransform: "capitalize",
                           }}
                         >
-                          {toSignificantDecimals(quantity, 1)}
+                          {toDecimalPlaces(quantity, 2)}
                         </Text>
                       </div>
                     );

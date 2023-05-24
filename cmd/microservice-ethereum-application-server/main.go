@@ -4,6 +4,8 @@
 
 package main
 
+//
+
 import (
 	"strconv"
 	"strings"
@@ -15,6 +17,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -40,7 +43,6 @@ const (
 	// EnvServerWorkQueue to send serverwork down
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
-
 
 // appsListFromEnvOrFatal parses a list of `app:address:address,app:address:address` into a map of {address => app}
 func appsListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.Application {
@@ -252,10 +254,10 @@ func main() {
 
 				normalisedAddress := ethereum.AddressFromString(transfer.Log.Address.String())
 
-				utility, utilityFound := utilities[normalisedAddress]
+				utility, _ := utilities[normalisedAddress]
 
-				// we set the decorator if there's an app fee or a utility
-				if fee == nil && !utilityFound {
+				// we set the decorator if there's an app fee
+				if fee == nil {
 					log.App(func(k *log.Log) {
 						k.Format(
 							"Skipping an application transfer for transaction %#v and application %#v!",
@@ -271,12 +273,6 @@ func main() {
 					Application:    transfer.Application,
 					UtilityName:    utility,
 					ApplicationFee: fee,
-				}
-
-				// if there's a utility but no fee, the event is from a protocol
-				// but not one that's decoded by GetApplicationFee
-				if fee == nil {
-					decorator.Application = applications.ApplicationNone
 				}
 
 				sender, recipient, err := applications.GetApplicationTransferParties(
@@ -295,10 +291,13 @@ func main() {
 					})
 				}
 
+				indexCopy := new(misc.BigInt)
+				indexCopy.Set(&transfer.Log.Index.Int)
+
 				decoratedTransfer := worker.EthereumDecoratedTransfer{
 					TransactionHash:  transactionHash,
 					SenderAddress:    sender,
-					LogIndex:         &transfer.Log.Index,
+					LogIndex:         indexCopy,
 					RecipientAddress: recipient,
 					Decorator:        decorator,
 					AppEmissions:     emission,
@@ -385,12 +384,20 @@ func main() {
 		for transactionHash, decoratedTransaction := range decoratedTransactions {
 			for i, transfer := range decoratedTransaction.Transfers {
 				if transfer.Decorator != nil {
+					fee := "nil"
+
+					if transfer.Decorator.ApplicationFee != nil {
+						fee = transfer.Decorator.ApplicationFee.RatString()
+					}
+
 					log.Debug(func(k *log.Log) {
 						k.Format(
-							"For transaction hash %v, transfer with index %v had application %v!",
+							"For transaction hash %v, transfer with index %v had application %v, utility %v, fee %v!",
 							transactionHash,
 							i,
 							transfer.Decorator.Application.String(),
+							transfer.Decorator.UtilityName,
+							fee,
 						)
 					})
 				}

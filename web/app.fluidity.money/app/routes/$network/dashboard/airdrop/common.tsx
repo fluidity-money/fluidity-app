@@ -41,10 +41,15 @@ import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
 
+// Epoch length
 const MAX_EPOCH_DAYS = 31;
 
+// Minimum/Maximum staking duration
 const MIN_STAKING_DAYS = 31;
 const MAX_STAKING_DAYS = 365;
+
+// Minimum amount of Fluid USDC deposit
+const MINIMUM_FLUID_LIQUIDITY_USD = 10;
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -95,19 +100,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottle
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottle
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottle
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -134,7 +139,7 @@ interface IReferralDetailsModal {
 
 const BottleSection = ({
   tooltipStyle,
-  activeRefereeReferralsCount,
+  activeReferrerReferralsCount,
   totalBottles,
 }: Partial<IReferralDetailsModal>) => (
   <div className="referral-details-container">
@@ -151,17 +156,17 @@ const BottleSection = ({
         </Hoverable>
       }
     >
-      {activeRefereeReferralsCount}
+      {activeReferrerReferralsCount}
     </LabelledValue>
     <LabelledValue
       label={
         <Hoverable
           style={{ minWidth: 250 }}
           tooltipStyle={tooltipStyle}
-          tooltipContent="The amount of Loot Bottles you have earned from referring users with your link."
+          tooltipContent="The amount of Loot Bottles you have earned from referring users with your link, and Loot Bottles you have claimed by clicking on links and performing the claim task."
         >
           <Text className="helper-label" size="xs">
-            Total Bottles earned from your link <InfoCircle />
+            Total Bottles earned from Clicked Links & Your Link <InfoCircle />
           </Text>
         </Hoverable>
       }
@@ -174,8 +179,8 @@ const BottleSection = ({
 const ReferralDetailsModal = ({
   bottles,
   totalBottles,
-  activeRefereeReferralsCount,
   activeReferrerReferralsCount,
+  activeRefereeReferralsCount,
   inactiveReferrerReferralsCount,
   nextInactiveReferral,
   isMobile,
@@ -193,7 +198,7 @@ const ReferralDetailsModal = ({
       )}
       <BottleSection
         totalBottles={totalBottles}
-        activeRefereeReferralsCount={activeRefereeReferralsCount}
+        activeReferrerReferralsCount={activeReferrerReferralsCount}
         tooltipStyle={tooltipStyle}
       />
       {showCopyGroup && referralCode && (
@@ -240,7 +245,7 @@ const ReferralDetailsModal = ({
             </div>
           }
         >
-          {activeReferrerReferralsCount + inactiveReferrerReferralsCount}
+          {activeRefereeReferralsCount + inactiveReferrerReferralsCount}
         </LabelledValue>
         <div>
           <LabelledValue
@@ -270,9 +275,9 @@ const ReferralDetailsModal = ({
               </div>
             }
           >
-            {activeReferrerReferralsCount}
+            {activeRefereeReferralsCount}
           </LabelledValue>
-          <Text size="xs">{activeReferrerReferralsCount * 10} BOTTLES</Text>
+          <Text size="xs">{activeRefereeReferralsCount * 5} BOTTLES</Text>
         </div>
         <div>
           <LabelledValue
@@ -360,7 +365,6 @@ const BottlesDetailsModal = ({
   navigate,
   network,
   bottles,
-  isMobile,
 }: IBottlesDetailsModal) => (
   <>
     <BottleDistribution numberPosition="relative" bottles={bottles} />
@@ -377,29 +381,6 @@ const BottlesDetailsModal = ({
     >
       SEE YOUR LOOTBOTTLE TX HISTORY
     </GeneralButton>
-    <div
-      style={{
-        width: "100%",
-        borderBottom: "1px solid white",
-        margin: "1em 0",
-      }}
-    />
-    <Hoverable
-      style={{ minWidth: 250 }}
-      tooltipStyle={isMobile ? "frosted" : "solid"}
-      tooltipContent="The amount of Loot Bottles you have earned since you last checked this page."
-    >
-      <Text size="sm">
-        Bottles earned since last checked <InfoCircle />
-      </Text>
-    </Hoverable>
-    <div>
-      {/* TODO POPULATE THIS WITH LOCAL STORAGE STUFF */}
-      <LootBottle size="lg" rarity="legendary"></LootBottle>
-      <Text prominent size="lg">
-        x22
-      </Text>
-    </div>
   </>
 );
 
@@ -663,8 +644,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -689,7 +670,7 @@ const StakeNowModal = ({
   });
 
   const [stakingDuration, setStakingDuration] = useState(31);
-  const [slippage, setSlippage] = useState(5);
+  const [slippage, setSlippage] = useState(15);
   const [stakeErr, setStakeErr] = useState("");
 
   // tokenRatios is the proportion of base tokens in the pool,
@@ -715,14 +696,14 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      baseToken.symbol === "USDC"
-        ? (tokenRatios.fusdcUsdcRatio.toNumber() -
-          tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
-        1e12
-        : (tokenRatios.fusdcWethRatio.toNumber() -
-          tokenRatios.fusdcWethSpread.toNumber() / 2) /
-        1e12
-    );
+        baseToken.symbol === "USDC"
+          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
+              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
+              1e12
+          : (tokenRatios.fusdcWethRatio.toNumber() -
+              tokenRatios.fusdcWethSpread.toNumber() / 2) /
+              1e12
+      );
 
   const fluidUsdMultiplier = usdcPrice;
   const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
@@ -784,31 +765,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const tokenAmtStr =
-          dec !== undefined
-            ? [whole, dec.slice(0 - token.decimals)].join(".")
-            : whole ?? "0";
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-        setInput({
-          ...token,
-          amount: tokenAmtStr,
-        });
+      setInput({
+        ...token,
+        amount: tokenAmtStr,
+      });
 
-        if (!lockRatio) return;
-        if (!tokenAmtStr) return;
+      if (!lockRatio) return;
+      if (!tokenAmtStr) return;
 
-        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-        setOtherInput({
-          ...otherToken,
-          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-        });
-      };
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+      });
+    };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -883,8 +864,18 @@ const StakeNowModal = ({
 
   const testStake = async (): Promise<boolean> => {
     try {
-      if (!(fluidToken.amount && fluidToken.amount)) {
+      if (!(fluidToken.amount && baseToken.amount)) {
         throw Error('reason="not enough liquidity"');
+      }
+
+      if (
+        getUsdFromTokenAmount(
+          fluidTokenAmount,
+          fluidToken.decimals,
+          fluidUsdMultiplier
+        ) < MINIMUM_FLUID_LIQUIDITY_USD
+      ) {
+        throw Error('reason="not enough liquidity (At Least 10 fUSDC)"');
       }
 
       if (fluidTokenAmount.gt(fluidToken.userTokenBalance)) {
@@ -910,7 +901,7 @@ const StakeNowModal = ({
       return true;
     } catch (e) {
       // Expect error on fail
-      const errMsgMatchReason = /reason="[a-z0-9 :_]+/i;
+      const errMsgMatchReason = /reason="[a-z0-9 :_()]+/i;
       const stakingError = (e as { message: string }).message
         .match(errMsgMatchReason)?.[0]
         .slice(8);
@@ -950,6 +941,10 @@ const StakeNowModal = ({
     if (!canStake) return;
 
     setStakingState("staking");
+
+    const testRes = await testStake();
+
+    if (!testRes) return setStakingState("ready");
 
     try {
       const receipt = await stakeTokens(
@@ -1023,8 +1018,9 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`airdrop-stake-container ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         {/* Staking Amount */}
         <div
@@ -1349,7 +1345,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(0, stakingDuration),
+                stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1400,7 +1396,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1652,8 +1648,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
