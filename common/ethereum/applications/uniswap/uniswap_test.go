@@ -183,7 +183,7 @@ func TestGetUniswapV3Fees(t *testing.T) {
 	assert.NoError(t, err)
 	transfer.Log.Data = *dataBlob
 
-	r, ok = new(big.Rat).SetString("333333333/10000000000")
+	r, ok = new(big.Rat).SetString("10000000000/1111000000")
 	assert.True(t, ok)
 
 	feeData, err = GetUniswapV3Fees(transfer, client, fluidTokenAddr2, tokenDecimals)
