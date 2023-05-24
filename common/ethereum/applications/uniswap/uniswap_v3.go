@@ -236,8 +236,8 @@ func GetUniswapV3Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		swapContainsFluid = token0IsFluid || (token1addr == fluidTokenContract)
 
 		zeroRat = big.NewRat(0, 1)
-		// Whether amount0 is equal to zero
-		amount0IsNeg = amount0.Cmp(zeroRat) == 0
+		// Whether amount0 is less than zero
+		amount0IsNeg = amount0.Cmp(zeroRat) < 0
 	)
 
 	switch true {
