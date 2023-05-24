@@ -190,9 +190,9 @@ func TryDecodeUnblockedRewardData(log typesEth.Log, token token_details.TokenDet
 }
 
 const (
-	USDC_DECIMALS  = 6
-	FUSDC_DECIMALS = 6
-	WETH_DECIMALS  = 18 
+	UsdcDecimals  = 6
+	FusdcDecimals = 6
+	WethDecimals  = 18
 )
 
 func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.StakingEvent, error) {
@@ -260,9 +260,9 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 		stakingEvent.Address = ethereum.AddressFromString(addressString)
 		stakingEvent.InsertedDate = lockedTimestamp
 
-		usdcDecimals := math.Pow10(USDC_DECIMALS)
-		fusdcDecimals:= math.Pow10(FUSDC_DECIMALS)
-		wethDecimals := math.Pow10(WETH_DECIMALS)
+		usdcDecimals := math.Pow10(UsdcDecimals)
+		fusdcDecimals := math.Pow10(FusdcDecimals)
+		wethDecimals := math.Pow10(WethDecimals)
 
 		usdcDecimalsRat := new(big.Rat).SetFloat64(usdcDecimals)
 		fusdcDecimalsRat := new(big.Rat).SetFloat64(fusdcDecimals)
@@ -276,7 +276,7 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 		usdcRat := new(big.Rat).SetInt(usdcAmountInt)
 		usdcRat.Quo(usdcRat, usdcDecimalsRat)
 
-		// weth usd = (weth / (weth price usd) / weth_decimals
+		// weth usd = (weth / weth_decimals) * (weth price usd)
 		wethRat := new(big.Rat).SetInt(wethAmountInt)
 		wethRat.Quo(wethRat, wethDecimalsRat)
 		wethRat.Mul(wethRat, wethPriceUsd)
@@ -285,22 +285,17 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 		sumUsd = sumUsd.Add(sumUsd, wethRat)
 
 		// round to nearest whole
-		sumUsdInt, success := new(big.Int).SetString(sumUsd.FloatString(0), 10)
-		if success != true {
-			return stakingEvent, fmt.Errorf(
-				"Failed to convert USD sum %v to a big int!",
-				sumUsd.FloatString(0),
-			)
-		}
+
+		sumUsdInt := new(big.Int).Quo(sumUsd.Num(), sumUsd.Denom())
 
 		stakingEvent.UsdAmount = misc.NewBigIntFromInt(*sumUsdInt)
 
 		// convert lockup length (seconds) to days
 		lockupLengthSeconds := int(lockupLengthInt.Int64())
-        lockupLength := time.Duration(lockupLengthSeconds) * time.Second
-        lockupLengthDays := math.Floor(lockupLength.Hours() / 24)
+		lockupLength := time.Duration(lockupLengthSeconds) * time.Second
+		lockupLengthDays := math.Floor(lockupLength.Hours() / 24)
 
-		// will always be an integer number of days
+		// will always be an integer number of days (max lockup time is a year)
 		stakingEvent.LockupLength = int(lockupLengthDays)
 
 		return stakingEvent, nil
