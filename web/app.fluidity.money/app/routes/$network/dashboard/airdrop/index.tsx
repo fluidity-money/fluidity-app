@@ -1340,7 +1340,9 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
       </td>
 
       {/* Multiplier */}
-      <td>
+      <td
+        style={{textAlign: 'right'}}
+      >
         <Text
           prominent
           style={
@@ -1351,7 +1353,7 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
               : {}
           }
         >
-          {liquidityMultiplier.toLocaleString()}x
+          {toSignificantDecimals(liquidityMultiplier,1)}x
         </Text>
       </td>
 
