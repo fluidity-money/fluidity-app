@@ -37,7 +37,12 @@ import {
 } from "./common";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
-import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
+import {
+  getAddressExplorerLink,
+  getUsdFromTokenAmount,
+  Token,
+  trimAddress,
+} from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
@@ -1323,18 +1328,25 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
       {/* User */}
       <td>
-        <Text
-          prominent
-          style={
-            address === user
-              ? {
-                  color: "black",
-                }
-              : {}
-          }
+        <a
+          className="table-address"
+          target="_blank"
+          href={getAddressExplorerLink("arbitrum", user)}
+          rel="no-referrer"
         >
-          {address === user ? "ME" : trimAddress(user)}
-        </Text>
+          <Text
+            prominent
+            style={
+              address === user
+                ? {
+                    color: "black",
+                  }
+                : {}
+            }
+          >
+            {address === user ? "ME" : trimAddress(user)}
+          </Text>
+        </a>
       </td>
 
       {/* Bottles */}
@@ -1354,8 +1366,7 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
       </td>
 
       {/* Multiplier */}
-      <td
-      >
+      <td>
         <Text
           prominent
           style={
@@ -1366,7 +1377,7 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
               : {}
           }
         >
-          {toSignificantDecimals(liquidityMultiplier,1)}x
+          {toSignificantDecimals(liquidityMultiplier, 1)}x
         </Text>
       </td>
 
@@ -1465,7 +1476,7 @@ const Leaderboard = ({
           { name: "RANK" },
           { name: "USER" },
           { name: "BOTTLES" },
-          { name: "MULTIPLIER" },
+          { name: "STAKING MULTIPLIER" },
           { name: "REFERRALS" },
         ]}
         pagination={{
