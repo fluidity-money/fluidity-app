@@ -24,7 +24,6 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
-  LinkVerticalIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {

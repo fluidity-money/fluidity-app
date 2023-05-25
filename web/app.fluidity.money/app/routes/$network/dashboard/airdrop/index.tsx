@@ -1332,7 +1332,7 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           className="table-address"
           target="_blank"
           href={getAddressExplorerLink("arbitrum", user)}
-          rel="no-referrer"
+          rel="noreferrer"
         >
           <Text
             prominent
