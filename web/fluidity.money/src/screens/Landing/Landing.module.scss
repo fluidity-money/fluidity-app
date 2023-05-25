@@ -20,6 +20,7 @@
 }
 
 .bgVid {
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -68,7 +69,6 @@
 .content {
   width: 100%;
   max-width: 2500px;
-  margin-top: -830px;
   display: flex;
   position: relative;
   flex-direction: column;

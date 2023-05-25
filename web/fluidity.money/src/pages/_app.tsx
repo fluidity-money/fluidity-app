@@ -7,7 +7,12 @@ import { AppProps } from "next/app";
 import Script from "next/script";
 
 import { ApolloProvider } from "@apollo/client";
-import { useViewport } from "@fluidity-money/surfing";
+import {
+  Card,
+  Text,
+  GeneralButton,
+  useViewport,
+} from "@fluidity-money/surfing";
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
 import { useEffect, useState } from "react";
@@ -22,6 +27,7 @@ import * as gtag from "utils/gtag";
 import { GTM_ID } from "utils/gtag";
 import { SPLIT_BROWSER_KEY } from "hooks/SplitContext";
 import { SplitContextProvider } from "hooks/SplitContext";
+import AirdropBanner from "components/AirdropBanner";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -78,7 +84,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   const splitUser =
     process.env.NODE_ENV === "development" ||
-    (!!location && location.hostname.includes('staging'))
+      (!!location && location.hostname.includes("staging"))
       ? "dev"
       : "user";
 
@@ -91,7 +97,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           width="0"
           style={{
             display: "none",
-            visibility: "hidden"
+            visibility: "hidden",
           }}
         ></iframe>
       </noscript>
@@ -100,9 +106,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <div id="root">
         <ApolloProvider client={client}>
           <ChainContextProvider>
-            <SplitContextProvider splitBrowserKey={SPLIT_BROWSER_KEY} splitUser={splitUser} >
+            <SplitContextProvider
+              splitBrowserKey={SPLIT_BROWSER_KEY}
+              splitUser={splitUser}
+            >
               <div className="App">
-                {width < breakpoint && width > 0 ? <MobileNavBar /> : <NavBar />}
+                <AirdropBanner />
+                {width < breakpoint && width > 0 ? (
+                  <MobileNavBar />
+                ) : (
+                  <NavBar />
+                )}
                 <Component {...pageProps} />
               </div>
             </SplitContextProvider>
