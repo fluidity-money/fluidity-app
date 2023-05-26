@@ -211,8 +211,6 @@ if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_MAINNET_URL,
   };
 
-let forkOptions = {};
-
 const enableMainnet =
   process.env.FLU_FORKNET_NETWORK == "mainnet" &&
   "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env;
@@ -224,6 +222,8 @@ const enableGoerli =
 const enableArbitrum =
   process.env.FLU_FORKNET_NETWORK == "arbitrum" &&
   "FLU_ETHEREUM_FORKNET_URL_ARBITRUM" in process.env;
+
+let forkOptions = {};
 
 if (enableMainnet)
   forkOptions = {
@@ -272,7 +272,10 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.FLU_ETHERSCAN_API
+    apiKey: {
+      mainnet: process.env.FLU_ETHERSCAN_API,
+      arbitrumOne: process.env.FLU_ARBISCAN_API
+    }
   },
   dependencyCompiler: {
     paths: [
