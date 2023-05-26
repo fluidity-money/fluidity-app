@@ -21,8 +21,6 @@ import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
-import "hardhat/console.sol";
-
 /*
  * Network(s): Ethereum & Arbitrum
  *
@@ -331,21 +329,17 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         uint256 tokenBBefore = _tokenB.balanceOf(address(this));
 
-	// require(
-	    // fusdc_.allowance(_sender, address(this)) >= _fusdcAmount,
-	    // "allowance needed"
-	// );
-//
-	// require(
-	    // _tokenB.allowance(_sender, address(this)) >=
-	    // _tokenBAmount, "allowance needed"
-	// );
+	require(
+	    fusdc_.allowance(_sender, address(this)) >= _fusdcAmount,
+	    "allowance needed"
+	);
+
+	require(
+	    _tokenB.allowance(_sender, address(this)) >=
+	    _tokenBAmount, "allowance needed"
+	);
 
         fusdc_.transferFrom(_sender, address(this), _fusdcAmount);
-
-        console.log("bal", _tokenB.balanceOf(_sender), "a", _tokenBAmount);
-
-        require(_tokenB.balanceOf(_sender) + 1 > _tokenBAmount, "wtf");
 
         _tokenB.transferFrom(_sender, address(this), _tokenBAmount);
 
