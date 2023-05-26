@@ -14,6 +14,14 @@ interface ISushiswapBentoBox {
         uint256 _share
     ) external payable returns (uint256 amountOut, uint256 shareOut);
 
+    function withdraw(
+        IERC20 _token,
+        address _from,
+        address _to,
+        uint256 _amount,
+        uint256 _share
+    ) external returns (uint256 amountOut, uint256 shareOut);
+
     function transfer(
         IERC20 _token,
         address _from,

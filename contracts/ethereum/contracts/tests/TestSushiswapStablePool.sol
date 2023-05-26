@@ -19,8 +19,11 @@ contract TestSushiswapStablePool is ISushiswapStablePool, BaseNativeToken {
         return ++x;
     }
 
-    function burn(bytes calldata /* data */) external returns (uint256 liquidity) {
-        return ++x;
+    function burn(bytes calldata /* data */) external returns (
+        TokenAmount[] memory withdrawnAmounts
+    ) {
+        ++x;
+        return new TokenAmount[](0);
     }
 
     function getReserves() external view returns (uint256 reserve0, uint256 reserve1) {

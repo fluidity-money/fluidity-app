@@ -11,10 +11,13 @@ import "../../interfaces/IUniswapV2Factory.sol";
 import "../../interfaces/IUniswapV2Pair.sol";
 
 contract TestUniswapV2Factory is IUniswapV2Factory {
+    uint x;
+
     function createPair(
         address /* tokenA */,
         address /* tokenB */
     ) external returns (IUniswapV2Pair) {
+        ++x;
         revert("test client");
     }
 
