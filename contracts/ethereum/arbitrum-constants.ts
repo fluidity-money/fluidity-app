@@ -1,5 +1,5 @@
 
-import type { Token } from "../types";
+import type { Token } from "./types";
 
 export const USDC_ADDR = "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
 export const AUSDC_ADDR = "0x625E7708f30cA75bfd92586e17077590C60eb4cD";

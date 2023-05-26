@@ -31,4 +31,8 @@ contract TestWETH is IWETH {
   function balanceOf(address /* y */) external view returns (uint256) {
     return x;
   }
+
+  function decimals() external view returns (uint8) {
+    return uint8(x);
+  }
 }

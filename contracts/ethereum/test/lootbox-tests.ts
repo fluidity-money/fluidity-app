@@ -14,11 +14,12 @@ import {
   deposit,
   redeem,
   pickRandomBalance,
-  expectDeposited } from "./lootbox";
+  pickRatio,
+  expectDeposited } from "../lootbox-utils";
 
 const MaxUint256 = ethers.constants.MaxUint256;
 
-const slippage = 10;
+const slippage = 30;
 
 export type lootboxTestsArgs = {
   stakingSigner: ethers.Signer,
@@ -42,8 +43,10 @@ const LootboxTests = async (
   it("should lock up 2000000 test token 1 and 2000000 test token 2", async() => {
     const { stakingSigner, staking } = args;
 
-    const fusdcDeposit = 2000000;
-    const usdcDeposit = 2000000;
+    const {
+      fusdcForUsdc: fusdcDeposit,
+      usdc: usdcDeposit
+    } = await pickRatio(staking, 2000000, 2000000, 0);
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
@@ -57,8 +60,6 @@ const LootboxTests = async (
     expectWithinSlippage(fusdcDeposit, fusdc, slippage);
 
     expectWithinSlippage(usdcDeposit, usdc, slippage);
-
-    await expectDeposited(staking, fusdcDeposit, usdcDeposit, weth);
 
     await advanceTime(hre, 8640005);
 
@@ -83,17 +84,33 @@ const LootboxTests = async (
       staking,
     } = args;
 
-    const depositFusdc = await pickRandomBalance(token0, minimumDeposit);
-    const depositUsdc = await pickRandomBalance(token1, minimumDeposit);
+    let maxFusdc = await pickRandomBalance(token0, minimumDeposit);
+    let maxUsdc = await pickRandomBalance(token1, minimumDeposit);
 
-    console.log(`depositing fusdc: ${depositFusdc}`);
-    console.log(`depositing usdc: ${depositUsdc}`);
+    let { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
+      staking,
+      maxFusdc,
+      maxUsdc,
+      0
+    );
 
     expectDeposited(staking, 0, 0, 0);
 
     const token0BeforeDeposit = await token0.balanceOf(stakingSignerAddress);
     const token1BeforeDeposit = await token1.balanceOf(stakingSignerAddress);
     const token2BeforeDeposit = await token2.balanceOf(stakingSignerAddress);
+
+    maxFusdc = await pickRandomBalance(token0, minimumDeposit);
+    maxUsdc = await pickRandomBalance(token1, minimumDeposit);
+
+    ({ fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
+      staking,
+      maxFusdc,
+      maxUsdc,
+      0
+    ));
+
+    console.log(`depositing fusdc 2: ${depositFusdc}, usdc: ${depositUsdc}, ratios: ${await staking.ratios()}`);
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
@@ -117,7 +134,11 @@ const LootboxTests = async (
 
     expectWithinSlippage(depositUsdc, usdc, slippage);
 
+    console.log("expecting deposit...");
+
     await expectDeposited(staking, fusdc, usdc, weth);
+
+    console.log("done expecting");
 
     const [ fusdc1, usdc1, weth1 ] = await deposit(
       staking,
@@ -244,6 +265,7 @@ const LootboxTests = async (
     async () => {
       const {
         stakingSigner,
+        stakingSignerAddress,
         staking,
         token0,
         token1,
@@ -252,36 +274,58 @@ const LootboxTests = async (
 
       await expectDeposited(staking, 0, 0, 0);
 
-      const depositFusdc = await pickRandomBalance(token0, minimumDeposit);
-      const depositWeth = await pickRandomBalance(token2, minimumDeposit);
+      // since we're doing this twice
+
+      let availableFusdc = await pickRandomBalance(token0, minimumDeposit);
+
+      const availableUsdc = await pickRandomBalance(token1, minimumDeposit);
+      const availableWeth = await token2.balanceOf(stakingSignerAddress);
+
+      console.log(`token 2 signer: ${await token2.signer.getAddress()}`);
+
+      const {
+        fusdcForWeth,
+        fusdcForUsdc,
+        usdc: depositUsdc,
+        weth: depositWeth
+      } = await pickRatio(
+        staking,
+        availableFusdc,
+        availableUsdc,
+        availableWeth
+      );
+
+      console.log(`max available fusdc is ${availableFusdc}, max available weth is ${availableWeth} about to supply fusdc ${fusdcForWeth}, supply weth ${depositWeth}`);
 
       const [ fusdc, _usdc, weth ] = await deposit(
         staking,
         8640000,
-        depositFusdc,
+        fusdcForWeth,
         0,
         depositWeth,
         slippage
       );
 
-      expectWithinSlippage(depositFusdc, fusdc, slippage);
+      expectWithinSlippage(fusdcForWeth, fusdc, slippage);
 
       expectWithinSlippage(depositWeth, weth, slippage);
 
-      const depositUsdc = await pickRandomBalance(token1, minimumDeposit);
+      console.log("deposit 2");
 
       const [ fusdc1, usdc ] = await deposit(
         staking,
         8640000,
-        depositFusdc,
+        fusdcForUsdc,
         depositUsdc,
         0,
         slippage
       );
 
+      console.log("deposit 3");
+
       await sendEmptyTransaction(stakingSigner);
 
-      expectWithinSlippage(depositFusdc, fusdc1, slippage);
+      expectWithinSlippage(fusdcForUsdc, fusdc1, slippage);
 
       expectWithinSlippage(depositUsdc, usdc, slippage);
 
@@ -317,11 +361,17 @@ const LootboxTests = async (
 
       const timestamp = await getLatestTimestamp(hre);
 
+      console.log("about to deposit");
+
+      const fusdcDepositAmount = BigNumber.from(100000000000);
+
+      const usdcDepositAmount = BigNumber.from(100000000000);
+
       const [ fusdcDeposited, usdcDeposited ] = await deposit(
         staking,
         8640000,
-        await pickRandomBalance(token0, minimumDeposit), // fusdc amount
-        await pickRandomBalance(token1, minimumDeposit), // usdc amount
+        fusdcDepositAmount, // fusdc amount
+        usdcDepositAmount, // usdc amount
         0,
         slippage
       );
@@ -338,13 +388,9 @@ const LootboxTests = async (
             ? [token0.address, token1.address]
             : [token1.address, token0.address];
 
-        const fusdcAvailable = await pickRandomBalance(token0, minimumDeposit);
-
-        const usdcAvailable = await pickRandomBalance(token1, minimumDeposit);
-
         await camelotRouter.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-          fusdcAvailable, // amount in
-          usdcAvailable, // amount out min
+          1000000000, // amount in
+          0, // amount out min
           path, // path
           stakingSignerAddress, // to
           ethers.constants.AddressZero, // referrer

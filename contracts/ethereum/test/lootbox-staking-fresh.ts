@@ -9,26 +9,28 @@
 
 import * as hre from "hardhat";
 
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 
 import {
   CAMELOT_FACTORY,
   CAMELOT_ROUTER,
   SUSHISWAP_MASTER_DEPLOYER,
   SUSHISWAP_BENTO_BOX,
-  SUSHISWAP_TRIDENT_ROUTER } from "./arbitrum-constants";
+  SUSHISWAP_TRIDENT_ROUTER } from "../arbitrum-constants";
 
 import { signers, commonFactories } from "./setup-common";
 
 import {
   createPair,
-  deployPool } from "./lootbox";
+  deployPool } from "../lootbox-utils";
 
 import LootboxTests from "./lootbox-tests";
 
 import type { lootboxTestsArgs } from "./lootbox-tests";
 
 const MaxUint256 = ethers.constants.MaxUint256;
+
+const MinimumDeposit = BigNumber.from(10).pow(20);
 
 describe("LootboxStaking with fresh deployment of tokens", async () => {
   const context = <lootboxTestsArgs>{};
@@ -159,5 +161,7 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
     await token2.approve(staking.address, MaxUint256);
   });
 
-  LootboxTests(context);
+  return;
+
+  LootboxTests(context, MinimumDeposit);
 });

@@ -15,8 +15,6 @@ import type { HardhatUserConfig } from "hardhat/types";
 
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
 
-import * as tdly from "@tenderly/hardhat-tenderly";
-
 import {
   setOracles,
   forknetTakeFunds,

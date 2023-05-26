@@ -23,7 +23,7 @@ import {
   SUSHISWAP_FUSDC_USDC_POOL,
   SUSHISWAP_TRIDENT_ROUTER,
   USUAL_LOOTBOX_STAKING,
-  SUSHISWAP_FUSDC_WETH_POOL } from "./arbitrum-constants";
+  SUSHISWAP_FUSDC_WETH_POOL } from "../arbitrum-constants";
 
 import LootboxTests from "./lootbox-tests";
 
@@ -39,6 +39,8 @@ describe("LootboxStaking deployed infra", async () => {
       this.skip();
 
     const stakingSigner = (await hre.ethers.getSigners())[0];
+
+    context.stakingSigner = stakingSigner;
 
     const stakingSignerAddress = await stakingSigner.getAddress();
 
@@ -69,6 +71,29 @@ describe("LootboxStaking deployed infra", async () => {
         lootboxStakingBytecode
       ]
     });
+
+    const stakingOperatorAddr = await staking.operator();
+
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [stakingOperatorAddr]
+    });
+
+    const stakingOperatorSigner = await hre.ethers.getSigner(stakingOperatorAddr);
+
+    await hre.network.provider.request({
+      method: "hardhat_setBalance",
+      params: [
+        stakingOperatorAddr,
+        ethers.constants.MaxUint256.toHexString()
+      ]
+    });
+
+    try {
+      await staking.connect(stakingOperatorSigner).migrateV2();
+    } catch (err) {
+      console.log(`couldn't migrate deployed staking contract to v2, ${err}`);
+    }
 
     context.camelotRouter = await hre.ethers.getContractAt(
       "TestCamelotRouter",
@@ -104,11 +129,11 @@ describe("LootboxStaking deployed infra", async () => {
       method: "hardhat_setBalance",
       params: [
         stakingSignerAddress,
-        ethers.constants.MaxUint256.toHexString()
+        MaxUint256.toHexString()
       ]
     });
 
-    const spendableEth = ethers.constants.WeiPerEther;
+    const spendableEth = MaxUint256.div(BigNumber.from(10).pow(80));
 
     await weth.deposit({ value: spendableEth });
 
@@ -140,8 +165,6 @@ describe("LootboxStaking deployed infra", async () => {
     // transfer the usdc holder's balance to the stakingSigner spender
 
     await usdc.connect(usdcSigner).transfer(stakingSignerAddress, MaxUint256);
-
-    console.log("done sending amount to the staking signer");
 
     // move some funds into fusdc on the stakingSigner and approve
     // everything else
