@@ -382,7 +382,7 @@ func main() {
 		}
 
 		for transactionHash, decoratedTransaction := range decoratedTransactions {
-			for i, transfer := range decoratedTransaction.Transfers {
+			for _, transfer := range decoratedTransaction.Transfers {
 				if transfer.Decorator != nil {
 					fee := "nil"
 
@@ -394,7 +394,7 @@ func main() {
 						k.Format(
 							"For transaction hash %v, transfer with index %v had application %v, utility %v, fee %v!",
 							transactionHash,
-							i,
+							transfer.LogIndex.String(),
 							transfer.Decorator.Application.String(),
 							transfer.Decorator.UtilityName,
 							fee,
