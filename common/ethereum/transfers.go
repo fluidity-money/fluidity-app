@@ -143,14 +143,16 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 		var (
 			transferContract = transferLog.Address
 			topics           = transferLog.Topics
+			index            = transferLog.Index
 		)
 
 		app, found := applicationContracts[transferContract]
 
 		if !found {
 			log.Debugf(
-				"For transaction hash %#v, contract %v was not an app contract!",
+				"For transaction hash %#v, index %v, contract %v was not an app contract!",
 				transactionHash,
+				index.String(),
 				transferContract,
 			)
 
@@ -159,7 +161,8 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 
 		if len(topics) == 0 {
 			log.Debugf(
-				"For transaction hash %#v, no topics were found!",
+				"For transaction hash %#v, index %v, no topics were found!",
+				index.String(),
 				transactionHash,
 			)
 
