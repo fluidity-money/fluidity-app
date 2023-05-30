@@ -180,10 +180,10 @@ func GetOneInchLPFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	contractAddr := ethereum.ConvertInternalAddress(contractAddr_)
 
 	// figure out which token is which in the pair contract
-	token0addr_ := transfer.Log.Topics[3]
+	token0addr_ := transfer.Log.Topics[2]
 	token0addr := ethCommon.HexToAddress(token0addr_.String())
 
-	token1addr_ := transfer.Log.Topics[4]
+	token1addr_ := transfer.Log.Topics[3]
 	token1addr := ethCommon.HexToAddress(token1addr_.String())
 
 	var (
