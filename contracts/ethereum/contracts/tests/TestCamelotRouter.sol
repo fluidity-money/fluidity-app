@@ -7,9 +7,9 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../../interfaces/IUniswapV2Router02.sol";
+import "../../interfaces/ICamelotRouter.sol";
 
-contract TestUniswapV2Router is IUniswapV2Router02 {
+contract TestCamelotRouter is ICamelotRouter {
     uint x;
 
     function addLiquidity(
@@ -39,13 +39,14 @@ contract TestUniswapV2Router is IUniswapV2Router02 {
         revert("test client");
     }
 
-    function swapExactTokensForTokens(
+    function swapExactTokensForTokensSupportingFeeOnTransferTokens(
         uint /* _amountIn */,
         uint /* _amountOutMin */,
         address[] calldata /* _path */,
         address /* _to */,
+        address /* _referrer */,
         uint /* _deadline */
-    ) external returns (uint[] memory amounts) {
+    ) external {
         ++x;
         revert("test client");
     }

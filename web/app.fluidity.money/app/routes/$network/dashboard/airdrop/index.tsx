@@ -37,7 +37,12 @@ import {
 } from "./common";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
-import { getUsdFromTokenAmount, Token, trimAddress } from "~/util";
+import {
+  getAddressExplorerLink,
+  getUsdFromTokenAmount,
+  Token,
+  trimAddress,
+} from "~/util";
 import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
@@ -137,6 +142,20 @@ const Airdrop = () => {
     tokens: defaultTokens,
     network,
   } = useLoaderData<LoaderData>();
+
+  if (network !== "arbitrum") {
+    return (
+      <div className="pad-main">
+        <Heading as="h1" className="no-margin">
+          Airdrop
+        </Heading>
+        <Text>
+          The Fluidity Airdrop is currently only available on Arbitrum. Please
+          switch to the Arbitrum network to participate.
+        </Text>
+      </div>
+    );
+  }
 
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
@@ -1309,18 +1328,25 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
       {/* User */}
       <td>
-        <Text
-          prominent
-          style={
-            address === user
-              ? {
-                  color: "black",
-                }
-              : {}
-          }
+        <a
+          className="table-address"
+          target="_blank"
+          href={getAddressExplorerLink("arbitrum", user)}
+          rel="noreferrer"
         >
-          {address === user ? "ME" : trimAddress(user)}
-        </Text>
+          <Text
+            prominent
+            style={
+              address === user
+                ? {
+                    color: "black",
+                  }
+                : {}
+            }
+          >
+            {address === user ? "ME" : trimAddress(user)}
+          </Text>
+        </a>
       </td>
 
       {/* Bottles */}
@@ -1351,7 +1377,7 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
               : {}
           }
         >
-          {liquidityMultiplier.toLocaleString()}x
+          {toSignificantDecimals(liquidityMultiplier, 1)}x
         </Text>
       </td>
 
@@ -1450,7 +1476,7 @@ const Leaderboard = ({
           { name: "RANK" },
           { name: "USER" },
           { name: "BOTTLES" },
-          { name: "MULTIPLIER" },
+          { name: "STAKING MULTIPLIER" },
           { name: "REFERRALS" },
         ]}
         pagination={{

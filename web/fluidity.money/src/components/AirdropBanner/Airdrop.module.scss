@@ -1,0 +1,39 @@
+.container {
+  // position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0px;
+  width: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+  z-index: 99;
+}
+
+.content {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: center;
+  align-items: center;
+}
+
+.text {
+  text-align: center;
+  color: black;
+}
+
+.button {
+  border-radius: 8px;
+  background: black;
+  border: none;
+  padding: 0.5em 1em 0.5em 1em;
+}
+
+.closebutton {
+  position: absolute;
+  width: 100px;
+  left: 50vw;
+  bottom: 0px;
+  transform: translate(-50%, 70%);
+}

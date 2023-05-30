@@ -50,6 +50,11 @@ const Landing = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+        }}
       >
         <div className={`${styles.bgVid}`}>
           {width > breakpoint ? (
@@ -60,7 +65,6 @@ const Landing = () => {
               loop={state.loop}
               videoKey={state.key}
               scale={state.scale}
-              margin={"-60px 0 0 0"}
               width={"65%"}
             />
           ) : isMobile ? (
@@ -71,7 +75,6 @@ const Landing = () => {
               loop={state.loop}
               videoKey={state.key}
               scale={state.scale * 2}
-              margin={"-400px 0 0 0"}
             />
           ) : (
             <></>

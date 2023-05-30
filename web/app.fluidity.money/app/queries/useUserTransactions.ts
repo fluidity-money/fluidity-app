@@ -119,7 +119,6 @@ const queryByAddress: Queryable = {
         token_decimals
         type
         swap_in
-        send_transaction_log_index
       }
     }
   `,
@@ -220,7 +219,6 @@ const queryByTxHash: Queryable = {
         token_decimals
         type
         swap_in
-        send_transaction_log_index
       }
     }
   `,
@@ -329,7 +327,6 @@ const queryAll: Queryable = {
         token_decimals
         type
         swap_in
-        send_transaction_log_index
       }
     }
   `,
@@ -380,8 +377,6 @@ export type UserTransaction = {
   transaction: { hash: string };
   amount: number;
   currency: { symbol: string };
-  // not supported on Bitquery chains yet
-  sendTransactionLogIndex?: number;
 };
 
 export type HasuraUserTransaction = {
@@ -394,7 +389,6 @@ export type HasuraUserTransaction = {
   time: string;
   type: "swap" | "send";
   swap_in: boolean;
-  send_transaction_log_index: number;
 };
 
 export type HasuraUserTransactionRes = {
@@ -473,7 +467,6 @@ const useUserTransactionsByAddress = async (
         currency: { symbol: "f" + transfer.token_short_name },
         transaction: { hash: transfer.transaction_hash },
         block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
-        sendTransactionLogIndex: transfer.send_transaction_log_index 
       };
     });
 
@@ -559,7 +552,6 @@ const useUserTransactionsByTxHash = async (
         currency: { symbol: "f" + transfer.token_short_name },
         transaction: { hash: transfer.transaction_hash },
         block: { timestamp: { unixtime: hasuraDateToUnix(transfer.time) } },
-        sendTransactionLogIndex: transfer.send_transaction_log_index 
       };
     });
 
@@ -651,7 +643,6 @@ const useUserTransactionsAll = async (
             block: {
               timestamp: { unixtime: hasuraDateToUnix(transfer.time) },
             },
-            sendTransactionLogIndex: transfer.send_transaction_log_index 
           };
         }),
       },

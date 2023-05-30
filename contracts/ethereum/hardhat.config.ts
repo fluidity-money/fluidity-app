@@ -3,6 +3,8 @@ import "@nomiclabs/hardhat-waffle";
 
 import "@openzeppelin/hardhat-upgrades";
 
+import * as tdly from "@tenderly/hardhat-tenderly";
+
 import "hardhat-dependency-compiler";
 
 import "hardhat-docgen";
@@ -12,8 +14,6 @@ import { task, subtask } from "hardhat/config";
 import type { HardhatUserConfig } from "hardhat/types";
 
 import { TASK_NODE_SERVER_READY } from "hardhat/builtin-tasks/task-names";
-
-import * as tdly from "@tenderly/hardhat-tenderly";
 
 import {
   setOracles,
@@ -205,6 +205,12 @@ if (process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_URL,
   };
 
+if (process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY)
+  networks['zksync'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_URL,
+  };
+
 if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
   networks['mainnet'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY],
@@ -245,7 +251,7 @@ if (enableArbitrum)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
-      blockNumber: 88934647,
+      blockNumber: 92931847,
     },
   };
 

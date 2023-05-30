@@ -24,7 +24,6 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
-  LinkVerticalIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -669,16 +668,18 @@ const StakeNowModal = ({
     amount: "",
   });
 
+  // stakingDuration is length of lockup time, in days
   const [stakingDuration, setStakingDuration] = useState(31);
+
+  // slippage % is the allowance of the base token
   const [slippage, setSlippage] = useState(15);
+
+  // stakeErr is the UI response on a failed test stake
   const [stakeErr, setStakeErr] = useState("");
 
   // tokenRatios is the proportion of base tokens in the pool,
   // and maximum base token spread, to the factor of 12
   const [tokenRatios, setTokenRatios] = useState<StakingRatioRes | null>(null);
-
-  // Force recommended token ratio
-  const [lockRatio, setLockRatio] = useState(true);
 
   // Convert proportion of Base Tokens in Pool to Fluid:Base Token ratio
   // `prop` = base / (base + fluid)
@@ -696,15 +697,14 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        baseToken.symbol === "USDC"
-          ? (tokenRatios.fusdcUsdcRatio.toNumber() -
-              tokenRatios.fusdcUsdcSpread.toNumber() / 2) /
-              1e12
-          : (tokenRatios.fusdcWethRatio.toNumber() -
-              tokenRatios.fusdcWethSpread.toNumber() / 2) /
-              1e12
+        (baseToken.symbol === "USDC"
+          ? tokenRatios.fusdcUsdcRatio.toNumber() -
+            tokenRatios.fusdcUsdcSpread.toNumber() / 2
+          : tokenRatios.fusdcWethRatio.toNumber() -
+            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
       );
 
+  // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
   const baseUsdMultiplier = baseToken.symbol === "USDC" ? usdcPrice : wethPrice;
 
@@ -780,8 +780,8 @@ const StakeNowModal = ({
         amount: tokenAmtStr,
       });
 
-      if (!lockRatio) return;
-      if (!tokenAmtStr) return;
+      if (!ratio) return;
+      if (!(whole || dec)) return;
 
       const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
@@ -831,7 +831,7 @@ const StakeNowModal = ({
 
       setBaseToken({
         ...baseToken,
-        amount: (matchingBaseTokenUsd / baseUsdMultiplier)
+        amount: (matchingBaseTokenUsd / baseUsdMultiplier || 0)
           .toFixed(baseToken.decimals)
           .replace(/\.0+$/, ""),
       });
@@ -848,7 +848,7 @@ const StakeNowModal = ({
 
     setFluidToken({
       ...fluidToken,
-      amount: (matchingFluidTokenUsd / fluidUsdMultiplier)
+      amount: (matchingFluidTokenUsd / fluidUsdMultiplier || 0)
         .toFixed(fluidToken.decimals)
         .replace(/\.0+$/, ""),
     });
@@ -1050,26 +1050,10 @@ const StakeNowModal = ({
               </Text>
             </Hoverable>
             <div className="airdrop-stake-buttons">
-              <Hoverable
-                style={{ minWidth: 200 }}
-                tooltipStyle={tooltipStyle}
-                tooltipContent="Enforce recommended token ratio."
-              >
-                <GeneralButton
-                  type={lockRatio ? "primary" : "transparent"}
-                  size="small"
-                  handleClick={() => setLockRatio(!lockRatio)}
-                  style={{
-                    width: "2px",
-                    padding: "0.5em 0.5em",
-                  }}
-                  icon={<LinkVerticalIcon />}
-                ></GeneralButton>
-              </Hoverable>
               <GeneralButton
                 type="transparent"
                 size="small"
-                handleClick={() => inputMaxBalance()}
+                handleClick={inputMaxBalance}
                 style={{
                   padding: "0.5em 1em",
                   borderRadius: "100px",
