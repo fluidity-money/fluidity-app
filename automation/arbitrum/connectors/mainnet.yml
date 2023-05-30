@@ -7,6 +7,7 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/connector-ethereum-reward-logs-amqp
       ENV_FLU_WORKER_ID: arbitrum-connector-arbitrum-reward-logs-amqp
       SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/arbitrum/token_list
+      FLU_ETHEREUM_LOG_PAGINATION_AMOUNT: 1000
       TASK_MIN_COUNT: 1
 
   - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
