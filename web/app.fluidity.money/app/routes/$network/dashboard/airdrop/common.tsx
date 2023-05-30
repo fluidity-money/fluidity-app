@@ -667,6 +667,7 @@ const StakeNowModal = ({
     ...baseTokens[0],
     amount: "",
   });
+  console.log(baseToken.amount);
 
   // stakingDuration is length of lockup time, in days
   const [stakingDuration, setStakingDuration] = useState(31);
@@ -736,7 +737,7 @@ const StakeNowModal = ({
 
     const wholeBn = getTokenAmountFromUsd(new BN(whole || 0), token);
 
-    if (dec === undefined) {
+    if (!dec) {
       return wholeBn;
     }
 
@@ -781,7 +782,7 @@ const StakeNowModal = ({
       });
 
       if (!ratio) return;
-      if (!tokenAmtStr) return;
+      if (!(whole || dec)) return;
 
       const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
