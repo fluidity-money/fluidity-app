@@ -41,12 +41,11 @@ const (
 	// EnvTokenList to get the list of tokens to watch events from
 	EnvTokenList = `FLU_ETHEREUM_TOKENS_LIST`
 
+	// EnvPaginationAmount to change the pagination length
+	EnvPaginationAmount = `FLU_ETHEREUM_LOG_PAGINATION_AMOUNT`
+
 	// TopicLogs to use when writing logs found with Ethereum
 	TopicLogs = queueEth.TopicLogs
-
-	// PaginateBlockAmount to paginate until up to speed with
-	// the current block height
-	PaginateBlockAmount = 10
 )
 
 func getLatestBlockHeight(client *ethclient.Client) (uint64, error) {
@@ -66,14 +65,14 @@ func getLatestBlockHeight(client *ethclient.Client) (uint64, error) {
 
 // paginateLogs by calling FilterLogs until the client is brought back up
 // to the latest log
-func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethclient.Client, fromBlockHeight uint64, chanLogs chan ethTypes.Log) (uint64, error) {
+func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethclient.Client, fromBlockHeight, paginateAmount uint64, chanLogs chan ethTypes.Log) (uint64, error) {
 	currentBlockHeight, err := getLatestBlockHeight(client)
 
 	if err != nil {
 		return 0, err
 	}
 
-	nextBlockHeight := fromBlockHeight + PaginateBlockAmount
+	nextBlockHeight := fromBlockHeight + paginateAmount
 
 	filterQuery := ethereum.FilterQuery{
 		FromBlock: newBig(fromBlockHeight),
@@ -127,7 +126,8 @@ func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethcl
 			tokens,
 			topics,
 			client,
-			nextBlockHeight,
+			nextBlockHeight+1,
+			paginateAmount,
 			chanLogs,
 		)
 	}
@@ -137,8 +137,9 @@ func paginateLogs(tokens []common.Address, topics [][]common.Hash, client *ethcl
 
 func main() {
 	var (
-		ethereumWsUrl = util.PickEnvOrFatal(EnvEthereumWsUrl)
-		tokenList_    = util.GetEnvOrFatal(EnvTokenList)
+		ethereumWsUrl     = util.PickEnvOrFatal(EnvEthereumWsUrl)
+		tokenList_        = util.GetEnvOrFatal(EnvTokenList)
+		paginationAmount_ = util.GetEnvOrFatal(EnvPaginationAmount)
 	)
 
 	tokenList := util.GetTokensListBase(tokenList_)
@@ -147,6 +148,15 @@ func main() {
 
 	for i, token := range tokenList {
 		tokens[i] = common.HexToAddress(token.TokenAddress)
+	}
+
+	paginationAmount, err := strconv.ParseUint(paginationAmount_, 10, 64)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to parse pagination amount from env!"
+			k.Payload = err
+		})
 	}
 
 	topics := [][]common.Hash{
@@ -221,7 +231,7 @@ func main() {
 		k.Format(
 			"About to filter for logs in blocks starting from %v until %v!",
 			startingBlock,
-			startingBlock+PaginateBlockAmount,
+			startingBlock+paginationAmount,
 		)
 	})
 
@@ -233,6 +243,7 @@ func main() {
 			topics,
 			gethClient,
 			startingBlock,
+			paginationAmount,
 			chanGethLogs,
 		)
 
