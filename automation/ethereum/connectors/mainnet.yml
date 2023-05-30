@@ -6,7 +6,7 @@ SERVICES:
       DOCKERFILE_PATH: ./cmd/connector-ethereum-reward-logs-amqp
       ENV_FLU_WORKER_ID: ethereum-connector-ethereum-reward-logs-amqp
       SECRET_FLU_ETHEREUM_TOKENS_LIST: /fluidity/ethereum/token_list
-      FLU_ETHEREUM_LOG_PAGINATION_AMOUNT: 10
+      ENV_FLU_ETHEREUM_LOG_PAGINATION_AMOUNT: 10
       TASK_MIN_COUNT: 1
 
   - CONNECTORS_ETHEREUM_BLOCK_HEADERS_AMQP:
