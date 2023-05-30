@@ -20,25 +20,51 @@ type ProviderMap = {
     | undefined;
 };
 
+export const loader: LoaderFunction = async ({ params }) => {
+  // Prevent unknown network params
+  const { network } = params;
+  const { tokens, explorer } =
+    serverConfig.config[network as unknown as string] ?? {};
+
+  const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
+
+  const walletconnectId = process.env.FLU_WALLETCONNECT_ID;
+
+  const redirectTarget = redirect("/");
+
+  if (!network) return redirectTarget;
+
+  if (network in config.drivers === false) return redirectTarget;
+
+  return {
+    network,
+    explorer,
+    tokens,
+    rpcUrls: {
+      solana: solanaRpcUrl,
+    },
+    walletconnectId,
+    colors: (await colors)[network as string],
+  };
+};
+
 const Provider = ({
   network,
   tokens,
   solRpc,
-  ethRpc,
-  arbRpc,
+  walletconnectId,
   children,
 }: {
   network?: string;
   tokens: Token[];
   solRpc: string;
-  ethRpc: string;
-  arbRpc: string;
+  walletconnectId: string;
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    ethereum: EthereumProvider(ethRpc, tokens, network),
+    ethereum: EthereumProvider(walletconnectId, tokens, network),
     solana: SolanaProvider(solRpc, tokens),
-    arbitrum: EthereumProvider(arbRpc, tokens, network),
+    arbitrum: EthereumProvider(walletconnectId, tokens, network),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
@@ -55,35 +81,6 @@ const Provider = ({
   );
 
   return <ProviderComponent>{children}</ProviderComponent>;
-};
-
-export const loader: LoaderFunction = async ({ params }) => {
-  // Prevent unknown network params
-  const { network } = params;
-  const { tokens, explorer } =
-    serverConfig.config[network as unknown as string] ?? {};
-
-  const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
-  const ethereumRpcUrl = process.env.FLU_ETH_RPC_HTTP;
-  const arbitrumRpcUrl = process.env.FLU_ARB_RPC_HTTP;
-
-  const redirectTarget = redirect("/");
-
-  if (!network) return redirectTarget;
-
-  if (network in config.drivers === false) return redirectTarget;
-
-  return {
-    network,
-    explorer,
-    tokens,
-    rpcUrls: {
-      solana: solanaRpcUrl,
-      ethereum: ethereumRpcUrl,
-      arbitrum: arbitrumRpcUrl,
-    },
-    colors: (await colors)[network as string],
-  };
 };
 
 const ProviderOutlet = () => {
@@ -118,9 +115,8 @@ type LoaderData = {
   tokens: Token[];
   rpcUrls: {
     solana: string;
-    ethereum: string;
-    arbitrum: string;
   };
+  walletconnectId: string;
   colors: {
     [symbol: string]: string;
   };
@@ -139,7 +135,8 @@ function ErrorBoundary({ error }: { error: string }) {
 }
 
 export default function Network() {
-  const { network, tokens, rpcUrls, colors } = useLoaderData<LoaderData>();
+  const { network, tokens, rpcUrls, colors, walletconnectId } =
+    useLoaderData<LoaderData>();
 
   // Hardcode solana to redirect to ethereum
   if (network === "solana") throw new Error("Solana not supported");
@@ -149,8 +146,7 @@ export default function Network() {
       network={network}
       tokens={tokens}
       solRpc={rpcUrls.solana}
-      ethRpc={rpcUrls.ethereum}
-      arbRpc={rpcUrls.arbitrum}
+      walletconnectId={walletconnectId}
     >
       <NotificationSubscription
         network={network}
