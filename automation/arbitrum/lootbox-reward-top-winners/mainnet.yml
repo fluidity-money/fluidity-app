@@ -9,4 +9,4 @@ SERVICES:
 
       EVENT_ROLE: ecsEventsRole
       EVENT_RULE: microservice-lootbox-reward-top-winners-cron
-      EVENT_SCHEDULE: cron(35 2 * * ? *) # 14:35utc / 00:05am acst (the next day) every day
+      EVENT_SCHEDULE: cron(35 14 * * ? *) # 14:35utc / 00:05am acst (the next day) every day
