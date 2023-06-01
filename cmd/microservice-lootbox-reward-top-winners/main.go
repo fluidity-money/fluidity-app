@@ -9,7 +9,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
@@ -32,13 +31,6 @@ func getStartOfCurrentDay(location *time.Location) time.Time {
 // runs as a cron service, every day at 00:00:05 (adelaide time)
 // assumes there are at least 5 active users in a given day
 func main() {
-    // env to override date, otherwise use the current day in adelaide time
-    var (
-        timeString = util.GetEnvOrDefault(EnvRewardDate, "")
-
-        startTime time.Time
-    )
-
     location, err := time.LoadLocation("Australia/Adelaide")
     if err != nil {
         log.Fatal(func(k *log.Log) {
@@ -48,30 +40,10 @@ func main() {
     }
 
     currentTime := getStartOfCurrentDay(location)
-
-    switch timeString {
-    // no override set, use the current time
-    case "":
-        startTime = currentTime
-    // an override is set, parse and use it
-    default:
-        startTime, err = time.ParseInLocation(LayoutISO, timeString, location)
-        if err != nil {
-            log.Fatal(func(k *log.Log) {
-                k.Format(
-                    "Failed to parse time %v in layout %v, location %v! %v",
-                    timeString,
-                    LayoutISO,
-                    location.String(),
-                    err,
-                )
-            })
-        }
-    }
-
-    // endTime is the beginning of the day after startTime
-    endTime := startTime
-    endTime = endTime.Add(time.Hour * 24)
+    // startTime is the day before the current day
+    startTime := currentTime.AddDate(0, 0, -1)
+    // endTime is the beginning of the day after startTime (the start of the current date)
+    endTime := currentTime
 
     // fetch and log the top 10 users
     topUsers := lootboxes.GetTopUsersByLootboxCount(startTime, endTime)
@@ -80,7 +52,7 @@ func main() {
             k.Format(
                 "Top user %d on day %v had address %v and lootbox count %v",
                 i,
-                currentTime.String(),
+                startTime.String(),
                 user.Address,
                 user.LootboxCount,
             )
@@ -88,5 +60,5 @@ func main() {
     }
 
     // reward the top 5 users
-    lootboxes.InsertTopUserReward(currentTime, topUsers[0:5])
+    lootboxes.InsertTopUserReward(startTime, topUsers[0:5])
 }
