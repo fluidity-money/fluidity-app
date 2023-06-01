@@ -296,13 +296,18 @@ contract Token is
 
         _burn(_sender, _amount);
 
-        // give them erc20
-
         pool_.takeFromPool(_amount);
 
         emit BurnFluid(_sender, _amount);
 
-        underlyingToken().safeTransfer(_beneficiary, _amount);
+        // give them erc20, if the user's amount is greater than 100, then we keep 1%
+
+        uint256 returnAmount = _amount > 100 ? (_amount * 99) / 100 : _amount;
+
+        underlyingToken().safeTransfer(_beneficiary, returnAmount);
+
+        // the remaining 1% is kept here in the form of fees, which can
+        // be taken with the drain() function
     }
 
     /**
@@ -819,5 +824,15 @@ contract Token is
         }
 
         return true;
+    }
+
+    /* ~~~~~~~~~~ MISC OPERATOR FUNCTIONS ~~~~~~~~~~ */
+
+    function drain(address _recipient) public {
+        require(msg.sender == operator_, "only operator");
+
+        IERC20 token = underlyingToken();
+
+        token.transfer(_recipient, token.balanceOf(address(this)));
     }
 }

@@ -12,6 +12,7 @@ import "../../interfaces/IUniswapV2Pair.sol";
 
 contract TestUniswapV2Factory is IUniswapV2Factory {
     uint x;
+    address y;
 
     function createPair(
         address /* tokenA */,
@@ -25,6 +26,6 @@ contract TestUniswapV2Factory is IUniswapV2Factory {
         address /* tokenA */,
         address /* tokenB */
     ) external view returns (IUniswapV2Pair) {
-        revert("test client");
+        return IUniswapV2Pair(y);
     }
 }

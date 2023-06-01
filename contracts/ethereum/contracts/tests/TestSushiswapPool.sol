@@ -7,9 +7,9 @@ import "../BaseNativeToken.sol";
 
 import "../../interfaces/IERC20.sol";
 
-import "../../interfaces/ISushiswapStablePool.sol";
+import "../../interfaces/ISushiswapPool.sol";
 
-contract TestSushiswapStablePool is ISushiswapStablePool, BaseNativeToken {
+contract TestSushiswapPool is ISushiswapPool, BaseNativeToken {
     uint256 x;
 
     constructor() BaseNativeToken("Test", "test", 18) {
@@ -26,7 +26,12 @@ contract TestSushiswapStablePool is ISushiswapStablePool, BaseNativeToken {
         return new TokenAmount[](0);
     }
 
-    function getReserves() external view returns (uint256 reserve0, uint256 reserve1) {
+    function swap(bytes calldata /* data */) external returns (uint256 /* amountOut */) {
+        ++x;
+        revert("test impl");
+    }
+
+    function getNativeReserves() external view returns (uint256 reserve0, uint256 reserve1) {
         return (x, x);
     }
 }

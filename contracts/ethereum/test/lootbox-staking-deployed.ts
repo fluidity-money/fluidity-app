@@ -21,8 +21,9 @@ import {
   CAMELOT_FUSDC_USDC_PAIR,
   CAMELOT_FUSDC_WETH_PAIR,
   SUSHISWAP_FUSDC_USDC_POOL,
-  SUSHISWAP_TRIDENT_ROUTER,
   USUAL_LOOTBOX_STAKING,
+  SUSHISWAP_TRIDENT_ROUTER,
+  SUSHISWAP_BENTO_BOX,
   SUSHISWAP_FUSDC_WETH_POOL } from "../arbitrum-constants";
 
 import LootboxTests from "./lootbox-tests";
@@ -110,20 +111,33 @@ describe("LootboxStaking deployed infra", async () => {
       CAMELOT_FUSDC_WETH_PAIR
     );
 
-    context.sushiswapToken1Pool = await hre.ethers.getContractAt(
-      "TestSushiswapStablePool",
+    const sushiswapToken1Pool = await hre.ethers.getContractAt(
+      "TestSushiswapPool",
       SUSHISWAP_FUSDC_USDC_POOL
     );
 
-    context.sushiswapToken2Pool = await hre.ethers.getContractAt(
-      "TestSushiswapStablePool",
+    context.sushiswapToken1Pool = sushiswapToken1Pool.connect(stakingSigner);
+
+    const sushiswapToken2Pool = await hre.ethers.getContractAt(
+      "TestSushiswapPool",
       SUSHISWAP_FUSDC_WETH_POOL
     );
 
-    context.sushiswapTridentRouter = await hre.ethers.getContractAt(
+    context.sushiswapToken2Pool = sushiswapToken2Pool.connect(stakingSigner);
+
+    const sushiswapTridentRouter = await hre.ethers.getContractAt(
         "TestSushiswapTridentRouter",
         SUSHISWAP_TRIDENT_ROUTER
     );
+
+    context.sushiswapTridentRouter = sushiswapTridentRouter.connect(stakingSigner);
+
+    const sushiswapBentoBox = await hre.ethers.getContractAt(
+        "TestSushiswapBentoBox",
+        SUSHISWAP_BENTO_BOX
+    );
+
+    context.sushiswapBentoBox = sushiswapBentoBox.connect(stakingSigner);
 
     await hre.network.provider.request({
       method: "hardhat_setBalance",
@@ -133,7 +147,7 @@ describe("LootboxStaking deployed infra", async () => {
       ]
     });
 
-    const spendableEth = MaxUint256.div(BigNumber.from(10).pow(80));
+    const spendableEth = MaxUint256.sub(BigNumber.from(10).pow(30));
 
     await weth.deposit({ value: spendableEth });
 
@@ -177,9 +191,33 @@ describe("LootboxStaking deployed infra", async () => {
 
     context.token0 = token0;
 
+    context.token0Decimals = await token0.decimals();
+
     context.token1 = token1;
 
+    context.token1Decimals = await token1.decimals();
+
     context.token2 = token2;
+
+    context.token2Decimals = await token2.decimals();
+
+    await token0.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+
+    await token1.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+
+    await token2.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+
+    await token0.approve(SUSHISWAP_TRIDENT_ROUTER, MaxUint256);
+
+    await token1.approve(SUSHISWAP_TRIDENT_ROUTER, MaxUint256);
+
+    await token2.approve(SUSHISWAP_TRIDENT_ROUTER, MaxUint256);
+
+    await token0.approve(CAMELOT_ROUTER, MaxUint256);
+
+    await token1.approve(CAMELOT_ROUTER, MaxUint256);
+
+    await token2.approve(CAMELOT_ROUTER, MaxUint256);
 
     await token2.approve(staking.address, MaxUint256);
 
@@ -194,5 +232,9 @@ describe("LootboxStaking deployed infra", async () => {
     await token0.approve(staking.address, MaxUint256);
   });
 
-  LootboxTests(context, BigNumber.from(1e6));
+  LootboxTests(
+    context,
+    BigNumber.from(1e6),
+    ethers.constants.WeiPerEther
+  );
 });

@@ -8,16 +8,18 @@ import {
 
 import { expect, assert } from "chai";
 
-const MaxDeposit = BigNumber.from(200000000);
+// MaxDeposit that's enforced by Sushi/Camelot from observation (may not
+// be accurate)
+const MaxDeposit = BigNumber.from(10).pow(30);
 
 const Zero = ethers.constants.Zero;
 
 export type pickRatioResults = {
-    fusdcForUsdc: BigNumber,
-    usdc: BigNumber,
-    fusdcForWeth: BigNumber,
-    weth: BigNumber
-  };
+  fusdcForUsdc: BigNumber,
+  usdc: BigNumber,
+  fusdcForWeth: BigNumber,
+  weth: BigNumber
+};
 
 export const createPair = async (
   factory: ethers.Contract,
@@ -48,7 +50,7 @@ export const deposit = async (
   slippageTolerance: BigNumberish
 ): Promise<[BigNumber, BigNumber, BigNumber]> => {
   const { fusdcDeposited, usdcDeposited, wethDeposited } =
-    await contract.deposit(
+    await contract.callStatic.deposit(
       lockupLength,
       maxFusdcAmount,
       maxUsdcAmount,
@@ -135,10 +137,7 @@ export const deployPool = async (
     enc
   );
 
-  return await hre.ethers.getContractAt(
-    "TestSushiswapStablePool",
-    addr
-  );
+  return await hre.ethers.getContractAt("TestSushiswapPool", addr);
 };
 
 // pickRandomBalance, using the user's balance as the max amount and the
@@ -151,7 +150,7 @@ export const pickRandomBalance = async (
   const bal = await token.balanceOf(signerAddr);
 
   if (bal.lt(minimumAmount))
-    throw new Error(`minimum amount ${minimumAmount} > balance ${bal}!`);
+    throw new Error(`minimum amount ${minimumAmount} > balance ${bal} for signer ${signerAddr}, token ${token.address}!`);
 
   if (bal.eq(Zero))
     throw new Error(`balance for ${signerAddr} is 0!`);
@@ -164,8 +163,6 @@ export const pickRandomBalance = async (
 
   maxAmount = maxAmount.add(minimumAmount);
 
-  console.log(`max amount: ${maxAmount}, max deposit: ${maxDeposit}, bal: ${bal}`);
-
   // take a random number where (minimumAmount < x > bal)
 
   return ethers.BigNumber.from(ethers.utils.randomBytes(32))
@@ -173,65 +170,89 @@ export const pickRandomBalance = async (
     .sub(minimumAmount);
 };
 
+const allocateRatio = (
+  num1: BigNumber,
+  num2: BigNumber,
+  perc1: BigNumber
+): [BigNumber, BigNumber] => {
+  if (num1.eq(Zero) || num2.eq(Zero)) return [Zero, Zero];
+  const oneE18 = BigNumber.from(10).pow(18);
+  const perc2 = BigNumber.from(10).pow(12).sub(perc1);
+  const [comp1, comp2] = [num1.mul(oneE18).div(perc1), num2.mul(oneE18).div(perc2)];
+  const x = comp1.gt(comp2) ? comp2 : comp1;
+  const a = perc1.mul(x);
+  const b = perc2.mul(x);
+  return [a.div(oneE18), b.div(oneE18)];
+};
+
 export const pickRatio = async (
   staking: ethers.Contract,
   maxFusdc_: BigNumberish,
   maxUsdc_: BigNumberish,
-  maxWeth_: BigNumberish
+  maxWeth_: BigNumberish,
+  fusdcDecimals_: BigNumberish,
+  usdcDecimals_: BigNumberish,
+  wethDecimals_: BigNumberish
 ): Promise<pickRatioResults> => {
-  const {
-    fusdcUsdcRatio: fusdcUsdcRatio_,
-    fusdcWethRatio: fusdcWethRatio_
-  } = await staking.ratios();
+  const fusdcDecimals = BigNumber.from(fusdcDecimals_);
+  const usdcDecimals = BigNumber.from(usdcDecimals_);
+  const wethDecimals = BigNumber.from(wethDecimals_);
 
   const maxFusdc = BigNumber.from(maxFusdc_);
   const maxUsdc = BigNumber.from(maxUsdc_);
   const maxWeth = BigNumber.from(maxWeth_);
 
-  // since we use 1e6 instead of 1e10 to get the division of both sides,
-  // we need to multiply everything by 1000
+  const { fusdcUsdcRatio, fusdcWethRatio } = await staking.ratios();
 
-  const oneE6 = BigNumber.from(10).pow(6);
+  // choose the correct numbers for each side based on the ratio given
 
-  console.log(`fusdc weth ratio: ${fusdcWethRatio_}`);
+  let fusdcUsdcDecimalsAdjustment = ethers.constants.One;
+  let fusdcWethDecimalsAdjustment = ethers.constants.One;
+  let usdcDecimalsAdjustment = ethers.constants.One;
+  let wethDecimalsAdjustment = ethers.constants.One;
 
-  const fusdcUsdcRatio = fusdcUsdcRatio_.div(oneE6);
+  if (fusdcDecimals.gt(usdcDecimals))
+    usdcDecimalsAdjustment =
+      BigNumber.from(10).pow(fusdcDecimals.sub(usdcDecimals).add(1));
 
-  const fusdcWethRatio = fusdcWethRatio_.div(oneE6);
+  if (usdcDecimals.gt(fusdcDecimals))
+    fusdcUsdcDecimalsAdjustment =
+      BigNumber.from(10).pow(usdcDecimals.sub(fusdcDecimals));
 
-  console.log(`fusdc weth ratio after: ${fusdcWethRatio}`);
+  if (fusdcDecimals.gt(wethDecimals))
+    wethDecimalsAdjustment =
+      BigNumber.from(10).pow(fusdcDecimals.sub(wethDecimals));
 
-  const pickRatio = (
-    num1: BigNumber,
-    num2: BigNumber,
-    perc1: BigNumber,
-    perc2: BigNumber
-  ): [BigNumber, BigNumber] => {
-    if (num1.eq(Zero) || num2.eq(Zero)) return [Zero, Zero];
-    const [comp1, comp2] = [num1.div(perc1), num2.div(perc2)];
-    const x = comp1.gt(comp2) ? comp2 : comp1;
-    const a = perc1.mul(x);
-    const b = perc2.mul(x);
-    return [a, b];
-};
+  if (wethDecimals.gt(fusdcDecimals))
+    fusdcWethDecimalsAdjustment =
+      BigNumber.from(10).pow(wethDecimals.sub(fusdcDecimals));
 
-  const [ fusdcForUsdc, usdcForUsdc ] = pickRatio(
-    maxFusdc,
-    maxUsdc,
-    fusdcUsdcRatio,
-    oneE6.sub(fusdcUsdcRatio)
+  console.log("fusdcDecimals:", fusdcDecimals);
+  console.log("wethDecimals:", wethDecimals);
+  console.log("usdcDecimals:", usdcDecimals);
+
+  console.log("fusdcUsdcDecimalsAdjustment:", fusdcUsdcDecimalsAdjustment);
+  console.log("fusdcWethDecimalsAdjustment:", fusdcWethDecimalsAdjustment);
+  console.log("usdcDecimalsAdjustment:", usdcDecimalsAdjustment);
+  console.log("wethDecimalsAdjustment:", wethDecimalsAdjustment);
+
+  let [ fusdcForUsdc, usdcForUsdc ] = allocateRatio(
+    maxFusdc.mul(fusdcUsdcDecimalsAdjustment),
+    maxUsdc.mul(usdcDecimalsAdjustment),
+    fusdcUsdcRatio
   );
 
-  const [ fusdcForWeth_, wethForWeth ] = pickRatio(
-    maxFusdc.mul(BigNumber.from(1e10)),
-    maxWeth,
-    fusdcWethRatio,
-    oneE6.sub(fusdcWethRatio)
+  fusdcForUsdc = fusdcForUsdc.div(fusdcUsdcDecimalsAdjustment);
+  usdcForUsdc = usdcForUsdc.div(usdcDecimalsAdjustment);
+
+  let [ fusdcForWeth, wethForWeth ] = allocateRatio(
+    maxFusdc.mul(fusdcWethDecimalsAdjustment),
+    maxWeth.mul(wethDecimalsAdjustment),
+    fusdcWethRatio
   );
 
-  const fusdcForWeth = fusdcForWeth_.div(BigNumber.from(1e10));
-
-  console.log(`fusdcWethRatio: ${fusdcWethRatio}, fusdc for weth: ${fusdcForWeth}, weth for weth: ${wethForWeth}`);
+  fusdcForWeth = fusdcForWeth.div(fusdcWethDecimalsAdjustment);
+  wethForWeth = wethForWeth.div(wethDecimalsAdjustment);
 
   return {
     fusdcForUsdc: fusdcForUsdc,
