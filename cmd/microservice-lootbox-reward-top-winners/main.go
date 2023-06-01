@@ -61,6 +61,6 @@ func main() {
 		})
 	}
 
-	// reward the top 5 users
-	lootboxes.InsertTopUserReward(startTime, topUsers[0:5])
+	// reward the top 10 users
+	lootboxes.InsertTopUserReward(startTime, topUsers)
 }

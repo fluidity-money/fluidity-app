@@ -12,7 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 )
 
-const ExpectedTopUsers = 5
+const ExpectedTopUsers = 10
 
 // UserLootboxCount to group an address and their respective lootboxes
 type UserLootboxCount struct {
@@ -21,7 +21,7 @@ type UserLootboxCount struct {
 }
 
 // InsertTopUserReward to insert lootboxes for the given users for their activity during the airdrop.
-// Expects 5 users to reward
+// Expects 10 users to reward
 func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 	if lenUsers := len(users); lenUsers != ExpectedTopUsers {
 		log.Fatal(func(k *log.Log) {
@@ -61,7 +61,17 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 		('$4', '', 'leaderboard_prize', '$6', 0, 1, 12, 'none'),
 		('$4', '', 'leaderboard_prize', '$6', 0, 2, 1, 'none'),
 
-		('$5', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none')`,
+		('$5', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+
+		('$6', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+
+		('$7', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+
+		('$8', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+
+		('$9', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+
+		('$10', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none')`,
 		TableLootboxes,
 	)
 
@@ -72,6 +82,11 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 		users[2].Address,
 		users[3].Address,
 		users[4].Address,
+		users[5].Address,
+		users[6].Address,
+		users[7].Address,
+		users[8].Address,
+		users[9].Address,
 		currentTime,
 	)
 
