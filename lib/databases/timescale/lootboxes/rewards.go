@@ -12,6 +12,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 )
 
+const ExpectedTopUsers = 5
+
 // UserLootboxCount to group an address and their respective lootboxes
 type UserLootboxCount struct {
 	Address      string  `json:"address"`
@@ -21,11 +23,12 @@ type UserLootboxCount struct {
 // InsertTopUserReward to insert lootboxes for the given users for their activity during the airdrop.
 // Expects 5 users to reward
 func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
-	if len(users) != 5 {
+	if lenUsers := len(users); lenUsers != ExpectedTopUsers {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
-				"Expected top 5 leaderboard winners, but got %d values!",
-				len(users),
+				"Expected top %d leaderboard winners, but got %d values!",
+				ExpectedTopUsers,
+				lenUsers,
 			)
 		})
 	}
