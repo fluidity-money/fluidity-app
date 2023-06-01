@@ -14,21 +14,21 @@ import (
 
 // UserLootboxCount to group an address and their respective lootboxes
 type UserLootboxCount struct {
-	Address string `json:"address"`
+	Address      string  `json:"address"`
 	LootboxCount float64 `json:"lootbox_count"`
 }
 
 // InsertTopUserReward to insert lootboxes for the given users for their activity during the airdrop.
 // Expects 5 users to reward
 func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
-    if len(users) != 5 {
-        log.Fatal(func(k *log.Log) {
-            k.Format(
-                "Expected top 5 leaderboard winners, but got %d values!",
-                len(users),
-            )
-        })
-    }
+	if len(users) != 5 {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Expected top 5 leaderboard winners, but got %d values!",
+				len(users),
+			)
+		})
+	}
 
 	timescaleClient := timescale.Client()
 
@@ -117,7 +117,7 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 
 	defer rows.Close()
 
-    var topUsers []UserLootboxCount
+	var topUsers []UserLootboxCount
 
 	for rows.Next() {
 		var user UserLootboxCount
