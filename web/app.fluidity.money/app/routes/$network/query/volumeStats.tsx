@@ -27,18 +27,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const address = url.searchParams.get("address");
 
   // Postprocess res
-  const fdaiPostprocess = (volume: Volume) => {
-    // const bn = new BN(volume.amount);
-    // const decimals = new BN(10).pow(new BN(12));
-    // const amount = bn.div(decimals).toNumber();
-
-    return network === "arbitrum"
+  const fdaiPostprocess = (volume: Volume) =>
+    network === "arbitrum"
       ? volume
       : {
           ...volume,
           amount: volume.amount / 10 ** 12,
         };
-  };
 
   const { fluidAssets } = config.config[network ?? ""];
 

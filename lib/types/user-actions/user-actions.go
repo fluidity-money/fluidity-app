@@ -62,6 +62,10 @@ type (
 		// Amount that was swapped or sent
 		Amount misc.BigInt `json:"amount"`
 
+		// AmountStr is the string representation of Amount
+		// Used to accurately store digits in database
+		AmountStr string `json:"amount_str"`
+
 		// TokenDetails to include information on the token's name and the number
 		// of decimal places contained within it
 		TokenDetails token_details.TokenDetails `json:"token_details"`
@@ -87,6 +91,7 @@ func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.
 		SwapIn:          swapIn,
 		SenderAddress:   senderAddress.String(),
 		Amount:          amount,
+		AmountStr:       amount.String(),
 		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
 		Time:            time.Now(),
 	}
@@ -104,6 +109,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 		SwapIn:          swapIn,
 		SenderAddress:   senderAddress,
 		Amount:          amount,
+		AmountStr:       amount.String(),
 		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
 		Time:            time.Now(),
 	}
@@ -121,6 +127,7 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 		SenderAddress:    senderAddress.String(),
 		RecipientAddress: recipientAddress.String(),
 		Amount:           amount,
+		AmountStr:        amount.String(),
 		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
 		Time:             time.Now(),
 	}
@@ -134,6 +141,7 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 		SenderAddress:    senderAddress,
 		RecipientAddress: recipientAddress,
 		Amount:           amount,
+		AmountStr:        amount.String(),
 		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
 		Time:             time.Now(),
 	}
