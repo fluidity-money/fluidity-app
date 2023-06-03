@@ -41,8 +41,8 @@ type Emission struct {
 	GasLimitNormal  float64 `json:"gas_limit_normal"`
 	GasTipCapNormal float64 `json:"gas_tip_cap_normal"`
 
-	GasUsed       misc.BigInt  `json:"gas_used"`
-	GasUsedNormal float64 `json:"gas_used_normal"`
+	GasUsed       misc.BigInt `json:"gas_used"`
+	GasUsedNormal float64     `json:"gas_used_normal"`
 
 	TransferFeeNormal float64 `json:"transfer_fee_normal"`
 
@@ -142,19 +142,19 @@ type Emission struct {
 	// FeeSwitchSender if enabled and their custom arguments
 	FeeSwitchSender struct {
 		OriginalAddress string `json:"original_address"`
-		NewAddress string `json:"new_address"`
+		NewAddress      string `json:"new_address"`
 	} `json:"fee_switch_sender"`
 
 	// FeeSwitchRecipient if enabled and their custom arguments
 	FeeSwitchRecipient struct {
 		OriginalAddress string `json:"original_address"`
-		NewAddress string `json:"new_address"`
+		NewAddress      string `json:"new_address"`
 	} `json:"fee_switch_recipient"`
 
 	// SpecialPoolOptions enabled by enabling the utility mining feature
 	SpecialPoolOptions struct {
-		PayoutFreqOverride float64 `json:"payout_freq_override"`
-		DeltaWeightOverride float64 `json:"delta_weight_override"`
+		PayoutFreqOverride     float64 `json:"payout_freq_override"`
+		DeltaWeightOverride    float64 `json:"delta_weight_override"`
 		WinningClassesOverride float64 `json:"winning_classes_override"`
 	} `json:"special_pool_options"`
 }

@@ -120,7 +120,7 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 
 	for rows.Next() {
 		var (
-			lootbox Lootbox
+			lootbox      Lootbox
 			application_ string
 		)
 

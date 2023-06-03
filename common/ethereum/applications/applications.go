@@ -54,7 +54,6 @@ const (
 	ApplicationChronos
 )
 
-
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns (feeData wiht Fee set to nil, ni) in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
