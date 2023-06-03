@@ -273,7 +273,7 @@ func GetBalancerFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		fee.Quo(fee, decimalsRat)
 		amountOut = amountOut.Quo(amountOut, decimalsRat)
 
-		feeData.Fee = fee 
+		feeData.Fee = fee
 		feeData.Volume = amountOut
 
 		return feeData, nil

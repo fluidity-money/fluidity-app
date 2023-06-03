@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/moving-average"
-	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
 func addBtx(key string, transfers int) {
