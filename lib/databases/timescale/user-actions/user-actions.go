@@ -25,13 +25,6 @@ const (
 
 type UserAction = user_actions.UserAction
 
-// UserActionDb is used to temporarily store and cast amount into BigInt
-// Necessary because database cannot accurately store 1e21+ as Numeric
-type UserActionDb struct {
-	userAction   UserAction
-	amountString string
-}
-
 // InsertUserAction to the database, setting time to the current timestamp
 func InsertUserAction(userAction UserAction) {
 	timescaleClient := timescale.Client()
@@ -87,7 +80,7 @@ func InsertUserAction(userAction UserAction) {
 		userAction.SwapIn,
 		userAction.SenderAddress,
 		userAction.RecipientAddress,
-		userAction.Amount.String(), // Store Amount as string in database
+		userAction.Amount,
 		tokenShortName,
 		tokenDecimals,
 		userAction.SolanaSenderOwnerAddress,
@@ -154,13 +147,9 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 	userActions := make([]UserAction, 0)
 
 	for rows.Next() {
-		preCastUserAction := UserActionDb{
-			userAction: UserAction{
-				Network: network,
-			},
+		userAction := UserAction{
+			Network: network,
 		}
-
-		userAction := preCastUserAction.userAction
 
 		var solanaSenderOwnerAddress, solanaRecipientOwnerAddress sql.NullString
 
@@ -172,7 +161,7 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 			&userAction.SwapIn,
 			&userAction.SenderAddress,
 			&userAction.RecipientAddress,
-			&preCastUserAction.amountString,
+			&userAction.Amount,
 			&userAction.Time,
 			&userAction.TokenDetails.TokenShortName,
 			&userAction.TokenDetails.TokenDecimals,
@@ -190,18 +179,6 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 
 		userAction.SolanaSenderOwnerAddress = solanaSenderOwnerAddress.String
 		userAction.SolanaRecipientOwnerAddress = solanaRecipientOwnerAddress.String
-
-		// Cast string amount from database to BigInt
-		amount, err := misc.BigIntFromString(preCastUserAction.amountString)
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to cast user action amount from db!"
-				k.Payload = err
-			})
-		}
-
-		userAction.Amount = *amount
 
 		userActions = append(userActions, userAction)
 	}
@@ -261,13 +238,9 @@ func GetUserActionsWithSenderAddressOrRecipientOwnerAddress(network network.Bloc
 	userActions := make([]UserAction, 0)
 
 	for rows.Next() {
-		preCastUserAction := UserActionDb{
-			userAction: UserAction{
-				Network: network,
-			},
+		userAction := UserAction{
+			Network: network,
 		}
-
-		userAction := preCastUserAction.userAction
 
 		var solanaSenderOwnerAddress, solanaRecipientOwnerAddress sql.NullString
 
@@ -279,7 +252,7 @@ func GetUserActionsWithSenderAddressOrRecipientOwnerAddress(network network.Bloc
 			&userAction.SwapIn,
 			&userAction.SenderAddress,
 			&userAction.RecipientAddress,
-			&preCastUserAction.amountString,
+			&userAction.Amount,
 			&userAction.Time,
 			&userAction.TokenDetails.TokenShortName,
 			&userAction.TokenDetails.TokenDecimals,
@@ -297,18 +270,6 @@ func GetUserActionsWithSenderAddressOrRecipientOwnerAddress(network network.Bloc
 
 		userAction.SolanaSenderOwnerAddress = solanaSenderOwnerAddress.String
 		userAction.SolanaRecipientOwnerAddress = solanaRecipientOwnerAddress.String
-
-		// Cast string amount from database to BigInt
-		amount, err := misc.BigIntFromString(preCastUserAction.amountString)
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to cast user action amount from db!"
-				k.Payload = err
-			})
-		}
-
-		userAction.Amount = *amount
 
 		userActions = append(userActions, userAction)
 	}
@@ -387,12 +348,10 @@ func GetUserActions(f func(userAction UserAction)) {
 
 	for rows.Next() {
 		var (
-			preCastUserAction UserActionDb
+			userAction UserAction
 
 			solanaSenderOwnerAddress, solanaRecipientOwnerAddress sql.NullString
 		)
-
-		userAction := preCastUserAction.userAction
 
 		err = rows.Scan(
 			&userAction.EventNumber,
@@ -420,18 +379,6 @@ func GetUserActions(f func(userAction UserAction)) {
 
 		userAction.SolanaSenderOwnerAddress = solanaSenderOwnerAddress.String
 		userAction.SolanaRecipientOwnerAddress = solanaRecipientOwnerAddress.String
-
-		// Cast string amount from database to BigInt
-		amount, err := misc.BigIntFromString(preCastUserAction.amountString)
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to cast user action amount from db!"
-				k.Payload = err
-			})
-		}
-
-		userAction.Amount = *amount
 
 		f(userAction)
 	}
@@ -472,13 +419,9 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 		logIndex,
 	)
 
-	preCastUserAction := UserActionDb{
-		userAction: UserAction{
-			Network: network,
-		},
+	userAction := UserAction{
+		Network: network,
 	}
-
-	userAction := preCastUserAction.userAction
 
 	err := row.Scan(
 		&userAction.EventNumber,
@@ -488,7 +431,7 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 		&userAction.SwapIn,
 		&userAction.SenderAddress,
 		&userAction.RecipientAddress,
-		&preCastUserAction.amountString,
+		&userAction.Amount,
 		&userAction.Time,
 		&userAction.TokenDetails.TokenShortName,
 		&userAction.TokenDetails.TokenDecimals,
@@ -498,7 +441,7 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil
+			return nil 
 		}
 
 		log.Fatal(func(k *log.Log) {
@@ -512,18 +455,6 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 			k.Payload = err
 		})
 	}
-
-	// Cast string amount from database to BigInt
-	amount, err := misc.BigIntFromString(preCastUserAction.amountString)
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Failed to cast user action amount from db!"
-			k.Payload = err
-		})
-	}
-
-	userAction.Amount = *amount
 
 	return &userAction
 }
