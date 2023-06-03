@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -310,10 +311,17 @@ func main() {
 		lastBlockEmitted uint64
 	)
 
+	thirtyMinuteTimer := time.After(30 * time.Minute)
+
 	for {
 		log.Debugf("Waiting for new messages from Geth!")
 
 		select {
+		case <-thirtyMinuteTimer:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "30 minute kill timer reached"
+			})
+
 		case gethLog := <-chanGethLogs:
 
 			var (
