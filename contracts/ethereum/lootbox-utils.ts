@@ -227,15 +227,6 @@ export const pickRatio = async (
     fusdcWethDecimalsAdjustment =
       BigNumber.from(10).pow(wethDecimals.sub(fusdcDecimals));
 
-  console.log("fusdcDecimals:", fusdcDecimals);
-  console.log("wethDecimals:", wethDecimals);
-  console.log("usdcDecimals:", usdcDecimals);
-
-  console.log("fusdcUsdcDecimalsAdjustment:", fusdcUsdcDecimalsAdjustment);
-  console.log("fusdcWethDecimalsAdjustment:", fusdcWethDecimalsAdjustment);
-  console.log("usdcDecimalsAdjustment:", usdcDecimalsAdjustment);
-  console.log("wethDecimalsAdjustment:", wethDecimalsAdjustment);
-
   let [ fusdcForUsdc, usdcForUsdc ] = allocateRatio(
     maxFusdc.mul(fusdcUsdcDecimalsAdjustment),
     maxUsdc.mul(usdcDecimalsAdjustment),

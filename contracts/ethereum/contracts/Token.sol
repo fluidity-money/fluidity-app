@@ -153,6 +153,14 @@ contract Token is
 
     bytes32 private initialDomainSeparator_;
 
+    /* ~~~~~~~~~~ FEE TAKING ~~~~~~~~~~ */
+
+    /// @notice burnFee_ that's paid by the user when they burn
+    uint256 private burnFee_;
+
+    /// @notice feeRecipient_ that receives the fee paid by a user
+    address private feeRecipient_;
+
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
     /**
@@ -294,20 +302,25 @@ contract Token is
     ) internal {
         // take the user's fluid tokens
 
-        _burn(_sender, _amount);
+         // if the fee amount > 0 and the burn fee is greater than 0, then
+         // we take burn fee% of the amount given by the user
 
-        pool_.takeFromPool(_amount);
+        uint256 burnAmount =
+            (burnFee_ != 0 && _amount > burnFee_) ? (_amount * burnFee_) / 100 : _amount;
 
-        emit BurnFluid(_sender, _amount);
+        uint256 remainder = burnAmount - burnFee_;
 
         // give them erc20, if the user's amount is greater than 100, then we keep 1%
 
-        uint256 returnAmount = _amount > 100 ? (_amount * 99) / 100 : _amount;
+        _burn(_sender, burnAmount);
 
-        underlyingToken().safeTransfer(_beneficiary, returnAmount);
+        if (remainder > 0) _transfer(_sender, feeRecipient_, remainder);
 
-        // the remaining 1% is kept here in the form of fees, which can
-        // be taken with the drain() function
+        pool_.takeFromPool(burnAmount);
+
+        emit BurnFluid(_sender, burnAmount);
+
+        underlyingToken().safeTransfer(_beneficiary, burnAmount);
     }
 
     /**
@@ -358,7 +371,6 @@ contract Token is
     ) internal {
         // solhint-disable-next-line reason-string
         require(from != address(0), "ERC20: transfer from the zero address");
-
 
         // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
@@ -828,11 +840,13 @@ contract Token is
 
     /* ~~~~~~~~~~ MISC OPERATOR FUNCTIONS ~~~~~~~~~~ */
 
-    function drain(address _recipient) public {
+    function setFeeDetails(uint256 _fee, address _recipient) public {
         require(msg.sender == operator_, "only operator");
 
-        IERC20 token = underlyingToken();
+        emit FeeSet(burnFee_, _fee);
 
-        token.transfer(_recipient, token.balanceOf(address(this)));
+        feeRecipient_ = _recipient;
+
+        burnFee_ = _fee;
     }
 }

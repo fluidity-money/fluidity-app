@@ -50,6 +50,12 @@ interface IToken is IERC20 {
         uint256 amount
     );
 
+    /// @notice emitted when an operator sets the burn fee (1%)
+    event FeeSet(
+        uint256 _originalFee,
+        uint256 _newFee
+    );
+
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
