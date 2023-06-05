@@ -552,3 +552,110 @@ $holo: linear-gradient(
     }
   }
 }
+
+.claim-ropsten {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  .ropsten-header {
+      h3 {
+      margin: 0;
+  }
+
+    height: 100px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5em;
+  }
+
+
+  img {
+    top: 0;
+    width: 100%;
+    opacity: 0.5;
+    position: absolute;
+    z-index: -1;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  ol {
+    padding-left: 1em;
+    list-style-type: decimal;
+    margin: 0;
+
+    li {
+      margin-bottom: 0.5em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .ropsten-address-btn {
+        color: grey;
+        padding: 0.5em 1em;
+        display: inline-flex;
+        margin-left: 1em;
+
+        .ropsten-check > svg {
+          width: 10px !important;
+          height: 10px !important;
+
+          path {
+            stroke: none;
+            fill: currentColor;
+          }
+        }
+
+        svg {
+          width: 16px;
+          height: 16px;
+
+
+          path {
+            stroke: currentColor;
+          }
+        }
+      }
+    }
+  }
+
+  .claim-ropsten-form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+
+    .claim-ropsten-input {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+
+      input {
+        all: unset;
+        padding: 0.5em 1em;
+        border: 1px solid grey;
+        border-radius: 50px;
+      }
+    }
+  }
+
+  .ropsten-warning {
+    color: #ff6969;
+    border: 1px solid #ff6969;
+    background-color: rgba(255, 105, 105, 0.1);
+    padding: 0.5em;
+
+    svg {
+      transform: translate(0, 2px);
+      margin-right: 0.5em;
+
+      path {
+      fill: currentColor;
+      }
+    }
+  }
+}
