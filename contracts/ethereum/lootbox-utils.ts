@@ -234,6 +234,7 @@ export const pickRatio = async (
   );
 
   fusdcForUsdc = fusdcForUsdc.div(fusdcUsdcDecimalsAdjustment);
+
   usdcForUsdc = usdcForUsdc.div(usdcDecimalsAdjustment);
 
   let [ fusdcForWeth, wethForWeth ] = allocateRatio(
@@ -243,6 +244,7 @@ export const pickRatio = async (
   );
 
   fusdcForWeth = fusdcForWeth.div(fusdcWethDecimalsAdjustment);
+
   wethForWeth = wethForWeth.div(wethDecimalsAdjustment);
 
   return {

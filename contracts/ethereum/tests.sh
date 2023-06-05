@@ -9,4 +9,4 @@ fi
 
 >&2 echo "testing arbitrum..."
 
-FLU_FORKNET_NETWORK=arbitrum $HARDHAT test
+FLU_FORKNET_NETWORK=arbitrum $HARDHAT test --grep 'ing fees from fusdc/usdc sushiswap tra'

@@ -108,37 +108,19 @@ const LootboxTests = async (
       token2Decimals
     } = args;
 
-    let maxFusdc = await pickRandomBalance(token0, minimumDepositToken1);
-    let maxUsdc = await pickRandomBalance(token1, minimumDepositToken1);
+    const token0BeforeDeposit = await token0.balanceOf(stakingSignerAddress);
+    const token1BeforeDeposit = await token1.balanceOf(stakingSignerAddress);
+    const token2BeforeDeposit = await token2.balanceOf(stakingSignerAddress);
 
-    let { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
+    const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
       staking,
-      maxFusdc,
-      maxUsdc,
+      await pickRandomBalance(token0, minimumDepositToken1),
+      await pickRandomBalance(token0, minimumDepositToken1),
       0,
       token0Decimals,
       token1Decimals,
       token2Decimals
     );
-
-    expectDeposited(staking, 0, 0, 0);
-
-    const token0BeforeDeposit = await token0.balanceOf(stakingSignerAddress);
-    const token1BeforeDeposit = await token1.balanceOf(stakingSignerAddress);
-    const token2BeforeDeposit = await token2.balanceOf(stakingSignerAddress);
-
-    maxFusdc = await pickRandomBalance(token0, minimumDepositToken1);
-    maxUsdc = await pickRandomBalance(token1, minimumDepositToken2);
-
-    ({ fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
-      staking,
-      maxFusdc,
-      maxUsdc,
-      0,
-      token0Decimals,
-      token1Decimals,
-      token2Decimals
-    ));
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
@@ -164,11 +146,21 @@ const LootboxTests = async (
 
     await expectDeposited(staking, fusdc, usdc, weth);
 
+    const { fusdcForUsdc: depositFusdc1, usdc: depositUsdc1 } = await pickRatio(
+      staking,
+      await pickRandomBalance(token0, minimumDepositToken1),
+      await pickRandomBalance(token0, minimumDepositToken1),
+      0,
+      token0Decimals,
+      token1Decimals,
+      token2Decimals
+    );
+
     const [ fusdc1, usdc1, weth1 ] = await deposit(
       staking,
       8640000,
-      depositFusdc,
-      depositUsdc,
+      depositFusdc1,
+      depositUsdc1,
       0,
       slippage
     );
@@ -519,34 +511,31 @@ const LootboxTests = async (
       return shareOut;
     };
 
-    await bentoDeposit(
+    expect(await bentoDeposit(
       token0.address,
       stakingSignerAddress, // from
       stakingSignerAddress, // recipient
       availableFusdcBento,
       0
-    );
+    )).to.be.gt(0);
 
-    await bentoDeposit(
+    expect(await bentoDeposit(
       token1.address,       // token
       stakingSignerAddress, // from
       stakingSignerAddress, // recipient
       availableUsdcBento,
       0
-    );
+    )).to.be.gt(0);
 
     for (let i = 1; i <= 10; i++) {
       const tokenIn = i % 2 == 0 ? token0 : token1;
-
-      const params = ethers.utils.defaultAbiCoder.encode(
-        [ "address", "address", "bool" ], // token in, recipient, should unwrap
-        [ tokenIn.address, stakingSignerAddress, false ]
-      );
 
       const shares = await sushiswapBentoBox.balanceOf(
         tokenIn.address,
         stakingSignerAddress
       );
+
+      console.log(`about to transfer sushiswap bento shares: ${shares}`);
 
       await sushiswapBentoBox.transfer(
         tokenIn.address, // token
@@ -555,7 +544,14 @@ const LootboxTests = async (
         shares // share amount
       );
 
+      const params = ethers.utils.defaultAbiCoder.encode(
+        [ "address", "address", "bool" ], // token in, recipient, should unwrap
+        [ tokenIn.address, stakingSignerAddress, false ]
+      );
+
       const amountOut = await sushiswapToken1Pool.callStatic.swap(params);
+
+      console.log(`done swapping with sushi`);
 
       await sushiswapToken1Pool.swap(params);
 

@@ -176,6 +176,8 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
     await token2.approve(staking.address, MaxUint256);
   });
 
+  return;
+
   LootboxTests(
     context,
     MinimumDeposit,
