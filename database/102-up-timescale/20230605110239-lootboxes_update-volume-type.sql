@@ -1,7 +1,7 @@
 -- migrate:up
 
 ALTER TABLE lootbox
-	ALTER COLUMN volume TYPE NUMERIC;
+	ALTER COLUMN volume TYPE uint256;
 
 -- migrate:down
 
