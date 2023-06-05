@@ -20,6 +20,9 @@ import "./openzeppelin/SafeERC20.sol";
 
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
+/// @dev BURN_DENOM for the unwrap fee (ie, 10 is a 1% fee)
+uint constant BURN_DENOM = 1000;
+
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
 contract Token is
@@ -305,22 +308,28 @@ contract Token is
          // if the fee amount > 0 and the burn fee is greater than 0, then
          // we take burn fee% of the amount given by the user
 
-        uint256 burnAmount =
-            (burnFee_ != 0 && _amount > burnFee_) ? (_amount * burnFee_) / 100 : _amount;
+        uint256 feeAmount =
+            (burnFee_ != 0 && _amount > burnFee_)
+                ? (_amount * burnFee_) / BURN_DENOM
+                : _amount;
 
-        uint256 remainder = burnAmount - burnFee_;
+        // burn burnAmount and give it to the user
+
+        uint256 burnAmount = _amount - feeAmount;
 
         // give them erc20, if the user's amount is greater than 100, then we keep 1%
 
         _burn(_sender, burnAmount);
 
-        if (remainder > 0) _transfer(_sender, feeRecipient_, remainder);
-
         pool_.takeFromPool(burnAmount);
 
         emit BurnFluid(_sender, burnAmount);
 
+        // send out the amounts
+
         underlyingToken().safeTransfer(_beneficiary, burnAmount);
+
+        if (feeAmount > 0) _transfer(_sender, feeRecipient_, feeAmount);
     }
 
     /**
