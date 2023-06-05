@@ -40,7 +40,7 @@ const (
 func main() {
 	var (
 		ethereumTokensList_ = util.GetEnvOrFatal(EnvTokensList)
-		gethHttpUrl         = util.GetEnvOrFatal(EnvGethHttpUrl)
+		gethHttpUrl         = util.PickEnvOrFatal(EnvGethHttpUrl)
 
 		volumeBigInt misc.BigInt
 		volume       *big.Rat
