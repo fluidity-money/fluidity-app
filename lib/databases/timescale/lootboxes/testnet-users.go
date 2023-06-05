@@ -7,7 +7,6 @@ package lootboxes
 import (
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -38,19 +37,27 @@ func InsertTestnetOwner(ownerPair fluidity.TestnetOwnerPair) bool {
 			$2
 		WHERE EXISTS(
 			SELECT 1 FROM %[2]s 
-			WHERE address = $2
+			WHERE address = $3
 		) AND NOT EXISTS(
 			SELECT 1 FROM %[1]s 
-			WHERE testnet_address = $2
+			WHERE testnet_address = $4
 		) RETURNING owner`,
 		TableTestnetOwner,
 		TableTestnetAddress,
 	)
 
+	var (
+		ownerString			 = ownerPair.Owner.String()
+		testnetAddressString = ownerPair.TestnetAddress.String()
+	)
+
+	// using $2 multiple times fails with a postgres type error, so duplicate the param
 	row := timescaleClient.QueryRow(
 		statementText,
-		ownerPair.Owner,
-		ownerPair.TestnetAddress,
+		ownerString,
+		testnetAddressString,
+		testnetAddressString,
+		testnetAddressString,
 	)
 
 	var owner_ string 
