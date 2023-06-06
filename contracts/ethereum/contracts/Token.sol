@@ -20,8 +20,8 @@ import "./openzeppelin/SafeERC20.sol";
 
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
-/// @dev BURN_DENOM for the unwrap fee (ie, 10 is a 1% fee)
-uint constant BURN_DENOM = 1000;
+/// @dev BURN_FEE_DENOM for the unwrap fee (ie, 10 is a 1% fee)
+uint constant BURN_FEE_DENOM = 1000;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
@@ -310,10 +310,10 @@ contract Token is
 
         uint256 feeAmount =
             (burnFee_ != 0 && _amount > burnFee_)
-                ? (_amount * burnFee_) / BURN_DENOM
+                ? (_amount * burnFee_) / BURN_FEE_DENOM
                 : 0;
 
-        // burn burnAmount and give it to the user
+        // burn burnAmount
 
         uint256 burnAmount = _amount - feeAmount;
 
@@ -851,6 +851,8 @@ contract Token is
 
     function setFeeDetails(uint256 _fee, address _recipient) public {
         require(msg.sender == operator_, "only operator");
+
+        require(burnFee_ < BURN_FEE_DENOM, "fee too high");
 
         emit FeeSet(burnFee_, _fee);
 
