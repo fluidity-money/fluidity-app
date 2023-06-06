@@ -636,7 +636,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             uint256 tokenARedeemed;
             uint256 tokenBRedeemed;
 
-            // if the pair is the fusdc usdc pair, we assume it's a constant product
+            // if the pair is the fusdc usdc pair, we assume it's a stable swap pool
             // pool, and ignore any fees taken since it's difficult to calculate the
             // fees from the stableswap formula in the smart contract
 

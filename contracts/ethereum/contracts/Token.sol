@@ -311,7 +311,7 @@ contract Token is
         uint256 feeAmount =
             (burnFee_ != 0 && _amount > burnFee_)
                 ? (_amount * burnFee_) / BURN_DENOM
-                : _amount;
+                : 0;
 
         // burn burnAmount and give it to the user
 
