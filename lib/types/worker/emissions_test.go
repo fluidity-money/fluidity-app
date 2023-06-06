@@ -5,9 +5,9 @@
 package worker
 
 import (
+	"regexp"
 	"testing"
 	"time"
-	"regexp"
 
 	"github.com/stretchr/testify/assert"
 )

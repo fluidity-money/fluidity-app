@@ -12,10 +12,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	common "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	types "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
 
 func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error) {
@@ -114,12 +114,21 @@ func GetLogsFromHash(gethHttpApi, blockHash string) (logs []types.Log, err error
 			)
 		}
 
-		data := misc.Blob([]byte(logData))
+		// received as an encoded hex string, so decode
+		dataBytes, err := hexutil.Decode(logData)
+
+		if err != nil {
+			return nil, fmt.Errorf(
+				"failed to decode data bytes %v - %v",
+				logData,
+				err,
+			)
+		}
 
 		logs[i] = types.Log{
 			Address:     types.AddressFromString(address),
 			Topics:      topics,
-			Data:        data,
+			Data:        dataBytes,
 			BlockNumber: *blockNumber,
 			TxHash:      types.HashFromString(txHash),
 			TxIndex:     *txIndex,

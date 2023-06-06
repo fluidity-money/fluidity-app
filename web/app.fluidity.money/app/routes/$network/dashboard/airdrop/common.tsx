@@ -781,7 +781,7 @@ const StakeNowModal = ({
       });
 
       if (!ratio) return;
-      if (!tokenAmtStr) return;
+      if (!(whole || dec)) return;
 
       const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 

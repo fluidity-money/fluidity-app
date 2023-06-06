@@ -20,7 +20,7 @@ type (
 	EthereumAnnouncement struct {
 		TransactionHash ethereum.Hash                         `json:"transaction_hash"`
 		BlockNumber     *misc.BigInt                          `json:"block_number"`
-		LogIndex        *misc.BigInt                        `json:"log_index"`
+		LogIndex        *misc.BigInt                          `json:"log_index"`
 		FromAddress     ethereum.Address                      `json:"from_address"`
 		ToAddress       ethereum.Address                      `json:"to_address"`
 		RandomSource    []uint32                              `json:"random_source"`

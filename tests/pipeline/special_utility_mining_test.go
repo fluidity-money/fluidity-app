@@ -18,7 +18,7 @@ import (
 )
 
 func addUtilityConfigOverride(network_ network.BlockchainNetwork, utility string,
-payoutFreqNum, payoutFreqDenom misc.BigInt, winningClasses int) {
+	payoutFreqNum, payoutFreqDenom misc.BigInt, winningClasses int) {
 	postgresClient := postgres.Client()
 
 	statementText := fmt.Sprintf(

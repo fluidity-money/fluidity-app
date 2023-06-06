@@ -448,7 +448,7 @@ func GetXyFinanceSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 	)
 
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-	
+
 	feeData.Fee = feeUsd
 	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
 

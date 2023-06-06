@@ -197,7 +197,7 @@ func GetFixedRateSwapFees(transfer worker.EthereumApplicationTransfer, client *e
 
 	fee.Quo(fee, decimalsRat)
 	feeData.Volume = feeData.Volume.Quo(feeData.Volume, decimalsRat)
-	
+
 	feeData.Fee = fee
 
 	return feeData, nil

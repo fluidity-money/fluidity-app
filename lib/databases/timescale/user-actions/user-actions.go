@@ -45,6 +45,7 @@ func InsertUserAction(userAction UserAction) {
 			sender_address,
 			recipient_address,
 			amount,
+			amount_str,
 			token_short_name,
 			token_decimals,
 			solana_sender_owner_address,
@@ -64,7 +65,8 @@ func InsertUserAction(userAction UserAction) {
 			$10,
 			$11,
 			$12,
-			$13
+			$13,
+			$14
 		)`,
 
 		TableUserActions,
@@ -81,6 +83,7 @@ func InsertUserAction(userAction UserAction) {
 		userAction.SenderAddress,
 		userAction.RecipientAddress,
 		userAction.Amount,
+		userAction.AmountStr,
 		tokenShortName,
 		tokenDecimals,
 		userAction.SolanaSenderOwnerAddress,
@@ -111,6 +114,7 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 			sender_address,
 			recipient_address,
 			amount,
+			amount_str,
 			time,
 			token_short_name,
 			token_decimals,
@@ -162,6 +166,7 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 			&userAction.SenderAddress,
 			&userAction.RecipientAddress,
 			&userAction.Amount,
+			&userAction.AmountStr,
 			&userAction.Time,
 			&userAction.TokenDetails.TokenShortName,
 			&userAction.TokenDetails.TokenDecimals,
@@ -202,6 +207,7 @@ func GetUserActionsWithSenderAddressOrRecipientOwnerAddress(network network.Bloc
 			sender_address,
 			recipient_address,
 			amount,
+			amount_str,
 			time,
 			token_short_name,
 			token_decimals,
@@ -253,6 +259,7 @@ func GetUserActionsWithSenderAddressOrRecipientOwnerAddress(network network.Bloc
 			&userAction.SenderAddress,
 			&userAction.RecipientAddress,
 			&userAction.Amount,
+			&userAction.AmountStr,
 			&userAction.Time,
 			&userAction.TokenDetails.TokenShortName,
 			&userAction.TokenDetails.TokenDecimals,
@@ -323,6 +330,7 @@ func GetUserActions(f func(userAction UserAction)) {
 			sender_address,
 			recipient_address,
 			amount,
+			amount_str,
 			time,
 			token_short_name,
 			token_decimals,
@@ -362,6 +370,7 @@ func GetUserActions(f func(userAction UserAction)) {
 			&userAction.SenderAddress,
 			&userAction.RecipientAddress,
 			&userAction.Amount,
+			&userAction.AmountStr,
 			&userAction.Time,
 			&userAction.TokenDetails.TokenShortName,
 			&userAction.TokenDetails.TokenDecimals,
@@ -398,6 +407,7 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 			sender_address,
 			recipient_address,
 			amount,
+			amount_str,
 			time,
 			token_short_name,
 			token_decimals,
@@ -432,6 +442,7 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 		&userAction.SenderAddress,
 		&userAction.RecipientAddress,
 		&userAction.Amount,
+		&userAction.AmountStr,
 		&userAction.Time,
 		&userAction.TokenDetails.TokenShortName,
 		&userAction.TokenDetails.TokenDecimals,
@@ -441,7 +452,7 @@ func GetUserActionByLogIndex(network network.BlockchainNetwork, transactionHash 
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil 
+			return nil
 		}
 
 		log.Fatal(func(k *log.Log) {
