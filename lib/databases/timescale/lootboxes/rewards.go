@@ -157,3 +157,63 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 
 	return topUsers
 }
+
+// fetch the 10 addresses with the highest lootboxes earned during the given period on chronos
+func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT 
+			address, 
+			SUM(lootbox_count) AS lootbox_count 
+		FROM %s
+		WHERE 
+			awarded_time >= $1 AT TIME ZONE 'Australia/Adelaide' AND
+			awarded_time < $2 AT TIME ZONE 'Australia/Adelaide' AND 
+			source != 'leaderboard_prize' AND
+			application = 'chronos'
+		GROUP BY address 
+		ORDER BY lootbox_count DESC
+		LIMIT 10`,
+
+		TableLootboxes,
+	)
+
+	rows, err := timescaleClient.Query(
+		statementText,
+		startTime,
+		endTime,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to get the top 10 users by lootbox count!"
+			k.Payload = err
+		})
+	}
+
+	defer rows.Close()
+
+	var topUsers []UserLootboxCount
+
+	for rows.Next() {
+		var user UserLootboxCount
+		err := rows.Scan(
+			user.Address,
+			user.LootboxCount,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "Failed to scan a user's address and lootbox count!"
+				k.Payload = err
+			})
+		}
+
+		topUsers = append(topUsers, user)
+	}
+
+	return topUsers
+}
