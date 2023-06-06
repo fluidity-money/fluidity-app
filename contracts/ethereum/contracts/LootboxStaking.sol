@@ -41,6 +41,8 @@ uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
 
+uint256 constant MAX_SLIPPAGE = 100;
+
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
 
@@ -448,7 +450,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     /**
      * @notice _redeemCamelotStableSwapSushiswap by assuming it's
      *         fusdc/usdc and not rederivating the constant product formula to
-     *         take fees from sushiswap
+     *         take fees from sushiswap (which is likely a stableswap pool in practice)
      */
     function _redeemCamelotStableSwapSushiswap(
         Deposit memory dep,
@@ -556,7 +558,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
 
-        require(_slippage < 101, "slippage too high");
+        require(_slippage < MAX_SLIPPAGE + 1, "slippage too high");
 
         // the ui should restrict the deposits to more than 1e18
 
@@ -639,7 +641,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             // fees from the stableswap formula in the smart contract
 
             uint256 originalCamelotK = dep.camelotTokenA * dep.camelotTokenB;
-
 
             if (fusdcUsdcPair) {
                 (
@@ -977,6 +978,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         emit Emergency(true);
 
         noEmergencyMode_ = false;
+    }
+
+    function updateEmergencyCouncil(address _emergencyCouncil) public {
+        require(msg.sender == operator_, "only operator");
+        emergencyCouncil_ = _emergencyCouncil;
     }
 
     /* ~~~~~~~~~~ OPERATOR ~~~~~~~~~~ */

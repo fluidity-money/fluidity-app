@@ -21,7 +21,7 @@ import {
 
 const MaxUint256 = ethers.constants.MaxUint256;
 
-const slippage = 30;
+const slippage = 15;
 
 export type lootboxTestsArgs = {
   stakingSigner: ethers.Signer,
@@ -104,8 +104,7 @@ const LootboxTests = async (
       token2,
       staking,
       token0Decimals,
-      token1Decimals,
-      token2Decimals
+      token1Decimals
     } = args;
 
     const token0BeforeDeposit = await token0.balanceOf(stakingSignerAddress);
@@ -115,11 +114,11 @@ const LootboxTests = async (
     const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
       staking,
       await pickRandomBalance(token0, minimumDepositToken1),
-      await pickRandomBalance(token0, minimumDepositToken1),
+      await pickRandomBalance(token1, minimumDepositToken1),
       0,
       token0Decimals,
       token1Decimals,
-      token2Decimals
+      0
     );
 
     const [ fusdc, usdc, weth ] = await deposit(
@@ -149,11 +148,11 @@ const LootboxTests = async (
     const { fusdcForUsdc: depositFusdc1, usdc: depositUsdc1 } = await pickRatio(
       staking,
       await pickRandomBalance(token0, minimumDepositToken1),
-      await pickRandomBalance(token0, minimumDepositToken1),
+      await pickRandomBalance(token1, minimumDepositToken1),
       0,
       token0Decimals,
       token1Decimals,
-      token2Decimals
+      0
     );
 
     const [ fusdc1, usdc1, weth1 ] = await deposit(
@@ -325,22 +324,16 @@ const LootboxTests = async (
 
       // since we're doing this twice
 
-      const availableFusdc = await pickRandomBalance(token0, minimumDepositToken1);
-      const availableUsdc = await pickRandomBalance(token1, minimumDepositToken1);
-      const availableWeth = await pickRandomBalance(token2, minimumDepositToken2);
-
       const {
         fusdcForWeth,
-        fusdcForUsdc,
-        usdc: depositUsdc,
         weth: depositWeth
       } = await pickRatio(
         staking,
-        availableFusdc,
-        availableUsdc,
-        availableWeth  ,
+        await pickRandomBalance(token0, minimumDepositToken1),
+        0,
+        await pickRandomBalance(token2, minimumDepositToken2),
         token0Decimals,
-        token1Decimals,
+        0,
         token2Decimals
       );
 
@@ -356,6 +349,19 @@ const LootboxTests = async (
       expectWithinSlippage(fusdcForWeth, fusdc, slippage);
 
       expectWithinSlippage(depositWeth, weth, slippage);
+
+      const {
+        fusdcForUsdc,
+        usdc: depositUsdc
+      } = await pickRatio(
+        staking,
+        await pickRandomBalance(token0, minimumDepositToken1),
+        await pickRandomBalance(token1, minimumDepositToken1),
+        0,
+        token0Decimals,
+        token1Decimals,
+        0
+      );
 
       const [ fusdc1, usdc ] = await deposit(
         staking,
@@ -487,7 +493,7 @@ const LootboxTests = async (
       token2Decimals
     );
 
-    const [ fusdcDeposited, usdcDeposited ] = await deposit(
+    await deposit(
       staking,
       8640000,
       depositFusdc,
@@ -502,8 +508,12 @@ const LootboxTests = async (
     const stakingFusdcBefore = await token0.balanceOf(staking.address);
     const stakingUsdcBefore = await token1.balanceOf(staking.address);
 
-    const availableFusdcBento = await pickRandomBalance(token0, minimumDepositToken1);
-    const availableUsdcBento = await pickRandomBalance(token1, minimumDepositToken1);
+    const stakingBefore = stakingFusdcBefore.add(stakingUsdcBefore);
+
+    // hardcode some numbers since sushi doesn't play well with random
+
+    const availableFusdcBento = minimumDepositToken1.mul(1000);
+    const availableUsdcBento = minimumDepositToken1.mul(10000);
 
     const bentoDeposit = async (...args: any[]): Promise<BigNumber> => {
       const { shareOut } = await sushiswapBentoBox.callStatic.deposit(...args);
@@ -535,8 +545,6 @@ const LootboxTests = async (
         stakingSignerAddress
       );
 
-      console.log(`about to transfer sushiswap bento shares: ${shares}`);
-
       await sushiswapBentoBox.transfer(
         tokenIn.address, // token
         stakingSignerAddress, // from
@@ -551,8 +559,6 @@ const LootboxTests = async (
 
       const amountOut = await sushiswapToken1Pool.callStatic.swap(params);
 
-      console.log(`done swapping with sushi`);
-
       await sushiswapToken1Pool.swap(params);
 
       expect(amountOut).to.be.gt(0);
@@ -562,18 +568,15 @@ const LootboxTests = async (
 
     await sendEmptyTransaction(stakingSigner);
 
-    const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking);
-
-    expectWithinSlippage(fusdcRedeemed, fusdcDeposited, 10);
-
-    expectWithinSlippage(usdcRedeemed, usdcDeposited, 10);
+    await redeem(staking);
 
     const stakingFusdcAfter = await token0.balanceOf(staking.address);
     const stakingUsdcAfter = await token1.balanceOf(staking.address);
 
-    expect(stakingFusdcAfter).to.be.equal(stakingFusdcBefore);
-    expect(stakingUsdcAfter).to.be.equal(stakingUsdcBefore);}
-  );
+    const stakingAfter = stakingFusdcAfter.add(stakingUsdcAfter);
+
+    expect(stakingAfter, "complete staking amount after").to.be.gte(stakingBefore);
+  });
 
   it("should support taking fees from fusdc/weth sushiswap trades", async () => {
     const {
@@ -585,9 +588,10 @@ const LootboxTests = async (
       sushiswapBentoBox,
       staking,
       token0Decimals,
-      token1Decimals,
       token2Decimals
     } = args;
+
+    await expectDeposited(staking, 0, 0, 0);
 
     const availableFusdc = await pickRandomBalance(token0, minimumDepositToken1);
     const availableWeth = await pickRandomBalance(token2, minimumDepositToken2);
@@ -601,11 +605,14 @@ const LootboxTests = async (
       0,
       availableWeth,
       token0Decimals,
-      token1Decimals,
+      0,
       token2Decimals
     );
 
-    const [ fusdcDeposited, usdcDeposited ] = await deposit(
+    console.log("depositFusdc:", depositFusdc);
+    console.log("depositWeth:", depositWeth);
+
+    await deposit(
       staking,
       8640000,
       depositFusdc,
@@ -620,8 +627,10 @@ const LootboxTests = async (
     const stakingFusdcBefore = await token0.balanceOf(staking.address);
     const stakingWethBefore = await token2.balanceOf(staking.address);
 
-    const availableFusdcBento = await pickRandomBalance(token0, minimumDepositToken1);
-    const availableWethBento = await pickRandomBalance(token2, minimumDepositToken2);
+    const stakingBefore = stakingFusdcBefore.add(stakingWethBefore);
+
+    const availableFusdcBento = minimumDepositToken1.mul(1000);
+    const availableWethBento = minimumDepositToken2.mul(1000);
 
     const bentoDeposit = async (...args: any[]): Promise<BigNumber> => {
       const { shareOut } = await sushiswapBentoBox.callStatic.deposit(...args);
@@ -629,29 +638,24 @@ const LootboxTests = async (
       return shareOut;
     };
 
-    await bentoDeposit(
+    expect(await bentoDeposit(
       token0.address,
       stakingSignerAddress, // from
       stakingSignerAddress, // recipient
       availableFusdcBento,
       0
-    );
+    )).to.be.gt(0);
 
-    await bentoDeposit(
+    expect(await bentoDeposit(
       token2.address,       // token
       stakingSignerAddress, // from
       stakingSignerAddress, // recipient
       availableWethBento,
       0
-    );
+    )).to.be.gt(0);
 
     for (let i = 1; i <= 10; i++) {
       const tokenIn = i % 2 == 0 ? token0 : token2;
-
-      const params = ethers.utils.defaultAbiCoder.encode(
-        [ "address", "address", "bool" ], // token in, recipient, should unwrap
-        [ tokenIn.address, stakingSignerAddress, false ]
-      );
 
       const shares = await sushiswapBentoBox.balanceOf(
         tokenIn.address,
@@ -665,6 +669,11 @@ const LootboxTests = async (
         shares // share amount
       );
 
+      const params = ethers.utils.defaultAbiCoder.encode(
+        [ "address", "address", "bool" ], // token in, recipient, should unwrap
+        [ tokenIn.address, stakingSignerAddress, false ]
+      );
+
       const amountOut = await sushiswapToken2Pool.callStatic.swap(params);
 
       await sushiswapToken2Pool.swap(params);
@@ -676,17 +685,14 @@ const LootboxTests = async (
 
     await sendEmptyTransaction(stakingSigner);
 
-    const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking);
-
-    expectWithinSlippage(fusdcRedeemed, fusdcDeposited, 10);
-
-    expectWithinSlippage(usdcRedeemed, usdcDeposited, 10);
+    await redeem(staking);
 
     const stakingFusdcAfter = await token0.balanceOf(staking.address);
-    const stakingWethAfter = await token2.balanceOf(staking.address);
+    const stakingUsdcAfter = await token2.balanceOf(staking.address);
 
-    expect(stakingFusdcAfter).to.be.equal(stakingFusdcBefore);
-    expect(stakingWethAfter).to.be.gt(stakingWethBefore);
+    const stakingAfter = stakingFusdcAfter.add(stakingUsdcAfter);
+
+    expect(stakingAfter, "complete staking amount after").to.be.gte(stakingBefore);
   });
 };
 

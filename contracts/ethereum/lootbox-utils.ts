@@ -9,8 +9,8 @@ import {
 import { expect, assert } from "chai";
 
 // MaxDeposit that's enforced by Sushi/Camelot from observation (may not
-// be accurate)
-const MaxDeposit = BigNumber.from(10).pow(30);
+// be accurate) - this is after adding the minimum balance to this number guesswork
+const MaxDeposit = BigNumber.from(10).pow(3);
 
 const Zero = ethers.constants.Zero;
 
@@ -144,30 +144,35 @@ export const deployPool = async (
 // minimum amount given
 export const pickRandomBalance = async (
   token: ethers.Contract,
-  minimumAmount: BigNumberish
+  minAmount_: BigNumberish
 ): Promise<BigNumber> => {
   const signerAddr = await token.signer.getAddress();
+
+  const minAmount = BigNumber.from(minAmount_);
+
   const bal = await token.balanceOf(signerAddr);
 
-  if (bal.lt(minimumAmount))
-    throw new Error(`minimum amount ${minimumAmount} > balance ${bal} for signer ${signerAddr}, token ${token.address}!`);
+  if (bal.lt(minAmount))
+    throw new Error(`min amount ${minAmount} > balance ${bal} for signer ${signerAddr}, token ${token.address}!`);
+
+  const decimals = await token.decimals();
+
+  const maxDeposit =
+    BigNumber.from(10).pow(decimals).mul(MaxDeposit);
+
+  const maxAmount = bal.gt(maxDeposit) ? maxDeposit : bal;
+
+  if (minAmount.gt(maxAmount))
+    throw new Error(`min amount ${minAmount} > max amount ${maxAmount}`);
 
   if (bal.eq(Zero))
     throw new Error(`balance for ${signerAddr} is 0!`);
 
-  const decimals = await token.decimals();
-
-  const maxDeposit = MaxDeposit.mul(decimals);
-
-  let maxAmount = bal.gt(maxDeposit) ? maxDeposit : bal;
-
-  maxAmount = maxAmount.add(minimumAmount);
-
-  // take a random number where (minimumAmount < x > bal)
+  // take a random number where (minAmount < x > bal);
 
   return ethers.BigNumber.from(ethers.utils.randomBytes(32))
-    .mod(maxAmount)
-    .sub(minimumAmount);
+    .mod(maxAmount.sub(minAmount))
+    .add(minAmount);
 };
 
 const allocateRatio = (

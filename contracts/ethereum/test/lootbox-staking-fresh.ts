@@ -30,7 +30,11 @@ import type { lootboxTestsArgs } from "./lootbox-tests";
 
 const MaxUint256 = ethers.constants.MaxUint256;
 
-const MinimumDeposit = BigNumber.from(10).pow(20);
+// 100 of token 1 (6 decimals)
+const MinimumDepositToken1 = BigNumber.from(10).pow(8);
+
+// 100 of token 2 (18 decimals)
+const MinimumDepositToken2 = BigNumber.from(10).pow(20);
 
 describe("LootboxStaking with fresh deployment of tokens", async () => {
   const context = <lootboxTestsArgs>{};
@@ -127,6 +131,10 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
 
     context.sushiswapBentoBox = sushiswapBentoBox;
 
+    await token0.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+    await token1.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+    await token2.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+
     const sushiswapToken1Pool = await deployPool(
       sushiswapMasterDeployer,
       token0.address,
@@ -148,6 +156,10 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
     const sushiswapToken1PoolAddress = sushiswapToken1Pool.address;
 
     const sushiswapToken2PoolAddress = sushiswapToken2Pool.address;
+
+    await token0.approve(sushiswapToken1PoolAddress, MaxUint256);
+    await token1.approve(sushiswapToken1PoolAddress, MaxUint256);
+    await token2.approve(sushiswapToken2PoolAddress, MaxUint256);
 
     const staking = await stakingFactory.connect(stakingSigner).deploy();
 
@@ -171,16 +183,16 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
       sushiswapToken2PoolAddress
     );
 
+    await staking.migrateV2();
+
     await token0.approve(staking.address, MaxUint256);
     await token1.approve(staking.address, MaxUint256);
     await token2.approve(staking.address, MaxUint256);
   });
 
-  return;
-
   LootboxTests(
     context,
-    MinimumDeposit,
-    MinimumDeposit
+    MinimumDepositToken1,
+    MinimumDepositToken2
   );
 });
