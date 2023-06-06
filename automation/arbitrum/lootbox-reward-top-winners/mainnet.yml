@@ -1,0 +1,12 @@
+SERVICES:
+  - MICROSERVICE_LOOTBOX_REWARD_TOP_WINNERS:
+      SERVICE_NAME: microservice-lootbox-reward-top-winners
+      DOCKER_IMAGE: microservice-lootbox-reward-top-winners
+      DOCKERFILE_PATH: ./cmd/microservice-lootbox-reward-top-winners
+      DEPLOYMENT_TYPE: CRON
+
+      ENV_FLU_WORKER_ID: ethereum-microservice-lootbox-reward-top-winners
+
+      EVENT_ROLE: ecsEventsRole
+      EVENT_RULE: microservice-lootbox-reward-top-winners-cron
+      EVENT_SCHEDULE: cron(35 14 * * ? *) # 14:35utc / 00:05am acst (the next day) every day

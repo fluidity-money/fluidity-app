@@ -9,8 +9,8 @@ package moving_average
 
 import (
 	"fmt"
-	"math/big"
 	"math"
+	"math/big"
 	"strconv"
 
 	"github.com/fluidity-money/fluidity-app/lib/state"
@@ -45,7 +45,7 @@ func CalculateMovingAverageAndSumMaybePop(key string, limit int, shouldPopIfExce
 	// should only pop if there's excess and the argument is set
 
 	if shouldPop {
-		state.RPopCount(key, listLength - limit)
+		state.RPopCount(key, listLength-limit)
 	}
 
 	valuesBytes := state.LRange(key, 0, int64(limit))

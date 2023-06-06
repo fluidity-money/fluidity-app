@@ -18,7 +18,7 @@ import {
   initializeConnector,
 } from "@web3-react/core";
 import { MetaMask } from "@web3-react/metamask";
-import { WalletConnect } from "@web3-react/walletconnect";
+import { WalletConnect } from "@web3-react/walletconnect-v2";
 import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -34,7 +34,6 @@ import makeContractSwap, {
   ContractToken,
   getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
-import { Buffer } from "buffer";
 import useWindow from "~/hooks/useWindow";
 import {
   Chain,
@@ -166,10 +165,6 @@ const EthereumFacade = ({
         connector = connectors.find(
           (connector) => connector[0] instanceof WalletConnect
         )?.[0];
-        // Node Polyfills are no longer bundled with webpack
-        // We manually re-add Node.Buffer to client
-        // https://github.com/WalletConnect/web3modal/issues/455
-        window.Buffer = Buffer;
         break;
       case "okxwallet":
         !okxWallet && window?.open("https://www.okx.com/web3", "_blank");
@@ -627,7 +622,7 @@ const EthereumFacade = ({
 };
 
 export const EthereumProvider = (
-  rpcUrl: string,
+  walletconnectId: string,
   tokens: Token[],
   network?: string
 ) => {
@@ -654,9 +649,9 @@ export const EthereumProvider = (
               new WalletConnect({
                 actions,
                 options: {
-                  rpc: {
-                    1: rpcUrl,
-                  },
+                  projectId: walletconnectId,
+                  chains: [1, 42161],
+                  showQrModal: true,
                 },
               })
           );
