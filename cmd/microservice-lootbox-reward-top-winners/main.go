@@ -6,6 +6,7 @@ package main
 
 import (
 	"time"
+	_ "time/tzdata"
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/log"
