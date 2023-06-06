@@ -28,7 +28,7 @@ export const createPair = async (
 ): Promise<ethers.Contract> => {
   const addr = await factory.callStatic.createPair(token0.address, token1.address);
   await factory.createPair(token0.address, token1.address);
-  return hre.ethers.getContractAt("TestUniswapV2Pair", addr);
+  return hre.ethers.getContractAt("TestCamelotPair", addr);
 };
 
 export const expectWithinSlippage = (

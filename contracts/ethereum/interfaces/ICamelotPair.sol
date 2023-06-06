@@ -7,10 +7,13 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../../interfaces/IUniswapV2Pair.sol";
+import "./IERC20.sol";
 
-contract TestUniswapV2Pair {
-    function balanceOf(address /* _spender */) public pure returns (uint256) {
-        revert("test client");
-    }
+interface ICamelotPair is IERC20 {
+    function getReserves() external view returns (
+        uint112 reserve0,
+        uint112 reserve1,
+        uint16 token0FeePercent,
+        uint16 token1
+    );
 }

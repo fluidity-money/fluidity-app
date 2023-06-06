@@ -14,7 +14,7 @@ import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IToken.sol";
 
 import "../interfaces/ICamelotRouter.sol";
-import "../interfaces/IUniswapV2Pair.sol";
+import "../interfaces/ICamelotPair.sol";
 
 import "../interfaces/ISushiswapPool.sol";
 import "../interfaces/ISushiswapBentoBox.sol";
@@ -71,9 +71,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     ISushiswapPool private sushiswapFusdcWethPool_;
 
-    IUniswapV2Pair private camelotFusdcUsdcPair_;
+    ICamelotPair private camelotFusdcUsdcPair_;
 
-    IUniswapV2Pair private camelotFusdcWethPair_;
+    ICamelotPair private camelotFusdcWethPair_;
 
     mapping (address => Deposit[]) private deposits_;
 
@@ -104,8 +104,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IERC20 _weth,
         ICamelotRouter _camelotRouter,
         ISushiswapBentoBox _sushiswapBentoBox,
-        IUniswapV2Pair _camelotFusdcUsdcPair,
-        IUniswapV2Pair _camelotFusdcWethPair,
+        ICamelotPair _camelotFusdcUsdcPair,
+        ICamelotPair _camelotFusdcWethPair,
         ISushiswapPool _sushiswapFusdcUsdcPool,
         ISushiswapPool _sushiswapFusdcWethPool
     ) public {
@@ -162,7 +162,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL DEPOSIT FUNCTIONS ~~~~~~~~~~ */
 
-    function _depositToUniswapV2Router(
+    function _depositToCamelotRouter(
         ICamelotRouter _router,
         address _tokenA,
         address _tokenB,
@@ -285,7 +285,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             dep.camelotTokenA,
             dep.camelotTokenB,
             dep.camelotLpMinted
-        ) = _depositToUniswapV2Router(
+        ) = _depositToCamelotRouter(
             camelotRouter_,
             address(_tokenA),
             address(_tokenB),
@@ -395,7 +395,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL REDEEM FUNCTIONS ~~~~~~~~~~ */
 
-    function _redeemFromUniswapV2Router(
+    function _redeemFromCamelotRouter(
         ICamelotRouter _router,
         IERC20 _tokenB,
         uint256 _lpTokens,
@@ -461,7 +461,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 tokenBRedeemed
     ) {
         (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
-            _redeemFromUniswapV2Router(
+            _redeemFromCamelotRouter(
                 camelotRouter_,
                 usdc_,
                 dep.camelotLpMinted,
@@ -501,7 +501,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 tokenBRedeemed
     ) {
         (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
-            _redeemFromUniswapV2Router(
+            _redeemFromCamelotRouter(
                 camelotRouter_,
                 weth_,
                 dep.camelotLpMinted,
@@ -803,14 +803,14 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL MISC FUNCTIONS ~~~~~~~~~~ */
 
-    function _uniswapPairReserves(
-        IUniswapV2Pair _pair,
+    function _camelotPairReserves(
+        ICamelotPair _pair,
         IERC20 _tokenB
     ) internal view returns (
         uint256 reserveA,
         uint256 reserveB
     ) {
-        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
+        (uint112 reserve0_, uint112 reserve1_,,) = _pair.getReserves();
 
         uint256 reserve0 = uint256(reserve0_);
 
@@ -848,7 +848,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcWethLiq
     ) {
         (uint256 camelotFusdcUsdcReserveA, uint256 camelotFusdcUsdcReserveB) =
-            _uniswapPairReserves(
+            _camelotPairReserves(
                 camelotFusdcUsdcPair_,
                 usdc_
             );
@@ -871,7 +871,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
 
         (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
-            _uniswapPairReserves(
+            _camelotPairReserves(
                 camelotFusdcWethPair_,
                 weth_
             );

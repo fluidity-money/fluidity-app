@@ -102,12 +102,12 @@ describe("LootboxStaking deployed infra", async () => {
     );
 
     context.camelotToken1Pair = await hre.ethers.getContractAt(
-      "TestUniswapV2Pair",
+      "TestCamelotPair",
       CAMELOT_FUSDC_USDC_PAIR
     );
 
     context.camelotToken2Pair = await hre.ethers.getContractAt(
-      "TestUniswapV2Pair",
+      "TestCamelotPair",
       CAMELOT_FUSDC_WETH_PAIR
     );
 

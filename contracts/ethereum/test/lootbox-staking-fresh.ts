@@ -85,7 +85,7 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
     context.token2Decimals = await token2.decimals();
 
     const camelotFactory = await hre.ethers.getContractAt(
-      "TestUniswapV2Factory",
+      "TestCamelotFactory",
       CAMELOT_FACTORY
     );
 
