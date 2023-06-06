@@ -158,6 +158,8 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 	return topUsers
 }
 
+const LootboxRewardTimezone = "Australia/Adelaide"
+
 // fetch the 10 addresses with the highest lootboxes earned during the given period on chronos
 func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount {
 	timescaleClient := timescale.Client()
@@ -168,13 +170,13 @@ func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootbo
 			SUM(lootbox_count) AS lootbox_count 
 		FROM %s
 		WHERE 
-			awarded_time >= $1 AT TIME ZONE 'Australia/Adelaide' AND
-			awarded_time < $2 AT TIME ZONE 'Australia/Adelaide' AND 
+			awarded_time >= $1 AT TIME ZONE $3 AND
+			awarded_time < $2 AT TIME ZONE $4 AND 
 			source != 'leaderboard_prize' AND
 			application = 'chronos'
 		GROUP BY address 
 		ORDER BY lootbox_count DESC
-		LIMIT 10`,
+		LIMIT $5`,
 
 		TableLootboxes,
 	)
@@ -183,6 +185,9 @@ func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootbo
 		statementText,
 		startTime,
 		endTime,
+		LootboxRewardTimezone,
+		LootboxRewardTimezone,
+		10,
 	)
 
 	if err != nil {
