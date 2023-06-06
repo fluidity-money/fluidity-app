@@ -161,7 +161,9 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
+  // TODO: Change these!
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
+  const [useChronos, setUseChronos] = useState(false);
 
   const {
     address,
@@ -178,8 +180,8 @@ const Airdrop = () => {
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}`
+      leaderboardFilterIndex === 0 || useChronos ? "24" : "all"
+    }&address=${address ?? ""}&provider=${useChronos ? "chronos" : ""}`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
