@@ -319,17 +319,17 @@ contract Token is
 
         // give them erc20, if the user's amount is greater than 100, then we keep 1%
 
-        _burn(_sender, burnAmount);
+        _burn(_sender, _amount);
 
         pool_.takeFromPool(burnAmount);
 
-        emit BurnFluid(_sender, burnAmount);
+        emit BurnFluid(_sender, _amount);
 
         // send out the amounts
 
         underlyingToken().safeTransfer(_beneficiary, burnAmount);
 
-        if (feeAmount > 0) _transfer(_sender, feeRecipient_, feeAmount);
+        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
     }
 
     /**
