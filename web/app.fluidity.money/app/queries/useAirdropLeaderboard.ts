@@ -185,7 +185,7 @@ export const useAirdropLeaderboardByUser24HoursChronos = (address: string) => {
     address,
   };
   const body = {
-    query: queryByUser24Hours,
+    query: queryByUser24HoursChronos,
     variables,
   };
 
@@ -199,7 +199,7 @@ export const useAirdropLeaderboardByUser24HoursChronos = (address: string) => {
 export const useAirdropLeaderboard24HoursChronos = () => {
   const { url, headers } = fetchInternalEndpoint();
   const body = {
-    query: query24Hours,
+    query: query24HoursChronos,
   };
 
   return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
