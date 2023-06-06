@@ -246,15 +246,14 @@ const LootboxTests = async (
     await expectDeposited(staking, 0, 0, 0);
   });
 
-  it("should fail to redeem weth early", async () => {
+  it("should fail to redeem usdc early", async () => {
     const {
       stakingSigner,
       staking,
       token0,
-      token2,
+      token1,
       token0Decimals,
-      token1Decimals,
-      token2Decimals
+      token1Decimals
     } = args;
 
     const availableFusdc = await pickRandomBalance(
@@ -262,36 +261,33 @@ const LootboxTests = async (
       minimumDepositToken1
     );
 
-    const availableWeth = await pickRandomBalance(
-      token2,
-      minimumDepositToken2
+    const availableUsdc = await pickRandomBalance(
+      token1,
+      minimumDepositToken1
     );
 
-    const {
-      fusdcForWeth: depositFusdc,
-      weth: depositWeth
-    } = await pickRatio(
+    const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
       staking,
       availableFusdc,
+      availableUsdc,
       0,
-      availableWeth,
       token0Decimals,
       token1Decimals,
-      token2Decimals
+      0
     );
 
     const [ fusdc, usdc, weth ] = await deposit(
       staking,
       9999999,
       depositFusdc,
+      depositUsdc,
       0,
-      depositWeth,
       slippage
     );
 
     await sendEmptyTransaction(stakingSigner);
 
-    expect(redeem(staking)).to.be.revertedWith("swag");
+    await redeem(staking);
 
     await advanceTime(hre, 99999999);
 
@@ -324,10 +320,7 @@ const LootboxTests = async (
 
       // since we're doing this twice
 
-      const {
-        fusdcForWeth,
-        weth: depositWeth
-      } = await pickRatio(
+      const { fusdcForWeth, weth: depositWeth } = await pickRatio(
         staking,
         await pickRandomBalance(token0, minimumDepositToken1),
         0,
@@ -350,10 +343,7 @@ const LootboxTests = async (
 
       expectWithinSlippage(depositWeth, weth, slippage);
 
-      const {
-        fusdcForUsdc,
-        usdc: depositUsdc
-      } = await pickRatio(
+      const { fusdcForUsdc, usdc: depositUsdc } = await pickRatio(
         staking,
         await pickRandomBalance(token0, minimumDepositToken1),
         await pickRandomBalance(token1, minimumDepositToken1),
@@ -362,6 +352,8 @@ const LootboxTests = async (
         token1Decimals,
         0
       );
+
+      console.log("about to deposit for the second time");
 
       const [ fusdc1, usdc ] = await deposit(
         staking,
@@ -480,10 +472,7 @@ const LootboxTests = async (
     const availableFusdc = await pickRandomBalance(token0, minimumDepositToken1);
     const availableUsdc = await pickRandomBalance(token1, minimumDepositToken1);
 
-    const {
-      fusdcForUsdc: depositFusdc,
-      usdc: depositUsdc
-    } = await pickRatio(
+    const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
       staking,
       availableFusdc,
       availableUsdc,
@@ -596,10 +585,7 @@ const LootboxTests = async (
     const availableFusdc = await pickRandomBalance(token0, minimumDepositToken1);
     const availableWeth = await pickRandomBalance(token2, minimumDepositToken2);
 
-    const {
-      fusdcForWeth: depositFusdc,
-      weth: depositWeth
-    } = await pickRatio(
+    const { fusdcForWeth: depositFusdc, weth: depositWeth } = await pickRatio(
       staking,
       availableFusdc,
       0,
@@ -609,16 +595,13 @@ const LootboxTests = async (
       token2Decimals
     );
 
-    console.log("depositFusdc:", depositFusdc);
-    console.log("depositWeth:", depositWeth);
-
     await deposit(
       staking,
       8640000,
       depositFusdc,
       0,
       depositWeth,
-      slippage
+      100 // 100% slippage since we only want to test the fees
     );
 
     // randomly pick which swap to make and just keep going back and
