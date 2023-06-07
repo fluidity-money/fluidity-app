@@ -38,14 +38,13 @@ contract StupidLiquidityProvider is ILiquidityProvider {
 
         version_ = 1;
 
-
         fluid_ = IToken(_token);
 
         underlying_ = IERC20(_underlying);
     }
 
     /// @inheritdoc ILiquidityProvider
-    function addToPool(uint _amount) external {
+    function addToPool(uint /* _amount */) external {
         require(msg.sender == address(fluid_), "only the owner can use this");
     }
 
@@ -59,7 +58,7 @@ contract StupidLiquidityProvider is ILiquidityProvider {
     function totalPoolAmount() external returns (uint) {
         uint fluidBalance = fluid_.balanceOf(address(this));
 
-        fluid_.burnFluidWithoutWithdrawl(fluidBalance);
+        fluid_.burnFluidWithoutWithdrawal(fluidBalance);
 
         return underlying_.balanceOf(address(this));
     }

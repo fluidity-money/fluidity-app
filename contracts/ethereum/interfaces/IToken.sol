@@ -118,7 +118,7 @@ interface IToken is IERC20 {
      *
      * @param _amount the number of fluid tokens to burn
      */
-    function burnFluidWithoutWithdrawl(uint256 _amount) external;
+    function burnFluidWithoutWithdrawal(uint256 _amount) external;
 
     /**
      * @notice calculates the size of the reward pool (the interest we've earned)
