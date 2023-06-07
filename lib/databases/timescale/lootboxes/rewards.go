@@ -140,8 +140,8 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 	for rows.Next() {
 		var user UserLootboxCount
 		err := rows.Scan(
-			user.Address,
-			user.LootboxCount,
+			&user.Address,
+			&user.LootboxCount,
 		)
 
 		if err != nil {
@@ -205,8 +205,8 @@ func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootbo
 	for rows.Next() {
 		var user UserLootboxCount
 		err := rows.Scan(
-			user.Address,
-			user.LootboxCount,
+			&user.Address,
+			&user.LootboxCount,
 		)
 
 		if err != nil {
