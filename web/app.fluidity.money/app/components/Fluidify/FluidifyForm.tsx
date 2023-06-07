@@ -138,9 +138,10 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
-  const swapAmountIncludingFee = swapAmount.sub(swapAmount.mul(FeeDenom).div(Hundred));
-
-  const fAssetCreatedVisual = addDecimalToBn(swapAmountIncludingFee, toToken.decimals);
+  const swapAmountIncludingFee =
+    swapping
+      ? swapAmount
+      : swapAmount.sub(swapAmount.mul(FeeDenom).div(Hundred));
 
   return (
     <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
@@ -192,7 +193,7 @@ export const FluidifyForm = ({
 
       {/* Creating / Remaining Tokens */}
       <Text>
-        Creating {fAssetCreatedVisual}{" "}
+        Creating {addDecimalToBn(swapAmountIncludingFee, toToken.decimals)}{" "}
         {toToken.symbol || ""}
       </Text>
       {/* Tokens User Holds */}
