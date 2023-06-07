@@ -88,6 +88,16 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 			for {
 				_, content, err := websocketConn.ReadMessage()
 
+				log.Debug(func(k *log.Log) {
+					k.Context = Context
+
+					k.Format(
+						"Received this message from the queue, ip %v: %#v",
+						ipAddress,
+						string(content),
+					)
+				})
+
 				if err != nil {
 					log.App(func(k *log.Log) {
 						k.Context = Context
