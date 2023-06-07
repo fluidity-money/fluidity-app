@@ -598,6 +598,10 @@ contract Token is
         _erc20Out(msg.sender, _recipient, _amount);
     }
 
+    function burnFluidWithoutWithdrawl(uint256 _amount) public {
+        _burn(msg.sender, _amount);
+    }
+
     /// @inheritdoc IToken
     function rewardPoolAmount() public returns (uint) {
         uint totalAmount = pool_.totalPoolAmount();
@@ -864,15 +868,17 @@ contract Token is
 
     /* ~~~~~~~~~~ MISC OPERATOR FUNCTIONS ~~~~~~~~~~ */
 
-    function setFeeDetails(uint256 _fee, address _recipient) public {
+    function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) public {
         require(msg.sender == operator_, "only operator");
 
-        require(burnFee_ < BURN_FEE_DENOM, "fee too high");
+        require(_mintFee < FEE_DENOM, "mint fee too high");
+        require(_burnFee < FEE_DENOM, "burn fee too high");
 
-        emit FeeSet(burnFee_, _fee);
+        emit FeeSet(mintFee_, _mintFee, burnFee_, _burnFee);
 
         feeRecipient_ = _recipient;
 
-        burnFee_ = _fee;
+        mintFee_ = _mintFee;
+        burnFee_ = _burnFee;
     }
 }
