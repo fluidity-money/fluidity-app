@@ -593,31 +593,31 @@ $holo: linear-gradient(
       &:last-child {
         margin-bottom: 0;
       }
+    }
+  }
 
-      .ropsten-address-btn {
-        color: grey;
-        padding: 0.5em 1em;
-        display: inline-flex;
+  .ropsten-address-btn {
+    color: grey;
+    padding: 0.5em 1em;
+    display: inline-flex;
+    margin-top: 0.5em;
+    .ropsten-check > svg {
+      width: 10px !important;
+      height: 10px !important;
 
-        .ropsten-check > svg {
-          width: 10px !important;
-          height: 10px !important;
+      path {
+        stroke: none;
+        fill: currentColor;
+      }
+    }
 
-          path {
-            stroke: none;
-            fill: currentColor;
-          }
-        }
-
-        svg {
-          width: 16px;
-          height: 16px;
+    svg {
+      width: 16px;
+      height: 16px;
 
 
-          path {
-            stroke: currentColor;
-          }
-        }
+      path {
+        stroke: currentColor;
       }
     }
   }

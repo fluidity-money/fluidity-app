@@ -527,24 +527,25 @@
 .claim-ropsten ol li:last-child {
   margin-bottom: 0;
 }
-.claim-ropsten ol li .ropsten-address-btn {
+.claim-ropsten .ropsten-address-btn {
   color: grey;
   padding: 0.5em 1em;
   display: inline-flex;
+  margin-top: 0.5em;
 }
-.claim-ropsten ol li .ropsten-address-btn .ropsten-check > svg {
+.claim-ropsten .ropsten-address-btn .ropsten-check > svg {
   width: 10px !important;
   height: 10px !important;
 }
-.claim-ropsten ol li .ropsten-address-btn .ropsten-check > svg path {
+.claim-ropsten .ropsten-address-btn .ropsten-check > svg path {
   stroke: none;
   fill: currentColor;
 }
-.claim-ropsten ol li .ropsten-address-btn svg {
+.claim-ropsten .ropsten-address-btn svg {
   width: 16px;
   height: 16px;
 }
-.claim-ropsten ol li .ropsten-address-btn svg path {
+.claim-ropsten .ropsten-address-btn svg path {
   stroke: currentColor;
 }
 .claim-ropsten .claim-ropsten-form {
