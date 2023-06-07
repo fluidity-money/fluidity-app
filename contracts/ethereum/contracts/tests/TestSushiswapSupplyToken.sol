@@ -10,7 +10,7 @@ pragma abicoder v2;
 import "../../interfaces/IERC20.sol";
 
 import "../../interfaces/ISushiswapBentoBox.sol";
-import "../../interfaces/ISushiswapStablePool.sol";
+import "../../interfaces/ISushiswapPool.sol";
 
 uint256 constant MAX_UINT256 = type(uint256).max;
 
@@ -21,13 +21,13 @@ contract TestSushiswapSupplyToken {
 
     ISushiswapBentoBox bento_;
 
-    ISushiswapStablePool pool_;
+    ISushiswapPool pool_;
 
     constructor(
         IERC20 _tokenA,
         IERC20 _tokenB,
         ISushiswapBentoBox _bento,
-        ISushiswapStablePool _pool
+        ISushiswapPool _pool
     ) {
         tokenA_ = _tokenA;
         tokenB_ = _tokenB;

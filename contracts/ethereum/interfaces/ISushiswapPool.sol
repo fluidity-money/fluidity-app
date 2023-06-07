@@ -10,12 +10,17 @@ struct TokenAmount {
     uint256 amount;
 }
 
-interface ISushiswapStablePool is IERC20 {
+interface ISushiswapPool is IERC20 {
     function mint(bytes calldata _data) external returns (uint256 liquidity);
 
     function burn(bytes calldata _data) external returns (
         TokenAmount[] memory withdrawnAmounts
     );
 
-    function getReserves() external view returns (uint256 reserve0, uint256 reserve1);
+    function swap(bytes calldata _data) external returns (uint256 amountOut);
+
+    function getNativeReserves() external view returns (
+        uint256 reserve0,
+        uint256 reserve1
+    );
 }

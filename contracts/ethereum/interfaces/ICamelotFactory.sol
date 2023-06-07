@@ -7,16 +7,16 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "./IUniswapV2Pair.sol";
+import "./ICamelotPair.sol";
 
-interface IUniswapV2Factory {
+interface ICamelotFactory {
     function createPair(
         address tokenA,
         address tokenB
-    ) external returns (IUniswapV2Pair);
+    ) external returns (ICamelotPair);
 
     function getPair(
         address tokenA,
         address tokenB
-    ) external view returns (IUniswapV2Pair);
+    ) external view returns (ICamelotPair);
 }

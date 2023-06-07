@@ -1,9 +1,11 @@
 
 import "@nomiclabs/hardhat-waffle";
 
-import "@openzeppelin/hardhat-upgrades";
+import "@nomicfoundation/hardhat-verify";
 
 import * as tdly from "@tenderly/hardhat-tenderly";
+
+import "@openzeppelin/hardhat-upgrades";
 
 import "hardhat-dependency-compiler";
 

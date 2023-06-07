@@ -20,6 +20,9 @@ import "./openzeppelin/SafeERC20.sol";
 
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
+/// @dev BURN_FEE_DENOM for the unwrap fee (ie, 10 is a 1% fee)
+uint constant BURN_FEE_DENOM = 1000;
+
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
 contract Token is
@@ -152,6 +155,14 @@ contract Token is
     uint256 private initialChainId_;
 
     bytes32 private initialDomainSeparator_;
+
+    /* ~~~~~~~~~~ FEE TAKING ~~~~~~~~~~ */
+
+    /// @notice burnFee_ that's paid by the user when they burn
+    uint256 private burnFee_;
+
+    /// @notice feeRecipient_ that receives the fee paid by a user
+    address private feeRecipient_;
 
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
@@ -294,15 +305,31 @@ contract Token is
     ) internal {
         // take the user's fluid tokens
 
+         // if the fee amount > 0 and the burn fee is greater than 0, then
+         // we take burn fee% of the amount given by the user
+
+        uint256 feeAmount =
+            (burnFee_ != 0 && _amount > burnFee_)
+                ? (_amount * burnFee_) / BURN_FEE_DENOM
+                : 0;
+
+        // burn burnAmount
+
+        uint256 burnAmount = _amount - feeAmount;
+
+        // give them erc20, if the user's amount is greater than 100, then we keep 1%
+
         _burn(_sender, _amount);
 
-        // give them erc20
-
-        pool_.takeFromPool(_amount);
+        pool_.takeFromPool(burnAmount);
 
         emit BurnFluid(_sender, _amount);
 
-        underlyingToken().safeTransfer(_beneficiary, _amount);
+        // send out the amounts
+
+        underlyingToken().safeTransfer(_beneficiary, burnAmount);
+
+        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
     }
 
     /**
@@ -353,7 +380,6 @@ contract Token is
     ) internal {
         // solhint-disable-next-line reason-string
         require(from != address(0), "ERC20: transfer from the zero address");
-
 
         // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
@@ -819,5 +845,19 @@ contract Token is
         }
 
         return true;
+    }
+
+    /* ~~~~~~~~~~ MISC OPERATOR FUNCTIONS ~~~~~~~~~~ */
+
+    function setFeeDetails(uint256 _fee, address _recipient) public {
+        require(msg.sender == operator_, "only operator");
+
+        require(burnFee_ < BURN_FEE_DENOM, "fee too high");
+
+        emit FeeSet(burnFee_, _fee);
+
+        feeRecipient_ = _recipient;
+
+        burnFee_ = _fee;
     }
 }

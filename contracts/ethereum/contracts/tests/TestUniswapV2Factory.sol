@@ -7,16 +7,17 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../../interfaces/IUniswapV2Factory.sol";
-import "../../interfaces/IUniswapV2Pair.sol";
+import "../../interfaces/ICamelotFactory.sol";
+import "../../interfaces/ICamelotPair.sol";
 
-contract TestUniswapV2Factory is IUniswapV2Factory {
+contract TestCamelotFactory is ICamelotFactory {
     uint x;
+    address y;
 
     function createPair(
         address /* tokenA */,
         address /* tokenB */
-    ) external returns (IUniswapV2Pair) {
+    ) external returns (ICamelotPair) {
         ++x;
         revert("test client");
     }
@@ -24,7 +25,7 @@ contract TestUniswapV2Factory is IUniswapV2Factory {
     function getPair(
         address /* tokenA */,
         address /* tokenB */
-    ) external view returns (IUniswapV2Pair) {
-        revert("test client");
+    ) external view returns (ICamelotPair) {
+        return ICamelotPair(y);
     }
 }
