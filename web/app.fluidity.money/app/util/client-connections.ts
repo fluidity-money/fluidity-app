@@ -1,10 +1,12 @@
 import { PipedTransaction } from "drivers/types";
 
-const DSSocketManager = ({
-  onCallback = (payload: PipedTransaction) => payload,
-  network = ""
-}) => {
-  if (network == "") throw new Error(`websocket network to filter for is empty!`);
+export type DSSocketManagerArgs = {
+  onCallback: (x: PipedTransaction) => void,
+  network: string
+};
+
+const DSSocketManager = ({ onCallback, network }: DSSocketManagerArgs) => {
+  if (!network) throw new Error(`websocket network to filter for is empty!`);
 
   const url = new URL("ws://localhost:8888");
 
@@ -31,9 +33,9 @@ const DSSocketManager = ({
   );
 
   const emitEvent = (address: string) => {
-    if (address == "") throw new Error(`websocket address to filter for is empty!`);
+    if (!address) throw new Error(`websocket address to filter for is empty!`);
     const message = JSON.stringify(address);
-    if (socket.readyState == 1) socket.send(message);
+    if (socket.readyState === 1) socket.send(message);
     else socket.addEventListener("open", () => socket.send(message));
   };
 
