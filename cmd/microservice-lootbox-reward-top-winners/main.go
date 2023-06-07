@@ -12,16 +12,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
 
-const (
-	// LayoutISO to parse the date in the given format
-	LayoutISO = `2006-01-02`
-	// Location for the timezone location to use for partitioning users
-	Location = `Australia/Adelaide`
-	// EnvRewardDate to override the date to reward top winners for, otherwise using the current date
-	// In the format yyyy-mm-dd, parsed in Australia/Adelaide (ACST)
-	EnvRewardDate = `FLU_REWARD_DATE`
-)
-
 // getStartOfCurrentDay to return the current time with all values after day
 // set to 0, i.e. the beginning of the current day, e.g. 2015-05-17 00:00:00+00
 func getStartOfCurrentDay(location *time.Location) time.Time {
@@ -34,15 +24,8 @@ func getStartOfCurrentDay(location *time.Location) time.Time {
 // runs as a cron service, every day at 00:00:05 (adelaide time)
 // assumes there are at least 5 active users in a given day
 func main() {
-	location, err := time.LoadLocation(Location)
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Message = "Failed to load a time location!"
-			k.Payload = err
-		})
-	}
-
-	currentTime := getStartOfCurrentDay(location)
+	// use UTC to pass timescale a timestamp with no zone, which is then converted within the query
+	currentTime := getStartOfCurrentDay(time.UTC)
 	// startTime is the day before the current day
 	startTime := currentTime.AddDate(0, 0, -1)
 	// endTime is the beginning of the day after startTime (the start of the current date)
