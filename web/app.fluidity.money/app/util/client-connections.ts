@@ -15,7 +15,9 @@ const DSSocketManager = ({
   socket.addEventListener("error", (err) => {
     try {
       socket.close(); // hygiene?
-    } catch {}
+    } catch {
+      // do nothing
+    }
 
     console.error(`websocket disconnected with err: ${err}`);
   });
