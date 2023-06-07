@@ -46,32 +46,32 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 			lootbox_count, 
 			application
 		) VALUES
-		('$1', '', 'leaderboard_prize', '$6', 0, 1, 30, 'none'),
-		('$1', '', 'leaderboard_prize', '$6', 0, 2, 10, 'none'),
-		('$1', '', 'leaderboard_prize', '$6', 0, 3, 5, 'none'),
+		($1, '', 'leaderboard_prize', $11, 0, 1, 30, 'none'),
+		($1, '', 'leaderboard_prize', $11, 0, 2, 10, 'none'),
+		($1, '', 'leaderboard_prize', $11, 0, 3, 5, 'none'),
 
-		('$2', '', 'leaderboard_prize', '$6', 0, 1, 20, 'none'),
-		('$2', '', 'leaderboard_prize', '$6', 0, 2, 5, 'none'),
-		('$2', '', 'leaderboard_prize', '$6', 0, 3, 2, 'none'),
+		($2, '', 'leaderboard_prize', $11, 0, 1, 20, 'none'),
+		($2, '', 'leaderboard_prize', $11, 0, 2, 5, 'none'),
+		($2, '', 'leaderboard_prize', $11, 0, 3, 2, 'none'),
 
-		('$3', '', 'leaderboard_prize', '$6', 0, 1, 15, 'none'),
-		('$3', '', 'leaderboard_prize', '$6', 0, 2, 3, 'none'),
-		('$3', '', 'leaderboard_prize', '$6', 0, 3, 1, 'none'),
+		($3, '', 'leaderboard_prize', $11, 0, 1, 15, 'none'),
+		($3, '', 'leaderboard_prize', $11, 0, 2, 3, 'none'),
+		($3, '', 'leaderboard_prize', $11, 0, 3, 1, 'none'),
 
-		('$4', '', 'leaderboard_prize', '$6', 0, 1, 12, 'none'),
-		('$4', '', 'leaderboard_prize', '$6', 0, 2, 1, 'none'),
+		($4, '', 'leaderboard_prize', $11, 0, 1, 12, 'none'),
+		($4, '', 'leaderboard_prize', $11, 0, 2, 1, 'none'),
 
-		('$5', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+		($5, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
 
-		('$6', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+		($6, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
 
-		('$7', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+		($7, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
 
-		('$8', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+		($8, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
 
-		('$9', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none'),
+		($9, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
 
-		('$10', '', 'leaderboard_prize', '$6', 0, 1, 10, 'none')`,
+		($10, '', 'leaderboard_prize', $11, 0, 1, 10, 'none')`,
 		TableLootboxes,
 	)
 
@@ -109,12 +109,12 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 			SUM(lootbox_count) AS lootbox_count 
 		FROM %s
 		WHERE 
-			awarded_time >= $1 AT TIME ZONE 'Australia/Adelaide' AND
-			awarded_time < $2 AT TIME ZONE 'Australia/Adelaide' AND 
-			source != 'leaderboard_prize' 
+			awarded_time >= $1 AT TIME ZONE $3 AND
+			awarded_time < $2 AT TIME ZONE $4 AND 
+			source != 'leaderboard_prize'
 		GROUP BY address 
 		ORDER BY lootbox_count DESC
-		LIMIT 10`,
+		LIMIT $5`,
 
 		TableLootboxes,
 	)
@@ -123,6 +123,9 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 		statementText,
 		startTime,
 		endTime,
+		LootboxRewardTimezone,
+		LootboxRewardTimezone,
+		10,
 	)
 
 	if err != nil {
