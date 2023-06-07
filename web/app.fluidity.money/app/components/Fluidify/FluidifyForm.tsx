@@ -18,6 +18,11 @@ interface IFluidifyFormProps {
   swapping: boolean;
 }
 
+// FeeDenom is currently in use for unwrapping
+const FeeDenom = new BN(1, 32);
+
+const Hundred = new BN(100);
+
 export const FluidifyForm = ({
   handleSwap,
   assetToken,
@@ -133,6 +138,10 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
+  const swapAmountIncludingFee = swapAmount.sub(swapAmount.mul(FeeDenom).div(Hundred));
+
+  const fAssetCreatedVisual = addDecimalToBn(swapAmountIncludingFee, toToken.decimals);
+
   return (
     <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
       <Text size="lg" prominent>
@@ -183,7 +192,7 @@ export const FluidifyForm = ({
 
       {/* Creating / Remaining Tokens */}
       <Text>
-        Creating {addDecimalToBn(swapAmount, toToken.decimals)}{" "}
+        Creating {fAssetCreatedVisual}{" "}
         {toToken.symbol || ""}
       </Text>
       {/* Tokens User Holds */}
