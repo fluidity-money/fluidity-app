@@ -598,12 +598,18 @@ contract Token is
         _erc20Out(msg.sender, _recipient, _amount);
     }
 
-    function burnFluidWithoutWithdrawl(uint256 _amount) public {
+    /// @inheritdoc IToken
+    function burnFluidWithoutWithdrawal(uint256 _amount) public {
+        // burns fluid without taking from the liquidity provider
+        // this is fine, because the amount in the liquidity provider
+        // and the amount of fluid tokens are explicitly allowed to be different
+        // using this will essentially add the tokens to the reward pool
         _burn(msg.sender, _amount);
     }
 
     /// @inheritdoc IToken
     function rewardPoolAmount() public returns (uint) {
+        // XXX calling totalPoolAmount before totalSupply is load bearing to the StupidLiquidityProvider
         uint totalAmount = pool_.totalPoolAmount();
         uint totalFluid = totalSupply();
         require(totalAmount >= totalFluid, "bad underlying liq");
