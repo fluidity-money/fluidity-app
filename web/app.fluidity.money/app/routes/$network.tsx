@@ -141,17 +141,6 @@ export default function Network() {
   // Hardcode solana to redirect to ethereum
   if (network === "solana") throw new Error("Solana not supported");
 
-  const { showExperiment } = useContext(SplitContext);
-
-  const notificationSubscription =
-    showExperiment("enable-notifications") ?
-      <NotificationSubscription
-        network={network}
-        tokens={tokens}
-        colorMap={colors}
-      />
-      : <></>;
-
   return (
     <Provider
       network={network}
@@ -159,7 +148,11 @@ export default function Network() {
       solRpc={rpcUrls.solana}
       walletconnectId={walletconnectId}
     >
-      { notificationSubscription }
+      <NotificationSubscription
+        network={network}
+        tokens={tokens}
+        colorMap={colors}
+      />
       <ProviderOutlet />
     </Provider>
   );

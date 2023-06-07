@@ -12,7 +12,17 @@ const DSSocketManager = ({
 
   const socket = new WebSocket(url.toString());
 
-  socket.addEventListener("error", (err) => { console.error(`websocket disconnected with err: ${err}`) });
+  socket.addEventListener("error", (err) => {
+    try {
+      socket.close(); // hygiene?
+    } catch {}
+
+    console.error(`websocket disconnected with err: ${err}`);
+  });
+
+  socket.addEventListener("close", () => {
+    console.error("websocket disconnected with no reason");
+  });
 
   socket.addEventListener("message", (message) =>
     onCallback(JSON.parse(message.data) as PipedTransaction)

@@ -36,8 +36,8 @@ type websocketNotification struct {
 	Destination     string `json:"destination"`
 	Amount          string `json:"amount"`
 	Token           string `json:"token"`
-	TransactionHash string `json:"transaction_hash"`
-	RewardType      string `json:"reward_type"`
+	TransactionHash string `json:"transactionHash"`
+	RewardType      string `json:"rewardType"`
 }
 
 type registration struct {
@@ -67,8 +67,8 @@ func main() {
 	}
 
 	var (
-		registrations       = make(chan registration)
-		incomingWinners     = make(chan winners.Winner)
+		registrations   = make(chan registration)
+		incomingWinners = make(chan winners.Winner)
 	)
 
 	go func() {
@@ -103,7 +103,7 @@ func main() {
 					tokenShortName  = winner.TokenDetails.TokenShortName
 					tokenDecimals   = winner.TokenDetails.TokenDecimals
 					transactionHash = winner.TransactionHash
-					application     = winner.Application
+					rewardType      = winner.RewardType
 				)
 
 				broadcast := clients[winnerAddress]
@@ -124,7 +124,7 @@ func main() {
 					Amount:          amount.FloatString(2),
 					Token:           tokenShortName,
 					TransactionHash: transactionHash,
-					RewardType:      application,
+					RewardType:      string(rewardType),
 				})
 			}
 		}
@@ -132,8 +132,8 @@ func main() {
 
 	websocket.Endpoint(endpoint, func(ipAddress string, query url.Values, incoming <-chan []byte, outgoing chan<- []byte, requestShutdown chan<- error, shutdown <-chan bool) {
 		var (
-			broadcast         *websocket.Broadcast
-			cookie            uint64
+			broadcast *websocket.Broadcast
+			cookie    uint64
 		)
 
 		broadcastMessages := make(chan []byte)

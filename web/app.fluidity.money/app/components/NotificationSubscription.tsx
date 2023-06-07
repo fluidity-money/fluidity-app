@@ -82,6 +82,7 @@ export const NotificationSubscription = ({
     switch (payload.type) {
       case NotificationType.PENDING_REWARD:
       case NotificationType.WINNING_REWARD:
+        console.log(payload);
         return payload.rewardType === "send"
           ? "reward for s͟e͟n͟d͟i͟n͟g"
           : "reward for r͟e͟c͟e͟i͟v͟i͟n͟g";
