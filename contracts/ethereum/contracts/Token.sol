@@ -20,8 +20,8 @@ import "./openzeppelin/SafeERC20.sol";
 
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
-/// @dev BURN_FEE_DENOM for the unwrap fee (ie, 10 is a 1% fee)
-uint constant BURN_FEE_DENOM = 1000;
+/// @dev FEE_DENOM for the fees (ie, 10 is a 1% fee)
+uint constant FEE_DENOM = 1000;
 
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
@@ -164,6 +164,9 @@ contract Token is
     /// @notice feeRecipient_ that receives the fee paid by a user
     address private feeRecipient_;
 
+    /// @notice burnFee_ that's paid by the user when they mint
+    uint256 private mintFee_;
+
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
     /**
@@ -291,9 +294,21 @@ contract Token is
 
         // give the user fluid tokens
 
-        _mint(_beneficiary, realAmount);
+        // calculate the fee to take
+        uint256 feeAmount =
+            (mintFee_ != 0 && realAmount > mintFee_)
+                ? (realAmount * mintFee_) / FEE_DENOM
+                : 0;
 
-        emit MintFluid(_beneficiary, realAmount);
+        // calculate the amount to give the user
+        uint256 mintAmount = realAmount - feeAmount;
+
+        _mint(_beneficiary, mintAmount);
+
+        emit MintFluid(_beneficiary, mintAmount);
+
+        // mint the fee to the fee recipient
+        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
 
         return realAmount;
     }
@@ -310,7 +325,7 @@ contract Token is
 
         uint256 feeAmount =
             (burnFee_ != 0 && _amount > burnFee_)
-                ? (_amount * burnFee_) / BURN_FEE_DENOM
+                ? (_amount * burnFee_) / FEE_DENOM
                 : 0;
 
         // burn burnAmount
