@@ -10,9 +10,9 @@ import (
 	"math/big"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -26,9 +26,7 @@ const EnvNetwork = `FLU_ETHEREUM_NETWORK`
 const (
 	NotificationTypeOnchain = iota + 1
 	NotificationTypeWinningReward
-	NotificationTypeSend
-	NotificationTypeSwapIn
-	NotificationTypeSwapOut
+	NotificationTypePendingReward
 )
 
 // websocketNotification is received via websocket
@@ -71,7 +69,6 @@ func main() {
 	var (
 		registrations       = make(chan registration)
 		incomingWinners     = make(chan winners.Winner)
-		incomingUserActions = make(chan user_actions.UserAction)
 	)
 
 	go func() {
@@ -81,21 +78,14 @@ func main() {
 	}()
 
 	go func() {
-		user_actions.UserActionsEthereum(func(userAction user_actions.UserAction) {
-			incomingUserActions <- userAction
-		})
-	}()
-
-	go func() {
 		clients := make(map[string]*websocket.Broadcast)
 
 		for {
 			select {
 			case registration := <-registrations:
-				var (
-					address = registration.address
-					reply   = registration.reply
-				)
+				address := strings.ToLower(registration.address)
+
+				reply := registration.reply
 
 				broadcast := clients[address]
 
@@ -136,69 +126,6 @@ func main() {
 					TransactionHash: transactionHash,
 					RewardType:      application,
 				})
-
-			case userAction := <-incomingUserActions:
-				// send to the sender and receiver
-
-				var (
-					typ              = userAction.Type
-					transactionHash  = userAction.TransactionHash
-					swapIn           = userAction.SwapIn
-					senderAddress    = userAction.SenderAddress
-					recipientAddress = userAction.RecipientAddress
-					amount_          = userAction.Amount
-					tokenShortName   = userAction.TokenDetails.TokenShortName
-					tokenDecimals    = userAction.TokenDetails.TokenDecimals
-				)
-
-				var (
-					senderBroadcast    = clients[senderAddress]
-					recipientBroadcast = clients[recipientAddress]
-				)
-
-				tokenDecimalsPow10 := pow10(tokenDecimals)
-
-				amount := new(big.Rat).SetInt(&amount_.Int)
-
-				amount.Quo(amount, tokenDecimalsPow10)
-
-				var notificationType int
-
-				switch true {
-				case typ == "send":
-					notificationType = NotificationTypeSend
-
-				case typ == "swap" && swapIn:
-					notificationType = NotificationTypeSwapIn
-
-				case typ == "swap" && !swapIn:
-					notificationType = NotificationTypeSwapOut
-
-				default:
-					log.Fatal(func(k *log.Log) {
-						k.Format(
-							"Unusual user action type received, notification type %#v",
-							typ,
-						)
-					})
-				}
-
-				notification := websocketNotification{
-					Type:            notificationType,
-					Source:          senderAddress,
-					Destination:     recipientAddress,
-					Amount:          amount.FloatString(2),
-					Token:           tokenShortName,
-					TransactionHash: transactionHash,
-				}
-
-				if senderBroadcast != nil {
-					senderBroadcast.BroadcastJson(notification)
-				}
-
-				if recipientBroadcast != nil {
-					recipientBroadcast.BroadcastJson(notification)
-				}
 			}
 		}
 	}()
@@ -206,9 +133,10 @@ func main() {
 	websocket.Endpoint(endpoint, func(ipAddress string, query url.Values, incoming <-chan []byte, outgoing chan<- []byte, requestShutdown chan<- error, shutdown <-chan bool) {
 		var (
 			broadcast         *websocket.Broadcast
-			broadcastMessages chan []byte
 			cookie            uint64
 		)
+
+		broadcastMessages := make(chan []byte)
 
 		for {
 			select {
@@ -244,6 +172,8 @@ func main() {
 				cookie = newBroadcast.Subscribe(broadcastMessages)
 
 				broadcast = newBroadcast
+
+				log.Debugf("broadcast %v", broadcast)
 
 				outgoing <- []byte(`"ok"`)
 
