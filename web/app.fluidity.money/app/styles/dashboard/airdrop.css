@@ -495,7 +495,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2em;
+  gap: 1em;
 }
 .claim-ropsten .ropsten-header {
   height: 100px;
@@ -531,7 +531,6 @@
   color: grey;
   padding: 0.5em 1em;
   display: inline-flex;
-  margin-left: 1em;
 }
 .claim-ropsten ol li .ropsten-address-btn .ropsten-check > svg {
   width: 10px !important;

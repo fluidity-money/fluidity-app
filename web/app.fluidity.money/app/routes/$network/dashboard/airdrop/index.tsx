@@ -648,9 +648,6 @@ const Airdrop = () => {
           )}
           {currentModal === "testnet-rewards" && (
             <>
-              <Heading as="h3" className="no-margin">
-                Claim Testnet Rewards
-              </Heading>
               <TestnetRewardsModal />
             </>
           )}

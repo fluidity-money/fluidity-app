@@ -557,14 +557,14 @@ $holo: linear-gradient(
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2em;
+  gap: 1em;
+
   .ropsten-header {
-      h3 {
-      margin: 0;
-  }
+    h3 {
+        margin: 0;
+    }
 
     height: 100px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -598,7 +598,6 @@ $holo: linear-gradient(
         color: grey;
         padding: 0.5em 1em;
         display: inline-flex;
-        margin-left: 1em;
 
         .ropsten-check > svg {
           width: 10px !important;
