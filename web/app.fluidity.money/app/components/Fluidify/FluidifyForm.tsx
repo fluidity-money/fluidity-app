@@ -18,7 +18,7 @@ interface IFluidifyFormProps {
   swapping: boolean;
 }
 
-// feeDenom is currently in use for unwrapping
+// FeeDenom is currently in use for unwrapping
 const FeeDenom = new BN(1, 32);
 
 const Hundred = new BN(100);
