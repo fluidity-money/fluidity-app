@@ -139,9 +139,9 @@ export const FluidifyForm = ({
   const tokenIsFluid = !!assetToken.isFluidOf;
 
   const swapAmountIncludingFee =
-    swapping
-      ? swapAmount
-      : swapAmount.sub(swapAmount.mul(FeeDenom).div(Hundred));
+    tokenIsFluid
+      ? swapAmount.sub(swapAmount.mul(FeeDenom).div(Hundred))
+      : swapAmount;
 
   return (
     <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
