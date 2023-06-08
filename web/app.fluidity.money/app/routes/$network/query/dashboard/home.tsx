@@ -101,6 +101,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       throw new Error("Could not fetch rewards data");
     }
 
+    // whitespace
+
     return json({
       totalPrizePool,
       rewards: rewardsData,
