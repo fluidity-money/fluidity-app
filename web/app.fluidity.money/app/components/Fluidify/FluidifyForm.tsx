@@ -138,9 +138,11 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
-  const swapAmountIncludingFee =
+  const fee = swapAmount.mul(FeeDenom).div(Hundred);
+
+  const swapAmountAfterFee =
     tokenIsFluid
-      ? swapAmount.sub(swapAmount.mul(FeeDenom).div(Hundred))
+      ? swapAmount.sub(fee)
       : swapAmount;
 
   return (
@@ -151,9 +153,8 @@ export const FluidifyForm = ({
 
       <section className={"fluidify-form-el fluidify-input-container"}>
         <img
-          className={`fluidify-form-logo ${
-            tokenIsFluid ? "fluid-token-form-logo" : ""
-          }`}
+          className={`fluidify-form-logo ${tokenIsFluid ? "fluid-token-form-logo" : ""
+            }`}
           src={assetToken.logo || ""}
         />
         {/* Swap Field */}
@@ -193,8 +194,18 @@ export const FluidifyForm = ({
 
       {/* Creating / Remaining Tokens */}
       <Text>
-        Creating {addDecimalToBn(swapAmountIncludingFee, toToken.decimals)}{" "}
+        Creating {addDecimalToBn(swapAmountAfterFee, toToken.decimals)}{" "}
         {toToken.symbol || ""}
+        {fee.gt(new BN(0)) && (
+          <GeneralButton
+            type="transparent"
+            size="small"
+            style={{ marginTop: '0.5em', padding: '0.5em 1em', borderColor: 'grey' }}
+            disabled
+          >
+            <Text code size="sm">{addDecimalToBn(fee, toToken.decimals)} {toToken.symbol || ""} collected in fees</Text>
+          </GeneralButton>
+        )}
       </Text>
       {/* Tokens User Holds */}
       <Text prominent>
@@ -230,8 +241,8 @@ export const FluidifyForm = ({
             ? "Revert Fluid Asset"
             : `Reverting ${assetToken.symbol}`
           : !swapping
-          ? "Create Fluid Asset"
-          : `Creating ${toToken.symbol || ""}...`}
+            ? "Create Fluid Asset"
+            : `Creating ${toToken.symbol || ""}...`}
       </GeneralButton>
 
       <Text size="sm" className="swap-footer-text">
