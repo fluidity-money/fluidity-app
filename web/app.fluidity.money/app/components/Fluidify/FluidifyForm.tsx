@@ -138,7 +138,8 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
-  const fee = swapAmount.mul(FeeDenom).div(Hundred);
+  //const fee = swapAmount.mul(FeeDenom).div(Hundred);
+  const fee = new BN(0, 32);
 
   const swapAmountAfterFee =
     tokenIsFluid
