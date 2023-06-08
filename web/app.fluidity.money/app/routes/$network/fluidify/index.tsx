@@ -591,14 +591,6 @@ export default function FluidifyToken() {
                     </div>
                   );
                 })}
-                {isTablet && (
-                  <Text size="xs" className="footer-text">
-                    Fluidity employs daily limits on fluidifying assets for{" "}
-                    <br /> maintained system stability. Limits reset at midnight
-                    EST. <br />
-                    Unlimited reversion of fluid to non-fluid assets per day.
-                  </Text>
-                )}
               </div>
             </aside>
 
@@ -611,15 +603,6 @@ export default function FluidifyToken() {
                 setAssetToken={setAssetToken}
                 colorMap={colors}
               />
-            )}
-
-            {!isTablet && (
-              <Text size="xs" className="footer-text">
-                Fluidity employs daily limits on fluidifying assets for <br />{" "}
-                maintained system stability. Limits reset at midnight EST.{" "}
-                <br />
-                Unlimited reversion of fluid to non-fluid assets per day.
-              </Text>
             )}
 
             {/* Swap Token Form */}
