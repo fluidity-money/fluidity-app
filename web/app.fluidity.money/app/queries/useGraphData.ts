@@ -1,32 +1,41 @@
 import { gql, jsonPost } from "~/util";
 
 const query = gql`
-query GraphData($network: network_blockchain!) {
-  day: graph_bucket(args: {interval_: "1 hour", limit_: 24, network_: $network}) {
-    amount
-    sender_address
-    bucket
-    time
+  query GraphData($network: network_blockchain!) {
+    day: graph_bucket(
+      args: { interval_: "1 hour", limit_: 24, network_: $network }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+    week: graph_bucket(
+      args: { interval_: "1 day", limit_: 7, network_: $network }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+    month: graph_bucket(
+      args: { interval_: "1 day", limit_: 30, network_: $network }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+    year: graph_bucket(
+      args: { interval_: "1 month", limit_: 12, network_: $network }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
   }
-  week: graph_bucket(args: {interval_: "1 day", limit_: 7, network_: $network}) {
-    amount
-    sender_address
-    bucket
-    time
-  }
-  month: graph_bucket(args: {interval_: "1 day", limit_: 30, network_: $network}) {
-    amount
-    sender_address
-    bucket
-    time
-  }
-  year: graph_bucket(args: {interval_: "1 month", limit_: 12, network_: $network}) {
-    amount
-    sender_address
-    bucket
-    time
-  }
-}`;
+`;
 
 const useGraphData = async (network: string) => {
   const variables = { network };
@@ -48,19 +57,19 @@ const useGraphData = async (network: string) => {
 };
 
 export type GraphEntry = {
-  amount: number,
-  sender_address: string,
+  amount: number;
+  sender_address: string;
   // bucket for grouping by intervals of day, month etc
-  bucket: string,
+  bucket: string;
   // time for the exact timestamp of the highest event in each interval
-  time: string
-}
+  time: string;
+};
 export type GraphData = {
-    day: GraphEntry[],
-    week: GraphEntry[],
-    month: GraphEntry[],
-    year: GraphEntry[],
-  }
+  day: GraphEntry[];
+  week: GraphEntry[];
+  month: GraphEntry[];
+  year: GraphEntry[];
+};
 
 export type GraphDataResponse = {
   data?: GraphData;
@@ -75,4 +84,4 @@ type GraphDataBody = {
   query: string;
 };
 
-export {useGraphData};
+export { useGraphData };

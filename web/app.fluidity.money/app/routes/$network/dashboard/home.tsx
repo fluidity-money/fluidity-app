@@ -37,7 +37,7 @@ import dashboardHomeStyle from "~/styles/dashboard/home.css";
 import { useCache } from "~/hooks/useCache";
 import { Volume } from "../query/volumeStats";
 import { colors } from "~/webapp.config.server";
-import ArbitrumDashboard from "~/components/arbitrum/dashboard/home"
+import ArbitrumDashboard from "~/components/arbitrum/dashboard/home";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -201,7 +201,7 @@ export default function Home() {
 
   // arbitrum dashboard collates data differently due to SQL optimisations
   if (network === "arbitrum") {
-    return <ArbitrumDashboard/>
+    return <ArbitrumDashboard />;
   }
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);

@@ -24,7 +24,7 @@ import {
   toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
-import { useLoaderData, useFetcher, Link} from "@remix-run/react";
+import { useLoaderData, useFetcher, Link } from "@remix-run/react";
 import { Table, ToolTipContent, useToolTip } from "~/components";
 import {
   transactionActivityLabel,
@@ -36,7 +36,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
-import {GraphEntry} from "~/queries/useGraphData";
+import { GraphEntry } from "~/queries/useGraphData";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -90,11 +90,11 @@ const SAFE_DEFAULT_HOME: HomeLoaderData = {
     all: [],
   },
   volumeStats: {
-    day: [{totalVolume: 0, actionCount: 0}],
-    week: [{totalVolume: 0, actionCount: 0}],
-    month: [{totalVolume: 0, actionCount: 0}],
-    year: [{totalVolume: 0, actionCount: 0}],
-    all: [{totalVolume: 0, actionCount: 0}],
+    day: [{ totalVolume: 0, actionCount: 0 }],
+    week: [{ totalVolume: 0, actionCount: 0 }],
+    month: [{ totalVolume: 0, actionCount: 0 }],
+    year: [{ totalVolume: 0, actionCount: 0 }],
+    all: [{ totalVolume: 0, actionCount: 0 }],
   },
   totalFluidPairs: 0,
   timestamp: 0,
@@ -165,10 +165,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    prizePoolData.load(
-     `/${network}/query/dashboard/prizePool`
-    )
-  }, [])
+    prizePoolData.load(`/${network}/query/dashboard/prizePool`);
+  }, []);
 
   useEffect(() => {
     if (!address) return;
@@ -178,13 +176,12 @@ export default function Home() {
     userTransactionsData.load(
       `/${network}/query/userTransactions?page=${page}&address=${address}`
     );
-
   }, [address, page]);
 
   useEffect(() => {
-    if(prizePoolData?.data)
-      setTotalPrizePool(prizePoolData?.data.totalPrizePool)
-  }, [prizePoolData])
+    if (prizePoolData?.data)
+      setTotalPrizePool(prizePoolData?.data.totalPrizePool);
+  }, [prizePoolData]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
     SAFE_DEFAULT_HOME.totalFluidPairs
@@ -340,11 +337,10 @@ export default function Home() {
       }
     })();
 
-    const [{actionCount: transactionCount}] = volumeStats.all;
-    const [{
-      totalVolume: filteredVolume, 
-      actionCount: filteredTransactionCount
-    }] = Object.values(volumeStats)[activeTransformerIndex];
+    const [{ actionCount: transactionCount }] = volumeStats.all;
+    const [
+      { totalVolume: filteredVolume, actionCount: filteredTransactionCount },
+    ] = Object.values(volumeStats)[activeTransformerIndex];
 
     return {
       count: filteredTransactionCount,
@@ -550,9 +546,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                        ({network: rewardNetwork}) =>
-                          rewardNetwork === network
-                      )?.total_reward || 0
+                          ({ network: rewardNetwork }) =>
+                            rewardNetwork === network
+                        )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
@@ -600,7 +596,9 @@ export default function Home() {
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
-                  {totalPrizePool ? numberToMonetaryString(totalPrizePool) : "Loading..."}
+                  {totalPrizePool
+                    ? numberToMonetaryString(totalPrizePool)
+                    : "Loading..."}
                 </Display>
               </div>
               {activeTableFilterIndex === 0 ? (
@@ -683,7 +681,7 @@ export default function Home() {
           style={{ width: "100%", height: "400px", mixBlendMode: "screen" }}
         >
           <div className="statistics-row pad-main">
-            {["D","W","M","Y"].map((filter, i) => (
+            {["D", "W", "M", "Y"].map((filter, i) => (
               <TabButton
                 key={`filter-${filter}`}
                 onClick={() => setActiveTransformerIndex(i)}
@@ -722,7 +720,9 @@ export default function Home() {
                     justifyContent: "center",
                   }}
                 >
-                  <Text>{format(new Date(datum.time).getTime(), "dd/MM/yy")}</Text>
+                  <Text>
+                    {format(new Date(datum.time).getTime(), "dd/MM/yy")}
+                  </Text>
                   <div>
                     <Text prominent>
                       {datum.sender_address === MintAddress

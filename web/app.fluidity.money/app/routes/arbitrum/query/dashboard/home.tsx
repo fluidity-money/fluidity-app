@@ -1,12 +1,12 @@
 import type { TimeSepUserYield } from "~/queries/useUserYield";
 
-import { LoaderFunction, json, } from "@remix-run/node";
+import { LoaderFunction, json } from "@remix-run/node";
 import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import config from "~/webapp.config.server";
-import {GraphData, useGraphData} from "~/queries/useGraphData";
-import {ArbitrumVolume} from "../volumeStats";
-import {Chain} from "~/util/chainUtils/chains";
+import { GraphData, useGraphData } from "~/queries/useGraphData";
+import { ArbitrumVolume } from "../volumeStats";
+import { Chain } from "~/util/chainUtils/chains";
 
 export type HomeLoaderData = {
   rewards: TimeSepUserYield;
@@ -19,7 +19,7 @@ export type HomeLoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const network = "arbitrum"
+  const network = "arbitrum";
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
@@ -32,7 +32,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     const [
       { volume },
       { data: rewardsData, errors: rewardsErr },
-      { data: graphData, errors: graphErr }
+      { data: graphData, errors: graphErr },
     ] = await Promise.all([
       address
         ? jsonGet<{ address: string }, { volume: ArbitrumVolume }>(
@@ -47,7 +47,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       address
         ? useUserYieldByAddress(network ?? "", address)
         : useUserYieldAll(network ?? ""),
-      useGraphData(network ?? "")
+      useGraphData(network ?? ""),
     ]);
 
     if (!volume) {
