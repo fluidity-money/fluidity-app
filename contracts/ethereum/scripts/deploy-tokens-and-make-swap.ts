@@ -60,7 +60,7 @@ const main = async () => {
   );
 
   const camelotFactory = await hre.ethers.getContractAt(
-    "TestUniswapV2Factory",
+    "TestCamelotFactory",
     CAMELOT_FACTORY
   );
 
@@ -69,7 +69,7 @@ const main = async () => {
   const camelotPairAddress = await camelotFactory.getPair(token0.address, token1.address);
 
   const camelotPair = await hre.ethers.getContractAt(
-    "TestUniswapV2Pair",
+    "TestCamelotPair",
     camelotPairAddress
   );
 

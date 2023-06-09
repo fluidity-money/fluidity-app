@@ -1,26 +1,43 @@
 import { PipedTransaction } from "drivers/types";
-import io from "socket.io-client";
 
-const DSSocketManager = ({
-  onCallback = (payload: PipedTransaction) => payload,
-}) => {
-  const socket = io("wss://fanfare.fluidity.money", {
-    transports: ["websocket"],
+export type DSSocketManagerArgs = {
+  onCallback: (x: PipedTransaction) => void;
+  network: string;
+};
+
+const DSSocketManager = ({ onCallback, network }: DSSocketManagerArgs) => {
+  if (!network) throw new Error(`websocket network to filter for is empty!`);
+
+  const url = new URL("ws://localhost:8888");
+
+  url.pathname = `/${network}`;
+
+  const socket = new WebSocket(url.toString());
+
+  socket.addEventListener("error", (err) => {
+    try {
+      socket.close(); // hygiene?
+    } catch {
+      // do nothing
+    }
+
+    console.error(`websocket disconnected with err: ${err}`);
   });
 
-  const emitEvent = (protocol: string, address: string) => {
-    socket.emit("subscribeTransactions", {
-      protocol,
-      address,
-    });
-  };
+  socket.addEventListener("close", () => {
+    console.error("websocket disconnected with no reason");
+  });
 
-  // Wait to listen, don't be in a rush ")
-  setTimeout(() => {
-    socket.on("Transactions", (payload: PipedTransaction) => {
-      onCallback(payload);
-    });
-  }, 10000);
+  socket.addEventListener("message", (message) =>
+    onCallback(JSON.parse(message.data) as PipedTransaction)
+  );
+
+  const emitEvent = (address: string) => {
+    if (!address) throw new Error(`websocket address to filter for is empty!`);
+    const message = JSON.stringify(address);
+    if (socket.readyState === 1) socket.send(message);
+    else socket.addEventListener("open", () => socket.send(message));
+  };
 
   return {
     emitEvent,
