@@ -153,7 +153,7 @@ export const NotificationSubscription = ({
     if (rawAddress) {
       const { emitEvent } = DSSocketManager({
         onCallback: handleClientListener,
-        network
+        network,
       });
 
       emitEvent(rawAddress.toLowerCase() as unknown as string);

@@ -227,8 +227,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       throw new Error("Could not fetch rewards data");
     }
 
-    const activeTransformerIndex = 0;
-
     const filteredVolume = {
       day: volumeAll.filter(
         TIME_FILTERS.day.filter
