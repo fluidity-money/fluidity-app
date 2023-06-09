@@ -110,6 +110,7 @@ export const FluidifyForm = ({
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
     e
   ) => {
+    console.log("hello");
     e.preventDefault();
 
     if (!assertCanSwap) return;
@@ -136,10 +137,7 @@ export const FluidifyForm = ({
   //const fee = swapAmount.mul(FeeDenom).div(Hundred);
   const fee = new BN(0, 32);
 
-  const swapAmountAfterFee =
-    tokenIsFluid
-      ? swapAmount.sub(fee)
-      : swapAmount;
+  const swapAmountAfterFee = tokenIsFluid ? swapAmount.sub(fee) : swapAmount;
 
   return (
     <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
@@ -149,8 +147,9 @@ export const FluidifyForm = ({
 
       <section className={"fluidify-form-el fluidify-input-container"}>
         <img
-          className={`fluidify-form-logo ${tokenIsFluid ? "fluid-token-form-logo" : ""
-            }`}
+          className={`fluidify-form-logo ${
+            tokenIsFluid ? "fluid-token-form-logo" : ""
+          }`}
           src={assetToken.logo || ""}
         />
         {/* Swap Field */}
@@ -176,7 +175,10 @@ export const FluidifyForm = ({
         <GeneralButton
           type={"transparent"}
           size="small"
-          handleClick={inputMaxBalance}
+          onClick={(e: React.FormEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            inputMaxBalance();
+          }}
           disabled={
             assetToken.userTokenBalance.eq(new BN(0)) ||
             swapAmount.eq(assetToken.userTokenBalance)
@@ -196,10 +198,17 @@ export const FluidifyForm = ({
           <GeneralButton
             type="transparent"
             size="small"
-            style={{ marginTop: '0.5em', padding: '0.5em 1em', borderColor: 'grey' }}
+            style={{
+              marginTop: "0.5em",
+              padding: "0.5em 1em",
+              borderColor: "grey",
+            }}
             disabled
           >
-            <Text code size="sm">{addDecimalToBn(fee, toToken.decimals)} {toToken.symbol || ""} collected in fees</Text>
+            <Text code size="sm">
+              {addDecimalToBn(fee, toToken.decimals)} {toToken.symbol || ""}{" "}
+              collected in fees
+            </Text>
           </GeneralButton>
         )}
       </Text>
@@ -237,8 +246,8 @@ export const FluidifyForm = ({
             ? "Revert Fluid Asset"
             : `Reverting ${assetToken.symbol}`
           : !swapping
-            ? "Create Fluid Asset"
-            : `Creating ${toToken.symbol || ""}...`}
+          ? "Create Fluid Asset"
+          : `Creating ${toToken.symbol || ""}...`}
       </GeneralButton>
 
       <Text size="sm" className="swap-footer-text">
