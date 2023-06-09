@@ -1,5 +1,4 @@
-// import {defer} from "@remix-run/node";
-import {json, defer} from "react-router-dom";
+import {json} from "react-router-dom";
 import config from "~/webapp.config.server";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
