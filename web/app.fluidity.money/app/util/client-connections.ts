@@ -1,8 +1,8 @@
 import { PipedTransaction } from "drivers/types";
 
 export type DSSocketManagerArgs = {
-  onCallback: (x: PipedTransaction) => void,
-  network: string
+  onCallback: (x: PipedTransaction) => void;
+  network: string;
 };
 
 const DSSocketManager = ({ onCallback, network }: DSSocketManagerArgs) => {
