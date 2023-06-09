@@ -110,7 +110,6 @@ export const FluidifyForm = ({
   const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
     e
   ) => {
-    console.log("hello");
     e.preventDefault();
 
     if (!assertCanSwap) return;
