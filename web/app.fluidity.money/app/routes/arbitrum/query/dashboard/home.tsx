@@ -5,18 +5,9 @@ import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import config from "~/webapp.config.server";
 import { GraphData, useGraphData } from "~/queries/useGraphData";
-import { ArbitrumVolume } from "../volumeStats";
 import { Chain } from "~/util/chainUtils/chains";
+import {HomeLoaderData, TotalVolume} from "~/routes/$network/query/dashboard/home";
 
-export type HomeLoaderData = {
-  rewards: TimeSepUserYield;
-  volumeStats: ArbitrumVolume;
-  graph: GraphData;
-  totalFluidPairs: number;
-  network: Chain;
-  timestamp: number;
-  loaded: boolean;
-};
 
 export const loader: LoaderFunction = async ({ request }) => {
   const network = "arbitrum";
@@ -35,13 +26,13 @@ export const loader: LoaderFunction = async ({ request }) => {
       { data: graphData, errors: graphErr },
     ] = await Promise.all([
       address
-        ? jsonGet<{ address: string }, { volume: ArbitrumVolume }>(
+        ? jsonGet<{ address: string }, { volume: TotalVolume }>(
             `${url.origin}/${network}/query/volumeStats`,
             {
               address,
             }
           )
-        : jsonGet<Record<string, never>, { volume: ArbitrumVolume }>(
+        : jsonGet<Record<string, never>, { volume: TotalVolume }>(
             `${url.origin}/${network}/query/volumeStats`
           ),
       address

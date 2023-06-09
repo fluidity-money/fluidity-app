@@ -3,42 +3,10 @@ import {
   useVolumeStats,
   useVolumeStatsByAddress,
 } from "~/queries/useVolumeStats";
-
-export type ArbitrumVolume = {
-  day: [
-    {
-      totalVolume: number;
-      actionCount: number;
-    }
-  ];
-  week: [
-    {
-      totalVolume: number;
-      actionCount: number;
-    }
-  ];
-  month: [
-    {
-      totalVolume: number;
-      actionCount: number;
-    }
-  ];
-  year: [
-    {
-      totalVolume: number;
-      actionCount: number;
-    }
-  ];
-  all: [
-    {
-      totalVolume: number;
-      actionCount: number;
-    }
-  ];
-};
+import {TotalVolume} from "~/routes/$network/query/dashboard/home";
 
 export type ArbitrumVolumeLoaderData = {
-  volume?: ArbitrumVolume;
+  volume?: TotalVolume;
   loaded: boolean;
 };
 
