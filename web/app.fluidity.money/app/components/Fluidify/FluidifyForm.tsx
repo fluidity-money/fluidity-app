@@ -107,11 +107,7 @@ export const FluidifyForm = ({
     );
   };
 
-  const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
-    e
-  ) => {
-    e.preventDefault();
-
+  const swapAndRedirect = async () => {
     if (!assertCanSwap) return;
 
     if (!swap) return;
@@ -139,7 +135,7 @@ export const FluidifyForm = ({
   const swapAmountAfterFee = tokenIsFluid ? swapAmount.sub(fee) : swapAmount;
 
   return (
-    <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
+    <div className={"fluidify-form"}>
       <Text size="lg" prominent>
         AMOUNT TO {tokenIsFluid ? "REVERT" : "FLUIDIFY"}
       </Text>
@@ -174,10 +170,7 @@ export const FluidifyForm = ({
         <GeneralButton
           type={"transparent"}
           size="small"
-          onClick={(e: React.FormEvent<HTMLButtonElement>) => {
-            e.preventDefault();
-            inputMaxBalance();
-          }}
+          handleClick={inputMaxBalance}
           disabled={
             assetToken.userTokenBalance.eq(new BN(0)) ||
             swapAmount.eq(assetToken.userTokenBalance)
@@ -236,7 +229,7 @@ export const FluidifyForm = ({
         type={"primary"}
         size="large"
         buttonType={"submit"}
-        handleClick={() => null}
+        handleClick={swapAndRedirect}
         disabled={!assertCanSwap}
         className={"fluidify-form-submit"}
       >
@@ -256,7 +249,7 @@ export const FluidifyForm = ({
         </a>
         .
       </Text>
-    </form>
+    </div>
   );
 };
 
