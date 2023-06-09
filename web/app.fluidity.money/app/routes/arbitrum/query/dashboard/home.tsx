@@ -1,13 +1,9 @@
-import type { TimeSepUserYield } from "~/queries/useUserYield";
-
 import { LoaderFunction, json } from "@remix-run/node";
 import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import config from "~/webapp.config.server";
-import { GraphData, useGraphData } from "~/queries/useGraphData";
-import { Chain } from "~/util/chainUtils/chains";
+import { useGraphData } from "~/queries/useGraphData";
 import {HomeLoaderData, TotalVolume} from "~/routes/$network/query/dashboard/home";
-
 
 export const loader: LoaderFunction = async ({ request }) => {
   const network = "arbitrum";
