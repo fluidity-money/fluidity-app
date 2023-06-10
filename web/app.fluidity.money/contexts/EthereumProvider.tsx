@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
-import {
-  confirmAccountOwnership_,
-  signOwnerAddress_,
-  StakingDepositsRes,
-} from "~/util/chainUtils/ethereum/transaction";
+import type Result from "~/types/Result";
 import type { Web3ReactHooks } from "@web3-react/core";
 import type { Connector, Provider } from "@web3-react/types";
 import type { TransactionResponse } from "~/util/chainUtils/instructions";
 import type { Token } from "~/util/chainUtils/tokens";
 
+import {
+  confirmAccountOwnership_,
+  signOwnerAddress_,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
 import { useMemo, useEffect, useContext } from "react";
@@ -47,14 +48,7 @@ import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
-
-type OKXWallet = {
-  isOkxWallet: boolean;
-} & Provider;
-
-type Coin98Wallet = {
-  isCoin98?: boolean;
-} & Provider;
+import { Ok, Err } from "~/types/Result";
 
 type MetamaskError = { code: number; message: string };
 
@@ -66,13 +60,11 @@ const EthereumFacade = ({
 }: {
   children: ReactNode;
   tokens: Token[];
-  connectors: [Connector, Web3ReactHooks][];
+  connectors: Map<string, [Connector, Web3ReactHooks]>;
   network: Chain;
 }) => {
   const { isActive, provider, account, connector, isActivating } =
     useWeb3React();
-  const okxWallet = useWindow("okxwallet");
-  const browserWallet = useWindow("ethereum") as Coin98Wallet;
 
   const chain = chainType(network);
   const toolTip = useToolTip();
@@ -82,7 +74,7 @@ const EthereumFacade = ({
   // attempt to connect eagerly on mount
   // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/connectorCards/MetaMaskCard.tsx#L20
   useEffect(() => {
-    connectors.every(([connector]) => {
+    Object.values(connectors).every(([connector]) => {
       connector
         ?.connectEagerly?.()
         ?.then(() => {
@@ -91,32 +83,42 @@ const EthereumFacade = ({
           const connectedChainId = (
             connector.provider as unknown as { chainId?: string }
           )?.chainId;
-          const desiredChainId = `0x${getChainId(network).toString(16)}`;
-          if (connectedChainId && desiredChainId !== connectedChainId) {
-            connector
-              .activate(getChainId(network))
-              ?.catch((error: unknown | MetamaskError) => {
-                if (
-                  error &&
-                  Object.prototype.hasOwnProperty.call(error, "code")
-                ) {
-                  const { code } = error as MetamaskError;
-                  if (code === 4001) {
-                    toolTip.open("#010A16", <NetworkTooltip />);
-                    const currPath = window.location.pathname.toLowerCase();
-                    const currNetwork = getNetworkFromChainId(connectedChainId);
 
-                    if (currNetwork) {
-                      window.location.pathname = currPath.replaceAll(
-                        network,
-                        currNetwork
-                      );
-                    }
-                  }
+          const desiredChainId = `0x${getChainId(network).toString(16)}`;
+
+          // If could not connect eagerly, continue to next provider
+          if (!connectedChainId) return true;
+
+          // If connected provider matches network, return
+          if (desiredChainId === connectedChainId) return false;
+
+          // Prompt switch chains modal
+          connector
+            .activate(getChainId(network))
+            ?.catch((error: unknown | MetamaskError) => {
+              // Filter for Metamask Error
+              if (
+                error &&
+                Object.prototype.hasOwnProperty.call(error, "code")
+              ) {
+                const { code } = error as MetamaskError;
+
+                const currNetwork = getNetworkFromChainId(connectedChainId);
+
+                // Filter for Rejection code
+                if (code === 4001 && currNetwork) {
+                  toolTip.open("#010A16", <NetworkTooltip />);
+                  const currPath = window.location.pathname.toLowerCase();
+
+                  window.location.pathname = currPath.replaceAll(
+                    network,
+                    currNetwork
+                  );
                 }
-                return false;
-              });
-          }
+              }
+
+              return false;
+            });
         })
         .catch(() => true);
     });
@@ -132,76 +134,39 @@ const EthereumFacade = ({
 
   const getBalance = async (
     contractAddress: string
-  ): Promise<BN | undefined> => {
+  ): Promise<Result<BN, Error>> => {
     const signer = provider?.getSigner();
-    if (!signer) {
-      return;
-    }
+    if (!signer) return Err(Error("no signer"));
 
-    return await getBalanceOfERC20(signer, contractAddress, tokenAbi);
+    return getBalanceOfERC20(signer, contractAddress, tokenAbi);
   };
 
-  const signBuffer = async (buffer: string): Promise<string | undefined> => {
+  const signBuffer = async (buffer: string): Promise<Result<string, Error>> => {
     const signer = provider?.getSigner();
 
-    if (!signer) return;
+    if (!signer) return Err(Error("no signer found"));
 
-    return signer.signMessage(buffer);
+    return Ok(await signer.signMessage(buffer));
   };
 
   // find and activate corresponding connector
-  const useConnectorType = (
+  const useConnectorType = async (
     type: "metamask" | "walletconnect" | "coin98" | "okxwallet" | string
-  ) => {
-    let connector: Connector | undefined;
+  ): Promise<Result<void, Error>> => {
+    const connector = connectors.get(type)?.[0];
 
-    switch (type) {
-      case "metamask":
-        connector = connectors.find(
-          (connector) => connector[0] instanceof MetaMask
-        )?.[0];
-        break;
-      case "walletconnect":
-        connector = connectors.find(
-          (connector) => connector[0] instanceof WalletConnect
-        )?.[0];
-        break;
-      case "okxwallet":
-        !okxWallet && window?.open("https://www.okx.com/web3", "_blank");
+    if (!connector) return Err(Error(`unsupported connector: ${type}`));
 
-        connector = connectors.find((connector) => {
-          const _connector = (connector[0].provider as OKXWallet)?.isOkxWallet
-            ? connector[0]
-            : undefined;
-          return _connector;
-        })?.[0];
-        break;
-      case "coin98":
-        (!browserWallet || !browserWallet.isCoin98) &&
-          window?.open("https://wallet.coin98.com/", "_blank");
-
-        connector = connectors.find((connector) => {
-          const _connector = (connector[0].provider as Coin98Wallet)?.isCoin98
-            ? connector[0]
-            : undefined;
-          return _connector;
-        })?.[0];
-        break;
-      default:
-        console.warn("Unsupported connector", type);
-        break;
-    }
-
-    connector?.activate(getChainId(network));
+    return Ok(await connector.activate(getChainId(network)));
   };
 
-  const deactivate = async (): Promise<void> => {
+  const deactivate = async (): Promise<Result<void, Error>> => {
     // Metamask does not directly disconnect, so instead reset State
     // https://github.com/Uniswap/web3-react/blob/main/packages/example-next/components/ConnectWithSelect.tsx#L139
     if (connector?.deactivate) {
-      void connector.deactivate();
+      return Ok(await connector.deactivate());
     } else {
-      void connector.resetState();
+      return Ok(await connector.resetState());
     }
   };
 
@@ -210,8 +175,8 @@ const EthereumFacade = ({
    * @deprecated mint limits no longer enabled
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const limit = async (contractAddress: string): Promise<BN | undefined> => {
-    return undefined;
+  const limit = async (contractAddress: string): Promise<Result<BN, Error>> => {
+    return Err(Error("no longer enabled"));
   };
 
   /**
@@ -219,8 +184,10 @@ const EthereumFacade = ({
    * @deprecated mint limits no longer enabled
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const amountMinted = async (contractAddress: string): Promise<BN> => {
-    return new BN(0);
+  const amountMinted = async (
+    contractAddress: string
+  ): Promise<Result<BN, Error>> => {
+    return Err(Error("no longer enabled"));
   };
 
   // swap <symbol> to its counterpart, with amount in its own units
@@ -228,17 +195,17 @@ const EthereumFacade = ({
   const swap = async (
     amount: string,
     contractAddress: string
-  ): Promise<TransactionResponse | undefined> => {
+  ): Promise<Result<TransactionResponse, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return;
+      return Err(Error("no signer"));
     }
 
     const fromToken = tokens.find((t) => t.address === contractAddress);
 
     if (!fromToken) {
-      return;
+      return Err(Error("no fromToken"));
     }
 
     // true if swapping from fluid -> non-fluid
@@ -251,7 +218,7 @@ const EthereumFacade = ({
       : tokens.find((t) => t.isFluidOf === fromToken.address);
 
     if (!toToken) {
-      return;
+      return Err(Error("no toToken"));
     }
 
     const from: ContractToken = {
@@ -268,52 +235,65 @@ const EthereumFacade = ({
       isFluidOf: !fromFluid,
     };
 
-    const ethContractRes = await makeContractSwap(signer, from, to, amount);
+    const ethContractRes = Ok(await makeContractSwap(signer, from, to, amount));
 
-    return ethContractRes
-      ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
-      : undefined;
+    return ethContractRes.map(({ wait, hash }) => ({
+      confirmTx: async () => (await wait()).status == 1,
+      txHash: hash,
+    }));
   };
 
+  /**
+   *
+   * @deprecated manualReward no longer supported
+   */
   const manualReward = async (
     fluidTokenAddrs: string[],
     userAddr: string
   ): Promise<
-    | ({ amount: number; gasFee: number; networkFee: number } | undefined)[]
-    | undefined
+    Result<
+      Result<{ gasFee: number; networkFee: number; amount: number }, Error>[],
+      Error
+    >
   > => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return;
+      return Err(Error("no signer"));
     }
 
-    return Promise.all(
-      fluidTokenAddrs
-        .map((addr) => tokens.find((t) => t.address === addr))
-        .filter((t) => !!t && !!t.isFluidOf)
-        .map(async (token) => {
-          const baseToken = tokens.find((t) => t.address === token?.isFluidOf);
+    return Ok(
+      await Promise.all(
+        fluidTokenAddrs
+          .map((addr) => tokens.find((t) => t.address === addr))
+          .filter((t) => t && t.isFluidOf)
+          .map(async (token, i) => {
+            if (!token) return Err(Error(`no token at ${fluidTokenAddrs[i]}`));
 
-          if (!baseToken) return;
+            const baseToken = tokens.find(
+              (t) => t.address === token?.isFluidOf
+            );
 
-          const contract: ContractToken = {
-            address: token?.address ?? "",
-            ABI: tokenAbi,
-            symbol: token?.symbol ?? "",
-            isFluidOf: !!token?.isFluidOf,
-          };
+            if (!baseToken)
+              return Err(Error(`no matching base token for ${token.address}`));
 
-          return await manualRewardToken(
-            contract,
-            baseToken.symbol,
-            userAddr,
-            signer
-          );
-        })
+            const contract: ContractToken = {
+              address: token?.address ?? "",
+              ABI: tokenAbi,
+              symbol: token?.symbol ?? "",
+              isFluidOf: !!token?.isFluidOf,
+            };
+
+            return Ok(
+              await manualRewardToken(
+                contract,
+                baseToken.symbol,
+                userAddr,
+                signer
+              )
+            );
+          })
+      )
     );
   };
 
@@ -633,54 +613,50 @@ export const EthereumProvider = (
     const okxWallet = useWindow("okxwallet");
 
     // Listen for changes to the injected connectors / Setup the injected connectors.
-    const [connectors, key]: [[Connector, Web3ReactHooks][], string] =
-      useMemo(() => {
-        const _key: string[] = [];
-        const _connectors: [Connector, Web3ReactHooks][] = [];
-        const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-          (actions) => new MetaMask({ actions })
+    const connectors: Map<string, [Connector, Web3ReactHooks]> = useMemo(() => {
+      const _connectors = new Map();
+
+      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+        (actions) => new MetaMask({ actions })
+      );
+      _connectors.set("metamask", [metaMask, metamaskHooks]);
+
+      const [walletConnect, walletconnectHooks] =
+        initializeConnector<WalletConnect>(
+          (actions) =>
+            new WalletConnect({
+              actions,
+              options: {
+                projectId: walletconnectId,
+                chains: [1, 42161],
+                showQrModal: true,
+              },
+            })
         );
-        _connectors.push([metaMask, metamaskHooks]);
-        _key.push("MetaMask");
+      _connectors.set("walletconnect", [walletConnect, walletconnectHooks]);
 
-        const [walletConnect, walletconnectHooks] =
-          initializeConnector<WalletConnect>(
-            (actions) =>
-              new WalletConnect({
-                actions,
-                options: {
-                  projectId: walletconnectId,
-                  chains: [1, 42161],
-                  showQrModal: true,
-                },
-              })
-          );
-        _connectors.push([walletConnect, walletconnectHooks]);
-        _key.push("WalletConnect");
+      const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
+        (actions) => new MetaMask({ actions })
+      );
+      _connectors.set("coin98", [coin98, coin98Hooks]);
 
-        const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
-          (actions) => new MetaMask({ actions })
+      if (okxWallet) {
+        const [okx, okxHooks] = initializeConnector<EIP1193>(
+          (actions) =>
+            new EIP1193({
+              actions,
+              provider: okxWallet as Provider,
+            })
         );
-        _connectors.push([coin98, coin98Hooks]);
-        _key.push("Coin98");
+        _connectors.set("okx", [okx, okxHooks]);
+      }
 
-        if (okxWallet) {
-          const [okx, okxHooks] = initializeConnector<EIP1193>(
-            (actions) =>
-              new EIP1193({
-                actions,
-                provider: okxWallet as Provider,
-              })
-          );
-          _connectors.push([okx, okxHooks]);
-          _key.push("OKX");
-        }
+      return _connectors;
+    }, [okxWallet]);
 
-        return [_connectors, _key.join(",")];
-      }, [okxWallet]);
     return (
       <>
-        <Web3ReactProvider connectors={connectors} key={key}>
+        <Web3ReactProvider connectors={Object.values(connectors)}>
           <EthereumFacade
             tokens={tokens}
             connectors={connectors}

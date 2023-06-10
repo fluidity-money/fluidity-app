@@ -91,15 +91,13 @@ const ProviderOutlet = () => {
   const { client } = useContext(SplitContext);
 
   useEffect(() => {
-    if (!(address && connected)) return;
+    if (!address || !connected) return;
 
-    (async () => {
-      if (!getDegenScore) return;
-
-      const degenScore = await getDegenScore(address);
-
-      client?.track("connected-user-degen-score", address, degenScore);
-    })();
+    getDegenScore?.(address)
+      .then((degenScore) =>
+        client?.track("connected-user-degen-score", address, degenScore)
+      )
+      .catch(() => null);
   }, [address, client]);
 
   return (

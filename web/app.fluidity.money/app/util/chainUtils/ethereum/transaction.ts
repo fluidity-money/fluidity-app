@@ -1,3 +1,5 @@
+import type Result from "~/types/Result";
+
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
 import { ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
@@ -5,6 +7,7 @@ import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
+import { Ok, Err } from "~/types/Result";
 
 export type ContractToken = {
   address: string;
@@ -51,10 +54,9 @@ export const confirmAccountOwnership_ = async (
   const { v, r, s } = utils.splitSignature(signature);
 
   try {
-    await contract.confirm(address, owner, v, r, s);
-    console.log("Confirmation transaction successful!");
+    return Ok(contract.confirm(address, owner, v, r, s));
   } catch (error) {
-    console.error("Error confirming ownership:", error);
+    return Err(error);
   }
 };
 
@@ -71,13 +73,15 @@ export const getBalanceOfERC20 = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-): Promise<BN> => {
+): Promise<Result<BN, Error>> => {
   const contract = getContract(ABI, contractAddress, signer);
-  if (!contract) return new BN(0);
+  if (!contract) return Err(Error("no contract"));
 
   const userAddress = await signer.getAddress();
 
-  return new BN((await contract.balanceOf(userAddress)).toString());
+  return Ok(await contract.balanceOf(userAddress))
+    .map(toString)
+    .map((str) => new BN(str));
 };
 
 // get ERC20 balance for the given token, divided by its decimals
@@ -211,7 +215,7 @@ export const manualRewardToken = async (
   address: string,
   signer: Signer
 ): Promise<
-  { amount: number; gasFee: number; networkFee: number } | undefined
+  Result<{ amount: number; gasFee: number; networkFee: number }, Error>
 > => {
   const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
 
@@ -225,7 +229,7 @@ export const manualRewardToken = async (
     manualRewardBody
   );
 
-  if (error || !payload) return;
+  if (error || !payload) return Err(Error("could not generate payload"));
 
   // Call eth contract
 

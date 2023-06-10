@@ -48,8 +48,9 @@ const AcceptReferralModal = ({
       {
         address: address,
         referrer_code: referralCode,
-        referee_msg:
-          (await signBuffer?.(`${referralCode} 🌊 ${address}`)) ?? "",
+        referee_msg: await signBuffer?.(`${referralCode} 🌊 ${address}`)
+          .then((buf) => buf)
+          .catch(() => ""),
       }
     );
 
