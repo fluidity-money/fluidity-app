@@ -108,9 +108,8 @@ const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const {network} = params;
-  if (!network)
-    return;
+  const { network } = params;
+  if (!network) return;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
