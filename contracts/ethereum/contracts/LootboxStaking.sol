@@ -176,7 +176,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 amountB,
         uint256 liquidity
      ) {
-        (amountA, amountB, liquidity) = _router.addLiquidity(
+        return _router.addLiquidity(
             _tokenA,
             _tokenB,
             _tokenAAmount,
@@ -186,8 +186,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             address(this),
             _timestamp
         );
-
-        return (amountA, amountB, liquidity);
     }
 
     function _depositToSushiswapPool(
@@ -542,12 +540,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         Deposit memory dep;
 
-        uint256 fusdcBefore = fusdc_.balanceOf(msg.sender);
-
-        uint256 usdcBefore = usdc_. balanceOf(msg.sender);
-
-        uint256 wethBefore = weth_.balanceOf(msg.sender);
-
         for (uint i = deposits_[msg.sender].length; i > 0;) {
             --i;
 
@@ -559,6 +551,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 continue;
 
             bool fusdcUsdcPair = dep.fusdcUsdcPair;
+
+            uint256 fusdcBefore = fusdc_.balanceOf(msg.sender);
+
+            uint256 usdcBefore = usdc_. balanceOf(msg.sender);
+
+            uint256 wethBefore = weth_.balanceOf(msg.sender);
 
             _redeemCamelotSushiswap(dep, fusdcUsdcPair, _maxTimestamp, msg.sender);
 
