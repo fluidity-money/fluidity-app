@@ -447,55 +447,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         deposits_[_sender].pop();
     }
 
-    /**
-     * @notice _redeemCamelotStableSwapSushiswap by assuming it's
-     *         fusdc/usdc and not rederivating the constant product formula to
-     *         take fees from sushiswap (which is likely a stableswap pool in practice)
-     */
-    function _redeemCamelotStableSwapSushiswap(
+    function _redeemCamelotSushiswap(
         Deposit memory dep,
-        uint256 _timestamp,
-        uint256 _originalCamelotK
-    ) internal returns (
-        uint256 tokenARedeemed,
-        uint256 tokenBRedeemed
-    ) {
-        (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
-            _redeemFromCamelotRouter(
-                camelotRouter_,
-                usdc_,
-                dep.camelotLpMinted,
-                _timestamp
-            );
-
-        (uint256 sushiswapARedeemed, uint256 sushiswapBRedeemed) =
-            _redeemFromSushiswapPool(
-                sushiswapFusdcUsdcPool_,
-                usdc_,
-                dep.sushiswapLpMinted
-            );
-
-        uint256 tokenBAvailable = camelotBRedeemed + sushiswapBRedeemed;
-
-        uint256 redeemedCamelotK = _originalCamelotK / camelotARedeemed;
-
-        tokenARedeemed = camelotARedeemed + sushiswapARedeemed;
-
-        // if token B redeemed is higher than the amount that the user
-        // got back, then we simply return that amount
-
-        tokenBRedeemed = redeemedCamelotK + sushiswapBRedeemed;
-
-        if (tokenBRedeemed > tokenBAvailable) tokenBRedeemed = tokenBAvailable;
-
-        return (tokenARedeemed, tokenBRedeemed);
-    }
-
-    function _redeemCamelotConstantProductSushiswap(
-        Deposit memory dep,
-        uint256 _timestamp,
-        uint256 _originalCamelotK,
-        uint256 _originalSushiswapK
+        uint256 _timestamp
     ) internal returns (
         uint256 tokenARedeemed,
         uint256 tokenBRedeemed
@@ -515,21 +469,9 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 dep.sushiswapLpMinted
             );
 
-        uint256 tokenBAvailable = camelotBRedeemed + sushiswapBRedeemed;
-
-        uint256 redeemedCamelotK = _originalCamelotK / camelotARedeemed;
-
-        uint256 redeemedSushiswapK = _originalSushiswapK / sushiswapARedeemed;
-
         tokenARedeemed = camelotARedeemed + sushiswapARedeemed;
 
-        // if token B redeemed is higher than the amount that the user
-        // got back, then we simply return that amount (this could happen
-        // if the user got rekt on fees by bento)
-
-        tokenBRedeemed = redeemedCamelotK + redeemedSushiswapK;
-
-        if (tokenBRedeemed > tokenBAvailable) tokenBRedeemed = tokenBAvailable;
+        tokenBRedeemed = camelotBRedeemed + sushiswapBRedeemed;
 
         return (tokenARedeemed, tokenBRedeemed);
     }
@@ -633,47 +575,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             bool fusdcUsdcPair = dep.fusdcUsdcPair;
 
-            uint256 tokenARedeemed;
-            uint256 tokenBRedeemed;
+            (uint256 tokenARedeemed, uint256 tokenBRedeemed) =
+                    _redeemCamelotSushiswap(dep, _maxTimestamp);
 
-            // if the pair is the fusdc usdc pair, we assume it's a stable swap pool
-            // pool, and ignore any fees taken since it's difficult to calculate the
-            // fees from the stableswap formula in the smart contract
-
-            uint256 originalCamelotK = dep.camelotTokenA * dep.camelotTokenB;
-
-            if (fusdcUsdcPair) {
-                (
-                    tokenARedeemed,
-                    tokenBRedeemed
-                ) =
-                    _redeemCamelotStableSwapSushiswap(
-                        dep,
-                        _maxTimestamp,
-                        originalCamelotK
-                    );
-
-                camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
-                sushiswapFusdcUsdcDepositedLpTokens_ -= dep.sushiswapLpMinted;
-            }
-
-            else {
-                uint256 originalSushiswapK = dep.sushiswapTokenA * dep.sushiswapTokenB;
-
-                (
-                    tokenARedeemed,
-                    tokenBRedeemed
-                ) =
-                    _redeemCamelotConstantProductSushiswap(
-                        dep,
-                        _maxTimestamp,
-                        originalCamelotK,
-                        originalSushiswapK
-                    );
-
-                camelotFusdcWethDepositedLpTokens_ -= dep.camelotLpMinted;
-                sushiswapFusdcWethDepositedLpTokens_ -= dep.sushiswapLpMinted;
-            }
+            camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
+            sushiswapFusdcUsdcDepositedLpTokens_ -= dep.sushiswapLpMinted;
 
             fusdcRedeemed += tokenARedeemed;
 
