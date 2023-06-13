@@ -16,8 +16,13 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
-// EnvAddressConfirmerContractAddress for the address of the contract that emits the confirmation event
-const EnvAddressConfirmerContractAddress = `FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS`
+const (
+    // EnvAddressConfirmerContractAddress for the address of the contract that emits the confirmation event
+    EnvAddressConfirmerContractAddress = `FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS`
+
+    // LootboxCount for the number of lootboxes to pay out
+    LootboxCount = 0
+)
 
 func main() {
     var (
@@ -42,7 +47,8 @@ func main() {
         // decode all "AddressConfirmed" events
         testnetOwnerPair, err := fluidity.TryDecodeAddressConfirmed(l)
 
-        if err == fluidity.ErrWrongEvent {
+        switch err {
+        case fluidity.ErrWrongEvent:
             log.Debug(func(k *log.Log) {
                 k.Format(
                     "Event for log %v in transaction %v wasn't AddressConfirmed, skipping!",
@@ -50,10 +56,12 @@ func main() {
                     l.TxHash,
                 )
             })
-            return
-        }
+        return
 
-        if err != nil {
+        case nil:
+            // do nothing
+            
+        default:
             log.Fatal(func(k *log.Log) {
                 k.Message = "Failed to decode an AddressConfirmed event!"
                 k.Payload = err
@@ -76,12 +84,11 @@ func main() {
         }
 
         // inserted, pay out lootboxes
-        const LOOTBOX_COUNT = 0
         lootbox := lootboxes.Lootbox{
             Address: testnetOwnerPair.Owner.String(),
             Source: lootboxLib.Leaderboard,
             AwardedTime: time.Now(),
-            LootboxCount: LOOTBOX_COUNT,
+            LootboxCount: LootboxCount,
         }
         lootboxes.InsertLootbox(lootbox)
     })

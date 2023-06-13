@@ -15,6 +15,7 @@ import (
 
 const (
 	// TableTestnetAddress that contains a list of addresses used in the testnet
+	// for lootbox specific actions
 	TableTestnetAddress = `testnet_address`
 
 	// TableTestnetOwner to insert a mainnet owner -> testnet address relation
