@@ -35,6 +35,7 @@ var applicationNames = []string{
 	"meson",
 	"camelot",
 	"chronos",
+	"sushiswap",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
