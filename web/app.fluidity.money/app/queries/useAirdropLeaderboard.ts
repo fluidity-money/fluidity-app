@@ -58,9 +58,10 @@ const query24Hours = gql`
   }
 `;
 
-const queryByUser24HoursChronos = gql`
-  query AirdropLeaderboard($address: String!) {
-    airdrop_leaderboard: airdrop_leaderboard_24_hours_chronos(
+const query24HoursByUserByApplication = gql`
+  query AirdropLeaderboardApplication($application: ethereum_application!) {
+    airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
+      args: { application_: $application }
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -74,9 +75,10 @@ const queryByUser24HoursChronos = gql`
   }
 `;
 
-const query24HoursChronos = gql`
-  query AirdropLeaderboard {
-    airdrop_leaderboard: airdrop_leaderboard_24_hours_chronos(
+const query24HoursByApplication = gql`
+  query AirdropLeaderboardByApplication($application: ethereum_application!) {
+    airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
+      args: { application_: $application }
       limit: 16
       order_by: { total_lootboxes: desc }
     ) {
@@ -97,6 +99,19 @@ type AirdropLeaderboardBody = {
 type AirdropLeaderboardByUserBody = AirdropLeaderboardBody & {
   variables: {
     address: string;
+  };
+};
+
+type AirdropLeaderboardByApplicationBody = AirdropLeaderboardBody & {
+  variables: {
+    application: string;
+  };
+};
+
+type AirdropLeaderboardByUserByApplicationBody = AirdropLeaderboardBody & {
+  variables: {
+    address: string;
+    application: string;
   };
 };
 
@@ -178,33 +193,41 @@ export const useAirdropLeaderboard24Hours = () => {
   );
 };
 
-export const useAirdropLeaderboardByUser24HoursChronos = (address: string) => {
+export const useAirdropLeaderboardByUserByApplication24Hours = (
+  address: string,
+  application: string
+) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
     address,
+    application,
   };
   const body = {
-    query: queryByUser24HoursChronos,
+    query: query24HoursByUserByApplication,
     variables,
   };
 
-  return jsonPost<AirdropLeaderboardByUserBody, AirdropLeaderboardResponse>(
-    url,
-    body,
-    headers
-  );
+  return jsonPost<
+    AirdropLeaderboardByUserByApplicationBody,
+    AirdropLeaderboardResponse
+  >(url, body, headers);
 };
 
-export const useAirdropLeaderboard24HoursChronos = () => {
+export const useAirdropLeaderboardByApplication24Hours = (
+  application: string
+) => {
   const { url, headers } = fetchInternalEndpoint();
+  const variables = {
+    application,
+  };
   const body = {
-    query: query24HoursChronos,
+    query: query24HoursByApplication,
+    variables,
   };
 
-  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
-    url,
-    body,
-    headers
-  );
+  return jsonPost<
+    AirdropLeaderboardByApplicationBody,
+    AirdropLeaderboardResponse
+  >(url, body, headers);
 };
