@@ -5,7 +5,7 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import config from "~/webapp.config.server";
-import {GraphData, GraphEntry} from "~/queries/useGraphData";
+import { GraphData, GraphEntry } from "~/queries/useGraphData";
 
 export type TotalVolume = {
   day: [
@@ -66,22 +66,25 @@ const binTransactions = (bins: Volume[], txs: Volume[]): GraphEntry[] => {
   });
 
   const maxTxMappedBins = txMappedBins
-    .map(
-      (txs, i) => {
-        const tx = txs.find(
-          (tx) => tx.amount === Math.max(...txs.map(({amount}) => amount))
+    .map((txs, i) => {
+      const tx =
+        txs.find(
+          (tx) => tx.amount === Math.max(...txs.map(({ amount }) => amount))
         ) || bins[i];
-        const time = new Date(tx.timestamp * 1000);
+      const time = new Date(tx.timestamp * 1000);
 
-        return {
-          amount: tx.amount,
-          sender_address: tx.sender,
-          timestamp: tx.timestamp,
-          time: time.toUTCString(),
-          bucket: new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDay()).toUTCString(),
-        };
-      }
-    )
+      return {
+        amount: tx.amount,
+        sender_address: tx.sender,
+        timestamp: tx.timestamp,
+        time: time.toUTCString(),
+        bucket: new Date(
+          time.getUTCFullYear(),
+          time.getUTCMonth(),
+          time.getUTCDay()
+        ).toUTCString(),
+      };
+    })
     .reverse();
 
   const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
@@ -120,7 +123,7 @@ const GRAPH_TRANSFORMERS = {
       const unixHourInc = 60 * 60 * 1000;
       const unixNow = Date.now();
 
-      const mappedTxBins = Array.from({length: entries}).map((_, i) => ({
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
         ...graphEmptyVolume(unixNow - (i + 1) * unixHourInc),
       }));
 
@@ -135,7 +138,7 @@ const GRAPH_TRANSFORMERS = {
       const unixEightHourInc = 24 * 60 * 60 * 1000;
       const unixNow = Date.now();
 
-      const mappedTxBins = Array.from({length: entries}).map((_, i) => ({
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
         ...graphEmptyVolume(unixNow - (i + 1) * unixEightHourInc),
       }));
 
@@ -148,7 +151,7 @@ const GRAPH_TRANSFORMERS = {
       const unixDayInc = 24 * 60 * 60 * 1000;
       const unixNow = Date.now();
 
-      const mappedTxBins = Array.from({length: entries}).map((_, i) => ({
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
         ...graphEmptyVolume(unixNow - (i + 1) * unixDayInc),
       }));
 
@@ -161,7 +164,7 @@ const GRAPH_TRANSFORMERS = {
       const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
       const unixNow = Date.now();
 
-      const mappedTxBins = Array.from({length: entries}).map((_, i) => ({
+      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
         ...graphEmptyVolume(unixNow - (i + 1) * unixBimonthlyInc),
       }));
 
@@ -200,24 +203,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const timestamp = new Date().getTime();
 
   try {
-    const [
-      { volume, volumeAll },
-      { data: rewardsData, errors: rewardsErr },
-    ] = await Promise.all([
-      address
-        ? jsonGet<{ address: string }, { volume: TotalVolume, volumeAll: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`,
-            {
+    const [{ volume, volumeAll }, { data: rewardsData, errors: rewardsErr }] =
+      await Promise.all([
+        address
+          ? jsonGet<
+              { address: string },
+              { volume: TotalVolume; volumeAll: Volume[] }
+            >(`${url.origin}/${network}/query/volumeStats`, {
               address,
-            }
-          )
-        : jsonGet<Record<string, never>, { volume: TotalVolume, volumeAll: Volume[] }>(
-            `${url.origin}/${network}/query/volumeStats`
-          ),
-      address
-        ? useUserYieldByAddress(network ?? "", address)
-        : useUserYieldAll(network ?? ""),
-    ]);
+            })
+          : jsonGet<
+              Record<string, never>,
+              { volume: TotalVolume; volumeAll: Volume[] }
+            >(`${url.origin}/${network}/query/volumeStats`),
+        address
+          ? useUserYieldByAddress(network ?? "", address)
+          : useUserYieldAll(network ?? ""),
+      ]);
 
     if (!volume) {
       throw new Error("Could not fetch volume data");
@@ -228,26 +230,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     const filteredVolume = {
-      day: volumeAll.filter(
-        TIME_FILTERS.day.filter
-      ),
-      week: volumeAll.filter(
-        TIME_FILTERS.week.filter
-      ),
-      month: volumeAll.filter(
-        TIME_FILTERS.month.filter
-      ),
-      year: volumeAll.filter(
-        TIME_FILTERS.year.filter
-      ),
-    }
+      day: volumeAll.filter(TIME_FILTERS.day.filter),
+      week: volumeAll.filter(TIME_FILTERS.week.filter),
+      month: volumeAll.filter(TIME_FILTERS.month.filter),
+      year: volumeAll.filter(TIME_FILTERS.year.filter),
+    };
 
     const graphData: GraphData = {
       day: GRAPH_TRANSFORMERS.day.transform(filteredVolume.day),
       week: GRAPH_TRANSFORMERS.week.transform(filteredVolume.week),
       month: GRAPH_TRANSFORMERS.month.transform(filteredVolume.month),
       year: GRAPH_TRANSFORMERS.year.transform(filteredVolume.year),
-    }
+    };
 
     return json({
       rewards: rewardsData,
@@ -258,10 +252,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       timestamp,
       loaded: true,
     } satisfies HomeLoaderData);
-
   } catch (err) {
     console.log(err);
     throw new Error(`Could not fetch Transactions on ${network}: ${err}`);
   } // Fail silently - for now.
 };
-

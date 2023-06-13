@@ -1,6 +1,7 @@
 import { gql, jsonPost } from "~/util";
+import { fetchInternalEndpoint } from "~/util";
 
-const query = gql`
+const QUERY_ALL = gql`
   query GraphData($network: network_blockchain!) {
     day: graph_bucket(
       args: { interval_: "1 hour", limit_: 24, network_: $network }
@@ -37,24 +38,62 @@ const query = gql`
   }
 `;
 
-const useGraphData = async (network: string) => {
-  const variables = { network };
-  const url = "https://fluidity.hasura.app/v1/graphql";
-  const body = {
-    variables,
-    query: query,
-  };
-
-  return await jsonPost<GraphDataBody, GraphDataResponse>(
-    url,
-    body,
-    process.env.FLU_HASURA_SECRET
-      ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
-      : {}
-  );
-};
+const QUERY_BY_USER = gql`
+  query GraphDataByAddress($network: network_blockchain!, $address: String!) {
+    day: graph_bucket(
+      args: {
+        interval_: "1 hour"
+        limit_: 24
+        network_: $network
+        address: $address
+      }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+    week: graph_bucket(
+      args: {
+        interval_: "1 day"
+        limit_: 7
+        network_: $network
+        address: $address
+      }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+    month: graph_bucket(
+      args: {
+        interval_: "1 day"
+        limit_: 30
+        network_: $network
+        address: $address
+      }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+    year: graph_bucket(
+      args: {
+        interval_: "1 month"
+        limit_: 12
+        network_: $network
+        address: $address
+      }
+    ) {
+      amount
+      sender_address
+      bucket
+      time
+    }
+  }
+`;
 
 export type GraphEntry = {
   amount: number;
@@ -77,11 +116,49 @@ export type GraphDataResponse = {
   errors?: unknown;
 };
 
-type GraphDataBody = {
+type GraphDataAllBody = {
   variables: {
     network: string;
   };
   query: string;
 };
 
-export { useGraphData };
+type GraphDataByUserBody = {
+  variables: {
+    network: string;
+    address: string;
+  };
+  query: string;
+};
+
+const useGraphDataAll = async (network: string) => {
+  const variables = { network };
+  const { url, headers } = fetchInternalEndpoint();
+  const body = {
+    variables,
+    query: QUERY_ALL,
+  };
+
+  return await jsonPost<GraphDataAllBody, GraphDataResponse>(
+    url,
+    body,
+    headers
+  );
+};
+
+const useGraphDataByUser = async (network: string, address: string) => {
+  const variables = { network, address };
+  const { url, headers } = fetchInternalEndpoint();
+  const body = {
+    variables,
+    query: QUERY_BY_USER,
+  };
+
+  return await jsonPost<GraphDataByUserBody, GraphDataResponse>(
+    url,
+    body,
+    headers
+  );
+};
+
+export { useGraphDataAll, useGraphDataByUser };
