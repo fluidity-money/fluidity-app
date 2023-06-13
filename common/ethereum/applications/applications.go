@@ -52,6 +52,7 @@ const (
 	ApplicationMeson
 	ApplicationCamelot
 	ApplicationChronos
+	ApplicationSushiswap
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -75,6 +76,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.UniswapV3 += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationSushiswap:
+		fallthrough
 	case ApplicationUniswapV2:
 		feeData, err = uniswap.GetUniswapV2Fees(
 			transfer,
