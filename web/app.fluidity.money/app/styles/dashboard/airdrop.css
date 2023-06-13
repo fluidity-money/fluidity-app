@@ -529,12 +529,12 @@
   margin: 0;
 }
 .leaderboard-header-title-row .leaderboard-provider-button {
-  -webkit-box-shadow: 0px 0px 64px 7px rgba(152, 75, 252, 0.53);
-  -moz-box-shadow: 0px 0px 64px 7px rgba(152, 75, 252, 0.53);
-  box-shadow: 0px 0px 64px 7px rgba(152, 75, 252, 0.53);
+  -webkit-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
+  -moz-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
+  box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
   padding: 0.5em 1em;
-  border-color: #d4d7ff;
-  color: #d4d7ff;
+  border-color: #f7c8e7;
+  color: #f7c8e7;
 }
 
 /*# sourceMappingURL=airdrop.css.map */

@@ -1,8 +1,4 @@
-import {
-  AirdropLeaderboardEntry,
-  useAirdropLeaderboard24HoursChronos,
-  useAirdropLeaderboardByUser24HoursChronos,
-} from "~/queries/useAirdropLeaderboard";
+import type { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
 
 import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
@@ -11,6 +7,8 @@ import {
   useAirdropLeaderboardByUserAllTime,
   useAirdropLeaderboard24Hours,
   useAirdropLeaderboardByUser24Hours,
+  useAirdropLeaderboardByApplication24Hours,
+  useAirdropLeaderboardByUserByApplication24Hours,
 } from "~/queries/useAirdropLeaderboard";
 
 export type AirdropLeaderboardLoaderData = {
@@ -18,16 +16,19 @@ export type AirdropLeaderboardLoaderData = {
   loaded: boolean;
 };
 
+const AIRDROP_PROVIDERS = new Set(["chronos", "sushiswap"]);
+
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address") ?? "";
   const period = url.searchParams.get("period") ?? "";
-  const provider = url.searchParams.get("provider") ?? "";
+  const provider_ = url.searchParams.get("provider") ?? "";
   const use24Hours = period === "24";
   const useAll = period === "all";
-  const useChronos = provider === "chronos";
+
+  const provider = provider_ in AIRDROP_PROVIDERS ? provider_ : "";
 
   if (!network) throw new Error("Invalid Request");
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
@@ -41,13 +42,17 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             useAirdropLeaderboardByUserAllTime,
           ];
         }
-        case use24Hours && useChronos: {
+        case use24Hours && provider: {
           return [
-            useAirdropLeaderboard24HoursChronos,
-            useAirdropLeaderboardByUser24HoursChronos,
+            () => useAirdropLeaderboardByApplication24Hours(provider),
+            (address: string) =>
+              useAirdropLeaderboardByUserByApplication24Hours(
+                address,
+                provider
+              ),
           ];
         }
-        case use24Hours && !useChronos:
+        case use24Hours && !provider:
         default: {
           return [
             useAirdropLeaderboard24Hours,
