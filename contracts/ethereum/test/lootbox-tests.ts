@@ -422,7 +422,7 @@ const LootboxTests = async (
   );
 
   it(
-    "should support camelot people making trades with the pool and redeeming people's money fine",
+    "should support camelot people making trades with the pool",
     async () => {
       const {
         stakingSigner,
@@ -454,6 +454,8 @@ const LootboxTests = async (
       const stakingFusdcBefore = await token0.balanceOf(staking.address);
       const stakingUsdcBefore = await token1.balanceOf(staking.address);
 
+      const amountPutIn = stakingFusdcBefore.add(stakingUsdcBefore);
+
       for (let i = 1; i <= 10; i++) {
         const path =
           i % 2 == 0
@@ -483,8 +485,10 @@ const LootboxTests = async (
       const stakingFusdcAfter = await token0.balanceOf(staking.address);
       const stakingUsdcAfter = await token1.balanceOf(staking.address);
 
-      expect(stakingFusdcAfter).to.be.gte(stakingFusdcBefore);
-      expect(stakingUsdcAfter).to.be.gt(stakingUsdcBefore);
+      const amountReturned = stakingFusdcAfter.add(stakingUsdcAfter);
+
+      // assumes the decimals for fusdc and usdc are the same
+      expect(amountReturned).to.be.eq(amountPutIn);
     }
   );
 
@@ -597,7 +601,7 @@ const LootboxTests = async (
 
     const stakingAfter = stakingFusdcAfter.add(stakingUsdcAfter);
 
-    expect(stakingAfter, "complete staking amount after").to.be.gte(stakingBefore);
+    expect(stakingAfter, "complete staking amount after").to.be.eq(stakingBefore);
   });
 
   it("should support taking fees from fusdc/weth sushiswap trades", async () => {
@@ -708,7 +712,7 @@ const LootboxTests = async (
 
     const stakingAfter = stakingFusdcAfter.add(stakingUsdcAfter);
 
-    expect(stakingAfter, "complete staking amount after").to.be.gte(stakingBefore);
+    expect(stakingAfter, "complete staking amount after").to.be.eq(stakingBefore);
   });
 };
 

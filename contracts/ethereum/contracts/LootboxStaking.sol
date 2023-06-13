@@ -571,8 +571,13 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             else tokenBRedeemed = weth_.balanceOf(msg.sender) - wethBefore;
 
-            camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
-            sushiswapFusdcUsdcDepositedLpTokens_ -= dep.sushiswapLpMinted;
+            if (fusdcUsdcPair) {
+                camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
+                sushiswapFusdcUsdcDepositedLpTokens_ -= dep.sushiswapLpMinted;
+            } else {
+                camelotFusdcWethDepositedLpTokens_ -= dep.camelotLpMinted;
+                sushiswapFusdcWethDepositedLpTokens_ -= dep.sushiswapLpMinted;
+            }
 
             fusdcRedeemed += tokenARedeemed;
 
