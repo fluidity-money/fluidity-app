@@ -50,7 +50,11 @@ const LootboxTests = async (
   it("should lock up 2000000 test token 1 and 2000000 test token 2", async() => {
     const {
       stakingSigner,
+      stakingSignerAddress,
       staking,
+      token0,
+      token1,
+      token2,
       token0Decimals,
       token1Decimals,
       token2Decimals
@@ -86,13 +90,44 @@ const LootboxTests = async (
 
     await sendEmptyTransaction(stakingSigner);
 
+    const fusdcBefore = await token0.balanceOf(stakingSignerAddress);
+
+    const usdcBefore = await token1.balanceOf(stakingSignerAddress);
+
+    const wethBefore = await token2.balanceOf(stakingSignerAddress);
+
     const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+
+    expect(fusdcRedeemed).to.be.gt(0);
+
+    expect(usdcRedeemed).to.be.gt(0);
+
+    expect(wethRedeemed).to.be.eq(0);
+
+    // amount returned should be the same to the amount quoted as being sent
+
+    const fusdcAfter = await token0.balanceOf(stakingSignerAddress);
+
+    expect(fusdcRedeemed).to.be.eq(fusdcAfter.sub(fusdcBefore));
+
+    const usdcAfter = await token1.balanceOf(stakingSignerAddress);
+
+    expect(usdcRedeemed).to.be.eq(usdcAfter.sub(usdcBefore));
+
+    const wethAfter = await token2.balanceOf(stakingSignerAddress);
+
+    expect(wethRedeemed).to.be.eq(0);
+
+    expect(wethAfter.sub(wethBefore)).to.be.eq(0);
+
+    // expect the amount returned to be equal (give or take 10 percent) to the redeemed amount
 
     expectWithinSlippage(fusdcRedeemed, fusdc, 10);
 
     expectWithinSlippage(usdcRedeemed, usdc, 10);
 
     expectWithinSlippage(wethRedeemed, weth, 10);
+
   });
 
   it("should lock up two amounts then redeem them", async() => {
@@ -353,8 +388,6 @@ const LootboxTests = async (
         0
       );
 
-      console.log("about to deposit for the second time");
-
       const [ fusdc1, usdc ] = await deposit(
         staking,
         8640000,
@@ -389,7 +422,7 @@ const LootboxTests = async (
   );
 
   it(
-    "should support camelot people making trades with the pool and collecting their fees",
+    "should support camelot people making trades with the pool and redeeming people's money fine",
     async () => {
       const {
         stakingSigner,

@@ -399,7 +399,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         ICamelotRouter _router,
         IERC20 _tokenB,
         uint256 _lpTokens,
-        uint256 _timestamp
+        uint256 _timestamp,
+        address _recipient
     ) internal returns (
         uint256 tokenARedeemed,
         uint256 tokenBRedeemed
@@ -410,34 +411,20 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _lpTokens,
             0,
             0,
-            address(this),
+            _recipient,
             _timestamp
         );
     }
 
     function _redeemFromSushiswapPool(
         ISushiswapPool _pool,
-        IERC20 _tokenB,
-        uint256 _lpTokens
-    ) internal returns (
-        uint256 tokenARedeemed,
-        uint256 tokenBRedeemed
-    ) {
-        uint256 tokenABefore = fusdc_.balanceOf(address(this));
-        uint256 tokenBBefore = _tokenB.balanceOf(address(this));
-
+        uint256 _lpTokens,
+        address _recipient
+    ) internal {
         _pool.transfer(address(_pool), _lpTokens);
 
-        // unwrap the bento (the true) so we get the funds back into the contract
-        _pool.burn(abi.encode(address(this), true));
-
-        uint256 tokenAAfter = fusdc_.balanceOf(address(this));
-        uint256 tokenBAfter = _tokenB.balanceOf(address(this));
-
-        tokenARedeemed = tokenAAfter - tokenABefore;
-        tokenBRedeemed = tokenBAfter - tokenBBefore;
-
-        return (tokenARedeemed, tokenBRedeemed);
+        // unwrap the bento (the true) so we get the funds back to the user
+        _pool.burn(abi.encode(_recipient, true));
     }
 
     function _deleteDeposit(address _sender, uint _depositId) internal {
@@ -449,31 +436,23 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     function _redeemCamelotSushiswap(
         Deposit memory dep,
-        uint256 _timestamp
-    ) internal returns (
-        uint256 tokenARedeemed,
-        uint256 tokenBRedeemed
-    ) {
-        (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
-            _redeemFromCamelotRouter(
-                camelotRouter_,
-                weth_,
-                dep.camelotLpMinted,
-                _timestamp
-            );
+        bool _fusdcUsdcPair,
+        uint256 _timestamp,
+        address _recipient
+    ) internal {
+        _redeemFromCamelotRouter(
+            camelotRouter_,
+            _fusdcUsdcPair ? usdc_ : weth_,
+            dep.camelotLpMinted,
+            _timestamp,
+            _recipient
+        );
 
-        (uint256 sushiswapARedeemed, uint256 sushiswapBRedeemed) =
-            _redeemFromSushiswapPool(
-                sushiswapFusdcWethPool_,
-                weth_,
-                dep.sushiswapLpMinted
-            );
-
-        tokenARedeemed = camelotARedeemed + sushiswapARedeemed;
-
-        tokenBRedeemed = camelotBRedeemed + sushiswapBRedeemed;
-
-        return (tokenARedeemed, tokenBRedeemed);
+        _redeemFromSushiswapPool(
+            _fusdcUsdcPair ? sushiswapFusdcUsdcPool_ : sushiswapFusdcWethPool_,
+            dep.sushiswapLpMinted,
+            _recipient
+        );
     }
 
     /* ~~~~~~~~~~ EXTERNAL FUNCTIONS ~~~~~~~~~~ */
@@ -563,6 +542,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         Deposit memory dep;
 
+        uint256 fusdcBefore = fusdc_.balanceOf(msg.sender);
+
+        uint256 usdcBefore = usdc_. balanceOf(msg.sender);
+
+        uint256 wethBefore = weth_.balanceOf(msg.sender);
+
         for (uint i = deposits_[msg.sender].length; i > 0;) {
             --i;
 
@@ -575,8 +560,16 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             bool fusdcUsdcPair = dep.fusdcUsdcPair;
 
-            (uint256 tokenARedeemed, uint256 tokenBRedeemed) =
-                    _redeemCamelotSushiswap(dep, _maxTimestamp);
+            _redeemCamelotSushiswap(dep, fusdcUsdcPair, _maxTimestamp, msg.sender);
+
+            // assumes that the user will always receive some amount from the pools
+            uint256 tokenARedeemed = fusdc_.balanceOf(msg.sender) - fusdcBefore;
+
+            uint256 tokenBRedeemed = 0;
+
+            if (fusdcUsdcPair) tokenBRedeemed = usdc_.balanceOf(msg.sender) - usdcBefore;
+
+            else tokenBRedeemed = weth_.balanceOf(msg.sender) - wethBefore;
 
             camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
             sushiswapFusdcUsdcDepositedLpTokens_ -= dep.sushiswapLpMinted;
@@ -601,12 +594,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             _deleteDeposit(msg.sender, i);
         }
-
-        fusdc_.safeTransfer(msg.sender, fusdcRedeemed);
-
-        usdc_.safeTransfer(msg.sender, usdcRedeemed);
-
-        weth_.safeTransfer(msg.sender, wethRedeemed);
 
         return (fusdcRedeemed, usdcRedeemed, wethRedeemed);
     }
@@ -665,16 +652,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             fusdcUsdcLiq,
             fusdcWethLiq
         );
-    }
-
-    /// @inheritdoc ILootboxStaking
-    function drain(address _recipient) public {
-        require(msg.sender == operator_, "only operator");
-        require(noEmergencyMode_, "emergency mode");
-
-        fusdc_.safeTransfer(_recipient, fusdc_.balanceOf(address(this)));
-        usdc_.safeTransfer(_recipient, usdc_.balanceOf(address(this)));
-        weth_.safeTransfer(_recipient, weth_.balanceOf(address(this)));
     }
 
     /* ~~~~~~~~~~ INTERNAL APPROVAL FUNCTIONS ~~~~~~~~~~ */
@@ -759,13 +736,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
                 usdc_
             );
 
-
-
         camelotFusdcUsdcReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
         camelotFusdcUsdcReserveB *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
 
         fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
-
 
         // if the information here is empty, then we provide a hardcoded ratio suggestion
 
