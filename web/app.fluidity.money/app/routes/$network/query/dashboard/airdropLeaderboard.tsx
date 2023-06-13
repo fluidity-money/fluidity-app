@@ -94,19 +94,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const jointLeaderboardData = (
       userLeaderboardData.airdrop_leaderboard.length
         ? userLeaderboardData.airdrop_leaderboard.map((e) => ({
-          ...e,
-          rank: -1,
-        }))
-        : [
-          {
-            user: address,
+            ...e,
             rank: -1,
-            liquidityMultiplier: 0,
-            referralCount: 0,
-            bottles: 0,
-            highestRewardTier: 0,
-          } satisfies AirdropLeaderboardEntry,
-        ]
+          }))
+        : [
+            {
+              user: address,
+              rank: -1,
+              liquidityMultiplier: 0,
+              referralCount: 0,
+              bottles: 0,
+              highestRewardTier: 0,
+            } satisfies AirdropLeaderboardEntry,
+          ]
     ).concat(leaderboard);
 
     return json({
