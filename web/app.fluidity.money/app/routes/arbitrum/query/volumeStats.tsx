@@ -3,7 +3,7 @@ import {
   useVolumeStats,
   useVolumeStatsByAddress,
 } from "~/queries/useVolumeStats";
-import {TotalVolume} from "~/routes/$network/query/dashboard/home";
+import { TotalVolume } from "~/routes/$network/query/dashboard/home";
 
 export type ArbitrumVolumeLoaderData = {
   volume?: TotalVolume;

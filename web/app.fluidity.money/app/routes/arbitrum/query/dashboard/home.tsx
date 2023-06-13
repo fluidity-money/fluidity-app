@@ -2,8 +2,11 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { jsonGet } from "~/util";
 import { useUserYieldAll, useUserYieldByAddress } from "~/queries";
 import config from "~/webapp.config.server";
-import { useGraphData } from "~/queries/useGraphData";
-import {HomeLoaderData, TotalVolume} from "~/routes/$network/query/dashboard/home";
+import { useGraphDataAll, useGraphDataByUser } from "~/queries/useGraphData";
+import {
+  HomeLoaderData,
+  TotalVolume,
+} from "~/routes/$network/query/dashboard/home";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const network = "arbitrum";
@@ -20,22 +23,26 @@ export const loader: LoaderFunction = async ({ request }) => {
       { volume },
       { data: rewardsData, errors: rewardsErr },
       { data: graphData, errors: graphErr },
-    ] = await Promise.all([
+    ] = await Promise.all(
       address
-        ? jsonGet<{ address: string }, { volume: TotalVolume }>(
-            `${url.origin}/${network}/query/volumeStats`,
-            {
-              address,
-            }
-          )
-        : jsonGet<Record<string, never>, { volume: TotalVolume }>(
-            `${url.origin}/${network}/query/volumeStats`
-          ),
-      address
-        ? useUserYieldByAddress(network ?? "", address)
-        : useUserYieldAll(network ?? ""),
-      useGraphData(network ?? ""),
-    ]);
+        ? [
+            jsonGet<{ address: string }, { volume: TotalVolume }>(
+              `${url.origin}/${network}/query/volumeStats`,
+              {
+                address,
+              }
+            ),
+            useUserYieldByAddress(network ?? "", address),
+            useGraphDataByUser(network ?? "", address),
+          ]
+        : [
+            jsonGet<Record<string, never>, { volume: TotalVolume }>(
+              `${url.origin}/${network}/query/volumeStats`
+            ),
+            useUserYieldAll(network ?? ""),
+            useGraphDataAll(network ?? ""),
+          ]
+    );
 
     if (!volume) {
       throw new Error("Could not fetch volume data");
