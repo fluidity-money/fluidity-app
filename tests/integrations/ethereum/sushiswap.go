@@ -29,7 +29,7 @@ const integrationTestSushiswap = `
     "expected_recipient": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
     "expected_fees": "30000000/997000000",
     "expected_emission": {
-	"uniswap_v2": 0.03009027081243731
+	"sushiswap": 0.03009027081243731
     },
     "rpc_methods": {
 	"eth_getCode": "0x0"
