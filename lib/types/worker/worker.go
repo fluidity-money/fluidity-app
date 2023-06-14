@@ -98,6 +98,7 @@ type (
 		Meson            float64 `json:"meson"`
 		Camelot          float64 `json:"camelot"`
 		Chronos          float64 `json:"chronos"`
+		Sushiswap        float64 `json:"sushiswap"`
 	}
 
 	FeeSwitch struct {
