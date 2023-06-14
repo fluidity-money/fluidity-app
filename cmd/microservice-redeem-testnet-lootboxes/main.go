@@ -17,79 +17,113 @@ import (
 )
 
 const (
-    // EnvAddressConfirmerContractAddress for the address of the contract that emits the confirmation event
-    EnvAddressConfirmerContractAddress = `FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS`
+	// EnvAddressConfirmerContractAddress for the address of the contract that emits the confirmation event
+	EnvAddressConfirmerContractAddress = `FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS`
 
-    // LootboxCount for the number of lootboxes to pay out
-    LootboxCount = 0
+	// LootboxCount for the number of lootboxes to pay out
+	LootboxCountCommon    = 180
+	LootboxCountUncommon  = 100
+	LootboxCountRare      = 17
+	LootboxCountUltraRare = 3
 )
 
 func main() {
-    var (
-        addressConfirmerContractAddress_ = util.GetEnvOrFatal(EnvAddressConfirmerContractAddress)
-        addressConfirmerContractAddress  = ethereum.AddressFromString(addressConfirmerContractAddress_)
-    )
+	var (
+		addressConfirmerContractAddress_ = util.GetEnvOrFatal(EnvAddressConfirmerContractAddress)
+		addressConfirmerContractAddress  = ethereum.AddressFromString(addressConfirmerContractAddress_)
+	)
 
+	logs.Logs(func(l logs.Log) {
+		if l.Address != addressConfirmerContractAddress {
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Event was not emitted by address confirmer contract at %v, was %v - skipping!",
+					addressConfirmerContractAddress,
+					l.Address,
+				)
+			})
 
-    logs.Logs(func(l logs.Log) {
-        if l.Address != addressConfirmerContractAddress {
-            log.Debug(func(k *log.Log) {
-                k.Format(
-                    "Event was not emitted by address confirmer contract at %v, was %v - skipping!",
-                    addressConfirmerContractAddress,
-                    l.Address,
-                )
-            })
+			return
+		}
 
-            return
-        } 
+		// decode all "AddressConfirmed" events
+		testnetOwnerPair, err := fluidity.TryDecodeAddressConfirmed(l)
 
-        // decode all "AddressConfirmed" events
-        testnetOwnerPair, err := fluidity.TryDecodeAddressConfirmed(l)
+		switch err {
+		case fluidity.ErrWrongEvent:
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Event for log %v in transaction %v wasn't AddressConfirmed, skipping!",
+					l.Index,
+					l.TxHash,
+				)
+			})
+			return
 
-        switch err {
-        case fluidity.ErrWrongEvent:
-            log.Debug(func(k *log.Log) {
-                k.Format(
-                    "Event for log %v in transaction %v wasn't AddressConfirmed, skipping!",
-                    l.Index,
-                    l.TxHash,
-                )
-            })
-        return
+		case nil:
+			// do nothing
 
-        case nil:
-            // do nothing
-            
-        default:
-            log.Fatal(func(k *log.Log) {
-                k.Message = "Failed to decode an AddressConfirmed event!"
-                k.Payload = err
-            })
-        }
+		default:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to decode an AddressConfirmed event!"
+				k.Payload = err
+			})
+		}
 
-        // insert as owner if testnet address is valid and not already owned
-        didInsert := lootboxes.InsertTestnetOwner(testnetOwnerPair)
+		// insert as owner if testnet address is valid and not already owned
+		didInsert := lootboxes.InsertTestnetOwner(testnetOwnerPair)
 
-        if !didInsert {
-            log.Debug(func(k *log.Log) {
-                k.Format(
-                    "Testnet owner pair with owner %v and testnet address %v was not inserted!",
-                    testnetOwnerPair.Owner,
-                    testnetOwnerPair.TestnetAddress,
-                )
-            })
+		if !didInsert {
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Testnet owner pair with owner %v and testnet address %v was not inserted!",
+					testnetOwnerPair.Owner,
+					testnetOwnerPair.TestnetAddress,
+				)
+			})
 
-            return
-        }
+			return
+		}
 
-        // inserted, pay out lootboxes
-        lootbox := lootboxes.Lootbox{
-            Address: testnetOwnerPair.Owner.String(),
-            Source: lootboxLib.Leaderboard,
-            AwardedTime: time.Now(),
-            LootboxCount: LootboxCount,
-        }
-        lootboxes.InsertLootbox(lootbox)
-    })
+		var (
+			currentTime        = time.Now()
+			testnetOwnerString = testnetOwnerPair.Owner.String()
+		)
+
+		// inserted, pay out lootboxes
+		boxes := []lootboxes.Lootbox{
+			{
+				Address:      testnetOwnerString,
+				Source:       lootboxLib.Leaderboard,
+				AwardedTime:  currentTime,
+				LootboxCount: LootboxCountCommon,
+				RewardTier:   1,
+			},
+			{
+				Address:      testnetOwnerString,
+				Source:       lootboxLib.Leaderboard,
+				AwardedTime:  currentTime,
+				LootboxCount: LootboxCountUncommon,
+				RewardTier:   2,
+			},
+			{
+				Address:      testnetOwnerString,
+				Source:       lootboxLib.Leaderboard,
+				AwardedTime:  currentTime,
+				LootboxCount: LootboxCountRare,
+				RewardTier:   3,
+			},
+			{
+				Address:      testnetOwnerString,
+				Source:       lootboxLib.Leaderboard,
+				AwardedTime:  currentTime,
+				LootboxCount: LootboxCountUltraRare,
+				RewardTier:   4,
+			},
+		}
+
+		for _, lootbox := range boxes {
+			lootboxes.InsertLootbox(lootbox)
+		}
+	})
 }
