@@ -32,14 +32,29 @@ export const createPair = async (
 };
 
 export const expectWithinSlippage = (
-  base: BigNumberish,
-  test: BigNumberish,
+  base_: BigNumberish,
+  test_: BigNumberish,
   slippage: BigNumberish
-) =>
+) => {
+  const base = BigNumber.from(base_);
+  const test = BigNumber.from(test_);
+
+  switch (true) {
+  case base.eq(0) && test.eq(0): return;
+  case base.eq(0): assert(false, `base: ${base} when test: ${test}`);
+  case test.eq(0): assert(false, `base ${base} when test: ${test}`);
+  default: break;
+  }
+
+  const perc = BigNumber.from(slippage);
+
+  const Hundred = BigNumber.from(100);
+
   assert(
-    BigNumber.from(base).sub(BigNumber.from(base)).mul(slippage).div(100).lte(test),
-    `${base} - (${base} * ${slippage} / 100) >= ${test} not true!`
+    BigNumber.from(50).sub(Hundred.mul(base).div(base.add(test))).abs().lt(perc),
+    `abs(50 - (100 * ${base}) / (${base} + ${test})) < ${perc}`
   );
+}
 
 export const deposit = async (
   contract: ethers.Contract,

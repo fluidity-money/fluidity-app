@@ -10,4 +10,6 @@ const (
 	Airdrop     lootboxSource = "airdrop"
 	Transaction lootboxSource = "transaction"
 	Referral    lootboxSource = "referral"
+	// Leaderboard for rewards that don't contribute towards top winnings
+	Leaderboard lootboxSource = "leaderboard_prize"
 )

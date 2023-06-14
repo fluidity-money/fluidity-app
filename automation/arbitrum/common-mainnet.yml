@@ -1,6 +1,9 @@
-CLUSTER: arbitrum
+CLUSTER: arbitrum-ec2
 ORG_ROOT: fluidity
 ENABLE: true
+LAUNCH_TYPE: EC2
+TASK_MIN_COUNT: 1
+TASK_MAX_COUNT: 1
 
 ENV_FLU_DEBUG: true
 ENV_FLU_SILENT: false
