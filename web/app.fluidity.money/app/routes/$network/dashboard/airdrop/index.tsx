@@ -180,7 +180,7 @@ const Airdrop = () => {
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}${
-      leaderboardFilterIndex === 0 ? "&provider=chronos" : ""
+      leaderboardFilterIndex === 0 ? "&provider=sushiswap" : ""
     }`
   );
 
@@ -1445,20 +1445,20 @@ const Leaderboard = ({
             <Heading as="h3">Leaderboard</Heading>
             {filterIndex === 0 && (
               <GeneralButton
-                icon={<ProviderIcon provider="Chronos" />}
+                icon={<ProviderIcon provider="Sushiswap" />}
                 type="secondary"
                 disabled
                 className="leaderboard-provider-button"
               >
                 <Text code style={{ color: "inherit" }}>
-                  CHRONOS
+                  SUSHISWAP
                 </Text>
               </GeneralButton>
             )}
           </div>
           <Text prominent>
             This leaderboard shows your rank among other users
-            {filterIndex === 0 ? " using Chronos " : " "}
+            {filterIndex === 0 ? " using SushiSwap " : " "}
             {filterIndex === 0 ? " per" : " for"}
             &nbsp;
             {filterIndex === 0 ? (
@@ -1472,7 +1472,7 @@ const Leaderboard = ({
           <GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
-            icon={<ProviderIcon provider="Chronos" />}
+            icon={<ProviderIcon provider="Sushiswap" />}
           >
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
