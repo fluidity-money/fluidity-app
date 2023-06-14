@@ -18,7 +18,7 @@ const integrationTestSushiswap = `
           "0x000000000000000000000000d4cf8e47beac55b42ae58991785fa326d9384bd1"
         ]
       },
-     "application": 2
+     "application": 18
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
