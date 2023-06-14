@@ -28,7 +28,9 @@ const sushiswapStablePoolAbiString = `[
 			{"indexed":true,"internalType":"address","name":"tokenOut","type":"address"},
 			{"indexed":false,"internalType":"uint256","name":"amountIn","type":"uint256"},
 			{"indexed":false,"internalType":"uint256","name":"amountOut","type":"uint256"}
-		],"name":"Swap","type":"event"},
+		],
+		"name":"Swap","type":"event"
+	},
 	{
     "constant": true,
     "inputs": [],
@@ -58,7 +60,7 @@ const sushiswapStablePoolAbiString = `[
     "payable": false,
     "stateMutability": "view",
     "type": "function"
-  }
+  },
   {
 	"constant": true,
     "inputs": [],
@@ -86,7 +88,7 @@ const sushiswapStablePoolAbiString = `[
 	  ],
 	  "stateMutability":"view",
 	  "type":"function"
-  },
+  }
 ]`
 
 // sushiswapStablePoolAbi set by init.go to generate the ABI code
