@@ -1,7 +1,10 @@
+import type { Provider } from "@fluidity-money/surfing";
 import type {
   StakingRatioRes,
   StakingDepositsRes,
 } from "~/util/chainUtils/ethereum/transaction";
+import type AugmentedToken from "~/types/AugmentedToken";
+
 import { useState, useEffect, useContext, useMemo } from "react";
 import BN from "bn.js";
 import {
@@ -29,7 +32,6 @@ import {
   Rarity,
   numberToCommaSeparated,
 } from "@fluidity-money/surfing";
-import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
@@ -1768,13 +1770,20 @@ interface IRecapModal {
   totalVolume: number;
   bottlesLooted: number;
   bottles: BottleTiers;
-  recap: unknown;
+  userRecap?: {
+    bottles: BottleTiers;
+    bottlesEarned: number;
+    multiplier: number;
+    linksClicked: number;
+    referees: number;
+    referralBottles: number;
+  };
 }
 const RecapModal = ({
   totalVolume,
   bottlesLooted,
   bottles,
-  recap,
+  userRecap,
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
@@ -1906,8 +1915,40 @@ const RecapModal = ({
       </div>
 
       {/* User Recap */}
-      {recap ? (
-        <div className={"recap-user-stats"}></div>
+      {userRecap ? (
+        <>
+          <Heading>Personal Airdrop Recap Stats:</Heading>
+          <div className={"recap-user-stats"}>
+            <div>
+              <Text>TOTAL BOTTLES EARNED</Text>
+              <Display>
+                {numberToCommaSeparated(userRecap.bottlesEarned)}
+              </Display>
+            </div>
+            <div>
+              <Text>YOUR TOTAL MULTIPLIER</Text>
+              <Display>{numberToCommaSeparated(userRecap.multiplier)}x</Display>
+            </div>
+            <BottleDistribution bottles={userRecap.bottles} />
+            <div>
+              <Text>REFERRALS</Text>
+              <div className={"recap-referrals"}>
+                <div>
+                  <Heading>{userRecap.linksClicked}</Heading>
+                  <Text>LINKS CLICKED</Text>
+                </div>
+                <div>
+                  <Heading>{userRecap.referees}</Heading>
+                  <Text>REFEREES</Text>
+                </div>
+                <div>
+                  <Heading>{userRecap.referralBottles}</Heading>
+                  <Text>BOTTLES EARNED</Text>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         <div className={"recap-connect"}>
           <div>
