@@ -546,6 +546,56 @@ export const makeStakingDeposit = async (
   }
 };
 
+export type StakingRedeemableRes = {
+  fusdcRedeemable: BN;
+  usdcRedeemable: BN;
+  wethRedeemable: BN;
+};
+
+export const getRedeemableTokens = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  address: string
+): Promise<StakingRedeemableRes | undefined> => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    // call redeemable
+    return await stakingContract.redeemable(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
+  }
+};
+
+export const makeStakingRedemption = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  timestamp: BN
+) => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    // call redeem
+    return await stakingContract.callStatic.redeem(timestamp.toString());
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
+  }
+};
+
 export const getWethUsdPrice = async (
   provider: JsonRpcProvider,
   eacAggregatorProxyAddr: string,
