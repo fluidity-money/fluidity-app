@@ -24,6 +24,10 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
+  ArrowDown,
+  ProviderIcon,
+  Rarity,
+  numberToCommaSeparated,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -32,13 +36,13 @@ import {
   getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
-
 import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
+import { shorthandAmountFormatter } from "~/util";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -99,19 +103,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottle
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottle
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottle
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -643,8 +647,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -697,12 +701,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        (baseToken.symbol === "USDC"
-          ? tokenRatios.fusdcUsdcRatio.toNumber() -
-            tokenRatios.fusdcUsdcSpread.toNumber() / 2
-          : tokenRatios.fusdcWethRatio.toNumber() -
-            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-      );
+      (baseToken.symbol === "USDC"
+        ? tokenRatios.fusdcUsdcRatio.toNumber() -
+        tokenRatios.fusdcUsdcSpread.toNumber() / 2
+        : tokenRatios.fusdcWethRatio.toNumber() -
+        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+    );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -765,31 +769,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const tokenAmtStr =
-        dec !== undefined
-          ? [whole, dec.slice(0 - token.decimals)].join(".")
-          : whole ?? "0";
+        const tokenAmtStr =
+          dec !== undefined
+            ? [whole, dec.slice(0 - token.decimals)].join(".")
+            : whole ?? "0";
 
-      setInput({
-        ...token,
-        amount: tokenAmtStr,
-      });
+        setInput({
+          ...token,
+          amount: tokenAmtStr,
+        });
 
-      if (!ratio) return;
-      if (!(whole || dec)) return;
+        if (!ratio) return;
+        if (!(whole || dec)) return;
 
-      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-      setOtherInput({
-        ...otherToken,
-        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-      });
-    };
+        setOtherInput({
+          ...otherToken,
+          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+        });
+      };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1018,9 +1022,8 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         {/* Staking Amount */}
         <div
@@ -1329,7 +1332,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(0, stakingDuration),
+              stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1380,7 +1383,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1632,9 +1635,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1762,6 +1764,166 @@ const TestnetRewardsModal = () => {
   }
 };
 
+interface IRecapModal {
+  totalVolume: number;
+  bottlesLooted: number;
+  bottles: BottleTiers;
+  recap: unknown;
+}
+const RecapModal = ({
+  totalVolume,
+  bottlesLooted,
+  bottles,
+  recap,
+}: IRecapModal) => {
+  const providerLinks: { provider: Provider; link: string }[] = [
+    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    {
+      provider: "Sushiswap",
+      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+    },
+    { provider: "Camelot", link: "https://app.camelot.exchange/" },
+    { provider: "Saddle", link: "https://saddle.exchange/#/" },
+    { provider: "Chronos", link: "https://app.chronos.exchange/" },
+    {
+      provider: "Kyber",
+      link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
+    },
+  ];
+
+  const bottleRarityColours = {
+    [Rarity.Common]: "white",
+    [Rarity.Uncommon]: "white",
+    [Rarity.Rare]: "white",
+    [Rarity.UltraRare]: "white",
+    [Rarity.Legendary]: "white",
+  };
+
+  return (
+    <>
+      {/* Recap Heading */}
+      <div className={"recap-heading-container"}>
+        <Display as="h1">
+          {numberToCommaSeparated(bottlesLooted)}+ bottles were distributed in
+          this epoch!
+        </Display>
+        <Text>
+          <strong>
+            Congratulations for completing Fluidity's First Airdrop Wave!
+          </strong>{" "}
+          All of these loot bottles you have earned are safely secured in your
+          personal airdrop crate, and is now En Route to you to TGE land. You
+          will get notified for when it is time to crack open the crate!
+        </Text>
+        <GeneralButton>Learn more about the timeline</GeneralButton>
+      </div>
+      <img src="" />
+      <div>
+        <Text>SCROLL DOWN FOR IN-DEPTH STATS</Text>
+        <ArrowDown />
+      </div>
+
+      {/* Global Stats */}
+      {/* Providers / Total Volume */}
+      <div className={"recap-stats"}>
+        <div className={"recap-left"}>
+          <Heading>
+            Fluidity's first Airdrop Epoch has come to an end. Here are some{" "}
+            <strong>Global Stats</strong> for the epoch.
+          </Heading>
+
+          {/* Providers */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+            className="multiplier-tasks-tasks"
+          >
+            {providerLinks.map(({ provider, link }, i) => {
+              return (
+                <a
+                  key={`airdrop-mx-provider-` + i}
+                  style={{
+                    cursor: "pointer",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "32px",
+                    backgroundColor: "black",
+                    padding: "6px",
+                  }}
+                  href={link}
+                >
+                  <ProviderIcon
+                    provider={provider}
+                    style={{ height: "100%" }}
+                  />
+                </a>
+              );
+            })}
+          </motion.div>
+        </div>
+        <div className={"recap-right"}>
+          <div>
+            <Text>TOTAL VOLUME</Text>
+            <Display>
+              {shorthandAmountFormatter(totalVolume.toString(), 0)}+
+            </Display>
+            <Text>
+              The number of Total Volume Locked in this Epoch!{" "}
+              <strong>Millions of Fluidity Users</strong> contributed!
+            </Text>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottles Looted */}
+      <div className={"recap-stats"}>
+        <div className={"recap-left"}>
+          <Text>TOTAL BOTTLES LOOTED</Text>
+          <Display>{numberToCommaSeparated(bottlesLooted)}+</Display>
+        </div>
+        <div className={"recap-right"}>
+          <Text>
+            All of these loot bottles you have earned are safely secured in your
+            personal airdrop crate, and is now En Route to you to TGE land. You
+            will get notified for when it is time to crack open the crate!
+          </Text>
+        </div>
+      </div>
+
+      {/*Bottle Distribution*/}
+      <div className={"recap-bottle-distribution-container"}>
+        {Object.entries(bottles).map(([tier, amount]) => (
+          <div
+            className={"bottle-container"}
+            style={{
+              border: `1px solid ${bottleRarityColours[tier as Rarity]}`,
+            }}
+          >
+            {numberToCommaSeparated(amount)}+
+          </div>
+        ))}
+      </div>
+
+      {/* User Recap */}
+      {recap ? (
+        <div className={"recap-user-stats"}></div>
+      ) : (
+        <div className={"recap-connect"}>
+          <div>
+            <Text>Curious to see how you personally did this epoch?</Text>
+            <Text>
+              <LinkButton>CONNECT YOUR WALLET</LinkButton> to see your Airdrop
+              Wave Recap!
+            </Text>
+          </div>
+          <GeneralButton>Connect Wallet</GeneralButton>
+        </div>
+      )}
+    </>
+  );
+};
+
 export {
   BottleDistribution,
   TutorialModal,
@@ -1771,4 +1933,5 @@ export {
   BottlesDetailsModal,
   ReferralDetailsModal,
   TestnetRewardsModal,
+  RecapModal,
 };
