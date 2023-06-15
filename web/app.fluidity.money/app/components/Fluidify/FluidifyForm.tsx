@@ -135,7 +135,7 @@ export const FluidifyForm = ({
 
   const fee = swapAmount.mul(FeeDenom).div(Hundred);
 
-  const swapAmountAfterFee = tokenIsFluid ? swapAmount.sub(fee) : swapAmount;
+  const swapAmountAfterFee = swapping ? swapAmount :  swapAmount.sub(fee);
 
   return (
     <div className={"fluidify-form"}>
