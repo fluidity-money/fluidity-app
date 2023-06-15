@@ -273,9 +273,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -283,9 +283,10 @@ const EthereumFacade = ({
    *
    * @deprecated manual reward no longer supported
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const manualReward = async (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fluidTokenAddrs: string[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userAddr: string
   ): Promise<
     | ({ amount: number; gasFee: number; networkFee: number } | undefined)[]
@@ -362,11 +363,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -513,9 +514,9 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-        txHash: stakingDepositRes.hash,
-      }
+          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+          txHash: stakingDepositRes.hash,
+        }
       : undefined;
   };
 
@@ -557,9 +558,9 @@ const EthereumFacade = ({
 
     return stakingRedeemRes
       ? {
-        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
-        txHash: stakingRedeemRes.hash,
-      }
+          confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+          txHash: stakingRedeemRes.hash,
+        }
       : undefined;
   };
 
