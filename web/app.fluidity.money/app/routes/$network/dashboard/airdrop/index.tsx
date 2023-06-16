@@ -55,7 +55,6 @@ import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
-import { SplitContext } from "contexts/SplitProvider";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: may 22nd, 2023
@@ -172,8 +171,6 @@ const Airdrop = () => {
     testStakeTokens,
     getStakingRatios,
   } = useContext(FluidityFacadeContext);
-  const { showExperiment } = useContext(SplitContext);
-  const showRedeemTestnet = showExperiment("enable-redeem-testnet");
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
@@ -454,16 +451,14 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
-        {showRedeemTestnet && (
-          <TabButton
-            size="small"
-            onClick={() => setCurrentModal("testnet-rewards")}
-            groupId="airdrop"
-            isSelected={isMobile && currentModal === "testnet-rewards"}
-          >
-            Testnet Rewards
-          </TabButton>
-        )}
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("testnet-rewards")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "testnet-rewards"}
+        >
+          Testnet Rewards
+        </TabButton>
       </div>
     );
   };
@@ -656,7 +651,7 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {showRedeemTestnet && currentModal === "testnet-rewards" && (
+          {currentModal === "testnet-rewards" && (
             <>
               <TestnetRewardsModal />
             </>
@@ -742,7 +737,7 @@ const Airdrop = () => {
       </CardModal>
       <CardModal
         id="testnet-rewards"
-        visible={showRedeemTestnet && currentModal === "testnet-rewards"}
+        visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
