@@ -1660,7 +1660,6 @@ const TestnetRewardsModal = () => {
   const [address, setAddress] = useState("");
   const [ropstenAddress, setRopstenAddress] = useState("");
   const [signature, setSignature] = useState("");
-  const [manualSignature, setManualSignature] = useState("");
   const [finalised, setFinalised] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
@@ -1830,8 +1829,7 @@ const TestnetRewardsModal = () => {
               <li>Enter your Arbitrum One address in the box below.</li>
               <li>
                 Click the confirmation button to prompt a signature from your
-                wallet. (If you have already generated a signature previously,
-                enter it in the signature box, as well as the address)
+                wallet.
               </li>
               <Card className="ropsten-warning" border="solid">
                 <Text size="sm">
@@ -1863,26 +1861,6 @@ const TestnetRewardsModal = () => {
               >
                 <Text style={{ color: "inherit" }} code>
                   Confirm Owner Address
-                </Text>
-              </GeneralButton>
-            </div>
-            <div className="claim-ropsten-input">
-              <Text size="xs" className="helper-label">
-                SIGNATURE
-              </Text>
-              <input
-                value={manualSignature}
-                onChange={(v) => setManualSignature(v.target.value)}
-              ></input>
-              <GeneralButton
-                layout="after"
-                handleClick={() => {
-                  setSignature(manualSignature);
-                }}
-                type="transparent"
-              >
-                <Text style={{ color: "inherit" }} code>
-                  Confirm signature
                 </Text>
               </GeneralButton>
             </div>
