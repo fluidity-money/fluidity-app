@@ -16,6 +16,10 @@ task_definition:
       
       {% endblock %}
 run_params:
+  task_placement:
+    strategy:
+      - field: instanceId
+        type: spread
   network_configuration:
     awsvpc_configuration:
       subnets:

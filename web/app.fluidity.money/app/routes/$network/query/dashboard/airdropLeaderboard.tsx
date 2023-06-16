@@ -7,6 +7,8 @@ import {
   useAirdropLeaderboardByUserAllTime,
   useAirdropLeaderboard24Hours,
   useAirdropLeaderboardByUser24Hours,
+  useAirdropLeaderboardByApplication24Hours,
+  useAirdropLeaderboardByUserByApplication24Hours,
 } from "~/queries/useAirdropLeaderboard";
 
 export type AirdropLeaderboardLoaderData = {
@@ -14,41 +16,64 @@ export type AirdropLeaderboardLoaderData = {
   loaded: boolean;
 };
 
+const AIRDROP_PROVIDERS = new Set(["chronos", "sushiswap"]);
+
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
   const address = url.searchParams.get("address") ?? "";
   const period = url.searchParams.get("period") ?? "";
+  const provider_ = url.searchParams.get("provider") ?? "";
   const use24Hours = period === "24";
   const useAll = period === "all";
+
+  const provider = provider_ in AIRDROP_PROVIDERS ? provider_ : "";
 
   if (!network) throw new Error("Invalid Request");
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
 
   try {
-    const { data: globalLeaderboardData, errors: globalLeaderboardErrors } =
-      await (async () => {
-        switch (useAll) {
-          case true: {
-            const res = await useAirdropLeaderboardAllTime();
-            return { ...res, data: res.data?.airdrop_leaderboard };
-          }
-          case false:
-          default: {
-            const res = await useAirdropLeaderboard24Hours();
-            return { ...res, data: res.data?.airdrop_leaderboard_24_hours };
-          }
+    const [useAllQuery, useUserQuery] = (() => {
+      switch (true) {
+        case useAll: {
+          return [
+            useAirdropLeaderboardAllTime,
+            useAirdropLeaderboardByUserAllTime,
+          ];
         }
-      })();
+        case use24Hours && provider: {
+          return [
+            () => useAirdropLeaderboardByApplication24Hours(provider),
+            (address: string) =>
+              useAirdropLeaderboardByUserByApplication24Hours(
+                address,
+                provider
+              ),
+          ];
+        }
+        case use24Hours && !provider:
+        default: {
+          return [
+            useAirdropLeaderboard24Hours,
+            useAirdropLeaderboardByUser24Hours,
+          ];
+        }
+      }
+    })();
+
+    const { data: globalLeaderboardData, errors: globalLeaderboardErrors } =
+      await useAllQuery();
 
     if (!globalLeaderboardData || globalLeaderboardErrors)
       throw globalLeaderboardErrors;
 
-    const leaderboard = globalLeaderboardData.map((leaderboardRow, i) => ({
-      ...leaderboardRow,
-      rank: i + 1,
-    }));
+    const leaderboard = globalLeaderboardData.airdrop_leaderboard.map(
+      (leaderboardRow, i) => ({
+        ...leaderboardRow,
+        rank: i + 1,
+      })
+    );
 
     if (
       !address ||
@@ -61,26 +86,17 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     }
 
     const { data: userLeaderboardData, errors: userLeaderboardErrors } =
-      await (async () => {
-        switch (useAll) {
-          case true: {
-            const res = await useAirdropLeaderboardByUserAllTime(address);
-            return { ...res, data: res.data?.airdrop_leaderboard };
-          }
-          case false:
-          default: {
-            const res = await useAirdropLeaderboardByUser24Hours(address);
-            return { ...res, data: res.data?.airdrop_leaderboard_24_hours };
-          }
-        }
-      })();
+      await useUserQuery(address);
 
     if (!userLeaderboardData || userLeaderboardErrors)
       throw userLeaderboardErrors;
 
     const jointLeaderboardData = (
-      userLeaderboardData.length
-        ? userLeaderboardData.map((e) => ({ ...e, rank: -1 }))
+      userLeaderboardData.airdrop_leaderboard.length
+        ? userLeaderboardData.airdrop_leaderboard.map((e) => ({
+            ...e,
+            rank: -1,
+          }))
         : [
             {
               user: address,

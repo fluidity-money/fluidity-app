@@ -28,7 +28,7 @@ const queryAllTime = gql`
 
 const queryByUser24Hours = gql`
   query AirdropLeaderboard($address: String!) {
-    airdrop_leaderboard_24_hours(
+    airdrop_leaderboard: airdrop_leaderboard_24_hours(
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -44,7 +44,41 @@ const queryByUser24Hours = gql`
 
 const query24Hours = gql`
   query AirdropLeaderboard {
-    airdrop_leaderboard_24_hours(
+    airdrop_leaderboard: airdrop_leaderboard_24_hours(
+      limit: 16
+      order_by: { total_lootboxes: desc }
+    ) {
+      user: address
+      rank
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
+    }
+  }
+`;
+
+const query24HoursByUserByApplication = gql`
+  query AirdropLeaderboardApplication($application: ethereum_application!) {
+    airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
+      args: { application_: $application }
+      where: { address: { _eq: $address } }
+      limit: 1
+    ) {
+      user: address
+      rank
+      referralCount: referral_count
+      bottles: total_lootboxes
+      highestRewardTier: highest_reward_tier
+      liquidityMultiplier: liquidity_multiplier
+    }
+  }
+`;
+
+const query24HoursByApplication = gql`
+  query AirdropLeaderboardByApplication($application: ethereum_application!) {
+    airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
+      args: { application_: $application }
       limit: 16
       order_by: { total_lootboxes: desc }
     ) {
@@ -68,6 +102,19 @@ type AirdropLeaderboardByUserBody = AirdropLeaderboardBody & {
   };
 };
 
+type AirdropLeaderboardByApplicationBody = AirdropLeaderboardBody & {
+  variables: {
+    application: string;
+  };
+};
+
+type AirdropLeaderboardByUserByApplicationBody = AirdropLeaderboardBody & {
+  variables: {
+    address: string;
+    application: string;
+  };
+};
+
 export type AirdropLeaderboardEntry = {
   user: string;
   rank: number;
@@ -80,13 +127,6 @@ export type AirdropLeaderboardEntry = {
 type AirdropLeaderboardResponse = {
   data?: {
     airdrop_leaderboard: Array<AirdropLeaderboardEntry>;
-  };
-  errors?: unknown;
-};
-
-type AirdropLeaderboard24HoursResponse = {
-  data?: {
-    airdrop_leaderboard_24_hours: Array<AirdropLeaderboardEntry>;
   };
   errors?: unknown;
 };
@@ -133,10 +173,11 @@ export const useAirdropLeaderboardByUser24Hours = (address: string) => {
     variables,
   };
 
-  return jsonPost<
-    AirdropLeaderboardByUserBody,
-    AirdropLeaderboard24HoursResponse
-  >(url, body, headers);
+  return jsonPost<AirdropLeaderboardByUserBody, AirdropLeaderboardResponse>(
+    url,
+    body,
+    headers
+  );
 };
 
 export const useAirdropLeaderboard24Hours = () => {
@@ -145,9 +186,48 @@ export const useAirdropLeaderboard24Hours = () => {
     query: query24Hours,
   };
 
-  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboard24HoursResponse>(
+  return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
     url,
     body,
     headers
   );
+};
+
+export const useAirdropLeaderboardByUserByApplication24Hours = (
+  address: string,
+  application: string
+) => {
+  const { url, headers } = fetchInternalEndpoint();
+
+  const variables = {
+    address,
+    application,
+  };
+  const body = {
+    query: query24HoursByUserByApplication,
+    variables,
+  };
+
+  return jsonPost<
+    AirdropLeaderboardByUserByApplicationBody,
+    AirdropLeaderboardResponse
+  >(url, body, headers);
+};
+
+export const useAirdropLeaderboardByApplication24Hours = (
+  application: string
+) => {
+  const { url, headers } = fetchInternalEndpoint();
+  const variables = {
+    application,
+  };
+  const body = {
+    query: query24HoursByApplication,
+    variables,
+  };
+
+  return jsonPost<
+    AirdropLeaderboardByApplicationBody,
+    AirdropLeaderboardResponse
+  >(url, body, headers);
 };

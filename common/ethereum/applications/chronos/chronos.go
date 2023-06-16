@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	chronosSwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
+	chronosSwapLogTopic       = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 	chronosPairFactoryAddress = "0xce9240869391928253ed9cc9bcb8cb98cb5b0722"
-	FeeDenominator = 10000
+	FeeDenominator            = 10000
 )
 
 const chronosPairAbiString = `[
@@ -135,7 +135,7 @@ var (
 	// chronosPairAbi set by init.go to generate the ABI code
 	chronosPairAbi ethAbi.ABI
 	// chronosPairFactoryAbi set by init.go to generathe the ABI code for the factory
-    chronosPairFactoryAbi ethAbi.ABI
+	chronosPairFactoryAbi ethAbi.ABI
 )
 
 // GetChronosFees returns Chronos' fee based on fees given by Chronos' pair factory
@@ -252,9 +252,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		swapContainsFluid = fluidIndex0 || (token1addr == fluidTokenContract)
 		// Whether amount0 is equal to zero
 		amount0IsZero = amount0in.Sign() == 0
-
 	)
-
 
 	switch true {
 	case !swapContainsFluid:
@@ -331,7 +329,7 @@ func GetChronosFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	// amount*(1-fee) = loggedAmount
 	// amount = loggedAmount/(1-fee)
 	if !inTokenIsFluid {
-		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1,1),feeMultiplier))
+		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1, 1), feeMultiplier))
 	}
 
 	fee := new(big.Rat).Set(fluidTransferAmount)

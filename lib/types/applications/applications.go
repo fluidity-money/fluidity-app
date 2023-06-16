@@ -35,6 +35,7 @@ var applicationNames = []string{
 	"meson",
 	"camelot",
 	"chronos",
+	"sushiswap",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
@@ -45,7 +46,7 @@ var UtilityFluid UtilityName = "FLUID"
 
 type ApplicationFeeData = struct {
 	// Fee for the fee paid to the application (in USD)
-	Fee    *big.Rat `json:"fee"`
+	Fee *big.Rat `json:"fee"`
 	// Volume for the amount of fluid token used (in USD)
 	Volume *big.Rat `json:"volume"`
 }

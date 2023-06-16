@@ -30,7 +30,11 @@ import type { lootboxTestsArgs } from "./lootbox-tests";
 
 const MaxUint256 = ethers.constants.MaxUint256;
 
-const MinimumDeposit = BigNumber.from(10).pow(20);
+// 100 of token 1 (6 decimals)
+const MinimumDepositToken1 = BigNumber.from(10).pow(8);
+
+// 100 of token 2 (18 decimals)
+const MinimumDepositToken2 = BigNumber.from(10).pow(20);
 
 describe("LootboxStaking with fresh deployment of tokens", async () => {
   const context = <lootboxTestsArgs>{};
@@ -50,20 +54,24 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
     const token0 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
       "token 0",
-      18,
+      6,
       MaxUint256
     );
 
     context.token0 = token0;
 
+    context.token0Decimals = await token0.decimals();
+
     const token1 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
       "token 1",
-      18,
+      6,
       MaxUint256
     );
 
     context.token1 = token1;
+
+    context.token1Decimals = await token1.decimals();
 
     const token2 = await erc20TokenFactory.connect(stakingSigner).deploy(
       "Staking test token",
@@ -74,8 +82,10 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
 
     context.token2 = token2;
 
+    context.token2Decimals = await token2.decimals();
+
     const camelotFactory = await hre.ethers.getContractAt(
-      "TestUniswapV2Factory",
+      "TestCamelotFactory",
       CAMELOT_FACTORY
     );
 
@@ -107,10 +117,23 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
       SUSHISWAP_MASTER_DEPLOYER
     );
 
-    context.sushiswapTridentRouter = await hre.ethers.getContractAt(
-        "TestSushiswapTridentRouter",
-        SUSHISWAP_TRIDENT_ROUTER
+    const sushiswapTridentRouter = await hre.ethers.getContractAt(
+      "TestSushiswapTridentRouter",
+      SUSHISWAP_TRIDENT_ROUTER
     );
+
+    context.sushiswapTridentRouter = sushiswapTridentRouter;
+
+    const sushiswapBentoBox = await hre.ethers.getContractAt(
+      "TestSushiswapBentoBox",
+      SUSHISWAP_BENTO_BOX
+    );
+
+    context.sushiswapBentoBox = sushiswapBentoBox;
+
+    await token0.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+    await token1.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
+    await token2.approve(SUSHISWAP_BENTO_BOX, MaxUint256);
 
     const sushiswapToken1Pool = await deployPool(
       sushiswapMasterDeployer,
@@ -134,6 +157,10 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
 
     const sushiswapToken2PoolAddress = sushiswapToken2Pool.address;
 
+    await token0.approve(sushiswapToken1PoolAddress, MaxUint256);
+    await token1.approve(sushiswapToken1PoolAddress, MaxUint256);
+    await token2.approve(sushiswapToken2PoolAddress, MaxUint256);
+
     const staking = await stakingFactory.connect(stakingSigner).deploy();
 
     context.staking = staking;
@@ -156,12 +183,16 @@ describe("LootboxStaking with fresh deployment of tokens", async () => {
       sushiswapToken2PoolAddress
     );
 
+    await staking.migrateV2();
+
     await token0.approve(staking.address, MaxUint256);
     await token1.approve(staking.address, MaxUint256);
     await token2.approve(staking.address, MaxUint256);
   });
 
-  return;
-
-  LootboxTests(context, MinimumDeposit);
+  LootboxTests(
+    context,
+    MinimumDepositToken1,
+    MinimumDepositToken2
+  );
 });

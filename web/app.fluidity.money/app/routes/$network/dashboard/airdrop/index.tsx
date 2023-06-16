@@ -161,7 +161,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
   const {
     address,
@@ -177,8 +177,11 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}`
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${
+      leaderboardFilterIndex === 0 ? "&provider=sushiswap" : ""
+    }`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
@@ -1440,9 +1443,24 @@ const Leaderboard = ({
     <>
       <div className={`leaderboard-header ${isMobile ? "airdrop-mobile" : ""}`}>
         <div className="leaderboard-header-text">
-          <Heading as="h3">Leaderboard</Heading>
+          <div className="leaderboard-header-title-row">
+            <Heading as="h3">Leaderboard</Heading>
+            {filterIndex === 0 && (
+              <GeneralButton
+                icon={<ProviderIcon provider="Sushiswap" />}
+                type="secondary"
+                disabled
+                className="leaderboard-provider-button"
+              >
+                <Text code style={{ color: "inherit" }}>
+                  SUSHISWAP
+                </Text>
+              </GeneralButton>
+            )}
+          </div>
           <Text prominent>
-            This leaderboard shows your rank among other users{" "}
+            This leaderboard shows your rank among other users
+            {filterIndex === 0 ? " using SushiSwap " : " "}
             {filterIndex === 0 ? " per" : " for"}
             &nbsp;
             {filterIndex === 0 ? (
@@ -1454,15 +1472,16 @@ const Leaderboard = ({
         </div>
         <div className="leaderboard-header-filters">
           <GeneralButton
-            type={filterIndex === 0 ? "primary" : "secondary"}
+            type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
+            icon={<ProviderIcon provider="Sushiswap" />}
           >
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
             </Text>
           </GeneralButton>
           <GeneralButton
-            type={filterIndex === 1 ? "primary" : "secondary"}
+            type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
           >
             <Text code size="sm" style={{ color: "inherit" }}>

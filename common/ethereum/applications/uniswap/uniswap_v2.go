@@ -18,7 +18,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-const uniswapV2SwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
+const UniswapV2SwapLogTopic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822"
 
 const uniswapV2PairAbiString = `[
   {
@@ -112,7 +112,7 @@ func GetUniswapV2Fees(transfer worker.EthereumApplicationTransfer, client *ethcl
 
 	logTopic := transfer.Log.Topics[0].String()
 
-	if logTopic != uniswapV2SwapLogTopic {
+	if logTopic != UniswapV2SwapLogTopic {
 		return feeData, nil
 	}
 

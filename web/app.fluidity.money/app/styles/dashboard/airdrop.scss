@@ -665,3 +665,23 @@ $holo: linear-gradient(
     }
   }
 }
+
+.leaderboard-header-title-row {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1em;
+  gap: 2em;
+  
+  h3 {
+    margin: 0;
+  }
+
+  .leaderboard-provider-button {
+    -webkit-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
+    -moz-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
+    box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
+    padding: 0.5em 1em;
+    border-color: #f7c8e7;
+    color: #f7c8e7;
+  }
+}

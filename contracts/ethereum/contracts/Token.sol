@@ -20,6 +20,9 @@ import "./openzeppelin/SafeERC20.sol";
 
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
+/// @dev FEE_DENOM for the fees (ie, 10 is a 1% fee)
+uint constant FEE_DENOM = 1000;
+
 /// @title The fluid token ERC20 contract
 // solhint-disable-next-line max-states-count
 contract Token is
@@ -153,6 +156,17 @@ contract Token is
 
     bytes32 private initialDomainSeparator_;
 
+    /* ~~~~~~~~~~ FEE TAKING ~~~~~~~~~~ */
+
+    /// @notice burnFee_ that's paid by the user when they burn
+    uint256 private burnFee_;
+
+    /// @notice feeRecipient_ that receives the fee paid by a user
+    address private feeRecipient_;
+
+    /// @notice burnFee_ that's paid by the user when they mint
+    uint256 private mintFee_;
+
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
     /**
@@ -280,9 +294,21 @@ contract Token is
 
         // give the user fluid tokens
 
-        _mint(_beneficiary, realAmount);
+        // calculate the fee to take
+        uint256 feeAmount =
+            (mintFee_ != 0 && realAmount > mintFee_)
+                ? (realAmount * mintFee_) / FEE_DENOM
+                : 0;
 
-        emit MintFluid(_beneficiary, realAmount);
+        // calculate the amount to give the user
+        uint256 mintAmount = realAmount - feeAmount;
+
+        _mint(_beneficiary, mintAmount);
+
+        emit MintFluid(_beneficiary, mintAmount);
+
+        // mint the fee to the fee recipient
+        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
 
         return realAmount;
     }
@@ -294,15 +320,31 @@ contract Token is
     ) internal {
         // take the user's fluid tokens
 
+         // if the fee amount > 0 and the burn fee is greater than 0, then
+         // we take burn fee% of the amount given by the user
+
+        uint256 feeAmount =
+            (burnFee_ != 0 && _amount > burnFee_)
+                ? (_amount * burnFee_) / FEE_DENOM
+                : 0;
+
+        // burn burnAmount
+
+        uint256 burnAmount = _amount - feeAmount;
+
+        // give them erc20, if the user's amount is greater than 100, then we keep 1%
+
         _burn(_sender, _amount);
 
-        // give them erc20
-
-        pool_.takeFromPool(_amount);
+        pool_.takeFromPool(burnAmount);
 
         emit BurnFluid(_sender, _amount);
 
-        underlyingToken().safeTransfer(_beneficiary, _amount);
+        // send out the amounts
+
+        underlyingToken().safeTransfer(_beneficiary, burnAmount);
+
+        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
     }
 
     /**
@@ -353,7 +395,6 @@ contract Token is
     ) internal {
         // solhint-disable-next-line reason-string
         require(from != address(0), "ERC20: transfer from the zero address");
-
 
         // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
@@ -558,7 +599,17 @@ contract Token is
     }
 
     /// @inheritdoc IToken
+    function burnFluidWithoutWithdrawal(uint256 _amount) public {
+        // burns fluid without taking from the liquidity provider
+        // this is fine, because the amount in the liquidity provider
+        // and the amount of fluid tokens are explicitly allowed to be different
+        // using this will essentially add the tokens to the reward pool
+        _burn(msg.sender, _amount);
+    }
+
+    /// @inheritdoc IToken
     function rewardPoolAmount() public returns (uint) {
+        // XXX calling totalPoolAmount before totalSupply is load bearing to the StupidLiquidityProvider
         uint totalAmount = pool_.totalPoolAmount();
         uint totalFluid = totalSupply();
         require(totalAmount >= totalFluid, "bad underlying liq");
@@ -819,5 +870,21 @@ contract Token is
         }
 
         return true;
+    }
+
+    /* ~~~~~~~~~~ MISC OPERATOR FUNCTIONS ~~~~~~~~~~ */
+
+    function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) public {
+        require(msg.sender == operator_, "only operator");
+
+        require(_mintFee < FEE_DENOM, "mint fee too high");
+        require(_burnFee < FEE_DENOM, "burn fee too high");
+
+        emit FeeSet(mintFee_, _mintFee, burnFee_, _burnFee);
+
+        feeRecipient_ = _recipient;
+
+        mintFee_ = _mintFee;
+        burnFee_ = _burnFee;
     }
 }

@@ -18,6 +18,10 @@ interface IFluidifyFormProps {
   swapping: boolean;
 }
 
+const FeeDenom = new BN(1, 32);
+
+const Hundred = new BN(100);
+
 export const FluidifyForm = ({
   handleSwap,
   assetToken,
@@ -107,11 +111,7 @@ export const FluidifyForm = ({
     );
   };
 
-  const swapAndRedirect: React.FormEventHandler<HTMLFormElement> = async (
-    e
-  ) => {
-    e.preventDefault();
-
+  const swapAndRedirect = async () => {
     if (!assertCanSwap) return;
 
     if (!swap) return;
@@ -133,8 +133,12 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
+  const fee = swapAmount.mul(FeeDenom).div(Hundred);
+
+  const swapAmountAfterFee = swapping ? swapAmount :  swapAmount.sub(fee);
+
   return (
-    <form className={"fluidify-form"} onSubmit={swapAndRedirect}>
+    <div className={"fluidify-form"}>
       <Text size="lg" prominent>
         AMOUNT TO {tokenIsFluid ? "REVERT" : "FLUIDIFY"}
       </Text>
@@ -183,8 +187,25 @@ export const FluidifyForm = ({
 
       {/* Creating / Remaining Tokens */}
       <Text>
-        Creating {addDecimalToBn(swapAmount, toToken.decimals)}{" "}
+        Creating {addDecimalToBn(swapAmountAfterFee, toToken.decimals)}{" "}
         {toToken.symbol || ""}
+        {fee.gt(new BN(0)) && (
+          <GeneralButton
+            type="transparent"
+            size="small"
+            style={{
+              marginTop: "0.5em",
+              padding: "0.5em 1em",
+              borderColor: "grey",
+            }}
+            disabled
+          >
+            <Text code size="sm">
+              {addDecimalToBn(fee, toToken.decimals)} {toToken.symbol || ""}{" "}
+              collected in fees
+            </Text>
+          </GeneralButton>
+        )}
       </Text>
       {/* Tokens User Holds */}
       <Text prominent>
@@ -211,7 +232,7 @@ export const FluidifyForm = ({
         type={"primary"}
         size="large"
         buttonType={"submit"}
-        handleClick={() => null}
+        handleClick={swapAndRedirect}
         disabled={!assertCanSwap}
         className={"fluidify-form-submit"}
       >
@@ -231,7 +252,7 @@ export const FluidifyForm = ({
         </a>
         .
       </Text>
-    </form>
+    </div>
   );
 };
 

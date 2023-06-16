@@ -14,9 +14,9 @@ import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IToken.sol";
 
 import "../interfaces/ICamelotRouter.sol";
-import "../interfaces/IUniswapV2Pair.sol";
+import "../interfaces/ICamelotPair.sol";
 
-import "../interfaces/ISushiswapStablePool.sol";
+import "../interfaces/ISushiswapPool.sol";
 import "../interfaces/ISushiswapBentoBox.sol";
 
 import "./openzeppelin/SafeERC20.sol";
@@ -40,6 +40,8 @@ uint256 constant MAX_UINT256 = type(uint256).max;
 uint256 constant MIN_LOCKUP_TIME = 31 days;
 
 uint256 constant MAX_LOCKUP_TIME = 365 days;
+
+uint256 constant MAX_SLIPPAGE = 100;
 
 contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     using SafeERC20 for IERC20;
@@ -65,13 +67,13 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     // we don't use a sushiswap router since it doesn't do much aside from
     // check amounts
 
-    ISushiswapStablePool private sushiswapFusdcUsdcPool_;
+    ISushiswapPool private sushiswapFusdcUsdcPool_;
 
-    ISushiswapStablePool private sushiswapFusdcWethPool_;
+    ISushiswapPool private sushiswapFusdcWethPool_;
 
-    IUniswapV2Pair private camelotFusdcUsdcPair_;
+    ICamelotPair private camelotFusdcUsdcPair_;
 
-    IUniswapV2Pair private camelotFusdcWethPair_;
+    ICamelotPair private camelotFusdcWethPair_;
 
     mapping (address => Deposit[]) private deposits_;
 
@@ -102,10 +104,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         IERC20 _weth,
         ICamelotRouter _camelotRouter,
         ISushiswapBentoBox _sushiswapBentoBox,
-        IUniswapV2Pair _camelotFusdcUsdcPair,
-        IUniswapV2Pair _camelotFusdcWethPair,
-        ISushiswapStablePool _sushiswapFusdcUsdcPool,
-        ISushiswapStablePool _sushiswapFusdcWethPool
+        ICamelotPair _camelotFusdcUsdcPair,
+        ICamelotPair _camelotFusdcWethPair,
+        ISushiswapPool _sushiswapFusdcUsdcPool,
+        ISushiswapPool _sushiswapFusdcWethPool
     ) public {
         require(version_ == 0, "already initialised");
 
@@ -160,7 +162,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL DEPOSIT FUNCTIONS ~~~~~~~~~~ */
 
-    function _depositToUniswapV2Router(
+    function _depositToCamelotRouter(
         ICamelotRouter _router,
         address _tokenA,
         address _tokenB,
@@ -174,7 +176,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 amountB,
         uint256 liquidity
      ) {
-        (amountA, amountB, liquidity) = _router.addLiquidity(
+        return _router.addLiquidity(
             _tokenA,
             _tokenB,
             _tokenAAmount,
@@ -184,12 +186,10 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             address(this),
             _timestamp
         );
-
-        return (amountA, amountB, liquidity);
     }
 
     function _depositToSushiswapPool(
-        ISushiswapStablePool _pool,
+        ISushiswapPool _pool,
         IERC20 _tokenA,
         IERC20 _tokenB,
         uint256 _tokenAAmount,
@@ -260,7 +260,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     function _depositTokens(
         IERC20 _tokenA,
         IERC20 _tokenB,
-        ISushiswapStablePool _sushiswapPool,
+        ISushiswapPool _sushiswapPool,
         uint256 _tokenAAmount,
         uint256 _tokenBAmount,
         uint256 _slippage,
@@ -283,7 +283,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             dep.camelotTokenA,
             dep.camelotTokenB,
             dep.camelotLpMinted
-        ) = _depositToUniswapV2Router(
+        ) = _depositToCamelotRouter(
             camelotRouter_,
             address(_tokenA),
             address(_tokenB),
@@ -393,11 +393,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL REDEEM FUNCTIONS ~~~~~~~~~~ */
 
-    function _redeemFromUniswapV2Router(
+    function _redeemFromCamelotRouter(
         ICamelotRouter _router,
         IERC20 _tokenB,
         uint256 _lpTokens,
-        uint256 _timestamp
+        uint256 _timestamp,
+        address _recipient
     ) internal returns (
         uint256 tokenARedeemed,
         uint256 tokenBRedeemed
@@ -408,34 +409,20 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _lpTokens,
             0,
             0,
-            address(this),
+            _recipient,
             _timestamp
         );
     }
 
     function _redeemFromSushiswapPool(
-        ISushiswapStablePool _pool,
-        IERC20 _tokenB,
-        uint256 _lpTokens
-    ) internal returns (
-        uint256 tokenARedeemed,
-        uint256 tokenBRedeemed
-    ) {
-        uint256 tokenABefore = fusdc_.balanceOf(address(this));
-        uint256 tokenBBefore = _tokenB.balanceOf(address(this));
-
+        ISushiswapPool _pool,
+        uint256 _lpTokens,
+        address _recipient
+    ) internal {
         _pool.transfer(address(_pool), _lpTokens);
 
-        // unwrap the bento (the true) so we get the funds back into the contract
-        _pool.burn(abi.encode(address(this), true));
-
-        uint256 tokenAAfter = fusdc_.balanceOf(address(this));
-        uint256 tokenBAfter = _tokenB.balanceOf(address(this));
-
-        tokenARedeemed = tokenAAfter - tokenABefore;
-        tokenBRedeemed = tokenBAfter - tokenBBefore;
-
-        return (tokenARedeemed, tokenBRedeemed);
+        // unwrap the bento (the true) so we get the funds back to the user
+        _pool.burn(abi.encode(_recipient, true));
     }
 
     function _deleteDeposit(address _sender, uint _depositId) internal {
@@ -447,47 +434,23 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     function _redeemCamelotSushiswap(
         Deposit memory dep,
-        IERC20 _tokenB,
-        ISushiswapStablePool _sushiswapPool,
+        bool _fusdcUsdcPair,
         uint256 _timestamp,
-        uint256 _originalCamelotK,
-        uint256 _originalSushiswapK
-    ) internal returns (
-        uint256 tokenARedeemed,
-        uint256 tokenBRedeemed
-    ) {
-        (uint256 camelotARedeemed, uint256 camelotBRedeemed) =
-            _redeemFromUniswapV2Router(
-                camelotRouter_,
-                _tokenB,
-                dep.camelotLpMinted,
-                _timestamp
-            );
+        address _recipient
+    ) internal {
+        _redeemFromCamelotRouter(
+            camelotRouter_,
+            _fusdcUsdcPair ? usdc_ : weth_,
+            dep.camelotLpMinted,
+            _timestamp,
+            _recipient
+        );
 
-        (uint256 sushiswapARedeemed, uint256 sushiswapBRedeemed) =
-            _redeemFromSushiswapPool(
-                _sushiswapPool,
-                _tokenB,
-                dep.sushiswapLpMinted
-            );
-
-        uint256 tokenBAvailable = camelotBRedeemed + sushiswapBRedeemed;
-
-        uint256 redeemedCamelotK = _originalCamelotK / camelotARedeemed;
-
-        uint256 redeemedSushiswapK = _originalSushiswapK / sushiswapARedeemed;
-
-        tokenARedeemed = camelotARedeemed + sushiswapARedeemed;
-
-        // if token B redeemed is higher than the amount that the user
-        // got back, then we simply return that amount (this could happen
-        // if the user got rekt on fees by bento)
-
-        tokenBRedeemed = redeemedCamelotK + redeemedSushiswapK;
-
-        if (tokenBRedeemed > tokenBAvailable) tokenBRedeemed = tokenBAvailable;
-
-        return (tokenARedeemed, tokenBRedeemed);
+        _redeemFromSushiswapPool(
+            _fusdcUsdcPair ? sushiswapFusdcUsdcPool_ : sushiswapFusdcWethPool_,
+            dep.sushiswapLpMinted,
+            _recipient
+        );
     }
 
     /* ~~~~~~~~~~ EXTERNAL FUNCTIONS ~~~~~~~~~~ */
@@ -514,7 +477,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
 
-        require(_slippage < 101, "slippage too high");
+        require(_slippage < MAX_SLIPPAGE + 1, "slippage too high");
 
         // the ui should restrict the deposits to more than 1e18
 
@@ -589,30 +552,22 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             bool fusdcUsdcPair = dep.fusdcUsdcPair;
 
-            uint256 originalCamelotK = dep.camelotTokenA * dep.camelotTokenB;
+            uint256 fusdcBefore = fusdc_.balanceOf(msg.sender);
 
+            uint256 usdcBefore = usdc_. balanceOf(msg.sender);
 
-            uint256 originalSushiswapK = dep.sushiswapTokenA * dep.sushiswapTokenB;
+            uint256 wethBefore = weth_.balanceOf(msg.sender);
 
+            _redeemCamelotSushiswap(dep, fusdcUsdcPair, _maxTimestamp, msg.sender);
 
-            (
-                uint256 tokenARedeemed,
-                uint256 tokenBRedeemed
-            ) =
-                _redeemCamelotSushiswap(
-                    dep,
-                    fusdcUsdcPair ? usdc_ : weth_,
-                    fusdcUsdcPair ? sushiswapFusdcUsdcPool_ : sushiswapFusdcWethPool_,
-                    _maxTimestamp,
-                    originalCamelotK,
-                    originalSushiswapK
-                );
+            // assumes that the user will always receive some amount from the pools
+            uint256 tokenARedeemed = fusdc_.balanceOf(msg.sender) - fusdcBefore;
 
-            fusdc_.safeTransfer(msg.sender, tokenARedeemed);
+            uint256 tokenBRedeemed = 0;
 
-            IERC20 tokenB = fusdcUsdcPair ? usdc_ : weth_;
+            if (fusdcUsdcPair) tokenBRedeemed = usdc_.balanceOf(msg.sender) - usdcBefore;
 
-            tokenB.safeTransfer(msg.sender, tokenBRedeemed);
+            else tokenBRedeemed = weth_.balanceOf(msg.sender) - wethBefore;
 
             if (fusdcUsdcPair) {
                 camelotFusdcUsdcDepositedLpTokens_ -= dep.camelotLpMinted;
@@ -643,7 +598,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _deleteDeposit(msg.sender, i);
         }
 
-        return (fusdcRedeemed, fusdcRedeemed, fusdcRedeemed);
+        return (fusdcRedeemed, usdcRedeemed, wethRedeemed);
     }
 
     /// @inheritdoc ILootboxStaking
@@ -702,16 +657,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
     }
 
-    /// @inheritdoc ILootboxStaking
-    function drain(address _recipient) public {
-        require(msg.sender == operator_, "only operator");
-        require(noEmergencyMode_, "emergency mode");
-
-        fusdc_.safeTransfer(_recipient, fusdc_.balanceOf(address(this)));
-        usdc_.safeTransfer(_recipient, usdc_.balanceOf(address(this)));
-        weth_.safeTransfer(_recipient, weth_.balanceOf(address(this)));
-    }
-
     /* ~~~~~~~~~~ INTERNAL APPROVAL FUNCTIONS ~~~~~~~~~~ */
 
     function _enableApprovals() internal {
@@ -744,14 +689,14 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
     /* ~~~~~~~~~~ INTERNAL MISC FUNCTIONS ~~~~~~~~~~ */
 
-    function _uniswapPairReserves(
-        IUniswapV2Pair _pair,
+    function _camelotPairReserves(
+        ICamelotPair _pair,
         IERC20 _tokenB
     ) internal view returns (
         uint256 reserveA,
         uint256 reserveB
     ) {
-        (uint112 reserve0_, uint112 reserve1_,) = _pair.getReserves();
+        (uint112 reserve0_, uint112 reserve1_,,) = _pair.getReserves();
 
         uint256 reserve0 = uint256(reserve0_);
 
@@ -766,13 +711,13 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     }
 
     function _sushiswapPoolReserves(
-        ISushiswapStablePool _pool,
+        ISushiswapPool _pool,
         IERC20 _tokenB
     ) internal view returns (
         uint256 reserveA,
         uint256 reserveB
     ) {
-        (uint256 reserve0, uint256 reserve1) = _pool.getReserves();
+        (uint256 reserve0, uint256 reserve1) = _pool.getNativeReserves();
 
         (reserveA, reserveB) =
           address(fusdc_) < address(_tokenB)
@@ -789,18 +734,15 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         uint256 fusdcWethLiq
     ) {
         (uint256 camelotFusdcUsdcReserveA, uint256 camelotFusdcUsdcReserveB) =
-            _uniswapPairReserves(
+            _camelotPairReserves(
                 camelotFusdcUsdcPair_,
                 usdc_
             );
-
-
 
         camelotFusdcUsdcReserveA *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
         camelotFusdcUsdcReserveB *= 10 ** (wethMinLiquidity_ - fusdcMinLiquidity_);
 
         fusdcUsdcLiq = camelotFusdcUsdcReserveA + camelotFusdcUsdcReserveB;
-
 
         // if the information here is empty, then we provide a hardcoded ratio suggestion
 
@@ -812,7 +754,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
 
         (uint256 camelotFusdcWethReserveA, uint256 camelotFusdcWethReserveB) =
-            _uniswapPairReserves(
+            _camelotPairReserves(
                 camelotFusdcWethPair_,
                 weth_
             );
@@ -919,6 +861,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         emit Emergency(true);
 
         noEmergencyMode_ = false;
+    }
+
+    function updateEmergencyCouncil(address _emergencyCouncil) public {
+        require(msg.sender == operator_, "only operator");
+        emergencyCouncil_ = _emergencyCouncil;
     }
 
     /* ~~~~~~~~~~ OPERATOR ~~~~~~~~~~ */

@@ -25,7 +25,7 @@ const (
 
 func main() {
 	var (
-		gethHttpUrl		     = util.PickEnvOrFatal(EnvEthereumHttpUrl)
+		gethHttpUrl          = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		wethPriceFeedAddress = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 	)
 

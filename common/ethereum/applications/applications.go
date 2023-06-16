@@ -18,6 +18,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/sushiswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -52,8 +53,8 @@ const (
 	ApplicationMeson
 	ApplicationCamelot
 	ApplicationChronos
+	ApplicationSushiswap
 )
-
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns (feeData wiht Fee set to nil, ni) in the case where the application event is legitimate, but doesn't involve
@@ -76,6 +77,14 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.UniswapV3 += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationSushiswap:
+		feeData, err = sushiswap.GetSushiswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.Sushiswap += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationUniswapV2:
 		feeData, err = uniswap.GetUniswapV2Fees(
 			transfer,
@@ -304,6 +313,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationChronos:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationSushiswap:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil

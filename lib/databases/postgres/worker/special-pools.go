@@ -46,10 +46,10 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 	}
 
 	var (
-		poolOverrides worker.SpecialPoolOptions
-		payoutFreqNum misc.BigInt
-		payoutFreqDenom misc.BigInt
-		deltaWeightNum misc.BigInt
+		poolOverrides    worker.SpecialPoolOptions
+		payoutFreqNum    misc.BigInt
+		payoutFreqDenom  misc.BigInt
+		deltaWeightNum   misc.BigInt
 		deltaWeightDenom misc.BigInt
 	)
 

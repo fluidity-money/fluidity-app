@@ -88,7 +88,6 @@ func main() {
 			Transactions: make([]types.Transaction, 0),
 		}
 
-
 		// Block contains log with ABI hash in its topics
 		// Guaranteed to be signature - Order dependent
 

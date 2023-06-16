@@ -18,7 +18,7 @@ const integrationTestSushiswap = `
           "0x000000000000000000000000d4cf8e47beac55b42ae58991785fa326d9384bd1"
         ]
       },
-     "application": 2
+     "application": 18
     },
     "transaction": {
       "to": "0xd9e1ce17f2641f24ae83637ab66a2cca9c378b9f",
@@ -29,7 +29,7 @@ const integrationTestSushiswap = `
     "expected_recipient": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
     "expected_fees": "30000000/997000000",
     "expected_emission": {
-	"uniswap_v2": 0.03009027081243731
+	"sushiswap": 0.03009027081243731
     },
     "rpc_methods": {
 	"eth_getCode": "0x0"
