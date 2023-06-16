@@ -553,14 +553,128 @@ $holo: linear-gradient(
   }
 }
 
+.claim-ropsten {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  .ropsten-header {
+    h3 {
+        margin: 0;
+    }
+
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5em;
+  }
+
+
+  img {
+    top: 0;
+    width: 100%;
+    opacity: 0.5;
+    position: absolute;
+    z-index: -1;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  ol {
+    padding-left: 1em;
+    list-style-type: decimal;
+    margin: 0;
+
+    li {
+      margin-bottom: 0.5em;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .ropsten-address-btn {
+    color: grey;
+    padding: 0.5em 1em;
+    display: inline-flex;
+    margin-top: 0.5em;
+    .ropsten-check > svg {
+      width: 10px !important;
+      height: 10px !important;
+
+      path {
+        stroke: none;
+        fill: currentColor;
+      }
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+
+
+      path {
+        stroke: currentColor;
+      }
+    }
+  }
+
+  .claim-ropsten-form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2em;
+
+    .claim-ropsten-input {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+
+      input {
+        all: unset;
+        padding: 0.5em 1em;
+        border: 1px solid grey;
+        border-radius: 50px;
+      }
+    }
+  }
+
+  .ropsten-warning {
+    margin-top: 1em;
+    border-radius: 5px;
+    padding: 0.5em;
+
+    &.danger {
+        background-color: rgba(255, 105, 105, 0.1);
+        color: #ff6969;
+        border: 1px solid #ff6969;
+        margin-top: 0.5em;
+    }
+
+
+    svg {
+      transform: translate(0, 2px);
+      margin-right: 0.5em;
+
+      path {
+      fill: currentColor;
+      }
+    }
+  }
+}
+
 .leaderboard-header-title-row {
   display: flex;
   align-items: center;
   padding-bottom: 1em;
+  gap: 2em;
+  
   h3 {
     margin: 0;
   }
-  gap: 2em;
 
   .leaderboard-provider-button {
     -webkit-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);

@@ -551,17 +551,13 @@ const EthereumFacade = ({
     }
 
     const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
-    try {
-      const signature = await signOwnerAddress_(
-        ownerAddress,
-        signer,
-        lootboxOwnershipAddr,
-        LootboxOwnershipAbi
-      );
-      return signature;
-    } catch (e) {
-      console.log("failed to sign for account ownership", e);
-    }
+    const signature = await signOwnerAddress_(
+      ownerAddress,
+      signer,
+      lootboxOwnershipAddr,
+      LootboxOwnershipAbi
+    );
+    return signature;
   };
 
   // `confirm` that an account is owned by this account using a signature they have created
@@ -576,18 +572,14 @@ const EthereumFacade = ({
     }
 
     const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
-    try {
-      const result = await confirmAccountOwnership_(
-        signature,
-        address,
-        signer,
-        lootboxOwnershipAddr,
-        LootboxOwnershipAbi
-      );
-      console.log(result);
-    } catch (e) {
-      console.log("failed to confirm account ownership", e);
-    }
+    const result = await confirmAccountOwnership_(
+      signature,
+      address,
+      signer,
+      lootboxOwnershipAddr,
+      LootboxOwnershipAbi
+    );
+    console.log(result);
   };
 
   return (
