@@ -20,7 +20,7 @@ interface IFluidifyFormProps {
 
 const FeeDenom = new BN(5, 32);
 
-const Hundred = new BN(1000);
+const Thousand = new BN(1000);
 
 export const FluidifyForm = ({
   handleSwap,
