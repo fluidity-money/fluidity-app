@@ -550,7 +550,7 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
+    const lootboxOwnershipAddr = "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06";
     const signature = await signOwnerAddress_(
       ownerAddress,
       signer,
@@ -571,7 +571,7 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
+    const lootboxOwnershipAddr = "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06";
     const result = await confirmAccountOwnership_(
       signature,
       address,
