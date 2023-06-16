@@ -1,0 +1,25 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import { Input } from "./";
+
+<Meta
+    title="Form/Input"
+    component={Input}
+/>
+
+export const Template = (props) => <div style={{
+  maxWidth: 200,
+  marginLeft: 800
+}}>
+  <Input {...props} />
+</div>
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Form</Title>
+    <Subtitle>For forming things</Subtitle>
+    <Story
+        name="Input"
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>
