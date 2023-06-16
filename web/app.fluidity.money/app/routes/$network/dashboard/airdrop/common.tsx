@@ -1824,7 +1824,10 @@ const TestnetRewardsModal = () => {
                 </GeneralButton>
               </li>
               <li>
-                Switch your wallet to the address that you used on Ropsten.
+                Switch your wallet to the address that you used on Ropsten.{" "}
+                <br />
+                (If you are using the same address as you used on Ropsten
+                continue to Step 3)
               </li>
               <li>Enter your Arbitrum One address in the box below.</li>
               <li>
