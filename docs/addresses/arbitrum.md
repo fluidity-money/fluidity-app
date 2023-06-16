@@ -10,7 +10,7 @@
 | LootboxStaking                         | 0x770f77A67d9B1fC26B80447c666f8a9aECA47C82 |
 | Executor                               | 0xBdC05dE358bA65720f5cc74BBc615C029220C67D |
 | Chronos Booster UtilityClient          | 0xEB6057AE11BE83fFE0a3C191a41D67728938886B |
-| LootboxConfirmAddressOwnership         | 0x6a8AFEe01E95311F1372B34E686200068dbca1F2 |
+| LootboxConfirmAddressOwnership         | 0x18EB6Ac990BD3a31dD3e5dd9c7744751c8E9DC06 |
 
 ## Specifics
 
