@@ -53,7 +53,7 @@ export const confirmAccountOwnership_ = async (
   try {
     await contract.confirm(address, owner, v, r, s);
   } catch (error) {
-    throw new Error(`Could not claim testnet address. ${error}`)
+    throw new Error(`Could not claim testnet address. ${error}`);
   }
 };
 

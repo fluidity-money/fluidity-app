@@ -24,7 +24,7 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
-  Checkmark
+  Checkmark,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -101,19 +101,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottle
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottle
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottle
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -645,8 +645,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -699,12 +699,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      (baseToken.symbol === "USDC"
-        ? tokenRatios.fusdcUsdcRatio.toNumber() -
-        tokenRatios.fusdcUsdcSpread.toNumber() / 2
-        : tokenRatios.fusdcWethRatio.toNumber() -
-        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-    );
+        (baseToken.symbol === "USDC"
+          ? tokenRatios.fusdcUsdcRatio.toNumber() -
+            tokenRatios.fusdcUsdcSpread.toNumber() / 2
+          : tokenRatios.fusdcWethRatio.toNumber() -
+            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+      );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -767,31 +767,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const tokenAmtStr =
-          dec !== undefined
-            ? [whole, dec.slice(0 - token.decimals)].join(".")
-            : whole ?? "0";
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-        setInput({
-          ...token,
-          amount: tokenAmtStr,
-        });
+      setInput({
+        ...token,
+        amount: tokenAmtStr,
+      });
 
-        if (!ratio) return;
-        if (!(whole || dec)) return;
+      if (!ratio) return;
+      if (!(whole || dec)) return;
 
-        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-        setOtherInput({
-          ...otherToken,
-          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-        });
-      };
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+      });
+    };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1020,8 +1020,9 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`airdrop-stake-container ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         {/* Staking Amount */}
         <div
@@ -1330,7 +1331,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(0, stakingDuration),
+                stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1381,7 +1382,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1633,8 +1634,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1666,7 +1668,7 @@ const TestnetRewardsModal = () => {
   if (!confirmAccountOwnership || !signOwnerAddress) return <></>;
 
   return (
-    <div className="claim-ropsten" >
+    <div className="claim-ropsten">
       {/* {
         JSON.stringify({
           signature,
@@ -1678,183 +1680,220 @@ const TestnetRewardsModal = () => {
           manualSignature,
         }, null, 2)
       } */}
-      <img
-        src="/images/testnetBanner.png"
-      />
+      <img src="/images/testnetBanner.png" />
       <div className="ropsten-header">
-        <Heading
-          as="h3"
-        >
-          Claim Testnet Rewards
-        </Heading>
+        <Heading as="h3">Claim Testnet Rewards</Heading>
         <Text prominent size="sm">
           If you participated in Fluidity&#39;s Ropsten testnet, you are
           eligible for free bottles!
         </Text>
-
       </div>
-      {
-        !signerAddress ?
-          (
-            <>
-              <Text prominent size="sm">Please connect your wallet to begin.</Text>
-            </>
-          )
-          : finalised ? (
-            <Text prominent size="sm">Congratulations! You have successfully confirmed your ownership of the testnet address:
+      {!signerAddress ? (
+        <>
+          <Text prominent size="sm">
+            Please connect your wallet to begin.
+          </Text>
+        </>
+      ) : finalised ? (
+        <Text prominent size="sm">
+          Congratulations! You have successfully confirmed your ownership of the
+          testnet address:
+          <GeneralButton
+            type="transparent"
+            size="small"
+            className="ropsten-address-btn"
+            disabled
+            onClick={() => {
+              return;
+            }}
+          >
+            <Text prominent size="sm" code style={{ color: "inherit " }}>
+              {ropstenAddress}
+            </Text>
+          </GeneralButton>
+          <br />
+          <br />
+          If this address participated in the Fluidity Ropsten testnet, you will
+          receive free loot bottles during the Fluidity Airdrop!
+        </Text>
+      ) : signature ? (
+        signerAddress.toLowerCase() === address.toLowerCase() ? (
+          <>
+            <Text prominent size="sm">
+              You are verifying ownership of the following testnet address:{" "}
               <GeneralButton
                 type="transparent"
                 size="small"
                 className="ropsten-address-btn"
                 disabled
-                onClick={() => { return }}
+                onClick={() => {
+                  return;
+                }}
               >
-                <Text prominent size="sm" code style={{ color: 'inherit ' }}>{ropstenAddress}</Text>
-              </GeneralButton>
-              <br />
-              <br />
-              If this address participated in the Fluidity Ropsten testnet, you will receive free loot bottles during the Fluidity Airdrop!
-            </Text>
-          ) : signature ? (
-            signerAddress.toLowerCase() === address.toLowerCase() ? (
-              <>
-                <Text prominent size="sm">
-                  You are verifying ownership of the following testnet address: {" "}
-                  <GeneralButton
-                    type="transparent"
-                    size="small"
-                    className="ropsten-address-btn"
-                    disabled
-                    onClick={() => { return }}
-                  >
-                    <Text prominent size="sm" code style={{ color: 'inherit ' }}>{ropstenAddress}</Text>
-                  </GeneralButton>
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {ropstenAddress}
                 </Text>
+              </GeneralButton>
+            </Text>
+            <GeneralButton
+              layout="after"
+              handleClick={() => {
+                confirmAccountOwnership(signature, address)
+                  .then(() => {
+                    setFinalised(true);
+                  })
+                  .catch((e) => {
+                    setError(JSON.stringify(e));
+                    setFinalised(false);
+                  })
+                  .finally(() => setSignature(""));
+              }}
+              type="transparent"
+            >
+              Confirm Account Ownership
+            </GeneralButton>
+          </>
+        ) : (
+          <>
+            <Text prominent size="sm">
+              Change your wallet account to{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {address}
+                </Text>
+              </GeneralButton>{" "}
+              to finalise confirmation. Currently signed in as{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {signerAddress}
+                </Text>
+              </GeneralButton>
+            </Text>
+          </>
+        )
+      ) : (
+        <>
+          <Text prominent size="sm" style={{ margin: "1em 0" }}>
+            <ol>
+              <li>
+                Copy your Arbitrum One address.
+                <div style={{ display: "inline-block", width: "1em" }} />
                 <GeneralButton
+                  className="ropsten-address-btn"
+                  size="small"
+                  icon={
+                    copied ? (
+                      <span className="ropsten-check">
+                        <Checkmark />
+                      </span>
+                    ) : (
+                      <CopyIcon />
+                    )
+                  }
+                  type="transparent"
                   layout="after"
                   handleClick={() => {
-                    confirmAccountOwnership(signature, address)
-                      .catch((e) => setError(JSON.stringify(e)))
-                      .then(() => {
-                        setFinalised(!error)
-                        setSignature("")
-                      })
+                    navigator.clipboard.writeText(signerAddress);
+                    setCopied(true);
                   }}
-                  type="transparent"
                 >
-                  Confirm Account Ownership
+                  <Text code size="sm" style={{ color: "inherit" }}>
+                    {signerAddress}
+                  </Text>
                 </GeneralButton>
-              </>
-            ) : (
-              <>
-                <Text prominent size="sm">
-                  Change your wallet account to <GeneralButton
-                    type="transparent"
-                    size="small"
-                    className="ropsten-address-btn"
-                    disabled
-                    onClick={() => { return }}
-                  >
-                    <Text prominent size="sm" code style={{ color: 'inherit ' }}>{address}</Text>
-                  </GeneralButton> to finalise confirmation.
-                  Currently signed in as <GeneralButton
-                    type="transparent"
-                    size="small"
-                    className="ropsten-address-btn"
-                    disabled
-                    onClick={() => { return }}
-                  >
-                    <Text prominent size="sm" code style={{ color: 'inherit ' }}>{signerAddress}</Text>
-                  </GeneralButton>
+              </li>
+              <li>
+                Switch your wallet to the address that you used on Ropsten.
+              </li>
+              <li>Enter your Arbitrum One address in the box below.</li>
+              <li>
+                Click the confirmation button to prompt a signature from your
+                wallet. (If you have already generated a signature previously,
+                enter it in the signature box, as well as the address)
+              </li>
+              <Card className="ropsten-warning" border="solid">
+                <Text size="sm">
+                  <InfoCircle />
+                  Ensure you don&#39;t change the active network away from
+                  Arbitrum One!
                 </Text>
-              </>
-            )
-          ) :
-            <>
-              <Text prominent size="sm" style={{ margin: '1em 0' }}>
-                <ol>
-                  <li>
-                    Copy your Arbitrum One address.<div style={{ display: 'inline-block', width: '1em' }} />
-                    <GeneralButton
-                      className="ropsten-address-btn"
-                      size="small"
-                      icon={copied ? <span className="ropsten-check"><Checkmark /></span> : <CopyIcon />}
-                      type="transparent"
-                      layout="after"
-                      handleClick={() => {
-                        navigator.clipboard.writeText(signerAddress)
-                        setCopied(true)
-                      }}
-                    >
-                      <Text code size="sm" style={{ color: 'inherit' }}>{signerAddress}</Text>
-                    </GeneralButton>
-                  </li>
-                  <li>Switch your wallet to the address
-                    that you used on Ropsten.</li>
-                  <li>Enter your Arbitrum One address in the box below.</li>
-                  <li>Click the confirmation button to prompt a signature from your wallet. (If you have
-                    already generated a signature previously, enter it in the signature
-                    box, as well as the address)</li>
-                  <Card className="ropsten-warning" border="solid">
-                    <Text size="sm" >
-                      <InfoCircle />Ensure you don&#39;t change the active network away from Arbitrum One!
-                    </Text>
-                  </Card>
-                </ol>
+              </Card>
+            </ol>
+          </Text>
+          <div className="claim-ropsten-form">
+            <div className="claim-ropsten-input">
+              <Text size="xs" className="helper-label">
+                ARBITRUM ONE ADDRESS
               </Text>
-              <div className="claim-ropsten-form">
-                <div className="claim-ropsten-input">
-                  <Text size="xs" className="helper-label">
-                    ARBITRUM ONE ADDRESS
-                  </Text>
-                  <input
-                    value={address}
-                    onChange={(v) => setAddress(v.target.value)}
-                  ></input>
-                  <GeneralButton
-                    layout="after"
-                    handleClick={() => {
-                      setRopstenAddress(signerAddress ?? "");
-                      signOwnerAddress(address).then((sig) => setSignature(sig ?? ""));
-                    }}
-                    type="transparent"
-                  >
-                    <Text style={{ color: 'inherit' }} code >Confirm Owner Address</Text>
-                  </GeneralButton>
-                </div>
-                <div className="claim-ropsten-input">
-                  <Text size="xs" className="helper-label">
-                    SIGNATURE
-                  </Text>
-                  <input
-                    value={manualSignature}
-                    onChange={(v) => setManualSignature(v.target.value)}
-                  ></input>
-                  <GeneralButton
-                    layout="after"
-                    handleClick={() => {
-                      setSignature(manualSignature);
-                    }}
-                    type="transparent"
-                  >
-                    <Text style={{ color: 'inherit' }} code >Confirm signature</Text>
-                  </GeneralButton>
-                </div>
-              </div>
-              {
-                error && (
-                  <Card className="ropsten-warning danger">
-                    <Text prominent size="xs" style={{ color: 'inherit' }} >
-                      <InfoCircle />{error}
-                    </Text>
-                  </Card>
-                )
-              }
-            </>
-      }
+              <input
+                value={address}
+                onChange={(v) => setAddress(v.target.value)}
+              ></input>
+              <GeneralButton
+                layout="after"
+                handleClick={() => {
+                  setRopstenAddress(signerAddress ?? "");
+                  signOwnerAddress(address).then((sig) =>
+                    setSignature(sig ?? "")
+                  );
+                }}
+                type="transparent"
+              >
+                <Text style={{ color: "inherit" }} code>
+                  Confirm Owner Address
+                </Text>
+              </GeneralButton>
+            </div>
+            <div className="claim-ropsten-input">
+              <Text size="xs" className="helper-label">
+                SIGNATURE
+              </Text>
+              <input
+                value={manualSignature}
+                onChange={(v) => setManualSignature(v.target.value)}
+              ></input>
+              <GeneralButton
+                layout="after"
+                handleClick={() => {
+                  setSignature(manualSignature);
+                }}
+                type="transparent"
+              >
+                <Text style={{ color: "inherit" }} code>
+                  Confirm signature
+                </Text>
+              </GeneralButton>
+            </div>
+          </div>
+          {error && (
+            <Card className="ropsten-warning danger">
+              <Text prominent size="xs" style={{ color: "inherit" }}>
+                <InfoCircle />
+                {error}
+              </Text>
+            </Card>
+          )}
+        </>
+      )}
     </div>
   );
-}
+};
 
 export {
   BottleDistribution,
