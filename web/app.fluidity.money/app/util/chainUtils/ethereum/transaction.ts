@@ -52,9 +52,8 @@ export const confirmAccountOwnership_ = async (
 
   try {
     await contract.confirm(address, owner, v, r, s);
-    console.log("Confirmation transaction successful!");
   } catch (error) {
-    console.error("Error confirming ownership:", error);
+    throw new Error(`Could not claim testnet address. ${error}`)
   }
 };
 

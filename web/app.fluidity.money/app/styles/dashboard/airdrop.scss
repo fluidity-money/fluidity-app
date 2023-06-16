@@ -643,10 +643,17 @@ $holo: linear-gradient(
   }
 
   .ropsten-warning {
-    color: #ff6969;
-    border: 1px solid #ff6969;
-    background-color: rgba(255, 105, 105, 0.1);
+    margin-top: 1em;
+    border-radius: 5px;
     padding: 0.5em;
+
+    &.danger {
+        background-color: rgba(255, 105, 105, 0.1);
+        color: #ff6969;
+        border: 1px solid #ff6969;
+        margin-top: 0.5em;
+    }
+
 
     svg {
       transform: translate(0, 2px);

@@ -1661,11 +1661,23 @@ const TestnetRewardsModal = () => {
   const [manualSignature, setManualSignature] = useState("");
   const [finalised, setFinalised] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
 
   if (!confirmAccountOwnership || !signOwnerAddress) return <></>;
 
   return (
     <div className="claim-ropsten" >
+      {/* {
+        JSON.stringify({
+          signature,
+          error,
+          ropstenAddress,
+          signerAddress,
+          address,
+          finalised,
+          manualSignature,
+        }, null, 2)
+      } */}
       <img
         src="/images/testnetBanner.png"
       />
@@ -1679,6 +1691,7 @@ const TestnetRewardsModal = () => {
           If you participated in Fluidity&#39;s Ropsten testnet, you are
           eligible for free bottles!
         </Text>
+
       </div>
       {
         !signerAddress ?
@@ -1688,15 +1701,20 @@ const TestnetRewardsModal = () => {
             </>
           )
           : finalised ? (
-            <Text prominent size="sm">Congratulations! You have successfully confirmed your ownership of the testnet address <GeneralButton
-              type="transparent"
-              size="small"
-              className="ropsten-address-btn"
-              disabled
-              onClick={() => { return }}
-            >
-              <Text prominent size="sm" code style={{ color: 'inherit ' }}>{ropstenAddress}</Text>
-            </GeneralButton>. If this address participated in the Fluidity Ropsten testnet, you will receive free loot bottles during the Fluidity Airdrop!</Text>
+            <Text prominent size="sm">Congratulations! You have successfully confirmed your ownership of the testnet address:
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => { return }}
+              >
+                <Text prominent size="sm" code style={{ color: 'inherit ' }}>{ropstenAddress}</Text>
+              </GeneralButton>
+              <br />
+              <br />
+              If this address participated in the Fluidity Ropsten testnet, you will receive free loot bottles during the Fluidity Airdrop!
+            </Text>
           ) : signature ? (
             signerAddress.toLowerCase() === address.toLowerCase() ? (
               <>
@@ -1715,9 +1733,12 @@ const TestnetRewardsModal = () => {
                 <GeneralButton
                   layout="after"
                   handleClick={() => {
-                    confirmAccountOwnership(signature, address).then(() =>
-                      setFinalised(true)
-                    );
+                    confirmAccountOwnership(signature, address)
+                      .catch((e) => setError(JSON.stringify(e)))
+                      .then(() => {
+                        setFinalised(!error)
+                        setSignature("")
+                      })
                   }}
                   type="transparent"
                 >
@@ -1774,6 +1795,11 @@ const TestnetRewardsModal = () => {
                   <li>Click the confirmation button to prompt a signature from your wallet. (If you have
                     already generated a signature previously, enter it in the signature
                     box, as well as the address)</li>
+                  <Card className="ropsten-warning" border="solid">
+                    <Text size="sm" >
+                      <InfoCircle />Ensure you don&#39;t change the active network away from Arbitrum One!
+                    </Text>
+                  </Card>
                 </ol>
               </Text>
               <div className="claim-ropsten-form">
@@ -1815,11 +1841,15 @@ const TestnetRewardsModal = () => {
                   </GeneralButton>
                 </div>
               </div>
-              <Card className="ropsten-warning">
-                <Text prominent size="xs" style={{ color: 'inherit' }} >
-                  <InfoCircle />Ensure you don&#39;t change the active network away from Arbitrum One!
-                </Text>
-              </Card>
+              {
+                error && (
+                  <Card className="ropsten-warning danger">
+                    <Text prominent size="xs" style={{ color: 'inherit' }} >
+                      <InfoCircle />{error}
+                    </Text>
+                  </Card>
+                )
+              }
             </>
       }
     </div>
