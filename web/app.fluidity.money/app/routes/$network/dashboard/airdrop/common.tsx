@@ -1739,11 +1739,17 @@ const TestnetRewardsModal = () => {
               layout="after"
               handleClick={() => {
                 confirmAccountOwnership(signature, address)
+                  // .then((tx) => tx.confirmTx())
                   .then(() => {
                     setFinalised(true);
                   })
                   .catch((e) => {
-                    setError(JSON.stringify(e));
+                    const errMsgMatchReason = /message":"[a-z0-9 :_()]+/gi;
+                    const stakingError = (e as { message: string }).message
+                      .match(errMsgMatchReason)?.[1]
+                      .slice(10);
+
+                    setError(stakingError ?? "");
                     setFinalised(false);
                   })
                   .finally(() => setSignature(""));
