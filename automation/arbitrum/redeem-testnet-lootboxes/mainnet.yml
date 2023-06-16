@@ -8,4 +8,4 @@ SERVICES:
   - REDEEM_TESTNET_LOOTBOXES:
       SERVICE_NAME: microservice-redeem-testnet-lootboxes
       ENV_FLU_WORKER_ID: arbitrum-microservice-redeem-testnet-lootboxes
-      ENV_FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS: "0x6a8afee01e95311f1372b34e686200068dbca1f2"
+      ENV_FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS: "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06"
