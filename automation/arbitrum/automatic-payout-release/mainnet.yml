@@ -12,7 +12,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.usdt
 
       EVENT_ROLE: ecsEventsRole
-      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
+      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron-usdt
       EVENT_SCHEDULE: cron(30 1 * * ? *) # 1:30utc / 11am acst every day
 
   - MICROSERVICE_ETHEREUM_AUTOMATIC_PAYOUT_RELEASE_USDC:
@@ -28,7 +28,7 @@ SERVICES:
       ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.usdc
 
       EVENT_ROLE: ecsEventsRole
-      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
+      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron-usdc
       EVENT_SCHEDULE: cron(30 1 * * ? *) # 1:30utc / 11am acst every day
 
   - MICROSERVICE_ETHEREUM_AUTOMATIC_PAYOUT_RELEASE_DAI:
@@ -44,5 +44,5 @@ SERVICES:
       ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.dai
 
       EVENT_ROLE: ecsEventsRole
-      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron
+      EVENT_RULE: microservice-ethereum-automatic-payout-release-cron-dai
       EVENT_SCHEDULE: cron(30 1 * * ? *) # 1:30utc / 11am acst every day
