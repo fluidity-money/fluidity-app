@@ -137,7 +137,7 @@ export const FluidifyForm = ({
 
   const fee = swapping ? Zero : swapAmount.mul(FeeDenom).div(Thousand);
 
-  const swapAmountAfterFee = swapping ? swapAmount :  swapAmount.sub(fee);
+  const swapAmountAfterFee = swapAmount.sub(fee);
 
   return (
     <div className={"fluidify-form"}>
