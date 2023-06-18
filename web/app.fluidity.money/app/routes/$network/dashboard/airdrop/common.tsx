@@ -1276,7 +1276,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="Your accepted % for slippage."
+            tooltipContent="Slippage is currently fixed at 50%."
             className="slippage-tooltip"
           >
             <Text prominent={!isMobile} code className="helper-label">
@@ -1285,6 +1285,7 @@ const StakeNowModal = ({
           </Hoverable>
           <input
             className={"staking-modal-token-input"}
+            disabled
             pattern="[0-9]*"
             min={1}
             value={slippage}
