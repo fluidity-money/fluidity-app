@@ -23,7 +23,7 @@ interface ITokenInPermit {
     ) external returns (bytes32);
 
     /**
-     * @notice erc20InWithUnderlyingPermit, taking the arguments given and
+     * @notice erc20InUnderlyingPermit, taking the arguments given and
      *         passing them to the permit function of the underlying token,
      *         the address that's signed for as the owner should be the fasset
      * @param _owner to send the tokens to and use the permit for
@@ -36,7 +36,7 @@ interface ITokenInPermit {
      * @param _r for ECDSA sig
      * @param _s for ECDSA sig
      */
-    function erc20InWithUnderlyingPermit(
+    function erc20InUnderlyingPermit(
         address _owner,
         IToken _fAsset,
         uint256 _erc20AmountIn,

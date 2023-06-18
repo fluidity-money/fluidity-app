@@ -126,7 +126,7 @@ contract PermitRouterV1 is IEIP712, ITokenInPermit, IEmergencyMode, IOperatorOwn
     }
 
     /// @inheritdoc ITokenInPermit
-    function erc20InWithUnderlyingPermit(
+    function erc20InUnderlyingPermit(
         address _owner,
         IToken _fAsset,
         uint256 _erc20AmountIn,
@@ -145,13 +145,15 @@ contract PermitRouterV1 is IEIP712, ITokenInPermit, IEmergencyMode, IOperatorOwn
 
         underlying.permit(
             _owner, // owner
-            address(_fAsset), // spender
+            address(this), // spender
             _erc20AmountIn, // erc20 in amount
             _deadline, // deadline
             _v,
             _r,
             _s
         );
+
+        underlying.transferFrom(_owner, address(this), _erc20AmountIn);
 
         amountIn = _fAsset.erc20InTo(_owner, _erc20AmountIn);
 
