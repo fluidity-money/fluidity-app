@@ -58,6 +58,9 @@ interface IToken is IERC20 {
         uint256 _newBurnFee
     );
 
+    /// @notice emitted when an operator changes the underlying over to a new token
+    event NewUnderlyingAsset(IERC20 _old, IERC20 _new);
+
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
@@ -102,16 +105,20 @@ interface IToken is IERC20 {
      * @notice unwraps `amount` of fluid tokens back to underlying
      *
      * @param _amount the number of fluid tokens to unwrap
+     * @return amountReturned to the sender in the underlying
      */
-    function erc20Out(uint256 _amount) external;
+    function erc20Out(uint256 _amount) external returns (uint256 amountReturned);
 
    /**
      * @notice unwraps `amount` of fluid tokens with the address as recipient
      *
      * @param _recipient to receive the underlying tokens to
      * @param _amount the number of fluid tokens to unwrap
+     * @return amountReturned to the user of the underlying
      */
-    function erc20OutTo(address _recipient, uint256 _amount) external;
+    function erc20OutTo(address _recipient, uint256 _amount) external returns (
+        uint256 amountReturned
+    );
 
    /**
      * @notice burns `amount` of fluid /without/ withdrawing the underlying
@@ -158,8 +165,17 @@ interface IToken is IERC20 {
      */
     function maxUncheckedReward() external view returns (uint256);
 
-    /// @notice upgrade the underlying ILiquidityProvider to a new source
-    function upgradeLiquidityProvider(ILiquidityProvider newPool) external;
+    /**
+     * @notice upgrade the underlying ILiquidityProvider to a new source
+     * @param _newPool to shift the liquidity into
+     * @param _minTokenAfterShift to enforce for the tokens quoted after shifting the assets over
+     *
+     * @return newPoolAmount returned from the underlying pool when asked with totalPoolAmount
+     */
+    function upgradeLiquidityProvider(
+        ILiquidityProvider _newPool,
+        uint256 _minTokenAfterShift
+    ) external returns (uint256 newPoolAmount);
 
     /**
      * @notice drain the reward pool of the amount given without
@@ -170,5 +186,15 @@ interface IToken is IERC20 {
      */
     function drainRewardPool(address _recipient, uint256 _amount) external;
 
+    /**
+     * @notice setFeeDetails for any fees that may be taken on mint or burn
+     * @param _mintFee numerated so that 10 is 1% taken on minting
+     * @param _burnFee numerated so that 30 is 3% taken on burning
+     * @param _recipient to send fees earned to using a minting interaction
+     *
+     * @dev the purpose of the mint fee primarily is to facilitate the
+     *      circular liquidity provider (StupidLiquidityProvider) on
+     *      self-contained chains
+     */
     function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) external;
 }
