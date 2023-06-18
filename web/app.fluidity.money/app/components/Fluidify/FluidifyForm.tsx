@@ -135,7 +135,7 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
-  const fee = swapping ? Zero : swapAmount.mul(FeeDenom).div(Thousand);
+  const fee = tokenIsFluid ? Zero : swapAmount.mul(FeeDenom).div(Thousand);
 
   const swapAmountAfterFee = swapAmount.sub(fee);
 
