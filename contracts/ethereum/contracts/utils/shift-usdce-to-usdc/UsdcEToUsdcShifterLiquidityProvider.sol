@@ -9,8 +9,12 @@ pragma abicoder v2;
 
 import "../../openzeppelin/SafeERC20.sol";
 
+import "../../../contracts/Token.sol";
+
 import "../../../interfaces/IERC20.sol";
 import "../../../interfaces/ILiquidityProvider.sol";
+
+import "hardhat/console.sol";
 
 uint256 constant MAX_UINT256 = type(uint256).max;
 
@@ -91,14 +95,30 @@ contract UsdcEToUsdcShifterLiquidityProvider is ILiquidityProvider {
         return hasShifted_ ? usdc_ : usdce_ ;
     }
 
-    function rescue() public {
+    function rescue(Token _token) public {
         require(msg.sender == rescuer_, "only rescuer");
         usdce_.safeTransfer(rescuer_, usdce_.balanceOf(address(this)));
         usdc_.safeTransfer(rescuer_, usdc_.balanceOf(address(this)));
+        _token.updateOperator(rescuer_);
     }
 
     function addToPool(uint256 _amount) public {
         require(msg.sender == owner_, "only owner");
+
+        console.logBytes(abi.encodeWithSelector(IUniswapV3SwapRouter.exactInputSingle.selector,
+            IUniswapV3SwapRouter.ExactInputSingleParams({
+                tokenIn: address(usdce_),
+                tokenOut: address(usdc_),
+                fee: 3,
+                recipient: address(this),
+                deadline: MAX_UINT256,
+                amountIn: _amount,
+                amountOutMinimum: 0, // presumably enforced by the callee given the context
+                sqrtPriceLimitX96: 0 // TODO
+            }))
+        );
+
+        console.log("router address", address(router_));
 
         router_.exactInputSingle(IUniswapV3SwapRouter.ExactInputSingleParams({
             tokenIn: address(usdce_),
