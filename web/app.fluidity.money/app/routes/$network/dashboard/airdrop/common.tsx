@@ -674,7 +674,7 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
 
   // slippage % is the allowance of the base token
-  const [slippage, setSlippage] = useState(15);
+  const [slippage, setSlippage] = useState(50);
 
   // stakeErr is the UI response on a failed test stake
   const [stakeErr, setStakeErr] = useState("");
