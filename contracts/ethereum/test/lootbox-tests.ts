@@ -98,7 +98,7 @@ const LootboxTests = async (
 
     const wethBefore = await token2.balanceOf(stakingSignerAddress);
 
-    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking, 0, 0, 0);
 
     expect(fusdcRedeemed).to.be.gt(0);
 
@@ -224,7 +224,7 @@ const LootboxTests = async (
     const token1BeforeRedeem = await token1.balanceOf(stakingSignerAddress);
     const token2BeforeRedeem = await token2.balanceOf(stakingSignerAddress);
 
-    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking, 0, 0, 0);
 
     // test if the amount added to the account is within the range of 10%,
     // assuming some fees were paid
@@ -328,7 +328,7 @@ const LootboxTests = async (
       slippage
     );
 
-    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking, 0, 0, 0);
 
     expect(fusdcRedeemed).to.be.equal(0);
 
@@ -340,7 +340,7 @@ const LootboxTests = async (
 
     await sendEmptyTransaction(stakingSigner);
 
-    const [ fusdcRedeemed1, usdcRedeemed1, wethRedeemed1 ] = await redeem(staking);
+    const [ fusdcRedeemed1, usdcRedeemed1, wethRedeemed1 ] = await redeem(staking, 0, 0, 0);
 
     expectWithinSlippage(fusdcRedeemed1, fusdc, 10);
 
@@ -406,7 +406,7 @@ const LootboxTests = async (
 
       await sendEmptyTransaction(stakingSigner);
 
-     const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking);
+     const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking, 0, 0, 0);
 
      expectWithinSlippage(fusdcRedeemed, fusdcDepositedConfirmed, 5);
 
@@ -489,7 +489,7 @@ const LootboxTests = async (
 
       await expectDeposited(staking, fusdc.add(fusdc1), usdc, weth);
 
-      const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+      const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking, 0, 0, 0);
 
       expectWithinSlippage(fusdcRedeemed, fusdc.add(fusdc1), 10);
 
@@ -556,7 +556,7 @@ const LootboxTests = async (
 
       await sendEmptyTransaction(stakingSigner);
 
-      const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking);
+      const [ fusdcRedeemed, usdcRedeemed ] = await redeem(staking, 0, 0, 0);
 
       expectWithinSlippage(fusdcRedeemed, fusdcDeposited, 10);
 
@@ -674,7 +674,7 @@ const LootboxTests = async (
 
     await sendEmptyTransaction(stakingSigner);
 
-    await redeem(staking);
+    await redeem(staking, 0, 0, 0);
 
     const stakingFusdcAfter = await token0.balanceOf(staking.address);
     const stakingUsdcAfter = await token1.balanceOf(staking.address);
@@ -785,7 +785,7 @@ const LootboxTests = async (
 
     await sendEmptyTransaction(stakingSigner);
 
-    await redeem(staking);
+    await redeem(staking, 0, 0, 0);
 
     const stakingFusdcAfter = await token0.balanceOf(staking.address);
     const stakingUsdcAfter = await token2.balanceOf(staking.address);
@@ -793,6 +793,55 @@ const LootboxTests = async (
     const stakingAfter = stakingFusdcAfter.add(stakingUsdcAfter);
 
     expect(stakingAfter, "complete staking amount after").to.be.eq(stakingBefore);
+  });
+
+  it("should revert if the redemption is too low", async () => {
+    const {
+      stakingSigner,
+      stakingSignerAddress,
+      token0,
+      token1,
+      staking,
+      token0Decimals,
+      token1Decimals
+    } = args;
+
+    await expectDeposited(staking, 0, 0, 0);
+
+    const availableFusdc = await token0.balanceOf(stakingSignerAddress);
+    const availableUsdc = await token1.balanceOf(stakingSignerAddress);
+
+    const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
+      staking,
+      availableFusdc,
+      availableUsdc,
+      0,
+      token0Decimals,
+      token1Decimals,
+      0
+    );
+
+    await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    await advanceTime(hre, 8640004);
+
+    await sendEmptyTransaction(stakingSigner);
+
+    expect(redeem(staking, MaxUint256, 0, 0))
+      .to.be.revertedWith("fusdc redeemed too low");
+
+    expect(redeem(staking, 0, MaxUint256, 0))
+      .to.be.revertedWith("usdc redeemed too low");
+
+    expect(redeem(staking, 0, 0, MaxUint256))
+      .to.be.revertedWith("weth redeemed too low");
   });
 };
 

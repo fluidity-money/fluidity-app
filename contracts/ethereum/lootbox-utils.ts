@@ -88,11 +88,14 @@ export const deposit = async (
 
 export const redeem = async (
   contract: ethers.Contract,
+  fusdcMin: BigNumberish,
+  usdcMin: BigNumberish,
+  wethMin: BigNumberish
 ): Promise<[ BigNumber, BigNumber, BigNumber ]> => {
   const { fusdcRedeemed, usdcRedeemed, wethRedeemed } =
-    await contract.callStatic.redeem(0);
+    await contract.callStatic.redeem(0, fusdcMin, usdcMin, wethMin);
 
-  await contract.redeem(0);
+  await contract.redeem(0, fusdcMin, usdcMin, wethMin);
 
   return [ fusdcRedeemed, usdcRedeemed, wethRedeemed ];
 };

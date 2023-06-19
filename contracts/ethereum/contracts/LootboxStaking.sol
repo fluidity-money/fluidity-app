@@ -527,7 +527,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
     }
 
     /// @inheritdoc ILootboxStaking
-    function redeem(uint256 _maxTimestamp) public returns (
+    function redeem(
+        uint256 _maxTimestamp,
+        uint256 _fusdcMinimum,
+        uint256 _usdcMinimum,
+        uint256 _wethMinimum
+    ) public returns (
         uint256 fusdcRedeemed,
         uint256 usdcRedeemed,
         uint256 wethRedeemed
@@ -597,6 +602,12 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
             _deleteDeposit(msg.sender, i);
         }
+
+        require(fusdcRedeemed + 1 > _fusdcMinimum, "fusdc redeemed too low");
+
+        require(usdcRedeemed + 1 > _usdcMinimum, "usdc redeemed too low");
+
+        require(wethRedeemed + 1 > _wethMinimum, "weth redeemed too low");
 
         return (fusdcRedeemed, usdcRedeemed, wethRedeemed);
     }
