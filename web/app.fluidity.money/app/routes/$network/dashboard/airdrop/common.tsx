@@ -1291,7 +1291,7 @@ const StakeNowModal = ({
             value={slippage}
             max={50}
             onChange={(e) => {
-              {/* setSlippage(Math.floor(parseInt(e.target.value) || 0)); */ }
+              return
             }}
           />
         </div>
