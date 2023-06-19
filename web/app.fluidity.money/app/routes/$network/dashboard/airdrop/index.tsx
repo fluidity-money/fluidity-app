@@ -1,7 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
-import { RecapModal, stakingLiquidityMultiplierEq } from "./common";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -34,6 +33,9 @@ import {
   StakeNowModal,
   StakingStatsModal,
   TutorialModal,
+  RecapModal,
+  stakingLiquidityMultiplierEq,
+  TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef } from "react";
@@ -469,6 +471,14 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("testnet-rewards")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "testnet-rewards"}
+        >
+          Testnet Rewards
+        </TabButton>
       </div>
     );
   };
@@ -675,14 +685,11 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {/*{currentModal === "testnet-rewards" && (
+          {currentModal === "testnet-rewards" && (
             <>
-              <Heading as="h3" className="no-margin">
-                Claim Testnet Rewards
-              </Heading>
               <TestnetRewardsModal />
             </>
-          )}*/}
+          )}
         </motion.div>
       </>
     );
@@ -762,13 +769,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      {/*<CardModal
+      <CardModal
         id="testnet-rewards"
         visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
-      </CardModal>*/}
+      </CardModal>
 
       {/* Page Content */}
       <Header />
@@ -1344,7 +1351,6 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
   isMobile = false,
 }: IAirdropRankRow) => {
   const { address } = useContext(FluidityFacadeContext);
-  // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
   return (

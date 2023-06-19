@@ -27,10 +27,8 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
-  ArrowDown,
-  ProviderIcon,
-  Rarity,
-  numberToCommaSeparated,
+  Checkmark,
+  CopyIcon,
 } from "@fluidity-money/surfing";
 import {
   addDecimalToBn,
@@ -1662,91 +1660,98 @@ const TestnetRewardsModal = () => {
   const [address, setAddress] = useState("");
   const [ropstenAddress, setRopstenAddress] = useState("");
   const [signature, setSignature] = useState("");
-  const [manualSignature, setManualSignature] = useState("");
   const [finalised, setFinalised] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
 
   if (!confirmAccountOwnership || !signOwnerAddress) return <></>;
 
-  if (finalised) {
-    return (
-      <div>
-        <Heading>Claim Testnet Rewards</Heading>
-        <Text prominent size="md">
-          Congratulations! You have successfully confirmed your ownership of the
-          testnet address {ropstenAddress}. If this address participated in the
-          Fluidity Ropsten testnet, you will receive free loot bottles during
-          the Fluidity Airdrop!
-        </Text>
-      </div>
-    );
-  }
-
-  if (!signature || !address) {
-    return (
-      <div>
-        <Heading>Claim Testnet Rewards</Heading>
-        <Text prominent size="md">
+  return (
+    <div className="claim-ropsten">
+      {/* {
+        JSON.stringify({
+          signature,
+          error,
+          ropstenAddress,
+          signerAddress,
+          address,
+          finalised,
+          manualSignature,
+        }, null, 2)
+      } */}
+      <img src="/images/testnetBanner.png" />
+      <div className="ropsten-header">
+        <Heading as="h3">Claim Testnet Rewards</Heading>
+        <Text prominent size="sm">
           If you participated in Fluidity&#39;s Ropsten testnet, you are
-          eligible for free bottles! To begin, switch your wallet to the address
-          that you used on Ropsten. Then, enter your <strong>mainnet</strong>{" "}
-          address in the box below.{" "}
-          <strong>
-            Ensure you don&#39;t change the active network away from Arbitrum!
-          </strong>
-          . Click the button to prompt a signature from your wallet. If you have
-          already generated a signature previously, enter it in the signature
-          box, as well as the address.
+          eligible for free bottles!
         </Text>
-
-        <Heading>ADDRESS</Heading>
-        <input
-          value={address}
-          onChange={(v) => setAddress(v.target.value)}
-        ></input>
-        <GeneralButton
-          layout="after"
-          handleClick={() => {
-            setRopstenAddress(signerAddress ?? "");
-            signOwnerAddress(address).then((sig) => setSignature(sig ?? ""));
-          }}
-          type="transparent"
-        >
-          Confirm Owner Address
-        </GeneralButton>
-        <Heading>SIGNATURE</Heading>
-        <input
-          value={manualSignature}
-          onChange={(v) => setManualSignature(v.target.value)}
-        ></input>
-        <GeneralButton
-          layout="after"
-          handleClick={() => {
-            setSignature(manualSignature);
-          }}
-          type="transparent"
-        >
-          Confirm signature
-        </GeneralButton>
       </div>
-    );
-  } else {
-    return (
-      <div>
-        <Heading>Claim Testnet Rewards</Heading>
-        <Heading>SIGNATURE</Heading>
-        <input value={signature} disabled={true}></input>
-        {signerAddress?.toLowerCase() === address.toLowerCase() ? (
-          <>
-            <Text prominent size="md">
-              Click to confirm your ownership of the testnet address{" "}
+      {!signerAddress ? (
+        <>
+          <Text prominent size="sm">
+            Please connect your wallet to begin.
+          </Text>
+        </>
+      ) : finalised ? (
+        <Text prominent size="sm">
+          Congratulations! You have successfully confirmed your ownership of the
+          testnet address:
+          <GeneralButton
+            type="transparent"
+            size="small"
+            className="ropsten-address-btn"
+            disabled
+            onClick={() => {
+              return;
+            }}
+          >
+            <Text prominent size="sm" code style={{ color: "inherit " }}>
               {ropstenAddress}
+            </Text>
+          </GeneralButton>
+          <br />
+          <br />
+          If this address participated in the Fluidity Ropsten testnet, you will
+          receive free loot bottles during the Fluidity Airdrop!
+        </Text>
+      ) : signature ? (
+        signerAddress.toLowerCase() === address.toLowerCase() ? (
+          <>
+            <Text prominent size="sm">
+              You are verifying ownership of the following testnet address:{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {ropstenAddress}
+                </Text>
+              </GeneralButton>
             </Text>
             <GeneralButton
               layout="after"
               handleClick={() => {
-                confirmAccountOwnership(signature, address).then(() =>
-                  setFinalised(true)
-                );
+                confirmAccountOwnership(signature, address)
+                  // .then((tx) => tx.confirmTx())
+                  .then(() => {
+                    setFinalised(true);
+                  })
+                  .catch((e) => {
+                    const errMsgMatchReason = /message":"[a-z0-9 :_()]+/gi;
+                    const stakingError = (e as { message: string }).message
+                      .match(errMsgMatchReason)?.[1]
+                      .slice(10);
+
+                    setError(stakingError ?? "");
+                    setFinalised(false);
+                  })
+                  .finally(() => setSignature(""));
               }}
               type="transparent"
             >
@@ -1755,15 +1760,126 @@ const TestnetRewardsModal = () => {
           </>
         ) : (
           <>
-            <Text prominent size="md">
-              Change your wallet account to {address} to finalise confirmation.
-              Currently signed in as {signerAddress}
+            <Text prominent size="sm">
+              Change your wallet account to{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {address}
+                </Text>
+              </GeneralButton>{" "}
+              to finalise confirmation. Currently signed in as{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {signerAddress}
+                </Text>
+              </GeneralButton>
             </Text>
           </>
-        )}
-      </div>
-    );
-  }
+        )
+      ) : (
+        <>
+          <Text prominent size="sm" style={{ margin: "1em 0" }}>
+            <ol>
+              <li>
+                Copy your Arbitrum One address.
+                <div style={{ display: "inline-block", width: "1em" }} />
+                <GeneralButton
+                  className="ropsten-address-btn"
+                  size="small"
+                  icon={
+                    copied ? (
+                      <span className="ropsten-check">
+                        <Checkmark />
+                      </span>
+                    ) : (
+                      <CopyIcon />
+                    )
+                  }
+                  type="transparent"
+                  layout="after"
+                  handleClick={() => {
+                    navigator.clipboard.writeText(signerAddress);
+                    setCopied(true);
+                  }}
+                >
+                  <Text code size="sm" style={{ color: "inherit" }}>
+                    {signerAddress}
+                  </Text>
+                </GeneralButton>
+              </li>
+              <li>
+                Switch your wallet to the address that you used on Ropsten.{" "}
+                <br />
+                (If you are using the same address as you used on Ropsten
+                continue to Step 3)
+              </li>
+              <li>Enter your Arbitrum One address in the box below.</li>
+              <li>
+                Click the confirmation button to prompt a signature from your
+                wallet.
+              </li>
+              <Card className="ropsten-warning" border="solid">
+                <Text size="sm">
+                  <InfoCircle />
+                  Ensure you don&#39;t change the active network away from
+                  Arbitrum One!
+                </Text>
+              </Card>
+            </ol>
+          </Text>
+          <div className="claim-ropsten-form">
+            <div className="claim-ropsten-input">
+              <Text size="xs" className="helper-label">
+                ARBITRUM ONE ADDRESS
+              </Text>
+              <input
+                value={address}
+                onChange={(v) => setAddress(v.target.value)}
+              ></input>
+              <GeneralButton
+                layout="after"
+                handleClick={() => {
+                  setRopstenAddress(signerAddress ?? "");
+                  signOwnerAddress(address).then((sig) =>
+                    setSignature(sig ?? "")
+                  );
+                }}
+                type="transparent"
+              >
+                <Text style={{ color: "inherit" }} code>
+                  Confirm Owner Address
+                </Text>
+              </GeneralButton>
+            </div>
+          </div>
+          {error && (
+            <Card className="ropsten-warning danger">
+              <Text prominent size="xs" style={{ color: "inherit" }}>
+                <InfoCircle />
+                {error}
+              </Text>
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
 
 interface IRecapModal {
