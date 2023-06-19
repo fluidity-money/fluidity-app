@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: mainnet
     outputs:
-      file_exists: ${{ steps.deployment_list.outputs.exist }} 
+      file_exists: ${{ steps.deployment_list.outputs.exist }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -48,6 +48,21 @@ jobs:
           if [[ -f "./deployment_list.json" ]]; then
             echo "exist=true" >> $GITHUB_OUTPUT
           fi
+
+  no-weekend-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check for downtimes
+      uses: ka7eh/no-weekend-merge@releases/v0.1.1
+      with:
+        tz: '-9.5'
+        mon: '00:00-09:00,17:00-23:59'
+        tue: '00:00-09:00,17:00-23:59'
+        wed: '00:00-09:00,17:00-23:59'
+        thu: '00:00-09:00,17:00-23:59'
+        fri: '00:00-09:00,17:00-23:59'
+        sat: '00:00-23:59'
+        sun: '00:00-23:59'
 
   deploy-ethereum:
     if: needs.get-diff.outputs.file_exists == 'true'
@@ -85,7 +100,7 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
@@ -125,6 +140,6 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
