@@ -21,6 +21,8 @@ import {
 
 const MaxUint256 = ethers.constants.MaxUint256;
 
+const Hundred = BigNumber.from(100);
+
 const slippage = 15;
 
 const Zero = ethers.constants.Zero;
@@ -572,6 +574,73 @@ const LootboxTests = async (
     }
   );
 
+  it("should revert if the redemption is too low", async () => {
+    const {
+      stakingSigner,
+      token0,
+      token1,
+      staking,
+      token0Decimals,
+      token1Decimals
+    } = args;
+
+    await expectDeposited(staking, 0, 0, 0);
+
+    const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
+      staking,
+      await pickRandomBalance(token0, minimumDepositToken1),
+      await pickRandomBalance(token1, minimumDepositToken1),
+      0,
+      token0Decimals,
+      token1Decimals,
+      0
+    );
+
+    const [ depositedFusdc, depositedUsdc, depositedWeth ] = await deposit(
+      staking,
+      8640000,
+      depositFusdc,
+      depositUsdc,
+      0,
+      slippage
+    );
+
+    expect(depositedWeth).to.be.equal(0);
+
+    await advanceTime(hre, 8640004);
+
+    await sendEmptyTransaction(stakingSigner);
+
+    expect(redeem(staking, MaxUint256, 0, 0))
+      .to.be.revertedWith("fusdc redeemed too low");
+
+    expect(redeem(staking, 0, MaxUint256, 0))
+      .to.be.revertedWith("usdc redeemed too low");
+
+    expect(redeem(staking, 0, 0, MaxUint256))
+      .to.be.revertedWith("weth redeemed too low");
+
+    const fusdcComparison = depositedFusdc.mul(Hundred.sub(slippage)).div(Hundred);
+
+    const usdcComparison = depositedUsdc.mul(Hundred.sub(slippage)).div(Hundred);
+
+    expect(fusdcComparison).to.be.gt(0);
+
+    expect(usdcComparison).to.be.gt(0);
+
+    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(
+      staking,
+      fusdcComparison,
+      usdcComparison,
+      0
+    );
+
+    expectWithinSlippage(fusdcRedeemed, depositedFusdc, slippage);
+    expectWithinSlippage(usdcRedeemed, depositedUsdc, slippage);
+
+    expect(wethRedeemed).to.be.equal(0);
+  });
+
   it("should support taking fees from fusdc/usdc sushiswap trades", async () => {
     const {
       stakingSigner,
@@ -793,55 +862,6 @@ const LootboxTests = async (
     const stakingAfter = stakingFusdcAfter.add(stakingUsdcAfter);
 
     expect(stakingAfter, "complete staking amount after").to.be.eq(stakingBefore);
-  });
-
-  it("should revert if the redemption is too low", async () => {
-    const {
-      stakingSigner,
-      stakingSignerAddress,
-      token0,
-      token1,
-      staking,
-      token0Decimals,
-      token1Decimals
-    } = args;
-
-    await expectDeposited(staking, 0, 0, 0);
-
-    const availableFusdc = await token0.balanceOf(stakingSignerAddress);
-    const availableUsdc = await token1.balanceOf(stakingSignerAddress);
-
-    const { fusdcForUsdc: depositFusdc, usdc: depositUsdc } = await pickRatio(
-      staking,
-      availableFusdc,
-      availableUsdc,
-      0,
-      token0Decimals,
-      token1Decimals,
-      0
-    );
-
-    await deposit(
-      staking,
-      8640000,
-      depositFusdc,
-      depositUsdc,
-      0,
-      slippage
-    );
-
-    await advanceTime(hre, 8640004);
-
-    await sendEmptyTransaction(stakingSigner);
-
-    expect(redeem(staking, MaxUint256, 0, 0))
-      .to.be.revertedWith("fusdc redeemed too low");
-
-    expect(redeem(staking, 0, MaxUint256, 0))
-      .to.be.revertedWith("usdc redeemed too low");
-
-    expect(redeem(staking, 0, 0, MaxUint256))
-      .to.be.revertedWith("weth redeemed too low");
   });
 };
 
