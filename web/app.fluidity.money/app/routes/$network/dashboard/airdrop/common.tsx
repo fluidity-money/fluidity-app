@@ -1779,6 +1779,7 @@ interface IRecapModal {
     referralBottles: number;
   };
 }
+
 const RecapModal = ({
   totalVolume,
   bottlesLooted,
@@ -1862,10 +1863,7 @@ const RecapModal = ({
                   }}
                   href={link}
                 >
-                  <ProviderIcon
-                    provider={provider}
-                    style={{ height: "100%" }}
-                  />
+                  <ProviderIcon provider={provider} />
                 </a>
               );
             })}
