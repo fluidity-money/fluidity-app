@@ -1,5 +1,9 @@
 # Useful links
 
+{% embed url="https://status.fluidity.money" %}
+Status tracking
+{% endembed %}
+
 {% embed url="https://fluidity.money" %}
 Website and whitepapers
 {% endembed %}

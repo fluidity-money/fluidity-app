@@ -77,3 +77,4 @@ Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)
 | fUSDT | [https://www.coingecko.com/en/coins/fluid-usdt](https://www.coingecko.com/en/coins/fluid-usdt) |
 | fDAI  | [https://www.coingecko.com/en/coins/fluid-dai](https://www.coingecko.com/en/coins/fluid-dai)   |
 
+{% embed url="https://status.fluidity.money" %}

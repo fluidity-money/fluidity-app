@@ -62,7 +62,6 @@
 * [👐 Work with us](docs/work-with-us.md)
 * [Useful links](docs/relevant-links/README.md)
   * [Fluidity website and whitepapers](https://fluidity.money/)
-  * [Testnet faucet](https://faucet.fluidity.money)
   * [Discord server](https://discord.gg/CNvpJk4HpC)
   * [Medium](https://blog.fluidity.money/)
   * [Telegram](https://t.me/fluiditymoney)
