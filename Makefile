@@ -102,9 +102,6 @@ docker: \
 	docker-build-web \
 	docker-node
 
-docker-test: docker
-	@${DOCKER_RUN} -f Dockerfile.testing
-
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build
 
