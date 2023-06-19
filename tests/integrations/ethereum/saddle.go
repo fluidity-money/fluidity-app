@@ -42,6 +42,7 @@ const integrationTestSaddle = `
     "expected_sender": "0x737b7865f84bdc86b5c8ca718a5b7a6d905776f6",
     "expected_recipient": "0x13cc34aa8037f722405285ad2c82fe570bfa2bdc",
     "expected_fees": "0.0008",
+    "expected_volume": "2/1",
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "expected_emission": {
@@ -84,6 +85,7 @@ const integrationTestSaddle = `
     "expected_sender": "0x737b7865f84bdc86b5c8ca718a5b7a6d905776f6",
     "expected_recipient": "0x13cc34aa8037f722405285ad2c82fe570bfa2bdc",
     "expected_fees": "125012756961026789/156187500000000000000",
+    "expected_volume": "125012756961026789/62500000000000000",
     "token_decimals": 18,
     "contract_address": "0x853d955acef822db058eb8505911ed77f175b99e",
     "expected_emission": {
