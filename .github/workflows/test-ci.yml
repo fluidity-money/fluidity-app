@@ -29,8 +29,8 @@ jobs:
           pip install semgrep
       - name: Setup infrastructure
         uses: isbang/compose-action@v1.4.1
-        up-flags: "--build"
         with:
+          up-flags: "--build"
           compose-file: "./tests/infrastructure/docker-compose.yml"
       - name: make test-go
         run: |
