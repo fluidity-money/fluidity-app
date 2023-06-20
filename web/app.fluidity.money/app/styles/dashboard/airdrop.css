@@ -519,6 +519,99 @@
   fill: none;
 }
 
+.claim-ropsten {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.claim-ropsten .ropsten-header {
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5em;
+}
+.claim-ropsten .ropsten-header h3 {
+  margin: 0;
+}
+.claim-ropsten img {
+  top: 0;
+  width: 100%;
+  opacity: 0.5;
+  position: absolute;
+  z-index: -1;
+  height: 100px;
+  object-fit: cover;
+}
+.claim-ropsten ol {
+  padding-left: 1em;
+  list-style-type: decimal;
+  margin: 0;
+}
+.claim-ropsten ol li {
+  margin-bottom: 0.5em;
+}
+.claim-ropsten ol li:last-child {
+  margin-bottom: 0;
+}
+.claim-ropsten .ropsten-address-btn {
+  color: grey;
+  padding: 0.5em 1em;
+  display: inline-flex;
+  margin-top: 0.5em;
+}
+.claim-ropsten .ropsten-address-btn .ropsten-check > svg {
+  width: 10px !important;
+  height: 10px !important;
+}
+.claim-ropsten .ropsten-address-btn .ropsten-check > svg path {
+  stroke: none;
+  fill: currentColor;
+}
+.claim-ropsten .ropsten-address-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.claim-ropsten .ropsten-address-btn svg path {
+  stroke: currentColor;
+}
+.claim-ropsten .claim-ropsten-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+}
+.claim-ropsten .claim-ropsten-form .claim-ropsten-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.claim-ropsten .claim-ropsten-form .claim-ropsten-input input {
+  all: unset;
+  padding: 0.5em 1em;
+  border: 1px solid grey;
+  border-radius: 50px;
+}
+.claim-ropsten .ropsten-warning {
+  margin-top: 1em;
+  border-radius: 5px;
+  padding: 0.5em;
+}
+.claim-ropsten .ropsten-warning.danger {
+  background-color: rgba(255, 105, 105, 0.1);
+  color: #ff6969;
+  border: 1px solid #ff6969;
+  margin-top: 0.5em;
+}
+.claim-ropsten .ropsten-warning svg {
+  transform: translate(0, 2px);
+  margin-right: 0.5em;
+}
+.claim-ropsten .ropsten-warning svg path {
+  fill: currentColor;
+}
+
 .leaderboard-header-title-row {
   display: flex;
   align-items: center;

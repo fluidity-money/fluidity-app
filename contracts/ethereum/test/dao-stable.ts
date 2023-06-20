@@ -47,8 +47,6 @@ import { EMPTY_ADDRESS } from "../script-utils";
 
 const GOV_TO_LOCK = 3;
 
-const advanceTime = sendEmptyTransaction;
-
 describe("DAOStable", async () => {
   let isRunningOnMainnet: boolean;
 
@@ -278,7 +276,7 @@ describe("DAOStable", async () => {
 
       // advance time
 
-      await advanceTime(govTokenSigner1);
+      await sendEmptyTransaction(govTokenSigner1);
 
       await expect(dao.callStatic.executeProposal(proposalId))
         .to.be.revertedWith("proposal can't execute");
@@ -340,7 +338,7 @@ describe("DAOStable", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      await advanceTime(govTokenSigner1);
+      await sendEmptyTransaction(govTokenSigner1);
 
       expectEq(
         await dao.getProposalStatus(proposalId),
@@ -398,7 +396,7 @@ describe("DAOStable", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      await advanceTime(govTokenSigner1);
+      await sendEmptyTransaction(govTokenSigner1);
 
       expectEq(
         await dao.getProposalStatus(proposalId),
@@ -546,7 +544,7 @@ describe("DAOStable", async () => {
 
       await advanceTimePastProposalFinished(hre);
 
-      await advanceTime(govTokenSigner1);
+      await sendEmptyTransaction(govTokenSigner1);
 
       expectEq(
         await dao.getProposalStatus(proposalId),

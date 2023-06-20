@@ -5,6 +5,7 @@ import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
+import { TransactionResponse } from "../instructions";
 
 export type ContractToken = {
   address: string;
@@ -43,7 +44,7 @@ export const confirmAccountOwnership_ = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-) => {
+): Promise<TransactionResponse> => {
   const contract = getContract(ABI, contractAddress, signer);
   if (!contract) throw new Error("Invalid contract provided!");
 
@@ -51,10 +52,9 @@ export const confirmAccountOwnership_ = async (
   const { v, r, s } = utils.splitSignature(signature);
 
   try {
-    await contract.confirm(address, owner, v, r, s);
-    console.log("Confirmation transaction successful!");
+    return await contract.confirm(address, owner, v, r, s);
   } catch (error) {
-    console.error("Error confirming ownership:", error);
+    throw new Error(`Could not claim testnet address. ${error}`);
   }
 };
 

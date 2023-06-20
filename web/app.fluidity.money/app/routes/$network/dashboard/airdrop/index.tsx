@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
-import { stakingLiquidityMultiplierEq } from "./common";
+import { stakingLiquidityMultiplierEq, TestnetRewardsModal } from "./common";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -520,6 +520,14 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("testnet-rewards")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "testnet-rewards"}
+        >
+          Testnet Rewards
+        </TabButton>
       </div>
     );
   };
@@ -714,14 +722,11 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {/*{currentModal === "testnet-rewards" && (
+          {currentModal === "testnet-rewards" && (
             <>
-              <Heading as="h3" className="no-margin">
-                Claim Testnet Rewards
-              </Heading>
               <TestnetRewardsModal />
             </>
-          )}*/}
+          )}
         </motion.div>
       </>
     );
@@ -804,13 +809,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      {/*<CardModal
+      <CardModal
         id="testnet-rewards"
         visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
-      </CardModal>*/}
+      </CardModal>
 
       {/* Page Content */}
       <Header />

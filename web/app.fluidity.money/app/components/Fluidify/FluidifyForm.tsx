@@ -18,6 +18,12 @@ interface IFluidifyFormProps {
   swapping: boolean;
 }
 
+const FeeDenom = new BN(5, 32);
+
+const Zero = new BN(0);
+
+const Thousand = new BN(1000);
+
 export const FluidifyForm = ({
   handleSwap,
   assetToken,
@@ -129,10 +135,9 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
-  //const fee = swapAmount.mul(FeeDenom).div(Hundred);
-  const fee = new BN(0, 32);
+  const fee = !tokenIsFluid ? Zero : swapAmount.mul(FeeDenom).div(Thousand);
 
-  const swapAmountAfterFee = tokenIsFluid ? swapAmount.sub(fee) : swapAmount;
+  const swapAmountAfterFee = swapAmount.sub(fee);
 
   return (
     <div className={"fluidify-form"}>
