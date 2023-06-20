@@ -602,4 +602,44 @@
   color: #f7c8e7;
 }
 
+.recap-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4em;
+}
+
+.recap-heading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  text-align: center;
+}
+
+.recap-stats {
+  display: grid;
+  grid-template-columns: 5fr 5fr;
+  gap: 4em;
+}
+
+.recap-bottle-distribution-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10em;
+}
+
+.bottle-container {
+  gap: 1em;
+  height: 200px;
+  width: 400px;
+  border-radius: 12px;
+}
+
+.recap-connect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  justify-content: space-between;
+}
+
 /*# sourceMappingURL=airdrop.css.map */

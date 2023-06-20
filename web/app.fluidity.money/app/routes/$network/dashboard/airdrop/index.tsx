@@ -779,7 +779,7 @@ const Airdrop = () => {
 
       {/* Page Content */}
       <Header />
-      {currentModal === "recap" && (
+      {currentModal === "recap" ? (
         <RecapModal
           totalVolume={0}
           bottlesLooted={0}
@@ -793,8 +793,7 @@ const Airdrop = () => {
             referralBottles: 0,
           }}
         />
-      )}
-      {currentModal === null && (
+      ) : (
         <>
           <div className="pad-main">
             <div

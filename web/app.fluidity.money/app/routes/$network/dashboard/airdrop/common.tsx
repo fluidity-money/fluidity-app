@@ -1,4 +1,5 @@
-import type { Provider } from "@fluidity-money/surfing";
+import { CardCarousel, Provider } from "@fluidity-money/surfing";
+
 import type {
   StakingRatioRes,
   StakingDepositsRes,
@@ -21,14 +22,18 @@ import {
   TokenIcon,
   toSignificantDecimals,
   ArrowLeft,
+  ProviderIcon,
   Heading,
   Video,
+  Rarity,
   Hoverable,
   Form,
   numberToMonetaryString,
   SliderButton,
   Checkmark,
   CopyIcon,
+  numberToCommaSeparated,
+  ArrowDown,
 } from "@fluidity-money/surfing";
 import {
   addDecimalToBn,
@@ -1926,22 +1931,28 @@ const RecapModal = ({
   };
 
   return (
-    <>
+    <div className={"recap-container"}>
       {/* Recap Heading */}
-      <div className={"recap-heading-container"}>
-        <Display as="h1">
-          {numberToCommaSeparated(bottlesLooted)}+ bottles were distributed in
-          this epoch!
+      <div className={"recap-heading-container pad-main"}>
+        <Display as="h3" color="gray">
+          <Text size="xl" holo>
+            <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
+          </Text>{" "}
+          bottles were distributed in this epoch!
         </Display>
         <Text>
-          <strong>
-            Congratulations for completing Fluidity's First Airdrop Wave!
-          </strong>{" "}
+          <Text prominent>
+            <strong>
+              Congratulations for completing Fluidity's First Airdrop Wave!
+            </strong>
+          </Text>{" "}
           All of these loot bottles you have earned are safely secured in your
           personal airdrop crate, and is now En Route to you to TGE land. You
           will get notified for when it is time to crack open the crate!
         </Text>
-        <GeneralButton>Learn more about the timeline</GeneralButton>
+        <GeneralButton type="transparent">
+          Learn more about the timeline
+        </GeneralButton>
       </div>
       <img src="" />
       <div>
@@ -1951,12 +1962,15 @@ const RecapModal = ({
 
       {/* Global Stats */}
       {/* Providers / Total Volume */}
-      <div className={"recap-stats"}>
+      <div className={"recap-stats pad-main"}>
         <div className={"recap-left"}>
-          <Heading>
+          <Text size="lg">
             Fluidity's first Airdrop Epoch has come to an end. Here are some{" "}
-            <strong>Global Stats</strong> for the epoch.
-          </Heading>
+            <Text prominent>
+              <strong>Global Stats</strong>
+            </Text>{" "}
+            for the epoch.
+          </Text>
 
           {/* Providers */}
           <motion.div
@@ -1964,25 +1978,36 @@ const RecapModal = ({
             animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
             exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
             className="multiplier-tasks-tasks"
+            style={{ justifySelf: "end" }}
           >
-            {providerLinks.map(({ provider, link }, i) => {
-              return (
-                <a
-                  key={`airdrop-mx-provider-` + i}
-                  style={{
-                    cursor: "pointer",
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "32px",
-                    backgroundColor: "black",
-                    padding: "6px",
-                  }}
-                  href={link}
-                >
-                  <ProviderIcon provider={provider} />
-                </a>
-              );
-            })}
+            <Text>PARTICIPATING PROTOCOLS THIS EPOCH</Text>
+            <div>
+              {providerLinks.map(({ provider, link }, i) => {
+                return (
+                  <a
+                    key={`airdrop-mx-provider-` + i}
+                    style={{
+                      cursor: "pointer",
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "32px",
+                      backgroundColor: "black",
+                      padding: "6px",
+                      border: "1px solid white",
+                    }}
+                    href={link}
+                  >
+                    <ProviderIcon
+                      provider={provider}
+                      style={{ width: "inherit", height: "inherit" }}
+                    />
+                  </a>
+                );
+              })}
+              <Text prominent>
+                <strong>+</strong>
+              </Text>
+            </div>
           </motion.div>
         </div>
         <div className={"recap-right"}>
@@ -2000,10 +2025,14 @@ const RecapModal = ({
       </div>
 
       {/* Bottles Looted */}
-      <div className={"recap-stats"}>
+      <div className={"recap-stats pad-main"} style={{ alignItems: "end" }}>
         <div className={"recap-left"}>
           <Text>TOTAL BOTTLES LOOTED</Text>
-          <Display>{numberToCommaSeparated(bottlesLooted)}+</Display>
+          <Display as="h1" style={{ margin: "0" }}>
+            <Text holo size="lg">
+              <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
+            </Text>
+          </Display>
         </div>
         <div className={"recap-right"}>
           <Text>
@@ -2016,21 +2045,23 @@ const RecapModal = ({
 
       {/*Bottle Distribution*/}
       <div className={"recap-bottle-distribution-container"}>
-        {Object.entries(bottles).map(([tier, amount]) => (
-          <div
-            className={"bottle-container"}
-            style={{
-              border: `1px solid ${bottleRarityColours[tier as Rarity]}`,
-            }}
-          >
-            {numberToCommaSeparated(amount)}+
-          </div>
-        ))}
+        <CardCarousel>
+          {Object.entries(bottles).map(([tier, amount]) => (
+            <div
+              className={"bottle-container"}
+              style={{
+                border: `1px solid ${bottleRarityColours[tier as Rarity]}`,
+              }}
+            >
+              {numberToCommaSeparated(amount)}+
+            </div>
+          ))}
+        </CardCarousel>
       </div>
 
       {/* User Recap */}
-      {userRecap ? (
-        <>
+      {!userRecap ? (
+        <div className={"recap-user-stats-container"}>
           <Heading>Personal Airdrop Recap Stats:</Heading>
           <div className={"recap-user-stats"}>
             <div>
@@ -2062,20 +2093,29 @@ const RecapModal = ({
               </div>
             </div>
           </div>
-        </>
+        </div>
       ) : (
-        <div className={"recap-connect"}>
-          <div>
-            <Text>Curious to see how you personally did this epoch?</Text>
-            <Text>
-              <LinkButton>CONNECT YOUR WALLET</LinkButton> to see your Airdrop
-              Wave Recap!
+        <div className={"recap-connect pad-main"}>
+          <Text>
+            Curious to see how you personally did this epoch?
+            <br />
+            <Text style={{ display: "flex", flexDirection: "row" }}>
+              <u>
+                <LinkButton handleClick={() => { }} type="external" size="small">
+                  CONNECT YOUR WALLET
+                </LinkButton>
+              </u>{" "}
+              to see your Airdrop Wave Recap!
             </Text>
-          </div>
-          <GeneralButton>Connect Wallet</GeneralButton>
+          </Text>
+          <GeneralButton>
+            <Text code style={{ color: "black" }}>
+              Connect Wallet
+            </Text>
+          </GeneralButton>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
