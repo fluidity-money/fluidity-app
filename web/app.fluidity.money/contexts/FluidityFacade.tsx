@@ -48,11 +48,11 @@ export interface IFluidityFacade {
 
   getStakingDeposits?: (address: string) => Promise<
     | Array<{
-        fluidAmount: BN;
-        baseAmount: BN;
-        durationDays: number;
-        depositDate: Date;
-      }>
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
     | undefined
   >;
 
@@ -74,7 +74,11 @@ export interface IFluidityFacade {
     maxTimestamp: BN
   ) => Promise<TransactionResponse | undefined>;
 
-  redeemTokens?: () => Promise<TransactionResponse | undefined>;
+  redeemTokens?: (
+    fusdcAmt: BN,
+    usdcAmt: BN,
+    wethAmt: BN
+  ) => Promise<TransactionResponse | undefined>;
 
   redeemableTokens?: (
     address: string

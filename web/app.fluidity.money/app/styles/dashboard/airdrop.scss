@@ -626,9 +626,17 @@ $holo: linear-gradient(
 
     .redeemable-token {
       display: flex;
-      width: 150px;
-      align-items: baseline;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      width: 12em;
+      align-items: center;
       gap: 0.5em;
+
+      span {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
     }
   }
 

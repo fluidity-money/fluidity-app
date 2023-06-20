@@ -570,7 +570,6 @@ export const getRedeemableTokens = async (
     return await stakingContract.redeemable(address);
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
-    return undefined;
   }
 };
 
@@ -578,7 +577,10 @@ export const makeStakingRedemption = async (
   signer: Signer,
   stakingAbi: ContractInterface,
   stakingAddr: string,
-  timestamp: BN
+  timestamp: BN,
+  fusdcMinimum: BN,
+  usdcMinimum: BN,
+  wethMinimum: BN
 ) => {
   try {
     const stakingContract = getContract(stakingAbi, stakingAddr, signer);
@@ -589,10 +591,14 @@ export const makeStakingRedemption = async (
       );
 
     // call redeem
-    return await stakingContract.callStatic.redeem(timestamp.toString());
+    return await stakingContract.redeem(
+      timestamp.toString(),
+      fusdcMinimum.toString(),
+      usdcMinimum.toString(),
+      wethMinimum.toString()
+    );
   } catch (error) {
-    await handleContractErrors(error as ErrorType, signer.provider);
-    return undefined;
+    return await handleContractErrors(error as ErrorType, signer.provider);
   }
 };
 
@@ -626,6 +632,7 @@ export const getWethUsdPrice = async (
     return wethUsdValue.div(decimalsBn).toNumber() / 100;
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
+
     return 0;
   }
 };

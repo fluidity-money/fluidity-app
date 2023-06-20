@@ -273,9 +273,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
       : undefined;
   };
 
@@ -363,11 +363,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-        fluidAmount: BN;
-        baseAmount: BN;
-        durationDays: number;
-        depositDate: Date;
-      }>
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -514,14 +514,14 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-          txHash: stakingDepositRes.hash,
-        }
+        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+        txHash: stakingDepositRes.hash,
+      }
       : undefined;
   };
 
   /*
-   * getRedeemableTokens gets amount of staked tokens after lockup period
+   * redeemableTokens gets amount of staked tokens after lockup period
    */
   const redeemableTokens = async (address: string) => {
     const signer = provider?.getSigner();
@@ -532,13 +532,32 @@ const EthereumFacade = ({
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    return getRedeemableTokens(signer, StakingAbi, stakingAddr, address);
+    const res = await getRedeemableTokens(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      address
+    );
+
+    if (!res) return undefined;
+
+    const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = res;
+
+    return {
+      fusdcRedeemable: new BN(fusdcRedeemable.toString()),
+      usdcRedeemable: new BN(usdcRedeemable.toString()),
+      wethRedeemable: new BN(wethRedeemable.toString()),
+    };
   };
 
   /*
    * redeemTokens redeems all staked tokens after lockup period
    */
-  const redeemTokens = async (): Promise<TransactionResponse | undefined> => {
+  const redeemTokens = async (
+    fusdcAmt: BN,
+    usdcAmt: BN,
+    wethAmt: BN
+  ): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -549,18 +568,23 @@ const EthereumFacade = ({
 
     const now = new BN(Math.floor(Date.now() / 1000));
 
+    const ninetyPercent = (amount: BN) => amount.mul(new BN(9)).div(new BN(10));
+
     const stakingRedeemRes = await makeStakingRedemption(
       signer,
       StakingAbi,
       stakingAddr,
-      now
+      now,
+      ninetyPercent(fusdcAmt),
+      ninetyPercent(usdcAmt),
+      ninetyPercent(wethAmt)
     );
 
     return stakingRedeemRes
       ? {
-          confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
-          txHash: stakingRedeemRes.hash,
-        }
+        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+        txHash: stakingRedeemRes.hash,
+      }
       : undefined;
   };
 
