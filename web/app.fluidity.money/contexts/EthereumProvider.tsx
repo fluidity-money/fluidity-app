@@ -23,12 +23,13 @@ import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
-  manualRewardToken,
   getUserDegenScore,
   getUserStakingDeposits,
   getTokenStakingRatio,
   makeStakingDeposit,
   testMakeStakingDeposit,
+  makeStakingRedemption,
+  getRedeemableTokens,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -272,49 +273,26 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
       : undefined;
   };
 
+  /**
+   *
+   * @deprecated manual reward no longer supported
+   */
   const manualReward = async (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fluidTokenAddrs: string[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userAddr: string
   ): Promise<
     | ({ amount: number; gasFee: number; networkFee: number } | undefined)[]
     | undefined
   > => {
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return;
-    }
-
-    return Promise.all(
-      fluidTokenAddrs
-        .map((addr) => tokens.find((t) => t.address === addr))
-        .filter((t) => !!t && !!t.isFluidOf)
-        .map(async (token) => {
-          const baseToken = tokens.find((t) => t.address === token?.isFluidOf);
-
-          if (!baseToken) return;
-
-          const contract: ContractToken = {
-            address: token?.address ?? "",
-            ABI: tokenAbi,
-            symbol: token?.symbol ?? "",
-            isFluidOf: !!token?.isFluidOf,
-          };
-
-          return await manualRewardToken(
-            contract,
-            baseToken.symbol,
-            userAddr,
-            signer
-          );
-        })
-    );
+    return undefined;
   };
 
   /**
@@ -385,11 +363,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-        fluidAmount: BN;
-        baseAmount: BN;
-        durationDays: number;
-        depositDate: Date;
-      }>
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -536,9 +514,73 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-          txHash: stakingDepositRes.hash,
-        }
+        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+        txHash: stakingDepositRes.hash,
+      }
+      : undefined;
+  };
+
+  /*
+   * redeemableTokens gets amount of staked tokens after lockup period
+   */
+  const redeemableTokens = async (address: string) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    const res = await getRedeemableTokens(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      address
+    );
+
+    if (!res) return undefined;
+
+    const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = res;
+
+    return {
+      fusdcRedeemable: new BN(fusdcRedeemable.toString()),
+      usdcRedeemable: new BN(usdcRedeemable.toString()),
+      wethRedeemable: new BN(wethRedeemable.toString()),
+    };
+  };
+
+  /*
+   * redeemTokens redeems all staked tokens after lockup period
+   */
+  const redeemTokens = async (): Promise<TransactionResponse | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    const now = new BN(Math.floor(Date.now() / 1000));
+
+    const minimumTokenAmt = new BN(0);
+
+    const stakingRedeemRes = await makeStakingRedemption(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      now,
+      minimumTokenAmt,
+      minimumTokenAmt,
+      minimumTokenAmt
+    );
+
+    return stakingRedeemRes
+      ? {
+        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+        txHash: stakingRedeemRes.hash,
+      }
       : undefined;
   };
 
@@ -602,6 +644,8 @@ const EthereumFacade = ({
         signBuffer,
         getStakingDeposits,
         stakeTokens,
+        redeemableTokens,
+        redeemTokens,
         testStakeTokens,
         getStakingRatios,
         signOwnerAddress,
