@@ -641,7 +641,7 @@ const LootboxTests = async (
     expect(wethRedeemed).to.be.equal(0);
   });
 
-  it("should support taking fees from fusdc/usdc sushiswap trades", async () => {
+  it("should not take fees from fusdc/usdc sushiswap trades", async () => {
     const {
       stakingSigner,
       stakingSignerAddress,
@@ -753,7 +753,7 @@ const LootboxTests = async (
     expect(stakingAfter, "complete staking amount after").to.be.eq(stakingBefore);
   });
 
-  it("should support taking fees from fusdc/weth sushiswap trades", async () => {
+  it("should not take fees from fusdc/weth sushiswap trades", async () => {
     const {
       stakingSigner,
       stakingSignerAddress,

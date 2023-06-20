@@ -243,11 +243,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         );
     }
 
-    function _reduceBySlippage(
+    function _takeSlippage(
         uint256 _x,
         uint256 _slippage
     ) internal pure returns (uint256) {
-        return _x - ((_x * _slippage) / 100);
+        return ((_x * _slippage) / 100);
     }
 
     function _hasEnoughWethLiquidity(
@@ -263,7 +263,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
         ISushiswapPool _sushiswapPool,
         uint256 _tokenAAmount,
         uint256 _tokenBAmount,
-        uint256 _slippage,
         uint256 _timestamp
     ) internal returns (Deposit memory dep) {
         (
@@ -273,9 +272,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             uint256 camelotTokenB,
             uint256 sushiTokenB
         ) = _calculateWeights(_tokenAAmount, _tokenBAmount);
-
-        uint256 camelotTokenAMin = _reduceBySlippage(camelotTokenA, _slippage);
-        uint256 camelotTokenBMin = _reduceBySlippage(camelotTokenB, _slippage);
 
         // deposit on camelot
 
@@ -289,8 +285,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             address(_tokenB),
             camelotTokenA,
             camelotTokenB,
-            camelotTokenAMin,
-            camelotTokenBMin,
+            0,
+            0,
             _timestamp
         );
 
@@ -351,7 +347,6 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             _fusdcUsdcPair ? sushiswapFusdcUsdcPool_ : sushiswapFusdcWethPool_,
             _fusdcAmount,
             _tokenBAmount,
-            _slippage,
             _timestamp
         );
 
@@ -374,13 +369,24 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         deposits_[_sender].push(dep);
 
+        uint256 tokenAMin = _takeSlippage(_fusdcAmount, _slippage);
+        uint256 tokenBMin = _takeSlippage(_tokenBAmount, _slippage);
+
+        uint256 tokenARemaining = tokenAAfter - tokenABefore;
+
+        uint256 tokenBRemaining = tokenBAfter - tokenBBefore;
+
+        // revert if the minimum was not consumed
+
+        require(tokenAMin + 1 > tokenARemaining, "fusdc minimum not consumed");
+
+        require(tokenBMin + 1 > tokenBRemaining, "token b minimum not consumed");
+
         // refund the user any amounts not used
 
-        if (tokenAAfter > tokenABefore)
-            fusdc_.transfer(_sender, tokenAAfter - tokenABefore);
+        if (tokenAAfter > tokenABefore) fusdc_.transfer(_sender, tokenARemaining);
 
-        if (tokenBAfter > tokenBBefore)
-            _tokenB.transfer(_sender, tokenBAfter - tokenBBefore);
+        if (tokenBAfter > tokenBBefore) _tokenB.transfer(_sender, tokenBRemaining);
 
         // return the amount that we deposited
 
