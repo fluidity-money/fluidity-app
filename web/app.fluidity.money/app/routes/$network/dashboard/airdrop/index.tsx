@@ -55,6 +55,7 @@ import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
+import { SplitContext } from "contexts/SplitProvider";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: may 22nd, 2023
@@ -193,6 +194,8 @@ const Airdrop = () => {
     redeemableTokens: getRedeemableTokens,
     redeemTokens,
   } = useContext(FluidityFacadeContext);
+
+  const { showExperiment } = useContext(SplitContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
@@ -374,6 +377,7 @@ const Airdrop = () => {
   // will throw error on revert
   const handleRedeemTokens = async () => {
     if (!address) return;
+    if (!showExperiment("enable-withdraw-stakes")) return;
 
     const res = await (await redeemTokens?.())?.confirmTx();
 

@@ -39,6 +39,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
+import { SplitContext } from "contexts/SplitProvider";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -410,6 +411,7 @@ const StakingStatsModal = ({
   redeemableTokens,
   handleRedeemTokens,
 }: IStakingStatsModal) => {
+  const { showExperiment } = useContext(SplitContext);
   const [redeeming, setRedeeming] = useState(false);
 
   const augmentedStakes = stakes.map((stake) => {
@@ -445,9 +447,11 @@ const StakingStatsModal = ({
     };
   });
 
-  const canWithdraw = augmentedStakes.some(({ stake, stakedDays }) => {
-    return stake.durationDays - stakedDays <= 0;
-  });
+  const canWithdraw =
+    showExperiment("enable-withdraw-stakes") &&
+    augmentedStakes.some(({ stake, stakedDays }) => {
+      return stake.durationDays - stakedDays <= 0;
+    });
 
   const sumLiquidityMultiplier = augmentedStakes.reduce(
     (sum, { multiplier, fluidUsd, baseUsd }) => {
