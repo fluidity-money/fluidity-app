@@ -276,36 +276,67 @@ describe("LootboxStaking deployed infra", async () => {
 
     expect(fusdcDeposited, addr).to.be.gt(0);
 
-    const fusdcUsdcSum = fusdcDeposited.add(usdcDeposited);
+    const { fusdcUsdcRatio, fusdcWethRatio } = await staking.ratios();
 
-    const { fusdcUsdcRatio } = await staking.ratios();
+    const fees = 100 - 5;
 
-    const [ fusdcRedeemable, usdcRedeemable ] = allocateRatio(
-      fusdcDeposited.mul(95).div(100),
-      usdcDeposited.mul(95).div(100),
+    const [ fusdcRedeemableForUsdc, usdcRedeemable ] = allocateRatio(
+      fusdcDeposited.mul(fees).div(100),
+      usdcDeposited.mul(fees).div(100),
       fusdcUsdcRatio
     );
 
-    console.log(`fusdc redeemable ${fusdcRedeemable}, usdc redeemable: ${usdcRedeemable}`);
+    const [ fusdcRedeemableForWeth, wethRedeemable ] = allocateRatio(
+      fusdcDeposited.mul(fees).div(100),
+      wethDeposited.mul(fees).div(100).mul(BigNumber.from(10).pow(12)),
+      fusdcWethRatio
+    );
 
     const { fusdcRedeemed, usdcRedeemed, wethRedeemed } =
       await staking.connect(signer).callStatic.redeem(
         0,
-        fusdcRedeemable,
+        fusdcRedeemableForUsdc,
         usdcRedeemable,
-        0
+        wethRedeemable
       );
+
+     // for weth, the number fusdc would be way higher, though it's
+     // difficult to test so hopefully this will suffice
 
     await staking.connect(signer).redeem(
       0,
-      fusdcRedeemable,
+      fusdcRedeemableForUsdc,
       usdcRedeemable,
-      0
+      wethRedeemable
     );
 
-    console.log(`fusdc redeemable ${fusdcRedeemable}, redeemed ${fusdcRedeemed} for addr ${addr}`);
+    expect(fusdcRedeemed, `fusdc redeemed > 0, for addr ${addr}`).to.be.gt(0);
 
-    expect(fusdcRedeemed, `fusdc redeemable ${fusdcRedeemable}, redeemed for addr ${addr}`).to.be.gte(fusdcRedeemable);
+    if (usdcDeposited.gt(0))
+      expect(usdcRedeemed, `usdc redeemed > 0, for addr ${addr}`).to.be.gt(0);
+
+    if (wethDeposited.gt(0))
+      expect(wethRedeemed, `weth redeemed > 0, for addr ${addr}`).to.be.gt(0);
+
+    expect(
+      fusdcRedeemed, `fusdc redeemable ${fusdcRedeemableForUsdc}, redeemed for addr ${addr}`
+    )
+      .to.be.gte(fusdcRedeemableForUsdc);
+
+    expect(
+      fusdcRedeemed, `fusdc redeemable ${fusdcRedeemableForWeth}, redeemed for addr ${addr}`
+    )
+      .to.be.gte(fusdcRedeemableForWeth);
+
+    expect(
+      usdcRedeemed, `usdc redeemable ${usdcRedeemable}, redeemed for addr ${addr}`
+    )
+      .to.be.gte(usdcRedeemable);
+
+    expect(
+      wethRedeemed, `weth redeemable ${wethRedeemable}, redeemed for addr ${addr}`
+    )
+      .to.be.eq(wethRedeemable.div(BigNumber.from(10).pow(12)));
   };
 
   LootboxTests(
