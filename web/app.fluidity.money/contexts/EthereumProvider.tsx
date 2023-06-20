@@ -568,6 +568,7 @@ const EthereumFacade = ({
 
     const now = new BN(Math.floor(Date.now() / 1000));
 
+    // use 97% of redeemable tokens as minimum redeem value
     const ninetySevenPercent = (amount: BN) =>
       amount.mul(new BN(97)).div(new BN(100));
 
