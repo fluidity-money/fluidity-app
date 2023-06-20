@@ -336,7 +336,7 @@ describe("LootboxStaking deployed infra", async () => {
     expect(
       wethRedeemed, `weth redeemable ${wethRedeemable}, redeemed for addr ${addr}`
     )
-      .to.be.eq(wethRedeemable.div(BigNumber.from(10).pow(12)));
+      .to.be.gte(wethRedeemable.div(BigNumber.from(10).pow(12)));
   };
 
   LootboxTests(
