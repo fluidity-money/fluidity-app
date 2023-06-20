@@ -23,7 +23,7 @@ const MaxUint256 = ethers.constants.MaxUint256;
 
 const Hundred = BigNumber.from(100);
 
-const slippage = 15;
+const slippage = 50;
 
 const Zero = ethers.constants.Zero;
 
@@ -64,10 +64,7 @@ const LootboxTests = async (
       token2Decimals
     } = args;
 
-    const {
-      fusdcForUsdc: fusdcDeposit,
-      usdc: usdcDeposit
-    } = await pickRatio(
+    const { fusdcForUsdc: fusdcDeposit, usdc: usdcDeposit } = await pickRatio(
       staking,
       2000000,
       2000000,
@@ -83,7 +80,7 @@ const LootboxTests = async (
       fusdcDeposit,
       usdcDeposit,
       0,
-      slippage
+      50
     );
 
     expectWithinSlippage(fusdcDeposit, fusdc, slippage);
@@ -131,7 +128,6 @@ const LootboxTests = async (
     expectWithinSlippage(usdcRedeemed, usdc, slippage);
 
     expectWithinSlippage(wethRedeemed, weth, slippage);
-
   });
 
   it("should lock up two amounts then redeem them", async() => {
@@ -639,6 +635,22 @@ const LootboxTests = async (
     expectWithinSlippage(usdcRedeemed, depositedUsdc, slippage);
 
     expect(wethRedeemed).to.be.equal(0);
+  });
+
+  it("should break if the user provides slippage that doesn't work in practice", async () => {
+    const { token0, token1, staking } = args;
+
+    const availableFusdc = await pickRandomBalance(token0, minimumDepositToken1);
+    const availableUsdc = await pickRandomBalance(token1, minimumDepositToken1);
+
+    expect(deposit(
+      staking,
+      8640000,
+      availableUsdc,
+      availableFusdc,
+      0,
+      1
+    )).to.be.revertedWith("token b minimum not consumed");
   });
 
   it("should not take fees from fusdc/usdc sushiswap trades", async () => {

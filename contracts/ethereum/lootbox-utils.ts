@@ -193,19 +193,19 @@ export const pickRandomBalance = async (
     .add(minAmount);
 };
 
-const allocateRatio = (
+export const allocateRatio = (
   num1: BigNumber,
   num2: BigNumber,
   perc1: BigNumber
 ): [BigNumber, BigNumber] => {
   if (num1.eq(Zero) || num2.eq(Zero)) return [Zero, Zero];
-  const oneE18 = BigNumber.from(10).pow(18);
+  const oneE40 = BigNumber.from(10).pow(40);
   const perc2 = BigNumber.from(10).pow(12).sub(perc1);
-  const [comp1, comp2] = [num1.mul(oneE18).div(perc1), num2.mul(oneE18).div(perc2)];
+  const [comp1, comp2] = [num1.mul(oneE40).div(perc1), num2.mul(oneE40).div(perc2)];
   const x = comp1.gt(comp2) ? comp2 : comp1;
   const a = perc1.mul(x);
   const b = perc2.mul(x);
-  return [a.div(oneE18), b.div(oneE18)];
+  return [a.div(oneE40), b.div(oneE40)];
 };
 
 export const pickRatio = async (
