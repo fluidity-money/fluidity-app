@@ -2030,9 +2030,20 @@ const RecapModal = ({
           </motion.div>
         </div>
         <div className={"recap-right"}>
-          <div>
-            <Text>TOTAL VOLUME</Text>
-            <Display>
+          <div
+            style={{
+              position: "relative",
+              textAlign: "center",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "end",
+              flexDirection: "column",
+              padding: "4em",
+            }}
+            className="volume-border"
+          >
+            <Text style={{ marginRight: "3em" }}>TOTAL VOLUME</Text>
+            <Display style={{ margin: "0" }}>
               {shorthandAmountFormatter(totalVolume.toString(), 0)}+
             </Display>
             <Text>
