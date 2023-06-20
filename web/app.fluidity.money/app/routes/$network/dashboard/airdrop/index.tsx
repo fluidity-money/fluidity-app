@@ -375,15 +375,7 @@ const Airdrop = () => {
   const handleRedeemTokens = async () => {
     if (!address) return;
 
-    const [fusdcAmt, usdcAmt, wethAmt] = ["fUSDC", "USDC", "wETH"].map(
-      (id) =>
-        redeemableTokens.find(({ tokenId }) => tokenId === id)?.amount ??
-        new BN(0)
-    );
-
-    const res = await (
-      await redeemTokens?.(fusdcAmt, usdcAmt, wethAmt)
-    )?.confirmTx();
+    const res = await (await redeemTokens?.())?.confirmTx();
 
     fetchUserTokenBalance();
     fetchUserStakes(address);

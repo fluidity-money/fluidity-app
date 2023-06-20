@@ -74,11 +74,7 @@ export interface IFluidityFacade {
     maxTimestamp: BN
   ) => Promise<TransactionResponse | undefined>;
 
-  redeemTokens?: (
-    fusdcAmt: BN,
-    usdcAmt: BN,
-    wethAmt: BN
-  ) => Promise<TransactionResponse | undefined>;
+  redeemTokens?: () => Promise<TransactionResponse | undefined>;
 
   redeemableTokens?: (
     address: string

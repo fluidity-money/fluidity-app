@@ -553,11 +553,7 @@ const EthereumFacade = ({
   /*
    * redeemTokens redeems all staked tokens after lockup period
    */
-  const redeemTokens = async (
-    fusdcAmt: BN,
-    usdcAmt: BN,
-    wethAmt: BN
-  ): Promise<TransactionResponse | undefined> => {
+  const redeemTokens = async (): Promise<TransactionResponse | undefined> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -568,18 +564,16 @@ const EthereumFacade = ({
 
     const now = new BN(Math.floor(Date.now() / 1000));
 
-    // use 97% of redeemable tokens as minimum redeem value
-    const ninetySevenPercent = (amount: BN) =>
-      amount.mul(new BN(97)).div(new BN(100));
+    const minimumTokenAmt = new BN(0);
 
     const stakingRedeemRes = await makeStakingRedemption(
       signer,
       StakingAbi,
       stakingAddr,
       now,
-      ninetySevenPercent(fusdcAmt),
-      ninetySevenPercent(usdcAmt),
-      ninetySevenPercent(wethAmt)
+      minimumTokenAmt,
+      minimumTokenAmt,
+      minimumTokenAmt
     );
 
     return stakingRedeemRes
