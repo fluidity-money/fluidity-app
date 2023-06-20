@@ -568,16 +568,17 @@ const EthereumFacade = ({
 
     const now = new BN(Math.floor(Date.now() / 1000));
 
-    const ninetyPercent = (amount: BN) => amount.mul(new BN(9)).div(new BN(10));
+    const ninetySevenPercent = (amount: BN) =>
+      amount.mul(new BN(97)).div(new BN(100));
 
     const stakingRedeemRes = await makeStakingRedemption(
       signer,
       StakingAbi,
       stakingAddr,
       now,
-      ninetyPercent(fusdcAmt),
-      ninetyPercent(usdcAmt),
-      ninetyPercent(wethAmt)
+      ninetySevenPercent(fusdcAmt),
+      ninetySevenPercent(usdcAmt),
+      ninetySevenPercent(wethAmt)
     );
 
     return stakingRedeemRes
