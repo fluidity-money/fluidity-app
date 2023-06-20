@@ -1,21 +1,25 @@
 
 import * as ethers from "ethers";
 
+import { BigNumber } from "ethers";
+
+import type { BigNumberish } from "ethers";
+
 import { assert } from "chai";
 
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { EMPTY_ADDRESS } from "../script-utils";
 
-export const expectEq = (a: ethers.BigNumberish, b: ethers.BigNumberish) => {
-    const aBN = ethers.BigNumber.from(a);
-    const bBN = ethers.BigNumber.from(b);
+export const expectEq = (a: BigNumberish, b: BigNumberish) => {
+    const aBN = BigNumber.from(a);
+    const bBN = BigNumber.from(b);
     assert(aBN.eq(bBN), `${aBN.toString()} != ${bBN.toString()}`);
 };
 
-export const expectGt = (a: ethers.BigNumberish, b: ethers.BigNumberish) => {
-    const aBN = ethers.BigNumber.from(a);
-    const bBN = ethers.BigNumber.from(b);
+export const expectGt = (a: BigNumberish, b: BigNumberish) => {
+    const aBN = BigNumber.from(a);
+    const bBN = BigNumber.from(b);
     assert(aBN.gt(bBN), `!(${aBN.toString()} > ${bBN.toString()})`);
 };
 
@@ -66,9 +70,9 @@ export const callAndExecuteProposal = async (
 
 export const advanceTime = async (
   hre: HardhatRuntimeEnvironment,
-  seconds: number
+  seconds: BigNumberish
 ) =>
-  await hre.network.provider.send(
-    "evm_increaseTime",
-    [ seconds ]
-  );
+  hre.network.provider.request({
+    method: "evm_increaseTime",
+    params: [ BigNumber.from(seconds).toNumber() ]
+  });
