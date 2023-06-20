@@ -108,19 +108,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottle
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottle
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottle
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -652,8 +652,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -706,12 +706,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      (baseToken.symbol === "USDC"
-        ? tokenRatios.fusdcUsdcRatio.toNumber() -
-        tokenRatios.fusdcUsdcSpread.toNumber() / 2
-        : tokenRatios.fusdcWethRatio.toNumber() -
-        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-    );
+        (baseToken.symbol === "USDC"
+          ? tokenRatios.fusdcUsdcRatio.toNumber() -
+            tokenRatios.fusdcUsdcSpread.toNumber() / 2
+          : tokenRatios.fusdcWethRatio.toNumber() -
+            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+      );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -774,31 +774,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const tokenAmtStr =
-          dec !== undefined
-            ? [whole, dec.slice(0 - token.decimals)].join(".")
-            : whole ?? "0";
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-        setInput({
-          ...token,
-          amount: tokenAmtStr,
-        });
+      setInput({
+        ...token,
+        amount: tokenAmtStr,
+      });
 
-        if (!ratio) return;
-        if (!(whole || dec)) return;
+      if (!ratio) return;
+      if (!(whole || dec)) return;
 
-        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-        setOtherInput({
-          ...otherToken,
-          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-        });
-      };
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+      });
+    };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1027,8 +1027,9 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`airdrop-stake-container ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         {/* Staking Amount */}
         <div
@@ -1337,7 +1338,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(0, stakingDuration),
+                stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1388,7 +1389,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1640,8 +1641,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1922,12 +1924,27 @@ const RecapModal = ({
     },
   ];
 
-  const bottleRarityColours = {
-    [Rarity.Common]: "white",
-    [Rarity.Uncommon]: "white",
-    [Rarity.Rare]: "white",
-    [Rarity.UltraRare]: "white",
-    [Rarity.Legendary]: "white",
+  const bottleRarityColorIcon = {
+    [Rarity.Common]: {
+      img: "/images/airdrop/COMMON.png",
+      color: "#FFFFFF",
+    },
+    [Rarity.Uncommon]: {
+      img: "/images/airdrop/UNCOMMON.png",
+      color: "#80E4EF",
+    },
+    [Rarity.Rare]: {
+      img: "/images/airdrop/RARE.png",
+      color: "#B7EBD4",
+    },
+    [Rarity.UltraRare]: {
+      img: "/images/airdrop/ULTRA RARE.png",
+      color: "#EDC6E1",
+    },
+    [Rarity.Legendary]: {
+      img: "/images/airdrop/LEGENDARY.png",
+      color: "#F8D192",
+    },
   };
 
   return (
@@ -1954,7 +1971,9 @@ const RecapModal = ({
           Learn more about the timeline
         </GeneralButton>
       </div>
-      <img src="" />
+
+      {/* Animation */}
+      <img src="/images/airdrop/HERO ANIMATION.jpg" />
       <div>
         <Text>SCROLL DOWN FOR IN-DEPTH STATS</Text>
         <ArrowDown />
@@ -2050,9 +2069,12 @@ const RecapModal = ({
             <div
               className={"bottle-container"}
               style={{
-                border: `1px solid ${bottleRarityColours[tier as Rarity]}`,
+                border: `1px solid ${
+                  bottleRarityColorIcon[tier as Rarity].color
+                }`,
               }}
             >
+              <img src={`${bottleRarityColorIcon[tier as Rarity].img}`} />
               {numberToCommaSeparated(amount)}+
             </div>
           ))}
@@ -2101,7 +2123,7 @@ const RecapModal = ({
             <br />
             <Text style={{ display: "flex", flexDirection: "row" }}>
               <u>
-                <LinkButton handleClick={() => { }} type="external" size="small">
+                <LinkButton handleClick={() => {}} type="external" size="small">
                   CONNECT YOUR WALLET
                 </LinkButton>
               </u>{" "}
