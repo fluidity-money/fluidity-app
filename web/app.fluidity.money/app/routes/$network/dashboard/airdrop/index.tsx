@@ -57,7 +57,7 @@ import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import { SplitContext } from "contexts/SplitProvider";
 
-const EPOCH_DAYS_TOTAL = 31;
+const EPOCH_DAYS_TOTAL = 38;
 // temp: may 22nd, 2023
 const EPOCH_START_DATE = new Date(2023, 4, 22);
 
