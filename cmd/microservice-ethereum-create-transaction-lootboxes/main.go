@@ -244,6 +244,10 @@ func main() {
 			protocolMultiplier(application),
 		)
 
+		// add flat 30%
+		flatMultiplier := big.NewRat(13, 10)
+		lootboxCount = lootboxCount.Mul(lootboxCount, flatMultiplier)
+
 		lootboxCountFloat, exact := lootboxCount.Float64()
 
 		if exact != true {
@@ -296,6 +300,8 @@ func protocolMultiplier(application applications.Application) *big.Rat {
 	case "camelot":
 		fallthrough
 	case "chronos":
+		fallthrough
+	case "sushiswap":
 		return big.NewRat(2, 100)
 	}
 
