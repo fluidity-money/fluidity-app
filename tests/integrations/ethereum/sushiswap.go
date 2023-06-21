@@ -28,6 +28,7 @@ const integrationTestSushiswap = `
     "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
     "expected_recipient": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
     "expected_fees": "30000000/997000000",
+    "expected_volume": "10/1",
     "expected_emission": {
 	"sushiswap": 0.03009027081243731
     },

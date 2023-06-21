@@ -28,6 +28,7 @@ const integrationTestUniswapV2 = `
     "expected_sender": "0x79328db8694a643c569740233869f4f5b344d0cf",
     "expected_recipient": "0xAE461cA67B15dc8dc81CE7615e0320dA1A9aB8D5",
     "expected_fees": "9934320933/997000000",
+    "expected_volume": "3311440311/1000000",
     "expected_emission": {
       "uniswap_v2": 9.964213573721164
     },
@@ -72,6 +73,7 @@ const integrationTestUniswapV3 = `
     "expected_sender": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
     "expected_recipient": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
     "expected_fees": "7099301084/9999000000",
+    "expected_volume": "1774825271/250000",
     "expected_emission": {
       "uniswap_v3": 0.7100011085108511
     },
