@@ -728,3 +728,33 @@ $holo: linear-gradient(
   background-image: url("/images/airdrop/volume_border.svg");
   background-size: cover;
 }
+
+.recap-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  border: 1px solid yellow;
+}
+
+.recap-circle-scroll {
+  position: relative;
+
+  .recap-circle-scroll-arrow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    svg {
+      fill: none;
+      stroke: white;
+      transform: scale(3);
+    }
+  }
+
+  .recap-circle-scroll-text {
+    fill: grey;
+    letter-spacing: 0.4em;
+    text-length: 100%;
+  }
+}

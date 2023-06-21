@@ -108,19 +108,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottle
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottle
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottle
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -652,8 +652,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -706,12 +706,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        (baseToken.symbol === "USDC"
-          ? tokenRatios.fusdcUsdcRatio.toNumber() -
-            tokenRatios.fusdcUsdcSpread.toNumber() / 2
-          : tokenRatios.fusdcWethRatio.toNumber() -
-            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-      );
+      (baseToken.symbol === "USDC"
+        ? tokenRatios.fusdcUsdcRatio.toNumber() -
+        tokenRatios.fusdcUsdcSpread.toNumber() / 2
+        : tokenRatios.fusdcWethRatio.toNumber() -
+        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+    );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -774,31 +774,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const tokenAmtStr =
-        dec !== undefined
-          ? [whole, dec.slice(0 - token.decimals)].join(".")
-          : whole ?? "0";
+        const tokenAmtStr =
+          dec !== undefined
+            ? [whole, dec.slice(0 - token.decimals)].join(".")
+            : whole ?? "0";
 
-      setInput({
-        ...token,
-        amount: tokenAmtStr,
-      });
+        setInput({
+          ...token,
+          amount: tokenAmtStr,
+        });
 
-      if (!ratio) return;
-      if (!(whole || dec)) return;
+        if (!ratio) return;
+        if (!(whole || dec)) return;
 
-      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-      setOtherInput({
-        ...otherToken,
-        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-      });
-    };
+        setOtherInput({
+          ...otherToken,
+          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+        });
+      };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1027,9 +1027,8 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         {/* Staking Amount */}
         <div
@@ -1338,7 +1337,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(0, stakingDuration),
+              stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1389,7 +1388,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1641,9 +1640,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1952,7 +1950,7 @@ const RecapModal = ({
       {/* Recap Heading */}
       <div className={"recap-heading-container pad-main"}>
         <Display as="h3" color="gray">
-          <Text size="xl" holo>
+          <Text size="xl" holo style={{ fontSize: "inherit" }}>
             <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
           </Text>{" "}
           bottles were distributed in this epoch!
@@ -1974,10 +1972,6 @@ const RecapModal = ({
 
       {/* Animation */}
       <img src="/images/airdrop/HERO ANIMATION.jpg" />
-      <div>
-        <Text>SCROLL DOWN FOR IN-DEPTH STATS</Text>
-        <ArrowDown />
-      </div>
 
       {/* Global Stats */}
       {/* Providers / Total Volume */}
@@ -1990,7 +1984,25 @@ const RecapModal = ({
             </Text>{" "}
             for the epoch.
           </Text>
-
+          <div className="recap-circle-scroll">
+            <div className="recap-circle-scroll-arrow">
+              <ArrowDown />
+            </div>
+            <svg viewBox="0 0 200 200">
+              <motion.path
+                id="recap-curve"
+                d="M 100, 100 m -75, 0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0"
+                fill="transparent"
+                stroke="transparent"
+                strokeWidth="2"
+              />
+              <text className="recap-circle-scroll-text">
+                <textPath xlinkHref="#recap-curve">
+                  SCROLL DOWN FOR IN-DEPTH STATS
+                </textPath>
+              </text>
+            </svg>
+          </div>
           {/* Providers */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -2080,9 +2092,8 @@ const RecapModal = ({
             <div
               className={"bottle-container"}
               style={{
-                border: `1px solid ${
-                  bottleRarityColorIcon[tier as Rarity].color
-                }`,
+                border: `1px solid ${bottleRarityColorIcon[tier as Rarity].color
+                  }`,
               }}
             >
               <img src={`${bottleRarityColorIcon[tier as Rarity].img}`} />
@@ -2134,7 +2145,7 @@ const RecapModal = ({
             <br />
             <Text style={{ display: "flex", flexDirection: "row" }}>
               <u>
-                <LinkButton handleClick={() => {}} type="external" size="small">
+                <LinkButton handleClick={() => { }} type="external" size="small">
                   CONNECT YOUR WALLET
                 </LinkButton>
               </u>{" "}
