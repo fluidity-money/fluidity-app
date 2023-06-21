@@ -55,7 +55,7 @@ jobs:
     - name: Check for downtimes
       uses: ka7eh/no-weekend-merge@releases/v0.1.1
       with:
-        tz: '-9.5'
+        tz: '9.5'
         mon: '00:00-09:00,17:00-23:59'
         tue: '00:00-09:00,17:00-23:59'
         wed: '00:00-09:00,17:00-23:59'
