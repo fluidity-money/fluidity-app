@@ -1,14 +1,11 @@
 import type Result from "~/types/Result";
 
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
-import { ContractReceipt, ContractTransaction } from "@ethersproject/contracts";
+import { ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
-import { bytesToHex } from "web3-utils";
-import { B64ToUint8Array, jsonPost } from "~/util";
-import { Ok, Err, flatten, isOk } from "~/types/Result";
-import { TransactionResponse } from "../instructions";
+import { Ok, Err, flatten, isOk, sync } from "~/types/Result";
 
 export type ContractToken = {
   address: string;
@@ -53,7 +50,7 @@ export const confirmAccountOwnership_ = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-): Promise<Result<TransactionResponse, Error>> => {
+): Promise<Result<ContractTransaction, Error>> => {
   const contract = getContract(ABI, contractAddress, signer);
   if (!contract) throw new Error("Invalid contract provided!");
 
@@ -433,7 +430,7 @@ export const makeStakingDeposit = async (
   wethAmt: BN,
   slippage: BN,
   maxTimestamp: BN
-) => {
+): Promise<Result<ContractTransaction, Error>> => {
   const stakingContract = getContract(stakingAbi, stakingAddr, signer);
 
   if (!stakingContract)
@@ -489,19 +486,21 @@ export const makeStakingDeposit = async (
   );
 
   // call deposit
-  return allowances
-    .map(
-      () =>
-        await stakingContract.deposit(
-          lockDurationSeconds.toString(),
-          fusdcAmt.toString(),
-          usdcAmt.toString(),
-          wethAmt.toString(),
-          slippage.toString(),
-          maxTimestamp.toString()
-        )
+  return (
+    await sync(
+      allowances.map(
+        async () =>
+          await stakingContract.deposit(
+            lockDurationSeconds.toString(),
+            fusdcAmt.toString(),
+            usdcAmt.toString(),
+            wethAmt.toString(),
+            slippage.toString(),
+            maxTimestamp.toString()
+          )
+      )
     )
-    .err((e) => handleContractErrors(e, signer.provider));
+  ).err((e) => handleContractErrors(e, signer.provider));
 };
 
 export type StakingRedeemableRes = {
@@ -537,7 +536,7 @@ export const makeStakingRedemption = async (
   fusdcMinimum: BN,
   usdcMinimum: BN,
   wethMinimum: BN
-): Promise<Result<TransactionResponse, Error>> => {
+): Promise<Result<ContractTransaction, Error>> => {
   const stakingContract = getContract(stakingAbi, stakingAddr, signer);
 
   if (!stakingContract)

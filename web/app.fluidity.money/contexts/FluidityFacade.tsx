@@ -19,12 +19,12 @@ export interface IFluidityFacade {
   amountMinted: (tokenAddr: string) => Promise<Result<BN, Error>>;
   balance: (tokenAddr: string) => Promise<Result<BN, Error>>;
   disconnect: () => Promise<Result<void, Error>>;
-  tokens: () => Promise<Result<string[], Error>>;
+  tokens: () => Promise<Result<string, Error>[]>;
   signBuffer?: (buffer: string) => Promise<Result<string, Error>>;
 
   connected: boolean;
   connecting: boolean;
-  useConnectorType: (use: string) => Result<void, Error>;
+  useConnectorType: (use: string) => Promise<Result<void, Error>>;
 
   // Normalised address - For filtering, etc
   address: string;
@@ -47,7 +47,6 @@ export interface IFluidityFacade {
   getStakingRatios?: () => Promise<Result<StakingRatioRes, Error>>;
 
   getStakingDeposits?: (address: string) => Promise<
-<<<<<<< HEAD
     Result<
       {
         fluidAmount: BN;
@@ -57,15 +56,6 @@ export interface IFluidityFacade {
       }[],
       Error
     >
-=======
-    | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
-    | undefined
->>>>>>> develop
   >;
 
   testStakeTokens?: (
@@ -86,22 +76,18 @@ export interface IFluidityFacade {
     maxTimestamp: BN
   ) => Promise<Result<TransactionResponse, Error>>;
 
-<<<<<<< HEAD
   signOwnerAddress?: (ownerAddress: string) => Promise<Result<string, Error>>;
-=======
-  redeemTokens?: () => Promise<TransactionResponse | undefined>;
+
+  redeemTokens?: () => Promise<Result<TransactionResponse, Error>>;
 
   redeemableTokens?: (
     address: string
-  ) => Promise<StakingRedeemableRes | undefined>;
-
-  signOwnerAddress?: (ownerAddress: string) => Promise<string | undefined>;
->>>>>>> develop
+  ) => Promise<Result<StakingRedeemableRes, Error>>;
 
   confirmAccountOwnership?: (
     signature: string,
     address: string
-  ) => Promise<Result<void, Error>>;
+  ) => Promise<Result<TransactionResponse, Error>>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

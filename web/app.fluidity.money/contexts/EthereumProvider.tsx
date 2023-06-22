@@ -9,6 +9,8 @@ import {
   confirmAccountOwnership_,
   signOwnerAddress_,
   StakingDepositsRes,
+  StakingRatioRes,
+  StakingRedeemableRes,
 } from "~/util/chainUtils/ethereum/transaction";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
@@ -50,6 +52,7 @@ import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddres
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
 import { Ok, Err } from "~/types/Result";
+import { ContractTransaction } from "ethers";
 
 type MetamaskError = { code: number; message: string };
 
@@ -173,6 +176,20 @@ const EthereumFacade = ({
 
   /**
    *
+   * @deprecated manual reward no longer enabled
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const manualReward = async (
+    fluidTokenAddrs: string[],
+    userAddr: string
+  ): Promise<
+    Result<{ gasFee: number; networkFee: number; amount: number }[], Error>
+  > => {
+    return Err(Error("no longer enabled"));
+  };
+
+  /**
+   *
    * @deprecated mint limits no longer enabled
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -200,13 +217,13 @@ const EthereumFacade = ({
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return Err(Error("no signer"));
+      return Err(new Error("no signer"));
     }
 
     const fromToken = tokens.find((t) => t.address === contractAddress);
 
     if (!fromToken) {
-      return Err(Error("no fromToken"));
+      return Err(new Error("no fromToken"));
     }
 
     // true if swapping from fluid -> non-fluid
@@ -219,7 +236,7 @@ const EthereumFacade = ({
       : tokens.find((t) => t.isFluidOf === fromToken.address);
 
     if (!toToken) {
-      return Err(Error("no toToken"));
+      return Err(new Error("no toToken"));
     }
 
     const from: ContractToken = {
@@ -236,85 +253,12 @@ const EthereumFacade = ({
       isFluidOf: !fromFluid,
     };
 
-    const ethContractRes = Ok(await makeContractSwap(signer, from, to, amount));
+    const ethContractRes = await makeContractSwap(signer, from, to, amount);
 
-<<<<<<< HEAD
-    return ethContractRes.map(({ wait, hash }) => ({
-      confirmTx: async () => (await wait()).status == 1,
-      txHash: hash,
+    return ethContractRes.map((ethContract: ContractTransaction) => ({
+      confirmTx: async () => (await ethContract.wait()).status == 1,
+      txHash: ethContract.hash,
     }));
-=======
-    return ethContractRes
-      ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
-      : undefined;
->>>>>>> develop
-  };
-
-  /**
-   *
-<<<<<<< HEAD
-   * @deprecated manualReward no longer supported
-=======
-   * @deprecated manual reward no longer supported
->>>>>>> develop
-   */
-  const manualReward = async (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fluidTokenAddrs: string[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    userAddr: string
-  ): Promise<
-    Result<
-      Result<{ gasFee: number; networkFee: number; amount: number }, Error>[],
-      Error
-    >
-  > => {
-<<<<<<< HEAD
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return Err(Error("no signer"));
-    }
-
-    return Ok(
-      await Promise.all(
-        fluidTokenAddrs
-          .map((addr) => tokens.find((t) => t.address === addr))
-          .filter((t) => t && t.isFluidOf)
-          .map(async (token, i) => {
-            if (!token) return Err(Error(`no token at ${fluidTokenAddrs[i]}`));
-
-            const baseToken = tokens.find(
-              (t) => t.address === token?.isFluidOf
-            );
-
-            if (!baseToken)
-              return Err(Error(`no matching base token for ${token.address}`));
-
-            const contract: ContractToken = {
-              address: token?.address ?? "",
-              ABI: tokenAbi,
-              symbol: token?.symbol ?? "",
-              isFluidOf: !!token?.isFluidOf,
-            };
-
-            return Ok(
-              await manualRewardToken(
-                contract,
-                baseToken.symbol,
-                userAddr,
-                signer
-              )
-            );
-          })
-      )
-    );
-=======
-    return undefined;
->>>>>>> develop
   };
 
   /**
@@ -322,10 +266,10 @@ const EthereumFacade = ({
    *
    * Will fail on non-Metamask compliant wallets.
    */
-  const addToken = async (symbol: string) => {
+  const addToken = async (symbol: string): Promise<Result<boolean, Error>> => {
     const token = tokens.find((t) => t.symbol === symbol);
 
-    if (!token) return;
+    if (!token) return Err(new Error("Could not find matching token"));
 
     const { protocol, host } = window.location;
 
@@ -336,24 +280,28 @@ const EthereumFacade = ({
       image: `${protocol}//${host}${token.logo}`,
     };
 
-    return connector?.watchAsset?.(watchToken);
+    return Ok(await connector?.watchAsset?.(watchToken)).flatMap((success) =>
+      success === true ? Ok(success) : Err(Error("Could not watch token"))
+    );
   };
 
   // getFluidTokens returns FLUID tokens user holds.
-  const getFluidTokens = async (): Promise<string[]> => {
+  const getFluidTokens = async (): Promise<Result<string, Error>[]> => {
     const fluidTokenAddrs = tokens
       .filter((t) => !!t.isFluidOf)
       .map((t) => t.address);
 
-    const fluidTokenBalances: [string, BN | undefined][] = await Promise.all(
+    const fluidTokenBalances: [string, Result<BN, Error>][] = await Promise.all(
       fluidTokenAddrs.map(async (addr) => [addr, await getBalance(addr)])
     );
 
     const ZERO = new BN(0);
 
-    return fluidTokenBalances
-      .filter((token) => token[1]?.gt(ZERO))
-      .map(([addr]) => addr);
+    return fluidTokenBalances.map(([addr, balance]) =>
+      balance.flatMap((balance) =>
+        balance.gt(ZERO) ? Ok(addr) : Err(new Error("No tokens"))
+      )
+    );
   };
 
   /**
@@ -361,11 +309,13 @@ const EthereumFacade = ({
    *
    * Source: https://degenscore.com.
    */
-  const getDegenScore = async (address: string): Promise<number> => {
+  const getDegenScore = async (
+    address: string
+  ): Promise<Result<number, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return 0;
+      return Err(new Error("No signer found"));
     }
 
     const degenScoreAddr = "0x0521FA0bf785AE9759C7cB3CBE7512EbF20Fbdaa";
@@ -384,39 +334,42 @@ const EthereumFacade = ({
   const getStakingDeposits = async (
     address: string
   ): Promise<
-    | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
-    | undefined
+    Result<
+      {
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }[],
+      Error
+    >
   > => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("No signer found"));
     }
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    const stakingDeposits =
-      (await getUserStakingDeposits(
-        signer.provider,
-        StakingAbi,
-        stakingAddr,
-        address
-      )) ?? [];
+    const stakingDepositsRes = await getUserStakingDeposits(
+      signer.provider,
+      StakingAbi,
+      stakingAddr,
+      address
+    );
 
-    return stakingDeposits.map(
-      ({
-        redeemTimestamp,
-        depositTimestamp,
-        camelotTokenA,
-        sushiswapTokenA,
-        camelotTokenB,
-        sushiswapTokenB,
-      }) => {
+    return stakingDepositsRes.map((stakingDeposits) =>
+      stakingDeposits.map((stakingDeposit) => {
+        const {
+          redeemTimestamp,
+          depositTimestamp,
+          camelotTokenA,
+          sushiswapTokenA,
+          camelotTokenB,
+          sushiswapTokenB,
+        } = stakingDeposit;
+
         const fluidAmount = new BN(
           camelotTokenA.add(sushiswapTokenA).toString()
         );
@@ -435,15 +388,17 @@ const EthereumFacade = ({
             60,
           depositDate: new Date(depositTimestamp.toNumber() * 1000),
         };
-      }
+      })
     );
   };
 
-  const getStakingRatios = async () => {
+  const getStakingRatios = async (): Promise<
+    Result<StakingRatioRes, Error>
+  > => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
@@ -461,11 +416,11 @@ const EthereumFacade = ({
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ): Promise<StakingDepositsRes | undefined> => {
+  ): Promise<Result<StakingDepositsRes, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
@@ -493,11 +448,11 @@ const EthereumFacade = ({
     wethAmt: BN,
     slippage: BN,
     maxTimestamp: BN
-  ): Promise<TransactionResponse | undefined> => {
+  ): Promise<Result<TransactionResponse, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
@@ -519,67 +474,69 @@ const EthereumFacade = ({
       }
     );
 
-    const stakingDepositRes = await makeStakingDeposit(
-      signer,
-      usdcToken,
-      fusdcToken,
-      wethToken,
-      StakingAbi,
-      stakingAddr,
-      lockDurationSeconds,
-      usdcAmt,
-      fusdcAmt,
-      wethAmt,
-      slippage,
-      maxTimestamp
-    );
-
-    return stakingDepositRes
-      ? {
-        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-        txHash: stakingDepositRes.hash,
-      }
-      : undefined;
+    return (
+      await makeStakingDeposit(
+        signer,
+        usdcToken,
+        fusdcToken,
+        wethToken,
+        StakingAbi,
+        stakingAddr,
+        lockDurationSeconds,
+        usdcAmt,
+        fusdcAmt,
+        wethAmt,
+        slippage,
+        maxTimestamp
+      )
+    ).map((stakingDepositRes: ContractTransaction) => ({
+      confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+      txHash: stakingDepositRes.hash,
+    }));
   };
 
   /*
    * redeemableTokens gets amount of staked tokens after lockup period
    */
-  const redeemableTokens = async (address: string) => {
+  const redeemableTokens = async (
+    address: string
+  ): Promise<Result<StakingRedeemableRes, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    const res = await getRedeemableTokens(
+    const redeemableTokensRes = await getRedeemableTokens(
       signer,
       StakingAbi,
       stakingAddr,
       address
     );
 
-    if (!res) return undefined;
+    return redeemableTokensRes.map((tokens) => {
+      const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = tokens;
 
-    const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = res;
-
-    return {
-      fusdcRedeemable: new BN(fusdcRedeemable.toString()),
-      usdcRedeemable: new BN(usdcRedeemable.toString()),
-      wethRedeemable: new BN(wethRedeemable.toString()),
-    };
+      return {
+        fusdcRedeemable: new BN(fusdcRedeemable.toString()),
+        usdcRedeemable: new BN(usdcRedeemable.toString()),
+        wethRedeemable: new BN(wethRedeemable.toString()),
+      };
+    });
   };
 
   /*
    * redeemTokens redeems all staked tokens after lockup period
    */
-  const redeemTokens = async (): Promise<TransactionResponse | undefined> => {
+  const redeemTokens = async (): Promise<
+    Result<TransactionResponse, Error>
+  > => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
@@ -598,52 +555,55 @@ const EthereumFacade = ({
       minimumTokenAmt
     );
 
-    return stakingRedeemRes
-      ? {
-        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
-        txHash: stakingRedeemRes.hash,
-      }
-      : undefined;
+    return stakingRedeemRes.map((stakingRedeem: ContractTransaction) => ({
+      confirmTx: async () => (await stakingRedeem.wait()).status == 1,
+      txHash: stakingRedeem.hash,
+    }));
   };
 
   // create a signature to say that `ownerAddress` owns the current address
-  const signOwnerAddress = async (ownerAddress: string) => {
+  const signOwnerAddress = async (
+    ownerAddress: string
+  ): Promise<Result<string, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const lootboxOwnershipAddr = "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06";
-    const signature = await signOwnerAddress_(
+    return signOwnerAddress_(
       ownerAddress,
       signer,
       lootboxOwnershipAddr,
       LootboxOwnershipAbi
     );
-    return signature;
   };
 
   // `confirm` that an account is owned by this account using a signature they have created
   const confirmAccountOwnership = async (
     signature: string,
     address: string
-  ) => {
+  ): Promise<Result<TransactionResponse, Error>> => {
     const signer = provider?.getSigner();
 
     if (!signer) {
-      return undefined;
+      return Err(new Error("Could not find signer"));
     }
 
     const lootboxOwnershipAddr = "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06";
-    const result = await confirmAccountOwnership_(
+    const confirmAccountRes = await confirmAccountOwnership_(
       signature,
       address,
       signer,
       lootboxOwnershipAddr,
       LootboxOwnershipAbi
     );
-    console.log(result);
+
+    return confirmAccountRes.map((confirmAccount: ContractTransaction) => ({
+      confirmTx: async () => (await confirmAccount.wait()).status == 1,
+      txHash: confirmAccount.hash,
+    }));
   };
 
   return (
