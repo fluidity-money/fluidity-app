@@ -6,7 +6,7 @@ package lootboxes
 
 import (
 	"fmt"
-	"html/template"
+	"text/template"
 	"strings"
 	"time"
 
