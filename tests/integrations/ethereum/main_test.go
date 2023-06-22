@@ -35,7 +35,8 @@ type integrationTest struct {
 	ExpectedRecipient ethereum.Address `json:"expected_recipient"`
 
 	// of a form parseable by big.Rat, e.g. 940/27
-	ExpectedFees string `json:"expected_fees"`
+	ExpectedFees   string `json:"expected_fees"`
+	ExpectedVolume string `json:"expected_volume"`
 
 	ExpectedEmission worker.EthereumAppFees `json:"expected_emission"`
 
@@ -174,6 +175,13 @@ func TestIntegrations(t *testing.T) {
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
 		assert.True(t, ok)
 		assert.Equal(t, expectedFeesRat, feeData.Fee)
+
+		// correct volume, if supported
+		expectedVolumeRat, ok := new(big.Rat).SetString(event.ExpectedVolume)
+		if expectedVolumeRat != nil {
+			assert.True(t, ok)
+			assert.Equal(t, expectedVolumeRat, feeData.Volume)
+		}
 
 		// correct emission
 		assert.Equal(t, event.ExpectedEmission, emission)

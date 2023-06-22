@@ -3,17 +3,17 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../../interfaces/ISushiswapStablePoolFactory.sol";
-import "../../interfaces/ISushiswapStablePool.sol";
+import "../../interfaces/ISushiswapPoolFactory.sol";
+import "../../interfaces/ISushiswapPool.sol";
 import "../../interfaces/ISushiswapMasterDeployer.sol";
 
 contract TestSushiswapMasterDeployer is ISushiswapMasterDeployer {
     uint x;
 
     function deployPool(
-      ISushiswapStablePoolFactory /* _factory */,
+      ISushiswapPoolFactory /* _factory */,
       bytes calldata /* _deployData */
-   ) external returns (ISushiswapStablePool) {
+   ) external returns (ISushiswapPool) {
        ++x;
        revert("test impl");
    }

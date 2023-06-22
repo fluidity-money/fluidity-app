@@ -18,8 +18,8 @@ task_definition:
 run_params:
   task_placement:
     strategy:
-      - type: spread
-        field: attribute:ecs.availability-zone
+      - field: instanceId
+        type: spread
   network_configuration:
     awsvpc_configuration:
       subnets:

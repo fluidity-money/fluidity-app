@@ -24,12 +24,13 @@ import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
-  manualRewardToken,
   getUserDegenScore,
   getUserStakingDeposits,
   getTokenStakingRatio,
   makeStakingDeposit,
   testMakeStakingDeposit,
+  makeStakingRedemption,
+  getRedeemableTokens,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -237,18 +238,33 @@ const EthereumFacade = ({
 
     const ethContractRes = Ok(await makeContractSwap(signer, from, to, amount));
 
+<<<<<<< HEAD
     return ethContractRes.map(({ wait, hash }) => ({
       confirmTx: async () => (await wait()).status == 1,
       txHash: hash,
     }));
+=======
+    return ethContractRes
+      ? {
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
+      : undefined;
+>>>>>>> develop
   };
 
   /**
    *
+<<<<<<< HEAD
    * @deprecated manualReward no longer supported
+=======
+   * @deprecated manual reward no longer supported
+>>>>>>> develop
    */
   const manualReward = async (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fluidTokenAddrs: string[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     userAddr: string
   ): Promise<
     Result<
@@ -256,6 +272,7 @@ const EthereumFacade = ({
       Error
     >
   > => {
+<<<<<<< HEAD
     const signer = provider?.getSigner();
 
     if (!signer) {
@@ -295,6 +312,9 @@ const EthereumFacade = ({
           })
       )
     );
+=======
+    return undefined;
+>>>>>>> develop
   };
 
   /**
@@ -365,11 +385,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-        fluidAmount: BN;
-        baseAmount: BN;
-        durationDays: number;
-        depositDate: Date;
-      }>
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -516,9 +536,73 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-          txHash: stakingDepositRes.hash,
-        }
+        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+        txHash: stakingDepositRes.hash,
+      }
+      : undefined;
+  };
+
+  /*
+   * redeemableTokens gets amount of staked tokens after lockup period
+   */
+  const redeemableTokens = async (address: string) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    const res = await getRedeemableTokens(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      address
+    );
+
+    if (!res) return undefined;
+
+    const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = res;
+
+    return {
+      fusdcRedeemable: new BN(fusdcRedeemable.toString()),
+      usdcRedeemable: new BN(usdcRedeemable.toString()),
+      wethRedeemable: new BN(wethRedeemable.toString()),
+    };
+  };
+
+  /*
+   * redeemTokens redeems all staked tokens after lockup period
+   */
+  const redeemTokens = async (): Promise<TransactionResponse | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
+
+    const now = new BN(Math.floor(Date.now() / 1000));
+
+    const minimumTokenAmt = new BN(0);
+
+    const stakingRedeemRes = await makeStakingRedemption(
+      signer,
+      StakingAbi,
+      stakingAddr,
+      now,
+      minimumTokenAmt,
+      minimumTokenAmt,
+      minimumTokenAmt
+    );
+
+    return stakingRedeemRes
+      ? {
+        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+        txHash: stakingRedeemRes.hash,
+      }
       : undefined;
   };
 
@@ -530,18 +614,14 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
-    try {
-      const signature = await signOwnerAddress_(
-        ownerAddress,
-        signer,
-        lootboxOwnershipAddr,
-        LootboxOwnershipAbi
-      );
-      return signature;
-    } catch (e) {
-      console.log("failed to sign for account ownership", e);
-    }
+    const lootboxOwnershipAddr = "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06";
+    const signature = await signOwnerAddress_(
+      ownerAddress,
+      signer,
+      lootboxOwnershipAddr,
+      LootboxOwnershipAbi
+    );
+    return signature;
   };
 
   // `confirm` that an account is owned by this account using a signature they have created
@@ -555,19 +635,15 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const lootboxOwnershipAddr = "0x6a8AFEe01E95311F1372B34E686200068dbca1F2";
-    try {
-      const result = await confirmAccountOwnership_(
-        signature,
-        address,
-        signer,
-        lootboxOwnershipAddr,
-        LootboxOwnershipAbi
-      );
-      console.log(result);
-    } catch (e) {
-      console.log("failed to confirm account ownership", e);
-    }
+    const lootboxOwnershipAddr = "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06";
+    const result = await confirmAccountOwnership_(
+      signature,
+      address,
+      signer,
+      lootboxOwnershipAddr,
+      LootboxOwnershipAbi
+    );
+    console.log(result);
   };
 
   return (
@@ -590,6 +666,8 @@ const EthereumFacade = ({
         signBuffer,
         getStakingDeposits,
         stakeTokens,
+        redeemableTokens,
+        redeemTokens,
         testStakeTokens,
         getStakingRatios,
         signOwnerAddress,

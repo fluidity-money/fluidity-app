@@ -3,6 +3,7 @@ import type { TransactionResponse } from "~/util/chainUtils/instructions";
 import type {
   StakingRatioRes,
   StakingDepositsRes,
+  StakingRedeemableRes,
 } from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
@@ -46,6 +47,7 @@ export interface IFluidityFacade {
   getStakingRatios?: () => Promise<Result<StakingRatioRes, Error>>;
 
   getStakingDeposits?: (address: string) => Promise<
+<<<<<<< HEAD
     Result<
       {
         fluidAmount: BN;
@@ -55,6 +57,15 @@ export interface IFluidityFacade {
       }[],
       Error
     >
+=======
+    | Array<{
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
+    | undefined
+>>>>>>> develop
   >;
 
   testStakeTokens?: (
@@ -75,7 +86,17 @@ export interface IFluidityFacade {
     maxTimestamp: BN
   ) => Promise<Result<TransactionResponse, Error>>;
 
+<<<<<<< HEAD
   signOwnerAddress?: (ownerAddress: string) => Promise<Result<string, Error>>;
+=======
+  redeemTokens?: () => Promise<TransactionResponse | undefined>;
+
+  redeemableTokens?: (
+    address: string
+  ) => Promise<StakingRedeemableRes | undefined>;
+
+  signOwnerAddress?: (ownerAddress: string) => Promise<string | undefined>;
+>>>>>>> develop
 
   confirmAccountOwnership?: (
     signature: string,

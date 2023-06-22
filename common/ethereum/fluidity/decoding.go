@@ -12,6 +12,7 @@ import (
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
+	addresslinker "github.com/fluidity-money/fluidity-app/common/ethereum/address-linker"
 	ethLogs "github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -304,5 +305,46 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 		return stakingEvent, nil
 	default:
 		return stakingEvent, ErrWrongEvent
+	}
+}
+
+type TestnetOwnerPair struct {
+	// Owner for the address that owns TestnetAddress
+	Owner   ethereum.Address
+	// TestnetAddress for the testnet address used on Ropsten
+	TestnetAddress ethereum.Address
+}
+
+// TryDecodeAddressConfirmed to decode ownership confirmation of a testnet address
+func TryDecodeAddressConfirmed(log ethLogs.Log) (TestnetOwnerPair, error) {
+	var (
+		logTopics			 = log.Topics
+		eventSignatureString = logTopics[0].String()
+		eventSignature       = ethCommon.HexToHash(eventSignatureString)
+
+		addressConfirmedEvent TestnetOwnerPair
+	)
+
+	switch eventSignature {
+	case addresslinker.AddressConfirmerAbi.Events["AddressConfirmed"].ID:
+		// no data to unpack, all indexed
+		if len(logTopics) != 3 {
+			return addressConfirmedEvent, fmt.Errorf(
+				"wrong number of log topics for event AddressConfirmed - expected 3, got %d",
+				len(logTopics),
+			)
+		}
+
+		var (
+			testnetAddressString  = logTopics[1].String()
+			ownerAddressString    = logTopics[2].String()
+		)
+
+		addressConfirmedEvent.TestnetAddress = ethereum.AddressFromString(testnetAddressString)
+		addressConfirmedEvent.Owner = ethereum.AddressFromString(ownerAddressString)
+
+		return addressConfirmedEvent, nil
+	default:
+		return addressConfirmedEvent, ErrWrongEvent
 	}
 }

@@ -1,8 +1,8 @@
 import type { Chain } from "~/util/chainUtils/chains";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
-import type { HomeLoaderData } from "../query/dashboard/home";
-import type { TransactionsLoaderData } from "../query/userTransactions";
+import type { HomeLoaderData } from "~/routes/$network/query/dashboard/home";
+import type { TransactionsLoaderData } from "~/routes/$network/query/userTransactions";
 
 import { motion } from "framer-motion";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
@@ -35,96 +35,12 @@ import {
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import dashboardHomeStyle from "~/styles/dashboard/home.css";
 import { useCache } from "~/hooks/useCache";
-import { Volume } from "../query/volumeStats";
 import { colors } from "~/webapp.config.server";
+import { GraphEntry } from "~/queries/useGraphData";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
 };
-
-const GRAPH_TRANSFORMERS = [
-  {
-    name: "D",
-    transform: (vols: Volume[]) => {
-      const entries = 24;
-      const unixHourInc = 60 * 60 * 1000;
-      const unixNow = Date.now();
-
-      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-        ...graphEmptyVolume(unixNow - (i + 1) * unixHourInc),
-      }));
-
-      return binTransactions(mappedTxBins, vols);
-    },
-  },
-  {
-    name: "W",
-    transform: (vols: Volume[]) => {
-      //const entries = 21;
-      //const unixEightHourInc = 8 * 60 * 60 * 1000;
-      const entries = 7;
-      const unixEightHourInc = 24 * 60 * 60 * 1000;
-      const unixNow = Date.now();
-
-      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-        ...graphEmptyVolume(unixNow - (i + 1) * unixEightHourInc),
-      }));
-
-      return binTransactions(mappedTxBins, vols);
-    },
-  },
-  {
-    name: "M",
-    transform: (vols: Volume[]) => {
-      const entries = 30;
-      const unixDayInc = 24 * 60 * 60 * 1000;
-      const unixNow = Date.now();
-
-      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-        ...graphEmptyVolume(unixNow - (i + 1) * unixDayInc),
-      }));
-
-      return binTransactions(mappedTxBins, vols);
-    },
-  },
-  {
-    name: "Y",
-    transform: (vols: Volume[]) => {
-      const entries = 12;
-      const unixBimonthlyInc = 30 * 24 * 60 * 60 * 1000;
-      const unixNow = Date.now();
-
-      const mappedTxBins = Array.from({ length: entries }).map((_, i) => ({
-        ...graphEmptyVolume(unixNow - (i + 1) * unixBimonthlyInc),
-      }));
-
-      return binTransactions(mappedTxBins, vols);
-    },
-  },
-];
-
-const TIME_FILTERS = [
-  {
-    name: "D",
-    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
-      timestamp > Date.now() - 24 * 60 * 60 * 1000,
-  },
-  {
-    name: "W",
-    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
-      timestamp > Date.now() - 7 * 24 * 60 * 60 * 1000,
-  },
-  {
-    name: "M",
-    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
-      timestamp > Date.now() - 30 * 24 * 60 * 60 * 1000,
-  },
-  {
-    name: "Y",
-    filter: <T extends { timestamp: number }>({ timestamp }: T) =>
-      timestamp > Date.now() - 365 * 24 * 60 * 60 * 1000,
-  },
-];
 
 type LoaderData = {
   page: number;
@@ -158,9 +74,14 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT_HOME: HomeLoaderData = {
-  totalPrizePool: 0,
   network: "ethereum",
   loaded: false,
+  graph: {
+    day: [],
+    week: [],
+    month: [],
+    year: [],
+  },
   rewards: {
     day: [],
     week: [],
@@ -168,7 +89,13 @@ const SAFE_DEFAULT_HOME: HomeLoaderData = {
     year: [],
     all: [],
   },
-  volume: [],
+  volumeStats: {
+    day: [{ totalVolume: 0, actionCount: 0 }],
+    week: [{ totalVolume: 0, actionCount: 0 }],
+    month: [{ totalVolume: 0, actionCount: 0 }],
+    year: [{ totalVolume: 0, actionCount: 0 }],
+    all: [{ totalVolume: 0, actionCount: 0 }],
+  },
   totalFluidPairs: 0,
   timestamp: 0,
 };
@@ -180,8 +107,9 @@ const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
   loaded: false,
 };
 
-export const loader: LoaderFunction = async ({ params, request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { network } = params;
+  if (!network) return;
 
   const url = new URL(request.url);
   const _pageStr = url.searchParams.get("page");
@@ -191,7 +119,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   return json({
     network,
     page: txTablePage,
-    colors: (await colors)[network as string],
+    colors: (await colors)[network],
   });
 };
 
@@ -211,8 +139,11 @@ export default function Home() {
     `/${network}/query/userTransactions?page=${page}`
   );
 
+  const [totalPrizePool, setTotalPrizePool] = useState(0);
+
   const userHomeData = useFetcher();
   const userTransactionsData = useFetcher();
+  const prizePoolData = useFetcher();
 
   const toolTip = useToolTip();
 
@@ -236,6 +167,10 @@ export default function Home() {
   };
 
   useEffect(() => {
+    prizePoolData.load(`/${network}/query/dashboard/prizePool`);
+  }, []);
+
+  useEffect(() => {
     if (!address) return;
 
     userHomeData.load(`/${network}/query/dashboard/home?address=${address}`);
@@ -244,6 +179,11 @@ export default function Home() {
       `/${network}/query/userTransactions?page=${page}&address=${address}`
     );
   }, [address, page]);
+
+  useEffect(() => {
+    if (prizePoolData?.data)
+      setTotalPrizePool(prizePoolData?.data.totalPrizePool);
+  }, [prizePoolData]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
     SAFE_DEFAULT_HOME.totalFluidPairs
@@ -353,13 +293,12 @@ export default function Home() {
       ];
 
   const {
-    totalPrizePool,
     count,
     totalCount,
     rewards,
     volume,
     transactions,
-    graphTransformedTransactions,
+    graph,
     fluidPairs,
     timestamp,
     txLoaded,
@@ -369,11 +308,11 @@ export default function Home() {
       : data.global;
 
     const {
-      volume,
+      volumeStats,
       rewards,
+      graph,
       totalFluidPairs,
       timestamp,
-      totalPrizePool,
       loaded: homeLoaded,
     } = home;
 
@@ -400,27 +339,20 @@ export default function Home() {
       }
     })();
 
-    const filteredVolume = volume.filter(
-      TIME_FILTERS[activeTransformerIndex].filter
-    );
-
-    const totalVolume = filteredVolume.reduce(
-      (sum, { amount }) => sum + amount,
-      0
-    );
-    const graphTransformedTransactions =
-      GRAPH_TRANSFORMERS[activeTransformerIndex].transform(filteredVolume);
+    const [{ actionCount: transactionCount }] = volumeStats.all;
+    const [
+      { totalVolume: filteredVolume, actionCount: filteredTransactionCount },
+    ] = Object.values(volumeStats)[activeTransformerIndex];
 
     return {
-      count: filteredVolume.length,
-      totalCount: volume.length,
+      count: filteredTransactionCount,
+      totalCount: transactionCount,
       rewards: activeRewards,
-      volume: totalVolume,
+      volume: filteredVolume,
       transactions,
-      graphTransformedTransactions,
+      graph,
       fluidPairs: totalFluidPairs,
       timestamp,
-      totalPrizePool,
       homeLoaded,
       txLoaded,
     };
@@ -666,7 +598,9 @@ export default function Home() {
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
-                  {numberToMonetaryString(totalPrizePool)}
+                  {totalPrizePool
+                    ? numberToMonetaryString(totalPrizePool)
+                    : "Loading..."}
                 </Display>
               </div>
               {activeTableFilterIndex === 0 ? (
@@ -749,9 +683,9 @@ export default function Home() {
           style={{ width: "100%", height: "400px", mixBlendMode: "screen" }}
         >
           <div className="statistics-row pad-main">
-            {GRAPH_TRANSFORMERS.map((filter, i) => (
+            {["D", "W", "M", "Y"].map((filter, i) => (
               <TabButton
-                key={`filter-${filter.name}`}
+                key={`filter-${filter}`}
                 onClick={() => setActiveTransformerIndex(i)}
                 size="default"
               >
@@ -762,23 +696,23 @@ export default function Home() {
                     activeTransformerIndex === i ? "active-filter" : ""
                   }
                 >
-                  {filter.name}
+                  {filter}
                 </Text>
               </TabButton>
             ))}
           </div>
           <LineChart
-            data={graphTransformedTransactions.map((tx, i) => ({
+            data={Object.values(graph)[activeTransformerIndex].map((tx, i) => ({
               ...tx,
               x: i,
             }))}
             lineLabel="transactions"
             accessors={{
-              xAccessor: (d: Volume & { x: number }) => d.x,
-              yAccessor: (d: Volume & { x: number }) =>
+              xAccessor: (d: GraphEntry & { x: number }) => d.x,
+              yAccessor: (d: GraphEntry & { x: number }) =>
                 d.amount ? Math.log(d.amount + 1) : 0,
             }}
-            renderTooltip={({ datum }: { datum: Volume }) => {
+            renderTooltip={({ datum }: { datum: GraphEntry }) => {
               return datum.amount > 0 ? (
                 <Tooltip
                   style={{
@@ -788,12 +722,14 @@ export default function Home() {
                     justifyContent: "center",
                   }}
                 >
-                  <Text>{format(datum.timestamp, "dd/MM/yy")}</Text>
+                  <Text>
+                    {format(new Date(datum.time).getTime(), "dd/MM/yy")}
+                  </Text>
                   <div>
                     <Text prominent>
-                      {datum.sender === MintAddress
+                      {datum.sender_address === MintAddress
                         ? "Mint Address"
-                        : trimAddress(datum.sender)}
+                        : trimAddress(datum.sender_address)}
                     </Text>
                   </div>
                   <div>
@@ -831,58 +767,5 @@ export default function Home() {
     </>
   );
 }
-
-const graphEmptyVolume = (time: number, amount = 0): Volume => ({
-  sender: "",
-  receiver: "",
-  timestamp: time,
-  amount,
-  symbol: "",
-});
-
-const binTransactions = (bins: Volume[], txs: Volume[]): Volume[] => {
-  const txMappedBins: Volume[][] = bins.map((bin) => [bin]);
-
-  let binIndex = 0;
-  txs.every((tx) => {
-    while (tx.timestamp < bins[binIndex].timestamp) {
-      binIndex++;
-
-      if (binIndex >= bins.length) return false;
-    }
-
-    txMappedBins[binIndex].push(tx);
-    return true;
-  });
-
-  const maxTxMappedBins = txMappedBins
-    .map(
-      (txs, i) =>
-        txs.find(
-          (tx) => tx.amount === Math.max(...txs.map(({ amount }) => amount))
-        ) || bins[i]
-    )
-    .reverse();
-
-  const [txMappedBinsStart, ...rest] = maxTxMappedBins.filter(
-    (tx) => tx.amount
-  );
-
-  if (!txMappedBinsStart) return maxTxMappedBins;
-
-  const txMappedBinsEnd = rest.pop();
-
-  const maxTxs = maxTxMappedBins.filter(
-    (tx, i) =>
-      tx.amount ||
-      i === 0 ||
-      i === maxTxMappedBins.length - 1 ||
-      (tx.timestamp < txMappedBinsStart.timestamp &&
-        txMappedBinsEnd &&
-        tx.timestamp > txMappedBinsEnd.timestamp)
-  );
-
-  return maxTxs;
-};
 
 export { ErrorBoundary };

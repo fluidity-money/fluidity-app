@@ -1,0 +1,11 @@
+DOCKER_IMAGE: microservice-redeem-testnet-lootboxes
+DOCKERFILE_PATH: ./cmd/microservice-redeem-testnet-lootboxes
+ENV_FLU_ETHEREUM_NETWORK: "arbitrum"
+TASK_MIN_COUNT: 1
+ENV_FLU_AMQP_GOROUTINES_PER_QUEUE: 1
+
+SERVICES:
+  - REDEEM_TESTNET_LOOTBOXES:
+      SERVICE_NAME: microservice-redeem-testnet-lootboxes
+      ENV_FLU_WORKER_ID: arbitrum-microservice-redeem-testnet-lootboxes
+      ENV_FLU_ADDRESS_CONFIRMER_CONTRACT_ADDRESS: "0x18eb6ac990bd3a31dd3e5dd9c7744751c8e9dc06"

@@ -261,7 +261,6 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 		feeNumerator_ []interface{}
 	)
 
-
 	switch true {
 	case !swapContainsFluid:
 		log.App(func(k *log.Log) {
@@ -372,7 +371,7 @@ func GetCamelotFees(transfer worker.EthereumApplicationTransfer, client *ethclie
 	// amount*(1-fee) = loggedAmount
 	// amount = loggedAmount/(1-fee)
 	if !inTokenIsFluid {
-		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1,1),feeMultiplier))
+		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1, 1), feeMultiplier))
 	}
 
 	fee := new(big.Rat).Mul(fluidTransferAmount, feeMultiplier)

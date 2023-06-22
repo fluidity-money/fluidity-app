@@ -18,8 +18,8 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	commonApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"

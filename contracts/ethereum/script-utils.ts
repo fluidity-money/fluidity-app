@@ -1,8 +1,13 @@
 
 import { promisify } from 'util';
+
 import { readFile as readFileCb } from 'fs';
+
 import { ethers } from 'ethers';
+
 import type { HardhatRuntimeEnvironment } from 'hardhat/types';
+
+import type { BigNumber } from "ethers";
 
 export const readFile = promisify(readFileCb);
 
@@ -95,3 +100,13 @@ export const getLatestTimestamp = async (
   const b = await hre.ethers.provider.getBlock("latest");
   return b.timestamp;
 };
+
+export const normaliseNumbers = (
+  left: BigNumber,
+  right: BigNumber,
+  decimalsLeft: BigNumber,
+  decimalsRight: BigNumber
+): [BigNumber, BigNumber] => [
+  decimalsRight > decimalsLeft ? left.pow(decimalsRight.sub(decimalsLeft)) : left,
+  decimalsLeft > decimalsRight ? right.pow(decimalsLeft.sub(decimalsRight)) : right
+];

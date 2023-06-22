@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
-import { stakingLiquidityMultiplierEq } from "./common";
+import { stakingLiquidityMultiplierEq, TestnetRewardsModal } from "./common";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -36,7 +36,7 @@ import {
   TutorialModal,
 } from "./common";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -55,10 +55,17 @@ import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
+import { SplitContext } from "contexts/SplitProvider";
 
 const EPOCH_DAYS_TOTAL = 31;
 // temp: may 22nd, 2023
 const EPOCH_START_DATE = new Date(2023, 4, 22);
+
+type RedeemableToken = {
+  tokenId: string;
+  amount: BN;
+  decimals: number;
+};
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
@@ -157,11 +164,25 @@ const Airdrop = () => {
     );
   }
 
+  const [redeemableTokens, setRedeemableTokens] = useState<RedeemableToken[]>(
+    []
+  );
+
+  const redeemableTokensUsd = useMemo(
+    () =>
+      redeemableTokens.reduce(
+        (sum, { amount, decimals }) =>
+          sum + getUsdFromTokenAmount(amount, decimals),
+        0
+      ),
+    [redeemableTokens]
+  );
+
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
   const {
     address,
@@ -170,16 +191,20 @@ const Airdrop = () => {
     getStakingDeposits,
     testStakeTokens,
     getStakingRatios,
+    redeemableTokens: getRedeemableTokens,
+    redeemTokens,
   } = useContext(FluidityFacadeContext);
+
+  const { showExperiment } = useContext(SplitContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}`
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? "&provider=sushiswap" : ""
+    }`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
@@ -281,6 +306,37 @@ const Airdrop = () => {
     );
   };
 
+  const fetchUserRedeemableTokens = async (address: string) => {
+    const redeemableTokens = await getRedeemableTokens?.(address);
+
+    if (!redeemableTokens) return;
+
+    return setRedeemableTokens(
+      Object.entries(redeemableTokens)
+        .map(([key, amount]) => {
+          // Get rid of 'Redeemable' in key
+          const tokenSymbol = key.slice(0, -10).toLowerCase();
+          const matchingToken = tokens.find(
+            ({ symbol }) => symbol.toLowerCase() === tokenSymbol
+          );
+
+          if (!matchingToken)
+            return {
+              tokenId: "",
+              amount: new BN(0),
+              decimals: 0,
+            };
+
+          return {
+            tokenId: matchingToken.symbol,
+            amount: amount,
+            decimals: matchingToken.decimals,
+          };
+        })
+        .filter(({ tokenId, amount }) => !!tokenId && amount.gt(new BN(0)))
+    );
+  };
+
   useEffect(() => {
     if (!currentModal) {
       navigate(`${location.pathname}${location.search}`, { replace: true });
@@ -314,7 +370,23 @@ const Airdrop = () => {
     fetchUserTokenBalance();
 
     fetchUserStakes(address);
+
+    fetchUserRedeemableTokens(address);
   }, [address]);
+
+  // will throw error on revert
+  const handleRedeemTokens = async () => {
+    if (!address) return;
+    if (!showExperiment("enable-withdraw-stakes")) return;
+
+    const res = await (await redeemTokens?.())?.confirmTx();
+
+    fetchUserTokenBalance();
+    fetchUserStakes(address);
+    fetchUserRedeemableTokens(address);
+
+    return res;
+  };
 
   const [localCookieConsent, setLocalCookieConsent] = useState<
     boolean | undefined
@@ -396,9 +468,8 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         <TabButton
           size="small"
@@ -449,6 +520,14 @@ const Airdrop = () => {
         >
           Stake
         </TabButton>
+        <TabButton
+          size="small"
+          onClick={() => setCurrentModal("testnet-rewards")}
+          groupId="airdrop"
+          isSelected={isMobile && currentModal === "testnet-rewards"}
+        >
+          Testnet Rewards
+        </TabButton>
       </div>
     );
   };
@@ -458,20 +537,19 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${
-            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-          }`}
+          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+            }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-              currentModal === "leaderboard" ||
-              currentModal === "stake"
+                currentModal === "leaderboard" ||
+                currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                ? "1em"
-                : "2em",
+                  ? "1em"
+                  : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -612,6 +690,9 @@ const Airdrop = () => {
                 stakes={stakes}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+                redeemableUsd={redeemableTokensUsd}
+                redeemableTokens={redeemableTokens}
+                handleRedeemTokens={handleRedeemTokens}
               />
             </>
           )}
@@ -641,14 +722,11 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {/*{currentModal === "testnet-rewards" && (
+          {currentModal === "testnet-rewards" && (
             <>
-              <Heading as="h3" className="no-margin">
-                Claim Testnet Rewards
-              </Heading>
               <TestnetRewardsModal />
             </>
-          )}*/}
+          )}
         </motion.div>
       </>
     );
@@ -719,6 +797,9 @@ const Airdrop = () => {
           stakes={stakes}
           wethPrice={wethPrice}
           usdcPrice={usdcPrice}
+          redeemableUsd={redeemableTokensUsd}
+          redeemableTokens={redeemableTokens}
+          handleRedeemTokens={handleRedeemTokens}
         />
       </CardModal>
       <CardModal
@@ -728,13 +809,13 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      {/*<CardModal
+      <CardModal
         id="testnet-rewards"
         visible={currentModal === "testnet-rewards"}
         closeModal={closeModal}
       >
         <TestnetRewardsModal />
-      </CardModal>*/}
+      </CardModal>
 
       {/* Page Content */}
       <Header />
@@ -963,8 +1044,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  navigate(`/${network}/dashboard/rewards`);
-                }
+                navigate(`/${network}/dashboard/rewards`);
+              }
               : seeBottlesDetails
           }
           style={{
@@ -1203,7 +1284,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
+                  0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1223,8 +1304,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                ? 0
-                : -1;
+                  ? 0
+                  : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1291,14 +1372,12 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
   isMobile = false,
 }: IAirdropRankRow) => {
   const { address } = useContext(FluidityFacadeContext);
-  // const address = '0xb3701a61a9759d10a0fc7ce55354a8163496caec'
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
-        address === user ? "highlighted-row" : ""
-      }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
+        }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1317,8 +1396,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1339,8 +1418,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
             style={
               address === user
                 ? {
-                    color: "black",
-                  }
+                  color: "black",
+                }
                 : {}
             }
           >
@@ -1356,8 +1435,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1372,8 +1451,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1388,8 +1467,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1439,9 +1518,24 @@ const Leaderboard = ({
     <>
       <div className={`leaderboard-header ${isMobile ? "airdrop-mobile" : ""}`}>
         <div className="leaderboard-header-text">
-          <Heading as="h3">Leaderboard</Heading>
+          <div className="leaderboard-header-title-row">
+            <Heading as="h3">Leaderboard</Heading>
+            {filterIndex === 0 && (
+              <GeneralButton
+                icon={<ProviderIcon provider="Sushiswap" />}
+                type="secondary"
+                disabled
+                className="leaderboard-provider-button"
+              >
+                <Text code style={{ color: "inherit" }}>
+                  SUSHISWAP
+                </Text>
+              </GeneralButton>
+            )}
+          </div>
           <Text prominent>
-            This leaderboard shows your rank among other users{" "}
+            This leaderboard shows your rank among other users
+            {filterIndex === 0 ? " using SushiSwap " : " "}
             {filterIndex === 0 ? " per" : " for"}
             &nbsp;
             {filterIndex === 0 ? (
@@ -1453,15 +1547,16 @@ const Leaderboard = ({
         </div>
         <div className="leaderboard-header-filters">
           <GeneralButton
-            type={filterIndex === 0 ? "primary" : "secondary"}
+            type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
+            icon={<ProviderIcon provider="Sushiswap" />}
           >
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
             </Text>
           </GeneralButton>
           <GeneralButton
-            type={filterIndex === 1 ? "primary" : "secondary"}
+            type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
           >
             <Text code size="sm" style={{ color: "inherit" }}>

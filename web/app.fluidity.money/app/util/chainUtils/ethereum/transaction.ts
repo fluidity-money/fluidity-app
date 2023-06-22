@@ -1,13 +1,14 @@
 import type Result from "~/types/Result";
 
 import { JsonRpcProvider, Provider } from "@ethersproject/providers";
-import { ContractTransaction } from "@ethersproject/contracts";
+import { ContractReceipt, ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
-import { Ok, Err } from "~/types/Result";
+import { Ok, Err, flatten, isOk } from "~/types/Result";
+import { TransactionResponse } from "../instructions";
 
 export type ContractToken = {
   address: string;
@@ -21,23 +22,29 @@ export const signOwnerAddress_ = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-) => {
+): Promise<Result<string, Error>> => {
   const contract = getContract(ABI, contractAddress, signer);
-  if (!contract) throw new Error("Invalid contract provided!");
+  if (!contract) return Err(new Error("Invalid contract provided!"));
 
-  const address = await signer.getAddress();
-  const msg = await signer.signMessage(
-    utils.arrayify(
-      utils.keccak256(
-        utils.solidityPack(
-          ["string", "address", "address"],
-          ["fluidity.lootbox.confirm.address.ownership", address, owner]
-        )
+  const address = Ok(await signer.getAddress());
+
+  const message = address
+    .map((address) =>
+      utils.solidityPack(
+        ["string", "address", "address"],
+        ["fluidity.lootbox.confirm.address.ownership", address, owner]
       )
     )
-  );
+    .map(utils.keccak256)
+    .map(utils.arrayify);
 
-  return msg;
+  return message.match<Promise<Result<string, Error>>>({
+    Ok: async (message) =>
+      Ok(await signer.signMessage(message)).err((e) =>
+        handleContractErrors(e, signer.provider)
+      ),
+    Err: async (err) => Err(err),
+  });
 };
 
 export const confirmAccountOwnership_ = async (
@@ -46,18 +53,22 @@ export const confirmAccountOwnership_ = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-) => {
+): Promise<Result<TransactionResponse, Error>> => {
   const contract = getContract(ABI, contractAddress, signer);
   if (!contract) throw new Error("Invalid contract provided!");
 
-  const owner = await signer.getAddress();
-  const { v, r, s } = utils.splitSignature(signature);
+  const owner = Ok(await signer.getAddress());
 
-  try {
-    return Ok(contract.confirm(address, owner, v, r, s));
-  } catch (error) {
-    return Err(error);
-  }
+  return owner.match({
+    Ok: async (owner) => {
+      const { v, r, s } = utils.splitSignature(signature);
+
+      return Ok(await contract.confirm(address, owner, v, r, s)).err((e) =>
+        handleContractErrors(e, signer.provider)
+      );
+    },
+    Err: async (e) => Err(e),
+  });
 };
 
 export const getContract = (
@@ -75,13 +86,19 @@ export const getBalanceOfERC20 = async (
   ABI: ContractInterface
 ): Promise<Result<BN, Error>> => {
   const contract = getContract(ABI, contractAddress, signer);
+
   if (!contract) return Err(Error("no contract"));
 
-  const userAddress = await signer.getAddress();
+  const userAddress = Ok(await signer.getAddress());
 
-  return Ok(await contract.balanceOf(userAddress))
-    .map(toString)
-    .map((str) => new BN(str));
+  return userAddress.match({
+    Ok: async (address) =>
+      Ok(await contract.balanceOf(address))
+        .map(toString)
+        .map((str) => new BN(str))
+        .err((e) => handleContractErrors(e, signer.provider)),
+    Err: async (e) => Err(e),
+  });
 };
 
 // get ERC20 balance for the given token, divided by its decimals
@@ -89,15 +106,22 @@ export const usdBalanceOfERC20 = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-): Promise<number> => {
+): Promise<Result<number, Error>> => {
   const contract = getContract(ABI, contractAddress, signer);
-  if (!contract) return 0;
+  if (!contract) return Err(new Error("Could not get contract"));
 
-  const userAddress = await signer.getAddress();
-  const balance = (await contract.balanceOf(userAddress)).toString();
-  const decimals = (await contract.decimals()).toString();
+  const userAddress = Ok(await signer.getAddress());
 
-  return Number(utils.formatUnits(balance, decimals));
+  const decimals = Ok(await contract.decimals()).map(toString);
+
+  return flatten([userAddress, decimals]).match({
+    Ok: async ([userAddress, decimals]) =>
+      Ok(await contract.balanceOf(userAddress))
+        .map((balance) => utils.formatUnits(balance, decimals))
+        .map(toString)
+        .map(Number),
+    Err: async (e) => Err(e),
+  });
 };
 
 // the amount towards the mint limit the given user has currently minted scaled by decimals
@@ -106,15 +130,19 @@ export const getUsdAmountMinted = async (
   contractAddress: string,
   ABI: ContractInterface,
   userAddress: string
-): Promise<number> => {
+): Promise<Result<number, Error>> => {
   const contract = new Contract(contractAddress, ABI, provider);
   if (!contract)
-    throw new Error(`Could not instantiate contract ${contractAddress}`);
+    return Err(new Error(`Could not instantiate contract ${contractAddress}`));
 
-  const amount = (await contract.userAmountMinted(userAddress)).toString();
-  const decimals = (await contract.decimals()).toString();
+  const amount = Ok(await contract.userAmountMinted(userAddress)).map(toString);
+  const decimals = Ok(await contract.decimals()).map(toString);
 
-  return Number(utils.formatUnits(amount, decimals));
+  return flatten([amount, decimals]).match({
+    Ok: async ([amount, decimals]) =>
+      Ok(utils.formatUnits(amount, decimals)).map(Number),
+    Err: async (e) => Err(e),
+  });
 };
 
 const makeContractSwap = async (
@@ -130,156 +158,89 @@ const makeContractSwap = async (
   const toContract = getContract(toABI, toAddress, signer);
   const amountBn = utils.parseUnits(String(amount));
 
-  if (amountBn.eq(0)) {
-    throw new Error(`Cannot send 0 ${from.symbol}!`);
-  }
-  if (amountBn.lt(0)) {
-    throw new Error(`${amount} is less than 0!`);
-  }
+  if (amountBn.eq(0)) return Err(new Error(`Cannot send 0 ${from.symbol}!`));
+  if (amountBn.lt(0)) return Err(new Error(`${amount} is less than 0!`));
 
-  try {
-    const fromAddress = await signer.getAddress();
-    const balance: BigNumber = await fromContract.balanceOf(fromAddress);
-    if (balance.lt(amount)) {
-      throw new Error(`You don't have enough ${from.symbol}`);
-    }
+  if (!toIsFluidOf && !fromIsFluidOf)
+    return Err(new Error(`Invalid token pair ${from.symbol}:${to.symbol}`));
 
-    if (toIsFluidOf) {
-      //Coin -> fCoin
-      //call approve
-      //check whether to increase allowance - if it already exists this will fail
-      const allowance: BigNumber = await fromContract.allowance(
-        fromAddress,
-        toAddress
-      );
-      // some tokens (USDT) will revert if approving from nonzero -> nonzero, to prevent reordering attacks
-      if (allowance.lt(amount)) {
-        if (!allowance.isZero()) {
-          const zeroApproval = await fromContract.approve(
-            toContract.address,
-            constants.Zero
-          );
-          await zeroApproval.wait();
-        }
-
-        const approval = await fromContract.approve(
-          toContract.address,
-          constants.MaxUint256
-        );
-        await approval.wait();
-      }
-      // `.wait()` these here to handle errors
-      // call ERC20in
-      return await toContract.erc20In(amount);
-    } else if (fromIsFluidOf) {
-      // fCoin -> Coin
-      return await fromContract.erc20Out(amount);
-    } else throw new Error(`Invalid token pair ${from.symbol}:${to.symbol}`);
-  } catch (error) {
-    return await handleContractErrors(error as ErrorType, signer.provider);
-  }
-};
-
-type ManualRewardBody = {
-  // Address of initiator
-  address: string;
-
-  // Name of Token being front-run
-  token_short_name: string;
-};
-
-type ManualRewardRes = {
-  // Error message on unsuccessful call
-  error?: string;
-
-  // Base64 encoded signature for calling
-  // manual-reward in Token.sol
-  payload?: {
-    reward: {
-      winner: string;
-      win_amount: number;
-      first_block: number;
-      last_block: number;
-      token_details: {
-        token_decimals: number;
-        token_short_name: string;
-      };
-    };
-    signature: string;
-  };
-};
-
-export const manualRewardToken = async (
-  token: ContractToken,
-  baseTokenSymbol: string,
-  address: string,
-  signer: Signer
-): Promise<
-  Result<{ amount: number; gasFee: number; networkFee: number }, Error>
-> => {
-  const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
-
-  const manualRewardBody = {
-    address,
-    token_short_name: baseTokenSymbol,
-  };
-
-  const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
-    manualRewardUrl,
-    manualRewardBody
+  const signerAddress = Ok(await signer.getAddress()).err(
+    () => `Could not get Signer Address`
   );
 
-  if (error || !payload) return Err(Error("could not generate payload"));
+  const canSwap: Result<boolean, Error> = await signerAddress.match({
+    Ok: async (address) =>
+      Ok(await fromContract.balanceOf(address))
+        .err(() => "Could not fetch balance")
+        .map((balance) => balance.lt(amount)),
+    Err: async (e) => Err(e),
+  });
 
-  // Call eth contract
+  if (!isOk(canSwap)) return canSwap;
 
-  const { winner, win_amount, first_block, last_block, token_details } =
-    payload.reward;
+  if (
+    canSwap.match({
+      Ok: (canSwap) => canSwap,
+      Err: (_) => false,
+    })
+  )
+    return Err(new Error(`You don't have enough ${from.symbol}`));
 
-  const { token_decimals } = token_details;
-  const decimals = BigNumber.from(10).pow(token_decimals);
-
-  const winningAmount = BigNumber.from(`${win_amount}`);
-
-  const { signature: b64Signature } = payload;
-
-  // convert B64 -> byte[] -> hex string
-  const uint8Signature = B64ToUint8Array(b64Signature);
-  const hexSignature = bytesToHex(Array.from(uint8Signature));
-
-  const mainnetId = 1;
-
-  try {
-    const tokenContract = getContract(token.ABI, token.address, signer);
-
-    const contractTx: ContractTransaction = await tokenContract.manualReward(
-      // contractAddress
-      token.address,
-      // chainid
-      mainnetId,
-      // winnerAddress
-      winner,
-      // winAmount
-      winningAmount,
-      // firstBlock
-      first_block,
-      // lastBlock
-      last_block,
-      // sig
-      hexSignature
+  if (toIsFluidOf) {
+    //Coin -> fCoin
+    //call approve
+    //check whether to increase allowance - if it already exists this will fail
+    const allowanceRes = Ok<BigNumber>(
+      await fromContract.allowance(signerAddress, toAddress)
     );
 
-    const res = await contractTx.wait();
+    if (!isOk(allowanceRes)) return Err(new Error(`Could not fetch allowance`));
 
-    return {
-      networkFee: res.gasUsed.toNumber(),
-      gasFee: res.gasUsed.toNumber(),
-      amount: parseFloat(winningAmount.div(decimals).toString()),
-    };
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, signer.provider);
-    return { amount: 0, gasFee: 0, networkFee: 0 };
+    const allowance = allowanceRes.match({
+      Ok: (allowance) => allowance,
+      Err: () => BigNumber.from(0), // Will not occur
+    });
+
+    const requireIncreaseAllowance = allowance.lt(amount);
+    if (requireIncreaseAllowance) {
+      if (!allowance.isZero()) {
+        const zeroAllowance = Ok(
+          await fromContract
+            .approve(toContract.address, constants.Zero)
+            .then((approval: ContractTransaction) => approval.wait())
+        ).err((e) => handleContractErrors(e, signer.provider));
+
+        if (!isOk(zeroAllowance)) return zeroAllowance;
+      }
+
+      const increaseAllowance = Ok(
+        await fromContract
+          .approve(toContract.address, constants.MaxUint256)
+          .then((approval: ContractTransaction) => approval.wait())
+      ).err((e) => handleContractErrors(e, signer.provider));
+
+      if (!isOk(increaseAllowance)) return increaseAllowance;
+    }
+
+    const approval = Ok(
+      await fromContract
+        .approve(toContract.address, constants.MaxUint256)
+        .then((approval: ContractTransaction) => approval.wait())
+    ).err((e) => handleContractErrors(e, signer.provider));
+
+    if (!isOk(approval)) return approval;
+
+    // `.wait()` these here to handle errors
+    // call ERC20in
+    return Ok(await toContract.erc20In(amount)).err((e) =>
+      handleContractErrors(e, signer.provider)
+    );
   }
+
+  // fCoin -> Coin
+  return Ok(await fromContract.erc20Out(amount)).err((e) =>
+    handleContractErrors(e, signer.provider)
+  );
 };
 
 type PrizePool = {
@@ -292,20 +253,22 @@ export const aggregatePrizePools = async (
   provider: JsonRpcProvider,
   rewardPoolAddr: string,
   rewardPoolAbi: ContractInterface
-): Promise<number> => {
-  try {
-    const rewardPoolContract = new Contract(
-      rewardPoolAddr,
-      rewardPoolAbi,
-      provider
-    );
+): Promise<Result<number, Error>> => {
+  const rewardPoolContract = new Contract(
+    rewardPoolAddr,
+    rewardPoolAbi,
+    provider
+  );
 
-    if (!rewardPoolContract)
-      throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
+  if (!rewardPoolContract)
+    throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
 
-    const pools: PrizePool[] = await rewardPoolContract.callStatic.getPools();
+  const poolsRes: Result<PrizePool[], Error> = Ok(
+    await rewardPoolContract.callStatic.getPools()
+  );
 
-    const totalPrizePool = pools.reduce((sum, { amount, decimals }) => {
+  const totalPrizePool: Result<BN, Error> = poolsRes.map((pools) =>
+    pools.reduce((sum, { amount, decimals }) => {
       // amount is uint256, convert to proper BN for float calculations
       const amountBn = new BN(amount.toString());
 
@@ -314,13 +277,10 @@ export const aggregatePrizePools = async (
       const amountDiv = amountBn.div(decimalsBn);
 
       return sum.add(amountDiv);
-    }, new BN(0));
+    }, new BN(0))
+  );
 
-    return totalPrizePool.toNumber();
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return 0;
-  }
+  return totalPrizePool.map((prizePool) => prizePool.toNumber());
 };
 
 // Returns total prize pool from aggregated contract
@@ -328,31 +288,29 @@ export const getTotalRewardPool = async (
   provider: JsonRpcProvider,
   rewardPoolAddr: string,
   rewardPoolAbi: ContractInterface
-): Promise<number> => {
-  try {
-    const rewardPoolContract = new Contract(
-      rewardPoolAddr,
-      rewardPoolAbi,
-      provider
+): Promise<Result<number, Error>> => {
+  const rewardPoolContract = new Contract(
+    rewardPoolAddr,
+    rewardPoolAbi,
+    provider
+  );
+
+  if (!rewardPoolContract)
+    return Err(
+      new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`)
     );
 
-    if (!rewardPoolContract)
-      throw new Error(`Could not instantiate Reward Pool at ${rewardPoolAddr}`);
+  const totalPrizePoolRes = Ok(
+    await rewardPoolContract.callStatic.getTotalRewardPool()
+  ).map((prizePool) => prizePool.toString());
 
-    const totalPrizePool_ =
-      await rewardPoolContract.callStatic.getTotalRewardPool();
+  const DECIMALS = new BN(18);
 
-    const totalPrizePool = new BN(totalPrizePool_.toString());
+  const decimalsBn = new BN(10).pow(DECIMALS);
 
-    const DECIMALS = new BN(18);
-
-    const decimalsBn = new BN(10).pow(DECIMALS);
-
-    return totalPrizePool.div(decimalsBn).toNumber();
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return 0;
-  }
+  return totalPrizePoolRes.map((totalPrizePool) =>
+    totalPrizePool.div(decimalsBn).toNumber()
+  );
 };
 
 // Returns User DegenScore
@@ -361,30 +319,23 @@ export const getUserDegenScore = async (
   userAddr: string,
   degenScoreAddr: string,
   degenScoreAbi: ContractInterface
-): Promise<number> => {
-  try {
-    const degenScoreContract = new Contract(
-      degenScoreAddr,
-      degenScoreAbi,
-      provider
+): Promise<Result<number, Error>> => {
+  const degenScoreContract = new Contract(
+    degenScoreAddr,
+    degenScoreAbi,
+    provider
+  );
+
+  if (!degenScoreContract)
+    return Err(
+      new Error(`Could not instantiate DegenScore at ${degenScoreAddr}`)
     );
 
-    if (!degenScoreContract)
-      throw new Error(`Could not instantiate DegenScore at ${degenScoreAddr}`);
+  const degenScoreTraitId = "121371448299756538184036965";
 
-    const degenScoreTraitId = "121371448299756538184036965";
-
-    const score = await degenScoreContract.callStatic.getTrait(
-      userAddr,
-      degenScoreTraitId,
-      0
-    );
-
-    return score.toNumber();
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return 0;
-  }
+  return Ok(
+    await degenScoreContract.callStatic.getTrait(userAddr, degenScoreTraitId, 0)
+  ).map((score) => score.toNumber());
 };
 
 export type StakingRatioRes = {
@@ -398,20 +349,17 @@ export const getTokenStakingRatio = async (
   provider: JsonRpcProvider,
   stakingAbi: ContractInterface,
   stakingAddr: string
-) => {
-  try {
-    const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
+): Promise<Result<StakingRatioRes, Error>> => {
+  const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
 
-    if (!stakingContract)
-      throw new Error(
-        `Could not instantiate Staking Contract at ${stakingAddr}`
-      );
+  if (!stakingContract)
+    return Err(
+      new Error(`Could not instantiate Staking Contract at ${stakingAddr}`)
+    );
 
-    return stakingContract.ratios();
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return undefined;
-  }
+  return Ok(await stakingContract.ratios()).err((e) =>
+    handleContractErrors(e, provider)
+  );
 };
 
 export type StakingDepositsRes = Array<{
@@ -431,22 +379,17 @@ export const getUserStakingDeposits = async (
   stakingAbi: ContractInterface,
   stakingAddr: string,
   userAddr: string
-): Promise<StakingDepositsRes | undefined> => {
-  try {
-    const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
+): Promise<Result<StakingDepositsRes, Error>> => {
+  const stakingContract = new Contract(stakingAddr, stakingAbi, provider);
 
-    if (!stakingContract)
-      throw new Error(
-        `Could not instantiate Staking Contract at ${stakingAddr}`
-      );
+  if (!stakingContract)
+    return Err(
+      new Error(`Could not instantiate Staking Contract at ${stakingAddr}`)
+    );
 
-    const deposits = await stakingContract.deposits(userAddr);
-
-    return deposits;
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return undefined;
-  }
+  return Ok(await stakingContract.deposits(userAddr)).err((e) =>
+    handleContractErrors(e, provider)
+  );
 };
 
 // Call Static Stake tokens - For Error Checking
@@ -491,97 +434,154 @@ export const makeStakingDeposit = async (
   slippage: BN,
   maxTimestamp: BN
 ) => {
-  try {
-    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+  const stakingContract = getContract(stakingAbi, stakingAddr, signer);
 
-    if (!stakingContract)
-      throw new Error(
-        `Could not instantiate Staking Contract at ${stakingAddr}`
-      );
+  if (!stakingContract)
+    return Err(
+      new Error(`Could not instantiate Staking Contract at ${stakingAddr}`)
+    );
 
-    const stakingTokenAmounts = [
-      {
-        token: usdcToken,
-        amt: usdcAmt,
-      },
-      {
-        token: fusdcToken,
-        amt: fusdcAmt,
-      },
-      {
-        token: wethToken,
-        amt: wethAmt,
-      },
-    ];
+  const stakingTokenAmounts = [
+    {
+      token: usdcToken,
+      amt: usdcAmt,
+    },
+    {
+      token: fusdcToken,
+      amt: fusdcAmt,
+    },
+    {
+      token: wethToken,
+      amt: wethAmt,
+    },
+  ];
 
-    // Check whether to increase allowance
+  const allowances = flatten(
     await Promise.all(
       stakingTokenAmounts.map(async ({ token: { ABI, address }, amt }) => {
         const tokenContract = getContract(ABI, address, signer);
 
-        const allowance: BigNumber = await tokenContract.allowance(
-          address,
-          stakingAddr
-        );
+        if (!tokenContract)
+          return Err(new Error(`Could not get token contract at ${address}`));
 
         const amtString = amt.toString();
 
-        if (allowance.lt(amtString)) {
-          const approval = await tokenContract.approve(stakingAddr, amtString);
-
-          // `.wait()` to handle errors
-          await approval.wait();
-        }
+        return (
+          Ok(await tokenContract.allowance(address, stakingAddr))
+            // Check whether to increase allowance
+            .map((allowance) => allowance.lt(amtString))
+            .match({
+              Ok: async (shouldIncreaseAllowance) =>
+                shouldIncreaseAllowance
+                  ? Ok(
+                      await tokenContract
+                        .approve(stakingAddr, amtString)
+                        .then((approval: ContractTransaction) =>
+                          approval.wait()
+                        )
+                    ).err((e) => handleContractErrors(e, signer.provider))
+                  : Ok(""),
+              Err: async (e) => Err(e),
+            })
+        );
       })
+    )
+  );
+
+  // call deposit
+  return allowances
+    .map(
+      () =>
+        await stakingContract.deposit(
+          lockDurationSeconds.toString(),
+          fusdcAmt.toString(),
+          usdcAmt.toString(),
+          wethAmt.toString(),
+          slippage.toString(),
+          maxTimestamp.toString()
+        )
+    )
+    .err((e) => handleContractErrors(e, signer.provider));
+};
+
+export type StakingRedeemableRes = {
+  fusdcRedeemable: BN;
+  usdcRedeemable: BN;
+  wethRedeemable: BN;
+};
+
+export const getRedeemableTokens = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  address: string
+): Promise<Result<StakingRedeemableRes, Error>> => {
+  const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+  if (!stakingContract)
+    return Err(
+      new Error(`Could not instantiate Staking Contract at ${stakingAddr}`)
     );
 
-    // call deposit
-    return await stakingContract.deposit(
-      lockDurationSeconds.toString(),
-      fusdcAmt.toString(),
-      usdcAmt.toString(),
-      wethAmt.toString(),
-      slippage.toString(),
-      maxTimestamp.toString()
-    );
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, signer.provider);
-    return undefined;
-  }
+  // call redeemable
+  return Ok(await stakingContract.redeemable(address)).err((e) =>
+    handleContractErrors(e, signer.provider)
+  );
+};
+
+export const makeStakingRedemption = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  timestamp: BN,
+  fusdcMinimum: BN,
+  usdcMinimum: BN,
+  wethMinimum: BN
+): Promise<Result<TransactionResponse, Error>> => {
+  const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+  if (!stakingContract)
+    throw new Error(`Could not instantiate Staking Contract at ${stakingAddr}`);
+
+  // call redeem
+  return Ok(
+    await stakingContract.redeem(
+      timestamp.toString(),
+      fusdcMinimum.toString(),
+      usdcMinimum.toString(),
+      wethMinimum.toString()
+    )
+  ).err((e) => handleContractErrors(e, signer.provider));
 };
 
 export const getWethUsdPrice = async (
   provider: JsonRpcProvider,
   eacAggregatorProxyAddr: string,
   eacAggregatorProxyAbi: ContractInterface
-): Promise<number> => {
-  try {
-    const eacAggregatorProxyContract = new Contract(
-      eacAggregatorProxyAddr,
-      eacAggregatorProxyAbi,
-      provider
+): Promise<Result<number, Error>> => {
+  const eacAggregatorProxyContract = new Contract(
+    eacAggregatorProxyAddr,
+    eacAggregatorProxyAbi,
+    provider
+  );
+
+  if (!eacAggregatorProxyContract)
+    return Err(
+      new Error(
+        `Could not instantiate EACAggregator at ${eacAggregatorProxyAddr}`
+      )
     );
 
-    if (!eacAggregatorProxyContract)
-      throw new Error(
-        `Could not instantiate EACAggregator at ${eacAggregatorProxyAddr}`
-      );
+  // Convert to cents, for more accurate calculations
+  const CENT_DECIMALS = new BN(6);
 
-    const wethUsdValue_ =
-      await eacAggregatorProxyContract.callStatic.latestAnswer();
+  const decimalsBn = new BN(10).pow(CENT_DECIMALS);
 
-    const wethUsdValue = new BN(wethUsdValue_.toString());
-
-    // Convert to cents, for more accurate calculations
-    const CENT_DECIMALS = new BN(6);
-
-    const decimalsBn = new BN(10).pow(CENT_DECIMALS);
-
-    return wethUsdValue.div(decimalsBn).toNumber() / 100;
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, provider);
-    return 0;
-  }
+  return Ok(await eacAggregatorProxyContract.callStatic.latestAnswer())
+    .map(toString)
+    .map((wethValue) => new BN(wethValue))
+    .map((wethValue) => wethValue.div(decimalsBn).toNumber() / 100)
+    .err((e) => handleContractErrors(e, provider));
 };
 
 type ErrorType = {
@@ -591,40 +591,41 @@ type ErrorType = {
 export const handleContractErrors = async (
   error: ErrorType,
   provider: Provider | undefined
-) => {
+): Promise<Error> => {
   const msg = error?.data?.message ?? error?.message;
 
-  if (!msg) throw new Error(`Unknown Error: ${error}`);
-
-  // check for denial separately (these don't contain an error code for some reason)
-  if (msg === "MetaMask Tx Signature: User denied transaction signature.") {
-    throw new Error(`Transaction Denied`);
-  }
-
   try {
+    if (!msg) return new Error(`Unknown Error: ${error}`);
+
+    // check for denial separately (these don't contain an error code for some reason)
+    if (msg === "MetaMask Tx Signature: User denied transaction signature.") {
+      return new Error(`Transaction Denied`);
+    }
+
     // check if we've got a different metamask error
     const metaMaskError = JSON.parse(msg.match(/{.*}/)?.[0] || "");
 
     if (metaMaskError?.value.code === -32603) {
-      throw new Error(
+      return new Error(
         `Failed to make swap. Please reset your Metamask account (settings -> advanced -> reset account)`
       );
     } else if (metaMaskError?.value.code === -32000) {
-      throw new Error(`Failed to make swap. Gas limit too low.`);
+      return new Error(`Failed to make swap. Gas limit too low.`);
     }
 
     // otherwise, check for a 'non intrinsic' gas error (gas exhausted)
     const { hash } = metaMaskError || {};
     const receipt = await provider?.getTransactionReceipt(hash);
+
     // found revert opcode, assume it's a gas error since we can't call this with an insufficient balance within the application
     if (receipt?.status === 0) {
-      throw new Error(
+      return new Error(
         `Failed to make swap. Gas limit of ${receipt?.gasUsed?.toNumber()} exhausted!`
       );
     }
-  } catch (e) {
-    // otherwise, use a generic error
-    throw new Error(`Failed to make swap. ${msg}`);
+  } finally {
+    // Unknown error - likely malformed call
+    return new Error(`Failed to make swap. ${msg}`);
   }
 };
 

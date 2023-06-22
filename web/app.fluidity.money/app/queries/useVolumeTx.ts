@@ -59,7 +59,7 @@ const queryByAddressTimestamp: Queryable = {
         token_decimals
         time
         transaction_hash
-        amount
+        amount_str
       }
     }
   `,
@@ -110,7 +110,7 @@ const queryByTimestamp: Queryable = {
         token_decimals
         time
         transaction_hash
-        amount
+        amount_str
       }
     }
   `,
@@ -161,7 +161,7 @@ export type VolumeTxsResponse = {
 export type HasuraVolumeTransaction = {
   sender_address: string;
   recipient_address: string;
-  amount: number;
+  amount_str: string;
   token_short_name: string;
   token_decimals: number;
   time: number;
@@ -211,7 +211,7 @@ const useVolumeTxByAddressTimestamp = async (
           sender: { address: transfer.sender_address },
           receiver: { address: transfer.recipient_address },
           amount: getUsdFromTokenAmount(
-            new BN(String(transfer.amount)),
+            new BN(transfer.amount_str),
             transfer.token_decimals
           ),
           currency: { symbol: "f" + transfer.token_short_name },
@@ -263,7 +263,7 @@ const useVolumeTxByTimestamp = async (
           sender: { address: transfer.sender_address },
           receiver: { address: transfer.recipient_address },
           amount: getUsdFromTokenAmount(
-            new BN(String(transfer.amount)),
+            new BN(transfer.amount_str),
             transfer.token_decimals
           ),
           currency: { symbol: "f" + transfer.token_short_name },

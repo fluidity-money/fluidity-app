@@ -50,6 +50,14 @@ interface IToken is IERC20 {
         uint256 amount
     );
 
+    /// @notice emitted when an operator sets the burn fee (1%)
+    event FeeSet(
+        uint256 _originalMintFee,
+        uint256 _newMintFee,
+        uint256 _originalBurnFee,
+        uint256 _newBurnFee
+    );
+
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
      * @return the address of the trusted oracle
@@ -105,6 +113,13 @@ interface IToken is IERC20 {
      */
     function erc20OutTo(address _recipient, uint256 _amount) external;
 
+   /**
+     * @notice burns `amount` of fluid /without/ withdrawing the underlying
+     *
+     * @param _amount the number of fluid tokens to burn
+     */
+    function burnFluidWithoutWithdrawal(uint256 _amount) external;
+
     /**
      * @notice calculates the size of the reward pool (the interest we've earned)
      *
@@ -154,4 +169,6 @@ interface IToken is IERC20 {
      *       liquidity provided by the team OR by the DAO to allocate funds
      */
     function drainRewardPool(address _recipient, uint256 _amount) external;
+
+    function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) external;
 }

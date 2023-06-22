@@ -7,6 +7,9 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-contract LootboxTestnetRewards {
-
+/// @notice TestCamelotPair does not implement ICamelotPair
+contract TestCamelotPair {
+    function balanceOf(address /* _spender */) public pure returns (uint256) {
+        revert("test client");
+    }
 }
