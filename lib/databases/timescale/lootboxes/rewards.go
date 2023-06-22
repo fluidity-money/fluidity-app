@@ -31,7 +31,7 @@ func buildUserRewardValuesString(userCount int) (string, error) {
 		)
 	}
 
-	uniqueMessages := []string{
+	rewardStrings := []string{
 		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none')`,
@@ -62,20 +62,36 @@ func buildUserRewardValuesString(userCount int) (string, error) {
 
 	var output strings.Builder
 
-	for i := 0; i < userCount; i++ {
-		tmpl := template.Must(template.New("leaderboardPrize").Parse(uniqueMessages[i]))
-		err := tmpl.Execute(&output, i)
+	// custom sub function to find the last index of the array
+	funcMap := template.FuncMap{
+		"sub": func(a, b int) int {
+			return a - b
+		},
+	}
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to execute template!"
-				k.Payload = err
-			})
-		}
+	// print each line of rewardStrings, separated by a comma and newline, except for the last
+	tmpl := template.Must(template.New("leaderboardPrize").Funcs(funcMap).Parse(`
+		{{- $lineCount := len .RewardStrings }}
+		{{- $lastIndex := sub $lineCount 1 }}
+		{{- range $i, $reward := .RewardStrings }}
+		{{- $reward }}
+		{{- if ne $i $lastIndex }},{{ println }}{{ end }}
+		{{- end }}`,
+	))
 
-		if i != userCount-1 {
-			output.WriteString(",\n")
-		}
+	data := struct {
+		RewardStrings []string
+	}{
+		RewardStrings: rewardStrings[:userCount],
+	}
+
+	err := tmpl.Execute(&output, data)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to execute template!"
+			k.Payload = err
+		})
 	}
 
 	return output.String(), nil
