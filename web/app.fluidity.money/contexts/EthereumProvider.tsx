@@ -64,7 +64,7 @@ const EthereumFacade = ({
 }: {
   children: ReactNode;
   tokens: Token[];
-  connectors: Map<string, [Connector, Web3ReactHooks]>;
+  connectors: { [providerId: string]: [Connector, Web3ReactHooks] };
   network: Chain;
 }) => {
   const { isActive, provider, account, connector, isActivating } =
@@ -157,7 +157,7 @@ const EthereumFacade = ({
   const useConnectorType = async (
     type: "metamask" | "walletconnect" | "coin98" | "okxwallet" | string
   ): Promise<Result<void, Error>> => {
-    const connector = connectors.get(type)?.[0];
+    const connector = connectors[type]?.[0];
 
     if (!connector) return Err(Error(`unsupported connector: ${type}`));
 
@@ -651,46 +651,49 @@ export const EthereumProvider = (
     const okxWallet = useWindow("okxwallet");
 
     // Listen for changes to the injected connectors / Setup the injected connectors.
-    const connectors: Map<string, [Connector, Web3ReactHooks]> = useMemo(() => {
-      const _connectors = new Map();
+    const connectors: { [providerId: string]: [Connector, Web3ReactHooks] } =
+      useMemo(() => {
+        const _connectors = {} as {
+          [providerId: string]: [Connector, Web3ReactHooks];
+        };
 
-      const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
-        (actions) => new MetaMask({ actions })
-      );
-      _connectors.set("metamask", [metaMask, metamaskHooks]);
-
-      const [walletConnect, walletconnectHooks] =
-        initializeConnector<WalletConnect>(
-          (actions) =>
-            new WalletConnect({
-              actions,
-              options: {
-                projectId: walletconnectId,
-                chains: [1, 42161],
-                showQrModal: true,
-              },
-            })
+        const [metaMask, metamaskHooks] = initializeConnector<MetaMask>(
+          (actions) => new MetaMask({ actions })
         );
-      _connectors.set("walletconnect", [walletConnect, walletconnectHooks]);
+        _connectors["metamask"] = [metaMask, metamaskHooks];
 
-      const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
-        (actions) => new MetaMask({ actions })
-      );
-      _connectors.set("coin98", [coin98, coin98Hooks]);
+        const [walletConnect, walletconnectHooks] =
+          initializeConnector<WalletConnect>(
+            (actions) =>
+              new WalletConnect({
+                actions,
+                options: {
+                  projectId: walletconnectId,
+                  chains: [1, 42161],
+                  showQrModal: true,
+                },
+              })
+          );
+        _connectors["walletconnect"] = [walletConnect, walletconnectHooks];
 
-      if (okxWallet) {
-        const [okx, okxHooks] = initializeConnector<EIP1193>(
-          (actions) =>
-            new EIP1193({
-              actions,
-              provider: okxWallet as Provider,
-            })
+        const [coin98, coin98Hooks] = initializeConnector<MetaMask>(
+          (actions) => new MetaMask({ actions })
         );
-        _connectors.set("okx", [okx, okxHooks]);
-      }
+        _connectors["coin98"] = [coin98, coin98Hooks];
 
-      return _connectors;
-    }, [okxWallet]);
+        if (okxWallet) {
+          const [okx, okxHooks] = initializeConnector<EIP1193>(
+            (actions) =>
+              new EIP1193({
+                actions,
+                provider: okxWallet as Provider,
+              })
+          );
+          _connectors["okx"] = [okx, okxHooks];
+        }
+
+        return _connectors;
+      }, [okxWallet]);
 
     return (
       <>

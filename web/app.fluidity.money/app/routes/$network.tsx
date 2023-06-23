@@ -93,11 +93,10 @@ const ProviderOutlet = () => {
   useEffect(() => {
     if (!address || !connected) return;
 
-    getDegenScore?.(address)
-      .then((degenScore) =>
+    (async () =>
+      (await getDegenScore?.(address))?.map((degenScore: number) =>
         client?.track("connected-user-degen-score", address, degenScore)
-      )
-      .catch(() => null);
+      ))();
   }, [address, client]);
 
   return (

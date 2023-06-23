@@ -224,54 +224,16 @@ export default function FluidifyToken() {
     }
 
     (async () => {
-      switch (network) {
-        case "ethereum":
-        case "arbitrum": {
-          const [tokensMinted, userTokenBalance] = await Promise.all([
-            Promise.all(
-              tokens.map(async (token) => {
-                if (token.isFluidOf) return undefined;
+      const userTokenBalance = await Promise.all(
+        tokens.map(async ({ address }) => await balance?.(address))
+      );
 
-                const fluidToken = tokens.find(
-                  ({ isFluidOf }) => isFluidOf === token.address
-                );
-
-                if (!fluidToken) return undefined;
-
-                return amountMinted?.(fluidToken.address);
-              })
-            ),
-            Promise.all(
-              tokens.map(
-                async ({ address }) => (await balance?.(address)) || new BN(0)
-              )
-            ),
-          ]);
-
-          return setTokens(
-            tokens.map((token, i) => ({
-              ...token,
-              userMintedAmt: tokensMinted[i],
-              userTokenBalance: userTokenBalance[i],
-            }))
-          );
-        }
-        case "solana": {
-          // get user token balances
-          const userTokenBalance = await Promise.all(
-            tokens.map(
-              async ({ address }) => (await balance?.(address)) || new BN(0)
-            )
-          );
-
-          return setTokens(
-            tokens.map((token, i) => ({
-              ...token,
-              userTokenBalance: userTokenBalance[i],
-            }))
-          );
-        }
-      }
+      return setTokens(
+        tokens.map((token, i) => ({
+          ...token,
+          userTokenBalance: userTokenBalance[i].match(),
+        }))
+      );
     })();
   }, [address, swapping]);
 
