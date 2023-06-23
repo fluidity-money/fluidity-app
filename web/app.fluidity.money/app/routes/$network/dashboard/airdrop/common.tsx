@@ -1991,15 +1991,15 @@ const RecapModal = ({
             <div className="recap-circle-scroll-arrow">
               <ArrowDown />
             </div>
-            <svg viewBox="0 0 200 200">
+            <svg viewBox="0 0 100 100">
               <motion.path
                 id="recap-curve"
-                d="M 100, 100 m -75, 0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0"
+                d="M50,1c27,0,49,22,49,49S77,99,50,99S1,77,1,50S23,1,50,1 M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50
+		S77.6,0,50,0L50,0z"
                 fill="transparent"
                 stroke="transparent"
-                strokeWidth="2"
               />
-              <text className="recap-circle-scroll-text">
+              <text className="recap-circle-scroll-text" dy="1em">
                 <textPath xlinkHref="#recap-curve">
                   SCROLL DOWN FOR IN-DEPTH STATS
                 </textPath>
