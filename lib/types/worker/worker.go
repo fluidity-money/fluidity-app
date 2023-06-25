@@ -99,6 +99,7 @@ type (
 		Camelot          float64 `json:"camelot"`
 		Chronos          float64 `json:"chronos"`
 		Sushiswap        float64 `json:"sushiswap"`
+		KyberClassic     float64 `json:"kyber_classic"`
 	}
 
 	FeeSwitch struct {
