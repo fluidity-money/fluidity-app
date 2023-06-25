@@ -449,11 +449,7 @@ const StakingStatsModal = ({
     };
   });
 
-  const canWithdraw =
-    showExperiment("enable-withdraw-stakes") &&
-    augmentedStakes.some(({ stake, stakedDays }) => {
-      return stake.durationDays - stakedDays < 0;
-    });
+  const canWithdraw = showExperiment("enable-withdraw-stakes");
 
   const sumLiquidityMultiplier = augmentedStakes.reduce(
     (sum, { multiplier, fluidUsd, baseUsd }) => {
