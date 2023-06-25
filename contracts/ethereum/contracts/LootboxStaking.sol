@@ -476,7 +476,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         if (_maxTimestamp == 0) _maxTimestamp = block.timestamp;
 
-        require(block.timestamp < _maxTimestamp + 1, "exceeded time");
+        require(block.timestamp <= _maxTimestamp + 1, "exceeded time");
 
         require(_lockupLength + 1 > MIN_LOCKUP_TIME, "lockup length too low");
         require(_lockupLength < MAX_LOCKUP_TIME + 1, "lockup length too high");
@@ -544,7 +544,7 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         if (_maxTimestamp == 0) _maxTimestamp = block.timestamp;
 
-        require(block.timestamp < _maxTimestamp + 1, "exceeded time");
+        require(block.timestamp <= _maxTimestamp + 1, "exceeded time");
 
         Deposit memory dep;
 
