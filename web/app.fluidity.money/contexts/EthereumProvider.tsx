@@ -29,7 +29,6 @@ import {
   makeStakingDeposit,
   testMakeStakingDeposit,
   makeStakingRedemption,
-  getRedeemableTokens,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -273,9 +272,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -363,11 +362,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -514,40 +513,19 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-        txHash: stakingDepositRes.hash,
-      }
+          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+          txHash: stakingDepositRes.hash,
+        }
       : undefined;
   };
 
   /*
+   * @deprecated
    * redeemableTokens gets amount of staked tokens after lockup period
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const redeemableTokens = async (address: string) => {
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return undefined;
-    }
-
-    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
-
-    const res = await getRedeemableTokens(
-      signer,
-      StakingAbi,
-      stakingAddr,
-      address
-    );
-
-    if (!res) return undefined;
-
-    const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = res;
-
-    return {
-      fusdcRedeemable: new BN(fusdcRedeemable.toString()),
-      usdcRedeemable: new BN(usdcRedeemable.toString()),
-      wethRedeemable: new BN(wethRedeemable.toString()),
-    };
+    return undefined;
   };
 
   /*
@@ -562,7 +540,7 @@ const EthereumFacade = ({
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    const now = new BN(Math.floor(Date.now() / 1000));
+    const maxTimestamp = new BN(0);
 
     const minimumTokenAmt = new BN(0);
 
@@ -570,7 +548,7 @@ const EthereumFacade = ({
       signer,
       StakingAbi,
       stakingAddr,
-      now,
+      maxTimestamp,
       minimumTokenAmt,
       minimumTokenAmt,
       minimumTokenAmt
@@ -578,9 +556,9 @@ const EthereumFacade = ({
 
     return stakingRedeemRes
       ? {
-        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
-        txHash: stakingRedeemRes.hash,
-      }
+          confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+          txHash: stakingRedeemRes.hash,
+        }
       : undefined;
   };
 
