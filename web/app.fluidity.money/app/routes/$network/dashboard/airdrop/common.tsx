@@ -452,7 +452,7 @@ const StakingStatsModal = ({
   const canWithdraw =
     showExperiment("enable-withdraw-stakes") &&
     augmentedStakes.some(({ stake, stakedDays }) => {
-      return stake.durationDays - stakedDays <= 0;
+      return stake.durationDays - stakedDays < 0;
     });
 
   const sumLiquidityMultiplier = augmentedStakes.reduce(
@@ -529,7 +529,7 @@ const StakingStatsModal = ({
               {
                 augmentedStakes
                   .map(({ stake, stakedDays }) =>
-                    Math.max(0, Math.floor(stake.durationDays - stakedDays))
+                    Math.max(0, Math.ceil(stake.durationDays - stakedDays))
                   )
                   .sort((daysLeftA, daysLeftB) =>
                     daysLeftA < daysLeftB ? -1 : daysLeftA === daysLeftB ? 0 : 1
