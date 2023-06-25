@@ -413,7 +413,6 @@ const StakingStatsModal = ({
   redeemableTokens,
   handleRedeemTokens,
 }: IStakingStatsModal) => {
-  const { showExperiment } = useContext(SplitContext);
   const [redeeming, setRedeeming] = useState(false);
 
   const augmentedStakes = stakes.map((stake) => {
