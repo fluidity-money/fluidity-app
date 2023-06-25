@@ -449,8 +449,6 @@ const StakingStatsModal = ({
     };
   });
 
-  const canWithdraw = showExperiment("enable-withdraw-stakes");
-
   const sumLiquidityMultiplier = augmentedStakes.reduce(
     (sum, { multiplier, fluidUsd, baseUsd }) => {
       return sum + (fluidUsd + baseUsd) * multiplier;
@@ -537,7 +535,6 @@ const StakingStatsModal = ({
             <></>
           )}
           <GeneralButton
-            disabled={!canWithdraw}
             handleClick={() => handleWithdraw()}
           >
             {!redeeming ? "Withdraw" : "Redeeming..."}
