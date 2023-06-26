@@ -7,11 +7,19 @@ package elliptic
 import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 )
 
 // IsAddressSafe screening by applying basic rules to test if we should
-// reward this address
+// reward this address, and also storing the address screening results in
+// the database so we don't need to mindlessly consume credits
 func IsAddressSafe(network_ network.BlockchainNetwork, address ethereum.Address) bool {
 	// unimplemented
-	return true
+	isRisky, cached := worker.GetEllipticScreeningIsRisky(network_, address)
+
+	if !cached {
+		isRisky = true
+	}
+
+	return isRisky
 }

@@ -6,6 +6,7 @@ package main
 
 import (
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/elliptic"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -122,6 +123,38 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			})
 
 			continue
+		}
+
+		// check if either side is high risk
+
+		isSenderSafe := elliptic.IsAddressSafe(fromAddress)
+
+		if !isSenderSafe {
+			// since the sender is a high risk, we skip this winner
+			log.App(func(k *log.Log) {
+				k.Format(
+					"In transaction hash %#v, sender %#v is a high risk! Skipping!",
+					transactionHash,
+					fromAddress,
+				)
+			})
+
+			return
+		}
+
+		isRecipientSafe := elliptic.IsAddressSafe(toAddress)
+
+		if !isRecipientSafe {
+			// since the sender is a high risk, we skip this winner
+			log.App(func(k *log.Log) {
+				k.Format(
+					"In transaction hash %#v, recipient %#v is a high risk! Skipping!",
+					transactionHash,
+					toAddress,
+				)
+			})
+
+			return
 		}
 
 		// check win status

@@ -24,6 +24,10 @@ const (
 	// paid out with another address for the fee switching feature until we
 	// have Fluidity V2 up
 	TableFeeSwitch = "fee_switch"
+
+	// TableEllipticScreening to use for screening addresses that
+	// pass through the worker
+	TableEllipticScreening = "worker_elliptic_screening"
 )
 
 type (
