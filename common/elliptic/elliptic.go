@@ -79,13 +79,13 @@ type (
 		ProcessStatusId  int           `json:"process_status_id"`
 		WorkflowStatusId int           `json:"workflow_status_id"`
 		WorkflowStatus   string        `json:"workflow_status"`
-		Error            string        `json:"error"`
+		Error            interface{}        `json:"error"`
 		AssetTier        string        `json:"asset_tier"`
 		RiskScore        int           `json:"risk_score"`
 
 		AnalysedBy struct {
 			Id   uuid.NullUUID `json:"id"`
-			Type string        `json:"id"`
+			Type string        `json:"type"`
 		} `json:"analysed_by"`
 
 		ClusterEntities []struct {
@@ -138,7 +138,7 @@ type (
 		} `json:"contributions"`
 
 		Changes struct {
-			RiskScoreChanges int `json:"risk_score_changes"`
+			RiskScoreChanges int `json:"risk_score_change"`
 		} `json:"changes"`
 	}
 )
@@ -236,6 +236,8 @@ func getWalletAnalysis(u, apiKey, secret string, network_ network.BlockchainNetw
 	return &analysis, nil
 }
 
+// GetWalletAnalysis, returning the whole object for an address (use
+// IsAddressSafe for an easier interface)
 func GetWalletAnalysis(network_ network.BlockchainNetwork, address ethereum.Address) WalletAnalysisResponse {
 	config := <-keyRequests
 

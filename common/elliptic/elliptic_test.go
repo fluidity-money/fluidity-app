@@ -19,6 +19,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// testWalletAnalysisJson with some adjustments made to the time in the
+// test blob (trailing 0s are emitted from JSON output)
 const testWalletAnalysisJson = `
 {
 	"analysed_by": {
@@ -46,8 +48,8 @@ const testWalletAnalysisJson = `
 		"reference": "my_customer"
 	},
 	"created_at": "2023-05-10T19:03:30.837Z",
-	"updated_at": "2023-05-10T19:05:42.840Z",
-	"analysed_at": "2023-05-10T19:05:43.560Z",
+	"updated_at": "2023-05-10T19:05:42.84Z",
+	"analysed_at": "2023-05-10T19:05:43.56Z",
 	"process_status": "complete",
 	"process_status_id": 2,
 	"workflow_status_id": 1,
