@@ -42,7 +42,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             useAirdropLeaderboardByUserAllTime,
           ];
         }
-        case use24Hours && provider: {
+        case use24Hours && !!provider: {
           return [
             () => useAirdropLeaderboardByApplication24Hours(provider),
             (address: string) =>
