@@ -1262,7 +1262,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="Slippage is currently fixed at 50%."
+            tooltipContent="Slippage is set to this default amount, and any unused funds will be refunded back to the user’s wallet."
             className="slippage-tooltip"
           >
             <Text prominent={!isMobile} code className="helper-label">
