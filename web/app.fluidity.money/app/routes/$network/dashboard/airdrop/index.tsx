@@ -36,7 +36,7 @@ import {
   TutorialModal,
 } from "./common";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -55,10 +55,17 @@ import { useCache } from "~/hooks/useCache";
 import Table from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
+import { SplitContext } from "contexts/SplitProvider";
 
-const EPOCH_DAYS_TOTAL = 31;
+const EPOCH_DAYS_TOTAL = 38;
 // temp: may 22nd, 2023
 const EPOCH_START_DATE = new Date(2023, 4, 22);
+
+type RedeemableToken = {
+  tokenId: string;
+  amount: BN;
+  decimals: number;
+};
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
@@ -157,6 +164,20 @@ const Airdrop = () => {
     );
   }
 
+  const [redeemableTokens, setRedeemableTokens] = useState<RedeemableToken[]>(
+    []
+  );
+
+  const redeemableTokensUsd = useMemo(
+    () =>
+      redeemableTokens.reduce(
+        (sum, { amount, decimals }) =>
+          sum + getUsdFromTokenAmount(amount, decimals),
+        0
+      ),
+    [redeemableTokens]
+  );
+
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
@@ -170,17 +191,19 @@ const Airdrop = () => {
     getStakingDeposits,
     testStakeTokens,
     getStakingRatios,
+    redeemableTokens: getRedeemableTokens,
+    redeemTokens,
   } = useContext(FluidityFacadeContext);
+
+  const { showExperiment } = useContext(SplitContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${
-      leaderboardFilterIndex === 0 ? "&provider=sushiswap" : ""
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? "&provider=sushiswap" : ""
     }`
   );
 
@@ -283,6 +306,37 @@ const Airdrop = () => {
     );
   };
 
+  const fetchUserRedeemableTokens = async (address: string) => {
+    const redeemableTokens = await getRedeemableTokens?.(address);
+
+    if (!redeemableTokens) return;
+
+    return setRedeemableTokens(
+      Object.entries(redeemableTokens)
+        .map(([key, amount]) => {
+          // Get rid of 'Redeemable' in key
+          const tokenSymbol = key.slice(0, -10).toLowerCase();
+          const matchingToken = tokens.find(
+            ({ symbol }) => symbol.toLowerCase() === tokenSymbol
+          );
+
+          if (!matchingToken)
+            return {
+              tokenId: "",
+              amount: new BN(0),
+              decimals: 0,
+            };
+
+          return {
+            tokenId: matchingToken.symbol,
+            amount: amount,
+            decimals: matchingToken.decimals,
+          };
+        })
+        .filter(({ tokenId, amount }) => !!tokenId && amount.gt(new BN(0)))
+    );
+  };
+
   useEffect(() => {
     if (!currentModal) {
       navigate(`${location.pathname}${location.search}`, { replace: true });
@@ -316,7 +370,23 @@ const Airdrop = () => {
     fetchUserTokenBalance();
 
     fetchUserStakes(address);
+
+    fetchUserRedeemableTokens(address);
   }, [address]);
+
+  // will throw error on revert
+  const handleRedeemTokens = async () => {
+    if (!address) return;
+    if (!showExperiment("enable-withdraw-stakes")) return;
+
+    const res = await (await redeemTokens?.())?.confirmTx();
+
+    fetchUserTokenBalance();
+    fetchUserStakes(address);
+    fetchUserRedeemableTokens(address);
+
+    return res;
+  };
 
   const [localCookieConsent, setLocalCookieConsent] = useState<
     boolean | undefined
@@ -398,9 +468,8 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         <TabButton
           size="small"
@@ -468,20 +537,19 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${
-            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-          }`}
+          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+            }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-              currentModal === "leaderboard" ||
-              currentModal === "stake"
+                currentModal === "leaderboard" ||
+                currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                ? "1em"
-                : "2em",
+                  ? "1em"
+                  : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -622,6 +690,9 @@ const Airdrop = () => {
                 stakes={stakes}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+                redeemableUsd={redeemableTokensUsd}
+                redeemableTokens={redeemableTokens}
+                handleRedeemTokens={handleRedeemTokens}
               />
             </>
           )}
@@ -726,6 +797,9 @@ const Airdrop = () => {
           stakes={stakes}
           wethPrice={wethPrice}
           usdcPrice={usdcPrice}
+          redeemableUsd={redeemableTokensUsd}
+          redeemableTokens={redeemableTokens}
+          handleRedeemTokens={handleRedeemTokens}
         />
       </CardModal>
       <CardModal
@@ -970,8 +1044,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  navigate(`/${network}/dashboard/rewards`);
-                }
+                navigate(`/${network}/dashboard/rewards`);
+              }
               : seeBottlesDetails
           }
           style={{
@@ -1210,7 +1284,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
+                  0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1230,8 +1304,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                ? 0
-                : -1;
+                  ? 0
+                  : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1302,9 +1376,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
-        address === user ? "highlighted-row" : ""
-      }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
+        }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1323,8 +1396,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1345,8 +1418,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
             style={
               address === user
                 ? {
-                    color: "black",
-                  }
+                  color: "black",
+                }
                 : {}
             }
           >
@@ -1362,8 +1435,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1378,8 +1451,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >
@@ -1394,8 +1467,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                  color: "black",
-                }
+                color: "black",
+              }
               : {}
           }
         >

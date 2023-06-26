@@ -29,6 +29,7 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x00000042d2d0aa64e0505a13eacdc9984a024322",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "1011539568884332906251/999500000000000000000",
+    "expected_volume": "1011539568884332906251/500000000000000000",
 	"expected_emission": {
 		"balancer_v2": 1.012045591680173
 	},
@@ -69,6 +70,7 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x054ba12713290ef5b9236e55944713c0edeb4cf4",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "75/4",
+    "expected_volume": "25000/1",
     "expected_emission": {
       "balancer_v2": 18.75
     },
@@ -109,6 +111,7 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0x1ca484dbdafad7e940f5073f6fcc5e87cd24202b",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "222/25",
+    "expected_volume": "400/1",
     "expected_emission": {
       "balancer_v2": 8.88
     },
@@ -149,6 +152,7 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0xdec08cb92a506b88411da9ba290f3694be223c26",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "25/2",
+    "expected_volume": "500/1",
     "expected_emission": {
       "balancer_v2": 12.5
     },
@@ -189,6 +193,7 @@ const integrationTestBalancerV2 = `
     "expected_sender": "0xd6b1fbcbe39e33a3d5d9014b024f511be3564ee5",
     "expected_recipient": "0xba12222222228d8ba445958a75a0704d566bf2c8",
     "expected_fees": "197042747/4999000000",
+    "expected_volume": "197042747/1000000",
     "expected_emission": {
       "balancer_v2": 0.03941643268653731
     },

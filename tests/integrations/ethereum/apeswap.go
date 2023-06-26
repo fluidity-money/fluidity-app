@@ -28,6 +28,7 @@ const integrationTestApeSwap = `
     "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
     "expected_recipient": "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f",
     "expected_fees": "2/100",
+    "expected_volume": "10/1",
 	"expected_emission": {
 		"apeswap": 0.02
 	},
@@ -67,6 +68,7 @@ const integrationTestApeSwap = `
     "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
     "expected_recipient": "0xaaf5110db6e744ff70fb339de037b990a20bdace",
     "expected_fees": "9977607422832023685/500000000000000000000",
+    "expected_volume": "1995521484566404737/200000000000000000",
 	"expected_emission": {
 		"apeswap": 0.019955214845664048
 	},
@@ -106,6 +108,7 @@ const integrationTestApeSwap = `
     "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
     "expected_recipient": "0x6b0cc136f7babd971b5decd21690be65718990e2",
     "expected_fees": "2/100",
+    "expected_volume": "10/1",
 	"expected_emission": {
 		"apeswap": 0.02
 	},

@@ -6,6 +6,8 @@ package lootboxes
 
 import (
 	"fmt"
+	"text/template"
+	"strings"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -20,16 +22,90 @@ type UserLootboxCount struct {
 	LootboxCount float64 `json:"lootbox_count"`
 }
 
+// buildUserRewardValuesString to build a variadic string for the values to insert for top winners
+func buildUserRewardValuesString(userCount int) (string, error) {
+	if userCount < 1 || userCount > 10 {
+		return "", fmt.Errorf(
+			"invalid number of leaderboard users - want 1-10, got %d",
+			userCount,
+		)
+	}
+
+	rewardStrings := []string{
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
+($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none')`,
+
+		`($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
+($3, '', 'leaderboard_prize', $1, 0, 2, 5, 'none'),
+($3, '', 'leaderboard_prize', $1, 0, 3, 2, 'none')`,
+
+		`($4, '', 'leaderboard_prize', $1, 0, 1, 15, 'none'),
+($4, '', 'leaderboard_prize', $1, 0, 2, 3, 'none'),
+($4, '', 'leaderboard_prize', $1, 0, 3, 1, 'none')`,
+
+		`($5, '', 'leaderboard_prize', $1, 0, 1, 12, 'none'),
+($5, '', 'leaderboard_prize', $1, 0, 2, 1, 'none')`,
+
+		"($6, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+
+		"($7, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+
+		"($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+
+		"($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+
+		"($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+
+		"($11, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+	}
+
+	var output strings.Builder
+
+	// custom sub function to find the last index of the array
+	funcMap := template.FuncMap{
+		"sub": func(a, b int) int {
+			return a - b
+		},
+	}
+
+	// print each line of rewardStrings, separated by a comma and newline, except for the last
+	tmpl := template.Must(template.New("leaderboardPrize").Funcs(funcMap).Parse(`
+		{{- $lineCount := len .RewardStrings }}
+		{{- $lastIndex := sub $lineCount 1 }}
+		{{- range $i, $reward := .RewardStrings }}
+		{{- $reward }}
+		{{- if ne $i $lastIndex }},{{ println }}{{ end }}
+		{{- end }}`,
+	))
+
+	data := struct {
+		RewardStrings []string
+	}{
+		RewardStrings: rewardStrings[:userCount],
+	}
+
+	err := tmpl.Execute(&output, data)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to execute template!"
+			k.Payload = err
+		})
+	}
+
+	return output.String(), nil
+}
+
 // InsertTopUserReward to insert lootboxes for the given users for their activity during the airdrop.
 // Expects 10 users to reward
 func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
-	if lenUsers := len(users); lenUsers != ExpectedTopUsers {
+	valuesString, err := buildUserRewardValuesString(len(users))
+
+	if err != nil {
 		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Expected top %d leaderboard winners, but got %d values!",
-				ExpectedTopUsers,
-				lenUsers,
-			)
+			k.Message = "Failed to build lootbox prize format string!"
+			k.Payload = err
 		})
 	}
 
@@ -46,48 +122,22 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 			lootbox_count, 
 			application
 		) VALUES
-		($1, '', 'leaderboard_prize', $11, 0, 1, 30, 'none'),
-		($1, '', 'leaderboard_prize', $11, 0, 2, 10, 'none'),
-		($1, '', 'leaderboard_prize', $11, 0, 3, 5, 'none'),
-
-		($2, '', 'leaderboard_prize', $11, 0, 1, 20, 'none'),
-		($2, '', 'leaderboard_prize', $11, 0, 2, 5, 'none'),
-		($2, '', 'leaderboard_prize', $11, 0, 3, 2, 'none'),
-
-		($3, '', 'leaderboard_prize', $11, 0, 1, 15, 'none'),
-		($3, '', 'leaderboard_prize', $11, 0, 2, 3, 'none'),
-		($3, '', 'leaderboard_prize', $11, 0, 3, 1, 'none'),
-
-		($4, '', 'leaderboard_prize', $11, 0, 1, 12, 'none'),
-		($4, '', 'leaderboard_prize', $11, 0, 2, 1, 'none'),
-
-		($5, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
-
-		($6, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
-
-		($7, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
-
-		($8, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
-
-		($9, '', 'leaderboard_prize', $11, 0, 1, 10, 'none'),
-
-		($10, '', 'leaderboard_prize', $11, 0, 1, 10, 'none')`,
+			%s`,
 		TableLootboxes,
+		valuesString,
 	)
 
-	_, err := timescaleClient.Exec(
+	// build variadic arguments [time, users...]
+	var args []interface{}
+	args = append(args, currentTime)
+
+	for _, user := range users {
+		args = append(args, user.Address)
+	}
+
+	_, err = timescaleClient.Exec(
 		statementText,
-		users[0].Address,
-		users[1].Address,
-		users[2].Address,
-		users[3].Address,
-		users[4].Address,
-		users[5].Address,
-		users[6].Address,
-		users[7].Address,
-		users[8].Address,
-		users[9].Address,
-		currentTime,
+		args...,
 	)
 
 	if err != nil {

@@ -44,6 +44,7 @@ const integrationTestChronos = `
     "expected_sender": "0x5add1cec842699d7d0eaea77632f92cf3f3ff8cf",
     "expected_recipient": "0x20585bfbc272a9d58ad17582bcda9a5a57271d6a",
     "expected_fees": "41774689/249500000",
+    "expected_volume": "41774689/499000",
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "expected_emission": {

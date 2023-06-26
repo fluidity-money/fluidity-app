@@ -546,6 +546,62 @@ export const makeStakingDeposit = async (
   }
 };
 
+export type StakingRedeemableRes = {
+  fusdcRedeemable: BN;
+  usdcRedeemable: BN;
+  wethRedeemable: BN;
+};
+
+export const getRedeemableTokens = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  address: string
+): Promise<StakingRedeemableRes | undefined> => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    // call redeemable
+    return await stakingContract.redeemable(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+  }
+};
+
+export const makeStakingRedemption = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  timestamp: BN,
+  fusdcMinimum: BN,
+  usdcMinimum: BN,
+  wethMinimum: BN
+) => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    // call redeem
+    return await stakingContract.redeem(
+      timestamp.toString(),
+      fusdcMinimum.toString(),
+      usdcMinimum.toString(),
+      wethMinimum.toString()
+    );
+  } catch (error) {
+    return await handleContractErrors(error as ErrorType, signer.provider);
+  }
+};
+
 export const getWethUsdPrice = async (
   provider: JsonRpcProvider,
   eacAggregatorProxyAddr: string,
@@ -576,6 +632,7 @@ export const getWethUsdPrice = async (
     return wethUsdValue.div(decimalsBn).toNumber() / 100;
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
+
     return 0;
   }
 };

@@ -27,6 +27,7 @@ const integrationTestDodoV2 = `
     "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
     "expected_fees": "3332148379/2499500000",
+    "expected_volume": "3332148379/500000",
     "expected_emission": {
 	"dodo_v2": 1.3331259767953592
     },
@@ -63,6 +64,7 @@ const integrationTestDodoV2 = `
     "expected_sender": "0xfd3f1d1f95481f91404f2042855686d42bd8a07e",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
     "expected_fees": "813878721330648008489/5000000000000000000000",
+    "expected_volume": "813878721330648008489/1000000000000000000",
     "expected_emission": {
 	"dodo_v2": 0.1627757442661296
     },
@@ -99,6 +101,7 @@ const integrationTestDodoV2 = `
     "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
     "expected_fees": "133754123816472273637/100000000000000000000",
+    "expected_volume": "133754123816472273637/20000000000000000",
     "expected_emission": {
 	"dodo_v2": 1.33754123816472273637
     },
@@ -136,6 +139,7 @@ const integrationTestDodoV2 = `
     "expected_sender": "0x1c631824b0551fd0540a1f198c893b379d5cf3c3",
     "expected_recipient": "0x3058ef90929cb8180174d74c507176cca6835d73",
     "expected_fees": "6697299699/4999000000",
+    "expected_volume": "6697299699/1000000",
     "expected_emission": {
 	"dodo_v2": 1.3397278853770753
     },
