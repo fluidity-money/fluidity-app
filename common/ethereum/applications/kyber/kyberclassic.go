@@ -242,8 +242,6 @@ func GetKyberClassicFees(transfer worker.EthereumApplicationTransfer, client *et
 		fluidTransferAmount = amount1out
 	}
 
-	feeData.Volume = new(big.Rat).Set(fluidTransferAmount)
-
 	// denominator of the fee
 	feeDenominator := new(big.Rat).SetInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(FeeDenominatorExponent), big.NewInt(0)))
 
@@ -256,6 +254,8 @@ func GetKyberClassicFees(transfer worker.EthereumApplicationTransfer, client *et
 	if !inTokenIsFluid {
 		fluidTransferAmount = fluidTransferAmount.Quo(fluidTransferAmount, new(big.Rat).Sub(big.NewRat(1, 1), feeMultiplier))
 	}
+
+	feeData.Volume = new(big.Rat).Set(fluidTransferAmount)
 
 	fee := new(big.Rat).Set(fluidTransferAmount)
 	fee = fee.Mul(fee, feeMultiplier)
