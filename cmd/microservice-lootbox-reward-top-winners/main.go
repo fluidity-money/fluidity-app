@@ -8,6 +8,7 @@ import (
 	"time"
 	_ "time/tzdata"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 )
@@ -32,7 +33,7 @@ func main() {
 	endTime := currentTime
 
 	// fetch and log the top 10 users
-	topUsers := lootboxes.GetTopSushiswapUsersByLootboxCount(startTime, endTime)
+	topUsers := lootboxes.GetTopApplicationUsersByLootboxCount(startTime, endTime, applications.ApplicationKyberClassic)
 	for i, user := range topUsers {
 		log.App(func(k *log.Log) {
 			k.Format(

@@ -41,7 +41,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
-import { SplitContext } from "contexts/SplitProvider";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -102,19 +101,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottle
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottle
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottle
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -413,7 +412,6 @@ const StakingStatsModal = ({
   redeemableTokens,
   handleRedeemTokens,
 }: IStakingStatsModal) => {
-  const { showExperiment } = useContext(SplitContext);
   const [redeeming, setRedeeming] = useState(false);
 
   const augmentedStakes = stakes.map((stake) => {
@@ -448,12 +446,6 @@ const StakingStatsModal = ({
       baseUsd,
     };
   });
-
-  const canWithdraw =
-    showExperiment("enable-withdraw-stakes") &&
-    augmentedStakes.some(({ stake, stakedDays }) => {
-      return stake.durationDays - stakedDays <= 0;
-    });
 
   const sumLiquidityMultiplier = augmentedStakes.reduce(
     (sum, { multiplier, fluidUsd, baseUsd }) => {
@@ -529,7 +521,7 @@ const StakingStatsModal = ({
               {
                 augmentedStakes
                   .map(({ stake, stakedDays }) =>
-                    Math.max(0, Math.floor(stake.durationDays - stakedDays))
+                    Math.max(0, Math.ceil(stake.durationDays - stakedDays))
                   )
                   .sort((daysLeftA, daysLeftB) =>
                     daysLeftA < daysLeftB ? -1 : daysLeftA === daysLeftB ? 0 : 1
@@ -540,10 +532,7 @@ const StakingStatsModal = ({
           ) : (
             <></>
           )}
-          <GeneralButton
-            disabled={!canWithdraw}
-            handleClick={() => handleWithdraw()}
-          >
+          <GeneralButton handleClick={() => handleWithdraw()}>
             {!redeeming ? "Withdraw" : "Redeeming..."}
           </GeneralButton>
         </div>
@@ -662,8 +651,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -691,7 +680,7 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
 
   // slippage % is the allowance of the base token
-  const [slippage, setSlippage] = useState(15);
+  const slippage = 50;
 
   // stakeErr is the UI response on a failed test stake
   const [stakeErr, setStakeErr] = useState("");
@@ -716,12 +705,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      (baseToken.symbol === "USDC"
-        ? tokenRatios.fusdcUsdcRatio.toNumber() -
-        tokenRatios.fusdcUsdcSpread.toNumber() / 2
-        : tokenRatios.fusdcWethRatio.toNumber() -
-        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-    );
+        (baseToken.symbol === "USDC"
+          ? tokenRatios.fusdcUsdcRatio.toNumber() -
+            tokenRatios.fusdcUsdcSpread.toNumber() / 2
+          : tokenRatios.fusdcWethRatio.toNumber() -
+            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+      );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -784,31 +773,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const tokenAmtStr =
-          dec !== undefined
-            ? [whole, dec.slice(0 - token.decimals)].join(".")
-            : whole ?? "0";
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-        setInput({
-          ...token,
-          amount: tokenAmtStr,
-        });
+      setInput({
+        ...token,
+        amount: tokenAmtStr,
+      });
 
-        if (!ratio) return;
-        if (!(whole || dec)) return;
+      if (!ratio) return;
+      if (!(whole || dec)) return;
 
-        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-        setOtherInput({
-          ...otherToken,
-          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-        });
-      };
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+      });
+    };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1032,8 +1021,9 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`airdrop-stake-container ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         {/* Staking Amount */}
         <div className="airdrop-stake-inputs-column">
@@ -1270,7 +1260,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="Your accepted % for slippage."
+            tooltipContent="Slippage is set to this default amount, and any unused funds will be refunded back to the user’s wallet."
             className="slippage-tooltip"
           >
             <Text prominent={!isMobile} code className="helper-label">
@@ -1279,12 +1269,13 @@ const StakeNowModal = ({
           </Hoverable>
           <input
             className={"staking-modal-token-input"}
+            disabled
             pattern="[0-9]*"
             min={1}
             value={slippage}
             max={50}
-            onChange={(e) => {
-              setSlippage(Math.floor(parseInt(e.target.value) || 0));
+            onChange={() => {
+              return;
             }}
           />
         </div>
@@ -1324,7 +1315,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(0, stakingDuration),
+                stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1375,7 +1366,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1627,8 +1618,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1660,17 +1652,6 @@ const TestnetRewardsModal = () => {
 
   return (
     <div className="claim-ropsten">
-      {/* {
-        JSON.stringify({
-          signature,
-          error,
-          ropstenAddress,
-          signerAddress,
-          address,
-          finalised,
-          manualSignature,
-        }, null, 2)
-      } */}
       <img src="/images/testnetBanner.png" />
       <div className="ropsten-header">
         <Heading as="h3">Claim Testnet Rewards</Heading>
