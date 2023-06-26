@@ -6,12 +6,13 @@ package lootboxes
 
 import (
 	"fmt"
-	"text/template"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 )
 
 const ExpectedTopUsers = 10
@@ -213,8 +214,8 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 
 const LootboxRewardTimezone = "Australia/Adelaide"
 
-// fetch the 10 addresses with the highest lootboxes earned during the given period on chronos
-func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount {
+// fetch the 10 addresses with the highest lootboxes earned during the given period on the given application 
+func GetTopApplicationUsersByLootboxCount(startTime, endTime time.Time, application applications.Application) []UserLootboxCount {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -226,7 +227,7 @@ func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootbo
 			awarded_time >= $1 AT TIME ZONE $3 AND
 			awarded_time < $2 AT TIME ZONE $4 AND 
 			source != 'leaderboard_prize' AND
-			application = 'chronos'
+			application = $6
 		GROUP BY address 
 		ORDER BY lootbox_count DESC
 		LIMIT $5`,
@@ -241,69 +242,7 @@ func GetTopChronosUsersByLootboxCount(startTime, endTime time.Time) []UserLootbo
 		LootboxRewardTimezone,
 		LootboxRewardTimezone,
 		10,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-			k.Message = "Failed to get the top 10 users by lootbox count!"
-			k.Payload = err
-		})
-	}
-
-	defer rows.Close()
-
-	var topUsers []UserLootboxCount
-
-	for rows.Next() {
-		var user UserLootboxCount
-		err := rows.Scan(
-			&user.Address,
-			&user.LootboxCount,
-		)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to scan a user's address and lootbox count!"
-				k.Payload = err
-			})
-		}
-
-		topUsers = append(topUsers, user)
-	}
-
-	return topUsers
-}
-
-// fetch the 10 addresses with the highest lootboxes earned during the given period on sushiswap
-func GetTopSushiswapUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount {
-	timescaleClient := timescale.Client()
-
-	statementText := fmt.Sprintf(
-		`SELECT 
-			address, 
-			SUM(lootbox_count) AS lootbox_count 
-		FROM %s
-		WHERE 
-			awarded_time >= $1 AT TIME ZONE $3 AND
-			awarded_time < $2 AT TIME ZONE $4 AND 
-			source != 'leaderboard_prize' AND
-			application = 'sushiswap'
-		GROUP BY address 
-		ORDER BY lootbox_count DESC
-		LIMIT $5`,
-
-		TableLootboxes,
-	)
-
-	rows, err := timescaleClient.Query(
-		statementText,
-		startTime,
-		endTime,
-		LootboxRewardTimezone,
-		LootboxRewardTimezone,
-		10,
+		application.String(),
 	)
 
 	if err != nil {

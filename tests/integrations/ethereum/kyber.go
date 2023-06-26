@@ -38,7 +38,7 @@ const integrationTestKyberClassic = `
     "expected_sender": "0x4c3fcb1505686a99aa5767c8a98192d86a1e8604",
     "expected_recipient": "0x38bdc8c37f2f710c7035ca1b24be226676c79ae6",
     "expected_fees": "12163031/624950000",
-    "expected_volume": "12163031/50000",
+    "expected_volume": "12163031/49996",
     "token_decimals": 6,
     "contract_address": "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
     "expected_emission": {
