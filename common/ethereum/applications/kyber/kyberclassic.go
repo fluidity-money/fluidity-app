@@ -103,7 +103,7 @@ const kyberClassicPairAbiString = `[
 
 var kyberClassicPairAbi ethAbi.ABI
 
-// GetKyberClassicFees returns KyberClassic's fee based on fees given by by the
+// GetKyberClassicFees returns KyberClassic's fee based on fees given by the
 // swap log
 func GetKyberClassicFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, error) {
 	var feeData applications.ApplicationFeeData
@@ -242,7 +242,7 @@ func GetKyberClassicFees(transfer worker.EthereumApplicationTransfer, client *et
 		fluidTransferAmount = amount1out
 	}
 
-	feeData.Volume = fluidTransferAmount
+	feeData.Volume = new(big.Rat).Set(fluidTransferAmount)
 
 	// denominator of the fee
 	feeDenominator := new(big.Rat).SetInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(FeeDenominatorExponent), big.NewInt(0)))
