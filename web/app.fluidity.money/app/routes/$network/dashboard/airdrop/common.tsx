@@ -680,7 +680,7 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
 
   // slippage % is the allowance of the base token
-  const [slippage, setSlippage] = useState(15);
+  const slippage = 50;
 
   // stakeErr is the UI response on a failed test stake
   const [stakeErr, setStakeErr] = useState("");
@@ -1260,7 +1260,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="Your accepted % for slippage."
+            tooltipContent="Slippage is set to this default amount, and any unused funds will be refunded back to the user’s wallet."
             className="slippage-tooltip"
           >
             <Text prominent={!isMobile} code className="helper-label">
@@ -1269,12 +1269,13 @@ const StakeNowModal = ({
           </Hoverable>
           <input
             className={"staking-modal-token-input"}
+            disabled
             pattern="[0-9]*"
             min={1}
             value={slippage}
             max={50}
-            onChange={(e) => {
-              setSlippage(Math.floor(parseInt(e.target.value) || 0));
+            onChange={() => {
+              return;
             }}
           />
         </div>
@@ -1651,17 +1652,6 @@ const TestnetRewardsModal = () => {
 
   return (
     <div className="claim-ropsten">
-      {/* {
-        JSON.stringify({
-          signature,
-          error,
-          ropstenAddress,
-          signerAddress,
-          address,
-          finalised,
-          manualSignature,
-        }, null, 2)
-      } */}
       <img src="/images/testnetBanner.png" />
       <div className="ropsten-header">
         <Heading as="h3">Claim Testnet Rewards</Heading>
