@@ -592,7 +592,7 @@ $holo: linear-gradient(
 
   .ropsten-header {
     h3 {
-        margin: 0;
+      margin: 0;
     }
 
     height: 100px;
@@ -601,7 +601,6 @@ $holo: linear-gradient(
     justify-content: center;
     gap: 0.5em;
   }
-
 
   img {
     top: 0;
@@ -646,7 +645,6 @@ $holo: linear-gradient(
       width: 16px;
       height: 16px;
 
-
       path {
         stroke: currentColor;
       }
@@ -679,19 +677,18 @@ $holo: linear-gradient(
     padding: 0.5em;
 
     &.danger {
-        background-color: rgba(255, 105, 105, 0.1);
-        color: #ff6969;
-        border: 1px solid #ff6969;
-        margin-top: 0.5em;
+      background-color: rgba(255, 105, 105, 0.1);
+      color: #ff6969;
+      border: 1px solid #ff6969;
+      margin-top: 0.5em;
     }
-
 
     svg {
       transform: translate(0, 2px);
       margin-right: 0.5em;
 
       path {
-      fill: currentColor;
+        fill: currentColor;
       }
     }
   }
@@ -702,7 +699,7 @@ $holo: linear-gradient(
   align-items: center;
   padding-bottom: 1em;
   gap: 2em;
-  
+
   h3 {
     margin: 0;
   }
