@@ -32,7 +32,7 @@ func main() {
 	endTime := currentTime
 
 	// fetch and log the top 10 users
-	topUsers := lootboxes.GetTopSushiswapUsersByLootboxCount(startTime, endTime)
+	topUsers := lootboxes.GetTopKyberswapUsersByLootboxCount(startTime, endTime)
 	for i, user := range topUsers {
 		log.App(func(k *log.Log) {
 			k.Format(
