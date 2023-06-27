@@ -99,7 +99,8 @@ func TestString(t *testing.T) {
 		"camelot":0,
 		"chronos":0,
 		"sushiswap":0,
-		"kyber_classic":0
+		"kyber_classic":0,
+		"wombat":0
 	},
 	"calculate_n":{
 		"probability_m":0,
