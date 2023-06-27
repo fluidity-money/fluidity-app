@@ -16,7 +16,7 @@ export type AirdropLeaderboardLoaderData = {
   loaded: boolean;
 };
 
-const AIRDROP_PROVIDERS = new Set(["chronos", "sushiswap"]);
+const AIRDROP_PROVIDERS = new Set(["chronos", "sushiswap", "kyber_classic"]);
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const use24Hours = period === "24";
   const useAll = period === "all";
 
-  const provider = provider_ in AIRDROP_PROVIDERS ? provider_ : "";
+  const provider = AIRDROP_PROVIDERS.has(provider_) ? provider_ : "";
 
   if (!network) throw new Error("Invalid Request");
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
