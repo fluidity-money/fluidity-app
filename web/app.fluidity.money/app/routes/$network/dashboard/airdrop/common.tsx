@@ -25,6 +25,7 @@ import {
   numberToMonetaryString,
   SliderButton,
   Checkmark,
+  CopyIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -40,7 +41,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
-import { CopyIcon } from "@fluidity-money/surfing";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -395,13 +395,25 @@ interface IStakingStatsModal {
   }>;
   wethPrice: number;
   usdcPrice: number;
+  redeemableUsd: number;
+  redeemableTokens: Array<{
+    tokenId: string;
+    amount: BN;
+    decimals: number;
+  }>;
+  handleRedeemTokens: () => Promise<boolean | undefined>;
 }
 
 const StakingStatsModal = ({
   stakes,
   wethPrice,
   usdcPrice,
+  redeemableUsd,
+  redeemableTokens,
+  handleRedeemTokens,
 }: IStakingStatsModal) => {
+  const [redeeming, setRedeeming] = useState(false);
+
   const augmentedStakes = stakes.map((stake) => {
     const { fluidAmount, baseAmount, durationDays, depositDate } = stake;
 
@@ -435,10 +447,6 @@ const StakingStatsModal = ({
     };
   });
 
-  const canWithdraw = augmentedStakes.some(({ stake, stakedDays }) => {
-    return stake.durationDays - stakedDays <= 0;
-  });
-
   const sumLiquidityMultiplier = augmentedStakes.reduce(
     (sum, { multiplier, fluidUsd, baseUsd }) => {
       return sum + (fluidUsd + baseUsd) * multiplier;
@@ -446,21 +454,19 @@ const StakingStatsModal = ({
     0
   );
 
+  const handleWithdraw = async () => {
+    setRedeeming(true);
+    try {
+      await handleRedeemTokens();
+    } catch (e) {
+      setRedeeming(false);
+    }
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1em",
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto auto auto",
-          gap: "2em",
-        }}
-      >
+    <div className={"staking-stats-container"}>
+      {/*Stats row*/}
+      <div className={"staking-stats-header"}>
         <LabelledValue
           label={<Text size="sm">Total Liquidity Multiplier</Text>}
         >
@@ -477,24 +483,62 @@ const StakingStatsModal = ({
           )}
         </LabelledValue>
       </div>
-      <div
-        style={{
-          position: "relative",
-          border: "1px gray",
-          width: "100%",
-        }}
-      >
-        <GeneralButton disabled={!canWithdraw} style={{ right: "0" }}>
-          Withdraw
-        </GeneralButton>
+
+      {/*Withdraw Row*/}
+      <div className={"staking-stats-withdraw"}>
         <div
           style={{
-            paddingTop: "1em",
-            overflowY: "scroll",
-            overflowX: "hidden",
-            maxHeight: "50vh",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
+          {redeemableTokens.length ? (
+            <Hoverable
+              tooltipStyle={"frosted"}
+              tooltipContent={
+                <div className={"redeemable-token-container"}>
+                  {redeemableTokens.map(({ tokenId, amount, decimals }) => {
+                    return (
+                      <div className={"redeemable-token"} key={tokenId}>
+                        <TokenIcon token={tokenId} height={"24"} />{" "}
+                        <Text prominent size={"lg"}>
+                          {tokenId}: {addDecimalToBn(amount, decimals)}
+                        </Text>
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+            >
+              <Text size={"lg"} prominent>
+                Total Redeemable: {numberToMonetaryString(redeemableUsd)}{" "}
+                <InfoCircle />
+              </Text>
+            </Hoverable>
+          ) : augmentedStakes.length ? (
+            <Text size={"lg"} prominent>
+              {
+                augmentedStakes
+                  .map(({ stake, stakedDays }) =>
+                    Math.max(0, Math.ceil(stake.durationDays - stakedDays))
+                  )
+                  .sort((daysLeftA, daysLeftB) =>
+                    daysLeftA < daysLeftB ? -1 : daysLeftA === daysLeftB ? 0 : 1
+                  )[0]
+              }{" "}
+              days until next Withdrawal
+            </Text>
+          ) : (
+            <></>
+          )}
+          <GeneralButton handleClick={() => handleWithdraw()}>
+            {!redeeming ? "Withdraw" : "Redeeming..."}
+          </GeneralButton>
+        </div>
+
+        {/*Stakes list*/}
+        <div className={"staking-stats-stakes-container"}>
           {augmentedStakes.map(
             ({ stake, stakedDays, fluidUsd, baseUsd, multiplier }, i) => {
               const { durationDays, depositDate } = stake;
@@ -504,24 +548,9 @@ const StakingStatsModal = ({
 
               return (
                 <>
-                  <div
-                    key={`stake-${i}`}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 3fr 1fr",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      gap: "1em",
-                    }}
-                  >
+                  <div key={`stake-${i}`} className={"stake"}>
                     {/* Dates */}
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.5em",
-                      }}
-                    >
+                    <div className={"stake-date"}>
                       <Text>Start Date</Text>
                       <Text prominent>
                         {depositDate.toLocaleDateString("en-US")}
@@ -532,14 +561,7 @@ const StakingStatsModal = ({
                         {endDate.toLocaleDateString("en-US")}
                       </Text>
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                        gap: "0.5em",
-                      }}
-                    >
+                    <div className={"stake-amount"}>
                       <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
                         {numberToMonetaryString(fluidUsd + baseUsd)}
                       </Heading>
@@ -550,15 +572,7 @@ const StakingStatsModal = ({
                         color={multiplier === 1 ? "holo" : "gray"}
                         size="sm"
                       />
-                      <div
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          flexWrap: "wrap",
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
+                      <div className={"stake-multiplier"}>
                         <Text prominent>
                           {toSignificantDecimals(multiplier, 1)}x Multiplier
                         </Text>
@@ -568,9 +582,7 @@ const StakingStatsModal = ({
                         </Text>
                       </div>
                     </div>
-                    <div
-                      style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                    >
+                    <div className={"stake-date"}>
                       <Text>Staked For</Text>
                       <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
                         {Math.floor(durationDays)}
@@ -578,13 +590,7 @@ const StakingStatsModal = ({
                       <Text>Days</Text>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      width: "100%",
-                      border: "1px solid gray",
-                      margin: "1em 0 1em 0",
-                    }}
-                  />
+                  <div className={"bottom-border"} />
                 </>
               );
             }
@@ -674,7 +680,7 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
 
   // slippage % is the allowance of the base token
-  const [slippage, setSlippage] = useState(15);
+  const slippage = 50;
 
   // stakeErr is the UI response on a failed test stake
   const [stakeErr, setStakeErr] = useState("");
@@ -1006,12 +1012,7 @@ const StakeNowModal = ({
           rounded
           color="holo"
           fill
-          style={{
-            textAlign: "center",
-            marginTop: "1em",
-            padding: "0.5em",
-            borderRadius: "0.5em",
-          }}
+          className={"staking-modal-banner"}
         >
           <Text style={{ color: "black" }} size="sm">
             👀 TIP: Stake over 31 days for more rewards in future epochs &
@@ -1025,23 +1026,8 @@ const StakeNowModal = ({
         }`}
       >
         {/* Staking Amount */}
-        <div
-          className="airdrop-stake-inputs-column"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1em",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1em",
-            }}
-          >
+        <div className="airdrop-stake-inputs-column">
+          <div className={"stake-inputs-header"}>
             <Hoverable
               style={{ minWidth: 250 }}
               tooltipStyle={tooltipStyle}
@@ -1056,10 +1042,7 @@ const StakeNowModal = ({
                 type="transparent"
                 size="small"
                 handleClick={inputMaxBalance}
-                style={{
-                  padding: "0.5em 1em",
-                  borderRadius: "100px",
-                }}
+                className={"max-button"}
               >
                 <Text size="sm">MAX</Text>
               </GeneralButton>
@@ -1069,7 +1052,7 @@ const StakeNowModal = ({
             <div className="staking-modal-token-selector">
               {fluidTokens.map((token) => (
                 <button
-                  style={{ background: "none", border: "none" }}
+                  className={"staking-modal-selector-token-icon"}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (fluidToken.symbol != token.symbol) {
@@ -1277,7 +1260,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="Your accepted % for slippage."
+            tooltipContent="Slippage is set to this default amount, and any unused funds will be refunded back to the user’s wallet."
             className="slippage-tooltip"
           >
             <Text prominent={!isMobile} code className="helper-label">
@@ -1286,12 +1269,13 @@ const StakeNowModal = ({
           </Hoverable>
           <input
             className={"staking-modal-token-input"}
+            disabled
             pattern="[0-9]*"
             min={1}
             value={slippage}
             max={50}
-            onChange={(e) => {
-              setSlippage(Math.floor(parseInt(e.target.value) || 0));
+            onChange={() => {
+              return;
             }}
           />
         </div>
@@ -1668,17 +1652,6 @@ const TestnetRewardsModal = () => {
 
   return (
     <div className="claim-ropsten">
-      {/* {
-        JSON.stringify({
-          signature,
-          error,
-          ropstenAddress,
-          signerAddress,
-          address,
-          finalised,
-          manualSignature,
-        }, null, 2)
-      } */}
       <img src="/images/testnetBanner.png" />
       <div className="ropsten-header">
         <Heading as="h3">Claim Testnet Rewards</Heading>

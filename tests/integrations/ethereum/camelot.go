@@ -47,6 +47,7 @@ const integrationTestCamelot = `
     "expected_sender": "0x262cb76acee4843e9c7fce4d788172deaaa2d23e",
     "expected_recipient": "0x84652bb2539513baf36e225c930fdd8eaa63ce27",
     "expected_fees": "58192383/49850000",
+    "expected_volume": "19397461/50000",
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "expected_emission": {
@@ -94,6 +95,7 @@ const integrationTestCamelot = `
     "expected_sender": "0x262cb76acee4843e9c7fce4d788172deaaa2d23e",
     "expected_recipient": "0x84652bb2539513baf36e225c930fdd8eaa63ce27",
     "expected_fees": "58192383/50000000",
+    "expected_volume": "19397461/50000",
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "expected_emission": {
@@ -141,6 +143,7 @@ const integrationTestCamelot = `
     "expected_sender": "0x262cb76acee4843e9c7fce4d788172deaaa2d23e",
     "expected_recipient": "0x84652bb2539513baf36e225c930fdd8eaa63ce27",
     "expected_fees": "58192383/50000000",
+    "expected_volume": "19397461/50000",
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "expected_emission": {
@@ -188,6 +191,7 @@ const integrationTestCamelot = `
     "expected_sender": "0x262cb76acee4843e9c7fce4d788172deaaa2d23e",
     "expected_recipient": "0x84652bb2539513baf36e225c930fdd8eaa63ce27",
     "expected_fees": "58192383/49850000",
+    "expected_volume": "19397461/50000",
     "token_decimals": 6,
     "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
     "expected_emission": {

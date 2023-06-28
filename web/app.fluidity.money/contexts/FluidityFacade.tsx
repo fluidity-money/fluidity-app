@@ -2,6 +2,7 @@ import type { TransactionResponse } from "~/util/chainUtils/instructions";
 import type {
   StakingRatioRes,
   StakingDepositsRes,
+  StakingRedeemableRes,
 } from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
@@ -72,6 +73,12 @@ export interface IFluidityFacade {
     slippage: BN,
     maxTimestamp: BN
   ) => Promise<TransactionResponse | undefined>;
+
+  redeemTokens?: () => Promise<TransactionResponse | undefined>;
+
+  redeemableTokens?: (
+    address: string
+  ) => Promise<StakingRedeemableRes | undefined>;
 
   signOwnerAddress?: (ownerAddress: string) => Promise<string | undefined>;
 

@@ -36,6 +36,7 @@ var applicationNames = []string{
 	"camelot",
 	"chronos",
 	"sushiswap",
+	"kyber_classic",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

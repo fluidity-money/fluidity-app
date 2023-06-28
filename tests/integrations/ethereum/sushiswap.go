@@ -28,6 +28,7 @@ const integrationTestSushiswap = `
     "expected_sender": "0xd4cf8e47beac55b42ae58991785fa326d9384bd1",
     "expected_recipient": "0x397ff1542f962076d0bfe58ea045ffa2d347aca0",
     "expected_fees": "30000000/997000000",
+    "expected_volume": "10/1",
     "expected_emission": {
 	"sushiswap": 0.03009027081243731
     },
@@ -44,6 +45,56 @@ const integrationTestSushiswap = `
     },
     "token_decimals": 6,
     "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  },
+  {
+    "transfer": {
+      "transaction": "0x8d07492567d8e01513482e17a7c2350b6918bba586deaf20fb6f907f58776b16",
+      "log": {
+        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzx3PcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADPOPxQ==",
+        "address": "0xa7f8207bbea17e44cdc5238cb03c03eacefba314",
+        "topics": [
+          "0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062",
+          "0x000000000000000000000000fc506aaa1340b4dedffd88be278bee058952d674",
+          "0x000000000000000000000000ff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+	  "0x0000000000000000000000004cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
+        ]
+      },
+     "application": 18
+    },
+    "transaction": {
+      "to": "0xfc506aaa1340b4dedffd88be278bee058952d674",
+      "from": "0x475681f0e12606cf8f97743c1d4558c06a287840",
+      "hash": "0x8d07492567d8e01513482e17a7c2350b6918bba586deaf20fb6f907f58776b16"
+    },
+    "expected_sender": "0x475681f0e12606cf8f97743c1d4558c06a287840",
+    "expected_recipient": "0xa7f8207bbea17e44cdc5238cb03c03eacefba314",
+    "expected_fees": "43435467/400000000",
+    "expected_volume": "43435467/200000",
+    "expected_emission": {
+	"sushiswap": 0.1085886675
+    },
+    "rpc_methods": {
+	"eth_getCode": "0x0"
+    },
+    "call_methods": {
+    	"token0()": {
+		    "": "0x0000000000000000000000004cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
+	    },
+    	"token1()": {
+		    "": "0x000000000000000000000000ff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+	    },
+	"swapFee()": {
+	 	    "": "0x0000000000000000000000000000000000000000000000000000000000000005"
+	},
+	"decimals0()": {
+	 	    "": "0x00000000000000000000000000000000000000000000000000000000000f4240"
+	},
+	"decimals1()": {
+	 	    "": "0x00000000000000000000000000000000000000000000000000000000000f4240"
+	}
+    },
+    "token_decimals": 6,
+    "contract_address": "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
   }
 ]
 `
