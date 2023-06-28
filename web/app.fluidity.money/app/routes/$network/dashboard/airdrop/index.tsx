@@ -1349,6 +1349,7 @@ const MyMultiplier = ({
         version="primary"
         handleClick={seeStakeNow}
         id="mx-stake-now-button"
+        disabled={true}
       >
         STAKE NOW
       </GeneralButton>
