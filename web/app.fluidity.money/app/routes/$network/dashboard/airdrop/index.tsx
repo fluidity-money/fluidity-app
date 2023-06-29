@@ -513,6 +513,7 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("stake")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "stake"}
+          disabled={true}
         >
           Stake
         </TabButton>
@@ -521,6 +522,7 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("testnet-rewards")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "testnet-rewards"}
+          disabled={true}
         >
           Testnet Rewards
         </TabButton>
@@ -1349,6 +1351,7 @@ const MyMultiplier = ({
         version="primary"
         handleClick={seeStakeNow}
         id="mx-stake-now-button"
+        disabled={true}
       >
         STAKE NOW
       </GeneralButton>
