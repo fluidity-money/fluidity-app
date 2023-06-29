@@ -592,7 +592,7 @@ const Airdrop = () => {
           )}
           {currentModal === "recap" && (
             <RecapModal
-              totalVolume={0}
+              totalVolume={11390000}
               bottlesLooted={0}
               bottles={SAFE_DEFAULT_AIRDROP.bottleTiers}
               userRecap={{
@@ -782,7 +782,7 @@ const Airdrop = () => {
       <Header />
       {currentModal === "recap" ? (
         <RecapModal
-          totalVolume={0}
+          totalVolume={11390000}
           bottlesLooted={0}
           bottles={SAFE_DEFAULT_AIRDROP.bottleTiers}
           userRecap={{

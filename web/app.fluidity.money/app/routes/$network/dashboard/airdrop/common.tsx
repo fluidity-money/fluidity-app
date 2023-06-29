@@ -1953,6 +1953,7 @@ const RecapModal = ({
   // use useTransform to get the negative of the scrollY
   const rotate = useTransform(scrollY, y => y * -0.2)
 
+  const [currentVideo, setCurrentVideo] = useState(0)
 
   return (
     <div className={"recap-container"}>
@@ -2001,11 +2002,22 @@ const RecapModal = ({
           </div>
         </div>
         {/* Animation */}
-        <Video
-          src={`/videos/airdrop/${isMobile ? 'LOOP_MOBILE.mp4' : 'FLOAT_LOOP.mp4'}`}
-          type={"contain"}
-          loop={true}
-        />
+        {currentVideo === 0 ? (
+          <Video
+            src={`/videos/airdrop/${isMobile ? 'FULL_ANIMATION_MOBILE.mp4' : 'FULL_ANIMATION.mp4'}`}
+            type={"contain"}
+            loop={false}
+            height="auto"
+            margin="200px 0 0 0"
+            onEnded={() => setCurrentVideo(1)}
+          />) : (
+          <Video
+            src={`/videos/airdrop/${isMobile ? 'LOOP_MOBILE.mp4' : 'FLOAT_LOOP.mp4'}`}
+            type={"contain"}
+            loop={true}
+            height="auto"
+            margin="200px 0 0 0"
+          />)}
       </div>
 
       {/* Global Stats */}
@@ -2055,7 +2067,7 @@ const RecapModal = ({
         >
           <Text style={{ marginRight: "3em" }}>TOTAL VOLUME</Text>
           <Display style={{ margin: "0" }}>
-            {shorthandAmountFormatter(totalVolume.toString(), 0)}+
+            {shorthandAmountFormatter(totalVolume.toString(), 1)}+
           </Display>
           <Text>
             The number of Total Volume Locked in this Epoch!{" "}
@@ -2067,7 +2079,7 @@ const RecapModal = ({
         <div className="recap-total-bottles">
           <div>
             <Text>TOTAL BOTTLES LOOTED</Text>
-            <Display as="h1" style={{ margin: "0" }}>
+            <Display size="lg">
               <Text holo size="lg">
                 <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
               </Text>
@@ -2087,13 +2099,70 @@ const RecapModal = ({
             <div
               key={`bottle-distribution-${tier}`}
               className={"bottle-container"}
-              style={{
-                border: `1px solid ${bottleRarityColorIcon[tier as Rarity].color
-                  }`,
-              }}
             >
-              <img src={`${bottleRarityColorIcon[tier as Rarity].img}`} />
-              {numberToCommaSeparated(amount)}+
+              {/* Make a circular SVG 250px in diameter with a red bg */}
+              <svg viewBox="0 0 100 100" width="200" height="200" style={{ overflow: 'visible' }}>
+                <motion.g
+                  initial={{ scale: 1, y: 0 }}
+                  whileHover={{ scale: 1.15, y: -9 }}
+                >
+                  <mask id={`mask-${tier}`}>
+                    <rect
+                      x="0"
+                      y="0"
+                      width="100"
+                      height="50"
+                      fill="white"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="50"
+                      fill="white"
+                    />
+                  </mask>
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="50"
+                    fill="transparent"
+                    stroke={bottleRarityColorIcon[tier as Rarity].color}
+                    strokeWidth="1"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <motion.image
+                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                    xlinkHref={`${bottleRarityColorIcon[tier as Rarity].img}`}
+                    mask={`url(#mask-${tier})`}
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      x: "-10px",
+                      y: "-20px",
+                      originX: "50%",
+                      originY: "50%",
+                    }}
+                  />
+                </motion.g>
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="50"
+                  fill="transparent"
+                  stroke={"grey"}
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                  style={{
+                    position: 'absolute',
+                    zIndex: 0,
+                    pointerEvents: 'none'
+                  }}
+                />
+              </svg>
+              <Text size="lg" style={{
+                textTransform: 'capitalize',
+              }}>{tier}</Text>
+              <Display size="xs" style={{ margin: 0, marginTop: -10, fontWeight: 800 }}>{numberToCommaSeparated(amount)}+</Display>
             </div>
           ))}
         </div>
