@@ -166,35 +166,35 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-  {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
+    {
+      airdrop: {
+        name: "airdrop",
+        path: (network: string) => `/${network}/dashboard/airdrop`,
+        icon: <AirdropIcon />,
+      },
     },
-  },
-  {
-    home: {
-      name: "dashboard",
-      path: (network: string) => `/${network}/dashboard/home`,
-      icon: <DashboardIcon />,
+    {
+      home: {
+        name: "dashboard",
+        path: (network: string) => `/${network}/dashboard/home`,
+        icon: <DashboardIcon />,
+      },
     },
-  },
-  {
-    rewards: {
-      name: "rewards",
-      path: (network: string) => `/${network}/dashboard/rewards`,
-      icon: <Trophy />,
+    {
+      rewards: {
+        name: "rewards",
+        path: (network: string) => `/${network}/dashboard/rewards`,
+        icon: <Trophy />,
+      },
     },
-  },
-  {
-    assets: {
-      name: "assets",
-      path: (network: string) => `/${network}/dashboard/assets`,
-      icon: <AssetsIcon />,
+    {
+      assets: {
+        name: "assets",
+        path: (network: string) => `/${network}/dashboard/assets`,
+        icon: <AssetsIcon />,
+      },
     },
-  },
-];
+  ];
 
 const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   ethereum: {
@@ -417,33 +417,14 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
   return (
     <>
-      <header id="flu-logo" className="hide-on-mobile">
-        <Link to={"./home"}>
-          <img
-            style={{ width: "5.5em", height: "2.5em" }}
-            src="/images/outlinedLogo.svg"
-            alt="Fluidity"
-          />
-        </Link>
-
-        <br />
-        <br />
-
-        <ChainSelectorButton
-          className="selector-button"
-          chain={CHAIN_NAME_MAP[network]}
-          onClick={() => setChainModalVisibility(true)}
-        />
-      </header>
-
       {/* Switch Chain Modal */}
       <Modal id="switch-chain" visible={chainModalVisibility}>
         <div className="cover">
@@ -505,9 +486,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -518,9 +498,24 @@ export default function Dashboard() {
         </GeneralButton>
       </Modal>
 
-      <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
+      <nav id="dashboard-navbar" className="hide-on-mobile">
+        <div id="flu-logo">
+          <Link to={"./home"}>
+            <img
+              style={{ width: "5.5em", height: "2.5em" }}
+              src="/images/outlinedLogo.svg"
+              alt="Fluidity"
+            />
+          </Link>
+          <ChainSelectorButton
+            className="selector-button"
+            chain={CHAIN_NAME_MAP[network]}
+            onClick={() => setChainModalVisibility(true)}
+          />
+        </div>
+
         {/* Nav Bar */}
-        <ul>
+        <ul className="sidebar-nav">
           {NAVIGATION_MAP.filter((obj) =>
             showAssets ? true : Object.keys(obj)[0] !== "assets"
           ).map((obj, index) => {
@@ -562,7 +557,7 @@ export default function Dashboard() {
                   !connectedWalletModalVisibility
                 );
               }}
-              className="connect-wallet-btn"
+              className="connect-wallet-btn connected"
             />
           ) : (
             <GeneralButton
@@ -585,7 +580,7 @@ export default function Dashboard() {
               connectedWalletModalVisibility &&
                 setConnectedWalletModalVisibility(false);
             }}
-            className="connect-wallet-btn"
+            className="connect-wallet-btn connected"
           />
         ) : (
           <GeneralButton
@@ -600,10 +595,12 @@ export default function Dashboard() {
           </GeneralButton>
         )}
       </nav>
+
+      {/* Main Content */}
       <main id="dashboard-body">
-        <nav id="top-navbar" className={"pad-main"}>
+        <header id="top-navbar" className={"pad-main"}>
           {/* App Name */}
-          <div className="top-navbar-left">
+          <div id="top-navbar-left">
             {(isMobile || isTablet) && (
               <a onClick={() => navigate("./home")}>
                 <img
@@ -622,31 +619,7 @@ export default function Dashboard() {
 
           {/* Navigation Buttons */}
           <div id="top-navbar-right">
-            {/* Send */}
-            {/*
-            <GeneralButton
-              version={"secondary"}
-              buttontype="icon before"
-              size={"small"}
-              handleClick={() => navigate("/send")}
-              icon={<ArrowUp />}
-            >
-              Send
-            </GeneralButton>
-            */}
-
-            {/* Receive */}
-            {/*
-            <GeneralButton
-              version={"secondary"}
-              buttontype="icon before"
-              size={"small"}
-              handleClick={() => navigate("/receive")}
-              icon={<ArrowDown />}
-            >
-              Recieve
-            </GeneralButton>
-            */}
+            {/* Network Button */}
             {(isTablet || isMobile) && showMobileNetworkButton && (
               <ChainSelectorButton
                 chain={CHAIN_NAME_MAP[network]}
@@ -706,7 +679,7 @@ export default function Dashboard() {
               <BurgerMenu isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
           </div>
-        </nav>
+        </header>
         <ConnectedWalletModal
           visible={connectedWalletModalVisibility}
           address={rawAddress ?? ""}
