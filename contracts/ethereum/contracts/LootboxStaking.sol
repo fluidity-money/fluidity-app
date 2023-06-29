@@ -548,6 +548,8 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
 
         Deposit memory dep;
 
+        uint256 numberRedeemed = 0;
+
         for (uint i = deposits_[msg.sender].length; i > 0;) {
             --i;
 
@@ -604,7 +606,11 @@ contract LootboxStaking is ILootboxStaking, IOperatorOwned, IEmergencyMode {
             );
 
             _deleteDeposit(msg.sender, i);
+
+            numberRedeemed++;
         }
+
+        require(numberRedeemed > 0, "no deposits were redeemed");
 
         require(fusdcRedeemed + 1 > _fusdcMinimum, "fusdc redeemed too low");
 
