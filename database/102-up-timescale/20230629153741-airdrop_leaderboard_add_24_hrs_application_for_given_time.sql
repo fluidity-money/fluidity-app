@@ -23,7 +23,7 @@ FROM (
 ) lb_24_application
     LEFT JOIN lootbox_referrals
         ON lb_24_application.address = lootbox_referrals.referrer,
-    LATERAL calculate_a_y(address, now()::TIMESTAMP) AS liquidity
+    LATERAL calculate_a_y(address, time_) AS liquidity
 GROUP BY address, liquidity_multiplier, total_box_count, highest_reward_tier
 $$;
 
