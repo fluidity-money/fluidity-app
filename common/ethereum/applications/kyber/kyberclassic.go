@@ -131,7 +131,7 @@ func GetKyberClassicFees(transfer worker.EthereumApplicationTransfer, client *et
 
 	if len(unpacked) != 5 {
 		return feeData, fmt.Errorf(
-			"Unpacked the wrong number of values! Expected 4, got %v",
+			"Unpacked the wrong number of values! Expected 5, got %v",
 			len(unpacked),
 		)
 	}

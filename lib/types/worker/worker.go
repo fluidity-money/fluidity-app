@@ -100,6 +100,7 @@ type (
 		Chronos          float64 `json:"chronos"`
 		Sushiswap        float64 `json:"sushiswap"`
 		KyberClassic     float64 `json:"kyber_classic"`
+		Wombat           float64 `json:"wombat"`
 	}
 
 	FeeSwitch struct {

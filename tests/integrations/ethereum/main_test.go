@@ -122,6 +122,9 @@ func init() {
 
     kyberClassicTests := unmarshalJsonTestOrFatal(integrationTestKyberClassic)
 	tests = append(tests, kyberClassicTests...)
+
+    wombatTests := unmarshalJsonTestOrFatal(integrationTestWombat)
+	tests = append(tests, wombatTests...)
 }
 
 func TestIntegrations(t *testing.T) {

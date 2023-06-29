@@ -14,13 +14,14 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/gtrade"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/kyber"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/meson"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/sushiswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/kyber"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -56,6 +57,7 @@ const (
 	ApplicationChronos
 	ApplicationSushiswap
 	ApplicationKyberClassic
+	ApplicationWombat
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -242,6 +244,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.KyberClassic += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationWombat:
+		feeData, err = wombat.GetWombatFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Wombat += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(
@@ -332,6 +343,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationKyberClassic:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationWombat:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
