@@ -37,8 +37,6 @@ import {
   Display,
   WalletIcon,
   TabButton,
-  LootBottle,
-  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";

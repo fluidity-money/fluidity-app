@@ -20,8 +20,6 @@ import {
   useViewport,
   Tooltip,
   TabButton,
-  LootBottle,
-  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
