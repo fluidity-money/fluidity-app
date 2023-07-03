@@ -316,7 +316,6 @@ export default function Rewards() {
     userUnclaimedRewards,
     txLoaded,
     hasTokenPerformance,
-    activeTokenPerformance,
   } = useMemo(() => {
     const {
       rewards: rewardsData,
