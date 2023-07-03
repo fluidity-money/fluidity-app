@@ -620,8 +620,6 @@ export default function Rewards() {
     );
   };
 
-  console.log(activeTokenPerformance);
-
   return (
     <div className="pad-main">
       {/* Loading State */}
