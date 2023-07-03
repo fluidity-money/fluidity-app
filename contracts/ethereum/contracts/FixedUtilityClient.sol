@@ -11,17 +11,21 @@ import "../interfaces/IFluidClient.sol";
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
 
+import "./openzeppelin/SafeERC20.sol";
+
 contract FixedUtilityClient is IFluidClient, IEmergencyMode {
-    event DustCollected(address destination, uint amount);
-    event ExchangeRateUpdated(uint num, uint denom);
+    using SafeERC20 for IERC20;
+
+    event DustCollected(address destination, uint256 amount);
+    event ExchangeRateUpdated(uint256 num, uint256 denom);
 
     IERC20 immutable token_;
 
-    uint immutable deltaWeightNum_;
-    uint immutable deltaWeightDenom_;
+    uint256 immutable deltaWeightNum_;
+    uint256 immutable deltaWeightDenom_;
 
-    uint private exchangeRateNum_;
-    uint private exchangeRateDenom_;
+    uint256 private exchangeRateNum_;
+    uint256 private exchangeRateDenom_;
 
     address immutable dustCollector_;
 
@@ -33,10 +37,10 @@ contract FixedUtilityClient is IFluidClient, IEmergencyMode {
 
     constructor(
         IERC20 _token,
-        uint _deltaWeightNum,
-        uint _deltaWeightDenom,
-        uint _exchangeRateNum,
-        uint _exchangeRateDenom,
+        uint256 _deltaWeightNum,
+        uint256 _deltaWeightDenom,
+        uint256 _exchangeRateNum,
+        uint256 _exchangeRateDenom,
         address _dustCollector,
         address _oracle,
         address _operator,
@@ -62,14 +66,14 @@ contract FixedUtilityClient is IFluidClient, IEmergencyMode {
     function drain() external {
         require(msg.sender == operator_, "only operator");
 
-        uint balance = token_.balanceOf(address(this));
+        uint256 balance = token_.balanceOf(address(this));
 
-        token_.transfer(dustCollector_, balance);
+        token_.safeTransfer(dustCollector_, balance);
 
         emit DustCollected(dustCollector_, balance);
     }
 
-    function updateExchangeRate(uint num, uint denom) external {
+    function updateExchangeRate(uint256 num, uint256 denom) external {
         require(msg.sender == operator_, "only operator");
 
         exchangeRateNum_ = num;
@@ -81,20 +85,20 @@ contract FixedUtilityClient is IFluidClient, IEmergencyMode {
     // implements IFluidClient
 
     /// @inheritdoc IFluidClient
-    function batchReward(Winner[] memory _rewards, uint _firstBlock, uint _lastBlock) external {
+    function batchReward(Winner[] memory _rewards, uint256 _firstBlock, uint256 _lastBlock) external {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
-        uint poolAmount = token_.balanceOf(address(this));
+        uint256 poolAmount = token_.balanceOf(address(this));
 
-        for (uint i = 0; i < _rewards.length; i++) {
+        for (uint256 i = 0; i < _rewards.length; i++) {
             Winner memory winner = _rewards[i];
 
             require(poolAmount >= winner.amount, "empty reward pool");
 
             poolAmount = poolAmount - winner.amount;
 
-            token_.transfer(winner.winner, winner.amount);
+            token_.safeTransfer(winner.winner, winner.amount);
             emit Reward(
                 winner.winner,
                 winner.amount,
