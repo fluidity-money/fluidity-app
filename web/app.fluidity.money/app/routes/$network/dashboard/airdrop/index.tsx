@@ -181,7 +181,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
   const {
     address,
@@ -967,6 +967,12 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
+
+  const dayDiff = epochMax - epochDays
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
+  const percentage = Math.floor((epochDays / epochMax) * 100)
+  const epochPercentage = percentage < 100 ? percentage : 100
+
   return (
     <div
       className="airdrop-stats"
@@ -991,7 +997,7 @@ const AirdropStats = ({
       <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
           <Text prominent size="xl">
-            {epochMax - epochDays}
+            {epochDaysLeft}
           </Text>
         </LabelledValue>
         <div
@@ -1008,7 +1014,7 @@ const AirdropStats = ({
             rounded
             color="white"
           />
-          <Text>{Math.floor((epochDays / epochMax) * 100)}%</Text>
+          <Text>{epochPercentage}%</Text>
         </div>
       </div>
       <div className="airdrop-stats-item">
@@ -1545,7 +1551,7 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
-          <GeneralButton
+          {/* <GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
             icon={<ProviderIcon provider="Kyber" />}
@@ -1553,7 +1559,7 @@ const Leaderboard = ({
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
             </Text>
-          </GeneralButton>
+          </GeneralButton> */}
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
