@@ -11,15 +11,18 @@ import "../interfaces/IFluidClient.sol";
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IERC20.sol";
 
+import "./openzeppelin/SafeERC20.sol";
 import "./uniswap/UniswapLibraries.sol";
 
 contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
-    event DustCollected(address destination, uint amount);
+    using SafeERC20 for IERC20;
+
+    event DustCollected(address destination, uint256 amount);
 
     IERC20 immutable token_;
 
-    uint immutable deltaWeightNum_;
-    uint immutable deltaWeightDenom_;
+    uint256 immutable deltaWeightNum_;
+    uint256 immutable deltaWeightDenom_;
 
     address immutable dustCollector_;
 
@@ -34,22 +37,22 @@ contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
     address immutable token0_;
     address immutable token1_;
 
-    uint32 immutable secondsAgo_;
+    uint32 immutable weightedAverageTime_;
 
     constructor(
         IERC20 _token,
-        uint _deltaWeightNum,
-        uint _deltaWeightDenom,
+        uint256 _deltaWeightNum,
+        uint256 _deltaWeightDenom,
         address _dustCollector,
         address _oracle,
         address _operator,
         address _council,
         IUniswapV3Pool _pool,
-        uint32 _secondsAgo
+        uint32 _weightedAverageTime
     ) {
         token_ = _token;
         pool_ = _pool;
-        secondsAgo_ = _secondsAgo;
+        weightedAverageTime_ = _weightedAverageTime;
         deltaWeightNum_ = _deltaWeightNum;
         deltaWeightDenom_ = _deltaWeightDenom;
         dustCollector_ = _dustCollector;
@@ -68,15 +71,16 @@ contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
         );
 
         // might revert if the pool doesn't have enough data!
-        OracleLibrary.consult(address(pool_), _secondsAgo);
+        getTickPrice();
     }
 
+    // drains any dust from the pool
     function drain() external {
         require(msg.sender == operator_, "only operator");
 
-        uint balance = token_.balanceOf(address(this));
+        uint256 balance = token_.balanceOf(address(this));
 
-        token_.transfer(dustCollector_, balance);
+        token_.safeTransfer(dustCollector_, balance);
 
         emit DustCollected(dustCollector_, balance);
     }
@@ -84,20 +88,20 @@ contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
     // implements IFluidClient
 
     /// @inheritdoc IFluidClient
-    function batchReward(Winner[] memory _rewards, uint _firstBlock, uint _lastBlock) external {
+    function batchReward(Winner[] memory _rewards, uint256 _firstBlock, uint256 _lastBlock) external {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
-        uint poolAmount = token_.balanceOf(address(this));
+        uint256 poolAmount = token_.balanceOf(address(this));
 
-        for (uint i = 0; i < _rewards.length; i++) {
+        for (uint256 i = 0; i < _rewards.length; i++) {
             Winner memory winner = _rewards[i];
 
             require(poolAmount >= winner.amount, "empty reward pool");
 
             poolAmount = poolAmount - winner.amount;
 
-            token_.transfer(winner.winner, winner.amount);
+            token_.safeTransfer(winner.winner, winner.amount);
             emit Reward(
                 winner.winner,
                 winner.amount,
@@ -111,10 +115,8 @@ contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
     function getUtilityVars() external view returns (UtilityVars memory) {
         require(noEmergencyMode_, "emergency mode!");
 
-        (int24 arithmetic, /* uint128 harmonic */) = OracleLibrary.consult(
-            address(pool_),
-            secondsAgo_
-        );
+        int24 arithmetic = getTickPrice();
+
         uint160 sqrtPrice = TickMath.getSqrtRatioAtTick(arithmetic);
         // sqrtPrice = sqrt(price) * 2**96
         // sqrtPrice**2 / 2**96**2 = price
@@ -156,6 +158,16 @@ contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
             // this is a constant that the offchain worker knows !
             customCalculationType: "worker config overrides"
         });
+    }
+
+    // returns the time weighted tick price from uniswap
+    function getTickPrice() internal view returns (int24) {
+        (int24 arithmetic, /* uint128 harmonic */) = OracleLibrary.consult(
+            address(pool_),
+            weightedAverageTime_
+        );
+
+        return arithmetic;
     }
 
     // implements IEmergencyMode
