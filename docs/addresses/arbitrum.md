@@ -1,16 +1,17 @@
 # 🅰 Arbitrum
 
-| Contract                               | Address                                    |
-| -------------------------------------- | ------------------------------------------ |
-| fUSDT                                  | 0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62 |
-| fUSDC                                  | 0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A |
-| fDAI                                   | 0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b |
-| ProxyAdmin used for TransparentProxies | 0x80d82aF50EF0277b7A888616a7CE9F2D2F39DAe2 |
-| Registry                               | 0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d |
-| LootboxStaking                         | 0x770f77A67d9B1fC26B80447c666f8a9aECA47C82 |
-| Executor                               | 0xBdC05dE358bA65720f5cc74BBc615C029220C67D |
-| Chronos Booster UtilityClient          | 0xEB6057AE11BE83fFE0a3C191a41D67728938886B |
-| LootboxConfirmAddressOwnership         | 0x18EB6Ac990BD3a31dD3e5dd9c7744751c8E9DC06 |
+| Contract                                      | Address                                    |
+| --------------------------------------------- | ------------------------------------------ |
+| fUSDT                                         | 0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62 |
+| fUSDC                                         | 0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A |
+| fDAI                                          | 0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b |
+| ProxyAdmin used for TransparentProxies        | 0x80d82aF50EF0277b7A888616a7CE9F2D2F39DAe2 |
+| Registry                                      | 0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d |
+| LootboxStaking                                | 0x770f77A67d9B1fC26B80447c666f8a9aECA47C82 |
+| Executor                                      | 0xBdC05dE358bA65720f5cc74BBc615C029220C67D |
+| Chronos Booster UtilityClient                 | 0xEB6057AE11BE83fFE0a3C191a41D67728938886B |
+| LootboxConfirmAddressOwnership                | 0x18EB6Ac990BD3a31dD3e5dd9c7744751c8E9DC06 |
+| Wombat fixed token distribution UtilityClient | 0x62363df6e7B1b06BACFa232B7cb1f0835c8ef0A0 |
 
 ## Specifics
 
