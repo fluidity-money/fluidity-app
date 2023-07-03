@@ -250,16 +250,16 @@ export default function Home() {
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "WOM" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
           { name: "ACCOUNT" },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "WOM" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];

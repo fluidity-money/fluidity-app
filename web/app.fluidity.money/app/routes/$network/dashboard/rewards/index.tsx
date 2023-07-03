@@ -236,13 +236,17 @@ export default function Rewards() {
   const txTableColumns = (() => {
     switch (true) {
       case isTablet:
-        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "WOM" }];
+        return [
+          { name: "ACTIVITY" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
+        ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "WOM" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -616,6 +620,8 @@ export default function Rewards() {
     );
   };
 
+  console.log(activeTokenPerformance);
+
   return (
     <div className="pad-main">
       {/* Loading State */}
@@ -683,13 +689,9 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue
                 label={"Highest performer"}
-                icon={
-                  <TokenIcon
-                    token={`f${activeTokenPerformance[0].token}` as Token}
-                  />
-                }
+                icon={<TokenIcon token={`fUSDC` as Token} />}
               >
-                {`f${activeTokenPerformance[0].token}` as Token}
+                {`fUSDC` as Token}
               </LabelledValue>
             </div>
           )}
