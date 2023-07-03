@@ -28,7 +28,7 @@ type (
 		// TokenDecimalsScale is 1e(decimals)
 		TokenDecimalsScale *big.Rat `json:"token_decimals"`
 
-		// ExchangeRate is the number for which (usd value)*(exchange rate) = (native amount)
+		// ExchangeRate is the number for which (usd value)/(exchange rate)*(decimal scale) = (native amount)
 		ExchangeRate *big.Rat `json:"exchange_rate"`
 
 		// DeltaWeight is the frequency with which to distribute tokens
