@@ -509,7 +509,7 @@ export default function Rewards() {
             <td>
               {wombatTokens ? (
                 <a
-                  className="table-address"
+                  className="table-token"
                   onClick={() =>
                     handleRewardTransactionClick(
                       network,
@@ -519,9 +519,8 @@ export default function Rewards() {
                     )
                   }
                 >
-                  <Text prominent={true}>
-                    {numberToMonetaryString(wombatTokens)}
-                  </Text>
+                  <img src="/images/providers/wombat.svg" />
+                  <Text>{wombatTokens}</Text>
                 </a>
               ) : (
                 <Text>-</Text>
