@@ -253,7 +253,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
-          { name: "BOTTLES" },
+          { name: "WOM" },
           { name: "ACCOUNT" },
         ];
       default:
@@ -261,7 +261,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "REWARD" },
-          { name: "BOTTLES" },
+          { name: "WOM" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -377,6 +377,7 @@ export default function Home() {
         currency,
         logo,
         lootBottles,
+        wombatTokens,
       } = data;
 
       return (
@@ -433,51 +434,30 @@ export default function Home() {
             </td>
           )}
 
-          {/* Bottles */}
-          {!isMobile &&
-            (lootBottles ? (
-              <td className="table-bottle">
-                {Object.entries(lootBottles).map(
-                  ([rarity, quantity]: [string, number], index) => {
-                    if (quantity <= 0.005) return <></>;
-
-                    return (
-                      <div key={index} className="lootbottle-container">
-                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
-                        <Text
-                          size="sm"
-                          style={{
-                            whiteSpace: "nowrap",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {toDecimalPlaces(quantity, 2)}
-                        </Text>
-                      </div>
-                    );
+          {/* WOM */}
+          {!isMobile && (
+            <td>
+              {wombatTokens ? (
+                <a
+                  className="table-address"
+                  onClick={() =>
+                    handleRewardTransactionClick(
+                      network,
+                      currency,
+                      logo,
+                      rewardHash
+                    )
                   }
-                )}
-              </td>
-            ) : reward > 0 && !data.swapType && data.sender === sender ? (
-              <td className="table-bottle">
-                <div key={index} className="lootbottle-container">
-                  <LootBottle size="sm" rarity={"legendary"} quantity={0} />
-                  <Text
-                    size="sm"
-                    style={{
-                      whiteSpace: "nowrap",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    ...
+                >
+                  <Text prominent={true}>
+                    {numberToMonetaryString(wombatTokens)}
                   </Text>
-                </div>
-              </td>
-            ) : (
-              <td>
+                </a>
+              ) : (
                 <Text>-</Text>
-              </td>
-            ))}
+              )}
+            </td>
+          )}
 
           {/* Account */}
           {!isSmallMobile && (
