@@ -160,7 +160,7 @@ const GLOBAL_AIRDROP_BOTTLE_TIERS = {
   [Rarity.Rare]: 11010,
   [Rarity.UltraRare]: 812,
   [Rarity.Legendary]: 5,
-}
+};
 
 const Airdrop = () => {
   const {
@@ -417,10 +417,13 @@ const Airdrop = () => {
 
   const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
     useState<boolean | undefined>(undefined);
-  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+  // const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+  //   boolean | undefined
+  // >(undefined);
+  const localShouldShowTutorial = false;
+  const [localShouldShowRecapIntro, setLocalShouldShowRecapIntro] = useState<
     boolean | undefined
   >(undefined);
-  const [localShouldShowRecapIntro, setLocalShouldShowRecapIntro] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     if (!window) return;
@@ -433,7 +436,7 @@ const Airdrop = () => {
       setLocalCookieConsent(true);
     }
 
-    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    // const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
     const airdropBottleCount =
       window.localStorage.getItem("airdropBottleCount");
     const airdropShouldShowBottleNumbers = window.localStorage.getItem(
@@ -484,7 +487,7 @@ const Airdrop = () => {
     if (!window || !localCookieConsent) return;
     if (localShouldShowRecapIntro !== false) return;
     window.localStorage.setItem("airdropShouldShowRecapIntro", "false");
-    setLocalShouldShowRecapIntro(false)
+    setLocalShouldShowRecapIntro(false);
   }, [localShouldShowRecapIntro]);
 
   useEffect(() => {
@@ -507,8 +510,9 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         <TabButton
           size="small"
@@ -522,7 +526,9 @@ const Airdrop = () => {
           size="small"
           onClick={() => setCurrentModal(null)}
           groupId="airdrop"
-          isSelected={isMobile ? currentModal === null : currentModal !== "recap"}
+          isSelected={
+            isMobile ? currentModal === null : currentModal !== "recap"
+          }
         >
           Airdrop Dashboard
         </TabButton>
@@ -586,19 +592,20 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-                currentModal === "leaderboard" ||
-                currentModal === "stake"
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                  ? "1em"
-                  : "2em",
+                ? "1em"
+                : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -1059,11 +1066,10 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
-
-  const dayDiff = epochMax - epochDays
-  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
-  const percentage = Math.floor((epochDays / epochMax) * 100)
-  const epochPercentage = percentage < 100 ? percentage : 100
+  const dayDiff = epochMax - epochDays;
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0;
+  const percentage = Math.floor((epochDays / epochMax) * 100);
+  const epochPercentage = percentage < 100 ? percentage : 100;
 
   return (
     <div
@@ -1140,8 +1146,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                navigate(`/${network}/dashboard/rewards`);
-              }
+                  navigate(`/${network}/dashboard/rewards`);
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1380,7 +1386,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1400,8 +1406,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                  ? 0
-                  : -1;
+                ? 0
+                : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1473,8 +1479,9 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
-        }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+        address === user ? "highlighted-row" : ""
+      }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1493,8 +1500,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1515,8 +1522,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
             style={
               address === user
                 ? {
-                  color: "black",
-                }
+                    color: "black",
+                  }
                 : {}
             }
           >
@@ -1532,8 +1539,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1548,8 +1555,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1564,8 +1571,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >

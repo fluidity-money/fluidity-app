@@ -1,7 +1,7 @@
-import { createContext } from "react"
+import { createContext } from "react";
 
 type UIContextShape = {
-  toggleConnectWalletModal?: () => void
-}
+  toggleConnectWalletModal?: () => void;
+};
 
-export const UIContext = createContext<UIContextShape>({})
+export const UIContext = createContext<UIContextShape>({});

@@ -804,7 +804,7 @@ $holo: linear-gradient(
   width: 100%;
   max-width: 1200px;
   align-self: center;
-  box-sizing:border-box;
+  box-sizing: border-box;
   flex-direction: column;
   gap: 150px;
   overflow: hidden;
@@ -829,7 +829,7 @@ $holo: linear-gradient(
       box-sizing: border-box;
       position: absolute;
       top: 0;
-      left:0;
+      left: 0;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -1009,7 +1009,7 @@ $holo: linear-gradient(
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content:space-between;
+    justify-content: space-between;
     gap: 4em;
 
     recap-connect-text {
