@@ -10,8 +10,7 @@ SERVICES:
       SERVICE_NAME: microservice-arbitrum-worker-server-usdt
       ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-server-usdt
       ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0xc9fa90d24b7103ad2215de52afec5e1e4c7a6e62"
-      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: USDT
-      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+      ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:USDT:6,wombat initial boost:WOM:18:chronos initial boost:USDC:6"
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.usdt
       ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.usdt
 
@@ -19,8 +18,7 @@ SERVICES:
       SERVICE_NAME: microservice-arbitrum-worker-server-usdc
       ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-server-usdc
       ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
-      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: USDC
-      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 6
+      ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:USDC:6,wombat initial boost:WOM:18:chronos initial boost:USDC:6"
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.usdc
       ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.usdc
 
@@ -28,7 +26,6 @@ SERVICES:
       SERVICE_NAME: microservice-arbitrum-worker-server-dai
       ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-server-dai
       ENV_FLU_ETHEREUM_CONTRACT_ADDR: "0x1b40e7812e75d02eef97e4399c33865d2ff5952b"
-      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_NAME: DAI
-      ENV_FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS: 18
+      ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:DAI:18,wombat initial boost:WOM:18:chronos initial boost:USDC:6"
       ENV_FLU_ETHEREUM_AMQP_QUEUE_NAME: arbitrum.worker.dai
       ENV_FLU_ETHEREUM_WORK_QUEUE: worker.arbitrum.server.work.dai
