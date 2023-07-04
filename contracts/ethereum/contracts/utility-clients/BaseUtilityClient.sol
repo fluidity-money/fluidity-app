@@ -7,91 +7,66 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../interfaces/IFluidClient.sol";
-import "../interfaces/IEmergencyMode.sol";
-import "../interfaces/IERC20.sol";
+import "../../interfaces/IFluidClient.sol";
+import "../../interfaces/IEmergencyMode.sol";
+import "../../interfaces/IERC20.sol";
 
-import "./openzeppelin/SafeERC20.sol";
+import "../openzeppelin/SafeERC20.sol";
 
-contract FixedUtilityClient is IFluidClient, IEmergencyMode {
+// BaseUtilityClient provides a utility client that can batchreward, drain, and supports emergency mode
+// it does not provide getUtilityVars
+abstract contract BaseUtilityClient is IFluidClient, IEmergencyMode {
     using SafeERC20 for IERC20;
 
-    event DustCollected(address destination, uint256 amount);
-    event ExchangeRateUpdated(uint256 num, uint256 denom);
+    event DustCollected(address destination, uint amount);
 
     IERC20 immutable token_;
 
-    uint256 immutable deltaWeightNum_;
-    uint256 immutable deltaWeightDenom_;
-
-    uint256 private exchangeRateNum_;
-    uint256 private exchangeRateDenom_;
-
     address immutable dustCollector_;
 
-    address private oracle_;
-    address private operator_;
-    address private emergencyCouncil_;
+    address internal oracle_;
+    address internal operator_;
+    address internal emergencyCouncil_;
 
-    bool private noEmergencyMode_;
+    bool internal noEmergencyMode_;
 
     constructor(
         IERC20 _token,
-        uint256 _deltaWeightNum,
-        uint256 _deltaWeightDenom,
-        uint256 _exchangeRateNum,
-        uint256 _exchangeRateDenom,
         address _dustCollector,
         address _oracle,
         address _operator,
         address _council
     ) {
         token_ = _token;
-        deltaWeightNum_ = _deltaWeightNum;
-        deltaWeightDenom_ = _deltaWeightDenom;
-
-        exchangeRateNum_ = _exchangeRateNum;
-        exchangeRateDenom_ = _exchangeRateDenom;
 
         dustCollector_ = _dustCollector;
-
         oracle_ = _oracle;
         operator_ = _operator;
         emergencyCouncil_ = _council;
-        noEmergencyMode_ = true;
 
-        emit ExchangeRateUpdated(exchangeRateNum_, exchangeRateDenom_);
+        noEmergencyMode_ = true;
     }
 
     function drain() external {
         require(msg.sender == operator_, "only operator");
 
-        uint256 balance = token_.balanceOf(address(this));
+        uint balance = token_.balanceOf(address(this));
 
         token_.safeTransfer(dustCollector_, balance);
 
         emit DustCollected(dustCollector_, balance);
     }
 
-    function updateExchangeRate(uint256 num, uint256 denom) external {
-        require(msg.sender == operator_, "only operator");
-
-        exchangeRateNum_ = num;
-        exchangeRateDenom_ = denom;
-
-        emit ExchangeRateUpdated(num, denom);
-    }
-
     // implements IFluidClient
 
     /// @inheritdoc IFluidClient
-    function batchReward(Winner[] memory _rewards, uint256 _firstBlock, uint256 _lastBlock) external {
+    function batchReward(Winner[] memory _rewards, uint _firstBlock, uint _lastBlock) external {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
-        uint256 poolAmount = token_.balanceOf(address(this));
+        uint poolAmount = token_.balanceOf(address(this));
 
-        for (uint256 i = 0; i < _rewards.length; i++) {
+        for (uint i = 0; i < _rewards.length; i++) {
             Winner memory winner = _rewards[i];
 
             require(poolAmount >= winner.amount, "empty reward pool");
@@ -109,20 +84,7 @@ contract FixedUtilityClient is IFluidClient, IEmergencyMode {
     }
 
     /// @inheritdoc IFluidClient
-    function getUtilityVars() external view returns (UtilityVars memory) {
-        require(noEmergencyMode_, "emergency mode!");
-
-        return UtilityVars({
-            poolSizeNative: token_.balanceOf(address(this)),
-            tokenDecimalScale: 10**token_.decimals(),
-            exchangeRateNum: exchangeRateNum_,
-            exchangeRateDenom: exchangeRateDenom_,
-            deltaWeightNum: deltaWeightNum_,
-            deltaWeightDenom: deltaWeightDenom_,
-            // this is a constant that the offchain worker knows !
-            customCalculationType: "worker config overrides"
-        });
-    }
+    function getUtilityVars() external virtual view returns (UtilityVars memory);
 
     // implements IEmergencyMode
 

@@ -3,7 +3,7 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../contracts/UniswapOracleUtilityClient.sol";
+import "../contracts/utility-clients/UniswapOracleUtilityClient.sol";
 import "../contracts/uniswap/UniswapLibraries.sol";
 
 import "forge-std/Test.sol";
@@ -53,7 +53,7 @@ contract TestUniswapOracleUM is Test {
         );
     }
 
-    function testUniswapOracle() public {
+    function testUniswapOracle() public view {
         UtilityVars memory v = wethUsdc_.getUtilityVars();
         // 1mil usdc to weth
         // usd * denom / num = usd * 1/(denom/num) = usd / (num/denom)
@@ -62,7 +62,7 @@ contract TestUniswapOracleUM is Test {
         require(wethAmount < 550, "weth amount too high");
 
         v = uniDai_.getUtilityVars();
-        //
+
         // 1mil dai to UNI
         uint uniAmount = FullMath.mulDiv(1000000, v.exchangeRateDenom, v.exchangeRateNum);
         console.logUint(uniAmount);
