@@ -88,6 +88,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           solana_application: undefined,
           reward_type: pending_winner.reward_type,
           awarded_time: pending_winner.inserted_date,
+          utility_name: pending_winner.utility_name,
         };
       });
 
@@ -262,11 +263,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
         const isSend = tx.sender === winner.winning_address;
 
+        const reward = winner.winning_amount / 10 ** winner.token_decimals;
+
         return {
           sender: tx.sender,
           receiver: tx.receiver,
           winner: winner.winning_address ?? "",
-          reward: winner.winning_amount / 10 ** winner.token_decimals,
+          reward,
           hash: tx.hash,
           rewardHash:
             winner.ethereum_application === undefined
@@ -282,6 +285,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               : winner?.solana_application) ?? "Fluidity",
           swapType,
           lootBottles: isSend ? lootbottlesMap[tx.hash] : undefined,
+          wombatTokens:
+            winner.utility_name === "wombat initial boost" ? reward : undefined,
         };
       });
 

@@ -15,3 +15,4 @@ hero/legendary.png filter=lfs diff=lfs merge=lfs -text
 hero/rare.png filter=lfs diff=lfs merge=lfs -text
 hero/ultra_rare.png filter=lfs diff=lfs merge=lfs -text
 hero/uncommon.png filter=lfs diff=lfs merge=lfs -text
+providers/wombat.svg filter=lfs diff=lfs merge=lfs -text

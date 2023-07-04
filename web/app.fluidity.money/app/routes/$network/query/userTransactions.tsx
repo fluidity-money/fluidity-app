@@ -298,24 +298,33 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           : undefined;
 
       const winner = jointWinnersMap[tx.hash];
-      const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
 
-      const winnerAddress = isFromPendingWin
-        ? ((winner as PendingWinner)?.address as unknown as string)
-        : ((winner as Winner)?.winning_address as unknown as string) ?? "";
+      const isWin = !!winner;
+      const isFromPendingWin = isWin && tx.hash === winner.transaction_hash;
+
+      const winnerAddress = isWin
+        ? isFromPendingWin
+          ? ((winner as PendingWinner)?.address as unknown as string)
+          : ((winner as Winner)?.winning_address as unknown as string)
+        : "";
 
       const isSend = tx.sender === winnerAddress;
+
+      const reward = isWin
+        ? (isFromPendingWin
+            ? (winner as PendingWinner).win_amount
+            : (winner as Winner).winning_amount) /
+          10 ** winner.token_decimals
+        : 0;
+
+      const hasWombatReward =
+        isWin && winner.utility_name === "wombat initial boost" && reward > 0;
 
       return {
         sender: tx.sender,
         receiver: tx.receiver,
         winner: winnerAddress ?? "",
-        reward: winner
-          ? (isFromPendingWin
-              ? (winner as PendingWinner).win_amount
-              : (winner as Winner).winning_amount) /
-            10 ** winner.token_decimals
-          : 0,
+        reward,
         hash: tx.hash,
         rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
         currency: tx.currency,
@@ -330,6 +339,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             : "Fluidity") ?? "Fluidity",
         swapType,
         lootBottles: isSend ? lootbottlesMap[tx.hash] : undefined,
+        wombatTokens: hasWombatReward ? reward : undefined,
       };
     });
 

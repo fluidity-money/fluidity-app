@@ -22,6 +22,7 @@ contract LootboxConfirmAddressOwnership is ILootboxConfirmAddressOwnership {
 
         addresses_[addr] = addr;
 
+        emit AddressConfirmed(addr, addr);
     }
 
     function confirm(address addr, address owner, uint8 _v, bytes32 _r, bytes32 _s) public {

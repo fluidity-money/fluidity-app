@@ -24,6 +24,8 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
+  Checkmark,
+  CopyIcon,
 } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
@@ -393,13 +395,25 @@ interface IStakingStatsModal {
   }>;
   wethPrice: number;
   usdcPrice: number;
+  redeemableUsd: number;
+  redeemableTokens: Array<{
+    tokenId: string;
+    amount: BN;
+    decimals: number;
+  }>;
+  handleRedeemTokens: () => Promise<boolean | undefined>;
 }
 
 const StakingStatsModal = ({
   stakes,
   wethPrice,
   usdcPrice,
+  redeemableUsd,
+  redeemableTokens,
+  handleRedeemTokens,
 }: IStakingStatsModal) => {
+  const [redeeming, setRedeeming] = useState(false);
+
   const augmentedStakes = stakes.map((stake) => {
     const { fluidAmount, baseAmount, durationDays, depositDate } = stake;
 
@@ -433,10 +447,6 @@ const StakingStatsModal = ({
     };
   });
 
-  const canWithdraw = augmentedStakes.some(({ stake, stakedDays }) => {
-    return stake.durationDays - stakedDays <= 0;
-  });
-
   const sumLiquidityMultiplier = augmentedStakes.reduce(
     (sum, { multiplier, fluidUsd, baseUsd }) => {
       return sum + (fluidUsd + baseUsd) * multiplier;
@@ -444,21 +454,19 @@ const StakingStatsModal = ({
     0
   );
 
+  const handleWithdraw = async () => {
+    setRedeeming(true);
+    try {
+      await handleRedeemTokens();
+    } catch (e) {
+      setRedeeming(false);
+    }
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "1em",
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "auto auto auto",
-          gap: "2em",
-        }}
-      >
+    <div className={"staking-stats-container"}>
+      {/*Stats row*/}
+      <div className={"staking-stats-header"}>
         <LabelledValue
           label={<Text size="sm">Total Liquidity Multiplier</Text>}
         >
@@ -475,24 +483,62 @@ const StakingStatsModal = ({
           )}
         </LabelledValue>
       </div>
-      <div
-        style={{
-          position: "relative",
-          border: "1px gray",
-          width: "100%",
-        }}
-      >
-        <GeneralButton disabled={!canWithdraw} style={{ right: "0" }}>
-          Withdraw
-        </GeneralButton>
+
+      {/*Withdraw Row*/}
+      <div className={"staking-stats-withdraw"}>
         <div
           style={{
-            paddingTop: "1em",
-            overflowY: "scroll",
-            overflowX: "hidden",
-            maxHeight: "50vh",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
+          {redeemableTokens.length ? (
+            <Hoverable
+              tooltipStyle={"frosted"}
+              tooltipContent={
+                <div className={"redeemable-token-container"}>
+                  {redeemableTokens.map(({ tokenId, amount, decimals }) => {
+                    return (
+                      <div className={"redeemable-token"} key={tokenId}>
+                        <TokenIcon token={tokenId} height={"24"} />{" "}
+                        <Text prominent size={"lg"}>
+                          {tokenId}: {addDecimalToBn(amount, decimals)}
+                        </Text>
+                      </div>
+                    );
+                  })}
+                </div>
+              }
+            >
+              <Text size={"lg"} prominent>
+                Total Redeemable: {numberToMonetaryString(redeemableUsd)}{" "}
+                <InfoCircle />
+              </Text>
+            </Hoverable>
+          ) : augmentedStakes.length ? (
+            <Text size={"lg"} prominent>
+              {
+                augmentedStakes
+                  .map(({ stake, stakedDays }) =>
+                    Math.max(0, Math.ceil(stake.durationDays - stakedDays))
+                  )
+                  .sort((daysLeftA, daysLeftB) =>
+                    daysLeftA < daysLeftB ? -1 : daysLeftA === daysLeftB ? 0 : 1
+                  )[0]
+              }{" "}
+              days until next Withdrawal
+            </Text>
+          ) : (
+            <></>
+          )}
+          <GeneralButton handleClick={() => handleWithdraw()}>
+            {!redeeming ? "Withdraw" : "Redeeming..."}
+          </GeneralButton>
+        </div>
+
+        {/*Stakes list*/}
+        <div className={"staking-stats-stakes-container"}>
           {augmentedStakes.map(
             ({ stake, stakedDays, fluidUsd, baseUsd, multiplier }, i) => {
               const { durationDays, depositDate } = stake;
@@ -502,24 +548,9 @@ const StakingStatsModal = ({
 
               return (
                 <>
-                  <div
-                    key={`stake-${i}`}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 3fr 1fr",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      gap: "1em",
-                    }}
-                  >
+                  <div key={`stake-${i}`} className={"stake"}>
                     {/* Dates */}
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.5em",
-                      }}
-                    >
+                    <div className={"stake-date"}>
                       <Text>Start Date</Text>
                       <Text prominent>
                         {depositDate.toLocaleDateString("en-US")}
@@ -530,14 +561,7 @@ const StakingStatsModal = ({
                         {endDate.toLocaleDateString("en-US")}
                       </Text>
                     </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                        gap: "0.5em",
-                      }}
-                    >
+                    <div className={"stake-amount"}>
                       <Heading as="h3" style={{ margin: "0.5em 0 0.5em 0" }}>
                         {numberToMonetaryString(fluidUsd + baseUsd)}
                       </Heading>
@@ -548,15 +572,7 @@ const StakingStatsModal = ({
                         color={multiplier === 1 ? "holo" : "gray"}
                         size="sm"
                       />
-                      <div
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          flexWrap: "wrap",
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
+                      <div className={"stake-multiplier"}>
                         <Text prominent>
                           {toSignificantDecimals(multiplier, 1)}x Multiplier
                         </Text>
@@ -566,9 +582,7 @@ const StakingStatsModal = ({
                         </Text>
                       </div>
                     </div>
-                    <div
-                      style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                    >
+                    <div className={"stake-date"}>
                       <Text>Staked For</Text>
                       <Heading as="h2" style={{ margin: "0.5em 0 0.5em 0" }}>
                         {Math.floor(durationDays)}
@@ -576,13 +590,7 @@ const StakingStatsModal = ({
                       <Text>Days</Text>
                     </div>
                   </div>
-                  <div
-                    style={{
-                      width: "100%",
-                      border: "1px solid gray",
-                      margin: "1em 0 1em 0",
-                    }}
-                  />
+                  <div className={"bottom-border"} />
                 </>
               );
             }
@@ -672,7 +680,7 @@ const StakeNowModal = ({
   const [stakingDuration, setStakingDuration] = useState(31);
 
   // slippage % is the allowance of the base token
-  const [slippage, setSlippage] = useState(15);
+  const slippage = 50;
 
   // stakeErr is the UI response on a failed test stake
   const [stakeErr, setStakeErr] = useState("");
@@ -1004,12 +1012,7 @@ const StakeNowModal = ({
           rounded
           color="holo"
           fill
-          style={{
-            textAlign: "center",
-            marginTop: "1em",
-            padding: "0.5em",
-            borderRadius: "0.5em",
-          }}
+          className={"staking-modal-banner"}
         >
           <Text style={{ color: "black" }} size="sm">
             👀 TIP: Stake over 31 days for more rewards in future epochs &
@@ -1023,23 +1026,8 @@ const StakeNowModal = ({
         }`}
       >
         {/* Staking Amount */}
-        <div
-          className="airdrop-stake-inputs-column"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1em",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: "1em",
-            }}
-          >
+        <div className="airdrop-stake-inputs-column">
+          <div className={"stake-inputs-header"}>
             <Hoverable
               style={{ minWidth: 250 }}
               tooltipStyle={tooltipStyle}
@@ -1054,10 +1042,7 @@ const StakeNowModal = ({
                 type="transparent"
                 size="small"
                 handleClick={inputMaxBalance}
-                style={{
-                  padding: "0.5em 1em",
-                  borderRadius: "100px",
-                }}
+                className={"max-button"}
               >
                 <Text size="sm">MAX</Text>
               </GeneralButton>
@@ -1067,7 +1052,7 @@ const StakeNowModal = ({
             <div className="staking-modal-token-selector">
               {fluidTokens.map((token) => (
                 <button
-                  style={{ background: "none", border: "none" }}
+                  className={"staking-modal-selector-token-icon"}
                   key={`${token.symbol}`}
                   onClick={() => {
                     if (fluidToken.symbol != token.symbol) {
@@ -1275,7 +1260,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="Your accepted % for slippage."
+            tooltipContent="Slippage is set to this default amount, and any unused funds will be refunded back to the user’s wallet."
             className="slippage-tooltip"
           >
             <Text prominent={!isMobile} code className="helper-label">
@@ -1284,12 +1269,13 @@ const StakeNowModal = ({
           </Hoverable>
           <input
             className={"staking-modal-token-input"}
+            disabled
             pattern="[0-9]*"
             min={1}
             value={slippage}
             max={50}
-            onChange={(e) => {
-              setSlippage(Math.floor(parseInt(e.target.value) || 0));
+            onChange={() => {
+              return;
             }}
           />
         </div>
@@ -1658,91 +1644,87 @@ const TestnetRewardsModal = () => {
   const [address, setAddress] = useState("");
   const [ropstenAddress, setRopstenAddress] = useState("");
   const [signature, setSignature] = useState("");
-  const [manualSignature, setManualSignature] = useState("");
   const [finalised, setFinalised] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
 
   if (!confirmAccountOwnership || !signOwnerAddress) return <></>;
 
-  if (finalised) {
-    return (
-      <div>
-        <Heading>Claim Testnet Rewards</Heading>
-        <Text prominent size="md">
-          Congratulations! You have successfully confirmed your ownership of the
-          testnet address {ropstenAddress}. If this address participated in the
-          Fluidity Ropsten testnet, you will receive free loot bottles during
-          the Fluidity Airdrop!
-        </Text>
-      </div>
-    );
-  }
-
-  if (!signature || !address) {
-    return (
-      <div>
-        <Heading>Claim Testnet Rewards</Heading>
-        <Text prominent size="md">
+  return (
+    <div className="claim-ropsten">
+      <img src="/images/testnetBanner.png" />
+      <div className="ropsten-header">
+        <Heading as="h3">Claim Testnet Rewards</Heading>
+        <Text prominent size="sm">
           If you participated in Fluidity&#39;s Ropsten testnet, you are
-          eligible for free bottles! To begin, switch your wallet to the address
-          that you used on Ropsten. Then, enter your <strong>mainnet</strong>{" "}
-          address in the box below.{" "}
-          <strong>
-            Ensure you don&#39;t change the active network away from Arbitrum!
-          </strong>
-          . Click the button to prompt a signature from your wallet. If you have
-          already generated a signature previously, enter it in the signature
-          box, as well as the address.
+          eligible for free bottles!
         </Text>
-
-        <Heading>ADDRESS</Heading>
-        <input
-          value={address}
-          onChange={(v) => setAddress(v.target.value)}
-        ></input>
-        <GeneralButton
-          layout="after"
-          handleClick={() => {
-            setRopstenAddress(signerAddress ?? "");
-            signOwnerAddress(address).then((sig) => setSignature(sig ?? ""));
-          }}
-          type="transparent"
-        >
-          Confirm Owner Address
-        </GeneralButton>
-        <Heading>SIGNATURE</Heading>
-        <input
-          value={manualSignature}
-          onChange={(v) => setManualSignature(v.target.value)}
-        ></input>
-        <GeneralButton
-          layout="after"
-          handleClick={() => {
-            setSignature(manualSignature);
-          }}
-          type="transparent"
-        >
-          Confirm signature
-        </GeneralButton>
       </div>
-    );
-  } else {
-    return (
-      <div>
-        <Heading>Claim Testnet Rewards</Heading>
-        <Heading>SIGNATURE</Heading>
-        <input value={signature} disabled={true}></input>
-        {signerAddress?.toLowerCase() === address.toLowerCase() ? (
-          <>
-            <Text prominent size="md">
-              Click to confirm your ownership of the testnet address{" "}
+      {!signerAddress ? (
+        <>
+          <Text prominent size="sm">
+            Please connect your wallet to begin.
+          </Text>
+        </>
+      ) : finalised ? (
+        <Text prominent size="sm">
+          Congratulations! You have successfully confirmed your ownership of the
+          testnet address:
+          <GeneralButton
+            type="transparent"
+            size="small"
+            className="ropsten-address-btn"
+            disabled
+            onClick={() => {
+              return;
+            }}
+          >
+            <Text prominent size="sm" code style={{ color: "inherit " }}>
               {ropstenAddress}
+            </Text>
+          </GeneralButton>
+          <br />
+          <br />
+          If this address participated in the Fluidity Ropsten testnet, you will
+          receive free loot bottles during the Fluidity Airdrop!
+        </Text>
+      ) : signature ? (
+        signerAddress.toLowerCase() === address.toLowerCase() ? (
+          <>
+            <Text prominent size="sm">
+              You are verifying ownership of the following testnet address:{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {ropstenAddress}
+                </Text>
+              </GeneralButton>
             </Text>
             <GeneralButton
               layout="after"
               handleClick={() => {
-                confirmAccountOwnership(signature, address).then(() =>
-                  setFinalised(true)
-                );
+                confirmAccountOwnership(signature, address)
+                  // .then((tx) => tx.confirmTx())
+                  .then(() => {
+                    setFinalised(true);
+                  })
+                  .catch((e) => {
+                    const errMsgMatchReason = /message":"[a-z0-9 :_()]+/gi;
+                    const stakingError = (e as { message: string }).message
+                      .match(errMsgMatchReason)?.[1]
+                      .slice(10);
+
+                    setError(stakingError ?? "");
+                    setFinalised(false);
+                  })
+                  .finally(() => setSignature(""));
               }}
               type="transparent"
             >
@@ -1751,15 +1733,126 @@ const TestnetRewardsModal = () => {
           </>
         ) : (
           <>
-            <Text prominent size="md">
-              Change your wallet account to {address} to finalise confirmation.
-              Currently signed in as {signerAddress}
+            <Text prominent size="sm">
+              Change your wallet account to{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {address}
+                </Text>
+              </GeneralButton>{" "}
+              to finalise confirmation. Currently signed in as{" "}
+              <GeneralButton
+                type="transparent"
+                size="small"
+                className="ropsten-address-btn"
+                disabled
+                onClick={() => {
+                  return;
+                }}
+              >
+                <Text prominent size="sm" code style={{ color: "inherit " }}>
+                  {signerAddress}
+                </Text>
+              </GeneralButton>
             </Text>
           </>
-        )}
-      </div>
-    );
-  }
+        )
+      ) : (
+        <>
+          <Text prominent size="sm" style={{ margin: "1em 0" }}>
+            <ol>
+              <li>
+                Copy your Arbitrum One address.
+                <div style={{ display: "inline-block", width: "1em" }} />
+                <GeneralButton
+                  className="ropsten-address-btn"
+                  size="small"
+                  icon={
+                    copied ? (
+                      <span className="ropsten-check">
+                        <Checkmark />
+                      </span>
+                    ) : (
+                      <CopyIcon />
+                    )
+                  }
+                  type="transparent"
+                  layout="after"
+                  handleClick={() => {
+                    navigator.clipboard.writeText(signerAddress);
+                    setCopied(true);
+                  }}
+                >
+                  <Text code size="sm" style={{ color: "inherit" }}>
+                    {signerAddress}
+                  </Text>
+                </GeneralButton>
+              </li>
+              <li>
+                Switch your wallet to the address that you used on Ropsten.{" "}
+                <br />
+                (If you are using the same address as you used on Ropsten
+                continue to Step 3)
+              </li>
+              <li>Enter your Arbitrum One address in the box below.</li>
+              <li>
+                Click the confirmation button to prompt a signature from your
+                wallet.
+              </li>
+              <Card className="ropsten-warning" border="solid">
+                <Text size="sm">
+                  <InfoCircle />
+                  Ensure you don&#39;t change the active network away from
+                  Arbitrum One!
+                </Text>
+              </Card>
+            </ol>
+          </Text>
+          <div className="claim-ropsten-form">
+            <div className="claim-ropsten-input">
+              <Text size="xs" className="helper-label">
+                ARBITRUM ONE ADDRESS
+              </Text>
+              <input
+                value={address}
+                onChange={(v) => setAddress(v.target.value)}
+              ></input>
+              <GeneralButton
+                layout="after"
+                handleClick={() => {
+                  setRopstenAddress(signerAddress ?? "");
+                  signOwnerAddress(address).then((sig) =>
+                    setSignature(sig ?? "")
+                  );
+                }}
+                type="transparent"
+              >
+                <Text style={{ color: "inherit" }} code>
+                  Confirm Owner Address
+                </Text>
+              </GeneralButton>
+            </div>
+          </div>
+          {error && (
+            <Card className="ropsten-warning danger">
+              <Text prominent size="xs" style={{ color: "inherit" }}>
+                <InfoCircle />
+                {error}
+              </Text>
+            </Card>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
 
 export {

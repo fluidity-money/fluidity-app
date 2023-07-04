@@ -5,6 +5,7 @@ import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
 import { B64ToUint8Array, jsonPost } from "~/util";
+import { TransactionResponse } from "../instructions";
 
 export type ContractToken = {
   address: string;
@@ -43,7 +44,7 @@ export const confirmAccountOwnership_ = async (
   signer: Signer,
   contractAddress: string,
   ABI: ContractInterface
-) => {
+): Promise<TransactionResponse> => {
   const contract = getContract(ABI, contractAddress, signer);
   if (!contract) throw new Error("Invalid contract provided!");
 
@@ -51,10 +52,9 @@ export const confirmAccountOwnership_ = async (
   const { v, r, s } = utils.splitSignature(signature);
 
   try {
-    await contract.confirm(address, owner, v, r, s);
-    console.log("Confirmation transaction successful!");
+    return await contract.confirm(address, owner, v, r, s);
   } catch (error) {
-    console.error("Error confirming ownership:", error);
+    throw new Error(`Could not claim testnet address. ${error}`);
   }
 };
 
@@ -546,6 +546,62 @@ export const makeStakingDeposit = async (
   }
 };
 
+export type StakingRedeemableRes = {
+  fusdcRedeemable: BN;
+  usdcRedeemable: BN;
+  wethRedeemable: BN;
+};
+
+export const getRedeemableTokens = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  address: string
+): Promise<StakingRedeemableRes | undefined> => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    // call redeemable
+    return await stakingContract.redeemable(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+  }
+};
+
+export const makeStakingRedemption = async (
+  signer: Signer,
+  stakingAbi: ContractInterface,
+  stakingAddr: string,
+  timestamp: BN,
+  fusdcMinimum: BN,
+  usdcMinimum: BN,
+  wethMinimum: BN
+) => {
+  try {
+    const stakingContract = getContract(stakingAbi, stakingAddr, signer);
+
+    if (!stakingContract)
+      throw new Error(
+        `Could not instantiate Staking Contract at ${stakingAddr}`
+      );
+
+    // call redeem
+    return await stakingContract.redeem(
+      timestamp.toString(),
+      fusdcMinimum.toString(),
+      usdcMinimum.toString(),
+      wethMinimum.toString()
+    );
+  } catch (error) {
+    return await handleContractErrors(error as ErrorType, signer.provider);
+  }
+};
+
 export const getWethUsdPrice = async (
   provider: JsonRpcProvider,
   eacAggregatorProxyAddr: string,
@@ -576,6 +632,7 @@ export const getWethUsdPrice = async (
     return wethUsdValue.div(decimalsBn).toNumber() / 100;
   } catch (error) {
     await handleContractErrors(error as ErrorType, provider);
+
     return 0;
   }
 };
