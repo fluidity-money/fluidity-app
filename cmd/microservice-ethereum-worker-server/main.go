@@ -54,6 +54,7 @@ const (
 
 	// EnvTokenDetails is a list of utility:shortname:decimals
 	EnvTokenDetails = `FLU_ETHERUEM_UTILITY_TOKEN_DETAILS`
+
 	// EnvUnderlyingTokenDecimals to use when normalising the returned value
 	// when converting to USDT
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
@@ -559,19 +560,10 @@ func main() {
 					payouts = append(payouts, specialPayout)
 				}
 
-				tokenDetails, exists := tokenDetails[transfer.Decorator.UtilityName]
-
-				if !exists {
-					log.Fatal(func(k *log.Log) {
-						k.Format(
-							"Couldn't find utility %s in token details %#v!",
-							transfer.Decorator.UtilityName,
-							tokenDetails,
-						)
-					})
-				}
+				tokenDetails := fluidTokenDetails
 
 				for _, payoutDetails := range payouts {
+
 					log.Debug(func(k *log.Log) {
 						k.Format(
 							"Transaction with hash %v, log index %v had application %v",

@@ -5,12 +5,16 @@
 package main
 
 import (
+	"strconv"
+	"strings"
+
 	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -24,6 +28,9 @@ const (
 	// EnvPublishAmqpQueueName is the queue to post batched winners down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
+	// EnvTokenDetails is a list of utility:shortname:decimals
+	EnvTokenDetails = `FLU_ETHERUEM_UTILITY_TOKEN_DETAILS`
+
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
@@ -33,6 +40,9 @@ func main() {
 		rewardsQueue        = util.GetEnvOrFatal(EnvRewardsAmqpQueueName)
 		batchedRewardsQueue = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
 		network_            = util.GetEnvOrFatal(EnvNetwork)
+
+		tokenDetails  = make(map[applications.UtilityName]token_details.TokenDetails)
+		tokenDetails_ = util.GetEnvOrFatal(EnvTokenDetails)
 	)
 
 	dbNetwork, err := network.ParseEthereumNetwork(network_)
@@ -42,6 +52,33 @@ func main() {
 			k.Message = "Failed to read the network from env!"
 			k.Payload = err
 		})
+	}
+
+	for _, details := range strings.Split(tokenDetails_, ",") {
+		parts := strings.Split(details, ":")
+		if len(parts) != 3 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Invalid token details split '%s'!",
+					parts,
+				)
+			})
+		}
+
+		utility := applications.UtilityName(parts[0])
+		shortName := parts[1]
+		decimals_ := parts[2]
+
+		decimals, err := strconv.ParseInt(decimals_, 10, 64)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to parse decimals from token list env!"
+				k.Payload = err
+			})
+		}
+
+		tokenDetails[utility] = token_details.New(shortName, int(decimals))
 	}
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
@@ -60,7 +97,7 @@ func main() {
 
 		for _, announcement := range announcements {
 			// write the winner into the database
-			spooler.InsertPendingWinners(announcement)
+			spooler.InsertPendingWinners(announcement, tokenDetails)
 
 			var (
 				// the sender's winnings will always be higher than the recipient's
