@@ -154,7 +154,7 @@ func main() {
 				)
 			})
 
-			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, fluidTokenDetails)
+			totalRewards := spooler.UnpaidWinningsForCategory(dbNetwork, fluidTokenDetails)
 
 			log.Debug(func(k *log.Log) {
 				k.Format(

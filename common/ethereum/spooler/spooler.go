@@ -11,7 +11,7 @@ import (
 
 // flushes the reward queue, returning the batch to send
 func GetRewards(dbNetwork network.BlockchainNetwork, token token_details.TokenDetails) (worker.EthereumSpooledRewards, bool, error) {
-	transactions := spooler.GetAndRemoveRewardsForToken(dbNetwork, token)
+	transactions := spooler.GetAndRemoveRewardsForCategory(dbNetwork, token)
 
 	if len(transactions) == 0 {
 		return worker.EthereumSpooledRewards{}, false, nil
