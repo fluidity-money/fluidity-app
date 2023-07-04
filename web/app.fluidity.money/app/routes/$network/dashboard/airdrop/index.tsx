@@ -148,6 +148,14 @@ const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
   loaded: false,
 };
 
+const GLOBAL_AIRDROP_BOTTLE_TIERS = {
+  [Rarity.Common]: 327394,
+  [Rarity.Uncommon]: 83233,
+  [Rarity.Rare]: 11010,
+  [Rarity.UltraRare]: 812,
+  [Rarity.Legendary]: 5,
+}
+
 const Airdrop = () => {
   const {
     epochDaysTotal,
@@ -261,7 +269,7 @@ const Airdrop = () => {
   const destModal = location.hash.replace("#", "");
 
   const [currentModal, setCurrentModal] = useState<AirdropModalName | null>(
-    isAirdropModal(destModal) ? destModal : null
+    isAirdropModal(destModal) ? destModal : "recap"
   );
 
   useEffect(() => {
@@ -342,6 +350,7 @@ const Airdrop = () => {
   const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
     boolean | undefined
   >(undefined);
+  const [localShouldShowRecapIntro, setLocalShouldShowRecapIntro] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     if (!window) return;
@@ -375,11 +384,21 @@ const Airdrop = () => {
       setLocalShouldShowBottleNumbers(true);
     }
 
-    if (airdropHasVisited) {
-      setLocalShouldShowTutorial(false);
+    const airdropShouldShowRecapIntro = window.localStorage.getItem(
+      "airdropShouldShowRecapIntro"
+    );
+
+    if (airdropShouldShowRecapIntro) {
+      setLocalShouldShowRecapIntro(false);
     } else {
-      setLocalShouldShowTutorial(true);
+      setLocalShouldShowRecapIntro(true);
     }
+
+    // if (airdropHasVisited) {
+    //   setLocalShouldShowTutorial(false);
+    // } else {
+    //   setLocalShouldShowTutorial(true);
+    // }
   }, []);
 
   useEffect(() => {
@@ -390,6 +409,13 @@ const Airdrop = () => {
       localShouldShowBottleNumbers.toString()
     );
   }, [localShouldShowBottleNumbers]);
+
+  useEffect(() => {
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowRecapIntro !== false) return;
+    window.localStorage.setItem("airdropShouldShowRecapIntro", "false");
+    setLocalShouldShowRecapIntro(false)
+  }, [localShouldShowRecapIntro]);
 
   useEffect(() => {
     if (!window || !localCookieConsent) return;
@@ -418,7 +444,7 @@ const Airdrop = () => {
           size="small"
           onClick={() => setCurrentModal("recap")}
           groupId="airdrop"
-          isSelected={isMobile ? currentModal === "recap" : false}
+          isSelected={currentModal === "recap"}
         >
           Airdrop Recap
         </TabButton>
@@ -426,7 +452,7 @@ const Airdrop = () => {
           size="small"
           onClick={() => setCurrentModal(null)}
           groupId="airdrop"
-          isSelected={isMobile ? currentModal === null : true}
+          isSelected={isMobile ? currentModal === null : currentModal !== "recap"}
         >
           Airdrop Dashboard
         </TabButton>
@@ -592,9 +618,9 @@ const Airdrop = () => {
           )}
           {currentModal === "recap" && (
             <RecapModal
-              totalVolume={0}
-              bottlesLooted={0}
-              bottles={SAFE_DEFAULT_AIRDROP.bottleTiers}
+              totalVolume={11390000}
+              bottlesLooted={424781}
+              bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
               userRecap={{
                 bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
                 bottlesEarned: 0,
@@ -603,6 +629,10 @@ const Airdrop = () => {
                 referees: 0,
                 referralBottles: 0,
               }}
+              isMobile={isMobile}
+              shouldShowIntro={localShouldShowRecapIntro}
+              onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
+              navigate={navigate}
             />
           )}
           {currentModal === "tutorial" && (
@@ -781,9 +811,9 @@ const Airdrop = () => {
       <Header />
       {currentModal === "recap" ? (
         <RecapModal
-          totalVolume={0}
-          bottlesLooted={0}
-          bottles={SAFE_DEFAULT_AIRDROP.bottleTiers}
+          totalVolume={11390000}
+          bottlesLooted={424781}
+          bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
           userRecap={{
             bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
             bottlesEarned: 0,
@@ -792,6 +822,10 @@ const Airdrop = () => {
             referees: 0,
             referralBottles: 0,
           }}
+          isMobile={isMobile}
+          shouldShowIntro={localShouldShowRecapIntro}
+          onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
+          navigate={navigate}
         />
       ) : (
         <>

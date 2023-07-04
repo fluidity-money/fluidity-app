@@ -603,49 +603,229 @@
 }
 
 .recap-container {
+  position: relative;
   display: flex;
+  width: 100%;
+  max-width: 1200px;
+  align-self: center;
+  box-sizing: border-box;
   flex-direction: column;
-  gap: 4em;
+  gap: 150px;
+  overflow: hidden;
+  padding-top: 200px;
+  min-height: 100vh;
+  padding-bottom: 150px;
 }
-
-.recap-heading-container {
+.recap-container .recap-hero {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  grid-column: 1/3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1em;
   text-align: center;
 }
-
-.recap-stats {
-  display: grid;
-  grid-template-columns: 5fr 5fr;
-  gap: 4em;
+.recap-container .recap-hero .recap-hero-text {
+  z-index: 1;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  align-items: center;
+  height: 100%;
 }
-
-.recap-bottle-distribution-container {
+.recap-container .recap-hero .recap-hero-text div {
+  max-width: 1000px;
+}
+.recap-container .recap-hero .recap-hero-text h1 {
+  margin: 0.2em;
+}
+.recap-container .recap-hero .recap-hero-text button svg path {
+  fill: none;
+  stroke: currentColor;
+}
+.recap-container .recap-hero .recap-hero-text .recap-circle-scroll {
+  position: absolute;
+  bottom: 0;
+  left: 64px;
+  width: 150px;
+  height: 150px;
+}
+.recap-container .recap-hero .recap-hero-text .recap-circle-scroll .recap-circle-scroll-arrow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.recap-container .recap-hero .recap-hero-text .recap-circle-scroll .recap-circle-scroll-arrow svg {
+  fill: none;
+  stroke: white;
+  transform: scale(3);
+}
+.recap-container .recap-hero .recap-hero-text .recap-circle-scroll .recap-circle-scroll-text {
+  font-size: 10px;
+  fill: grey;
+  letter-spacing: 0.4em;
+  text-length: 100%;
+}
+.recap-container .recap-stats {
+  position: relative;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 2em;
+}
+.recap-container .recap-stats .recap-mx-list {
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.recap-container .recap-stats .recap-mx-list .recap-mx-provider {
+  position: absolute;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: black;
+  padding: 6px;
+  border: 1px solid white;
+  transition: transform 0.2s ease-in-out;
+}
+.recap-container .recap-stats .recap-mx-list .recap-mx-provider img {
+  transform: scale(0.8);
+}
+.recap-container .recap-stats .recap-mx-list .recap-mx-provider:hover {
+  transform: scale(1.5);
+  z-index: 100 !important;
+  transition: transform 0.2s ease-in-out;
+}
+.recap-container .recap-stats .recap-mx-list .recap-mx-plus {
+  position: absolute;
+  left: 310px;
+  top: 30px;
+  font-size: 2em;
+  transform: translate(0, -50%);
+  color: white;
+}
+.recap-container .recap-stats .volume-border {
+  aspect-ratio: 1/1;
+  grid-column: 2/3;
+  grid-row: 1/3;
+  position: relative;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-image: url("/images/airdrop/volume_border.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+.recap-container .recap-stats .volume-border h1 {
+  font-weight: 800;
+}
+.recap-container .recap-stats .volume-border span {
+  max-width: 300px;
+}
+.recap-container .recap-stats .volume-border span:first-child {
+  transform: translate(50%);
+}
+.recap-container .recap-stats .recap-total-bottles {
+  align-items: flex-end;
+  display: flex;
+  gap: 2em;
+  grid-column: 1/3;
+}
+.recap-container .recap-stats .recap-total-bottles h1 {
+  margin: 0;
+  margin-bottom: -20px;
+}
+.recap-container .recap-stats .recap-bottle-distribution-container {
+  position: relative;
   display: flex;
   flex-direction: row;
-  gap: 10em;
+  gap: 50px;
+  padding: 25px;
+  grid-column: 1/3;
+  overflow-x: scroll;
+  overflow-y: auto;
+  /* width */
+  /* Track */
+  /* Handle */
 }
-
-.bottle-container {
+.recap-container .recap-stats .recap-bottle-distribution-container::-webkit-scrollbar {
+  height: 10px;
+}
+.recap-container .recap-stats .recap-bottle-distribution-container::-webkit-scrollbar-track {
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 5px;
+}
+.recap-container .recap-stats .recap-bottle-distribution-container::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 5px;
+}
+.recap-container .recap-stats .recap-bottle-distribution-container .bottle-container {
   gap: 1em;
-  height: 200px;
-  width: 400px;
-  border-radius: 12px;
-}
-
-.recap-connect {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
 }
-
-.volume-border {
+.recap-container .recap-connect {
   width: 100%;
-  background-image: url("/images/airdrop/volume_border.svg");
-  background-size: cover;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4em;
+}
+.recap-container .recap-connect recap-connect-text {
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+.recap-container .recap-connect button {
+  white-space: nowrap;
+  cursor: pointer;
+}
+.recap-container .recap-connect button .rc-btn-svg svg {
+  fill: none;
+}
+.recap-container .recap-connect button .rc-btn-svg svg path {
+  fill: none;
+  stroke: currentColor !important;
+}
+.recap-container.recap-mobile {
+  padding-top: 50px;
+}
+.recap-container.recap-mobile .recap-total-bottles {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.recap-container.recap-mobile .recap-hero h1 {
+  font-size: 2.5em;
+}
+.recap-container.recap-mobile .recap-stats {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+}
+.recap-container.recap-mobile .recap-stats .recap-mx-list {
+  height: 100px;
+  justify-content: flex-start;
+}
+.recap-container.recap-mobile .recap-stats .volume-border {
+  width: 100%;
+  box-sizing: border-box;
+  aspect-ratio: 1/1;
 }
 
 /*# sourceMappingURL=airdrop.css.map */
