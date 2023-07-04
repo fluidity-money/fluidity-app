@@ -37,8 +37,6 @@ import {
   Display,
   WalletIcon,
   TabButton,
-  LootBottle,
-  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -238,13 +236,17 @@ export default function Rewards() {
   const txTableColumns = (() => {
     switch (true) {
       case isTablet:
-        return [{ name: "ACTIVITY" }, { name: "REWARD" }, { name: "BOTTLES" }];
+        return [
+          { name: "ACTIVITY" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
+        ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -314,7 +316,6 @@ export default function Rewards() {
     userUnclaimedRewards,
     txLoaded,
     hasTokenPerformance,
-    activeTokenPerformance,
   } = useMemo(() => {
     const {
       rewards: rewardsData,
@@ -421,7 +422,7 @@ export default function Rewards() {
         rewardHash,
         logo,
         currency,
-        lootBottles,
+        wombatTokens,
       } = data;
 
       const toolTip = useToolTip();
@@ -504,48 +505,27 @@ export default function Rewards() {
             )}
           </td>
 
-          {/* Bottles */}
-          {lootBottles ? (
-            <td className="table-bottle">
-              {Object.entries(lootBottles).map(
-                ([rarity, quantity]: [string, number], index) => {
-                  if (quantity <= 0.005) return <></>;
-
-                  return (
-                    <div key={index} className="lootbottle-container">
-                      <LootBottle size="sm" rarity={rarity} quantity={1000} />
-                      <Text
-                        size="sm"
-                        style={{
-                          whiteSpace: "nowrap",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {toDecimalPlaces(quantity, 2)}
-                      </Text>
-                    </div>
-                  );
-                }
-              )}
-            </td>
-          ) : reward > 0 && !data.swapType && data.sender === winner ? (
-            <td className="table-bottle">
-              <div key={index} className="lootbottle-container">
-                <LootBottle size="sm" rarity={"legendary"} quantity={0} />
-                <Text
-                  size="sm"
-                  style={{
-                    whiteSpace: "nowrap",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  ...
-                </Text>
-              </div>
-            </td>
-          ) : (
+          {/* WOM */}
+          {!isMobile && (
             <td>
-              <Text>-</Text>
+              {wombatTokens ? (
+                <a
+                  className="table-token"
+                  onClick={() =>
+                    handleRewardTransactionClick(
+                      network,
+                      currency,
+                      logo,
+                      rewardHash
+                    )
+                  }
+                >
+                  <img src="/images/providers/wombat.svg" />
+                  <Text>{wombatTokens}</Text>
+                </a>
+              ) : (
+                <Text>-</Text>
+              )}
             </td>
           )}
 
@@ -706,13 +686,9 @@ export default function Rewards() {
             <div className="statistics-set">
               <LabelledValue
                 label={"Highest performer"}
-                icon={
-                  <TokenIcon
-                    token={`f${activeTokenPerformance[0].token}` as Token}
-                  />
-                }
+                icon={<TokenIcon token={`fUSDC` as Token} />}
               >
-                {`f${activeTokenPerformance[0].token}` as Token}
+                {`fUSDC` as Token}
               </LabelledValue>
             </div>
           )}

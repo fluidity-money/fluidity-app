@@ -38,7 +38,7 @@ import {
   TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -58,7 +58,7 @@ import Table from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 
-const EPOCH_DAYS_TOTAL = 31;
+const EPOCH_DAYS_TOTAL = 38;
 // temp: may 22nd, 2023
 const EPOCH_START_DATE = new Date(2023, 4, 22);
 
@@ -72,6 +72,12 @@ const AIRDROP_MODALS = [
 ];
 
 type AirdropModalName = (typeof AIRDROP_MODALS)[number];
+
+type RedeemableToken = {
+  tokenId: string;
+  amount: BN;
+  decimals: number;
+};
 
 export const links = () => {
   return [{ rel: "stylesheet", href: airdropStyle }];
@@ -178,11 +184,25 @@ const Airdrop = () => {
     );
   }
 
+  const [redeemableTokens, setRedeemableTokens] = useState<RedeemableToken[]>(
+    []
+  );
+
+  const redeemableTokensUsd = useMemo(
+    () =>
+      redeemableTokens.reduce(
+        (sum, { amount, decimals }) =>
+          sum + getUsdFromTokenAmount(amount, decimals),
+        0
+      ),
+    [redeemableTokens]
+  );
+
   const [tokens, setTokens] = useState<AugmentedToken[]>(
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
   const {
     address,
@@ -191,6 +211,8 @@ const Airdrop = () => {
     getStakingDeposits,
     testStakeTokens,
     getStakingRatios,
+    redeemableTokens: getRedeemableTokens,
+    redeemTokens,
   } = useContext(FluidityFacadeContext);
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
@@ -198,8 +220,10 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? "&provider=sushiswap" : ""
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${
+      leaderboardFilterIndex === 0 ? "&provider=kyber_classic" : ""
     }`
   );
 
@@ -304,6 +328,37 @@ const Airdrop = () => {
     );
   };
 
+  const fetchUserRedeemableTokens = async (address: string) => {
+    const redeemableTokens = await getRedeemableTokens?.(address);
+
+    if (!redeemableTokens) return;
+
+    return setRedeemableTokens(
+      Object.entries(redeemableTokens)
+        .map(([key, amount]) => {
+          // Get rid of 'Redeemable' in key
+          const tokenSymbol = key.slice(0, -10).toLowerCase();
+          const matchingToken = tokens.find(
+            ({ symbol }) => symbol.toLowerCase() === tokenSymbol
+          );
+
+          if (!matchingToken)
+            return {
+              tokenId: "",
+              amount: new BN(0),
+              decimals: 0,
+            };
+
+          return {
+            tokenId: matchingToken.symbol,
+            amount: amount,
+            decimals: matchingToken.decimals,
+          };
+        })
+        .filter(({ tokenId, amount }) => !!tokenId && amount.gt(new BN(0)))
+    );
+  };
+
   useEffect(() => {
     if (!currentModal) {
       navigate(`${location.pathname}${location.search}`, { replace: true });
@@ -337,7 +392,22 @@ const Airdrop = () => {
     fetchUserTokenBalance();
 
     fetchUserStakes(address);
+
+    fetchUserRedeemableTokens(address);
   }, [address]);
+
+  // will throw error on revert
+  const handleRedeemTokens = async () => {
+    if (!address) return;
+
+    const res = await (await redeemTokens?.())?.confirmTx();
+
+    fetchUserTokenBalance();
+    fetchUserStakes(address);
+    fetchUserRedeemableTokens(address);
+
+    return res;
+  };
 
   const [localCookieConsent, setLocalCookieConsent] = useState<
     boolean | undefined
@@ -494,6 +564,7 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("stake")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "stake"}
+          disabled={true}
         >
           Stake
         </TabButton>
@@ -502,6 +573,7 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("testnet-rewards")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "testnet-rewards"}
+          disabled={true}
         >
           Testnet Rewards
         </TabButton>
@@ -686,6 +758,9 @@ const Airdrop = () => {
                 stakes={stakes}
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
+                redeemableUsd={redeemableTokensUsd}
+                redeemableTokens={redeemableTokens}
+                handleRedeemTokens={handleRedeemTokens}
               />
             </>
           )}
@@ -790,6 +865,9 @@ const Airdrop = () => {
           stakes={stakes}
           wethPrice={wethPrice}
           usdcPrice={usdcPrice}
+          redeemableUsd={redeemableTokensUsd}
+          redeemableTokens={redeemableTokens}
+          handleRedeemTokens={handleRedeemTokens}
         />
       </CardModal>
       <CardModal
@@ -981,6 +1059,12 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
+
+  const dayDiff = epochMax - epochDays
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
+  const percentage = Math.floor((epochDays / epochMax) * 100)
+  const epochPercentage = percentage < 100 ? percentage : 100
+
   return (
     <div
       className="airdrop-stats"
@@ -1005,7 +1089,7 @@ const AirdropStats = ({
       <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
           <Text prominent size="xl">
-            {epochMax - epochDays}
+            {epochDaysLeft}
           </Text>
         </LabelledValue>
         <div
@@ -1022,7 +1106,7 @@ const AirdropStats = ({
             rounded
             color="white"
           />
-          <Text>{Math.floor((epochDays / epochMax) * 100)}%</Text>
+          <Text>{epochPercentage}%</Text>
         </div>
       </div>
       <div className="airdrop-stats-item">
@@ -1365,6 +1449,7 @@ const MyMultiplier = ({
         version="primary"
         handleClick={seeStakeNow}
         id="mx-stake-now-button"
+        disabled={true}
       >
         STAKE NOW
       </GeneralButton>
@@ -1534,20 +1619,20 @@ const Leaderboard = ({
             <Heading as="h3">Leaderboard</Heading>
             {filterIndex === 0 && (
               <GeneralButton
-                icon={<ProviderIcon provider="Sushiswap" />}
+                icon={<ProviderIcon provider="Kyber" />}
                 type="secondary"
                 disabled
                 className="leaderboard-provider-button"
               >
                 <Text code style={{ color: "inherit" }}>
-                  SUSHISWAP
+                  KYBERSWAP
                 </Text>
               </GeneralButton>
             )}
           </div>
           <Text prominent>
             This leaderboard shows your rank among other users
-            {filterIndex === 0 ? " using SushiSwap " : " "}
+            {filterIndex === 0 ? " using KyberSwap " : " "}
             {filterIndex === 0 ? " per" : " for"}
             &nbsp;
             {filterIndex === 0 ? (
@@ -1558,15 +1643,15 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
-          <GeneralButton
+          {/* <GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
-            icon={<ProviderIcon provider="Sushiswap" />}
+            icon={<ProviderIcon provider="Kyber" />}
           >
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
             </Text>
-          </GeneralButton>
+          </GeneralButton> */}
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}

@@ -259,7 +259,7 @@ if (enableArbitrum)
   forkOptions = {
     forking: {
       url: process.env.FLU_ETHEREUM_FORKNET_URL_ARBITRUM,
-      blockNumber: 92931847,
+      blockNumber: 102706408,
     },
   };
 

@@ -15,6 +15,7 @@ type Transaction = {
   provider: string;
   swapType?: "in" | "out";
   lootBottles?: BottleTiers;
+  wombatTokens?: number;
 };
 
 export default Transaction;
