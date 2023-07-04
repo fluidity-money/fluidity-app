@@ -3,9 +3,9 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../Token.sol";
-import "../GovToken.sol";
-import "../StupidLiquidityProvider.sol";
+import "../contracts/Token.sol";
+import "../contracts/GovToken.sol";
+import "../contracts/StupidLiquidityProvider.sol";
 
 contract TestStupidLiquidityProvider {
     IERC20 private underlying;
