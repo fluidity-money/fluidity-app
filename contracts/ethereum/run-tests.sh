@@ -12,7 +12,7 @@ failedcode=0
 run_test() {
 	"$@"
 	ret=$?
-	if [[ "$ret" -ne 0 ]]; then
+	if [ "$ret" -ne 0 ]; then
 		>&2 echo "test command '$@' failed with status $ret!"
 		failedcode=$ret
 	fi
