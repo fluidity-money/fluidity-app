@@ -57,6 +57,7 @@ import { getProviderDisplayName } from "~/util/provider";
 
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+import { UIContext } from "contexts/UIProvider";
 
 export const links: LinksFunction = () => {
   return [
@@ -696,7 +697,9 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-        <Outlet />
+        <UIContext.Provider value={{ toggleConnectWalletModal: () => setWalletModalVisibility(v => !v) }}>
+          <Outlet />
+        </UIContext.Provider>
         {/* Provide Liquidity*/}
         <div
           className="pad-main"

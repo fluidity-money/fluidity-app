@@ -49,6 +49,8 @@ import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
 import { shorthandAmountFormatter } from "~/util";
+import ConnectWalletModal from "~/components/ConnectWalletModal";
+import { UIContext } from "contexts/UIProvider";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -1993,12 +1995,14 @@ const RecapModal = ({
   }
 
   const { address } = useContext(FluidityFacadeContext);
+  const { toggleConnectWalletModal } = useContext(UIContext);
 
   const videoHeight = isMobile ? 500 : 700
   const videoWidth = isMobile ? 500 : 1500
 
   return (
     <div className={`recap-container ${isMobile ? 'recap-mobile' : ''}`}>
+
       {/* Recap Heading */}
       <div className={"recap-hero"}>
         {showPageContent && (
@@ -2286,7 +2290,7 @@ const RecapModal = ({
 
                     <LinkButton
                       handleClick={() => {
-                        return;
+                        toggleConnectWalletModal?.()
                       }}
                       type="external"
                       size="medium"
@@ -2307,7 +2311,7 @@ const RecapModal = ({
                 if (address) {
                   navigate(window.location.pathname);
                 } else {
-                  connectWallet();
+                  toggleConnectWalletModal?.();
                 }
               }
             }
