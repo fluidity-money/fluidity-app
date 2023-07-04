@@ -310,7 +310,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
       const isSend = tx.sender === winnerAddress;
 
-      const reward = winner.normalised_win_amount;
+      const reward = isWin ? winner.normalised_win_amount : 0;
 
       const hasWombatReward =
         isWin && winner.utility_name === "wombat initial boost" && reward > 0;
