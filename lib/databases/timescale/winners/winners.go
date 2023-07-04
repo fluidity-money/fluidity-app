@@ -499,11 +499,28 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			winAmountNative = payout.Native
 		)
 
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						token,
+					)
+				})
+			}
+
+			details = token
+		}
+
 		// insert the recipient's value
 		_, err := timescaleClient.Exec(
 			statementText,
 			net,
-			token.TokenShortName,
+			details.TokenShortName,
 			sendTransactionHash,
 			recipientAddress,
 			false,

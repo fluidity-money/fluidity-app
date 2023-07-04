@@ -136,10 +136,27 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			usdWinAmount    = payout.Usd
 		)
 
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		}
+
 		_, err := timescaleClient.Exec(
 			statementText,
-			fluidTokenShortName,
-			fluidTokenDecimals,
+			details.TokenShortName,
+			details.TokenDecimals,
 			hash,
 			recipientAddress,
 			nativeWinAmount,
