@@ -17,7 +17,7 @@ func GetRewards(dbNetwork network.BlockchainNetwork, token token_details.TokenDe
 		return worker.EthereumSpooledRewards{}, false, nil
 	}
 
-	firstBlock, lastBlock, spooledRewards, err := BatchWinnings(transactions, token)
+	firstBlock, lastBlock, spooledRewards, err := BatchWinnings(transactions, token.TokenShortName)
 
 	if err != nil {
 		return worker.EthereumSpooledRewards{}, false, fmt.Errorf(
