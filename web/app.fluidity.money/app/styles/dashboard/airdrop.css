@@ -610,10 +610,11 @@
   align-self: center;
   box-sizing: border-box;
   flex-direction: column;
-  gap: 4em;
+  gap: 150px;
   overflow: hidden;
   padding-top: 200px;
   min-height: 100vh;
+  padding-bottom: 150px;
 }
 .recap-container .recap-hero {
   position: relative;
@@ -714,6 +715,7 @@
   color: white;
 }
 .recap-container .recap-stats .volume-border {
+  aspect-ratio: 1/1;
   grid-column: 2/3;
   grid-row: 1/3;
   position: relative;
@@ -741,7 +743,6 @@
   display: flex;
   gap: 2em;
   grid-column: 1/3;
-  margin-bottom: 50px;
 }
 .recap-container .recap-stats .recap-total-bottles h1 {
   margin: 0;
@@ -800,6 +801,24 @@
 .recap-container .recap-connect button .rc-btn-svg svg path {
   fill: none;
   stroke: currentColor !important;
+}
+.recap-container.recap-mobile {
+  padding-top: 100px;
+}
+.recap-container.recap-mobile .recap-stats {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+}
+.recap-container.recap-mobile .recap-stats .recap-mx-list {
+  height: 100px;
+  justify-content: flex-start;
+}
+.recap-container.recap-mobile .recap-stats .volume-border {
+  width: 100%;
+  box-sizing: border-box;
+  aspect-ratio: 1/1;
 }
 
 /*# sourceMappingURL=airdrop.css.map */

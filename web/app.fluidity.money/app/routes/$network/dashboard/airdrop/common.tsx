@@ -1903,6 +1903,7 @@ interface IRecapModal {
   isMobile?: boolean;
   shouldShowIntro?: boolean;
   onIntroFinished?: () => void;
+  navigate?: (path: string) => void;
 }
 
 const RecapModal = ({
@@ -1913,6 +1914,7 @@ const RecapModal = ({
   shouldShowIntro,
   isMobile = false,
   onIntroFinished = () => { return },
+  navigate = () => { return },
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
@@ -1990,11 +1992,13 @@ const RecapModal = ({
     },
   }
 
+  const { address } = useContext(FluidityFacadeContext);
+
   const videoHeight = isMobile ? 500 : 700
   const videoWidth = isMobile ? 500 : 1500
 
   return (
-    <div className={"recap-container"}>
+    <div className={`recap-container ${isMobile ? 'recap-mobile' : ''}`}>
       {/* Recap Heading */}
       <div className={"recap-hero"}>
         {showPageContent && (
@@ -2023,7 +2027,11 @@ const RecapModal = ({
               </Text>
             </motion.div>
             <motion.div variants={heroItemVariants}>
-              <GeneralButton type="transparent" icon={<ArrowTopRight />} layout="after">
+              <GeneralButton type="transparent" icon={<ArrowTopRight />} layout="after"
+                onClick={() => {
+                  window.open('https://blog.fluidity.money/the-first-fluidity-airdrop-epoch-has-come-to-an-end-d6fcb6f91562', '_blank')
+                }}
+              >
                 <Text size="sm" prominent code style={{ color: 'inherit' }}>Learn more about the timeline</Text>
               </GeneralButton>
             </motion.div>
@@ -2223,7 +2231,7 @@ const RecapModal = ({
               Curious to see how many bottles you&apos;ve earned this epoch?
               <br />
               {
-                userRecap ? (
+                address ? (
                   "G"
                 ) :
                   (<>
@@ -2244,11 +2252,20 @@ const RecapModal = ({
             </Text>
           </div>
           <GeneralButton
-            icon={userRecap ? <span className="rc-btn-svg"><ArrowRight /></span> : undefined}
+            icon={address ? <span className="rc-btn-svg"><ArrowRight /></span> : undefined}
             layout="after"
+            onClick={
+              () => {
+                if (address) {
+                  navigate(window.location.pathname);
+                } else {
+                  connectWallet();
+                }
+              }
+            }
           >
             <Text code style={{ color: "inherit" }}>
-              {userRecap ? "GO TO DASHBOARD" : "CONNECT WALLET"}
+              {address ? "GO TO DASHBOARD" : "CONNECT WALLET"}
             </Text>
           </GeneralButton>
         </motion.div >

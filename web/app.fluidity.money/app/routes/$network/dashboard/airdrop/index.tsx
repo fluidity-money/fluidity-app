@@ -624,6 +624,7 @@ const Airdrop = () => {
               isMobile={isMobile}
               shouldShowIntro={localShouldShowRecapIntro}
               onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
+              navigate={navigate}
             />
           )}
           {currentModal === "tutorial" && (
@@ -816,6 +817,7 @@ const Airdrop = () => {
           isMobile={isMobile}
           shouldShowIntro={localShouldShowRecapIntro}
           onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
+          navigate={navigate}
         />
       ) : (
         <>

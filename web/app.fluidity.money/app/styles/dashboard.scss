@@ -410,15 +410,15 @@ body {
 .connect-wallet-outer-container {
   width: 100vw;
   height: 100vh;
-  background-color: transparent;
-  position: absolute;
+  background-color: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   left: 0;
 }
 
 .connect-wallet-modal-container {
-  position: absolute;
+  position: fixed;
   width: 30%;
   min-width: 300px;
   max-width: 327px;
@@ -673,7 +673,7 @@ ul.sidebar-nav {
 }
 
 .connected-wallet-modal-container {
-  position: absolute;
+  position: fixed;
   z-index: 1;
   width: 100%;
   height: 100%;
