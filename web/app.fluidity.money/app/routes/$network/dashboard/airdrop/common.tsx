@@ -1902,6 +1902,7 @@ interface IRecapModal {
   };
   isMobile?: boolean;
   shouldShowIntro?: boolean;
+  onIntroFinished?: () => void;
 }
 
 const RecapModal = ({
@@ -1911,6 +1912,7 @@ const RecapModal = ({
   userRecap,
   shouldShowIntro,
   isMobile = false,
+  onIntroFinished = () => { return },
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
@@ -2064,6 +2066,7 @@ const RecapModal = ({
             onEnded={() => {
               setShowPageContent(true)
               setCurrentVideo(1)
+              onIntroFinished()
             }}
           />) : (
           <Video

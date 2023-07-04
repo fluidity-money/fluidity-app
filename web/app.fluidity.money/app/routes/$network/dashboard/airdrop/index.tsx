@@ -404,8 +404,9 @@ const Airdrop = () => {
 
   useEffect(() => {
     if (!window || !localCookieConsent) return;
-    if (localShouldShowRecapIntro === undefined) return;
+    if (localShouldShowRecapIntro !== false) return;
     window.localStorage.setItem("airdropShouldShowRecapIntro", "false");
+    setLocalShouldShowRecapIntro(false)
   }, [localShouldShowRecapIntro]);
 
   useEffect(() => {
@@ -622,6 +623,7 @@ const Airdrop = () => {
               }}
               isMobile={isMobile}
               shouldShowIntro={localShouldShowRecapIntro}
+              onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
             />
           )}
           {currentModal === "tutorial" && (
@@ -813,6 +815,7 @@ const Airdrop = () => {
           }}
           isMobile={isMobile}
           shouldShowIntro={localShouldShowRecapIntro}
+          onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
         />
       ) : (
         <>
