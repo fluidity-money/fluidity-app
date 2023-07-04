@@ -1901,6 +1901,7 @@ interface IRecapModal {
     referralBottles: number;
   };
   isMobile?: boolean;
+  shouldShowIntro?: boolean;
 }
 
 const RecapModal = ({
@@ -1908,6 +1909,7 @@ const RecapModal = ({
   bottlesLooted,
   bottles,
   userRecap,
+  shouldShowIntro,
   isMobile = false,
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
@@ -1953,9 +1955,9 @@ const RecapModal = ({
   // use useTransform to get the negative of the scrollY
   const rotate = useTransform(scrollY, y => y * -0.2)
 
-  const [currentVideo, setCurrentVideo] = useState(0)
+  const [currentVideo, setCurrentVideo] = useState(shouldShowIntro ? 0 : 1)
 
-  const [showPageContent, setShowPageContent] = useState(false)
+  const [showPageContent, setShowPageContent] = useState(!shouldShowIntro)
 
   const heroVariants = {
     hidden: {
