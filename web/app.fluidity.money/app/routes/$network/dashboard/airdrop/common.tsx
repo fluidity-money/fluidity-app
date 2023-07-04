@@ -2091,17 +2091,31 @@ const RecapModal = ({
         showPageContent && (
           <div className={"recap-stats pad-main"}>
             {/* Text */}
-            <Text size="xl">
-              Fluidity&apos;s first Airdrop Epoch has come to an end. Here are
-              some <strong style={{ color: 'white' }}>Global Stats</strong> for the epoch.
-            </Text>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1 }}
+              viewport={{
+                amount: "all",
+                once: true
+              }}
+            >
+              <Text size="xl">
+                Fluidity&apos;s first Airdrop Epoch has come to an end. Here are
+                some <strong style={{ color: 'white' }}>Global Stats</strong> for the epoch.
+              </Text>
+            </motion.div>
 
             {/* Providers */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
-              exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1 }}
               className="recap-mx-list"
+              viewport={{
+                amount: "all",
+                once: true
+              }}
             >
               <Text>PARTICIPATING PROTOCOLS THIS EPOCH</Text>
               <div style={{ position: 'relative', marginTop: '1em' }}>
@@ -2130,8 +2144,15 @@ const RecapModal = ({
             </motion.div>
 
             {/* Volume */}
-            <div
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1.5 }}
               className="volume-border"
+              viewport={{
+                amount: "all",
+                once: true
+              }}
             >
               <Text style={{ marginRight: "3em" }}>TOTAL VOLUME</Text>
               <Display style={{ margin: "0" }}>
@@ -2141,10 +2162,19 @@ const RecapModal = ({
                 The number of Total Volume Locked in this Epoch!{" "}
                 <strong>Millions of Fluidity Users</strong> contributed!
               </Text>
-            </div>
+            </motion.div>
 
             {/* Total Bottles Looted */}
-            <div className="recap-total-bottles">
+            <motion.div
+              className="recap-total-bottles"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1 }}
+              viewport={{
+                amount: "all",
+                once: true
+              }}
+            >
               <div>
                 <Text>TOTAL BOTTLES LOOTED</Text>
                 <Display size="lg">
@@ -2159,10 +2189,19 @@ const RecapModal = ({
                 personal airdrop crate, and is now En Route to you to TGE land. You
                 will get notified for when it is time to crack open the crate!
               </Text>
-            </div>
+            </motion.div>
 
             {/*Bottle Distribution*/}
-            <div className={"recap-bottle-distribution-container"}>
+            <motion.div
+              className={"recap-bottle-distribution-container"}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 1 }}
+              viewport={{
+                amount: "all",
+                once: true
+              }}
+            >
               {Object.entries(bottles).map(([tier, amount]) => (
                 <div
                   key={`bottle-distribution-${tier}`}
@@ -2220,12 +2259,21 @@ const RecapModal = ({
                   <Display size="xs" style={{ margin: 0, marginTop: -10, fontWeight: 800 }}>{numberToCommaSeparated(amount)}+</Display>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )
       }
       {showPageContent && (
-        <motion.div className={"recap-connect pad-main"}>
+        <motion.div
+          className={"recap-connect pad-main"}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1 }}
+          viewport={{
+            amount: "some",
+            once: true
+          }}
+        >
           <div className="recap-connect-text">
             <Text size="md">
               Curious to see how many bottles you&apos;ve earned this epoch?
