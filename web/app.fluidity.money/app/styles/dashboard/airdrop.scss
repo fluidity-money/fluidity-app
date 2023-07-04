@@ -918,7 +918,18 @@ $holo: linear-gradient(
   }
 
   &.recap-mobile {
-    padding-top: 100px;
+    padding-top: 50px;
+
+    .recap-total-bottles {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .recap-hero {
+      h1 {
+        font-size: 2.5em;
+      }
+    }
 
     .recap-stats {
       position: relative;

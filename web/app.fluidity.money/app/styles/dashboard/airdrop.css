@@ -803,7 +803,14 @@
   stroke: currentColor !important;
 }
 .recap-container.recap-mobile {
-  padding-top: 100px;
+  padding-top: 50px;
+}
+.recap-container.recap-mobile .recap-total-bottles {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.recap-container.recap-mobile .recap-hero h1 {
+  font-size: 2.5em;
 }
 .recap-container.recap-mobile .recap-stats {
   position: relative;

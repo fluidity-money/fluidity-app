@@ -148,6 +148,14 @@ const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
   loaded: false,
 };
 
+const GLOBAL_AIRDROP_BOTTLE_TIERS = {
+  [Rarity.Common]: 327394,
+  [Rarity.Uncommon]: 83233,
+  [Rarity.Rare]: 11010,
+  [Rarity.UltraRare]: 812,
+  [Rarity.Legendary]: 5,
+}
+
 const Airdrop = () => {
   const {
     epochDaysTotal,
@@ -611,8 +619,8 @@ const Airdrop = () => {
           {currentModal === "recap" && (
             <RecapModal
               totalVolume={11390000}
-              bottlesLooted={0}
-              bottles={SAFE_DEFAULT_AIRDROP.bottleTiers}
+              bottlesLooted={424781}
+              bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
               userRecap={{
                 bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
                 bottlesEarned: 0,
@@ -804,8 +812,8 @@ const Airdrop = () => {
       {currentModal === "recap" ? (
         <RecapModal
           totalVolume={11390000}
-          bottlesLooted={0}
-          bottles={SAFE_DEFAULT_AIRDROP.bottleTiers}
+          bottlesLooted={424781}
+          bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
           userRecap={{
             bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
             bottlesEarned: 0,
