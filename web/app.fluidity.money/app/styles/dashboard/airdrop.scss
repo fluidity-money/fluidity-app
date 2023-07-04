@@ -851,6 +851,7 @@ $holo: linear-gradient(
     }
 
     .recap-bottle-distribution-container {
+      position: relative;
       display: flex;
       flex-direction: row;
       gap: 50px;
@@ -885,11 +886,33 @@ $holo: linear-gradient(
       }
     }
   }
-}
 
-.recap-connect {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
-  justify-content: space-between;
+  .recap-connect {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+    gap: 4em;
+
+    recap-connect-text {
+      flex-shrink: 1;
+      flex-grow: 1;
+    }
+
+    button {
+      white-space: nowrap;
+      cursor: pointer;
+
+      .rc-btn-svg {
+        svg {
+          fill: none;
+          path {
+            fill: none;
+            stroke: currentColor !important;
+          }
+        }
+      }
+    }
+  }
 }

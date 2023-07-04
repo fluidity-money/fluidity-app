@@ -2211,73 +2211,44 @@ const RecapModal = ({
           </div>
         )
       }
-
-
-      {/* User Recap */}
       {showPageContent && (
-        userRecap ? (
-          <div className={"recap-user-stats-container"}>
-            <Heading>Personal Airdrop Recap Stats:</Heading>
-            <div className={"recap-user-stats"}>
-              <div>
-                <Text>TOTAL BOTTLES EARNED</Text>
-                <Display>
-                  {numberToCommaSeparated(userRecap.bottlesEarned)}
-                </Display>
-              </div>
-              <div>
-                <Text>YOUR TOTAL MULTIPLIER</Text>
-                <Display>{numberToCommaSeparated(userRecap.multiplier)}x</Display>
-              </div>
-              <BottleDistribution bottles={userRecap.bottles} />
-              <div>
-                <Text>REFERRALS</Text>
-                <div className={"recap-referrals"}>
-                  <div>
-                    <Heading>{userRecap.linksClicked}</Heading>
-                    <Text>LINKS CLICKED</Text>
-                  </div>
-                  <div>
-                    <Heading>{userRecap.referees}</Heading>
-                    <Text>REFEREES</Text>
-                  </div>
-                  <div>
-                    <Heading>{userRecap.referralBottles}</Heading>
-                    <Text>BOTTLES EARNED</Text>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className={"recap-connect pad-main"}>
-            <Text>
-              Curious to see how many bottles you have earned epoch?
+        <motion.div className={"recap-connect pad-main"}>
+          <div className="recap-connect-text">
+            <Text size="md">
+              Curious to see how many bottles you&apos;ve earned this epoch?
               <br />
-              <Text style={{ display: "flex", flexDirection: "row" }}>
-                <u>
-                  <LinkButton
-                    handleClick={() => {
-                      return;
-                    }}
-                    type="external"
-                    size="small"
-                  >
-                    CONNECT YOUR WALLET
-                  </LinkButton>
-                </u>{" "}
-                and go to the Airdrop Dashboard to see your Airdrop Wave Recap!
-              </Text>
+              {
+                userRecap ? (
+                  "G"
+                ) :
+                  (<>
+
+                    <LinkButton
+                      handleClick={() => {
+                        return;
+                      }}
+                      type="external"
+                      size="medium"
+                      style={{ display: 'inline-flex', textDecoration: 'underline' }}
+                    >
+                      CONNECT YOUR WALLET
+                    </LinkButton>{" "}
+                    and g
+                  </>)
+              }o to the Airdrop Dashboard to see your Airdrop Wave Recap!
             </Text>
-            <GeneralButton>
-              <Text code style={{ color: "black" }}>
-                Connect Wallet
-              </Text>
-            </GeneralButton>
           </div>
-        ))
-      }
-    </div >
+          <GeneralButton
+            icon={userRecap ? <span className="rc-btn-svg"><ArrowRight /></span> : undefined}
+            layout="after"
+          >
+            <Text code style={{ color: "inherit" }}>
+              {userRecap ? "GO TO DASHBOARD" : "CONNECT WALLET"}
+            </Text>
+          </GeneralButton>
+        </motion.div >
+      )}
+    </div>
   );
 };
 

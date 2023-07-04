@@ -748,6 +748,7 @@
   margin-bottom: -20px;
 }
 .recap-container .recap-stats .recap-bottle-distribution-container {
+  position: relative;
   display: flex;
   flex-direction: row;
   gap: 50px;
@@ -777,12 +778,28 @@
   flex-direction: column;
   align-items: center;
 }
-
-.recap-connect {
+.recap-container .recap-connect {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
+  align-items: center;
   justify-content: space-between;
+  gap: 4em;
+}
+.recap-container .recap-connect recap-connect-text {
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+.recap-container .recap-connect button {
+  white-space: nowrap;
+  cursor: pointer;
+}
+.recap-container .recap-connect button .rc-btn-svg svg {
+  fill: none;
+}
+.recap-container .recap-connect button .rc-btn-svg svg path {
+  fill: none;
+  stroke: currentColor !important;
 }
 
 /*# sourceMappingURL=airdrop.css.map */
