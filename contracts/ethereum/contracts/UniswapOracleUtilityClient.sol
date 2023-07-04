@@ -134,18 +134,22 @@ contract UniswapOracleOverrideUtilityClient is IFluidClient, IEmergencyMode {
         }
         uint256 num;
         uint256 denom;
-        uint256 decimals;
+        uint256 usdDecimals;
+        uint256 otherDecimals;
         if (address(token_) == token1_) {
             // token0 is usd
-            num = ratio;
-            denom = ratioPoints;
-            decimals = 10 ** IERC20(token0_).decimals();
-        } else {
-            // token1 is usd
             denom = ratio;
             num = ratioPoints;
-            decimals = 10 ** IERC20(token1_).decimals();
+            usdDecimals = 10 ** IERC20(token0_).decimals();
+            otherDecimals = 10 ** IERC20(token1_).decimals();
+        } else {
+            // token1 is usd
+            num = ratio;
+            denom = ratioPoints;
+            usdDecimals = 10 ** IERC20(token1_).decimals();
+            otherDecimals = 10 ** IERC20(token0_).decimals();
         }
+        num = num / usdDecimals * otherDecimals;
 
         return UtilityVars({
             poolSizeNative: token_.balanceOf(address(this)),

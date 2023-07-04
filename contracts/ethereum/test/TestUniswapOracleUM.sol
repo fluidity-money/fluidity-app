@@ -3,8 +3,8 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "../UniswapOracleUtilityClient.sol";
-import "../uniswap/UniswapLibraries.sol";
+import "../contracts/UniswapOracleUtilityClient.sol";
+import "../contracts/uniswap/UniswapLibraries.sol";
 
 import "forge-std/Test.sol";
 
@@ -56,15 +56,17 @@ contract TestUniswapOracleUM is Test {
     function testUniswapOracle() public {
         UtilityVars memory v = wethUsdc_.getUtilityVars();
         // 1mil usdc to weth
-        uint wethAmount = FullMath.mulDiv(1000000, v.exchangeRateNum, v.exchangeRateDenom);
-        require(wethAmount > 540*10**18, "weth amount too low");
-        require(wethAmount < 550*10**18, "weth amount too high");
+        // usd * denom / num = usd * 1/(denom/num) = usd / (num/denom)
+        uint wethAmount = FullMath.mulDiv(1000000, v.exchangeRateDenom, v.exchangeRateNum);
+        require(wethAmount > 540, "weth amount too low");
+        require(wethAmount < 550, "weth amount too high");
 
         v = uniDai_.getUtilityVars();
+        //
         // 1mil dai to UNI
-        uint uniAmount = FullMath.mulDiv(1000000, v.exchangeRateNum, v.exchangeRateDenom);
+        uint uniAmount = FullMath.mulDiv(1000000, v.exchangeRateDenom, v.exchangeRateNum);
         console.logUint(uniAmount);
-        require(uniAmount > 200000*10**18, "uni amount too low");
-        require(uniAmount < 210000*10**18, "uni amount too high");
+        require(uniAmount > 200000, "uni amount too low");
+        require(uniAmount < 210000, "uni amount too high");
     }
 }
