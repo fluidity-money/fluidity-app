@@ -252,7 +252,8 @@ func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token to
 			address,
 			win_amount,
 			block_number,
-			utility_name
+			utility_name,
+			category
 		;`,
 
 		TablePendingWinners,
@@ -295,85 +296,13 @@ func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token to
 			&winner.WinAmount,
 			&winner.BlockNumber,
 			&winner.Utilityname,
+			&winner.Category,
 		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Context = Context
 				k.Message = "Failed to scan a row of the pending winners!"
-				k.Payload = err
-			})
-		}
-
-		winners = append(winners, winner)
-	}
-
-	return winners
-}
-
-func GetPendingRewardsForAddress(network_ network.BlockchainNetwork, address string) []worker.EthereumReward {
-	timescaleClient := timescale.Client()
-
-	statementText := fmt.Sprintf(
-		`SELECT
-			token_short_name,
-			token_decimals,
-			transaction_hash,
-			address,
-			win_amount,
-			block_number
-		FROM %s
-		WHERE
-			reward_sent = false
-			AND network = $1
-			AND address = $2
-		;
-		`,
-
-		TablePendingWinners,
-	)
-
-	rows, err := timescaleClient.Query(
-		statementText,
-		network_,
-		address,
-	)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Context = Context
-
-			k.Format(
-				"Failed to fetch unpaid winnings for user %s!",
-				address,
-			)
-
-			k.Payload = err
-		})
-	}
-
-	defer rows.Close()
-
-	winners := make([]worker.EthereumReward, 0)
-
-	for rows.Next() {
-		var (
-			winner worker.EthereumReward
-		)
-
-		err := rows.Scan(
-			&winner.TokenDetails.TokenShortName,
-			&winner.TokenDetails.TokenDecimals,
-			&winner.TransactionHash,
-			&winner.Winner,
-			&winner.WinAmount,
-			&winner.BlockNumber,
-		)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-				k.Message = "Failed to scan a row of pending winners!"
 				k.Payload = err
 			})
 		}
