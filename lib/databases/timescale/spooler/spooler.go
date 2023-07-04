@@ -10,6 +10,7 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -25,14 +26,12 @@ const (
 	TablePendingWinners = "ethereum_pending_winners"
 )
 
-func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
+func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails map[applications.UtilityName]token_details.TokenDetails) {
 	timescaleClient := timescale.Client()
 
 	var (
-		tokenDetails = winner.TokenDetails
+		fluidTokenDetails = winner.TokenDetails
 
-		tokenShortName     = tokenDetails.TokenShortName
-		tokenDecimals      = tokenDetails.TokenDecimals
 		network_           = winner.Network
 		hash               = winner.TransactionHash
 		blockNumber        = winner.BlockNumber
@@ -81,11 +80,28 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			usdWinAmount    = payout.Usd
 		)
 
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		}
+
 		// insert the sender's winnings
 		_, err := timescaleClient.Exec(
 			statementText,
-			tokenShortName,
-			tokenDecimals,
+			details.TokenShortName,
+			details.TokenDecimals,
 			hash,
 			senderAddress,
 			nativeWinAmount,
@@ -118,10 +134,27 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement) {
 			usdWinAmount    = payout.Usd
 		)
 
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		}
+
 		_, err := timescaleClient.Exec(
 			statementText,
-			tokenShortName,
-			tokenDecimals,
+			details.TokenShortName,
+			details.TokenDecimals,
 			hash,
 			recipientAddress,
 			nativeWinAmount,
