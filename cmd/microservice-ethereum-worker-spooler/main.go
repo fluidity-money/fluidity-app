@@ -101,16 +101,16 @@ func main() {
 
 			var (
 				// the sender's winnings will always be higher than the recipient's
-				fromWinAmount    = announcement.FromWinAmount
-				tokenDetails     = announcement.TokenDetails
-				blockNumberInt   = announcement.BlockNumber
-				transactionHash  = announcement.TransactionHash
-				senderAddress    = announcement.FromAddress
-				recipientAddress = announcement.ToAddress
-				toWinAmount      = announcement.ToWinAmount
-				application      = announcement.Application
-				rewardTier       = announcement.RewardTier
-				logIndex         = announcement.LogIndex
+				fromWinAmount     = announcement.FromWinAmount
+				fluidTokenDetails = announcement.TokenDetails
+				blockNumberInt    = announcement.BlockNumber
+				transactionHash   = announcement.TransactionHash
+				senderAddress     = announcement.FromAddress
+				recipientAddress  = announcement.ToAddress
+				toWinAmount       = announcement.ToWinAmount
+				application       = announcement.Application
+				rewardTier        = announcement.RewardTier
+				logIndex          = announcement.LogIndex
 
 				blockNumber = uint64(blockNumberInt.Int64())
 			)
@@ -126,7 +126,7 @@ func main() {
 			// write the sender and receiver to be stored once the win is paid out
 			winners.InsertPendingRewardType(
 				dbNetwork,
-				tokenDetails,
+				fluidTokenDetails,
 				blockNumber,
 				transactionHash,
 				senderAddress,
@@ -136,6 +136,7 @@ func main() {
 				application,
 				rewardTier,
 				*logIndex,
+				tokenDetails,
 			)
 
 			var totalWinAmount float64
@@ -153,7 +154,7 @@ func main() {
 				)
 			})
 
-			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, tokenDetails)
+			totalRewards := spooler.UnpaidWinningsForToken(dbNetwork, fluidTokenDetails)
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
@@ -168,13 +169,13 @@ func main() {
 					k.Message = "Transaction won more than instant send threshold, sending instantly!"
 				})
 
-				toSend[tokenDetails] = true
+				toSend[fluidTokenDetails] = true
 			} else if totalRewards > batchedRewardThreshold {
 				log.Debug(func(k *log.Log) {
 					k.Message = "Total pending rewards are greater than threshold, sending!"
 				})
 
-				toSend[tokenDetails] = true
+				toSend[fluidTokenDetails] = true
 			}
 		}
 

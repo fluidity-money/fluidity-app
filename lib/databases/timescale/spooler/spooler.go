@@ -32,16 +32,14 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 	var (
 		fluidTokenDetails = winner.TokenDetails
 
-		fluidTokenShortName = fluidTokenDetails.TokenShortName
-		fluidTokenDecimals  = fluidTokenDetails.TokenDecimals
-		network_            = winner.Network
-		hash                = winner.TransactionHash
-		blockNumber         = winner.BlockNumber
-		senderAddress       = winner.FromAddress
-		senderWinAmount     = winner.FromWinAmount
-		recipientAddress    = winner.ToAddress
-		recipientWinAmount  = winner.ToWinAmount
-		logIndex            = winner.LogIndex
+		network_           = winner.Network
+		hash               = winner.TransactionHash
+		blockNumber        = winner.BlockNumber
+		senderAddress      = winner.FromAddress
+		senderWinAmount    = winner.FromWinAmount
+		recipientAddress   = winner.ToAddress
+		recipientWinAmount = winner.ToWinAmount
+		logIndex           = winner.LogIndex
 	)
 
 	statementText := fmt.Sprintf(
