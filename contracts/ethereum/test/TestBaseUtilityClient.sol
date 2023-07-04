@@ -101,7 +101,7 @@ contract TestBaseUtilityClient is Test {
 
         c.disableEmergencyMode();
         c.batchReward(winners, 0, 0); // shouldn't revert
-        require(c.noEmergencyMode(), "emergency mode is now enabled!");
+        require(c.noEmergencyMode(), "emergency mode should be disabled!");
     }
 
     function testBatchReward() public {
