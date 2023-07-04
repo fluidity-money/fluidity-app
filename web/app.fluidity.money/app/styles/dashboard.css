@@ -364,6 +364,26 @@ main > footer > section > a {
   color: white;
 }
 
+.table-token {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  width: auto;
+}
+
+.table-token:hover > span {
+  color: white;
+}
+
+.table-token > img {
+  height: 1em;
+}
+
 .table-bottle {
   display: flex;
   flex-direction: row;

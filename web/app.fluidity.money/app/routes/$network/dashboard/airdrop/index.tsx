@@ -181,7 +181,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
   const {
     address,
@@ -199,8 +199,10 @@ const Airdrop = () => {
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? "&provider=kyber_classic" : ""
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${
+      leaderboardFilterIndex === 0 ? "&provider=kyber_classic" : ""
     }`
   );
 
@@ -464,8 +466,9 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         <TabButton
           size="small"
@@ -535,19 +538,20 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-                currentModal === "leaderboard" ||
-                currentModal === "stake"
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                  ? "1em"
-                  : "2em",
+                ? "1em"
+                : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -967,6 +971,12 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
+
+  const dayDiff = epochMax - epochDays
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
+  const percentage = Math.floor((epochDays / epochMax) * 100)
+  const epochPercentage = percentage < 100 ? percentage : 100
+
   return (
     <div
       className="airdrop-stats"
@@ -991,7 +1001,7 @@ const AirdropStats = ({
       <div className="airdrop-stats-item">
         <LabelledValue label={<Text size="xs">EPOCH DAYS LEFT</Text>}>
           <Text prominent size="xl">
-            {epochMax - epochDays}
+            {epochDaysLeft}
           </Text>
         </LabelledValue>
         <div
@@ -1008,7 +1018,7 @@ const AirdropStats = ({
             rounded
             color="white"
           />
-          <Text>{Math.floor((epochDays / epochMax) * 100)}%</Text>
+          <Text>{epochPercentage}%</Text>
         </div>
       </div>
       <div className="airdrop-stats-item">
@@ -1042,8 +1052,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                navigate(`/${network}/dashboard/rewards`);
-              }
+                  navigate(`/${network}/dashboard/rewards`);
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1282,7 +1292,7 @@ const MyMultiplier = ({
               // A false hit would be a USDC deposit >= $100,000
               const baseUsd =
                 getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                  0.01
+                0.01
                   ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
                   : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
 
@@ -1302,8 +1312,8 @@ const MyMultiplier = ({
               return stakeBVal > stakeAVal
                 ? 1
                 : stakeBVal === stakeAVal
-                  ? 0
-                  : -1;
+                ? 0
+                : -1;
             })
             .slice(0, 3)
             .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
@@ -1375,8 +1385,9 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
 
   return (
     <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
-        }`}
+      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+        address === user ? "highlighted-row" : ""
+      }`}
       key={`${rank}-${index}`}
       variants={{
         enter: { opacity: [0, 1] },
@@ -1395,8 +1406,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1417,8 +1428,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
             style={
               address === user
                 ? {
-                  color: "black",
-                }
+                    color: "black",
+                  }
                 : {}
             }
           >
@@ -1434,8 +1445,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1450,8 +1461,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1466,8 +1477,8 @@ const AirdropRankRow: React.FC<IAirdropRankRow> = ({
           style={
             address === user
               ? {
-                color: "black",
-              }
+                  color: "black",
+                }
               : {}
           }
         >
@@ -1545,7 +1556,7 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
-          <GeneralButton
+          {/* <GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
             icon={<ProviderIcon provider="Kyber" />}
@@ -1553,7 +1564,7 @@ const Leaderboard = ({
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
             </Text>
-          </GeneralButton>
+          </GeneralButton> */}
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}

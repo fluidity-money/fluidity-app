@@ -59,7 +59,10 @@ const query24Hours = gql`
 `;
 
 const query24HoursByUserByApplication = gql`
-  query AirdropLeaderboardApplication($application: ethereum_application!, $address: String!) {
+  query AirdropLeaderboardApplication(
+    $application: ethereum_application!
+    $address: String!
+  ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
       args: { application_: $application }
       where: { address: { _eq: $address } }
