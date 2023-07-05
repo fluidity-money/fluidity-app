@@ -135,7 +135,8 @@ contract UsdcEToUsdcShifterLiquidityProvider is ILiquidityProvider {
     }
 
     function totalPoolAmount() external view returns (uint256) {
-        return (hasShifted_ ? usdc_ : usdce_).balanceOf(address(this));
+        require(hasShifted_, "hasn't shifted");
+        return usdc_.balanceOf(address(this));
     }
 
     function takeFromPool(uint256 _amount) public {
