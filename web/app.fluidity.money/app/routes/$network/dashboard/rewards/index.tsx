@@ -520,6 +520,7 @@ export default function Rewards() {
                     )
                   }
                 >
+                  <img src="/images/providers/wombat.svg" width={"1.5em"} />
                   <Text>{wombatTokens}</Text>
                 </a>
               ) : (
