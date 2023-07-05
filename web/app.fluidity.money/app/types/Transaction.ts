@@ -14,7 +14,6 @@ type Transaction = {
   logo: string;
   provider: string;
   swapType?: "in" | "out";
-  lootBottles?: BottleTiers;
   wombatTokens?: number;
 };
 

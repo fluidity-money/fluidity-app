@@ -37,6 +37,7 @@ import {
   Display,
   WalletIcon,
   TabButton,
+  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip } from "~/components";
@@ -520,8 +521,8 @@ export default function Rewards() {
                     )
                   }
                 >
-                  <img src="/images/providers/wombat.svg" width={"1.5em"} />
-                  <Text>{wombatTokens}</Text>
+                  <img src="/images/providers/wombat.svg" />
+                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
                 </a>
               ) : (
                 <Text>-</Text>
