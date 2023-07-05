@@ -45,6 +45,7 @@ type (
 	}
 
 	EthereumReward struct {
+		Category        string                     `json:"category"`
 		Winner          ethereum.Address           `json:"winner"`
 		WinAmount       *misc.BigInt               `json:"amount"`
 		Utilityname     applications.UtilityName   `json:"utility"`

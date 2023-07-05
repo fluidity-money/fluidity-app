@@ -85,12 +85,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         ...map,
         [winner.send_transaction_hash]: {
           ...winner,
-          win_amount:
-            winner.winning_amount +
-            (map[winner.transaction_hash]?.winning_amount || 0),
+          normalised_win_amount:
+            winner.winning_amount / 10**winner.token_decimals +
+            (map[winner.transaction_hash]?.normalised_win_amount || 0),
         },
       }),
-      {} as { [key: string]: Winner }
+      {} as { [key: string]: Winner & {normalised_win_amount: number}}
     );
 
     // winnersMap looks up if a transaction was the send that caused a win
@@ -100,12 +100,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           ...map,
           [winner.transaction_hash]: {
             ...winner,
-            win_amount:
-              winner.win_amount +
-              (map[winner.transaction_hash]?.win_amount || 0),
+            normalised_win_amount:
+              winner.win_amount / 10**winner.token_decimals +
+              (map[winner.transaction_hash]?.normalised_win_amount || 0),
           },
         }),
-        {} as { [key: string]: PendingWinner }
+        {} as { [key: string]: PendingWinner & {normalised_win_amount: number}}
       );
 
     const jointWinnersMap = {
@@ -310,12 +310,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
       const isSend = tx.sender === winnerAddress;
 
-      const reward = isWin
-        ? (isFromPendingWin
-            ? (winner as PendingWinner).win_amount
-            : (winner as Winner).winning_amount) /
-          10 ** winner.token_decimals
-        : 0;
+      const reward = isWin ? winner.normalised_win_amount : 0;
 
       const hasWombatReward =
         isWin && winner.utility_name === "wombat initial boost" && reward > 0;

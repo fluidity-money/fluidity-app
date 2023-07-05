@@ -1,7 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
-import { stakingLiquidityMultiplierEq, TestnetRewardsModal } from "./common";
 import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
@@ -34,6 +33,9 @@ import {
   StakeNowModal,
   StakingStatsModal,
   TutorialModal,
+  RecapModal,
+  stakingLiquidityMultiplierEq,
+  TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
 import { useContext, useState, useEffect, useRef, useMemo } from "react";
@@ -59,6 +61,17 @@ import { HowItWorksContent } from "~/components/ReferralModal";
 const EPOCH_DAYS_TOTAL = 38;
 // temp: may 22nd, 2023
 const EPOCH_START_DATE = new Date(2023, 4, 22);
+
+const AIRDROP_MODALS = [
+  "recap",
+  "tutorial",
+  "leaderboard",
+  "referrals",
+  "stake",
+  "staking-stats",
+];
+
+type AirdropModalName = (typeof AIRDROP_MODALS)[number];
 
 type RedeemableToken = {
   tokenId: string;
@@ -139,6 +152,14 @@ const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
   },
   bottlesCount: 0,
   loaded: false,
+};
+
+const GLOBAL_AIRDROP_BOTTLE_TIERS = {
+  [Rarity.Common]: 327394,
+  [Rarity.Uncommon]: 83233,
+  [Rarity.Rare]: 11010,
+  [Rarity.UltraRare]: 812,
+  [Rarity.Legendary]: 5,
 };
 
 const Airdrop = () => {
@@ -269,13 +290,15 @@ const Airdrop = () => {
 
   const location = useLocation();
 
-  const [currentModal, setCurrentModal] = useState<string | null>(
-    location.hash.replace("#", "") || null
+  const destModal = location.hash.replace("#", "");
+
+  const [currentModal, setCurrentModal] = useState<AirdropModalName | null>(
+    isAirdropModal(destModal) ? destModal : "recap"
   );
 
   useEffect(() => {
-    if (location.hash.replace("#", "") === currentModal) return;
-    setCurrentModal(location.hash.replace("#", "") || null);
+    if (destModal === currentModal) return;
+    setCurrentModal(isAirdropModal(destModal) ? destModal : null);
   }, [location.hash]);
 
   const [stakes, setStakes] = useState<
@@ -394,7 +417,11 @@ const Airdrop = () => {
 
   const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
     useState<boolean | undefined>(undefined);
-  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+  // const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+  //   boolean | undefined
+  // >(undefined);
+  const localShouldShowTutorial = false;
+  const [localShouldShowRecapIntro, setLocalShouldShowRecapIntro] = useState<
     boolean | undefined
   >(undefined);
 
@@ -409,7 +436,7 @@ const Airdrop = () => {
       setLocalCookieConsent(true);
     }
 
-    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    // const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
     const airdropBottleCount =
       window.localStorage.getItem("airdropBottleCount");
     const airdropShouldShowBottleNumbers = window.localStorage.getItem(
@@ -430,11 +457,21 @@ const Airdrop = () => {
       setLocalShouldShowBottleNumbers(true);
     }
 
-    if (airdropHasVisited) {
-      setLocalShouldShowTutorial(false);
+    const airdropShouldShowRecapIntro = window.localStorage.getItem(
+      "airdropShouldShowRecapIntro"
+    );
+
+    if (airdropShouldShowRecapIntro) {
+      setLocalShouldShowRecapIntro(false);
     } else {
-      setLocalShouldShowTutorial(true);
+      setLocalShouldShowRecapIntro(true);
     }
+
+    // if (airdropHasVisited) {
+    //   setLocalShouldShowTutorial(false);
+    // } else {
+    //   setLocalShouldShowTutorial(true);
+    // }
   }, []);
 
   useEffect(() => {
@@ -445,6 +482,13 @@ const Airdrop = () => {
       localShouldShowBottleNumbers.toString()
     );
   }, [localShouldShowBottleNumbers]);
+
+  useEffect(() => {
+    if (!window || !localCookieConsent) return;
+    if (localShouldShowRecapIntro !== false) return;
+    window.localStorage.setItem("airdropShouldShowRecapIntro", "false");
+    setLocalShouldShowRecapIntro(false);
+  }, [localShouldShowRecapIntro]);
 
   useEffect(() => {
     if (!window || !localCookieConsent) return;
@@ -472,9 +516,19 @@ const Airdrop = () => {
       >
         <TabButton
           size="small"
+          onClick={() => setCurrentModal("recap")}
+          groupId="airdrop"
+          isSelected={currentModal === "recap"}
+        >
+          Airdrop Recap
+        </TabButton>
+        <TabButton
+          size="small"
           onClick={() => setCurrentModal(null)}
           groupId="airdrop"
-          isSelected={isMobile ? currentModal === null : true}
+          isSelected={
+            isMobile ? currentModal === null : currentModal !== "recap"
+          }
         >
           Airdrop Dashboard
         </TabButton>
@@ -640,6 +694,25 @@ const Airdrop = () => {
                 isMobile
               />
             </>
+          )}
+          {currentModal === "recap" && (
+            <RecapModal
+              totalVolume={11390000}
+              bottlesLooted={424781}
+              bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
+              userRecap={{
+                bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
+                bottlesEarned: 0,
+                multiplier: 0,
+                linksClicked: 0,
+                referees: 0,
+                referralBottles: 0,
+              }}
+              isMobile={isMobile}
+              shouldShowIntro={localShouldShowRecapIntro}
+              onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
+              navigate={navigate}
+            />
           )}
           {currentModal === "tutorial" && (
             <>
@@ -821,127 +894,149 @@ const Airdrop = () => {
 
       {/* Page Content */}
       <Header />
-      <div className="pad-main">
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "10%",
-            maxWidth: 1200,
+      {currentModal === "recap" ? (
+        <RecapModal
+          totalVolume={11390000}
+          bottlesLooted={424781}
+          bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
+          userRecap={{
+            bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
+            bottlesEarned: 0,
+            multiplier: 0,
+            linksClicked: 0,
+            referees: 0,
+            referralBottles: 0,
           }}
-        >
+          isMobile={isMobile}
+          shouldShowIntro={localShouldShowRecapIntro}
+          onIntroFinished={() => setLocalShouldShowRecapIntro(false)}
+          navigate={navigate}
+        />
+      ) : (
+        <>
+          <div className="pad-main">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "10%",
+                maxWidth: 1200,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "2em",
+                  zIndex: 100,
+                }}
+              >
+                <div>
+                  <Heading
+                    as="h2"
+                    className={"no-margin"}
+                    style={{ marginBottom: "0.5em" }}
+                  >
+                    Welcome to Fluidity&apos;s Airdrop Event!
+                  </Heading>
+                  <Text style={{ fontSize: 14 }}>
+                    Fluidify your assets, transact them, and boost your rewards
+                    by using your Fluid Assets on partnered protocols and
+                    staking liquidity right here on Fluidity! Keep an eye on the
+                    leaderboard as you compete with fellow Fluiders for the top
+                    spot. Future Fluid Governance Tokens await!
+                    <LinkButton
+                      size="medium"
+                      type="external"
+                      style={{
+                        display: "inline-flex",
+                        textDecoration: "underline",
+                        textUnderlineOffset: 2,
+                      }}
+                      handleClick={() => {
+                        window.open(
+                          "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+                          "_blank"
+                        );
+                      }}
+                    >
+                      Learn more
+                    </LinkButton>
+                  </Text>
+                </div>
+                <AirdropStats
+                  seeReferralsDetails={() => setCurrentModal("referrals")}
+                  seeBottlesDetails={() => setCurrentModal("bottles-details")}
+                  seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
+                  epochMax={epochDaysTotal}
+                  epochDays={epochDays}
+                  activatedReferrals={numActiveReferrerReferrals}
+                  totalBottles={bottlesCount}
+                  network={network}
+                  navigate={navigate}
+                />
+                <MultiplierTasks />
+                <MyMultiplier
+                  seeMyStakingStats={() => setCurrentModal("staking-stats")}
+                  seeStakeNow={() => setCurrentModal("stake")}
+                  liquidityMultiplier={liquidityMultiplier}
+                  stakes={stakes}
+                  wethPrice={wethPrice}
+                  usdcPrice={usdcPrice}
+                />
+              </div>
+              <BottleProgress
+                shouldShowBottleNumbers={
+                  localShouldShowBottleNumbers === undefined
+                    ? true
+                    : localShouldShowBottleNumbers
+                }
+                setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
+                bottles={bottleTiers}
+              />
+            </div>
+          </div>
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: "2em",
-              zIndex: 100,
+              justifyContent: "center",
+              marginTop: "2em",
+              marginBottom: "3em",
             }}
           >
-            <div>
-              <Heading
-                as="h2"
-                className={"no-margin"}
-                style={{ marginBottom: "0.5em" }}
-              >
-                Welcome to Fluidity&apos;s Airdrop Event!
-              </Heading>
-              <Text style={{ fontSize: 14 }}>
-                Fluidify your assets, transact them, and boost your rewards by
-                using your Fluid Assets on partnered protocols and staking
-                liquidity right here on Fluidity! Keep an eye on the leaderboard
-                as you compete with fellow Fluiders for the top spot. Future
-                Fluid Governance Tokens await!
-                <LinkButton
-                  size="medium"
-                  type="external"
-                  style={{
-                    display: "inline-flex",
-                    textDecoration: "underline",
-                    textUnderlineOffset: 2,
-                  }}
-                  handleClick={() => {
-                    window.open(
-                      "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
-                      "_blank"
-                    );
-                  }}
-                >
-                  Learn more
-                </LinkButton>
-              </Text>
-            </div>
-            <AirdropStats
-              seeReferralsDetails={() => setCurrentModal("referrals")}
-              seeBottlesDetails={() => setCurrentModal("bottles-details")}
-              seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
-              epochMax={epochDaysTotal}
-              epochDays={epochDays}
-              activatedReferrals={numActiveReferrerReferrals}
-              totalBottles={bottlesCount}
-              network={network}
-              navigate={navigate}
-            />
-            <MultiplierTasks />
-            <MyMultiplier
-              seeMyStakingStats={() => setCurrentModal("staking-stats")}
-              seeStakeNow={() => setCurrentModal("stake")}
-              liquidityMultiplier={liquidityMultiplier}
-              stakes={stakes}
-              wethPrice={wethPrice}
-              usdcPrice={usdcPrice}
-            />
+            <GeneralButton
+              type="transparent"
+              icon={<ArrowRight />}
+              className="scroll-to-leaderboard-button"
+              onClick={() => {
+                leaderboardRef.current?.scrollIntoView({
+                  block: "start",
+                  behavior: "smooth",
+                });
+              }}
+            >
+              LEADERBOARD
+            </GeneralButton>
           </div>
-          <BottleProgress
-            shouldShowBottleNumbers={
-              localShouldShowBottleNumbers === undefined
-                ? true
-                : localShouldShowBottleNumbers
-            }
-            setShouldShowBottleNumbers={setLocalShouldShowBottleNumbers}
-            bottles={bottleTiers}
-          />
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "2em",
-          marginBottom: "3em",
-        }}
-      >
-        <GeneralButton
-          type="transparent"
-          icon={<ArrowRight />}
-          className="scroll-to-leaderboard-button"
-          onClick={() => {
-            leaderboardRef.current?.scrollIntoView({
-              block: "start",
-              behavior: "smooth",
-            });
-          }}
-        >
-          LEADERBOARD
-        </GeneralButton>
-      </div>
-      <div className="pad-main" id="#leaderboard" ref={leaderboardRef}>
-        <Card
-          className="leaderboard-container"
-          type="transparent"
-          border="solid"
-          rounded
-          color="white"
-        >
-          <Leaderboard
-            loaded={leaderboardLoaded}
-            data={leaderboardRows}
-            filterIndex={leaderboardFilterIndex}
-            setFilterIndex={setLeaderboardFilterIndex}
-            userAddress={address || ""}
-          />
-        </Card>
-      </div>
+          <div className="pad-main" id="#leaderboard" ref={leaderboardRef}>
+            <Card
+              className="leaderboard-container"
+              type="transparent"
+              border="solid"
+              rounded
+              color="white"
+            >
+              <Leaderboard
+                loaded={leaderboardLoaded}
+                data={leaderboardRows}
+                filterIndex={leaderboardFilterIndex}
+                setFilterIndex={setLeaderboardFilterIndex}
+                userAddress={address || ""}
+              />
+            </Card>
+          </div>
+        </>
+      )}
     </>
   );
 };
@@ -971,11 +1066,10 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
-
-  const dayDiff = epochMax - epochDays
-  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
-  const percentage = Math.floor((epochDays / epochMax) * 100)
-  const epochPercentage = percentage < 100 ? percentage : 100
+  const dayDiff = epochMax - epochDays;
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0;
+  const percentage = Math.floor((epochDays / epochMax) * 100);
+  const epochPercentage = percentage < 100 ? percentage : 100;
 
   return (
     <div
@@ -1692,5 +1786,8 @@ const BottleProgress = ({
 
 export const dayDifference = (date1: Date, date2: Date) =>
   Math.round(Math.abs(date1.valueOf() - date2.valueOf()) / 1000 / 60 / 60 / 24);
+
+const isAirdropModal = (modal: string): modal is AirdropModalName =>
+  AIRDROP_MODALS.includes(modal as AirdropModalName);
 
 export default Airdrop;
