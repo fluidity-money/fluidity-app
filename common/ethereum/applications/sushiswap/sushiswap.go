@@ -260,9 +260,10 @@ func GetSushiswapStableFees(transfer worker.EthereumApplicationTransfer, client 
 
 	}
 
-	// amountIn * swapFee / maxFee / 10 ^ decimals
 	feeData.Volume = new(big.Rat).Set(amountIn)
+	feeData.Volume.Quo(feeData.Volume, amountInDecimals)
 
+	// amountIn * swapFee / maxFee / 10 ^ decimals
 	amountIn.Mul(amountIn, swapFee)
 	amountIn.Quo(amountIn, maxFee)
 

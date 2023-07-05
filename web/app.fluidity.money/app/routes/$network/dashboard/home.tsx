@@ -20,8 +20,6 @@ import {
   useViewport,
   Tooltip,
   TabButton,
-  LootBottle,
-  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -252,16 +250,16 @@ export default function Home() {
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
           { name: "ACCOUNT" },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
-          { name: "REWARD" },
-          { name: "BOTTLES" },
+          { name: "FLUID REWARDS" },
+          { name: "$WOM REWARDS" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -376,7 +374,7 @@ export default function Home() {
         rewardHash,
         currency,
         logo,
-        lootBottles,
+        wombatTokens,
       } = data;
 
       return (
@@ -433,51 +431,29 @@ export default function Home() {
             </td>
           )}
 
-          {/* Bottles */}
-          {!isMobile &&
-            (lootBottles ? (
-              <td className="table-bottle">
-                {Object.entries(lootBottles).map(
-                  ([rarity, quantity]: [string, number], index) => {
-                    if (quantity <= 0.005) return <></>;
-
-                    return (
-                      <div key={index} className="lootbottle-container">
-                        <LootBottle size="sm" rarity={rarity} quantity={1000} />
-                        <Text
-                          size="sm"
-                          style={{
-                            whiteSpace: "nowrap",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {toDecimalPlaces(quantity, 2)}
-                        </Text>
-                      </div>
-                    );
+          {/* WOM */}
+          {!isMobile && (
+            <td>
+              {wombatTokens ? (
+                <a
+                  className="table-token"
+                  onClick={() =>
+                    handleRewardTransactionClick(
+                      network,
+                      currency,
+                      logo,
+                      rewardHash
+                    )
                   }
-                )}
-              </td>
-            ) : reward > 0 && !data.swapType && data.sender === sender ? (
-              <td className="table-bottle">
-                <div key={index} className="lootbottle-container">
-                  <LootBottle size="sm" rarity={"legendary"} quantity={0} />
-                  <Text
-                    size="sm"
-                    style={{
-                      whiteSpace: "nowrap",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    ...
-                  </Text>
-                </div>
-              </td>
-            ) : (
-              <td>
+                >
+                  <img src="/images/providers/wombat.svg" />
+                  <Text>{wombatTokens}</Text>
+                </a>
+              ) : (
                 <Text>-</Text>
-              </td>
-            ))}
+              )}
+            </td>
+          )}
 
           {/* Account */}
           {!isSmallMobile && (

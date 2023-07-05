@@ -23,6 +23,7 @@ const queryWinnersAll = gql`
       solana_application
       reward_type
       awarded_time
+      utility_name
     }
   }
 `;
@@ -46,6 +47,7 @@ const queryWinnersByAddress = gql`
       solana_application
       reward_type
       awarded_time
+      utility_name
     }
   }
 `;
@@ -68,6 +70,7 @@ const queryPendingWinnersAll = gql`
       win_amount
       token_decimals
       reward_type
+      utility_name
     }
   }
 `;
@@ -93,6 +96,7 @@ const queryPendingWinnersByAddress = gql`
       win_amount
       token_decimals
       reward_type
+      utility_name
     }
   }
 `;
@@ -224,6 +228,7 @@ export type Winner = {
   solana_application?: string;
   reward_type: "send" | "receive";
   awarded_time: string;
+  utility_name: string;
 };
 
 export type PendingWinner = {
@@ -234,6 +239,7 @@ export type PendingWinner = {
   token_decimals: number;
   win_amount: number;
   reward_type: "send" | "receive";
+  utility_name: string;
 };
 
 export {

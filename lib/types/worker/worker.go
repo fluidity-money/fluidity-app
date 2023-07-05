@@ -28,7 +28,7 @@ type (
 		// TokenDecimalsScale is 1e(decimals)
 		TokenDecimalsScale *big.Rat `json:"token_decimals"`
 
-		// ExchangeRate is the number for which (usd value)*(exchange rate) = (native amount)
+		// ExchangeRate is the number for which (usd value)/(exchange rate)*(decimal scale) = (native amount)
 		ExchangeRate *big.Rat `json:"exchange_rate"`
 
 		// DeltaWeight is the frequency with which to distribute tokens
@@ -99,6 +99,8 @@ type (
 		Camelot          float64 `json:"camelot"`
 		Chronos          float64 `json:"chronos"`
 		Sushiswap        float64 `json:"sushiswap"`
+		KyberClassic     float64 `json:"kyber_classic"`
+		Wombat           float64 `json:"wombat"`
 	}
 
 	FeeSwitch struct {
