@@ -180,140 +180,132 @@ export default function MobileModal({
             </div>
           </nav>
 
-          <div className="mobile-modal-content">
-            <section>
-              {/* Wallet / Chain */}
-              <section>
-                {/* Connect Wallet */}
-                {connected && address ? (
-                  <ConnectedWallet
-                    address={rawAddress ?? ""}
-                    callback={() => {
-                      !connectedWalletModalVisibility &&
-                        setconnectedWalletModalVisibility(true);
-                      connectedWalletModalVisibility &&
-                        setconnectedWalletModalVisibility(false);
-                    }}
-                    // className="connect-wallet-btn"
-                  />
-                ) : (
-                  <GeneralButton
-                    type={connected || connecting ? "transparent" : "primary"}
-                    size={"medium"}
-                    handleClick={() =>
-                      connecting ? null : setWalletModalVisibility(true)
-                    }
-                    // className="connect-wallet-btn"
-                  >
-                    {connecting ? `Connecting...` : `Connect Wallet`}
-                  </GeneralButton>
-                )}
-
-                {/* Chain Switcher */}
-                {!showMobileNetworkButton && (
-                  <ChainSelectorButton
-                    chain={chains[network satisfies ChainName]}
-                    onClick={() => setChainModalVisibility(true)}
-                  />
-                )}
-              </section>
-              {/* Navigation between pages */}
-              <nav className={"navbar-v2 "}>
-                <ul>
-                  {navigationMap
-                    .filter(({ name }) => name !== "Assets" || showAssets)
-                    .map((obj, index) => {
-                      const key = Object.values(obj)[0];
-                      const { name, icon, path } = obj;
-                      const active = index === activeIndex;
-
-                      return (
-                        <li
-                          key={key as unknown as string}
-                          onClick={() => {
-                            //delay to show page change and allow loading
-                            setTimeout(() => {
-                              setIsOpen(false);
-                            }, 800);
-                          }}
-                        >
-                          {index === activeIndex ? (
-                            <motion.div
-                              className={"active"}
-                              layoutId="active"
-                            />
-                          ) : (
-                            <div />
-                          )}
-                          <Link to={path(network)}>
-                            <Text
-                              prominent={active}
-                              className="mobile-modal-text-link"
-                            >
-                              {icon} {name}
-                            </Text>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                </ul>
-              </nav>
-            </section>
-            <section className="mobile-modal-bottom">
-              {/* Unclaimed Winnings */}
-              <GeneralButton
-                type={"secondary"}
-                layout="after"
-                size={"small"}
-                handleClick={() => {
-                  setTimeout(() => {
-                    setIsOpen(false);
-                  }, 800);
-                  unclaimedRewards
-                    ? navigate(`/${network}/dashboard/rewards/unclaimed`)
-                    : navigate(`/${network}/dashboard/rewards`);
+          {/* Wallet / Chain */}
+          <section className="mobile-modal-chain pad-main">
+            {/* Connect Wallet */}
+            {connected && address ? (
+              <ConnectedWallet
+                address={rawAddress ?? ""}
+                callback={() => {
+                  !connectedWalletModalVisibility &&
+                    setconnectedWalletModalVisibility(true);
+                  connectedWalletModalVisibility &&
+                    setconnectedWalletModalVisibility(false);
                 }}
-                icon={<img src="/images/icons/arrowRightWhite.svg" />}
-                className="unclaimed-button"
-              >
-                <Text size="lg" prominent={true}>
-                  Unclaimed $FLUID{" "}
-                  <Heading as="h5" className="no-margin">
-                    {numberToMonetaryString(unclaimedFluid)}
-                  </Heading>
-                </Text>
-              </GeneralButton>
-
-              {/* Fluidify Money */}
+              />
+            ) : (
               <GeneralButton
-                type={"primary"}
+                type={connected || connecting ? "transparent" : "primary"}
                 size={"medium"}
-                handleClick={() => {
-                  setTimeout(() => {
-                    setIsOpen(false);
-                  }, 800);
-                  navigate(`/${network}/fluidify`);
-                }}
-                className="fluidify-money-button"
+                handleClick={() =>
+                  connecting ? null : setWalletModalVisibility(true)
+                }
               >
-                Fluidify Money
+                {connecting ? `Connecting...` : `Connect Wallet`}
               </GeneralButton>
-              <footer>
-                {/* Fluidity Website */}
-                <a href="https://fluidity.money" rel="noopener noreferrer">
-                  <LinkButton
-                    size="medium"
-                    type="external"
-                    handleClick={() => {
-                      return;
+            )}
+
+            {/* Chain Switcher */}
+            {!showMobileNetworkButton && (
+              <ChainSelectorButton
+                chain={chains[network satisfies ChainName]}
+                onClick={() => setChainModalVisibility(true)}
+              />
+            )}
+          </section>
+
+          {/* Navigation between pages */}
+          <ul className="sidebar-nav">
+            {navigationMap
+              .filter(({ name }) => name !== "Assets" || showAssets)
+              .map((obj, index) => {
+                const key = Object.values(obj)[0];
+                const { name, icon, path } = obj;
+                const active = index === activeIndex;
+
+                return (
+                  <li
+                    key={key as unknown as string}
+                    onClick={() => {
+                      //delay to show page change and allow loading
+                      setTimeout(() => {
+                        setIsOpen(false);
+                      }, 800);
                     }}
                   >
-                    Fluidity Money Website
-                  </LinkButton>
-                </a>
-              </footer>
-            </section>
-          </div>
+                    {index === activeIndex ? (
+                      <motion.div className={"active"} layoutId="active" />
+                    ) : (
+                      <div />
+                    )}
+                    <Link to={path(network)}>
+                      <Text
+                        prominent={active}
+                        className="mobile-modal-text-link"
+                      >
+                        {icon} {name}
+                      </Text>
+                    </Link>
+                  </li>
+                );
+              })}
+          </ul>
+
+          {/* Navigation at bottom of modal */}
+          <section className="mobile-modal-bottom">
+            {/* Unclaimed Winnings */}
+            <GeneralButton
+              type={"secondary"}
+              layout="after"
+              size={"small"}
+              handleClick={() => {
+                setTimeout(() => {
+                  setIsOpen(false);
+                }, 800);
+                unclaimedRewards
+                  ? navigate(`/${network}/dashboard/rewards/unclaimed`)
+                  : navigate(`/${network}/dashboard/rewards`);
+              }}
+              icon={<img src="/images/icons/arrowRightWhite.svg" />}
+              className="unclaimed-button"
+            >
+              <Text size="lg" prominent={true}>
+                Unclaimed $FLUID{" "}
+                <Heading as="h5" className="no-margin">
+                  {numberToMonetaryString(unclaimedFluid)}
+                </Heading>
+              </Text>
+            </GeneralButton>
+
+            {/* Fluidify Money */}
+            <GeneralButton
+              type={"primary"}
+              size={"medium"}
+              handleClick={() => {
+                setTimeout(() => {
+                  setIsOpen(false);
+                }, 800);
+                navigate(`/${network}/fluidify`);
+              }}
+              className="fluidify-money-button"
+            >
+              Fluidify Money
+            </GeneralButton>
+            <footer>
+              {/* Fluidity Website */}
+              <a href="https://fluidity.money" rel="noopener noreferrer">
+                <LinkButton
+                  size="medium"
+                  type="external"
+                  handleClick={() => {
+                    return;
+                  }}
+                >
+                  Fluidity Money Website
+                </LinkButton>
+              </a>
+            </footer>
+          </section>
           {connectedWalletModalVisibility && (
             <ConnectedWalletModal
               visible={connectedWalletModalVisibility}

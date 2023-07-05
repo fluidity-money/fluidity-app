@@ -1,7 +1,11 @@
+import { ArrowTopRight, Provider } from "@fluidity-money/surfing";
+
 import type {
   StakingRatioRes,
   StakingDepositsRes,
 } from "~/util/chainUtils/ethereum/transaction";
+import type AugmentedToken from "~/types/AugmentedToken";
+
 import { useState, useEffect, useContext, useMemo } from "react";
 import BN from "bn.js";
 import {
@@ -18,29 +22,38 @@ import {
   TokenIcon,
   toSignificantDecimals,
   ArrowLeft,
+  ProviderIcon,
   Heading,
   Video,
+  Rarity,
   Hoverable,
   Form,
   numberToMonetaryString,
   SliderButton,
   Checkmark,
   CopyIcon,
+  numberToCommaSeparated,
+  ArrowDown,
 } from "@fluidity-money/surfing";
-import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
   getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
-
 import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
+import { shorthandAmountFormatter } from "~/util";
+import { UIContext } from "contexts/UIProvider";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -1855,6 +1868,473 @@ const TestnetRewardsModal = () => {
   );
 };
 
+interface IRecapModal {
+  totalVolume: number;
+  bottlesLooted: number;
+  bottles: BottleTiers;
+  userRecap?: {
+    bottles: BottleTiers;
+    bottlesEarned: number;
+    multiplier: number;
+    linksClicked: number;
+    referees: number;
+    referralBottles: number;
+  };
+  isMobile?: boolean;
+  shouldShowIntro?: boolean;
+  onIntroFinished?: () => void;
+  navigate?: (path: string) => void;
+}
+
+const RecapModal = ({
+  totalVolume,
+  bottlesLooted,
+  bottles,
+  shouldShowIntro,
+  isMobile = false,
+  onIntroFinished = () => {
+    return;
+  },
+  navigate = () => {
+    return;
+  },
+}: IRecapModal) => {
+  const providerLinks: { provider: Provider; link: string }[] = [
+    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    {
+      provider: "Sushiswap",
+      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+    },
+    { provider: "Camelot", link: "https://app.camelot.exchange/" },
+    { provider: "Saddle", link: "https://saddle.exchange/#/" },
+    { provider: "Chronos", link: "https://app.chronos.exchange/" },
+    {
+      provider: "Kyber",
+      link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
+    },
+  ];
+
+  const bottleRarityColorIcon = {
+    [Rarity.Common]: {
+      img: "/images/airdrop/COMMON.png",
+      color: "#FFFFFF",
+    },
+    [Rarity.Uncommon]: {
+      img: "/images/airdrop/UNCOMMON.png",
+      color: "#80E4EF",
+    },
+    [Rarity.Rare]: {
+      img: "/images/airdrop/RARE.png",
+      color: "#B7EBD4",
+    },
+    [Rarity.UltraRare]: {
+      img: "/images/airdrop/ULTRA RARE.png",
+      color: "#EDC6E1",
+    },
+    [Rarity.Legendary]: {
+      img: "/images/airdrop/LEGENDARY.png",
+      color: "#F8D192",
+    },
+  };
+
+  const { scrollY } = useScroll();
+
+  // use useTransform to get the negative of the scrollY
+  const rotate = useTransform(scrollY, (y) => y * -0.2);
+
+  const [currentVideo, setCurrentVideo] = useState(shouldShowIntro ? 0 : 1);
+
+  const [showPageContent, setShowPageContent] = useState(!shouldShowIntro);
+
+  const heroVariants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 1,
+        staggerChildren: 0.5,
+      },
+    },
+  };
+
+  const heroItemVariants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 1,
+      },
+    },
+  };
+
+  const { address } = useContext(FluidityFacadeContext);
+  const { toggleConnectWalletModal } = useContext(UIContext);
+
+  const videoHeight = isMobile ? 500 : 700;
+  const videoWidth = isMobile ? 500 : 1500;
+
+  return (
+    <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
+      {/* Recap Heading */}
+      <div className={"recap-hero"}>
+        {showPageContent && (
+          <motion.div
+            className="recap-hero-text pad-main"
+            variants={heroVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={heroItemVariants}>
+              <Display size="md" color="gray">
+                <Text size="xl" holo style={{ fontSize: "inherit" }}>
+                  <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
+                </Text>{" "}
+                bottles were distributed in this epoch!
+              </Display>
+            </motion.div>
+            <motion.div variants={heroItemVariants}>
+              <Text size="sm">
+                <strong style={{ color: "white" }}>
+                  Congratulations for completing Fluidity&apos;s First Airdrop
+                  Wave!
+                </strong>{" "}
+                All of these loot bottles you have earned are safely secured in
+                your personal airdrop crate, and is now{" "}
+                <strong style={{ color: "white" }}>En Route</strong> to you to
+                TGE land. You will get notified for when it is time to crack
+                open the crate!
+              </Text>
+            </motion.div>
+            <motion.div variants={heroItemVariants}>
+              <GeneralButton
+                type="transparent"
+                icon={<ArrowTopRight />}
+                layout="after"
+                onClick={() => {
+                  window.open(
+                    "https://blog.fluidity.money/the-first-fluidity-airdrop-epoch-has-come-to-an-end-d6fcb6f91562",
+                    "_blank"
+                  );
+                }}
+              >
+                <Text size="sm" prominent code style={{ color: "inherit" }}>
+                  Learn more about the timeline
+                </Text>
+              </GeneralButton>
+            </motion.div>
+
+            <motion.div
+              className="recap-circle-scroll"
+              variants={heroItemVariants}
+            >
+              <div className="recap-circle-scroll-arrow">
+                <ArrowDown />
+              </div>
+              <svg viewBox="0 0 100 100">
+                <motion.path
+                  id="recap-curve"
+                  d="M50,1c27,0,49,22,49,49S77,99,50,99S1,77,1,50S23,1,50,1 M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50
+		S77.6,0,50,0L50,0z"
+                  fill="transparent"
+                  stroke="transparent"
+                />
+                <motion.text
+                  className="recap-circle-scroll-text"
+                  dy="1em"
+                  style={{
+                    rotate: rotate,
+                  }}
+                >
+                  <textPath xlinkHref="#recap-curve">
+                    SCROLL DOWN FOR IN-DEPTH STATS
+                  </textPath>
+                </motion.text>
+              </svg>
+            </motion.div>
+          </motion.div>
+        )}
+        {/* Animation */}
+        {currentVideo === 0 ? (
+          <Video
+            src={`/videos/airdrop/${
+              isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+            }`}
+            type={"cover"}
+            loop={false}
+            height={videoHeight}
+            width={videoWidth}
+            margin="200px 0 0 0"
+            onEnded={() => {
+              setShowPageContent(true);
+              setCurrentVideo(1);
+              onIntroFinished();
+            }}
+          />
+        ) : (
+          <Video
+            src={`/videos/airdrop/${
+              isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
+            }`}
+            type={"cover"}
+            loop={true}
+            height={videoHeight}
+            width={videoWidth}
+            margin="200px 0 0 0"
+          />
+        )}
+      </div>
+      {/* Global Stats */}
+      {showPageContent && (
+        <div className={"recap-stats pad-main"}>
+          {/* Text */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1 }}
+            viewport={{
+              amount: "all",
+              once: true,
+            }}
+          >
+            <Text size="xl">
+              Fluidity&apos;s first Airdrop Epoch has come to an end. Here are
+              some <strong style={{ color: "white" }}>Global Stats</strong> for
+              the epoch.
+            </Text>
+          </motion.div>
+
+          {/* Providers */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1 }}
+            className="recap-mx-list"
+            viewport={{
+              amount: "all",
+              once: true,
+            }}
+          >
+            <Text>PARTICIPATING PROTOCOLS THIS EPOCH</Text>
+            <div style={{ position: "relative", marginTop: "1em" }}>
+              {providerLinks.map(({ provider, link }, i) => {
+                return (
+                  <a
+                    className="recap-mx-provider"
+                    key={`airdrop-mx-provider-` + i}
+                    style={{
+                      zIndex: i,
+                      left: 48 * i,
+                    }}
+                    href={link}
+                  >
+                    <ProviderIcon
+                      provider={provider}
+                      style={{ width: "inherit", height: "inherit" }}
+                    />
+                  </a>
+                );
+              })}
+              <div className="recap-mx-plus">+</div>
+            </div>
+          </motion.div>
+
+          {/* Volume */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.5 }}
+            className="volume-border"
+            viewport={{
+              amount: "all",
+              once: true,
+            }}
+          >
+            <Text style={{ marginRight: "3em" }}>TOTAL VOLUME</Text>
+            <Display style={{ margin: "0" }}>
+              {shorthandAmountFormatter(totalVolume.toString(), 1)}+
+            </Display>
+            <Text>
+              The number of Total Volume Locked in this Epoch!{" "}
+              <strong>Millions of Fluidity Users</strong> contributed!
+            </Text>
+          </motion.div>
+
+          {/* Bottle Distribution */}
+          <motion.div
+            className="recap-total-bottles"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1 }}
+            viewport={{
+              amount: "all",
+              once: true,
+            }}
+          >
+            <div>
+              <Text>TOTAL BOTTLES LOOTED</Text>
+              <Display size="lg">
+                <Text holo size="lg">
+                  <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
+                </Text>
+              </Display>
+            </div>
+
+            <Text>
+              All of these loot bottles you have earned are safely secured in
+              your personal airdrop crate, and is now En Route to you to TGE
+              land. You will get notified for when it is time to crack open the
+              crate!
+            </Text>
+          </motion.div>
+
+          {/*Bottle Distribution*/}
+          <motion.div
+            className={"recap-bottle-distribution-container"}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1 }}
+            viewport={{
+              amount: "all",
+              once: true,
+            }}
+          >
+            {Object.entries(bottles).map(([tier, amount]) => (
+              <div
+                key={`bottle-distribution-${tier}`}
+                className={"bottle-container"}
+              >
+                <svg
+                  viewBox="0 0 100 150"
+                  width="200"
+                  height="300"
+                  style={{ overflow: "visible" }}
+                >
+                  <circle
+                    cx="50"
+                    cy="100"
+                    r="50"
+                    fill="transparent"
+                    stroke={"grey"}
+                    strokeWidth="1"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <motion.g
+                    initial={{ scale: 1, y: 0 }}
+                    whileHover={{ scale: 1.15, y: -9, zIndex: 100 }}
+                  >
+                    <mask id={`mask-${tier}`}>
+                      <rect x="0" y="0" width="100" height="100" fill="white" />
+                      <circle cx="50" cy="100" r="50" fill="white" />
+                    </mask>
+                    <circle
+                      cx="50"
+                      cy="100"
+                      r="50"
+                      fill="transparent"
+                      stroke={bottleRarityColorIcon[tier as Rarity].color}
+                      strokeWidth="1"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <motion.image
+                      xmlnsXlink="http://www.w3.org/1999/xlink"
+                      xlinkHref={`${bottleRarityColorIcon[tier as Rarity].img}`}
+                      mask={`url(#mask-${tier})`}
+                      width="100"
+                    />
+                  </motion.g>
+                </svg>
+                <Text
+                  size="lg"
+                  style={{
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {tier.replace("_", " ")}
+                </Text>
+                <Display
+                  size="xs"
+                  style={{ margin: 0, marginTop: -10, fontWeight: 800 }}
+                >
+                  {numberToCommaSeparated(amount)}+
+                </Display>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      )}
+      {showPageContent && (
+        <motion.div
+          className={"recap-connect pad-main"}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1 }}
+          viewport={{
+            amount: "some",
+            once: true,
+          }}
+        >
+          <div className="recap-connect-text">
+            <Text size="md">
+              Curious to see how many bottles you&apos;ve earned this epoch?
+              <br />
+              {address ? (
+                "G"
+              ) : (
+                <>
+                  <LinkButton
+                    handleClick={() => {
+                      toggleConnectWalletModal?.();
+                    }}
+                    type="external"
+                    size="medium"
+                    style={{
+                      display: "inline-flex",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    CONNECT YOUR WALLET
+                  </LinkButton>{" "}
+                  and g
+                </>
+              )}
+              o to the Airdrop Dashboard to see your Airdrop Wave Recap!
+            </Text>
+          </div>
+          <GeneralButton
+            icon={
+              address ? (
+                <span className="rc-btn-svg">
+                  <ArrowRight />
+                </span>
+              ) : undefined
+            }
+            layout="after"
+            onClick={() => {
+              if (address) {
+                navigate(window.location.pathname);
+              } else {
+                toggleConnectWalletModal?.();
+              }
+            }}
+          >
+            <Text code style={{ color: "inherit" }}>
+              {address ? "GO TO DASHBOARD" : "CONNECT WALLET"}
+            </Text>
+          </GeneralButton>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
 export {
   BottleDistribution,
   TutorialModal,
@@ -1864,4 +2344,5 @@ export {
   BottlesDetailsModal,
   ReferralDetailsModal,
   TestnetRewardsModal,
+  RecapModal,
 };

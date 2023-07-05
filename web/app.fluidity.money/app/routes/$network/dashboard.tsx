@@ -57,6 +57,7 @@ import { getProviderDisplayName } from "~/util/provider";
 
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+import { UIContext } from "contexts/UIProvider";
 
 export const links: LinksFunction = () => {
   return [
@@ -425,25 +426,6 @@ export default function Dashboard() {
 
   return (
     <>
-      <header id="flu-logo" className="hide-on-mobile">
-        <Link to={"./home"}>
-          <img
-            style={{ width: "5.5em", height: "2.5em" }}
-            src="/images/outlinedLogo.svg"
-            alt="Fluidity"
-          />
-        </Link>
-
-        <br />
-        <br />
-
-        <ChainSelectorButton
-          className="selector-button"
-          chain={CHAIN_NAME_MAP[network]}
-          onClick={() => setChainModalVisibility(true)}
-        />
-      </header>
-
       {/* Switch Chain Modal */}
       <Modal id="switch-chain" visible={chainModalVisibility}>
         <div className="cover">
@@ -518,9 +500,24 @@ export default function Dashboard() {
         </GeneralButton>
       </Modal>
 
-      <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
+      <nav id="dashboard-navbar" className="hide-on-mobile">
+        <div id="flu-logo">
+          <Link to={"./home"}>
+            <img
+              style={{ width: "5.5em", height: "2.5em" }}
+              src="/images/outlinedLogo.svg"
+              alt="Fluidity"
+            />
+          </Link>
+          <ChainSelectorButton
+            className="selector-button"
+            chain={CHAIN_NAME_MAP[network]}
+            onClick={() => setChainModalVisibility(true)}
+          />
+        </div>
+
         {/* Nav Bar */}
-        <ul>
+        <ul className="sidebar-nav">
           {NAVIGATION_MAP.filter((obj) =>
             showAssets ? true : Object.keys(obj)[0] !== "assets"
           ).map((obj, index) => {
@@ -562,7 +559,7 @@ export default function Dashboard() {
                   !connectedWalletModalVisibility
                 );
               }}
-              className="connect-wallet-btn"
+              className="connect-wallet-btn connected"
             />
           ) : (
             <GeneralButton
@@ -585,7 +582,7 @@ export default function Dashboard() {
               connectedWalletModalVisibility &&
                 setConnectedWalletModalVisibility(false);
             }}
-            className="connect-wallet-btn"
+            className="connect-wallet-btn connected"
           />
         ) : (
           <GeneralButton
@@ -600,10 +597,12 @@ export default function Dashboard() {
           </GeneralButton>
         )}
       </nav>
+
+      {/* Main Content */}
       <main id="dashboard-body">
-        <nav id="top-navbar" className={"pad-main"}>
+        <header id="top-navbar" className={"pad-main"}>
           {/* App Name */}
-          <div className="top-navbar-left">
+          <div id="top-navbar-left">
             {(isMobile || isTablet) && (
               <a onClick={() => navigate("./home")}>
                 <img
@@ -622,31 +621,7 @@ export default function Dashboard() {
 
           {/* Navigation Buttons */}
           <div id="top-navbar-right">
-            {/* Send */}
-            {/*
-            <GeneralButton
-              version={"secondary"}
-              buttontype="icon before"
-              size={"small"}
-              handleClick={() => navigate("/send")}
-              icon={<ArrowUp />}
-            >
-              Send
-            </GeneralButton>
-            */}
-
-            {/* Receive */}
-            {/*
-            <GeneralButton
-              version={"secondary"}
-              buttontype="icon before"
-              size={"small"}
-              handleClick={() => navigate("/receive")}
-              icon={<ArrowDown />}
-            >
-              Recieve
-            </GeneralButton>
-            */}
+            {/* Network Button */}
             {(isTablet || isMobile) && showMobileNetworkButton && (
               <ChainSelectorButton
                 chain={CHAIN_NAME_MAP[network]}
@@ -706,7 +681,7 @@ export default function Dashboard() {
               <BurgerMenu isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
           </div>
-        </nav>
+        </header>
         <ConnectedWalletModal
           visible={connectedWalletModalVisibility}
           address={rawAddress ?? ""}
@@ -723,7 +698,13 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-        <Outlet />
+        <UIContext.Provider
+          value={{
+            toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+          }}
+        >
+          <Outlet />
+        </UIContext.Provider>
         {/* Provide Liquidity*/}
         <div
           className="pad-main"
