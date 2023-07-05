@@ -1,5 +1,5 @@
 import type { ActionArgs, LoaderFunction } from "@remix-run/node";
-import { Outlet, useFetcher, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
 import { useEffect, useMemo, useState, useContext } from "react";
@@ -49,16 +49,17 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 
-// placeholder
-const isEllipticDisabled = async(address: string) => {
-  return true;
-}
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request, params }: ActionArgs) {
+  const { network } = params;
+
+  if (!network)
+    return;
+
   const formData = await request.formData();
   const address = formData.get("address")?.toString() || "";
 
-  if (await isEllipticDisabled(address))
+  if (await isEllipticDisabled(address, network))
     return redirect("/blocked");
 
   return null;

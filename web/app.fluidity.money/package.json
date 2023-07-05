@@ -56,6 +56,7 @@
     "cross-env": "^7.0.3",
     "csv": "^6.2.7",
     "date-fns": "^2.29.3",
+    "elliptic-sdk": "^0.7.2",
     "ethers": "^5",
     "express": "^4.18.1",
     "framer-motion": "^7.3.6",
