@@ -808,7 +808,7 @@ $holo: linear-gradient(
   flex-direction: column;
   gap: 150px;
   overflow: hidden;
-  padding-top: 200px;
+  padding-top: 50px;
   min-height: 100vh;
   padding-bottom: 150px;
 
@@ -1034,7 +1034,7 @@ $holo: linear-gradient(
   }
 
   &.recap-mobile {
-    padding-top: 50px;
+    padding-top: 25px;
 
     .recap-total-bottles {
       flex-direction: column;

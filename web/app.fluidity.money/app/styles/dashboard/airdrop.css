@@ -744,7 +744,7 @@
   flex-direction: column;
   gap: 150px;
   overflow: hidden;
-  padding-top: 200px;
+  padding-top: 50px;
   min-height: 100vh;
   padding-bottom: 150px;
 }
@@ -957,7 +957,7 @@
   stroke: currentColor !important;
 }
 .recap-container.recap-mobile {
-  padding-top: 50px;
+  padding-top: 25px;
 }
 .recap-container.recap-mobile .recap-total-bottles {
   flex-direction: column;
