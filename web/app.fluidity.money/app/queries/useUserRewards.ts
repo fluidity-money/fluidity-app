@@ -19,6 +19,7 @@ const queryWinnersAll = gql`
       send_transaction_hash
       winning_amount
       token_decimals
+      token_short_name
       ethereum_application
       solana_application
       reward_type
@@ -43,6 +44,7 @@ const queryWinnersByAddress = gql`
       send_transaction_hash
       winning_amount
       token_decimals
+      token_short_name
       ethereum_application
       solana_application
       reward_type
@@ -69,6 +71,7 @@ const queryPendingWinnersAll = gql`
       transaction_hash
       win_amount
       token_decimals
+      token_short_name
       reward_type
       utility_name
     }
@@ -95,6 +98,7 @@ const queryPendingWinnersByAddress = gql`
       transaction_hash
       win_amount
       token_decimals
+      token_short_name
       reward_type
       utility_name
     }
@@ -229,6 +233,7 @@ export type Winner = {
   reward_type: "send" | "receive";
   awarded_time: string;
   utility_name: string;
+  token_short_name: string;
 };
 
 export type PendingWinner = {
@@ -240,6 +245,7 @@ export type PendingWinner = {
   win_amount: number;
   reward_type: "send" | "receive";
   utility_name: string;
+  token_short_name: string;
 };
 
 export {
