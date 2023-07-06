@@ -8,7 +8,7 @@ export type DSSocketManagerArgs = {
 const DSSocketManager = ({ onCallback, network }: DSSocketManagerArgs) => {
   if (!network) throw new Error(`websocket network to filter for is empty!`);
 
-  const url = new URL("ws://localhost:8888");
+  const url = new URL("wss://fanfare.fluidity.money");
 
   url.pathname = `/${network}`;
 
