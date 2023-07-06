@@ -5,34 +5,34 @@ pragma abicoder v2;
 
 import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
-import "../../interfaces/aave/IAToken.sol";
+import "../../../interfaces/aave/IAToken.sol";
 
-import "../../interfaces/compound/CTokenInterfaces.sol";
+import "../../../interfaces/compound/CTokenInterfaces.sol";
 
-import "../../interfaces/IEmergencyMode.sol";
-import "../../interfaces/ILiquidityProvider.sol";
-import "../../interfaces/IRegistry.sol";
-import "../../interfaces/IToken.sol";
-import "../../interfaces/ITokenOperatorOwned.sol";
-import "../../interfaces/ITrfVariables.sol";
+import "../../../interfaces/IEmergencyMode.sol";
+import "../../../interfaces/ILiquidityProvider.sol";
+import "../../../interfaces/IRegistry.sol";
+import "../../../interfaces/IToken.sol";
+import "../../../interfaces/ITokenOperatorOwned.sol";
+import "../../../interfaces/ITrfVariables.sol";
 
 import {
     LendingPoolAddressesProviderInterface as AaveV2LendingPoolAddressesProviderInterface
-} from "../../interfaces/aaveV2/ATokenInterfaces.sol";
+} from "../../../interfaces/aaveV2/ATokenInterfaces.sol";
 
 import {
     PoolAddressesProviderInterface as AaveV3PoolAddressesProviderInterface
-} from "../../interfaces/aaveV3/ATokenInterfaces.sol";
+} from "../../../interfaces/aaveV3/ATokenInterfaces.sol";
 
-import { Token } from "../Token.sol";
+import { Token } from "../../Token.sol";
 
-import "../Executor.sol";
+import "../../Executor.sol";
 
-import "../CompoundLiquidityProvider.sol";
+import "../../CompoundLiquidityProvider.sol";
 
-import "../AaveV2LiquidityProvider.sol";
+import "../../AaveV2LiquidityProvider.sol";
 
-import "../AaveV3LiquidityProvider.sol";
+import "../../AaveV3LiquidityProvider.sol";
 
 /// @dev selector for the token's init function
 bytes4 constant TOKEN_INIT_SELECTOR = Token.init.selector;

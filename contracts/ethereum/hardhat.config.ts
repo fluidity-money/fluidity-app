@@ -274,7 +274,7 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 10000000,
+        runs: 200,
         details: {
           cse: true,
           yul: true,
