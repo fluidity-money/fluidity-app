@@ -20,6 +20,7 @@ import {
   useViewport,
   Tooltip,
   TabButton,
+  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -447,7 +448,7 @@ export default function Home() {
                   }
                 >
                   <img src="/images/providers/wombat.svg" />
-                  <Text>{wombatTokens}</Text>
+                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
                 </a>
               ) : (
                 <Text>-</Text>
