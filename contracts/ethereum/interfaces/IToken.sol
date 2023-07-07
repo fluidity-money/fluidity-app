@@ -197,4 +197,9 @@ interface IToken is IERC20 {
      *      self-contained chains
      */
     function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) external;
+
+    /**
+     * @notice addFeeWhitelist for a specific address: if set to true take no fees
+     */
+    function addFeeWhitelist(address _addr, bool _allowed) external;
 }

@@ -167,6 +167,10 @@ contract Token is
     /// @notice burnFee_ that's paid by the user when they mint
     uint256 private mintFee_;
 
+    /// @notice feeWhitelisted_ to see if a fee should not be taken for a
+    ///         user if set to true
+    mapping (address => bool) private feeWhitelisted_;
+
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
     /**
@@ -293,21 +297,27 @@ contract Token is
 
         // give the user fluid tokens
 
-        // calculate the fee to take
-        uint256 feeAmount =
-            (mintFee_ != 0 && realAmount > mintFee_)
+        // if the fee whitelisting is not set, then we should take no fee
+
+        bool shouldTakeFee = !feeWhitelisted_[_spender];
+
+        uint256 feeAmount = 0;
+
+        if (shouldTakeFee)  {
+            feeAmount = (mintFee_ != 0 && realAmount > mintFee_)
                 ? (realAmount * mintFee_) / FEE_DENOM
                 : 0;
+        }
 
         // calculate the amount to give the user
         uint256 mintAmount = realAmount - feeAmount;
 
+        // mint the fee to the fee recipient
+        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
+
         _mint(_beneficiary, mintAmount);
 
         emit MintFluid(_beneficiary, mintAmount);
-
-        // mint the fee to the fee recipient
-        if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
 
         return realAmount;
     }
@@ -890,5 +900,10 @@ contract Token is
 
         mintFee_ = _mintFee;
         burnFee_ = _burnFee;
+    }
+
+    function addFeeWhitelist(address _addr, bool _allowed) external {
+        require(msg.sender == operator_, "only operator");
+        feeWhitelisted_[_addr] = _allowed;
     }
 }
