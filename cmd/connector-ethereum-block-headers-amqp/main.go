@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 
 	ethCommon "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
