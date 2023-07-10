@@ -4,12 +4,12 @@
 
 package main
 
-//
-
 import (
 	"math"
 	"math/big"
+	"os"
 	"strconv"
+	"strings"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
@@ -261,7 +261,7 @@ func main() {
 				// don't emit mint/burn user actions
 				if sender == ethereum.ZeroAddress || recipient == ethereum.ZeroAddress {
 					continue
-				}	
+				}
 
 				decimalsAdjusted := math.Pow10(tokenDecimals)
 				decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
