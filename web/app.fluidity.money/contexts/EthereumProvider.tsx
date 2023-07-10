@@ -32,7 +32,6 @@ import {
   makeStakingDeposit,
   testMakeStakingDeposit,
   makeStakingRedemption,
-  getRedeemableTokens,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -496,35 +495,14 @@ const EthereumFacade = ({
   };
 
   /*
+   * @deprecated
    * redeemableTokens gets amount of staked tokens after lockup period
    */
   const redeemableTokens = async (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     address: string
   ): Promise<Result<StakingRedeemableRes, Error>> => {
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return Err(new Error("Could not find signer"));
-    }
-
-    const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
-
-    const redeemableTokensRes = await getRedeemableTokens(
-      signer,
-      StakingAbi,
-      stakingAddr,
-      address
-    );
-
-    return redeemableTokensRes.map((tokens) => {
-      const { fusdcRedeemable, usdcRedeemable, wethRedeemable } = tokens;
-
-      return {
-        fusdcRedeemable: new BN(fusdcRedeemable.toString()),
-        usdcRedeemable: new BN(usdcRedeemable.toString()),
-        wethRedeemable: new BN(wethRedeemable.toString()),
-      };
-    });
+    return Err(new Error("no longer supported"));
   };
 
   /*
@@ -541,7 +519,7 @@ const EthereumFacade = ({
 
     const stakingAddr = "0x770f77A67d9B1fC26B80447c666f8a9aECA47C82";
 
-    const now = new BN(Math.floor(Date.now() / 1000));
+    const maxTimestamp = new BN(0);
 
     const minimumTokenAmt = new BN(0);
 
@@ -549,7 +527,7 @@ const EthereumFacade = ({
       signer,
       StakingAbi,
       stakingAddr,
-      now,
+      maxTimestamp,
       minimumTokenAmt,
       minimumTokenAmt,
       minimumTokenAmt

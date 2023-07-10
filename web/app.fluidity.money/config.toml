@@ -380,3 +380,8 @@ ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
 
+[contract.registry]
+ethereum = ""
+arbitrum = "0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d"
+solana = ""
+

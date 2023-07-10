@@ -17,12 +17,10 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { getTokenForNetwork } from "~/util";
-import {
-  translateRewardTierToRarity,
-  useLootboxesByTxHash,
-} from "~/queries/useLootBottles";
-import { Rarity } from "@fluidity-money/surfing";
-import { BottleTiers } from "./dashboard/airdrop";
+
+const FLUID_UTILITY = "FLUID";
+
+const WOMBAT_UTILITY = "wombat initial boost";
 
 type UserTransaction = {
   sender: string;
@@ -80,52 +78,88 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     }
 
     // winnersMap looks up if a transaction was the send that caused a win
-    const winnersMap = winnersData.winners.reduce(
-      (map, winner) => ({
+    const winnersMap = winnersData.winners.reduce((map, winner) => {
+      const current_fluid_amount =
+        map[winner.send_transaction_hash]?.fluid_win_amount || 0;
+
+      const current_utility_reward =
+        map[winner.send_transaction_hash]?.utility || {};
+
+      return {
         ...map,
         [winner.send_transaction_hash]: {
           ...winner,
-          win_amount:
-            winner.winning_amount +
-            (map[winner.transaction_hash]?.winning_amount || 0),
+          fluid_win_amount:
+            (winner.utility_name === FLUID_UTILITY
+              ? winner.winning_amount / 10 ** winner.token_decimals
+              : 0) + current_fluid_amount,
+
+          utility:
+            winner.utility_name !== FLUID_UTILITY
+              ? {
+                  ...current_utility_reward,
+                  [winner.utility_name]: {
+                    ...(current_utility_reward[winner.utility_name] || {}),
+                    [winner.token_short_name]:
+                      winner.winning_amount / 10 ** winner.token_decimals +
+                      (current_utility_reward[winner.utility_name]?.[
+                        winner.token_short_name
+                      ] || 0),
+                  },
+                }
+              : { ...current_utility_reward },
         },
-      }),
-      {} as { [key: string]: Winner }
-    );
+      };
+    }, {} as { [transaction_hash: string]: Winner & { fluid_win_amount: number; utility: { [utility_name: string]: { [token: string]: number } } } });
 
     // winnersMap looks up if a transaction was the send that caused a win
     const pendingWinnersMap =
       pendingWinnersData.ethereum_pending_winners.reduce(
-        (map, winner) => ({
-          ...map,
-          [winner.transaction_hash]: {
-            ...winner,
-            win_amount:
-              winner.win_amount +
-              (map[winner.transaction_hash]?.win_amount || 0),
-          },
-        }),
-        {} as { [key: string]: PendingWinner }
+        (map, winner) => {
+          const current_fluid_amount =
+            map[winner.transaction_hash]?.fluid_win_amount || 0;
+
+          const current_utility_reward =
+            map[winner.transaction_hash]?.utility || {};
+
+          return {
+            ...map,
+            [winner.transaction_hash]: {
+              ...winner,
+              fluid_win_amount:
+                (winner.utility_name === FLUID_UTILITY
+                  ? winner.win_amount / 10 ** winner.token_decimals
+                  : 0) + current_fluid_amount,
+
+              utility:
+                winner.utility_name !== FLUID_UTILITY
+                  ? {
+                      ...current_utility_reward,
+                      [winner.utility_name]: {
+                        ...(current_utility_reward[winner.utility_name] || {}),
+                        [winner.token_short_name]:
+                          winner.win_amount / 10 ** winner.token_decimals +
+                          (current_utility_reward[winner.utility_name]?.[
+                            winner.token_short_name
+                          ] || 0),
+                      },
+                    }
+                  : { ...current_utility_reward },
+            },
+          };
+        },
+        {} as {
+          [transaction_hash: string]: PendingWinner & {
+            fluid_win_amount: number;
+            utility: { [utility_name: string]: { [token: string]: number } };
+          };
+        }
       );
 
     const jointWinnersMap = {
       ...pendingWinnersMap,
       ...winnersMap,
     };
-
-    const sendTransactions = Object.keys(jointWinnersMap);
-
-    const { data: lootbottlesData, errors: lootbottlesErr } =
-      await useLootboxesByTxHash(sendTransactions);
-
-    if (!lootbottlesData || lootbottlesErr) {
-      captureException(new Error(`Could not fetch Lootbottles`), {
-        tags: {
-          section: "dashboard",
-        },
-      });
-      return Error("Server could not fulfill request");
-    }
 
     // payoutsMap looks up if a transaction was a payout transaction
     const winnersPayoutAddrs = winnersData.winners.map(
@@ -250,45 +284,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const defaultLogo = "/assets/tokens/usdt.svg";
 
-    const lootbottlesMap = lootbottlesData.lootbox.reduce(
-      (map, { txHash, rewardTier, lootboxCount }) => {
-        if (!txHash) return map;
-
-        if (!map[txHash]) {
-          return {
-            ...map,
-            [txHash]: {
-              [Rarity.Common]: 0,
-              [Rarity.Uncommon]: 0,
-              [Rarity.Rare]: 0,
-              [Rarity.UltraRare]: 0,
-              [Rarity.Legendary]: 0,
-              [translateRewardTierToRarity(rewardTier)]: lootboxCount,
-            },
-          };
-        }
-
-        return {
-          ...map,
-          [txHash]: {
-            ...map[txHash],
-            [translateRewardTierToRarity(rewardTier)]:
-              map[txHash][translateRewardTierToRarity(rewardTier)] +
-              lootboxCount,
-          },
-        };
-      },
-      {} as {
-        [txHash: string]: BottleTiers;
-      }
-    );
-
-    Object.entries(lootbottlesMap).forEach(([txHash, bottles]) => {
-      if (Object.values(bottles).every((amt: number) => amt <= 0.005)) {
-        delete lootbottlesMap[txHash];
-      }
-    });
-
     const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
       const swapType =
         tx.sender === MintAddress
@@ -298,24 +293,26 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           : undefined;
 
       const winner = jointWinnersMap[tx.hash];
-      const isFromPendingWin = winner && tx.hash === winner.transaction_hash;
 
-      const winnerAddress = isFromPendingWin
-        ? ((winner as PendingWinner)?.address as unknown as string)
-        : ((winner as Winner)?.winning_address as unknown as string) ?? "";
+      const isWin = !!winner;
+      const isFromPendingWin = isWin && tx.hash === winner.transaction_hash;
 
-      const isSend = tx.sender === winnerAddress;
+      const winnerAddress = isWin
+        ? isFromPendingWin
+          ? ((winner as PendingWinner)?.address as unknown as string)
+          : ((winner as Winner)?.winning_address as unknown as string)
+        : "";
+
+      const reward = isWin ? winner.fluid_win_amount : 0;
+
+      const hasWombatReward =
+        isWin && winner.utility_name === WOMBAT_UTILITY && reward > 0;
 
       return {
         sender: tx.sender,
         receiver: tx.receiver,
         winner: winnerAddress ?? "",
-        reward: winner
-          ? (isFromPendingWin
-              ? (winner as PendingWinner).win_amount
-              : (winner as Winner).winning_amount) /
-            10 ** winner.token_decimals
-          : 0,
+        reward,
         hash: tx.hash,
         rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
         currency: tx.currency,
@@ -329,7 +326,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               : (winner as Winner)?.solana_application
             : "Fluidity") ?? "Fluidity",
         swapType,
-        lootBottles: isSend ? lootbottlesMap[tx.hash] : undefined,
+        wombatTokens: hasWombatReward
+          ? winner.utility[WOMBAT_UTILITY]?.["WOM"]
+          : undefined,
       };
     });
 

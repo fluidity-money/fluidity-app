@@ -7,6 +7,7 @@ package main
 import (
 	"math/big"
 	"strconv"
+	"strings"
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -51,6 +52,9 @@ const (
 	// EnvUnderlyingTokenName to be mindful of when doing price conversions to USDT
 	EnvUnderlyingTokenName = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`
 
+	// EnvTokenDetails is a list of utility:shortname:decimals
+	EnvTokenDetails = `FLU_ETHERUEM_UTILITY_TOKEN_DETAILS`
+
 	// EnvUnderlyingTokenDecimals to use when normalising the returned value
 	// when converting to USDT
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
@@ -74,38 +78,62 @@ type PayoutDetails struct {
 
 func main() {
 	var (
-		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
-		registryAddress          = mustEthereumAddressFromEnv(EnvRegistryAddress)
-		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
-		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
-		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
-		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		ethereumUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
-		networkId                = util.GetEnvOrFatal(EnvNetwork)
+		serverWorkAmqpTopic   = util.GetEnvOrFatal(EnvServerWorkQueue)
+		contractAddress       = mustEthereumAddressFromEnv(EnvContractAddress)
+		registryAddress       = mustEthereumAddressFromEnv(EnvRegistryAddress)
+		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
+		publishAmqpQueueName  = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		ethereumUrl           = util.PickEnvOrFatal(EnvEthereumHttpUrl)
+		networkId             = util.GetEnvOrFatal(EnvNetwork)
 
-		dbNetwork network.BlockchainNetwork
+		tokenDetails  = make(map[appTypes.UtilityName]token_details.TokenDetails)
+		tokenDetails_ = util.GetEnvOrFatal(EnvTokenDetails)
+		dbNetwork     network.BlockchainNetwork
 	)
+
+	for _, details := range strings.Split(tokenDetails_, ",") {
+		parts := strings.Split(details, ":")
+		if len(parts) != 3 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Invalid token details split '%s'!",
+					parts,
+				)
+			})
+		}
+
+		utility := appTypes.UtilityName(parts[0])
+		shortName := parts[1]
+		decimals_ := parts[2]
+
+		decimals, err := strconv.ParseInt(decimals_, 10, 64)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to parse decimals from token list env!"
+				k.Payload = err
+			})
+		}
+
+		tokenDetails[utility] = token_details.New(shortName, int(decimals))
+	}
+
+	fluidTokenDetails, exists := tokenDetails[appTypes.UtilityFluid]
+
+	if !exists {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Fluid token not specified in token details list!"
+		})
+	}
+
+	tokenName := fluidTokenDetails.TokenShortName
+	underlyingTokenDecimals := fluidTokenDetails.TokenDecimals
 
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
-			k.Payload = err
-		})
-	}
-
-	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Failed to convert the decimals from %v! Was %#v!",
-				EnvUnderlyingTokenDecimals,
-				underlyingTokenDecimals_,
-			)
-
 			k.Payload = err
 		})
 	}
@@ -532,12 +560,10 @@ func main() {
 					payouts = append(payouts, specialPayout)
 				}
 
-				tokenDetails := token_details.New(
-					tokenName,
-					underlyingTokenDecimals,
-				)
+				tokenDetails := fluidTokenDetails
 
 				for _, payoutDetails := range payouts {
+
 					log.Debug(func(k *log.Log) {
 						k.Format(
 							"Transaction with hash %v, log index %v had application %v",

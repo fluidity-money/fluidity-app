@@ -231,7 +231,7 @@ export default function FluidifyToken() {
       return setTokens(
         tokens.map((token, i) => ({
           ...token,
-          userTokenBalance: userTokenBalance[i].match(),
+          userTokenBalance: userTokenBalance[i],
         }))
       );
     })();
