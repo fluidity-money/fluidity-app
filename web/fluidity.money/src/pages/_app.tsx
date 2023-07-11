@@ -27,7 +27,6 @@ import * as gtag from "utils/gtag";
 import { GTM_ID } from "utils/gtag";
 import { SPLIT_BROWSER_KEY } from "hooks/SplitContext";
 import { SplitContextProvider } from "hooks/SplitContext";
-import AirdropBanner from "components/AirdropBanner";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
@@ -84,7 +83,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   const splitUser =
     process.env.NODE_ENV === "development" ||
-      (!!location && location.hostname.includes("staging"))
+    (!!location && location.hostname.includes("staging"))
       ? "dev"
       : "user";
 
@@ -111,7 +110,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               splitUser={splitUser}
             >
               <div className="App">
-                <AirdropBanner />
                 {width < breakpoint && width > 0 ? (
                   <MobileNavBar />
                 ) : (
