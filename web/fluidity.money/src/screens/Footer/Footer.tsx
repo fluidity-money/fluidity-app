@@ -83,16 +83,14 @@ const Footer = () => {
                     : "small"
               }
               icon={
-                <>
-                  <Image
-                    src="/assets/images/socials/discord.svg"
-                    alt="discord"
-                    height={12}
-                    width={12}
-                    priority={true}
-                    loading="eager"
-                  />
-                </>
+                <Image
+                  src="/assets/images/socials/discord.svg"
+                  alt="discord"
+                  height={12}
+                  width={12}
+                  priority={true}
+                  loading="eager"
+                />
               }
             >
               DISCORD
