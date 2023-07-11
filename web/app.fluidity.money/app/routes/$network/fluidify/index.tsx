@@ -306,18 +306,23 @@ export default function FluidifyToken() {
     }
   };
 
+  const supportedTokens = ({ isFluidOf, symbol }: AugmentedToken) =>
+    network !== "ethereum" || isFluidOf || symbol === "USDC";
+
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
-    tokens as AugmentedToken[]
+    tokens.filter(supportedTokens)
   );
 
   const debouncedSearch: DebouncedFunc<
     (tokens: AugmentedToken[]) => AugmentedToken[]
   > = debounce((tokens: AugmentedToken[]) => {
-    const filteredTokens = tokens.filter(
-      (token) =>
-        token.name.toLowerCase().includes(search.toLowerCase()) ||
-        token.symbol.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredTokens = tokens
+      .filter(supportedTokens)
+      .filter(
+        (token) =>
+          token.name.toLowerCase().includes(search.toLowerCase()) ||
+          token.symbol.toLowerCase().includes(search.toLowerCase())
+      );
 
     setFilteredTokens(filteredTokens);
   }, 500);
@@ -389,14 +394,20 @@ export default function FluidifyToken() {
             colorMap={colors}
           />
 
-          {assetToken && toToken && (
-            <FluidifyForm
-              handleSwap={handleRedirect}
-              assetToken={assetToken}
-              toToken={toToken}
-              swapping={swapping}
-            />
-          )}
+          {assetToken &&
+            toToken &&
+            (!assetToken.isFluidOf && assetToken.symbol !== "USDC" ? (
+              <Text size="lg" prominent>
+                Token no longer supported!
+              </Text>
+            ) : (
+              <FluidifyForm
+                handleSwap={handleRedirect}
+                assetToken={assetToken}
+                toToken={toToken}
+                swapping={swapping}
+              />
+            ))}
         </div>
       )}
 
@@ -606,14 +617,21 @@ export default function FluidifyToken() {
             )}
 
             {/* Swap Token Form */}
-            {!!assetToken && !isTablet && !!toToken && (
-              <FluidifyForm
-                handleSwap={handleRedirect}
-                assetToken={assetToken}
-                toToken={toToken}
-                swapping={swapping}
-              />
-            )}
+            {!!assetToken &&
+              !isTablet &&
+              !!toToken &&
+              (!assetToken.isFluidOf && assetToken.symbol !== "USDC" ? (
+                <Text size="lg" prominent>
+                  Token no longer supported!
+                </Text>
+              ) : (
+                <FluidifyForm
+                  handleSwap={handleRedirect}
+                  assetToken={assetToken}
+                  toToken={toToken}
+                  swapping={swapping}
+                />
+              ))}
           </div>
         </>
       )}

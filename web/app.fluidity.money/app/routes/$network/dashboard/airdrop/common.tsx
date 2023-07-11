@@ -114,19 +114,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottle
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottle
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottle
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -664,8 +664,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -718,12 +718,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        (baseToken.symbol === "USDC"
-          ? tokenRatios.fusdcUsdcRatio.toNumber() -
-            tokenRatios.fusdcUsdcSpread.toNumber() / 2
-          : tokenRatios.fusdcWethRatio.toNumber() -
-            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-      );
+      (baseToken.symbol === "USDC"
+        ? tokenRatios.fusdcUsdcRatio.toNumber() -
+        tokenRatios.fusdcUsdcSpread.toNumber() / 2
+        : tokenRatios.fusdcWethRatio.toNumber() -
+        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+    );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -786,31 +786,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const tokenAmtStr =
-        dec !== undefined
-          ? [whole, dec.slice(0 - token.decimals)].join(".")
-          : whole ?? "0";
+        const tokenAmtStr =
+          dec !== undefined
+            ? [whole, dec.slice(0 - token.decimals)].join(".")
+            : whole ?? "0";
 
-      setInput({
-        ...token,
-        amount: tokenAmtStr,
-      });
+        setInput({
+          ...token,
+          amount: tokenAmtStr,
+        });
 
-      if (!ratio) return;
-      if (!(whole || dec)) return;
+        if (!ratio) return;
+        if (!(whole || dec)) return;
 
-      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-      setOtherInput({
-        ...otherToken,
-        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-      });
-    };
+        setOtherInput({
+          ...otherToken,
+          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+        });
+      };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1028,15 +1028,14 @@ const StakeNowModal = ({
           className={"staking-modal-banner"}
         >
           <Text style={{ color: "black" }} size="sm">
-            👀 TIP: Stake over 31 days for more rewards in future epochs &
+            👀 TIP: Stake over 31 days for more rewards in future Waves &
             events! 🌊
           </Text>
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         {/* Staking Amount */}
         <div className="airdrop-stake-inputs-column">
@@ -1305,7 +1304,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the epoch. The longer you lock, the higher your multiplier will be on day 1."
+            tooltipContent="The lootbox multiplier you will receive on the first day after staking your liquidity. It will increase linearly until the end of the Wave. The longer you lock, the higher your multiplier will be on day 1."
           >
             <Text size="xs" code className="helper-label">
               DAY 0 POWER <InfoCircle />
@@ -1328,7 +1327,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(0, stakingDuration),
+              stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1361,7 +1360,7 @@ const StakeNowModal = ({
           <Hoverable
             style={{ minWidth: 250 }}
             tooltipStyle={tooltipStyle}
-            tooltipContent="The maximum multiplier you will receive from staking at the end of the epoch. The longer you lock, the faster you will receive this multiplier."
+            tooltipContent="The maximum multiplier you will receive from staking at the end of the Wave. The longer you lock, the faster you will receive this multiplier."
           >
             <Text size="xs" className="helper-label" code>
               DAY {MAX_EPOCH_DAYS} POWER <InfoCircle />
@@ -1379,7 +1378,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1518,7 +1517,7 @@ const tutorialContent: {
   },
   "3": {
     title: "REFERRALS",
-    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 5 Loot Bottles after performing certain actions. ",
+    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire Wave. Your friend will receive 5 Loot Bottles after performing certain actions. ",
     image: "REFERRALS",
   },
   "4": {
@@ -1631,9 +1630,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1997,7 +1995,7 @@ const RecapModal = ({
                 <Text size="xl" holo style={{ fontSize: "inherit" }}>
                   <strong>{numberToCommaSeparated(bottlesLooted)}+</strong>
                 </Text>{" "}
-                bottles were distributed in this epoch!
+                bottles were distributed in this Wave!
               </Display>
             </motion.div>
             <motion.div variants={heroItemVariants}>
@@ -2064,9 +2062,8 @@ const RecapModal = ({
         {/* Animation */}
         {currentVideo === 0 ? (
           <Video
-            src={`/videos/airdrop/${
-              isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
-            }`}
+            src={`/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+              }`}
             type={"cover"}
             loop={false}
             height={videoHeight}
@@ -2080,9 +2077,8 @@ const RecapModal = ({
           />
         ) : (
           <Video
-            src={`/videos/airdrop/${
-              isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
-            }`}
+            src={`/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
+              }`}
             type={"cover"}
             loop={true}
             height={videoHeight}
@@ -2105,9 +2101,9 @@ const RecapModal = ({
             }}
           >
             <Text size="xl">
-              Fluidity&apos;s first Airdrop Epoch has come to an end. Here are
+              Fluidity&apos;s first Airdrop Wave has come to an end. Here are
               some <strong style={{ color: "white" }}>Global Stats</strong> for
-              the epoch.
+              the Wave.
             </Text>
           </motion.div>
 
@@ -2115,14 +2111,14 @@ const RecapModal = ({
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
             className="recap-mx-list"
             viewport={{
               amount: "all",
               once: true,
             }}
           >
-            <Text>PARTICIPATING PROTOCOLS THIS EPOCH</Text>
+            <Text>PARTICIPATING PROTOCOLS THIS WAVE</Text>
             <div style={{ position: "relative", marginTop: "1em" }}>
               {providerLinks.map(({ provider, link }, i) => {
                 return (
@@ -2150,10 +2146,10 @@ const RecapModal = ({
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.5 }}
+            transition={{ duration: 0.5, delay: 1 }}
             className="volume-border"
             viewport={{
-              amount: "all",
+              amount: "some",
               once: true,
             }}
           >
@@ -2162,7 +2158,7 @@ const RecapModal = ({
               {shorthandAmountFormatter(totalVolume.toString(), 1)}+
             </Display>
             <Text>
-              The number of Total Volume Locked in this Epoch!{" "}
+              The number of Total Volume Locked in this Wave!{" "}
               <strong>Millions of Fluidity Users</strong> contributed!
             </Text>
           </motion.div>
@@ -2172,7 +2168,7 @@ const RecapModal = ({
             className="recap-total-bottles"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
             viewport={{
               amount: "all",
               once: true,
@@ -2200,7 +2196,7 @@ const RecapModal = ({
             className={"recap-bottle-distribution-container"}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
             viewport={{
               amount: "all",
               once: true,
@@ -2275,7 +2271,7 @@ const RecapModal = ({
           className={"recap-connect pad-main"}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
           viewport={{
             amount: "some",
             once: true,
@@ -2283,7 +2279,7 @@ const RecapModal = ({
         >
           <div className="recap-connect-text">
             <Text size="md">
-              Curious to see how many bottles you&apos;ve earned this epoch?
+              Curious to see how many bottles you&apos;ve earned this Wave?
               <br />
               {address ? (
                 "G"
