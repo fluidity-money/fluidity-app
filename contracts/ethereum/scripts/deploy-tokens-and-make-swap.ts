@@ -5,7 +5,7 @@ import type { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { ethers, BigNumber } from "ethers";
 
-import { CAMELOT_ROUTER, CAMELOT_FACTORY } from "../test/arbitrum-constants";
+import { CAMELOT_ROUTER, CAMELOT_FACTORY } from "../arbitrum-constants";
 
 import { getLatestTimestamp } from "../script-utils";
 

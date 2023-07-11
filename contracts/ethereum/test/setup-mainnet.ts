@@ -152,6 +152,14 @@ before(async function () {
     ethConvertor
   };
 
+  const { permitRouterV1: { operator: permitRouterV1 } } = commonBindings;
+
+  // update the permit router with what's available
+
+  await permitRouterV1.scanRegistry();
+
+  // TODO permitrouter scan the registry
+
   bindings = {
     ...commonBindings,
     usdt: {

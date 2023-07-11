@@ -173,16 +173,15 @@ contract Token is
      * @notice computeDomainSeparator that's used for EIP712
      */
     function computeDomainSeparator() internal view virtual returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-                    keccak256(bytes(name_)),
-                    keccak256("1"),
-                    block.chainid,
-                    address(this)
-                )
-            );
+        return keccak256(
+            abi.encode(
+                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                keccak256(bytes(name_)),
+                keccak256("1"),
+                block.chainid,
+                address(this)
+            )
+        );
     }
 
     function _setupEIP2612() internal {
@@ -317,7 +316,7 @@ contract Token is
         address _sender,
         address _beneficiary,
         uint256 _amount
-    ) internal {
+    ) internal returns (uint256) {
         // take the user's fluid tokens
 
          // if the fee amount > 0 and the burn fee is greater than 0, then
@@ -345,6 +344,8 @@ contract Token is
         underlyingToken().safeTransfer(_beneficiary, burnAmount);
 
         if (feeAmount > 0) _mint(feeRecipient_, feeAmount);
+
+        return burnAmount;
     }
 
     /**
@@ -584,18 +585,18 @@ contract Token is
     function erc20InTo(
         address _recipient,
         uint256 _amount
-    ) public returns (uint256 ) {
+    ) public returns (uint256 amountOut) {
         return _erc20In(msg.sender, _recipient, _amount);
     }
 
     /// @inheritdoc IToken
-    function erc20Out(uint256 _amount) public {
-        _erc20Out(msg.sender, msg.sender,_amount);
+    function erc20Out(uint256 _amount) public returns (uint256) {
+        return _erc20Out(msg.sender, msg.sender,_amount);
     }
 
     /// @inheritdoc IToken
-    function erc20OutTo(address _recipient, uint256 _amount) public {
-        _erc20Out(msg.sender, _recipient, _amount);
+    function erc20OutTo(address _recipient, uint256 _amount) public returns (uint256) {
+        return _erc20Out(msg.sender, _recipient, _amount);
     }
 
     /// @inheritdoc IToken
@@ -644,7 +645,10 @@ contract Token is
     }
 
     /// @inheritdoc IToken
-    function upgradeLiquidityProvider(ILiquidityProvider newPool) public {
+    function upgradeLiquidityProvider(
+        ILiquidityProvider _newPool,
+        uint256 _minTokenAfterShift
+     ) public returns (uint256) {
       require(noEmergencyMode_, "emergency mode");
       require(msg.sender == operator_, "operator only");
 
@@ -652,9 +656,7 @@ contract Token is
 
       pool_.takeFromPool(oldPoolAmount);
 
-
-      pool_ = newPool;
-
+      pool_ = _newPool;
 
       underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
 
@@ -662,7 +664,9 @@ contract Token is
 
       uint newPoolAmount = pool_.totalPoolAmount();
 
-      require(newPoolAmount >= oldPoolAmount, "total amount bad");
+      require(newPoolAmount > _minTokenAfterShift + 1, "total amount bad");
+
+      return newPoolAmount;
     }
 
     /// @inheritdoc IToken

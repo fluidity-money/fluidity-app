@@ -44,7 +44,7 @@ contract StupidLiquidityProvider is ILiquidityProvider {
     }
 
     /// @inheritdoc ILiquidityProvider
-    function addToPool(uint /* _amount */) external {
+    function addToPool(uint /* _amount */) external view {
         require(msg.sender == address(fluid_), "only the owner can use this");
     }
 
