@@ -18,6 +18,8 @@ import "../interfaces/ITransferWithBeneficiary.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 uint constant DEFAULT_MAX_UNCHECKED_REWARD = 1000;
 
 /// @dev FEE_DENOM for the fees (ie, 10 is a 1% fee)
@@ -663,6 +665,12 @@ contract Token is
       pool_.addToPool(oldPoolAmount);
 
       uint newPoolAmount = pool_.totalPoolAmount();
+
+      console.log("old pool amount", oldPoolAmount);
+
+      console.log("new pool amount", newPoolAmount);
+
+      console.log("new pool address", address(pool_));
 
       require(newPoolAmount > _minTokenAfterShift + 1, "total amount bad");
 

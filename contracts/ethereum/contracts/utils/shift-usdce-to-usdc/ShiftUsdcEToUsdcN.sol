@@ -15,37 +15,43 @@ import "../../../interfaces/ILiquidityProvider.sol";
 import "../../../contracts/AaveV3LiquidityProvider.sol";
 import "../../../contracts/Token.sol";
 
-import "./UsdcEToUsdcShifterLiquidityProvider.sol";
+import "./UsdcEToUsdcNShifterLiquidityProvider.sol";
+
+import "hardhat/console.sol";
 
 /**
  * ShiftUsdcEToUsdc is intended to be used with call after
  * transferring the ownership of the token given to this
  */
-contract ShiftUsdcEToUsdc {
+contract ShiftUsdcEToUsdcN {
     struct Args {
         address multisig;
         address aaveV3LiquidityProviderBeacon;
         IRegistry registry;
         Token token;
         uint256 deadline;
-        IUniswapV3SwapRouter router;
-        IERC20 usdce;
-        IERC20 usdc;
-        address aaveV3AddressProvider;
-        address aaveV3AToken;
+    }
+
+    IERC20 immutable private usdce_ = IERC20(0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8);
+
+    IERC20 immutable private usdcn_ = IERC20(0xaf88d065e77c8cC2239327C5EDb3A432268e5831);
+
+    address private authorised_;
+
+    constructor(address _authorised) {
+        authorised_ = _authorised;
     }
 
     function main(Args calldata _args) external {
+        require(msg.sender == authorised_, "only authorised");
+
         // first, deploy the liquidity provider with aave v3 so we can
         // start to shift the liquidity over
 
-        ILiquidityProvider tempLp = new UsdcEToUsdcShifterLiquidityProvider(
+        ILiquidityProvider tempLp = new UsdcEToUsdcNShifterLiquidityProvider(
             _args.multisig,
             _args.deadline,
-            _args.router,
-            address(_args.token), // owner
-            _args.usdce,
-            _args.usdc
+            address(_args.token) // owner
         );
 
         ILiquidityProvider oldLp = _args.token.underlyingLp();
@@ -58,23 +64,27 @@ contract ShiftUsdcEToUsdc {
 
         _args.token.upgradeLiquidityProvider(tempLp, minTokenAmount);
 
+        require(tempLp.underlying_() == usdcn_);
+
+        require(tempLp.totalPoolAmount() + 1 > minTokenAmount, "new usdcn amount too low");
+
         ILiquidityProvider newAaveV3Lp = ILiquidityProvider(address(new BeaconProxy(
             _args.aaveV3LiquidityProviderBeacon,
             abi.encodeWithSelector(
                 AaveV3LiquidityProvider.init.selector,
-                _args.aaveV3AddressProvider,
-                _args.aaveV3AToken,
+                0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb, // aave address provider
+                0x724dc807b04555b71ed48a6896b6F41593b8C637, // aave usdcn atoken
                 address(_args.token) // owner
             )
         )));
 
-        uint256 newTokenAmount = _args.usdc.balanceOf(address(newAaveV3Lp));
+        _args.token.upgradeLiquidityProvider(newAaveV3Lp, minTokenAmount);
 
-        require(newTokenAmount + 1 > minTokenAmount, "new usdce amount too low");
+        require(newAaveV3Lp.underlying_() == usdcn_);
+
+        require(newAaveV3Lp.totalPoolAmount() + 1 > minTokenAmount, "new usdcn amount too low");
 
         // better to be safe than sorry and estimate instead of relying on upstream
-
-        _args.token.upgradeLiquidityProvider(newAaveV3Lp, newTokenAmount);
 
         _args.token.updateOperator(_args.multisig);
     }
