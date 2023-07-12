@@ -15,6 +15,8 @@ import {
 import styles from "./Footer.module.scss";
 import { LaunchButton } from "components/Button";
 
+import Image from "next/image";
+
 interface IItem {
   title: string;
   src: string;
@@ -61,13 +63,14 @@ const Footer = () => {
                 width > firstBreakpoint
                   ? "medium"
                   : width > secondBreakpoint && width < firstBreakpoint
-                  ? "medium"
-                  : "small"
+                    ? "medium"
+                    : "small"
               }
             >
               LAUNCH FLUIDITY
             </LaunchButton>
             <GeneralButton
+              className={styles['discord-btn']}
               handleClick={() => {
                 window.location.href = "https://discord.gg/fluidity";
               }}
@@ -76,8 +79,18 @@ const Footer = () => {
                 width > firstBreakpoint
                   ? "medium"
                   : width > secondBreakpoint && width < firstBreakpoint
-                  ? "medium"
-                  : "small"
+                    ? "medium"
+                    : "small"
+              }
+              icon={
+                <Image
+                  src="/assets/images/socials/discord.svg"
+                  alt="discord"
+                  height={12}
+                  width={12}
+                  priority={true}
+                  loading="eager"
+                />
               }
             >
               DISCORD
