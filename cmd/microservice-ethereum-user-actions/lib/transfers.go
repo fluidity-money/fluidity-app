@@ -9,6 +9,8 @@ import (
 	"math/big"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -50,7 +52,7 @@ func coerceDataToUint256(data []byte) (*big.Int, error) {
 }
 
 // DecodeTransfer, making a new UserAction that contains a transfer
-func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum.Hash, fromAddressPadded, toAddressPadded string, data []byte, when time.Time, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) (*user_actions.UserAction, error) {
+func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum.Hash, logAddress ethereum.Address, fromAddressPadded, toAddressPadded string, data []byte, when time.Time, tokenShortName string, tokenDecimals int, logIndex misc.BigInt, applicationContracts map[ethereum.Address]applications.Application) (*user_actions.UserAction, error) {
 	var (
 		fromAddress = ethCommon.HexToAddress(fromAddressPadded)
 		toAddress   = ethCommon.HexToAddress(toAddressPadded)
@@ -73,6 +75,17 @@ func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum
 		toAddressHex   = toAddress.Hex()
 		amount         = misc.NewBigIntFromInt(*amountBigInt)
 	)
+
+	app, found := applicationContracts[logAddress]
+
+	if !found {
+		log.Debugf(
+			"For transaction hash %#v, index %v, contract %v was not an app contract!",
+			transactionHash,
+			logIndex.String(),
+			logAddress,
+		)
+	}
 
 	send := user_actions.NewSendEthereum(
 		network_,

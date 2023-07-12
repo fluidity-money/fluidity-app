@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -34,15 +35,19 @@ const (
 	// EnvNetwork to track (ethereum or arbitrum) in this microservice
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 
+	// EnvApplicationContracts to list the application contracts to monitor
+	EnvApplicationContracts = `FLU_ETHEREUM_APPLICATION_CONTRACTS`
+
 	topicUserActions = user_actions.TopicUserActionsEthereum
 )
 
 func main() {
 	var (
-		filterAddress_ = util.GetEnvOrFatal(EnvFilterAddress)
-		tokenShortName = util.GetEnvOrFatal(EnvTokenShortName)
-		tokenDecimals_ = util.GetEnvOrFatal(EnvTokenDecimals)
-		network__      = util.GetEnvOrFatal(EnvNetwork)
+		filterAddress_       = util.GetEnvOrFatal(EnvFilterAddress)
+		tokenShortName       = util.GetEnvOrFatal(EnvTokenShortName)
+		tokenDecimals_       = util.GetEnvOrFatal(EnvTokenDecimals)
+		network__            = util.GetEnvOrFatal(EnvNetwork)
+		applicationContracts = applications.AppsListFromEnvOrFatal(EnvApplicationContracts)
 	)
 
 	filterAddress := ethereumTypes.AddressFromString(filterAddress_)
@@ -137,12 +142,14 @@ func main() {
 			handleTransfer(
 				network_,
 				transactionHash,
+				logAddress,
 				topicRemaining,
 				logData,
 				time,
 				tokenShortName,
 				tokenDecimals,
 				logIndex,
+				applicationContracts,
 			)
 
 		case microservice_user_actions.EventMintFluid:

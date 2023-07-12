@@ -8,14 +8,12 @@ package main
 
 import (
 	"strconv"
-	"strings"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
-	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -44,83 +42,14 @@ const (
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
 )
 
-// appsListFromEnvOrFatal parses a list of `app:address:address,app:address:address` into a map of {address => app}
-func appsListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.Application {
-	applicationContracts_ := util.GetEnvOrFatal(EnvApplicationContracts)
-
-	apps := make(map[ethereum.Address]appTypes.Application)
-
-	for _, appAddresses_ := range strings.Split(applicationContracts_, ",") {
-		appAddresses := strings.Split(appAddresses_, ":")
-
-		if len(appAddresses) < 2 {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Malformed app address line '%s'!",
-					appAddresses_,
-				)
-			})
-		}
-
-		app, err := appTypes.ParseApplicationName(appAddresses[0])
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to parse an etherem application from name '%s'! %v",
-					appAddresses[0],
-					err,
-				)
-			})
-		}
-
-		for _, address_ := range appAddresses[1:] {
-			address := ethereum.AddressFromString(address_)
-
-			apps[address] = app
-		}
-	}
-
-	return apps
-}
-
-func utilityListFromEnvOrFatal(key string) map[ethereum.Address]appTypes.UtilityName {
-	utilitiesList := util.GetEnvOrFatal(key)
-
-	utilities := make(map[ethereum.Address]appTypes.UtilityName)
-
-	for _, appAddresses_ := range strings.Split(utilitiesList, ",") {
-		appAddresses := strings.Split(appAddresses_, ":")
-
-		if len(appAddresses) < 2 {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Malformed utilities address line '%s'!",
-					appAddresses_,
-				)
-			})
-		}
-
-		utility := appTypes.UtilityName(appAddresses[0])
-
-		for _, address_ := range appAddresses[1:] {
-			address := ethereum.AddressFromString(address_)
-
-			utilities[address] = utility
-		}
-	}
-
-	return utilities
-}
-
 func main() {
 	var (
 		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
 		gethHttpUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
-		applicationContracts     = appsListFromEnvOrFatal(EnvApplicationContracts)
-		utilities                = utilityListFromEnvOrFatal(EnvUtilityContracts)
+		applicationContracts     = applications.AppsListFromEnvOrFatal(EnvApplicationContracts)
+		utilities                = applications.UtilityListFromEnvOrFatal(EnvUtilityContracts)
 	)
 
 	contractAddress := ethCommon.HexToAddress(contractAddrString)
