@@ -306,8 +306,7 @@ export default function FluidifyToken() {
     }
   };
 
-  const supportedTokens = ({ isFluidOf, symbol }: AugmentedToken) =>
-    network !== "ethereum" || isFluidOf || symbol === "USDC";
+  const supportedTokens = ({ enabled }: AugmentedToken) => enabled;
 
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
     tokens.filter(supportedTokens)
@@ -620,7 +619,7 @@ export default function FluidifyToken() {
             {!!assetToken &&
               !isTablet &&
               !!toToken &&
-              (!assetToken.isFluidOf && assetToken.symbol !== "USDC" ? (
+              (!assetToken.enabled ? (
                 <Text size="lg" prominent>
                   Token no longer supported!
                 </Text>
