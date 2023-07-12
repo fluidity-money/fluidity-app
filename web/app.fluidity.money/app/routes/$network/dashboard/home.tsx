@@ -20,6 +20,7 @@ import {
   useViewport,
   Tooltip,
   TabButton,
+  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -230,9 +231,11 @@ export default function Home() {
   // Default to "Global" View
   const [activeTableFilterIndex, setActiveTableFilterIndex] = useState(0);
 
-  // If connected, default to "My Dashboard" View
+  // If connected and user has transactions to show, default to "My Dashboard" View
   useEffect(() => {
-    setActiveTableFilterIndex(connected ? 1 : 0);
+    const userTransactionCount = data.user.transactions.transactions.length;
+    const useUserData = connected && userTransactionCount > 0;
+    setActiveTableFilterIndex(useUserData ? 1 : 0);
   }, [connected]);
 
   const { width } = useViewport();
@@ -447,7 +450,7 @@ export default function Home() {
                   }
                 >
                   <img src="/images/providers/wombat.svg" />
-                  <Text>{wombatTokens}</Text>
+                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
                 </a>
               ) : (
                 <Text>-</Text>

@@ -285,7 +285,7 @@ const LootboxTests = async (
     await expectDeposited(staking, 0, 0, 0);
   });
 
-  it("should only receive 0 for redeeming early", async () => {
+  it("should revert if redeeming early", async () => {
     const {
       stakingSigner,
       staking,
@@ -326,13 +326,7 @@ const LootboxTests = async (
       slippage
     );
 
-    const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking, 0, 0, 0);
-
-    expect(fusdcRedeemed).to.be.equal(0);
-
-    expect(usdcRedeemed).to.be.equal(0);
-
-    expect(wethRedeemed).to.be.equal(0);
+    expect(redeem(staking, 0, 0, 0)).to.be.revertedWith("no deposits were redeemed");
 
     await advanceTime(hre, 99999999);
 

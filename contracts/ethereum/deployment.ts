@@ -42,6 +42,8 @@ export const getFactories = async (
 
   const utilityGaugesFactory = await hre.ethers.getContractFactory("UtilityGauges");
 
+  const permitRouterV1Factory = await hre.ethers.getContractFactory("PermitRouterV1");
+
   return {
     upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
@@ -54,7 +56,8 @@ export const getFactories = async (
     aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
     dao: daoFactory,
     staking: staking,
-    utilityGauges: utilityGaugesFactory
+    utilityGauges: utilityGaugesFactory,
+    permitRouterV1: permitRouterV1Factory
   };
 };
 
@@ -335,7 +338,9 @@ export const deployFluidity = async (
   daoFactory: ethers.ContractFactory,
 
   registryBeaconAddress: string,
-  operatorBeaconAddress: string
+  operatorBeaconAddress: string,
+
+  permitRouterV1Factory: ethers.ContractFactory
 ): Promise<FluidityContracts> => {
   const registry = await deployRegistry(
     hre,
@@ -376,11 +381,18 @@ export const deployFluidity = async (
     veGovLockup.address
   );
 
+  const permitRouterV1 = await permitRouterV1Factory.deploy(
+    operatorSigner.getAddress(),
+    emergencyCouncilAddress,
+    registry.address
+  );
+
   return {
     operator: operator,
     govToken: govToken,
     registry: registry,
     dao: dao,
-    veGovLockup: veGovLockup
+    veGovLockup: veGovLockup,
+    permitRouterV1: permitRouterV1
   }
 };
