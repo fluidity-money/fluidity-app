@@ -214,7 +214,7 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 
 const LootboxRewardTimezone = "Australia/Adelaide"
 
-// fetch the 10 addresses with the highest lootboxes earned during the given period on the given application 
+// fetch the 10 addresses with the highest lootboxes earned during the given period on the given application
 func GetTopApplicationUsersByLootboxCount(startTime, endTime time.Time, application applications.Application) []UserLootboxCount {
 	timescaleClient := timescale.Client()
 

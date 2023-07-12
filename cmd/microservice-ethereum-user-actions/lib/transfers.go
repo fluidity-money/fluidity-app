@@ -96,6 +96,7 @@ func DecodeTransfer(network_ network.BlockchainNetwork, transactionHash ethereum
 		tokenShortName,
 		tokenDecimals,
 		logIndex,
+		app,
 	)
 
 	return &send, nil

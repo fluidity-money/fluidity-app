@@ -147,6 +147,7 @@ func main() {
 						fluidityTokenMint,
 						fluidityPdaPubkey,
 						tokenDetails,
+						applications,
 					)
 				}
 

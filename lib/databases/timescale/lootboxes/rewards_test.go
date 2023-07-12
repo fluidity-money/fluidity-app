@@ -7,21 +7,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
 func TestBuildUserRewardValuesString(t *testing.T) {
 	expectedRewardStrings := []string{
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 2, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 3, 2, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -31,7 +30,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($4, '', 'leaderboard_prize', $1, 0, 2, 3, 'none'),
 ($4, '', 'leaderboard_prize', $1, 0, 3, 1, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -43,7 +42,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($5, '', 'leaderboard_prize', $1, 0, 1, 12, 'none'),
 ($5, '', 'leaderboard_prize', $1, 0, 2, 1, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -56,7 +55,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($5, '', 'leaderboard_prize', $1, 0, 2, 1, 'none'),
 ($6, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -70,7 +69,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($6, '', 'leaderboard_prize', $1, 0, 1, 10, 'none'),
 ($7, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -85,7 +84,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($7, '', 'leaderboard_prize', $1, 0, 1, 10, 'none'),
 ($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -101,7 +100,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none'),
 ($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -118,7 +117,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none'),
 ($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')`,
 
-`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
+		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
 ($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none'),
 ($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
@@ -142,7 +141,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 		rewardString, err := buildUserRewardValuesString(userCount)
 
 		require.NoError(t, err)
-		assert.Equal(t, expectedString, rewardString)	
+		assert.Equal(t, expectedString, rewardString)
 	}
 
 	rewardString, err := buildUserRewardValuesString(0)
