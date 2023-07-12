@@ -40,6 +40,7 @@ logo = "/assets/tokens/usdc.svg"
 address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 colour = "#2775ca"
 decimals = 6
+enabled = true
 
 [[config.ethereum.tokens]]
 symbol = "fUSDC"
@@ -49,6 +50,7 @@ address = "0x9d1089802eE608BA84C5c98211afE5f37F96B36C"
 colour = "#2775ca"
 isFluidOf = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 decimals = 6
+enabled = true
 
 [[config.ethereum.tokens]]
 symbol = "USDT"
@@ -57,6 +59,7 @@ logo = "/assets/tokens/usdt.svg"
 address = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 colour = "#12946c"
 decimals = 6
+enabled = true
 
 [[config.ethereum.tokens]]
 symbol = "fUSDT"
@@ -66,6 +69,7 @@ address = "0xADc234a4e90E2045f353F5d4fCdE66144d23b458"
 colour = "#12946c"
 isFluidOf = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 decimals = 6
+enabled = true 
 
 [[config.ethereum.tokens]]
 symbol = "TUSD"
@@ -74,6 +78,7 @@ logo = "/assets/tokens/tusd.svg"
 address = "0x0000000000085d4780B73119b644AE5ecd22b376"
 colour = "#1da1f2"
 decimals = 18
+enabled = false 
 
 [[config.ethereum.tokens]]
 symbol = "fTUSD"
@@ -83,6 +88,7 @@ address = "0x0B319dB00d07C8fAdfaAEf13C910141a5dA0aa8F"
 colour = "#1da1f2"
 isFluidOf = "0x0000000000085d4780B73119b644AE5ecd22b376"
 decimals = 18
+enabled = true 
 
 [[config.ethereum.tokens]]
 symbol = "FRAX"
@@ -91,6 +97,7 @@ logo = "/assets/tokens/frax.svg"
 address = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
 colour = "#e84142"
 decimals = 18
+enabled = false 
 
 [[config.ethereum.tokens]]
 symbol = "fFRAX"
@@ -100,6 +107,7 @@ address = "0x2bE1e42BF263AaB47D27Ba92E72c14823e101D7C"
 colour = "#e84142"
 isFluidOf = "0x853d955aCEf822Db058eb8505911ED77F175b99e"
 decimals = 18
+enabled = true
 
 [[config.ethereum.tokens]]
 symbol = "DAI"
@@ -108,6 +116,7 @@ logo = "/assets/tokens/dai.svg"
 address = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 colour = "#825902"
 decimals = 18
+enabled = false 
 
 [[config.ethereum.tokens]]
 symbol = "fDAI"
@@ -117,6 +126,7 @@ address = "0x244517Dc59943E8CdFbD424Bdb3262c5f04a1387"
 colour = "#825902"
 isFluidOf = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 decimals = 18
+enabled = true
 
 [config.solana]
 explorer = "https://explorer.solana.com"
@@ -132,6 +142,7 @@ logo = "/assets/tokens/usdc.svg"
 address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 colour = "#2775ca"
 decimals = 6
+enabled = false 
 
 [[config.solana.tokens]]
 symbol = "fUSDC"
@@ -141,6 +152,7 @@ address = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
 colour = "#2775ca"
 isFluidOf = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 decimals = 6
+enabled = false 
 
 [[config.solana.tokens]]
 symbol = "USDT"
@@ -149,6 +161,7 @@ logo = "/assets/tokens/usdt.svg"
 address = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 colour = "#12946c"
 decimals = 6
+enabled = false 
 
 [[config.solana.tokens]]
 symbol = "fUSDT"
@@ -158,6 +171,7 @@ address = "D5zHHS5tkf9zfGBRPQbDKpUiRAMVK8VvxGwTHP6tP1B8"
 colour = "#12946c"
 isFluidOf = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 decimals = 6
+enabled = false 
 
 [config.arbitrum]
 explorer = "https://etherscan.io"
@@ -174,6 +188,7 @@ logo = "/assets/tokens/usdc.svg"
 address = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
 colour = "#2775ca"
 decimals = 6
+enabled = true
 
 [[config.arbitrum.tokens]]
 symbol = "fUSDC"
@@ -183,6 +198,7 @@ address = "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 colour = "#2775ca"
 isFluidOf = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
 decimals = 6
+enabled = true
 
 [[config.arbitrum.tokens]]
 symbol = "USDT"
@@ -191,6 +207,7 @@ logo = "/assets/tokens/usdt.svg"
 address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
 colour = "#12946c"
 decimals = 6
+enabled = true
 
 [[config.arbitrum.tokens]]
 symbol = "fUSDT"
@@ -200,6 +217,7 @@ address = "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62"
 colour = "#12946c"
 isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
 decimals = 6
+enabled = true
 
 [[config.arbitrum.tokens]]
 symbol = "DAI"
@@ -208,6 +226,7 @@ logo = "/assets/tokens/dai.svg"
 address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
 colour = "#825902"
 decimals = 18
+enabled = true
 
 [[config.arbitrum.tokens]]
 symbol = "fDAI"
@@ -217,6 +236,7 @@ address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
 colour = "#825902"
 isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
 decimals = 18
+enabled = true
 
 [[config.arbitrum.tokens]]
 symbol = "wETH"
@@ -225,6 +245,7 @@ logo = "/assets/tokens/weth.svg"
 address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
 colour = "#eb2077"
 decimals = 18
+enabled = false 
 
 # liquidity_providers Configurations 
 # eth providers

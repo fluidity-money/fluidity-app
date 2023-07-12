@@ -47,6 +47,7 @@ const OptionsSchema = z.object({
             dataAccount: z.string().optional(),
             decimals: z.number(),
             userMintLimit: z.number().optional(),
+            enabled: z.boolean(),
           })
         )
         .min(1),
