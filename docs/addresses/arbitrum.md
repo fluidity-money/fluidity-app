@@ -35,7 +35,7 @@
 | ----------------------- | ------------------------------------------ |
 | Token address           | 0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A |
 | WorkerConfig            | 0xf3fd0c0c1ae303F5D46CFb510eBa07F1323529Af |
-| AAVE liquidity provider | 0x23E7f09Fae0933db01420173726d18Dae809022C |
+| AAVE liquidity provider | 0x91beB5C41dF001175b588C9510327D53f278972A |
 | aToken address          | 0x625E7708f30cA75bfd92586e17077590C60eb4cD |
 | Beacon address          | 0x90AEfF2D9376476F770463c77aF979dfd115Bbf0 |
 | Emergency council       | 0x5bC5DB835Af82Ab2333b1a60f529038F6508c94C |
