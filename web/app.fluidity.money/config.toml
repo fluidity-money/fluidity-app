@@ -185,7 +185,7 @@ fluidAssets = [
 symbol = "USDC"
 name = "USD Coin"
 logo = "/assets/tokens/usdc.svg"
-address = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+address = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 colour = "#2775ca"
 decimals = 6
 enabled = true
@@ -196,7 +196,7 @@ name = "Fluid USDC"
 logo = "/assets/tokens/fUSDC.svg"
 address = "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 colour = "#2775ca"
-isFluidOf = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+isFluidOf = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 decimals = 6
 enabled = true
 
@@ -338,13 +338,13 @@ fUSDT = "https://www.jup.ag/"
 name= "uniswap"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.uniswap.org/#/add/0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
+fUSDC = "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
 
 [[liquidity_providers.arbitrum.providers]]
 name= "camelot"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8&token2=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xaf88d065e77c8cC2239327C5EDb3A432268e5831&token2=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 
 [[liquidity_providers.arbitrum.providers]]
 name= "Saddle"
