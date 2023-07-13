@@ -14,12 +14,7 @@ import "../../../contracts/Token.sol";
 import "../../../interfaces/IERC20.sol";
 import "../../../interfaces/ILiquidityProvider.sol";
 
-import "./IWombatRouter.sol";
-import "./IWombatPool2.sol";
-
 import "./IGMXSwapRouter.sol";
-
-import "hardhat/console.sol";
 
 uint256 constant MAX_UINT256 = type(uint256).max;
 
