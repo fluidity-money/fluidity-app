@@ -14,35 +14,18 @@ import "../../../contracts/Token.sol";
 import "../../../interfaces/IERC20.sol";
 import "../../../interfaces/ILiquidityProvider.sol";
 
-import "hardhat/console.sol";
+import "./IGMXSwapRouter.sol";
 
 uint256 constant MAX_UINT256 = type(uint256).max;
 
-interface IUniswapV3SwapRouter {
-    struct ExactInputSingleParams {
-        address tokenIn;
-        address tokenOut;
-        uint24 fee;
-        address recipient;
-        uint256 deadline;
-        uint256 amountIn;
-        uint256 amountOutMinimum;
-        uint160 sqrtPriceLimitX96;
-    }
-
-    function exactInputSingle(
-        ExactInputSingleParams calldata _params
-    ) external returns (uint256 amountOut);
-}
-
 /**
- * UsdcEToUsdcShifterLiquidityProvider takes usdce assets provided with
+ * UsdcEToUsdcNShifterLiquidityProvider takes usdce assets provided with
  * addToPool, uses Uniswap to swap them, then changes the underlying to
  * point to usdc. Intended to be deployed, used and cast aside in one big
  * transaction. Includes a rescue function * JUST IN CASE * something
  * weird happens (this should be set to the gnosis safe).
 */
-contract UsdcEToUsdcShifterLiquidityProvider is ILiquidityProvider {
+contract UsdcEToUsdcNShifterLiquidityProvider is ILiquidityProvider {
     using SafeERC20 for IERC20;
 
     /**
@@ -55,17 +38,16 @@ contract UsdcEToUsdcShifterLiquidityProvider is ILiquidityProvider {
     /// @notice deadline_ to enforce that this transaction happens by
     uint256 immutable public deadline_;
 
-    /// @notice router_ to use to swap the assets over
-    IUniswapV3SwapRouter immutable public router_;
+    IGMXSwapRouter public swapRouter_ = IGMXSwapRouter(0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064);
 
     /// @notice owner_ of the liquidityprovider (Token) address
     address immutable public owner_;
 
     /// @notice usdce_ address to use as the bridged version of USDC
-    IERC20 immutable public usdce_;
+    IERC20 immutable public usdce_ = IERC20(0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8);
 
-    /// @notice usdc_ to point to as the version recently deployed by circle
-    IERC20 immutable public usdc_;
+    /// @notice usdcn_ to point to as the version recently deployed by circle
+    IERC20 immutable public usdcn_ = IERC20(0xaf88d065e77c8cC2239327C5EDb3A432268e5831);
 
     /// @notice hasShifted_ over the asset from usdce to usdc?
     bool private hasShifted_;
@@ -73,77 +55,54 @@ contract UsdcEToUsdcShifterLiquidityProvider is ILiquidityProvider {
     constructor(
         address _rescuer,
         uint256 _deadline,
-        IUniswapV3SwapRouter _router,
-        address _owner,
-        IERC20 _usdce,
-        IERC20 _usdc
+        address _owner
     ) {
         rescuer_ = _rescuer;
         deadline_ = _deadline;
-        router_ = _router;
         owner_ = _owner;
-        usdce_ = _usdce;
-        usdc_ = _usdc;
-
-        usdce_.safeApprove(address(router_), MAX_UINT256);
-        usdc_.safeApprove(address(router_), MAX_UINT256);
+        usdce_.safeApprove(address(swapRouter_), MAX_UINT256);
+        usdcn_.safeApprove(address(swapRouter_), MAX_UINT256);
     }
 
     /// @notice underlying_ quotes a different token depending on whether it
     ///         has transferred usdce to usdc
     function underlying_() public view returns (IERC20) {
-        return hasShifted_ ? usdc_ : usdce_ ;
+        return hasShifted_ ? usdcn_ : usdce_ ;
     }
 
     function rescue(Token _token) public {
         require(msg.sender == rescuer_, "only rescuer");
         usdce_.safeTransfer(rescuer_, usdce_.balanceOf(address(this)));
-        usdc_.safeTransfer(rescuer_, usdc_.balanceOf(address(this)));
+        usdcn_.safeTransfer(rescuer_, usdcn_.balanceOf(address(this)));
         _token.updateOperator(rescuer_);
     }
 
     function addToPool(uint256 _amount) public {
         require(msg.sender == owner_, "only owner");
 
-        console.logBytes(abi.encodeWithSelector(IUniswapV3SwapRouter.exactInputSingle.selector,
-            IUniswapV3SwapRouter.ExactInputSingleParams({
-                tokenIn: address(usdce_),
-                tokenOut: address(usdc_),
-                fee: 3,
-                recipient: address(this),
-                deadline: MAX_UINT256,
-                amountIn: _amount,
-                amountOutMinimum: 0, // presumably enforced by the callee given the context
-                sqrtPriceLimitX96: 0 // TODO
-            }))
+        address[] memory tokenIn = new address[](2);
+        tokenIn[0] =  address(usdce_);
+        tokenIn[1] = address(usdcn_);
+
+        swapRouter_.swap(
+            tokenIn,
+            _amount,
+            0,
+            address(this)
         );
-
-        console.log("router address", address(router_));
-
-        router_.exactInputSingle(IUniswapV3SwapRouter.ExactInputSingleParams({
-            tokenIn: address(usdce_),
-            tokenOut: address(usdc_),
-            fee: 3,
-            recipient: address(this),
-            deadline: deadline_,
-            amountIn: _amount,
-            amountOutMinimum: 0, // presumably enforced by the callee given the context
-            sqrtPriceLimitX96: 0 // TODO
-        }));
 
         hasShifted_ = true;
     }
 
     function totalPoolAmount() external view returns (uint256) {
         require(hasShifted_, "hasn't shifted");
-        return usdc_.balanceOf(address(this));
-
+        return usdcn_.balanceOf(address(this));
     }
 
     function takeFromPool(uint256 _amount) public {
         require(msg.sender == owner_, "only owner");
         require(hasShifted_, "hasn't shifted");
 
-        usdc_.safeTransfer(owner_, _amount);
+        usdcn_.safeTransfer(owner_, _amount);
     }
 }
