@@ -30,9 +30,9 @@ contract ShiftUsdcEToUsdcN {
         uint256 deadline;
     }
 
-    IERC20 immutable private usdce_ = IERC20(0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8);
+    IERC20 constant private usdce_ = IERC20(0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8);
 
-    IERC20 immutable private usdcn_ = IERC20(0xaf88d065e77c8cC2239327C5EDb3A432268e5831);
+    IERC20 constant private usdcn_ = IERC20(0xaf88d065e77c8cC2239327C5EDb3A432268e5831);
 
     address private authorised_;
 
@@ -64,7 +64,7 @@ contract ShiftUsdcEToUsdcN {
 
         require(tempLp.underlying_() == usdcn_);
 
-        require(tempLp.totalPoolAmount() + 1 > minTokenAmount, "new usdcn amount too low");
+        require(tempLp.totalPoolAmount() + 1 > minTokenAmount, "old usdcn amount too low");
 
         ILiquidityProvider newAaveV3Lp = ILiquidityProvider(address(new BeaconProxy(
             _args.aaveV3LiquidityProviderBeacon,
