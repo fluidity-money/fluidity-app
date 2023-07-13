@@ -17,8 +17,6 @@ import "../../../contracts/Token.sol";
 
 import "./UsdcEToUsdcNShifterLiquidityProvider.sol";
 
-import "hardhat/console.sol";
-
 /**
  * ShiftUsdcEToUsdc is intended to be used with call after
  * transferring the ownership of the token given to this
