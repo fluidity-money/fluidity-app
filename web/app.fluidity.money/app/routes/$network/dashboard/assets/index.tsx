@@ -127,7 +127,7 @@ const assetVariants = {
       ease: "easeInOut",
     },
   },
-};
+}
 
 const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const { token } = props;
