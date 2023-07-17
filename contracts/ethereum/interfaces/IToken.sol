@@ -52,14 +52,17 @@ interface IToken is IERC20 {
 
     /// @notice emitted when an operator sets the burn fee (1%)
     event FeeSet(
-        uint256 _originalMintFee,
-        uint256 _newMintFee,
-        uint256 _originalBurnFee,
-        uint256 _newBurnFee
+        uint256 originalMintFee,
+        uint256 newMintFee,
+        uint256 originalBurnFee,
+        uint256 newBurnFee
     );
 
     /// @notice emitted when an operator changes the underlying over to a new token
     event NewUnderlyingAsset(IERC20 _old, IERC20 _new);
+
+    /// @notice emitted when the fee whitelisting feature is used
+    event FeeWhitelisted(address indexed addr, bool allowed);
 
     /**
      * @notice getter for the RNG oracle provided by `workerConfig_`
@@ -200,6 +203,7 @@ interface IToken is IERC20 {
 
     /**
      * @notice addFeeWhitelist for a specific address: if set to true take no fees
+     * @dev emits FeeWhitelisted
      */
     function addFeeWhitelist(address _addr, bool _allowed) external;
 }

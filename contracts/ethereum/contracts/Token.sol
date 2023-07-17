@@ -904,6 +904,7 @@ contract Token is
 
     function addFeeWhitelist(address _addr, bool _allowed) external {
         require(msg.sender == operator_, "only operator");
+        emit FeeWhitelisted(_addr, _allowed);
         feeWhitelisted_[_addr] = _allowed;
     }
 }
