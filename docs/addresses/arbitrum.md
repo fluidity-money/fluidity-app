@@ -12,6 +12,7 @@
 | Chronos Booster UtilityClient                 | 0xEB6057AE11BE83fFE0a3C191a41D67728938886B |
 | LootboxConfirmAddressOwnership                | 0x18EB6Ac990BD3a31dD3e5dd9c7744751c8E9DC06 |
 | Wombat fixed token distribution UtilityClient | 0x62363df6e7B1b06BACFa232B7cb1f0835c8ef0A0 |
+| Sushi fixed token distribution UtilityClient  | 0x4E34F71a48AA3F9d5832D6d419a1De4c39657bc4 |
 
 ## Specifics
 
