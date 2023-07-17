@@ -1,6 +1,8 @@
 
 # Fluidity Ethereum Contracts
 
+`FLU_DO_VE_GOV_TESTS` if you want to test the VE gov numbers.
+
 ## Environment variables (deploying)
 
 |                Name                  |                            Description
