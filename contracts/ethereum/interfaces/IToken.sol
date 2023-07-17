@@ -58,9 +58,6 @@ interface IToken is IERC20 {
         uint256 newBurnFee
     );
 
-    /// @notice emitted when an operator changes the underlying over to a new token
-    event NewUnderlyingAsset(IERC20 _old, IERC20 _new);
-
     /// @notice emitted when the fee whitelisting feature is used
     event FeeWhitelisted(address indexed addr, bool allowed);
 
