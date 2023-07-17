@@ -5,7 +5,11 @@
 package ethereum
 
 import (
+	"fmt"
+	"math/big"
 	"strings"
+
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -14,6 +18,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+// TransferLogTopic is the signature of token transfers
 var TransferLogTopic = strings.ToLower(
 	"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
 )
@@ -185,4 +190,34 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 // the fluid transfer ABI
 func IsTransferLogTopic(topic string) bool {
 	return topic == TransferLogTopic
+}
+
+func GetTransferVolume(data []byte) (*big.Int, error) {
+	ethAbiType := ethAbi.Type{
+		T: ethAbi.UintTy,
+	}
+
+	amount, err := ethAbi.ReadInteger(ethAbiType, data)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to decode a uint256 from abi data! %w",
+			err,
+		)
+	}
+
+	var amountBigInt *big.Int
+
+	switch amount.(type) {
+	case *big.Int:
+		amountBigInt = amount.(*big.Int)
+
+	default:
+		return nil, fmt.Errorf(
+			"Failed to decode an amount (%#v)!",
+			amount,
+		)
+	}
+
+	return amountBigInt, nil
 }

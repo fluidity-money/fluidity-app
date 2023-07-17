@@ -9,10 +9,12 @@ import (
 	"strconv"
 	"strings"
 
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -20,10 +22,14 @@ import (
 	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	user_actions_queue "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
+	ethereum_internal "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 	workerTypes "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -190,8 +196,111 @@ func main() {
 			transfersInBlock int
 		)
 
-		for _, transfers := range fluidTransactions {
-			transfersInBlock += len(transfers.Transfers)
+		for _, tx := range fluidTransactions {
+			transfersInBlock += len(tx.Transfers)
+
+			txHash := tx.Transaction.Hash
+
+			// app is the initial application used in user transaction
+			// defaults to none
+			txApp := appTypes.Application(0)
+
+			for _, transfer := range tx.Transfers {
+				transferApp := transfer.Decorator.Application
+
+				// found application in transaction
+				if transferApp != 0 {
+					txApp = transferApp
+					break
+				}
+
+			}
+
+			// emit send transfers
+			fluidTxLogs := tx.Receipt.Logs
+			for _, fluidTxLog := range fluidTxLogs {
+				var (
+					logSig    = fluidTxLog.Topics[0]
+					logTopics = fluidTxLog.Topics[1:]
+					logData   = fluidTxLog.Data
+					logIndex  = fluidTxLog.Index
+				)
+
+				if ethereum.IsTransferLogTopic(logSig.String()) {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Transfer did not match TransferLogTopic! Is %v!",
+							logSig,
+						)
+					})
+					continue
+				}
+
+				if lenTopics := len(logTopics); lenTopics != 2 {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Length of the log topics for transfer is not 2! Is %v!",
+							lenTopics,
+						)
+					})
+					continue
+				}
+
+				var (
+					fromAddress = ethCommon.HexToAddress(logTopics[0].String())
+					toAddress   = ethCommon.HexToAddress(logTopics[1].String())
+				)
+
+				amountBigInt, err := ethereum.GetTransferVolume(logData)
+
+				if err != nil {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Could not coerce data to swap amount! Err: %v",
+							err,
+						)
+					})
+					continue
+				}
+
+				if amountBigInt == nil {
+					log.Debug(func(k *log.Log) {
+						k.Message = "Returned big.Int was nil when decoding a transfer!"
+					})
+					continue
+				}
+
+				var (
+					fromAddressHex = fromAddress.Hex()
+					toAddressHex   = toAddress.Hex()
+					amount         = misc.NewBigIntFromInt(*amountBigInt)
+				)
+
+				send := user_actions.NewSendEthereum(
+					dbNetwork,
+					ethereum_internal.AddressFromString(fromAddressHex),
+					ethereum_internal.AddressFromString(toAddressHex),
+					txHash,
+					amount,
+					tokenName,
+					underlyingTokenDecimals,
+					logIndex,
+					txApp,
+				)
+
+				zeroAddress := ethereum_internal.ZeroAddress.String()
+
+				// ignore mint/burn events
+				if send.SenderAddress == zeroAddress || send.RecipientAddress == zeroAddress {
+					continue
+				}
+
+				queue.SendMessage(
+					user_actions_queue.TopicUserActionsEthereum,
+					send,
+				)
+
+			}
 		}
 
 		movingAverageKey := createMovingAverageKey(dbNetwork, tokenName)
