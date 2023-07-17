@@ -15,7 +15,7 @@ import { Winner } from "~/queries/useUserRewards";
 
 const FLUID_UTILITY = "FLUID";
 
-const WOMBAT_UTILITY = "wombat initial boost";
+const CURRENT_UTILITY = "sushi initial boost";
 
 type UserTransaction = {
   sender: string;
@@ -269,9 +269,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
-          wombatTokens:
-            winner.utility_name === WOMBAT_UTILITY
-              ? winner.utility[WOMBAT_UTILITY]
+          utilityTokens:
+            winner.utility_name === CURRENT_UTILITY
+              ? winner.utility[CURRENT_UTILITY]
               : undefined,
         };
       });

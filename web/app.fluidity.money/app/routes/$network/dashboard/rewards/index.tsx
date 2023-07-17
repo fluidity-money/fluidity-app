@@ -240,14 +240,14 @@ export default function Rewards() {
         return [
           { name: "ACTIVITY" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$SUSHI REWARDS" },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$SUSHI REWARDS" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -423,7 +423,7 @@ export default function Rewards() {
         rewardHash,
         logo,
         currency,
-        wombatTokens,
+        utilityTokens,
       } = data;
 
       const toolTip = useToolTip();
@@ -506,10 +506,10 @@ export default function Rewards() {
             )}
           </td>
 
-          {/* WOM */}
+          {/* Utility Rewards */}
           {!isMobile && (
             <td>
-              {wombatTokens ? (
+              {utilityTokens ? (
                 <a
                   className="table-token"
                   onClick={() =>
@@ -521,8 +521,8 @@ export default function Rewards() {
                     )
                   }
                 >
-                  <img src="/images/providers/wombat.svg" />
-                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
+                  <img src="/images/providers/Sushiswap.svg" />
+                  <Text>{toDecimalPlaces(utilityTokens, 4)}</Text>
                 </a>
               ) : (
                 <Text>-</Text>

@@ -20,7 +20,7 @@ import { getTokenForNetwork } from "~/util";
 
 const FLUID_UTILITY = "FLUID";
 
-const WOMBAT_UTILITY = "wombat initial boost";
+const CURRENT_UTILITY = "sushi initial boost";
 
 type UserTransaction = {
   sender: string;
@@ -305,8 +305,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
       const reward = isWin ? winner.fluid_win_amount : 0;
 
-      const hasWombatReward =
-        isWin && winner.utility_name === WOMBAT_UTILITY && reward > 0;
+      const hasUtilityReward =
+        isWin && winner.utility_name === CURRENT_UTILITY && reward > 0;
 
       return {
         sender: tx.sender,
@@ -326,8 +326,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               : (winner as Winner)?.solana_application
             : "Fluidity") ?? "Fluidity",
         swapType,
-        wombatTokens: hasWombatReward
-          ? winner.utility[WOMBAT_UTILITY]?.["WOM"]
+        wombatTokens: hasUtilityReward
+          ? winner.utility[CURRENT_UTILITY]?.["SUSHI"]
           : undefined,
       };
     });

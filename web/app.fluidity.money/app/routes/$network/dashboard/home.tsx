@@ -254,7 +254,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$SUSHI REWARDS" },
           { name: "ACCOUNT" },
         ];
       default:
@@ -262,7 +262,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$SUSHI REWARDS" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -377,7 +377,7 @@ export default function Home() {
         rewardHash,
         currency,
         logo,
-        wombatTokens,
+        utilityTokens,
       } = data;
 
       return (
@@ -434,10 +434,10 @@ export default function Home() {
             </td>
           )}
 
-          {/* WOM */}
+          {/* Utility column */}
           {!isMobile && (
             <td>
-              {wombatTokens ? (
+              {utilityTokens ? (
                 <a
                   className="table-token"
                   onClick={() =>
@@ -449,8 +449,8 @@ export default function Home() {
                     )
                   }
                 >
-                  <img src="/images/providers/wombat.svg" />
-                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
+                  <img src="/images/providers/Sushiswap.svg" />
+                  <Text>{toDecimalPlaces(utilityTokens, 4)}</Text>
                 </a>
               ) : (
                 <Text>-</Text>
