@@ -41,8 +41,12 @@ Should contain functions necessary for supporting the application (finding fees,
 | `FLU_REDIS_ADDR`                         | Hostname to connect to for the Redis (state) codebase.                       |
 | `FLU_ETHEREUM_CONTRACT_ADDR`             | Address of the application contract.                                         |
 | `FLU_ETHEREUM_HTTP_URL`                  | URL to use to chat to an Ethereum RPC node.                                  |
+| `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`     | Name of underlying token. Used to create user actions.                       |
 | `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS` | Underlying token decimals in place (18 for DAI, 6 for USDT and USDC, etc).   |
 | `FLU_ETHEREUM_APPLICATION_CONTRACTS`     | List of supported application contracts to calculate fees from.              |
+| `FLU_ETHEREUM_UTILITY_CONTRACTS`         | List of supported utility contracts tag transactions for utility mining.     |
+| `FLU_ETHEREUM_WORK_QUEUE`                | Name of queue to send server work down.                                      |
+| `FLU_ETHEREUM_NETWORK`                   | Id of underlying network, used to create user actions.                       |
 
 ## Building
 
