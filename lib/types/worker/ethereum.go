@@ -82,6 +82,7 @@ type (
 		UtilityName applications.UtilityName `json:"utility_name"`
 		// Application fee in USD
 		ApplicationFee *big.Rat `json:"application_fee"`
+		Volume         *big.Int `json:"volume"`
 	}
 
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any

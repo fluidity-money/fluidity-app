@@ -13,9 +13,11 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -29,6 +31,9 @@ const (
 	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 
+	// EnvUnderlyingTokenName is used to identify token in user actions
+	EnvUnderlyingTokenName = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`
+
 	// EnvUnderlyingTokenDecimals supported by the contract
 	EnvUnderlyingTokenDecimals = `FLU_ETHEREUM_UNDERLYING_TOKEN_DECIMALS`
 
@@ -40,6 +45,9 @@ const (
 
 	// EnvServerWorkQueue to send serverwork down
 	EnvServerWorkQueue = `FLU_ETHEREUM_WORK_QUEUE`
+
+	// EnvNetwork is the network ID, used to create user actions
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
 func main() {
@@ -47,9 +55,11 @@ func main() {
 		publishAmqpTopic         = util.GetEnvOrFatal(EnvServerWorkQueue)
 		contractAddrString       = util.GetEnvOrFatal(EnvContractAddress)
 		gethHttpUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
+		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
 		applicationContracts     = applications.AppsListFromEnvOrFatal(EnvApplicationContracts)
 		utilities                = applications.UtilityListFromEnvOrFatal(EnvUtilityContracts)
+		networkId                = util.GetEnvOrFatal(EnvNetwork)
 	)
 
 	contractAddress := ethCommon.HexToAddress(contractAddrString)
@@ -62,6 +72,15 @@ func main() {
 				underlyingTokenDecimals_,
 			)
 
+			k.Payload = err
+		})
+	}
+
+	dbNetwork, err := network.ParseEthereumNetwork(networkId)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to parse network from env"
 			k.Payload = err
 		})
 	}
@@ -245,7 +264,13 @@ func main() {
 		// add the non-app fluid transfers (and get their receipts)
 
 		for _, fluidTransfer := range fluidTransfers {
-			transactionHash := fluidTransfer.TransactionHash
+			var (
+				from            = fluidTransfer.SenderAddress
+				to              = fluidTransfer.RecipientAddress
+				decorator       = fluidTransfer.Decorator
+				logIndex        = fluidTransfer.LogIndex
+				transactionHash = fluidTransfer.TransactionHash
+			)
 
 			decoratedTransaction, exists := decoratedTransactions[transactionHash]
 
@@ -279,14 +304,15 @@ func main() {
 				}
 
 				decoratedTransaction.Receipt = *receipt
-			}
+			} else {
+				// fill in decorator with app
+				transfers := decoratedTransaction.Transfers
 
-			var (
-				from      = fluidTransfer.SenderAddress
-				to        = fluidTransfer.RecipientAddress
-				decorator = fluidTransfer.Decorator
-				logIndex  = fluidTransfer.LogIndex
-			)
+				if len(transfers) > 0 {
+					app := transfers[0].Decorator.Application
+					decorator.Application = app
+				}
+			}
 
 			transfer := worker.EthereumDecoratedTransfer{
 				TransactionHash:  transactionHash,
@@ -300,6 +326,29 @@ func main() {
 			decoratedTransaction.Transfers = append(decoratedTransaction.Transfers, transfer)
 
 			decoratedTransactions[transactionHash] = decoratedTransaction
+
+			// don't emit mint/burn user actions
+			if from == ethereum.ZeroAddress || to == ethereum.ZeroAddress {
+				continue
+			}
+
+			transferUserAction := user_actions.NewSendEthereum(
+				dbNetwork,
+				from,
+				to,
+				transactionHash,
+				misc.NewBigIntFromInt(*decorator.Volume),
+				tokenName,
+				tokenDecimals,
+				*logIndex,
+				decorator.Application,
+			)
+
+			queue.SendMessage(
+				user_actions.TopicUserActionsEthereum,
+				transferUserAction,
+			)
+
 		}
 
 		serverWork := worker.EthereumHintedBlock{

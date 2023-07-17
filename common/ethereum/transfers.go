@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-
 	ethCommon "github.com/ethereum/go-ethereum/common"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -52,6 +52,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			transferContractAddress_ = transferLog.Address.String()
 			topics                   = transferLog.Topics
 			logIndex                 = transferLog.Index
+			logData                  = transferLog.Data
 		)
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
@@ -114,11 +115,33 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		var decorator *worker.EthereumWorkerDecorator
 
+		volumeBigInt, err := getTransferVolume(logData)
+
+		if err != nil {
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Could not coerce data to swap amount! Err: %v",
+					err,
+				)
+			})
+
+			continue
+		}
+
+		if volumeBigInt == nil {
+			log.Debug(func(k *log.Log) {
+				k.Message = "Returned big.Int was nil when decoding a transfer!"
+			})
+
+			continue
+		}
+
 		utility, exists := utilities[ethereum.AddressFromString(transferContractAddress)]
 
 		if exists {
 			decorator = &worker.EthereumWorkerDecorator{
 				UtilityName: utility,
+				Volume:      volumeBigInt,
 			}
 		}
 
@@ -192,7 +215,7 @@ func IsTransferLogTopic(topic string) bool {
 	return topic == TransferLogTopic
 }
 
-func GetTransferVolume(data []byte) (*big.Int, error) {
+func getTransferVolume(data []byte) (*big.Int, error) {
 	ethAbiType := ethAbi.Type{
 		T: ethAbi.UintTy,
 	}
