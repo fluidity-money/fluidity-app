@@ -11,18 +11,18 @@ SERVICES:
     ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-spooler-usdc
     ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.usdc
     ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.usdc
-    ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:USDC:6,wombat initial boost:WOM:18,chronos initial boost:USDC:6"
+    ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:USDC:6,wombat initial boost:WOM:18,chronos initial boost:USDC:6,sushi initial boost:USDC:6"
 
  - SPOOLER_USDT:
     SERVICE_NAME: microservice-arbitrum-worker-spooler-usdt
     ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-spooler-usdt
     ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.usdt
     ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.usdt
-    ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:USDT:6,wombat initial boost:WOM:18,chronos initial boost:USDC:6"
+    ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:USDT:6,wombat initial boost:WOM:18,chronos initial boost:USDC:6,sushi initial boost:USDC:6"
 
  - SPOOLER_DAI:
     SERVICE_NAME: microservice-arbitrum-worker-spooler-dai
     ENV_FLU_WORKER_ID: arbitrum-microservice-arbitrum-worker-spooler-dai
     ENV_FLU_ETHEREUM_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.dai
     ENV_FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME: arbitrum.winners.batched.dai
-    ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:DAI:18,wombat initial boost:WOM:18,chronos initial boost:USDC:6"
+    ENV_FLU_ETHERUEM_UTILITY_TOKEN_DETAILS: "FLUID:DAI:18,wombat initial boost:WOM:18,chronos initial boost:USDC:6,sushi initial boost:USDC:6"
