@@ -1,0 +1,10 @@
+SERVICES:
+  - ARB_FANFARE:
+      SERVICE_NAME: microservice-zkevm-fanfare-fluidity-money
+      DOCKERFILE_PATH: ./cmd/microservice-fanfare-fluidity-money
+      DOCKER_IMAGE: microservice-zkevm-fanfare-fluidity-money
+      TARGET_GROUP: flu-mainnet-zkevm-fanfare-tg
+      ENV_FLU_WORKER_ID: zkevm-microservice-fanfare-fluidity-money
+      ENV_FLU_ETHEREUM_NETWORK: polygon-zk
+
+
