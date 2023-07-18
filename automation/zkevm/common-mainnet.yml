@@ -1,4 +1,4 @@
-CLUSTER: zkevm-ec2
+CLUSTER: arbitrum-ec2
 ORG_ROOT: fluidity
 ENABLE: true
 LAUNCH_TYPE: EC2
