@@ -332,10 +332,16 @@ contract Token is
          // if the fee amount > 0 and the burn fee is greater than 0, then
          // we take burn fee% of the amount given by the user
 
-        uint256 feeAmount =
-            (burnFee_ != 0 && _amount > burnFee_)
-                ? (_amount * burnFee_) / FEE_DENOM
-                : 0;
+        bool shouldTakeFee = !feeWhitelisted_[_sender];
+
+        uint256 feeAmount = 0;
+
+        if (shouldTakeFee) {
+            feeAmount =
+                (burnFee_ != 0 && _amount > burnFee_)
+                    ? (_amount * burnFee_) / FEE_DENOM
+                    : 0;
+        }
 
         // burn burnAmount
 
