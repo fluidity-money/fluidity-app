@@ -257,22 +257,22 @@ export default function Rewards() {
 
   const txTableFilters = address
     ? [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-      {
-        filter: ({ sender, receiver }: Transaction) =>
-          [sender, receiver].includes(address),
-        name: "MY REWARDS",
-      },
-    ]
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+        {
+          filter: ({ sender, receiver }: Transaction) =>
+            [sender, receiver].includes(address),
+          name: "MY REWARDS",
+        },
+      ]
     : [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-    ];
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+      ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
@@ -521,7 +521,7 @@ export default function Rewards() {
                   }
                 >
                   {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
-                    <div className="table-token">
+                    <div key={utility} className="table-token">
                       <UtilityToken utility={utility} />
                       <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
                     </div>

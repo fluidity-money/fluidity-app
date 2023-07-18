@@ -58,13 +58,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ] = await Promise.all(
       address
         ? [
-          useUserRewardsByAddress(network ?? "", address),
-          useUserPendingRewardsByAddress(network ?? "", address),
-        ]
+            useUserRewardsByAddress(network ?? "", address),
+            useUserPendingRewardsByAddress(network ?? "", address),
+          ]
         : [
-          useUserRewardsAll(network ?? ""),
-          useUserPendingRewardsAll(network ?? ""),
-        ]
+            useUserRewardsAll(network ?? ""),
+            useUserPendingRewardsAll(network ?? ""),
+          ]
     );
 
     if (
@@ -125,25 +125,25 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
           return winner.utility_name === FLUID_UTILITY
             ? {
-              ...map,
-              [winner.send_transaction_hash]: {
-                ...sameTxWinner,
-                normalisedAmount: normalisedAmount + currentFluidAmount,
-              },
-            }
-            : {
-              ...map,
-              [winner.send_transaction_hash]: {
-                ...sameTxWinner,
-
-                utility: {
-                  ...currentUtilityReward,
-                  [utilityName]:
-                    normalisedAmount +
-                    (currentUtilityReward[utilityName] || 0),
+                ...map,
+                [winner.send_transaction_hash]: {
+                  ...sameTxWinner,
+                  normalisedAmount: normalisedAmount + currentFluidAmount,
                 },
-              },
-            };
+              }
+            : {
+                ...map,
+                [winner.send_transaction_hash]: {
+                  ...sameTxWinner,
+
+                  utility: {
+                    ...currentUtilityReward,
+                    [utilityName]:
+                      normalisedAmount +
+                      (currentUtilityReward[utilityName] || 0),
+                  },
+                },
+              };
         },
         {} as {
           [transaction_hash: string]: Winner & {
@@ -192,20 +192,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           const { data: transactionsData, errors: transactionsErr } =
             await (address
               ? useUserTransactionsByAddress(
-                network,
-                token ? [token] : getTokenForNetwork(network),
-                page,
-                address as string,
-                filterHashes,
-                12
-              )
+                  network,
+                  token ? [token] : getTokenForNetwork(network),
+                  page,
+                  address as string,
+                  filterHashes,
+                  12
+                )
               : useUserTransactionsAll(
-                network,
-                token ? [token] : getTokenForNetwork(network),
-                page,
-                filterHashes,
-                12
-              ));
+                  network,
+                  token ? [token] : getTokenForNetwork(network),
+                  page,
+                  filterHashes,
+                  12
+                ));
 
           if (!transactionsData || transactionsErr) {
             captureException(
@@ -250,7 +250,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-              (currency === "DAI" || currency === "fDAI")
+            (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -279,14 +279,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         tx.sender === MintAddress
           ? "in"
           : tx.receiver === MintAddress
-            ? "out"
-            : undefined;
+          ? "out"
+          : undefined;
 
       const winner:
         | (Winner & {
-          normalisedAmount: number;
-          utility: { [utility: string]: number };
-        })
+            normalisedAmount: number;
+            utility: { [utility: string]: number };
+          })
         | undefined = jointWinnersMap[tx.hash];
 
       const winnerAddress = winner?.winning_address ?? "";
