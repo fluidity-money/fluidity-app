@@ -40,7 +40,7 @@ import {
   toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
-import { ToolTipContent, useToolTip } from "~/components";
+import { ToolTipContent, useToolTip, UtilityToken } from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
@@ -240,14 +240,14 @@ export default function Rewards() {
         return [
           { name: "ACTIVITY" },
           { name: "FLUID REWARDS" },
-          { name: "$SUSHI REWARDS" },
+          { name: "$UTILITY REWARDS" },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$SUSHI REWARDS" },
+          { name: "$UTILTY REWARDS" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -257,22 +257,22 @@ export default function Rewards() {
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({ sender, receiver }: Transaction) =>
-            [sender, receiver].includes(address),
-          name: "MY REWARDS",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({ sender, receiver }: Transaction) =>
+          [sender, receiver].includes(address),
+        name: "MY REWARDS",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
@@ -509,9 +509,8 @@ export default function Rewards() {
           {/* Utility Rewards */}
           {!isMobile && (
             <td>
-              {utilityTokens ? (
+              {utilityTokens && Object.keys(utilityTokens).length ? (
                 <a
-                  className="table-token"
                   onClick={() =>
                     handleRewardTransactionClick(
                       network,
@@ -521,8 +520,12 @@ export default function Rewards() {
                     )
                   }
                 >
-                  <img src="/images/providers/Sushiswap.svg" />
-                  <Text>{toDecimalPlaces(utilityTokens, 4)}</Text>
+                  {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
+                    <div className="table-token">
+                      <UtilityToken utility={utility} />
+                      <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
+                    </div>
+                  ))}
                 </a>
               ) : (
                 <Text>-</Text>

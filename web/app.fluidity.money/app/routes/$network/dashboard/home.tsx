@@ -24,7 +24,7 @@ import {
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
-import { Table, ToolTipContent, useToolTip } from "~/components";
+import { Table, ToolTipContent, useToolTip, UtilityToken } from "~/components";
 import {
   transactionActivityLabel,
   transactionTimeLabel,
@@ -254,7 +254,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$SUSHI REWARDS" },
+          { name: "$UTILITY REWARDS" },
           { name: "ACCOUNT" },
         ];
       default:
@@ -262,7 +262,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$SUSHI REWARDS" },
+          { name: "$UTILITY REWARDS" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -271,27 +271,27 @@ export default function Home() {
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({
-            sender,
-            receiver,
-          }: {
-            sender: string;
-            receiver: string;
-          }) => [sender, receiver].includes(address),
-          name: "MY DASHBOARD",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({
+          sender,
+          receiver,
+        }: {
+          sender: string;
+          receiver: string;
+        }) => [sender, receiver].includes(address),
+        name: "MY DASHBOARD",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   const {
     count,
@@ -437,9 +437,8 @@ export default function Home() {
           {/* Utility column */}
           {!isMobile && (
             <td>
-              {utilityTokens ? (
+              {utilityTokens && Object.keys(utilityTokens).length ? (
                 <a
-                  className="table-token"
                   onClick={() =>
                     handleRewardTransactionClick(
                       network,
@@ -449,8 +448,12 @@ export default function Home() {
                     )
                   }
                 >
-                  <img src="/images/providers/Sushiswap.svg" />
-                  <Text>{toDecimalPlaces(utilityTokens, 4)}</Text>
+                  {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
+                    <div className="table-token">
+                      <UtilityToken utility={utility} />
+                      <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
+                    </div>
+                  ))}
                 </a>
               ) : (
                 <Text>-</Text>
@@ -516,8 +519,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
+                      ? "Weekly available rewards"
+                      : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -527,9 +530,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
+                        ({ network: rewardNetwork }) =>
+                          rewardNetwork === network
+                      )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
