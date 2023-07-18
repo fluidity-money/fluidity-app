@@ -11,7 +11,7 @@ const UtilityToken = ({ utility, ...imgProps }: IUtilityToken) => {
     case "sushi":
       return <img {...imgProps} src="/images/providers/Sushiswap.svg" />;
     default:
-      return <img {...imgProps} src="/assets/tokens/fUSDC" />;
+      return <img {...imgProps} src="/assets/tokens/fUSDC.svg" />;
   }
 };
 
