@@ -159,9 +159,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const jointWinnersMap = createWinnerMap(jointWinners);
 
     // used to filter out reward transactions
-    const jointPayoutTxHashes = jointWinners
-      .map(({ transaction_hash }) => transaction_hash)
-      .filter((hash) => hash);
+    const jointPayoutTxHashes = [
+      ...new Set(
+        jointWinners
+          .map(({ transaction_hash }) => transaction_hash)
+          .filter((hash) => hash)
+      ),
+    ];
 
     const chunkArray = <T,>(arr: T[], size: number): T[][] =>
       arr.reduce(
