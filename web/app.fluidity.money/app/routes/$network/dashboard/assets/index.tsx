@@ -1,7 +1,7 @@
 import type { AssetLoaderData } from "../../query/dashboard/assets";
 
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   CollapsibleCard,
   TokenCard,
@@ -48,18 +48,66 @@ const allAssetsVariants = {
   },
 };
 
+type AugmentedToken = Token & {
+  fluidAmt: number;
+};
+
 const FluidAssets = () => {
   const { tokens } = useLoaderData<LoaderData>();
 
+  const { balance } = useContext(FluidityFacadeContext);
+
+  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([])
+  const [sortingStrategy, setSortingStrategy] = useState<'desc'>('desc');
+
+  const fetchFluidAmtForTokens = useCallback(async () => {
+    const tokensWithFluidAmt = await Promise.all(
+      tokens.map(async (token) => {
+        const fluidAmt = await balance?.(token.address);
+        return {
+          ...token,
+          fluidAmt: getUsdFromTokenAmount(fluidAmt || new BN(0), token),
+        };
+      })
+    );
+
+    setAugmentedTokens(tokensWithFluidAmt);
+  }, [tokens, balance])
+
+  useEffect(() => {
+    if (!balance) return
+
+    fetchFluidAmtForTokens();
+  }, [tokens, balance]);
+
+  const sortedTokensMemoized = useMemo(() => {
+    if (!augmentedTokens) return [];
+
+    const sortedTokensCopy = [...augmentedTokens];
+
+    if (sortingStrategy === 'desc') {
+      sortedTokensCopy.sort((a, b) => {
+        return b.fluidAmt - a.fluidAmt;
+      });
+    }
+
+    return sortedTokensCopy;
+  }, [augmentedTokens, sortingStrategy]);
+
+  if (!balance) {
+    return <></>
+  }
+
   return (
     <motion.div
-      key="fluid-assets"
+      key={`fluid-assets-${sortedTokensMemoized}`}
       variants={allAssetsVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
+      style={{ minHeight: '100vh' }}
     >
-      {tokens.map((t, i) => {
+      {sortedTokensMemoized.map((t, i) => {
         return <CardWrapper key={i} token={t} />;
       })}
     </motion.div>
@@ -81,29 +129,6 @@ type Activity = {
   reward: number;
   transaction: string;
   time: number;
-};
-
-type AugmentedActivity = Activity & {
-  totalWalletValue: number;
-};
-
-const getAugmentedWalletActivity = (
-  activity: Activity[],
-  walletValue: number
-): AugmentedActivity[] => {
-  activity.sort((a, b) => a.time - b.time);
-
-  return activity.map((a, i) => {
-    const totalWalletValueDelta = activity
-      .slice(0, i + 1)
-      .reduce((acc, curr) => {
-        return curr.desc === "Sent" ? acc - curr.value : acc + curr.value;
-      }, walletValue);
-    return {
-      ...a,
-      totalWalletValue: totalWalletValueDelta,
-    };
-  });
 };
 
 const assetVariants = {
@@ -171,11 +196,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const { topPrize, avgPrize, topAssetPrize, activity } = data;
 
-  const augmentedActivity = getAugmentedWalletActivity(
-    activity,
-    getUsdFromTokenAmount(quantities.fluidAmt || new BN(0), token.decimals)
-  );
-
   return (
     <motion.div style={{ marginBottom: "1em" }} variants={assetVariants}>
       <CollapsibleCard expanded={false}>
@@ -207,7 +227,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
                 topAssetPrize.winning_amount / 10 ** token.decimals,
               transaction_hash: topAssetPrize.transaction_hash,
             }}
-            activity={augmentedActivity}
+            activity={activity}
             onClickFullHistory={() => navigate(`/${network}/dashboard/rewards`)}
           />
         </CollapsibleCard.Details>
