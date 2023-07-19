@@ -2,11 +2,12 @@ import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { CollapsibleCard, TokenCard } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { AugmentedToken } from "./index";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -60,15 +61,60 @@ const allAssetsVariants = {
 const RegularAssets = () => {
   const { tokens } = useLoaderData<LoaderData>();
 
+  const { balance } = useContext(FluidityFacadeContext);
+
+  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([])
+  const [sortingStrategy, setSortingStrategy] = useState<'desc'>('desc');
+
+  const fetchFluidAmtForTokens = useCallback(async () => {
+    const tokensWithFluidAmt = await Promise.all(
+      tokens.map(async (token) => {
+        const fluidAmt = await balance?.(token.address);
+        return {
+          ...token,
+          usdAmount: getUsdFromTokenAmount(fluidAmt || new BN(0), token),
+        };
+      })
+    );
+
+    setAugmentedTokens(tokensWithFluidAmt);
+  }, [tokens, balance])
+
+  useEffect(() => {
+    if (!balance) return
+
+    fetchFluidAmtForTokens();
+  }, [tokens, balance]);
+
+  const sortedTokensMemoized = useMemo(() => {
+    if (!augmentedTokens) return [];
+
+    const sortedTokensCopy = [...augmentedTokens];
+
+    if (sortingStrategy === 'desc') {
+      sortedTokensCopy.sort((a, b) => {
+        return b.usdAmount - a.usdAmount;
+      });
+    }
+
+    return sortedTokensCopy;
+  }, [augmentedTokens, sortingStrategy]);
+
+  if (!balance) {
+    return <></>
+  }
+
   return (
     <motion.div
+      key={`all-assets-${sortedTokensMemoized}`}
       variants={allAssetsVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
+      style={{ minHeight: 750 }}
     >
       <Suspense fallback={"loading"}>
-        {tokens.map((t, i) => {
+        {sortedTokensMemoized.map((t, i) => {
           return <CardWrapper key={i} token={t} />;
         })}
       </Suspense>

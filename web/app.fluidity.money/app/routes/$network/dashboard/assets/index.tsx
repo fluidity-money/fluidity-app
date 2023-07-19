@@ -48,8 +48,8 @@ const allAssetsVariants = {
   },
 };
 
-type AugmentedToken = Token & {
-  fluidAmt: number;
+export type AugmentedToken = Token & {
+  usdAmount: number;
 };
 
 const FluidAssets = () => {
@@ -66,7 +66,7 @@ const FluidAssets = () => {
         const fluidAmt = await balance?.(token.address);
         return {
           ...token,
-          fluidAmt: getUsdFromTokenAmount(fluidAmt || new BN(0), token),
+          usdAmount: getUsdFromTokenAmount(fluidAmt || new BN(0), token),
         };
       })
     );
@@ -87,7 +87,7 @@ const FluidAssets = () => {
 
     if (sortingStrategy === 'desc') {
       sortedTokensCopy.sort((a, b) => {
-        return b.fluidAmt - a.fluidAmt;
+        return b.usdAmount - a.usdAmount;
       });
     }
 
@@ -105,7 +105,7 @@ const FluidAssets = () => {
       initial="hidden"
       animate="visible"
       exit="exit"
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: 750 }}
     >
       {sortedTokensMemoized.map((t, i) => {
         return <CardWrapper key={i} token={t} />;
