@@ -172,6 +172,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			network_,
 			"receive",
 			logIndex,
+			application,
 		)
 
 		if err != nil {
