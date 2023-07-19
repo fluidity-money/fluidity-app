@@ -507,7 +507,20 @@ func main() {
 					payouts []PayoutDetails
 				)
 
+				zeroRat := big.NewRat(0, 1)
+
 				for _, pool := range pools {
+					if pool.PoolSizeNative.Cmp(zeroRat) == 0 {
+						log.Debug(func(k *log.Log) {
+							k.Format(
+								"Skipping empty pool %+v!",
+								pool,
+							)
+						})
+
+						continue
+					}
+
 					calculationType := pool.CalculationType
 
 					if calculationType == workerTypes.CalculationTypeNormal {
