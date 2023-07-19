@@ -136,13 +136,14 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			continue
 		}
 
+		decorator = &worker.EthereumWorkerDecorator{
+			Volume: volumeBigInt,
+		}
+
 		utility, exists := utilities[ethereum.AddressFromString(transferContractAddress)]
 
 		if exists {
-			decorator = &worker.EthereumWorkerDecorator{
-				UtilityName: utility,
-				Volume:      volumeBigInt,
-			}
+			decorator.UtilityName = utility
 		}
 
 		transfer := worker.EthereumDecoratedTransfer{
