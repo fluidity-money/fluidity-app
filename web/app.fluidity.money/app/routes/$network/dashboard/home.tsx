@@ -24,7 +24,7 @@ import {
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
-import { Table, ToolTipContent, useToolTip } from "~/components";
+import { Table, ToolTipContent, useToolTip, UtilityToken } from "~/components";
 import {
   transactionActivityLabel,
   transactionTimeLabel,
@@ -254,7 +254,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$UTILITY REWARDS" },
           { name: "ACCOUNT" },
         ];
       default:
@@ -262,7 +262,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$UTILITY REWARDS" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -377,7 +377,7 @@ export default function Home() {
         rewardHash,
         currency,
         logo,
-        wombatTokens,
+        utilityTokens,
       } = data;
 
       return (
@@ -434,12 +434,11 @@ export default function Home() {
             </td>
           )}
 
-          {/* WOM */}
+          {/* Utility column */}
           {!isMobile && (
             <td>
-              {wombatTokens ? (
+              {utilityTokens && Object.keys(utilityTokens).length ? (
                 <a
-                  className="table-token"
                   onClick={() =>
                     handleRewardTransactionClick(
                       network,
@@ -449,8 +448,12 @@ export default function Home() {
                     )
                   }
                 >
-                  <img src="/images/providers/wombat.svg" />
-                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
+                  {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
+                    <div key={utility} className="table-token">
+                      <UtilityToken utility={utility} />
+                      <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
+                    </div>
+                  ))}
                 </a>
               ) : (
                 <Text>-</Text>

@@ -12,7 +12,7 @@ type Transaction = {
   logo: string;
   provider: string;
   swapType?: "in" | "out";
-  wombatTokens?: number;
+  utilityTokens?: { [tokens: string]: number };
 };
 
 export default Transaction;
