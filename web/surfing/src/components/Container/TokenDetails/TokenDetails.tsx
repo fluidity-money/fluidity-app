@@ -8,12 +8,12 @@ import { numberToMonetaryString, trimAddress, useViewport } from "~/util";
 import styles from "./TokenDetails.module.scss";
 
 export type ITokenDetails = {
-  topPrize: { 
+  topPrize: {
     winning_amount: number
     transaction_hash: string
   }
   avgPrize: number
-  topAssetPrize: { 
+  topAssetPrize: {
     winning_amount: number
     transaction_hash: string
   }
@@ -23,6 +23,10 @@ export type ITokenDetails = {
     reward: number
     transaction: string
     totalWalletValue: number
+  }[]
+  graphData: {
+    x: number
+    y: number
   }[]
   onClickFullHistory: () => void
 }
@@ -38,11 +42,12 @@ const TokenDetails = ({
   topAssetPrize,
   activity,
   onClickFullHistory,
+  graphData
 }: ITokenDetails) => {
   const mobileBreakpoint = 1200
   const { width } = useViewport()
   const isMobile = width < mobileBreakpoint
-  
+
   return (
     <div className={`${styles.TokenDetails} ${isMobile ? styles.isMobile : ''}`}>
       {/* Prize & Activity */}
@@ -84,12 +89,12 @@ const TokenDetails = ({
               </tr>
             </thead>
             <tbody>
-            { activity.length ? (
-                activity.slice(0,3).map(({desc, value, reward, transaction}) => (
+              {activity.length ? (
+                activity.slice(0, 3).map(({ desc, value, reward, transaction }) => (
                   <tr key={`tx-${transaction}`}>
                     <td>
                       <Text>
-                      {isMobile ? (<a href={getTxExplorerLink('ethereum', transaction)}>{`${desc} ${numberToMonetaryString(value)}`}</a>) : (<>{desc}</>) }
+                        {isMobile ? (<a href={getTxExplorerLink('ethereum', transaction)}>{`${desc} ${numberToMonetaryString(value)}`}</a>) : (<>{desc}</>)}
                       </Text>
                     </td>
                     {!isMobile && <td><Text>{numberToMonetaryString(value)}</Text></td>}
@@ -97,37 +102,32 @@ const TokenDetails = ({
                     {!isMobile && <td><Text><a href={getTxExplorerLink('ethereum', transaction)}>{trimAddress(transaction)}</a></Text></td>}
                   </tr>
                 ))
-            ) : (
+              ) : (
                 <tr>
                   <td><Text>No recent activity found.</Text></td>
                 </tr>
-            )} 
+              )}
             </tbody>
           </table>
         </div>
 
         <LinkButton type="internal" size="small" handleClick={onClickFullHistory} >Full History</LinkButton>
       </div>
-      <motion.div 
+      <motion.div
         className={styles.graph}
         initial={{ opacity: 0, }}
         animate={{ opacity: 1, }}
         exit={{ opacity: 0, }}
         transition={{ delay: 0.2, duration: 0.3, ease: 'easeInOut' }}
       >
-        <LineChart 
-          data={activity.map((a, i) => {
-            return {
-              x: i,
-              y: a.totalWalletValue,
-            }
-          })}
+        <LineChart
+          data={graphData}
           lineLabel={"activity"}
           accessors={{
-            xAccessor: ({x}: {x: number, y: number}) => x,
-            yAccessor: ({y}: {x: number, y: number}) => y,
+            xAccessor: ({ x }: { x: number, y: number }) => x,
+            yAccessor: ({ y }: { x: number, y: number }) => y,
           }}
-          renderTooltip={() => {<></>}}
+          renderTooltip={() => { <></> }}
         />
       </motion.div>
     </div>
