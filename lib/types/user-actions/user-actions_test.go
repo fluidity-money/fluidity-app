@@ -7,6 +7,7 @@ package user_actions
 import (
 	"testing"
 
+	solApplications "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -52,6 +53,7 @@ func (suite *UserActionsTestSuite) SetupTest() {
 		"fTEST",
 		6,
 		misc.BigIntFromInt64(1),
+		0,
 	)
 
 	suite.solSend = NewSendSolana(
@@ -61,6 +63,7 @@ func (suite *UserActionsTestSuite) SetupTest() {
 		misc.BigIntFromInt64(123456789),
 		"fTEST",
 		6,
+		make([]solApplications.Application, 0),
 	)
 }
 

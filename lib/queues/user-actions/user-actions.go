@@ -7,7 +7,9 @@ package user_actions
 // user_actions contains queue code that receives user actions
 
 import (
+	solApplications "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -60,7 +62,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 	)
 }
 
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) UserAction {
+func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt, application applications.Application) UserAction {
 	return user_actions.NewSendEthereum(
 		network_,
 		senderAddress,
@@ -70,10 +72,11 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 		tokenShortName,
 		tokenDecimals,
 		logIndex,
+		application,
 	)
 }
 
-func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int, applications []solApplications.Application) UserAction {
 	return user_actions.NewSendSolana(
 		senderAddress,
 		recipientAddress,
@@ -81,6 +84,7 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 		amount,
 		tokenShortName,
 		tokenDecimals,
+		applications,
 	)
 }
 

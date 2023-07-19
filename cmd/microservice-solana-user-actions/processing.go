@@ -20,6 +20,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
+	"github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/common/solana/fluidity"
 	spl_token "github.com/fluidity-money/fluidity-app/common/solana/spl-token"
 )
@@ -204,7 +205,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 // processSplTransaction, returning possibly two transfers depending on
 // what's contained within the spl transaction
-func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
+func processSplTransaction(transactionHash string, instruction solana.TransactionInstruction, adjustedFee *big.Rat, accounts []string, fluidityOwners []string, fluidityTokenMintAddress, fluidityPdaPubkey string, tokenDetails token_details.TokenDetails, applications []applications.Application) (transfer1 *user_actions.UserAction, transfer2 *user_actions.UserAction, err error) {
 	splTransaction, err := spl_token.DecodeSplUserAction(instruction.Data)
 
 	if errors.Is(err, fluidity.UnknownInstructionError) {
@@ -263,6 +264,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 				transferAmount,
 				tokenDetails.TokenShortName,
 				tokenDetails.TokenDecimals,
+				applications,
 			)
 
 			transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
@@ -312,6 +314,7 @@ func processSplTransaction(transactionHash string, instruction solana.Transactio
 				transferAmount,
 				tokenDetails.TokenShortName,
 				tokenDetails.TokenDecimals,
+				applications,
 			)
 
 			transfer_.SolanaSenderOwnerAddress = senderOwnerAddress
