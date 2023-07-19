@@ -46,6 +46,7 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -257,22 +258,22 @@ export default function Rewards() {
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({ sender, receiver }: Transaction) =>
-            [sender, receiver].includes(address),
-          name: "MY REWARDS",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({ sender, receiver }: Transaction) =>
+          [sender, receiver].includes(address),
+        name: "MY REWARDS",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
@@ -424,6 +425,7 @@ export default function Rewards() {
         logo,
         currency,
         utilityTokens,
+        application,
       } = data;
 
       const toolTip = useToolTip();
@@ -447,6 +449,8 @@ export default function Rewards() {
           );
       };
 
+      const appProviderName = getProviderDisplayName(application);
+
       return (
         <motion.tr
           key={`${timestamp}-${index}`}
@@ -466,7 +470,11 @@ export default function Rewards() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img src={logo} />
+              {appProviderName !== "Fluidity" ? (
+                <ProviderIcon provider={appProviderName} />
+              ) : (
+                <TokenIcon token={currency} />
+              )}
               <Text>{transactionActivityLabel(data, winner)}</Text>
             </a>
           </td>
