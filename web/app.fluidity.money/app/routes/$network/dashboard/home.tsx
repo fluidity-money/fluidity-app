@@ -38,6 +38,7 @@ import dashboardHomeStyle from "~/styles/dashboard/home.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { GraphEntry } from "~/queries/useGraphData";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -383,6 +384,8 @@ export default function Home() {
         application,
       } = data;
 
+      const appProviderName = getProviderDisplayName(application);
+
       return (
         <motion.tr
           key={`${timestamp}-${index}`}
@@ -402,8 +405,8 @@ export default function Home() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              {application !== "none" ? (
-                <ProviderIcon provider={application} />
+              {appProviderName !== "Fluidity" ? (
+                <ProviderIcon provider={appProviderName} />
               ) : (
                 <TokenIcon token={currency} />
               )}

@@ -46,6 +46,7 @@ import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -448,6 +449,8 @@ export default function Rewards() {
           );
       };
 
+      const appProviderName = getProviderDisplayName(application);
+
       return (
         <motion.tr
           key={`${timestamp}-${index}`}
@@ -467,8 +470,8 @@ export default function Rewards() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              {application && application !== "none" ? (
-                <ProviderIcon provider={application} />
+              {appProviderName !== "Fluidity" ? (
+                <ProviderIcon provider={appProviderName} />
               ) : (
                 <TokenIcon token={currency} />
               )}
