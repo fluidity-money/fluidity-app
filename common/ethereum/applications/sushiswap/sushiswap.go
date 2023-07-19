@@ -181,15 +181,15 @@ func GetSushiswapStableFees(transfer worker.EthereumApplicationTransfer, client 
 		tokenIn  = transfer.Log.Topics[2]
 		tokenOut = transfer.Log.Topics[3]
 
-		amountIn   = swapAmounts[0]
+		amountIn = swapAmounts[0]
 
 		// per https://github.com/sushiswap/trident/blob/b4f1e3bdaa8ebfbb8881c9794b03cb439879171c/contracts/pool/stable/StablePool.sol#L37
 		// swapFee is in 100ths of a %, so 10000 represents a 100% fee
-		maxFee = big.NewRat(10000, 1) 
+		maxFee = big.NewRat(10000, 1)
 	)
 
 	var (
-		amountInDecimals *big.Rat 
+		amountInDecimals *big.Rat
 
 		tokenInAddress  = ethCommon.HexToAddress(tokenIn.String())
 		tokenOutAddress = ethCommon.HexToAddress(tokenOut.String())
@@ -229,7 +229,7 @@ func GetSushiswapStableFees(transfer worker.EthereumApplicationTransfer, client 
 		} else {
 			decimals_, err = ethereum.StaticCall(client, contractAddr, sushiswapStablePoolAbi, "decimals0")
 		}
-		
+
 		if err != nil {
 			return feeData, fmt.Errorf(
 				"Failed to fetch decimals for non-fluid token in pair! %v",
