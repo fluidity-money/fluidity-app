@@ -48,6 +48,8 @@
   * [🙋 How can I Fluid Wrap my custom token?](docs/developers/how-to-support-my-token.md)
   * [📊 GraphQL](docs/developers/graphql.md)
   * [🧾 Dev Tutorials](docs/developers/tutorials/README.md)
+    * [⛏ Creating a New Utility Mining Client](docs/developers/tutorials/creating-a-new-utility-mining-client.md)
+    * [👩💻 Supporting a New Application](docs/developers/tutorials/supporting-a-new-application.md)
     * [💸 Sending and receiving a Fluid Asset](docs/developers/tutorials/sending-and-receiving-a-fluid-asset.md)
     * [🚄 Supporting a Fluid Asset on your DEX/AMM/exchange](docs/developers/tutorials/supporting-a-fluid-asset-on-your-dex-amm-exchange.md)
     * [🎁 Wrapping and unwrapping a Fluid Asset in your app](docs/developers/tutorials/wrapping-and-unwrapping-a-fluid-asset-in-your-app.md)
