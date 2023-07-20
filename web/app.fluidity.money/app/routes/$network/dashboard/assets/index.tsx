@@ -57,8 +57,8 @@ const FluidAssets = () => {
 
   const { balance } = useContext(FluidityFacadeContext);
 
-  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([])
-  const [sortingStrategy, setSortingStrategy] = useState<'desc'>('desc');
+  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([]);
+  const [sortingStrategy, setSortingStrategy] = useState<"desc">("desc");
 
   const fetchFluidAmtForTokens = useCallback(async () => {
     const tokensWithFluidAmt = await Promise.all(
@@ -72,10 +72,10 @@ const FluidAssets = () => {
     );
 
     setAugmentedTokens(tokensWithFluidAmt);
-  }, [tokens, balance])
+  }, [tokens, balance]);
 
   useEffect(() => {
-    if (!balance) return
+    if (!balance) return;
 
     fetchFluidAmtForTokens();
   }, [tokens, balance]);
@@ -85,17 +85,17 @@ const FluidAssets = () => {
 
     const sortedTokensCopy = [...augmentedTokens];
 
-    if (sortingStrategy === 'desc') {
+    if (sortingStrategy === "desc") {
       sortedTokensCopy.sort((a, b) => {
         return b.usdAmount - a.usdAmount;
       });
     }
 
     return sortedTokensCopy;
-  }, [augmentedTokens, sortingStrategy]);
+  }, [augmentedTokens, sortingStrategy, setSortingStrategy]);
 
   if (!balance) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -123,19 +123,6 @@ type Quantities = {
   regAmt: BN | undefined;
 };
 
-type Activity = {
-  desc: string;
-  value: number;
-  reward: number;
-  transaction: string;
-  time: number;
-};
-
-type GraphActivity = {
-  x: number;
-  y: number;
-}
-
 const assetVariants = {
   hidden: {
     opacity: 0,
@@ -157,7 +144,7 @@ const assetVariants = {
       ease: "easeInOut",
     },
   },
-}
+};
 
 const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
   const { token } = props;
@@ -172,7 +159,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const queryString = `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}`;
 
-  const { data } = useCache<AssetLoaderData>(address ? queryString : '', true);
+  const { data } = useCache<AssetLoaderData>(address ? queryString : "", true);
 
   const navigate = useNavigate();
 
@@ -207,21 +194,20 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     let accum = getUsdFromTokenAmount(
       quantities.fluidAmt || new BN(0),
       token.decimals
-    )
+    );
 
-    graphData.push({ y: accum })
+    graphData.push({ y: accum });
 
-    activity.forEach((a, i) => {
-      a.desc === "Sent" ? accum += a.value : accum -= a.value
-      accum -= a.reward
-      accum = Math.round(accum * 100) / 100
+    activity.forEach((a) => {
+      a.desc === "Sent" ? (accum += a.value) : (accum -= a.value);
+      accum -= a.reward;
+      accum = Math.round(accum * 100) / 100;
 
-      graphData.push({ y: accum })
-    })
+      graphData.push({ y: accum });
+    });
 
-    return graphData.reverse().map((a, i) => ({ x: i, y: a.y }))
+    return graphData.reverse().map((a, i) => ({ x: i, y: a.y }));
   }, [activity, quantities, token.decimals]);
-
 
   return (
     <motion.div style={{ marginBottom: "1em" }} variants={assetVariants}>

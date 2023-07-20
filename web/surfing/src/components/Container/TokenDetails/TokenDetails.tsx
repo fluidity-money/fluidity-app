@@ -22,7 +22,6 @@ export type ITokenDetails = {
     value: number
     reward: number
     transaction: string
-    totalWalletValue: number
   }[]
   graphData: {
     x: number

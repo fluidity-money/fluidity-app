@@ -2,7 +2,14 @@ import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
-import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { CollapsibleCard, TokenCard } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import BN from "bn.js";
@@ -63,8 +70,8 @@ const RegularAssets = () => {
 
   const { balance } = useContext(FluidityFacadeContext);
 
-  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([])
-  const [sortingStrategy, setSortingStrategy] = useState<'desc'>('desc');
+  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([]);
+  const [sortingStrategy, setSortingStrategy] = useState<"desc">("desc");
 
   const fetchFluidAmtForTokens = useCallback(async () => {
     const tokensWithFluidAmt = await Promise.all(
@@ -78,10 +85,10 @@ const RegularAssets = () => {
     );
 
     setAugmentedTokens(tokensWithFluidAmt);
-  }, [tokens, balance])
+  }, [tokens, balance]);
 
   useEffect(() => {
-    if (!balance) return
+    if (!balance) return;
 
     fetchFluidAmtForTokens();
   }, [tokens, balance]);
@@ -91,17 +98,17 @@ const RegularAssets = () => {
 
     const sortedTokensCopy = [...augmentedTokens];
 
-    if (sortingStrategy === 'desc') {
+    if (sortingStrategy === "desc") {
       sortedTokensCopy.sort((a, b) => {
         return b.usdAmount - a.usdAmount;
       });
     }
 
     return sortedTokensCopy;
-  }, [augmentedTokens, sortingStrategy]);
+  }, [augmentedTokens, sortingStrategy, setSortingStrategy]);
 
   if (!balance) {
-    return <></>
+    return <></>;
   }
 
   return (
