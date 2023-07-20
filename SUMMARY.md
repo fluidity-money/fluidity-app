@@ -17,6 +17,8 @@
   * [💠 Ethereum](docs/addresses/ethereum.md)
   * [🅰 Arbitrum](docs/addresses/arbitrum.md)
   * [☀ Solana](docs/addresses/solana.md)
+  * [🐧 Polygon ZK](docs/addresses/polygon-zk.md)
+  * [⚡ ZKSync Era](docs/addresses/zksync-era.md)
 * [🔠 Fundamentals](docs/fundamentals/README.md)
   * [📄 FAQ](docs/fundamentals/faq.md)
   * [🔫 Fluidity Wars](docs/fundamentals/fluidity-wars.md)
