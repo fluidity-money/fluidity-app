@@ -89,6 +89,7 @@ func main() {
 				accountKeys       = transactionResult.Transaction.Message.AccountKeys
 				tokenBalances     = transactionResult.Meta.PostTokenBalances
 				adjustedFee       = transaction.AdjustedFee
+				applications      = transaction.Applications
 			)
 
 			log.Debug(func(k *log.Log) {
@@ -146,6 +147,7 @@ func main() {
 						fluidityTokenMint,
 						fluidityPdaPubkey,
 						tokenDetails,
+						applications,
 					)
 				}
 

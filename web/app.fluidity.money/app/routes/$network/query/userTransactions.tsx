@@ -1,6 +1,5 @@
 import type Transaction from "~/types/Transaction";
 import {
-  PendingWinner,
   useUserPendingRewardsAll,
   useUserPendingRewardsByAddress,
   Winner,
@@ -20,7 +19,7 @@ import { getTokenForNetwork } from "~/util";
 
 const FLUID_UTILITY = "FLUID";
 
-const WOMBAT_UTILITY = "wombat initial boost";
+const ALPHA_NUMERIC = /[a-z0-9]*/i;
 
 type UserTransaction = {
   sender: string;
@@ -29,6 +28,7 @@ type UserTransaction = {
   timestamp: number;
   value: number;
   currency: string;
+  application: string;
 };
 
 export type TransactionsLoaderData = {
@@ -59,13 +59,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ] = await Promise.all(
       address
         ? [
-            useUserRewardsByAddress(network ?? "", address),
-            useUserPendingRewardsByAddress(network ?? "", address),
-          ]
+          useUserRewardsByAddress(network ?? "", address),
+          useUserPendingRewardsByAddress(network ?? "", address),
+        ]
         : [
-            useUserRewardsAll(network ?? ""),
-            useUserPendingRewardsAll(network ?? ""),
-          ]
+          useUserRewardsAll(network ?? ""),
+          useUserPendingRewardsAll(network ?? ""),
+        ]
     );
 
     if (
@@ -77,103 +77,95 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       throw winnersErr;
     }
 
-    // winnersMap looks up if a transaction was the send that caused a win
-    const winnersMap = winnersData.winners.reduce((map, winner) => {
-      const current_fluid_amount =
-        map[winner.send_transaction_hash]?.fluid_win_amount || 0;
+    // set of transaction hashes corresponding to paid rewards
+    const paidTransactionHashes = new Set(
+      winnersData.winners.map(
+        ({ send_transaction_hash }) => send_transaction_hash
+      )
+    );
 
-      const current_utility_reward =
-        map[winner.send_transaction_hash]?.utility || {};
+    // castPending is the list of all pending rewards, casted to Winner
+    const castPending = pendingWinnersData.ethereum_pending_winners
+      // remove non-pending rewards
+      .filter(
+        ({ transaction_hash }) => !paidTransactionHashes.has(transaction_hash)
+      )
+      .map((pending_winner) => {
+        return {
+          network: pending_winner.network,
+          solana_winning_owner_address: null,
+          winning_address: pending_winner.address,
+          created: "",
+          transaction_hash: "",
+          send_transaction_hash: pending_winner.transaction_hash,
+          winning_amount: pending_winner.win_amount,
+          token_decimals: pending_winner.token_decimals,
+          ethereum_application: undefined,
+          solana_application: undefined,
+          reward_type: pending_winner.reward_type,
+          awarded_time: pending_winner.inserted_date,
+          utility_name: pending_winner.utility_name,
+          token_short_name: pending_winner.token_short_name,
+        };
+      });
 
-      return {
-        ...map,
-        [winner.send_transaction_hash]: {
-          ...winner,
-          fluid_win_amount:
-            (winner.utility_name === FLUID_UTILITY
-              ? winner.winning_amount / 10 ** winner.token_decimals
-              : 0) + current_fluid_amount,
-
-          utility:
-            winner.utility_name !== FLUID_UTILITY
-              ? {
-                  ...current_utility_reward,
-                  [winner.utility_name]: {
-                    ...(current_utility_reward[winner.utility_name] || {}),
-                    [winner.token_short_name]:
-                      winner.winning_amount / 10 ** winner.token_decimals +
-                      (current_utility_reward[winner.utility_name]?.[
-                        winner.token_short_name
-                      ] || 0),
-                  },
-                }
-              : { ...current_utility_reward },
-        },
-      };
-    }, {} as { [transaction_hash: string]: Winner & { fluid_win_amount: number; utility: { [utility_name: string]: { [token: string]: number } } } });
-
-    // winnersMap looks up if a transaction was the send that caused a win
-    const pendingWinnersMap =
-      pendingWinnersData.ethereum_pending_winners.reduce(
+    const createWinnerMap = (winners: Winner[]) =>
+      winners.reduce(
         (map, winner) => {
-          const current_fluid_amount =
-            map[winner.transaction_hash]?.fluid_win_amount || 0;
+          const sameTxWinner = map[winner.send_transaction_hash] || winner;
 
-          const current_utility_reward =
-            map[winner.transaction_hash]?.utility || {};
+          const currentFluidAmount: number = sameTxWinner.normalisedAmount || 0;
 
-          return {
-            ...map,
-            [winner.transaction_hash]: {
-              ...winner,
-              fluid_win_amount:
-                (winner.utility_name === FLUID_UTILITY
-                  ? winner.win_amount / 10 ** winner.token_decimals
-                  : 0) + current_fluid_amount,
+          const currentUtilityReward = sameTxWinner.utility || {};
 
-              utility:
-                winner.utility_name !== FLUID_UTILITY
-                  ? {
-                      ...current_utility_reward,
-                      [winner.utility_name]: {
-                        ...(current_utility_reward[winner.utility_name] || {}),
-                        [winner.token_short_name]:
-                          winner.win_amount / 10 ** winner.token_decimals +
-                          (current_utility_reward[winner.utility_name]?.[
-                            winner.token_short_name
-                          ] || 0),
-                      },
-                    }
-                  : { ...current_utility_reward },
-            },
-          };
+          const normalisedAmount =
+            winner.winning_amount / 10 ** winner.token_decimals;
+
+          const utilityName =
+            winner.utility_name.match(ALPHA_NUMERIC)?.[0] ?? FLUID_UTILITY;
+
+          return winner.utility_name === FLUID_UTILITY
+            ? {
+              ...map,
+              [winner.send_transaction_hash]: {
+                ...sameTxWinner,
+                normalisedAmount: normalisedAmount + currentFluidAmount,
+              },
+            }
+            : {
+              ...map,
+              [winner.send_transaction_hash]: {
+                ...sameTxWinner,
+
+                utility: {
+                  ...currentUtilityReward,
+                  [utilityName]:
+                    normalisedAmount +
+                    (currentUtilityReward[utilityName] || 0),
+                },
+              },
+            };
         },
         {} as {
-          [transaction_hash: string]: PendingWinner & {
-            fluid_win_amount: number;
-            utility: { [utility_name: string]: { [token: string]: number } };
+          [transaction_hash: string]: Winner & {
+            normalisedAmount: number;
+            utility: { [tokens: string]: number };
           };
         }
       );
 
-    const jointWinnersMap = {
-      ...pendingWinnersMap,
-      ...winnersMap,
-    };
+    const jointWinners = winnersData.winners.concat(castPending);
 
-    // payoutsMap looks up if a transaction was a payout transaction
-    const winnersPayoutAddrs = winnersData.winners.map(
-      ({ transaction_hash }) => transaction_hash
-    );
+    // jointWinnersMap looks up if a transaction was the send that caused a win
+    const jointWinnersMap = createWinnerMap(jointWinners);
 
-    const pendingWinnersPayoutAddrs = winnersData.winners.map(
-      ({ transaction_hash }) => transaction_hash
-    );
-
-    // Because every ethereum_pending_winners is present in winner
-    // and nothing in ethereum_pending_winners ever gets deleted after a payout (thats moving data to winners)
-    const jointPayoutAddrs = [
-      ...new Set(winnersPayoutAddrs.concat(pendingWinnersPayoutAddrs)),
+    // used to filter out reward transactions
+    const jointPayoutTxHashes = [
+      ...new Set(
+        jointWinners
+          .map(({ transaction_hash }) => transaction_hash)
+          .filter((hash) => hash)
+      ),
     ];
 
     const chunkArray = <T,>(arr: T[], size: number): T[][] =>
@@ -192,30 +184,29 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         [[]] as T[][]
       );
 
-    // Why's this loop here ? - because bitquery cant take in more than 100
+    // Chunk and filter out at most 99 txs at a time.
+    // This is because bitquery cannot take in more than 100
     // jointPayoutAddrs at a time
-    // we do a split and send in 99 if array length of jointPayoutAddrs is
-    // greater than 100.
     const rawUserTransfers = (
       await Promise.all(
-        chunkArray(jointPayoutAddrs, 100).map(async (filterHashes) => {
+        chunkArray(jointPayoutTxHashes, 100).map(async (filterHashes) => {
           const { data: transactionsData, errors: transactionsErr } =
             await (address
               ? useUserTransactionsByAddress(
-                  network,
-                  token ? [token] : getTokenForNetwork(network),
-                  page,
-                  address as string,
-                  filterHashes,
-                  12
-                )
+                network,
+                token ? [token] : getTokenForNetwork(network),
+                page,
+                address as string,
+                filterHashes,
+                12
+              )
               : useUserTransactionsAll(
-                  network,
-                  token ? [token] : getTokenForNetwork(network),
-                  page,
-                  filterHashes,
-                  12
-                ));
+                network,
+                token ? [token] : getTokenForNetwork(network),
+                page,
+                filterHashes,
+                12
+              ));
 
           if (!transactionsData || transactionsErr) {
             captureException(
@@ -232,7 +223,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             throw new Error("Server could not fulfill request");
           }
 
-          return transactionsData[network as string].transfers;
+          return transactionsData.transfers;
         })
       )
     ).flat();
@@ -249,6 +240,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           transaction: { hash },
           amount: value,
           currency: { symbol: currency },
+          application,
         } = transaction;
 
         return {
@@ -260,10 +252,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-            (currency === "DAI" || currency === "fDAI")
+              (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
+          application,
         };
       }
     );
@@ -282,60 +275,52 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       {} as Record<string, string>
     );
 
-    const defaultLogo = "/assets/tokens/usdt.svg";
+    const defaultLogo = "/assets/tokens/fUSDC.svg";
 
     const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
       const swapType =
         tx.sender === MintAddress
           ? "in"
           : tx.receiver === MintAddress
-          ? "out"
-          : undefined;
+            ? "out"
+            : undefined;
 
-      const winner = jointWinnersMap[tx.hash];
+      const winner:
+        | (Winner & {
+          normalisedAmount: number;
+          utility: { [utility: string]: number };
+        })
+        | undefined = jointWinnersMap[tx.hash];
 
-      const isWin = !!winner;
-      const isFromPendingWin = isWin && tx.hash === winner.transaction_hash;
+      const winnerAddress = winner?.winning_address ?? "";
 
-      const winnerAddress = isWin
-        ? isFromPendingWin
-          ? ((winner as PendingWinner)?.address as unknown as string)
-          : ((winner as Winner)?.winning_address as unknown as string)
-        : "";
-
-      const reward = isWin ? winner.fluid_win_amount : 0;
-
-      const hasWombatReward =
-        isWin && winner.utility_name === WOMBAT_UTILITY && reward > 0;
+      const reward = winner?.normalisedAmount || 0;
 
       return {
         sender: tx.sender,
         receiver: tx.receiver,
-        winner: winnerAddress ?? "",
+        winner: winnerAddress,
         reward,
         hash: tx.hash,
-        rewardHash: !isFromPendingWin ? winner?.transaction_hash : "" ?? "",
+        rewardHash: winner?.transaction_hash ?? "",
         currency: tx.currency,
         value: tx.value,
         timestamp: tx.timestamp,
         logo: tokenLogoMap[tx.currency] || defaultLogo,
         provider:
           (network === "ethereum" || network === "arbitrum"
-            ? !isFromPendingWin
-              ? (winner as Winner)?.ethereum_application
-              : (winner as Winner)?.solana_application
-            : "Fluidity") ?? "Fluidity",
+            ? winner?.ethereum_application
+            : winner?.solana_application) ?? "Fluidity",
         swapType,
-        wombatTokens: hasWombatReward
-          ? winner.utility[WOMBAT_UTILITY]?.["WOM"]
-          : undefined,
+        utilityTokens: winner?.utility,
+        application: tx.application,
       };
     });
 
     return json({
       page,
       transactions: mergedTransactions,
-      count: Object.keys(winnersMap).length,
+      count: Object.keys(jointWinnersMap).length,
       loaded: true,
     } satisfies TransactionsLoaderData);
   } catch (err) {

@@ -15,7 +15,7 @@ import { Winner } from "~/queries/useUserRewards";
 
 const FLUID_UTILITY = "FLUID";
 
-const WOMBAT_UTILITY = "wombat initial boost";
+const ALPHA_NUMERIC = /[a-z0-9]*/i;
 
 type UserTransaction = {
   sender: string;
@@ -24,6 +24,7 @@ type UserTransaction = {
   timestamp: number;
   value: number;
   currency: string;
+  application: string;
 };
 
 export type TransactionsLoaderData = {
@@ -53,13 +54,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ] = await Promise.all(
       address
         ? [
-            useUserRewardsByAddress(network ?? "", address),
-            useUserPendingRewardsByAddress(network ?? "", address),
-          ]
+          useUserRewardsByAddress(network ?? "", address),
+          useUserPendingRewardsByAddress(network ?? "", address),
+        ]
         : [
-            useUserRewardsAll(network ?? ""),
-            useUserPendingRewardsAll(network ?? ""),
-          ]
+          useUserRewardsAll(network ?? ""),
+          useUserPendingRewardsAll(network ?? ""),
+        ]
     );
 
     if (
@@ -112,38 +113,51 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       (map, winner) => {
         const sameTxWinner = map[winner.send_transaction_hash] || winner;
 
+        const currentUtilityReward = sameTxWinner.utility || {};
+
         const normalisedAmount =
           winner.winning_amount / 10 ** winner.token_decimals;
 
-        return {
-          ...map,
-          [winner.send_transaction_hash]: {
-            ...sameTxWinner,
-            normalisedAmount:
-              (winner.utility_name === FLUID_UTILITY ? normalisedAmount : 0) +
-              (sameTxWinner.normalisedAmount || 0),
-            utility: {
-              ...sameTxWinner.utility,
-              [winner.utility_name]:
-                (winner.utility_name !== FLUID_UTILITY ? normalisedAmount : 0) +
-                (sameTxWinner.utility?.[winner.utility_name] || 0),
+        const utilityName =
+          winner.utility_name.match(ALPHA_NUMERIC)?.[0] ?? FLUID_UTILITY;
+
+        return winner.utility_name === FLUID_UTILITY
+          ? {
+            ...map,
+            [winner.send_transaction_hash]: {
+              ...sameTxWinner,
+              normalisedAmount:
+                normalisedAmount + (sameTxWinner.normalisedAmount || 0),
             },
-          },
-        };
+          }
+          : {
+            ...map,
+            [winner.send_transaction_hash]: {
+              ...sameTxWinner,
+
+              utility: {
+                ...currentUtilityReward,
+                [utilityName]:
+                  normalisedAmount + (currentUtilityReward[utilityName] || 0),
+              },
+            },
+          };
       },
       {} as {
-        [key: string]: Winner & {
+        [transaction_hash: string]: Winner & {
           normalisedAmount: number;
-          utility: { [utility_name: string]: number };
+          utility: { [tokens: string]: number };
         };
       }
     );
 
     // winnersMap looks up if a transaction was the send that caused a win
-    const winners = Object.values(mergedWinnersMap).slice(
-      (page - 1) * 12,
-      page * 12
-    );
+    const winners = Object.values<
+      Winner & {
+        normalisedAmount: number;
+        utility: { [tokens: string]: number };
+      }
+    >(mergedWinnersMap).slice((page - 1) * 12, page * 12);
 
     const winnerAddrs = winners.map(
       ({ send_transaction_hash }) => send_transaction_hash
@@ -176,9 +190,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       return Error("Server could not fulfill request");
     }
 
-    const {
-      [network as string]: { transfers: transactions },
-    } = userTransactionsData;
+    const { transfers: transactions } = userTransactionsData;
 
     // Destructure GraphQL data
     const userTransactions: UserTransaction[] = transactions.map(
@@ -192,6 +204,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           transaction: { hash },
           amount: value,
           currency: { symbol: currency },
+          application,
         } = transaction;
 
         return {
@@ -203,10 +216,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-            (currency === "DAI" || currency === "fDAI")
+              (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
+          application,
         };
       }
     );
@@ -247,8 +261,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           tx.sender === MintAddress
             ? "in"
             : tx.receiver === MintAddress
-            ? "out"
-            : undefined;
+              ? "out"
+              : undefined;
 
         return {
           sender: tx.sender,
@@ -269,10 +283,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
-          wombatTokens:
-            winner.utility_name === WOMBAT_UTILITY
-              ? winner.utility[WOMBAT_UTILITY]
-              : undefined,
+          utilityTokens: winner.utility,
+          application: tx.application,
         };
       });
 

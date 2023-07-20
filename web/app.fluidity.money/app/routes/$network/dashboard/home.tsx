@@ -21,10 +21,12 @@ import {
   Tooltip,
   TabButton,
   toDecimalPlaces,
+  ProviderIcon,
+  TokenIcon,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
-import { Table, ToolTipContent, useToolTip } from "~/components";
+import { Table, ToolTipContent, useToolTip, UtilityToken } from "~/components";
 import {
   transactionActivityLabel,
   transactionTimeLabel,
@@ -36,6 +38,7 @@ import dashboardHomeStyle from "~/styles/dashboard/home.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { GraphEntry } from "~/queries/useGraphData";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardHomeStyle }];
@@ -254,7 +257,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$UTILITY REWARDS" },
           { name: "ACCOUNT" },
         ];
       default:
@@ -262,7 +265,7 @@ export default function Home() {
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$UTILITY REWARDS" },
           { name: "ACCOUNT" },
           { name: "TIME", alignRight: true },
         ];
@@ -271,27 +274,27 @@ export default function Home() {
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({
-            sender,
-            receiver,
-          }: {
-            sender: string;
-            receiver: string;
-          }) => [sender, receiver].includes(address),
-          name: "MY DASHBOARD",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({
+          sender,
+          receiver,
+        }: {
+          sender: string;
+          receiver: string;
+        }) => [sender, receiver].includes(address),
+        name: "MY DASHBOARD",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   const {
     count,
@@ -377,8 +380,11 @@ export default function Home() {
         rewardHash,
         currency,
         logo,
-        wombatTokens,
+        utilityTokens,
+        application,
       } = data;
+
+      const appProviderName = getProviderDisplayName(application);
 
       return (
         <motion.tr
@@ -399,7 +405,11 @@ export default function Home() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img src={logo} />
+              {appProviderName !== "Fluidity" ? (
+                <ProviderIcon provider={appProviderName} />
+              ) : (
+                <TokenIcon token={currency} />
+              )}
               <Text>{transactionActivityLabel(data, sender)}</Text>
             </a>
           </td>
@@ -434,12 +444,11 @@ export default function Home() {
             </td>
           )}
 
-          {/* WOM */}
+          {/* Utility column */}
           {!isMobile && (
             <td>
-              {wombatTokens ? (
+              {utilityTokens && Object.keys(utilityTokens).length ? (
                 <a
-                  className="table-token"
                   onClick={() =>
                     handleRewardTransactionClick(
                       network,
@@ -449,8 +458,12 @@ export default function Home() {
                     )
                   }
                 >
-                  <img src="/images/providers/wombat.svg" />
-                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
+                  {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
+                    <div key={utility} className="table-token">
+                      <UtilityToken utility={utility} />
+                      <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
+                    </div>
+                  ))}
                 </a>
               ) : (
                 <Text>-</Text>
@@ -516,8 +529,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
+                      ? "Weekly available rewards"
+                      : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -527,9 +540,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
+                        ({ network: rewardNetwork }) =>
+                          rewardNetwork === network
+                      )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
