@@ -1,7 +1,11 @@
 import { gql, Queryable, jsonPost } from "~/util";
 import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
 import BN from "bn.js";
-import { addDecimalToBn } from "~/util/chainUtils/tokens";
+import {
+  addDecimalToBn,
+  getTokenFromAddress,
+  Token,
+} from "~/util/chainUtils/tokens";
 import { MintAddress } from "~/types/MintAddress";
 
 const queryByAddress: Queryable = {
@@ -96,10 +100,12 @@ const queryByAddress: Queryable = {
       $offset: Int = 0
       $filterHashes: [String!] = []
       $limit: Int = 12
+      $tokens: [String!] = []
     ) {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          token_short_name: { _in: $tokens }
           _not: { transaction_hash: { _in: $filterHashes } }
           _or: [
             { sender_address: { _eq: $address } }
@@ -310,11 +316,13 @@ const queryAll: Queryable = {
       $offset: Int = 0
       $filterHashes: [String!] = []
       $limit: Int = 12
+      $tokens: [String!] = []
     ) {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
+          token_short_name: { _in: $tokens }
         }
         order_by: { time: desc }
         limit: $limit
@@ -432,7 +440,13 @@ const useUserTransactionsByAddress = async (
     offset: (page - 1) * 12,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && { tokens }),
+    tokens:
+      network !== "arbitrum"
+        ? tokens
+        : tokens
+          .map((addr) => getTokenFromAddress(network, addr))
+          .filter((token): token is Token => !!token)
+          .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -522,7 +536,13 @@ const useUserTransactionsAll = async (
     offset: (page - 1) * 12,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && { tokens }),
+    tokens:
+      network !== "arbitrum"
+        ? tokens
+        : tokens
+          .map((addr) => getTokenFromAddress(network, addr))
+          .filter((token): token is Token => !!token)
+          .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
