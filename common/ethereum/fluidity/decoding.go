@@ -310,7 +310,7 @@ func TryDecodeStakingEventData(l ethLogs.Log, wethPriceUsd *big.Rat) (ethereum.S
 
 type TestnetOwnerPair struct {
 	// Owner for the address that owns TestnetAddress
-	Owner   ethereum.Address
+	Owner ethereum.Address
 	// TestnetAddress for the testnet address used on Ropsten
 	TestnetAddress ethereum.Address
 }
@@ -318,7 +318,7 @@ type TestnetOwnerPair struct {
 // TryDecodeAddressConfirmed to decode ownership confirmation of a testnet address
 func TryDecodeAddressConfirmed(log ethLogs.Log) (TestnetOwnerPair, error) {
 	var (
-		logTopics			 = log.Topics
+		logTopics            = log.Topics
 		eventSignatureString = logTopics[0].String()
 		eventSignature       = ethCommon.HexToHash(eventSignatureString)
 
@@ -336,8 +336,8 @@ func TryDecodeAddressConfirmed(log ethLogs.Log) (TestnetOwnerPair, error) {
 		}
 
 		var (
-			testnetAddressString  = logTopics[1].String()
-			ownerAddressString    = logTopics[2].String()
+			testnetAddressString = logTopics[1].String()
+			ownerAddressString   = logTopics[2].String()
 		)
 
 		addressConfirmedEvent.TestnetAddress = ethereum.AddressFromString(testnetAddressString)

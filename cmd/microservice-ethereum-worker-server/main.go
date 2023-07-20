@@ -49,9 +49,6 @@ const (
 	// EnvChainlinkEthPriceFeed to get the price of eth in usd from
 	EnvChainlinkEthPriceFeed = `FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR`
 
-	// EnvUnderlyingTokenName to be mindful of when doing price conversions to USDT
-	EnvUnderlyingTokenName = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`
-
 	// EnvTokenDetails is a list of utility:shortname:decimals
 	EnvTokenDetails = `FLU_ETHERUEM_UTILITY_TOKEN_DETAILS`
 
@@ -190,8 +187,8 @@ func main() {
 			transfersInBlock int
 		)
 
-		for _, transfers := range fluidTransactions {
-			transfersInBlock += len(transfers.Transfers)
+		for _, tx := range fluidTransactions {
+			transfersInBlock += len(tx.Transfers)
 		}
 
 		movingAverageKey := createMovingAverageKey(dbNetwork, tokenName)
@@ -510,7 +507,20 @@ func main() {
 					payouts []PayoutDetails
 				)
 
+				zeroRat := big.NewRat(0, 1)
+
 				for _, pool := range pools {
+					if pool.PoolSizeNative.Cmp(zeroRat) == 0 {
+						log.Debug(func(k *log.Log) {
+							k.Format(
+								"Skipping empty pool %+v!",
+								pool,
+							)
+						})
+
+						continue
+					}
+
 					calculationType := pool.CalculationType
 
 					if calculationType == workerTypes.CalculationTypeNormal {

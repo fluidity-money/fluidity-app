@@ -120,10 +120,10 @@ func init() {
 	chronosTests := unmarshalJsonTestOrFatal(integrationTestChronos)
 	tests = append(tests, chronosTests...)
 
-    kyberClassicTests := unmarshalJsonTestOrFatal(integrationTestKyberClassic)
+	kyberClassicTests := unmarshalJsonTestOrFatal(integrationTestKyberClassic)
 	tests = append(tests, kyberClassicTests...)
 
-    wombatTests := unmarshalJsonTestOrFatal(integrationTestWombat)
+	wombatTests := unmarshalJsonTestOrFatal(integrationTestWombat)
 	tests = append(tests, wombatTests...)
 }
 
