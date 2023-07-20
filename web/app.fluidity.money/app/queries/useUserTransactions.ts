@@ -443,7 +443,8 @@ const useUserTransactionsByAddress = async (
     tokens:
       network !== "arbitrum"
         ? tokens
-        : tokens
+        : // convert tokens to token_short_name
+        tokens
           .map((addr) => getTokenFromAddress(network, addr))
           .filter((token): token is Token => !!token)
           .map(({ symbol }) => symbol.slice(1)),
@@ -539,7 +540,8 @@ const useUserTransactionsAll = async (
     tokens:
       network !== "arbitrum"
         ? tokens
-        : tokens
+        : // convert tokens to token_short_name
+        tokens
           .map((addr) => getTokenFromAddress(network, addr))
           .filter((token): token is Token => !!token)
           .map(({ symbol }) => symbol.slice(1)),
