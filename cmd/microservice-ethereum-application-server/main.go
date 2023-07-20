@@ -7,6 +7,8 @@ package main
 //
 
 import (
+	"math"
+	"math/big"
 	"strconv"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -191,7 +193,10 @@ func main() {
 					transaction.Data,
 				)
 
-				fee := feeData.Fee
+				var (
+					fee    = feeData.Fee
+					volume = feeData.Volume
+				)
 
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
@@ -252,6 +257,37 @@ func main() {
 				}
 
 				transfersWithFees = append(transfersWithFees, decoratedTransfer)
+
+				// don't emit mint/burn user actions
+				if sender == ethereum.ZeroAddress || recipient == ethereum.ZeroAddress {
+					continue
+				}	
+
+				decimalsAdjusted := math.Pow10(tokenDecimals)
+				decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+				// adjust volume then convert to a big int
+				// no loss of precision as there won't be more decimals than tokenDecimals
+				volume = volume.Mul(volume, decimalsRat)
+				volumeAdjusted_, _ := new(big.Int).SetString(volume.FloatString(0), 0)
+				volumeAdjusted := misc.NewBigIntFromInt(*volumeAdjusted_)
+
+				transferUserAction := user_actions.NewSendEthereum(
+					dbNetwork,
+					sender,
+					recipient,
+					transactionHash,
+					volumeAdjusted,
+					tokenName,
+					tokenDecimals,
+					*indexCopy,
+					decorator.Application,
+				)
+
+				queue.SendMessage(
+					user_actions.TopicUserActionsEthereum,
+					transferUserAction,
+				)
 			}
 
 			decoratedTransactions[transactionHash] = worker.EthereumDecoratedTransaction{
