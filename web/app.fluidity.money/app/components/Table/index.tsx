@@ -74,7 +74,7 @@ const Table = <T,>(props: ITable<T>) => {
 
   const isTransition = useTransition();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const setSearchParams = useSearchParams()[1];
 
   const cappedPageCount = Math.min(240, count);
 
@@ -118,7 +118,7 @@ const Table = <T,>(props: ITable<T>) => {
         {filteredHeadings
           .map(({ name }) => name)
           .map((name) => (
-            <RowElement heading={name} />
+            <RowElement heading={name} key={name} />
           ))}
       </motion.tr>
     );
@@ -222,13 +222,13 @@ const Table = <T,>(props: ITable<T>) => {
             >
               {/* Frozen Rows */}
               {frozenRows.map((row, i) => (
-                <Row index={i} {...renderRow(row)} />
+                <Row index={i} key={i} {...renderRow(row)} />
               ))}
               {/* Unfrozen Rows */}
               {data
                 .filter((_) => !freezeRow?.(_))
                 .map((row, i) => (
-                  <Row index={i} {...renderRow(row)} />
+                  <Row index={i} key={i} {...renderRow(row)} />
                 ))}
             </motion.tbody>
           </AnimatePresence>
