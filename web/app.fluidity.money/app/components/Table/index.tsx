@@ -9,6 +9,7 @@ type Filter<T> = {
 
 export type ColumnProps = {
   name: string;
+  show?: boolean;
   alignRight?: boolean;
 };
 
@@ -19,7 +20,9 @@ export type PaginationProps = {
   pageQuery?: string;
 };
 
-export type IRow<T> = React.FC<{ data: T; index: number }>;
+export type IRow = React.HTMLAttributes<HTMLDivElement> & {
+  RowElement: React.FC<{ heading: string }>;
+};
 
 type ITable<T> = {
   className?: string;
@@ -34,7 +37,7 @@ type ITable<T> = {
   data: T[];
 
   // Render data into row
-  renderRow: IRow<T>;
+  renderRow: (data: T) => IRow;
 
   // Filters based on elementData
   filters?: Filter<T>[];
@@ -79,6 +82,34 @@ const Table = <T,>(props: ITable<T>) => {
   const endIndex = Math.min(page * rowsPerPage, cappedPageCount);
 
   const frozenRows = data.filter((row) => freezeRow?.(row));
+
+  const filteredHeadings = headings.filter(
+    ({ show }) => show === undefined || show
+  );
+
+  const Row = ({ RowElement, index, className }: IRow & { index: number }) => {
+    return (
+      <motion.tr
+        className={className}
+        key={`row-${index}`}
+        variants={{
+          enter: { opacity: [0, 1] },
+          ready: { opacity: 1 },
+          exit: { opacity: 0 },
+          transitioning: {
+            opacity: [0.75, 1, 0.75],
+            transition: { duration: 1.5, repeat: Infinity },
+          },
+        }}
+      >
+        {filteredHeadings
+          .map(({ name }) => name)
+          .map((name) => (
+            <RowElement heading={name} />
+          ))}
+      </motion.tr>
+    );
+  };
 
   return (
     <div>
@@ -134,7 +165,7 @@ const Table = <T,>(props: ITable<T>) => {
           {/* Table Headings */}
           <thead>
             <tr>
-              {headings.map((heading) => {
+              {filteredHeadings.map((heading) => {
                 const alignProps = heading.alignRight
                   ? "alignRight"
                   : "alignLeft";
@@ -177,11 +208,15 @@ const Table = <T,>(props: ITable<T>) => {
               }}
             >
               {/* Frozen Rows */}
-              {frozenRows.map((row, i) => renderRow({ data: row, index: i }))}
+              {frozenRows.map((row, i) => (
+                <Row index={i} {...renderRow(row)} />
+              ))}
               {/* Unfrozen Rows */}
               {data
                 .filter((_) => !freezeRow?.(_))
-                .map((row, i) => renderRow({ data: row, index: i }))}
+                .map((row, i) => (
+                  <Row index={i} {...renderRow(row)} />
+                ))}
             </motion.tbody>
           </AnimatePresence>
         </table>
