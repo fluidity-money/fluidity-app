@@ -16,6 +16,20 @@ import BN from "bn.js";
 import { motion } from "framer-motion";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 
+const SAFE_DEFAULT_ASSETS: AssetLoaderData = {
+  topPrize: {
+    transaction_hash: "",
+    winning_amount: 0,
+  },
+  avgPrize: 0,
+  topAssetPrize: {
+    transaction_hash: "",
+    winning_amount: 0,
+  },
+  activity: [],
+  loaded: false,
+};
+
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
   const { tokens } = serverConfig.config[network as unknown as string] ?? {};
@@ -159,7 +173,10 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const queryString = `/${network}/query/dashboard/assets?address=${address}&token=${token.symbol}`;
 
-  const { data } = useCache<AssetLoaderData>(address ? queryString : "", true);
+  const { data: assetsData } = useCache<AssetLoaderData>(
+    address ? queryString : "",
+    true
+  );
 
   const navigate = useNavigate();
 
@@ -184,7 +201,12 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     })();
   }, [connected]);
 
-  if (!data) return <></>;
+  const data = {
+    ...SAFE_DEFAULT_ASSETS,
+    ...assetsData,
+  };
+
+  if (!data || !data.loaded) return <></>;
 
   const { topPrize, avgPrize, topAssetPrize, activity } = data;
 
