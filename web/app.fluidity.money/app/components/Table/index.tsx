@@ -1,4 +1,4 @@
-import { Link, useTransition } from "@remix-run/react";
+import { useTransition, useSearchParams } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GeneralButton, LoadingDots, Text } from "@fluidity-money/surfing";
 
@@ -74,6 +74,8 @@ const Table = <T,>(props: ITable<T>) => {
 
   const isTransition = useTransition();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const cappedPageCount = Math.min(240, count);
 
   const pageCount = Math.ceil(cappedPageCount / rowsPerPage);
@@ -86,6 +88,17 @@ const Table = <T,>(props: ITable<T>) => {
   const filteredHeadings = headings.filter(
     ({ show }) => show === undefined || show
   );
+
+  const handlePageTurn = (page: number) => {
+    if (page === 0) return;
+    if (page > pageCount) return;
+
+    setSearchParams((current) => {
+      current.set(pagination.pageQuery || "page", page.toString());
+
+      return current;
+    });
+  };
 
   const Row = ({ RowElement, index, className }: IRow & { index: number }) => {
     return (
@@ -226,15 +239,15 @@ const Table = <T,>(props: ITable<T>) => {
         <motion.div className="pagination" layout="position">
           <div className="pagination-numbers">
             {/* Pagination Numbers */}
-            <Link
+            <button
               className={
                 page === 1 ? "current-pagination" : "pagination-number"
               }
               key={`page-${1}`}
-              to={`?${pagination.pageQuery || "page"}=${1}`}
+              onClick={() => handlePageTurn(1)}
             >
               {1}
-            </Link>
+            </button>
 
             {/* ... */}
             {pageCount > 4 && page > 4 && <span>...</span>}
@@ -247,17 +260,17 @@ const Table = <T,>(props: ITable<T>) => {
               .filter((pageNo) => pageNo > 1 && pageNo < pageCount)
               .map((pageNo) => {
                 return (
-                  <Link
+                  <button
                     className={
                       page === pageNo
                         ? "current-pagination"
                         : "pagination-number"
                     }
                     key={`page-${pageNo}`}
-                    to={`?${pagination.pageQuery || "page"}=${pageNo}`}
+                    onClick={() => handlePageTurn(pageNo)}
                   >
                     {pageNo}
-                  </Link>
+                  </button>
                 );
               })}
 
@@ -265,30 +278,24 @@ const Table = <T,>(props: ITable<T>) => {
             {pageCount > 4 && page < pageCount - 3 && <span>...</span>}
 
             {pageCount > 1 && (
-              <Link
+              <button
                 className={
                   page === pageCount
                     ? "current-pagination"
                     : "pagination-number"
                 }
                 key={`page-${pageCount}`}
-                to={`?${pagination.pageQuery || "page"}=${pageCount}`}
+                onClick={() => handlePageTurn(pageCount)}
               >
                 {pageCount}
-              </Link>
+              </button>
             )}
           </div>
 
           {/* Pagination Arrows */}
 
           <div className="pagination-arrows">
-            <Link
-              to={
-                page === 1
-                  ? ""
-                  : `?${pagination.pageQuery || "page"}=${page - 1}`
-              }
-            >
+            <button onClick={() => handlePageTurn(page - 1)}>
               <img
                 style={{ width: 16 }}
                 src={
@@ -300,15 +307,9 @@ const Table = <T,>(props: ITable<T>) => {
                   page === 1 ? "pagination-arrow-off" : "pagination-arrow"
                 }
               />
-            </Link>
+            </button>
 
-            <Link
-              to={
-                page === pageCount
-                  ? ""
-                  : `?${pagination.pageQuery || "page"}=${page + 1}`
-              }
-            >
+            <button onClick={() => handlePageTurn(page + 1)}>
               <img
                 style={{ width: 16 }}
                 src={
@@ -322,7 +323,7 @@ const Table = <T,>(props: ITable<T>) => {
                     : "pagination-arrow"
                 }
               />
-            </Link>
+            </button>
           </div>
         </motion.div>
       )}
