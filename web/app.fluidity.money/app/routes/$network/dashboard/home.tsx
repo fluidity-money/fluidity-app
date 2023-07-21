@@ -506,7 +506,7 @@ export default function Home() {
                     <Text prominent={true}>{rewardHash}</Text>
                   </a>
                 ) : (
-                  <Text>Pending</Text>
+                  <Text>{reward ? "Pending" : "None"}</Text>
                 )}
               </td>
             );
