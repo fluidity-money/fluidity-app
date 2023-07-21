@@ -25,8 +25,8 @@ import {
   ProviderCard,
   GeneralButton,
 } from "@fluidity-money/surfing";
-import ConnectWalletModal from "~/components/ConnectWalletModal";
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
+import { UIContext } from "contexts/UIProvider";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: dashboardAssetsStyle }];
@@ -128,6 +128,8 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
+  const { toggleConnectWalletModal } = useContext(UIContext);
+
   if (!showExperiment("enable-assets-page")) return <></>;
 
   if (!address && !connecting)
@@ -138,16 +140,12 @@ const AssetsRoot = () => {
           type={connected || connecting ? "transparent" : "primary"}
           size={"medium"}
           handleClick={() =>
-            connecting ? null : setWalletModalVisibility(true)
+            connecting ? null : toggleConnectWalletModal?.()
           }
           className="connect-wallet-btn"
         >
           {connecting ? `Connecting...` : `Connect Wallet`}
         </GeneralButton>
-        <ConnectWalletModal
-          visible={walletModalVisibility}
-          close={() => setWalletModalVisibility(false)}
-        />
       </div>
     );
 
