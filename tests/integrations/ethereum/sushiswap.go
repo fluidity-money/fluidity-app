@@ -95,6 +95,53 @@ const integrationTestSushiswap = `
     },
     "token_decimals": 6,
     "contract_address": "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
+  },
+  {
+    "transfer": {
+      "transaction": "0x1b6fd9b81846dcfc73ec3af1a34dbd005bb3085713460abcf73151651317a152",
+      "log": {
+        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcgUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4ewjvtAQg==",
+        "address": "0xbaff0f830ab2d327925e5f1ed3c4772a80c0aaa9",
+        "topics": [
+          "0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062",
+          "0x000000000000000000000000fc506aaa1340b4dedffd88be278bee058952d674",
+          "0x0000000000000000000000004cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
+	  "0x00000000000000000000000082af49447d8a07e3bd95bd0d56f35241523fbab1"
+        ]
+      },
+     "application": 18
+    },
+    "transaction": {
+      "to": "0xfc506aaa1340b4dedffd88be278bee058952d674",
+      "from": "0x708f741b5fa76c9f4a70355207b4f0226ce265f3",
+      "hash": "0x1b6fd9b81846dcfc73ec3af1a34dbd005bb3085713460abcf73151651317a152"
+    },
+    "expected_sender": "0x708f741b5fa76c9f4a70355207b4f0226ce265f3",
+    "expected_recipient": "0xbaff0f830ab2d327925e5f1ed3c4772a80c0aaa9",
+    "expected_fees": "29189/31250000",
+    "expected_volume": "29189/15625",
+    "expected_emission": {
+	"sushiswap": 0.000934048
+    },
+    "rpc_methods": {
+	"eth_getCode": "0x0"
+    },
+    "call_methods": {
+    	"token0()": {
+		    "": "0x0000000000000000000000004cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
+	    },
+    	"token1()": {
+		    "": "0x00000000000000000000000082af49447d8a07e3bd95bd0d56f35241523fbab1"
+	    },
+	"swapFee()": {
+	 	    "": "0x0000000000000000000000000000000000000000000000000000000000000005"
+	},
+	"decimals()": {
+	 	    "": "0x0000000000000000000000000000000000000000000000000000000000000012"
+	}
+    },
+    "token_decimals": 6,
+    "contract_address": "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
   }
 ]
 `
