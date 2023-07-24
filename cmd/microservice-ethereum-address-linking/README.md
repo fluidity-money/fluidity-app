@@ -7,7 +7,7 @@ Watches for events from the LootboxConfirmAddressOwnership contract, decodes the
 
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
-| `FLU_ETHERUEM_ADDRESS_CONFIRMATION_CONTRACT_ADDR`                      | The address of the LootboxConfirmAddressOwnership contract. |
+| `FLU_ETHEREUM_ADDRESS_CONFIRMATION_CONTRACT_ADDR`                      | The address of the LootboxConfirmAddressOwnership contract. |
 | `FLU_ETHEREUM_NETWORK`                      | The network the service is running for. |
 
 ## Building
