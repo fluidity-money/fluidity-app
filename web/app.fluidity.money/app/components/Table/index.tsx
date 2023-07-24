@@ -115,11 +115,9 @@ const Table = <T,>(props: ITable<T>) => {
           },
         }}
       >
-        {filteredHeadings
-          .map(({ name }) => name)
-          .map((name) => (
-            <RowElement heading={name} key={name} />
-          ))}
+        {filteredHeadings.map(({ name }) => (
+          <RowElement heading={name} key={name} />
+        ))}
       </motion.tr>
     );
   };
