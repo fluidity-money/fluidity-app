@@ -19,9 +19,8 @@ const (
 	TableTestnetAddress = `testnet_address`
 
 	// TableTestnetOwner to insert a mainnet owner -> testnet address relation
-	TableTestnetOwner   = `testnet_owner`
+	TableTestnetOwner = `testnet_owner`
 )
-
 
 // InsertTestnetOwner to insert an owner -> address relation into Timescale
 // given that the address is found to be a testnet user
@@ -48,7 +47,7 @@ func InsertTestnetOwner(ownerPair fluidity.TestnetOwnerPair) bool {
 	)
 
 	var (
-		ownerString			 = ownerPair.Owner.String()
+		ownerString          = ownerPair.Owner.String()
 		testnetAddressString = ownerPair.TestnetAddress.String()
 	)
 
@@ -61,7 +60,7 @@ func InsertTestnetOwner(ownerPair fluidity.TestnetOwnerPair) bool {
 		testnetAddressString,
 	)
 
-	var owner_ string 
+	var owner_ string
 
 	err := row.Scan(&owner_)
 

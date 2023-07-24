@@ -40,12 +40,13 @@ import {
   toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
-import { ToolTipContent, useToolTip } from "~/components";
+import { ToolTipContent, useToolTip, UtilityToken } from "~/components";
 import { Table } from "~/components";
 import dashboardRewardsStyle from "~/styles/dashboard/rewards.css";
 import { useCache } from "~/hooks/useCache";
 import { colors } from "~/webapp.config.server";
 import { format } from "date-fns";
+import { getProviderDisplayName } from "~/util/provider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: dashboardRewardsStyle }];
@@ -240,14 +241,14 @@ export default function Rewards() {
         return [
           { name: "ACTIVITY" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$UTILITY REWARDS" },
         ];
       default:
         return [
           { name: "ACTIVITY" },
           { name: "VALUE" },
           { name: "FLUID REWARDS" },
-          { name: "$WOM REWARDS" },
+          { name: "$UTILTY REWARDS" },
           { name: "WINNER" },
           { name: "REWARDED TIME", alignRight: true },
         ];
@@ -257,22 +258,22 @@ export default function Rewards() {
 
   const txTableFilters = address
     ? [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-        {
-          filter: ({ sender, receiver }: Transaction) =>
-            [sender, receiver].includes(address),
-          name: "MY REWARDS",
-        },
-      ]
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+      {
+        filter: ({ sender, receiver }: Transaction) =>
+          [sender, receiver].includes(address),
+        name: "MY REWARDS",
+      },
+    ]
     : [
-        {
-          filter: () => true,
-          name: "GLOBAL",
-        },
-      ];
+      {
+        filter: () => true,
+        name: "GLOBAL",
+      },
+    ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);
@@ -423,7 +424,8 @@ export default function Rewards() {
         rewardHash,
         logo,
         currency,
-        wombatTokens,
+        utilityTokens,
+        application,
       } = data;
 
       const toolTip = useToolTip();
@@ -447,6 +449,8 @@ export default function Rewards() {
           );
       };
 
+      const appProviderName = getProviderDisplayName(application);
+
       return (
         <motion.tr
           key={`${timestamp}-${index}`}
@@ -466,7 +470,11 @@ export default function Rewards() {
               className="table-activity"
               href={getTxExplorerLink(network, hash)}
             >
-              <img src={logo} />
+              {appProviderName !== "Fluidity" ? (
+                <ProviderIcon provider={appProviderName} />
+              ) : (
+                <TokenIcon token={currency} />
+              )}
               <Text>{transactionActivityLabel(data, winner)}</Text>
             </a>
           </td>
@@ -506,12 +514,11 @@ export default function Rewards() {
             )}
           </td>
 
-          {/* WOM */}
+          {/* Utility Rewards */}
           {!isMobile && (
             <td>
-              {wombatTokens ? (
+              {utilityTokens && Object.keys(utilityTokens).length ? (
                 <a
-                  className="table-token"
                   onClick={() =>
                     handleRewardTransactionClick(
                       network,
@@ -521,8 +528,12 @@ export default function Rewards() {
                     )
                   }
                 >
-                  <img src="/images/providers/wombat.svg" />
-                  <Text>{toDecimalPlaces(wombatTokens, 4)}</Text>
+                  {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
+                    <div key={utility} className="table-token">
+                      <UtilityToken utility={utility} />
+                      <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
+                    </div>
+                  ))}
                 </a>
               ) : (
                 <Text>-</Text>

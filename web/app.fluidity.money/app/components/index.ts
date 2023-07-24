@@ -5,3 +5,4 @@ export {
   ToolTipLinks,
   ToolTipContent,
 } from "./ToolTip";
+export { UtilityToken } from "./UtilityToken";

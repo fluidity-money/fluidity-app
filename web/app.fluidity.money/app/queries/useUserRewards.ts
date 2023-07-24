@@ -63,7 +63,7 @@ const queryPendingWinnersAll = gql`
         reward_sent: { _eq: false }
       }
       order_by: { inserted_date: desc }
-      limit: 240
+      limit: 10
     ) {
       network
       address
@@ -90,7 +90,7 @@ const queryPendingWinnersByAddress = gql`
         reward_sent: { _eq: false }
       }
       order_by: { inserted_date: desc }
-      limit: 240
+      limit: 10
     ) {
       network
       address
