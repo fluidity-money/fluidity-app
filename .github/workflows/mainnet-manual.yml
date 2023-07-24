@@ -12,6 +12,7 @@ on:
         type: choice
         description: 'Network'
         options:
+          - 'arbitrum'
           - 'fluidity'
       group:
         description: 'Group'
