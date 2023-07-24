@@ -50,7 +50,7 @@ const (
 	EnvChainlinkEthPriceFeed = `FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR`
 
 	// EnvTokenDetails is a list of utility:shortname:decimals
-	EnvTokenDetails = `FLU_ETHERUEM_UTILITY_TOKEN_DETAILS`
+	EnvTokenDetails = `FLU_ETHEREUM_UTILITY_TOKEN_DETAILS`
 
 	// EnvUnderlyingTokenDecimals to use when normalising the returned value
 	// when converting to USDT
