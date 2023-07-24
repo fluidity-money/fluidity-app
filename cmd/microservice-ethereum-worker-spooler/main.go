@@ -29,7 +29,7 @@ const (
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_BATCHED_WINNERS_AMQP_QUEUE_NAME`
 
 	// EnvTokenDetails is a list of utility:shortname:decimals
-	EnvTokenDetails = `FLU_ETHERUEM_UTILITY_TOKEN_DETAILS`
+	EnvTokenDetails = `FLU_ETHEREUM_UTILITY_TOKEN_DETAILS`
 
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
