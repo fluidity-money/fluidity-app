@@ -7,9 +7,7 @@ package main
 import (
 	"math"
 	"math/big"
-	"os"
 	"strconv"
-	"strings"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
