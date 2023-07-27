@@ -16,6 +16,7 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { getTokenForNetwork } from "~/util";
+import {useUserActionsAll, useUserActionsByAddress} from "~/queries/useUserActionsAggregate";
 
 const FLUID_UTILITY = "FLUID";
 
@@ -51,6 +52,81 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const page = parseInt(page_);
 
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
+
+  const {
+    config: {
+      [network as string]: { tokens },
+    },
+  } = config;
+
+  const tokenLogoMap = tokens.reduce(
+    (map, token) => ({
+      ...map,
+      [token.symbol]: token.logo,
+    }),
+    {} as Record<string, string>
+  );
+
+  const defaultLogo = "/assets/tokens/fUSDC.svg";
+
+  // use updated SQL aggregation
+  if (network === "arbitrum") {
+    const {data: userActionsData, errors: userActionsErr} = address ?
+      await useUserActionsByAddress(network, address, page) :
+      await useUserActionsAll(network, page);
+
+    if (userActionsErr || !userActionsData) {
+      throw userActionsErr;
+    }
+
+    const transactions = userActionsData[network].map(({
+      sender, 
+      receiver,
+      hash,
+      winner,
+      reward,
+      rewardHash,
+      timestamp,
+      value,
+      currency,
+      application,
+      utility_name, 
+      utility_amount
+    }) => {
+      const utilityName =
+        utility_name?.match(ALPHA_NUMERIC)?.[0];
+
+      const swapType = sender === MintAddress
+          ? "in" as const
+          : receiver === MintAddress
+            ? "out" as const
+            : undefined
+
+      return {
+        sender,
+        receiver,
+        hash,
+        winner,
+        reward,
+        rewardHash,
+        timestamp,
+        value,
+        currency,
+        application,
+        swapType,
+        provider: application ?? "Fluidity",
+        logo: tokenLogoMap[currency] || defaultLogo,
+        utilityTokens: utilityName ? {[utilityName]: utility_amount} : undefined
+      }
+    })
+
+    return json({
+      page,
+      transactions,
+      count: transactions.length,
+      loaded: true,
+    } satisfies TransactionsLoaderData);
+  }
 
   try {
     const [
@@ -260,22 +336,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         };
       }
     );
-
-    const {
-      config: {
-        [network as string]: { tokens },
-      },
-    } = config;
-
-    const tokenLogoMap = tokens.reduce(
-      (map, token) => ({
-        ...map,
-        [token.symbol]: token.logo,
-      }),
-      {} as Record<string, string>
-    );
-
-    const defaultLogo = "/assets/tokens/fUSDC.svg";
 
     const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
       const swapType =
