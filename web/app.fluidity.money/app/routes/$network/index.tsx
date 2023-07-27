@@ -26,9 +26,30 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
+import { Chain } from "~/util/chainUtils/chains";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
+};
+
+const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
+  ethereum: {
+    name: "ETH",
+    icon: <img src="/assets/chains/ethIcon.svg" />,
+  },
+  arbitrum: {
+    name: "ARB",
+    icon: <img src="/assets/chains/arbIcon.svg" />,
+  },
+  polygon_zk: {
+    name: "POLY",
+    icon: <img src="/assets/chains/polygonIcon.svg" />,
+  },
+  solana: {
+    name: "SOL",
+    icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -60,6 +81,8 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
+  const { showExperiment } = useContext(SplitContext);
+
   const projectedWinningsData = useFetcher<ProjectedWinData>();
 
   useEffect(() => {
@@ -84,25 +107,23 @@ const NetworkPage = () => {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    arbitrum: {
-      name: "ARB",
-      icon: <img src="/assets/chains/arbIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
+  const showPolygon = showExperiment("enable-polygonzk");
+
+  const chainNameMap = (() => {
+    if (showPolygon) return CHAIN_NAME_MAP;
+
+    const { polygon, ...chains } = CHAIN_NAME_MAP;
+    return chains;
+  })();
 
   useEffect(() => {
     // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
+
+  if (!showExperiment("enable-polygonzk")) {
+    return <></>;
+  }
 
   return (
     <>
@@ -146,7 +167,7 @@ const NetworkPage = () => {
           <div className="connected-content">
             {/* Switch Chain Button */}
             <ChainSelectorButton
-              chain={chainNameMap[network as "ethereum" | "solana"]}
+              chain={chainNameMap[network as Chain]}
               onClick={() => setChainModalVisibility(true)}
             />
 
@@ -180,7 +201,7 @@ const NetworkPage = () => {
               <Modal id="switch-chain" visible={chainModalVisibility}>
                 <BlockchainModal
                   handleModal={setChainModalVisibility}
-                  option={chainNameMap[network as "ethereum" | "solana"]}
+                  option={chainNameMap[network as Chain]}
                   options={Object.values(chainNameMap)}
                   setOption={(chain: string) =>
                     navigate(`/${networkMapper(chain)}/dashboard/home`)

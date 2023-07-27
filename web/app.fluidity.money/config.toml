@@ -16,6 +16,11 @@ label = "Arbitrum"
 testnet = false
 rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
 
+[[drivers.polygon_zk]]
+label = "Polygon ZK"
+testnet = false
+rpc = { http = "FLU_POLYZK_RPC_HTTP", ws = "FLU_POLYZK_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -247,6 +252,32 @@ colour = "#eb2077"
 decimals = 18
 enabled = false
 
+[config.polygon_zk]
+explorer = "https://zkevm.polygonscan.com"
+fluidAssets = [
+    "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C",
+]
+
+[[config.polygon_zk.tokens]]
+symbol = "USDC"
+name = "USD Coin"
+logo = "/assets/tokens/usdc.svg"
+address = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+colour = "#2775ca"
+decimals = 6
+enabled = true
+
+[[config.polygon_zk.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C"
+colour = "#2775ca"
+isFluidOf = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+decimals = 6
+enabled = true
+
+
 # liquidity_providers Configurations
 # eth providers
 [liquidity_providers.ethereum]
@@ -390,18 +421,22 @@ address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
+polygon_zk = ""
 
 [contract.staking]
 ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
 solana = ""
+polygon_zk = ""
 
 [contract.eac_aggregator_proxy]
 ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
+polygon_zk = ""
 
 [contract.registry]
 ethereum = ""
 arbitrum = "0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d"
 solana = ""
+polygon_zk = ""

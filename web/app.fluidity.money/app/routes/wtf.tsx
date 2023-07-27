@@ -1,7 +1,7 @@
 import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   json,
   LinksFunction,
@@ -34,10 +34,30 @@ import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
 import { generateMeta } from "~/util/tweeter";
 import { MintAddress } from "~/types/MintAddress";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
 };
+
+const CHAINS = [
+  {
+    name: "ETH",
+    icon: <img src="/assets/chains/ethIcon.svg" />,
+  },
+  {
+    name: "ARB",
+    icon: <img src="/assets/chains/arbIcon.svg" />,
+  },
+  {
+    name: "POLY",
+    icon: <img src="/assets/chains/polygonIcon.svg" />,
+  },
+  {
+    name: "SOL",
+    icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
+];
 
 export const loader: LoaderFunction = async () => {
   const { data, errors } = await useHighestRewardStatisticsAll();
@@ -151,23 +171,10 @@ export default function IndexPage() {
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
 
+  const { showExperiment } = useContext(SplitContext);
+
   const { width } = useViewport();
   const mobileBreakpoint = 500;
-
-  const chains = [
-    {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    {
-      name: "ARB",
-      icon: <img src="/assets/chains/arbIcon.svg" />,
-    },
-    {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  ];
 
   return (
     <>
@@ -260,7 +267,11 @@ export default function IndexPage() {
             <BlockchainModal
               handleModal={setShowChainDashboardModal}
               option={{ name: "", icon: <div /> }}
-              options={chains}
+              options={
+                showExperiment("enable-polygonzk")
+                  ? CHAINS
+                  : CHAINS.filter(({ name }) => name !== "POLY")
+              }
               setOption={(chain: string) =>
                 navigate(`/${networkMapper(chain)}/dashboard/home`)
               }
@@ -295,11 +306,9 @@ export default function IndexPage() {
                       <Text prominent>
                         {numberToMonetaryString(highestWinner.totalWinnings)}
                       </Text>
-                      {` in fluid prizes over ${
-                        highestWinner.transactionCount
-                      } transaction${
-                        highestWinner.transactionCount > 1 ? "s" : ""
-                      }.`}
+                      {` in fluid prizes over ${highestWinner.transactionCount
+                        } transaction${highestWinner.transactionCount > 1 ? "s" : ""
+                        }.`}
                     </Text>
                   </Display>
                 )}
@@ -333,7 +342,11 @@ export default function IndexPage() {
             <BlockchainModal
               handleModal={setShowChainOpportunityModal}
               option={{ name: "", icon: <div /> }}
-              options={chains}
+              options={
+                showExperiment("enable-polygonzk")
+                  ? CHAINS
+                  : CHAINS.filter(({ name }) => name !== "POLY")
+              }
               setOption={(chain: string) =>
                 navigate(`/${networkMapper(chain)}`)
               }
