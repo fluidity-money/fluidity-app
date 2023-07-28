@@ -258,22 +258,22 @@ export default function Rewards() {
 
   const txTableFilters = address
     ? [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-      {
-        filter: ({ sender, receiver }: Transaction) =>
-          [sender, receiver].includes(address),
-        name: "MY REWARDS",
-      },
-    ]
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+        {
+          filter: ({ sender, receiver }: Transaction) =>
+            [sender, receiver].includes(address),
+          name: "MY REWARDS",
+        },
+      ]
     : [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-    ];
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+      ];
 
   useEffect(() => {
     setActiveTableFilterIndex(connected ? 1 : 0);

@@ -118,13 +118,15 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
     setModal(
       createPortal(
         <div
-          className={`connect-wallet-outer-container ${visible === true ? "show-modal" : "hide-modal"
-            }`}
+          className={`connect-wallet-outer-container ${
+            visible === true ? "show-modal" : "hide-modal"
+          }`}
         >
           <div onClick={close} className="connected-wallet-background"></div>
           <div
-            className={`connect-wallet-modal-container  ${visible === true ? "show-modal" : "hide-modal"
-              }`}
+            className={`connect-wallet-modal-container  ${
+              visible === true ? "show-modal" : "hide-modal"
+            }`}
           >
             <div className="connect-wallet-modal-header">
               <Text prominent size="xxl">

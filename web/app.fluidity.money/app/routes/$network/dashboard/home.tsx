@@ -274,27 +274,27 @@ export default function Home() {
 
   const txTableFilters = address
     ? [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-      {
-        filter: ({
-          sender,
-          receiver,
-        }: {
-          sender: string;
-          receiver: string;
-        }) => [sender, receiver].includes(address),
-        name: "MY DASHBOARD",
-      },
-    ]
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+        {
+          filter: ({
+            sender,
+            receiver,
+          }: {
+            sender: string;
+            receiver: string;
+          }) => [sender, receiver].includes(address),
+          name: "MY DASHBOARD",
+        },
+      ]
     : [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-    ];
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+      ];
 
   const {
     count,
@@ -529,8 +529,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                      ? "Weekly available rewards"
-                      : "Total yield"}
+                    ? "Weekly available rewards"
+                    : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -540,9 +540,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                        ({ network: rewardNetwork }) =>
-                          rewardNetwork === network
-                      )?.total_reward || 0
+                          ({ network: rewardNetwork }) =>
+                            rewardNetwork === network
+                        )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>

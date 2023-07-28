@@ -42,7 +42,6 @@ import {
   ConnectedWallet,
   Modal,
   ProvideLiquidity,
-  ChainName,
   BurgerMenu,
   Referral,
   CardModal,
@@ -324,7 +323,7 @@ export default function Dashboard() {
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: ChainName) => {
+  const handleSetChain = (network: string) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -435,7 +434,10 @@ export default function Dashboard() {
   const chainNameMap = showExperiment("enable-polygonzk")
     ? CHAIN_NAME_MAP
     : (() => {
-        const { polygon_zk, ...rest } = CHAIN_NAME_MAP;
+        const {
+          polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
+          ...rest
+        } = CHAIN_NAME_MAP;
         return rest;
       })();
 
@@ -837,7 +839,7 @@ export default function Dashboard() {
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}
-            network={network as ChainName}
+            network={network}
             isOpen={openMobModal}
             setIsOpen={setOpenMobModal}
             unclaimedRewards={userUnclaimedRewards}

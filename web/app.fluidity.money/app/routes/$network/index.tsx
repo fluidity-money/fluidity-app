@@ -116,8 +116,11 @@ const NetworkPage = () => {
   const chainNameMap = (() => {
     if (showPolygon) return CHAIN_NAME_MAP;
 
-    const { polygon_zk, ...chains } = CHAIN_NAME_MAP;
-    return chains;
+    const {
+      polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
+      ...rest
+    } = CHAIN_NAME_MAP;
+    return rest;
   })();
 
   useEffect(() => {
