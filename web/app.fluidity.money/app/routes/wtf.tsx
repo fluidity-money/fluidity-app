@@ -50,12 +50,13 @@ const CHAINS = [
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
   {
-    name: "POLY",
+    name: "POLY_ZK",
     icon: <img src="/assets/chains/polygonIcon.svg" />,
   },
   {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
+    disabled: true,
   },
 ];
 
@@ -270,7 +271,7 @@ export default function IndexPage() {
               options={
                 showExperiment("enable-polygonzk")
                   ? CHAINS
-                  : CHAINS.filter(({ name }) => name !== "POLY")
+                  : CHAINS.filter(({ name }) => name !== "POLY_ZK")
               }
               setOption={(chain: string) =>
                 navigate(`/${networkMapper(chain)}/dashboard/home`)
@@ -306,9 +307,11 @@ export default function IndexPage() {
                       <Text prominent>
                         {numberToMonetaryString(highestWinner.totalWinnings)}
                       </Text>
-                      {` in fluid prizes over ${highestWinner.transactionCount
-                        } transaction${highestWinner.transactionCount > 1 ? "s" : ""
-                        }.`}
+                      {` in fluid prizes over ${
+                        highestWinner.transactionCount
+                      } transaction${
+                        highestWinner.transactionCount > 1 ? "s" : ""
+                      }.`}
                     </Text>
                   </Display>
                 )}
@@ -345,7 +348,7 @@ export default function IndexPage() {
               options={
                 showExperiment("enable-polygonzk")
                   ? CHAINS
-                  : CHAINS.filter(({ name }) => name !== "POLY")
+                  : CHAINS.filter(({ name }) => name !== "POLY_ZK")
               }
               setOption={(chain: string) =>
                 navigate(`/${networkMapper(chain)}`)

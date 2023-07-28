@@ -54,10 +54,10 @@ const networkMapper = (network: string) => {
       return "arbitrum";
     case "arbitrum":
       return "ARB";
-    case "POLY":
+    case "POLY_ZK":
       return "polygon_zk";
     case "polygon_zk":
-      return "POLY";
+      return "POLY_ZK";
     default:
       return "ETH";
   }

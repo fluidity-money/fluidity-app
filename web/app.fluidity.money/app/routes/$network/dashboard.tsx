@@ -167,37 +167,40 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-    {
-      airdrop: {
-        name: "airdrop",
-        path: (network: string) => `/${network}/dashboard/airdrop`,
-        icon: <AirdropIcon />,
-      },
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
     },
-    {
-      home: {
-        name: "dashboard",
-        path: (network: string) => `/${network}/dashboard/home`,
-        icon: <DashboardIcon />,
-      },
+  },
+  {
+    home: {
+      name: "dashboard",
+      path: (network: string) => `/${network}/dashboard/home`,
+      icon: <DashboardIcon />,
     },
-    {
-      rewards: {
-        name: "rewards",
-        path: (network: string) => `/${network}/dashboard/rewards`,
-        icon: <Trophy />,
-      },
+  },
+  {
+    rewards: {
+      name: "rewards",
+      path: (network: string) => `/${network}/dashboard/rewards`,
+      icon: <Trophy />,
     },
-    {
-      assets: {
-        name: "assets",
-        path: (network: string) => `/${network}/dashboard/assets`,
-        icon: <AssetsIcon />,
-      },
+  },
+  {
+    assets: {
+      name: "assets",
+      path: (network: string) => `/${network}/dashboard/assets`,
+      icon: <AssetsIcon />,
     },
-  ];
+  },
+];
 
-const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
+const CHAIN_NAME_MAP: Record<
+  string,
+  { name: string; icon: JSX.Element; disabled?: boolean }
+> = {
   ethereum: {
     name: "ETH",
     icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -207,12 +210,13 @@ const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
   polygon_zk: {
-    name: "POLY",
+    name: "POLY_ZK",
     icon: <img src="/assets/chains/polygonIcon.svg" />,
   },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
+    disabled: true,
   },
 };
 
@@ -326,7 +330,6 @@ export default function Dashboard() {
     // Get path components after $network
     const pathComponents = pathname.split("/").slice(2);
 
-    console.log(network);
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
   };
 
@@ -423,11 +426,18 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
+
+  const chainNameMap = showExperiment("enable-polygonzk")
+    ? CHAIN_NAME_MAP
+    : (() => {
+        const { polygon_zk, ...rest } = CHAIN_NAME_MAP;
+        return rest;
+      })();
 
   return (
     <>
@@ -436,8 +446,8 @@ export default function Dashboard() {
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={CHAIN_NAME_MAP[network]}
-            options={Object.values(CHAIN_NAME_MAP)}
+            option={chainNameMap[network]}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />
@@ -492,8 +502,9 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -515,7 +526,7 @@ export default function Dashboard() {
           </Link>
           <ChainSelectorButton
             className="selector-button"
-            chain={CHAIN_NAME_MAP[network]}
+            chain={chainNameMap[network]}
             onClick={() => setChainModalVisibility(true)}
           />
         </div>
@@ -628,7 +639,7 @@ export default function Dashboard() {
             {/* Network Button */}
             {(isTablet || isMobile) && showMobileNetworkButton && (
               <ChainSelectorButton
-                chain={CHAIN_NAME_MAP[network]}
+                chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
             )}
@@ -824,7 +835,7 @@ export default function Dashboard() {
               return { name, icon, path };
             })}
             activeIndex={activeIndex}
-            chains={CHAIN_NAME_MAP}
+            chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}
             network={network as ChainName}
             isOpen={openMobModal}

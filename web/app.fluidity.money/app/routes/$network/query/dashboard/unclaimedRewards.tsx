@@ -17,7 +17,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const url = new URL(request.url);
   const address = url.searchParams.get("address");
 
-  if (!address) throw new Error("Invalid Request");
+  if (!address) {
+    throw new Error("Invalid Request");
+  }
 
   try {
     const { data, error } = await useUserUnclaimedRewards(

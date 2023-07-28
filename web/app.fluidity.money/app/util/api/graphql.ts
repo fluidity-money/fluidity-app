@@ -18,6 +18,7 @@ export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
         headers: { "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "" },
       };
     case "arbitrum":
+    case "polygon_zk":
       return {
         url: "https://fluidity.hasura.app/v1/graphql",
         headers: {

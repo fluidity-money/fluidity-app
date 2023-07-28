@@ -33,7 +33,10 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
 };
 
-const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
+const CHAIN_NAME_MAP: Record<
+  string,
+  { name: string; icon: JSX.Element; disabled?: boolean }
+> = {
   ethereum: {
     name: "ETH",
     icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -43,12 +46,13 @@ const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
   polygon_zk: {
-    name: "POLY",
+    name: "POLY_ZK",
     icon: <img src="/assets/chains/polygonIcon.svg" />,
   },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
+    disabled: true,
   },
 };
 
@@ -112,7 +116,7 @@ const NetworkPage = () => {
   const chainNameMap = (() => {
     if (showPolygon) return CHAIN_NAME_MAP;
 
-    const { polygon, ...chains } = CHAIN_NAME_MAP;
+    const { polygon_zk, ...chains } = CHAIN_NAME_MAP;
     return chains;
   })();
 

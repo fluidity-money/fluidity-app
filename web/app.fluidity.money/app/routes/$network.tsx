@@ -16,8 +16,8 @@ import { NotificationSubscription } from "~/components/NotificationSubscription"
 
 type ProviderMap = {
   [key: string]:
-  | ((props: { children: React.ReactNode }) => JSX.Element)
-  | undefined;
+    | ((props: { children: React.ReactNode }) => JSX.Element)
+    | undefined;
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -138,7 +138,6 @@ function ErrorBoundary({ error }: { error: string }) {
 export default function Network() {
   const { network, tokens, rpcUrls, colors, walletconnectId } =
     useLoaderData<LoaderData>();
-  console.log(network);
 
   // Hardcode solana to redirect to ethereum
   if (network === "solana") throw new Error("Solana not supported");

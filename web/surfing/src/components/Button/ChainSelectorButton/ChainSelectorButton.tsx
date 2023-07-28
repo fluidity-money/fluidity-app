@@ -7,9 +7,10 @@ import type { ButtonHTMLAttributes, ReactComponentElement } from "react";
 import { Text } from "~/components";
 import { ReactComponent as ArrowDiag } from "~/assets/images/buttonIcons/arrowDiagWhite.svg";
 import styles from "./ChainSelectorButton.module.scss";
+import { SupportedChains, SupportedChainsList } from "~/types";
 
 interface ChainOption {
-  name: string;
+  name: SupportedChainsList;
   icon: ReactComponentElement<any>;
 }
 
@@ -34,7 +35,7 @@ const ChainSelectorButton = ({
     >
       {chain.icon}
       <Text size={"lg"} prominent={true}>
-        {chain.name}
+        {SupportedChains[chain.name].short}
       </Text>
       <ArrowDiag />
     </button>

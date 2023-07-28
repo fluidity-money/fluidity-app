@@ -1,19 +1,12 @@
-export type ChainName =
-  | "ethereum"
-  | "solana"
-  | "arbitrum"
-  | "compound"
-  | "polygon_zk";
-
 interface Chain {
-  short: SupportedChainsList;
-  name: ChainName;
+  short: string;
+  name: string;
 }
 
 interface ISupportedChains {
   ETH: Chain;
   ARB: Chain;
-  POLY: Chain;
+  POLY_ZK: Chain;
   SOL: Chain;
 }
 
@@ -21,19 +14,19 @@ export type SupportedChainsList = keyof ISupportedChains;
 
 export const SupportedChains: ISupportedChains = {
   ETH: {
-    name: "ethereum",
+    name: "Ethereum",
     short: "ETH",
   },
   ARB: {
-    name: "arbitrum",
+    name: "Arbitrum",
     short: "ARB",
   },
-  POLY: {
-    name: "polygon_zk",
-    short: "POLY",
+  POLY_ZK: {
+    name: "Polygon zkEVM",
+    short: "POLY ZK",
   },
   SOL: {
-    name: "solana",
+    name: "Solana",
     short: "SOL",
   },
 };

@@ -421,7 +421,7 @@ address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
-polygon_zk = ""
+polygon_zk = "0xDB6d7F5aF3caDFEBBB86DD627C68fdC58cdEB91B"
 
 [contract.staking]
 ethereum = ""

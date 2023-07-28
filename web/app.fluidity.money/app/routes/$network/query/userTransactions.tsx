@@ -69,7 +69,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           ]
     );
 
-    console.log(winnersErr, winnersData, pendingWinnersData, pendingWinnersErr);
     if (
       winnersErr ||
       !winnersData ||
