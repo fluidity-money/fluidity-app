@@ -18,4 +18,10 @@ func init() {
 	if sushiswapStablePoolAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(sushiswapConstantProductPoolAbiString)
+
+	if sushiswapConstantProductPoolAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }

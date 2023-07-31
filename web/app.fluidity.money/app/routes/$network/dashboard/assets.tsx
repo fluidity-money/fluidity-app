@@ -111,10 +111,6 @@ const AssetsRoot = () => {
     undefined
   );
 
-  // Toggle Select Chain Modal
-  const [walletModalVisibility, setWalletModalVisibility] =
-    useState<boolean>(false);
-
   useEffect(() => {
     if (!connected || !balance) return;
 
