@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import type { ReactComponentElement } from "react";
-import { SupportedChainsList, SupportedChains } from "~/types"
+import { SupportedChainsList, SupportedChains } from "~/types";
 
 import { useRef } from "react";
 import { useClickOutside } from "~/util/hooks/useClickOutside";
@@ -14,6 +14,7 @@ import styles from "./BlockchainModal.module.scss";
 export interface IOption {
   name: SupportedChainsList;
   icon: ReactComponentElement<any>;
+  disabled?: boolean;
 }
 
 export interface IBlockchainModal {
@@ -56,7 +57,10 @@ const BlockchainModal = ({
     <div ref={blockchainModal} className={classProps}>
       <div className={styles.heading}>
         <Heading as={"h4"}>Select a Blockchain</Heading>
-        <button onClick={() => handleModal(false)} style={{all:'unset', cursor: 'pointer'}}>
+        <button
+          onClick={() => handleModal(false)}
+          style={{ all: "unset", cursor: "pointer" }}
+        >
           <Text size={"xl"} prominent={true}>
             X
           </Text>
@@ -67,12 +71,12 @@ const BlockchainModal = ({
           <Card
             component="button"
             className={`${styles.card}`}
-            type="transparent" 
-            color="holo" 
+            type="transparent"
+            color="holo"
             border="solid"
             rounded={true}
             onClick={() => handleOnClick(i)}
-            style={{flexDirection: 'row', gap: '1em'}}
+            style={{ flexDirection: "row", gap: "1em" }}
           >
             {option.icon}
             <Text size={"lg"} prominent={true}>
@@ -80,39 +84,29 @@ const BlockchainModal = ({
             </Text>
             <Checkmark style={{ marginLeft: "auto", marginRight: "24px" }} />
           </Card>
-        ) : option.name === "SOL" ? (
+        ) : (
           // Hardcode to disallow Solana
           <Card
             component="button"
             className={`${styles.card}`}
-            type="transparent" 
-            color="gray" 
+            type="transparent"
+            color="gray"
             border="solid"
             rounded={true}
             onClick={() => {
-              return;
+              if (option.disabled) return;
+              return handleOnClick(i);
             }}
-            disabled={true}
-            style={{flexDirection: 'row', gap: '1em'}}
+            disabled={!!option.disabled}
+            style={{ flexDirection: "row", gap: "1em" }}
           >
             {option.icon}
-            <Text size={"lg"} className={styles.disabled}>
+            <Text
+              size={"lg"}
+              className={`${!!option.disabled && styles.disabled}`}
+            >
               {SupportedChains[option.name].name}
             </Text>
-          </Card>
-        ) : (
-          <Card
-            component="button"
-            className={`${styles.card}`}
-            type="transparent" 
-            color="gray" 
-            border="solid"
-            rounded={true}
-            onClick={() => handleOnClick(i)}
-            style={{flexDirection: 'row', gap: '1em'}}
-          >
-            {option.icon}
-            <Text size={"lg"}>{SupportedChains[option.name].name}</Text>
           </Card>
         )
       )}

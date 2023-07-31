@@ -14,7 +14,6 @@ import "../interfaces/IFluidClient.sol";
 import "../interfaces/ILiquidityProvider.sol";
 import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IToken.sol";
-import "../interfaces/ITransferWithBeneficiary.sol";
 
 import "./openzeppelin/SafeERC20.sol";
 
@@ -28,7 +27,6 @@ uint constant FEE_DENOM = 1000;
 contract Token is
     IFluidClient,
     IERC2612,
-    ITransferWithBeneficiary,
     IToken,
     IEmergencyMode,
     IOperatorOwned
@@ -721,26 +719,6 @@ contract Token is
             deltaWeightDenom: 1,
             customCalculationType: DEFAULT_CALCULATION_TYPE
         });
-    }
-
-    /* ~~~~~~~~~~ IMPLEMENTS ITransferWithBeneficiary ~~~~~~~~~~ */
-
-    /// @inheritdoc ITransferWithBeneficiary
-    function transferWithBeneficiary(
-        address _token,
-        uint256 _amount,
-        address _beneficiary,
-        uint64 /* data */
-    ) external override returns (bool) {
-        bool rc;
-
-        rc = Token(_token).transferFrom(msg.sender, address(this), _amount);
-
-        if (!rc) return false;
-
-        rc = Token(_token).transfer(_beneficiary, _amount);
-
-        return rc;
     }
 
     /* ~~~~~~~~~~ IMPLEMENTS IERC2612 ~~~~~~~~~~ */
