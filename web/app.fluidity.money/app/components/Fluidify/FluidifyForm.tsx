@@ -191,23 +191,6 @@ export const FluidifyForm = ({
       <Text>
         Creating {addDecimalToBn(swapAmountAfterFee, toToken.decimals)}{" "}
         {toToken.symbol || ""}
-        {fee.gt(new BN(0)) && (
-          <GeneralButton
-            type="transparent"
-            size="small"
-            style={{
-              marginTop: "0.5em",
-              padding: "0.5em 1em",
-              borderColor: "grey",
-            }}
-            disabled
-          >
-            <Text code size="sm">
-              {addDecimalToBn(fee, toToken.decimals)} {toToken.symbol || ""}{" "}
-              collected in fees
-            </Text>
-          </GeneralButton>
-        )}
       </Text>
       {/* Tokens User Holds */}
       <Text prominent>
