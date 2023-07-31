@@ -135,9 +135,7 @@ const AssetsRoot = () => {
         <GeneralButton
           type={connected || connecting ? "transparent" : "primary"}
           size={"medium"}
-          handleClick={() =>
-            connecting ? null : toggleConnectWalletModal?.()
-          }
+          handleClick={() => (connecting ? null : toggleConnectWalletModal?.())}
           className="connect-wallet-btn"
         >
           {connecting ? `Connecting...` : `Connect Wallet`}

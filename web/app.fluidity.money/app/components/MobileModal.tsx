@@ -14,7 +14,6 @@ import {
   Trophy,
   numberToMonetaryString,
   ConnectedWalletModal,
-  ChainName,
   ConnectedWallet,
   BurgerMenu,
 } from "@fluidity-money/surfing";
@@ -29,7 +28,7 @@ type IMobileModal = {
   activeIndex: number;
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
-  network: ChainName;
+  network: string;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   unclaimedRewards: number;
@@ -93,7 +92,7 @@ export default function MobileModal({
   }
 
   if (chainModalVisibility) {
-    const handleSetChain = (network: ChainName) => {
+    const handleSetChain = (network: string) => {
       const { pathname } = location;
 
       // Get path components after $network
@@ -107,7 +106,7 @@ export default function MobileModal({
       <div className="select-blockchain-mobile">
         <BlockchainModal
           handleModal={setChainModalVisibility}
-          option={chains[network satisfies ChainName]}
+          option={chains[network]}
           options={Object.values(chains)}
           setOption={handleSetChain}
           mobile={true}
@@ -154,7 +153,7 @@ export default function MobileModal({
               {/* Chain Switcher */}
               {showMobileNetworkButton && (
                 <ChainSelectorButton
-                  chain={chains[network satisfies ChainName]}
+                  chain={chains[network]}
                   onClick={() => setChainModalVisibility(true)}
                 />
               )}
@@ -208,7 +207,7 @@ export default function MobileModal({
             {/* Chain Switcher */}
             {!showMobileNetworkButton && (
               <ChainSelectorButton
-                chain={chains[network satisfies ChainName]}
+                chain={chains[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
             )}

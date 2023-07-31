@@ -16,6 +16,7 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { getTokenForNetwork } from "~/util";
+import { chainType } from "~/util/chainUtils/chains";
 
 const FLUID_UTILITY = "FLUID";
 
@@ -308,7 +309,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         timestamp: tx.timestamp,
         logo: tokenLogoMap[tx.currency] || defaultLogo,
         provider:
-          (network === "ethereum" || network === "arbitrum"
+          (chainType(network) === "evm"
             ? winner?.ethereum_application
             : winner?.solana_application) ?? "Fluidity",
         swapType,

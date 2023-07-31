@@ -129,6 +129,42 @@ const queryByAddress: Queryable = {
       }
     }
   `,
+
+  polygon_zk: gql`
+    query getTransactionsByAddress(
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "polygon_zk" }
+          token_short_name: { _in: $tokens }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
 };
 
 const queryByTxHash: Queryable = {
@@ -211,6 +247,35 @@ const queryByTxHash: Queryable = {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { _in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  polygon_zk: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "polygon_zk" }
           _not: { transaction_hash: { _in: $filterHashes } }
           transaction_hash: { _in: $transactions }
         }
@@ -341,6 +406,37 @@ const queryAll: Queryable = {
       }
     }
   `,
+
+  polygon_zk: gql`
+    query getTransactions(
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "polygon_zk" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          token_short_name: { _in: $tokens }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
 };
 
 type UserTransactionsByAddressBody = {
@@ -441,7 +537,7 @@ const useUserTransactionsByAddress = async (
     filterHashes,
     limit,
     tokens:
-      network !== "arbitrum"
+      network in ["ethereum", "solana"]
         ? tokens
         : // convert tokens to token_short_name
           tokens
@@ -538,7 +634,7 @@ const useUserTransactionsAll = async (
     filterHashes,
     limit,
     tokens:
-      network !== "arbitrum"
+      network in ["ethereum", "solana"]
         ? tokens
         : // convert tokens to token_short_name
           tokens
