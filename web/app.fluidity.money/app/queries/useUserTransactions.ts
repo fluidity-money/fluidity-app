@@ -444,10 +444,10 @@ const useUserTransactionsByAddress = async (
       network !== "arbitrum"
         ? tokens
         : // convert tokens to token_short_name
-        tokens
-          .map((addr) => getTokenFromAddress(network, addr))
-          .filter((token): token is Token => !!token)
-          .map(({ symbol }) => symbol.slice(1)),
+          tokens
+            .map((addr) => getTokenFromAddress(network, addr))
+            .filter((token): token is Token => !!token)
+            .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -465,18 +465,18 @@ const useUserTransactionsByAddress = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-        await jsonPost<
-          UserTransactionsByAddressBody,
-          HasuraUserTransactionRes
-        >(url, body, headers)
-      )
+          await jsonPost<
+            UserTransactionsByAddressBody,
+            HasuraUserTransactionRes
+          >(url, body, headers)
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<
-          UserTransactionsByAddressBody,
-          BitqueryUserTransactionRes
-        >(url, body, headers),
-        network
-      );
+          await jsonPost<
+            UserTransactionsByAddressBody,
+            BitqueryUserTransactionRes
+          >(url, body, headers),
+          network
+        );
 
   return result;
 };
@@ -510,18 +510,18 @@ const useUserTransactionsByTxHash = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-        await jsonPost<
-          UserTransactionsByTxHashBody,
-          HasuraUserTransactionRes
-        >(url, body, headers)
-      )
+          await jsonPost<
+            UserTransactionsByTxHashBody,
+            HasuraUserTransactionRes
+          >(url, body, headers)
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<
-          UserTransactionsByTxHashBody,
-          BitqueryUserTransactionRes
-        >(url, body, headers),
-        network
-      );
+          await jsonPost<
+            UserTransactionsByTxHashBody,
+            BitqueryUserTransactionRes
+          >(url, body, headers),
+          network
+        );
 
   return result;
 };
@@ -541,10 +541,10 @@ const useUserTransactionsAll = async (
       network !== "arbitrum"
         ? tokens
         : // convert tokens to token_short_name
-        tokens
-          .map((addr) => getTokenFromAddress(network, addr))
-          .filter((token): token is Token => !!token)
-          .map(({ symbol }) => symbol.slice(1)),
+          tokens
+            .map((addr) => getTokenFromAddress(network, addr))
+            .filter((token): token is Token => !!token)
+            .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -562,20 +562,20 @@ const useUserTransactionsAll = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-        await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-          url,
-          body,
-          headers
+          await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+            url,
+            body,
+            headers
+          )
         )
-      )
       : parseBitqueryUserTransactions(
-        await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
-          url,
-          body,
-          headers
-        ),
-        network
-      );
+          await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
+            url,
+            body,
+            headers
+          ),
+          network
+        );
 
   return result;
 };

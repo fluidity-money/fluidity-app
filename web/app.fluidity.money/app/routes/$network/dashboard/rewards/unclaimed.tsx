@@ -14,7 +14,6 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { UserRewards } from "./common";
 import { getTxExplorerLink, getAddressExplorerLink } from "~/util";
 
-import { motion } from "framer-motion";
 import { Table } from "~/components";
 import {
   Heading,
@@ -104,23 +103,23 @@ const UnclaimedWinnings = () => {
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
 
   // Get claimed Rewards
-  const unclaimedRewardColumns = isSmallMobile
-    ? [{ name: "TOKEN" }, { name: "REWARD" }]
-    : [
-        {
-          name: "TOKEN",
-        },
-        {
-          name: "REWARD",
-        },
-        {
-          name: "TRANSACTION",
-        },
-        {
-          name: "BLOCK",
-          alignRight: true,
-        },
-      ];
+  const unclaimedRewardColumns = [
+    {
+      name: "TOKEN",
+    },
+    {
+      name: "REWARD",
+    },
+    {
+      name: "TRANSACTION",
+      show: !isSmallMobile,
+    },
+    {
+      name: "BLOCK",
+      show: !isSmallMobile,
+      alignRight: true,
+    },
+  ];
 
   const unclaimedTokenColumns = [{ name: "TOKEN" }, { name: "REWARD" }];
 
@@ -131,134 +130,112 @@ const UnclaimedWinnings = () => {
     { name: "My Winnings", filter: () => true },
   ];
 
-  const RewardRow = (chain: Chain): IRow<UserUnclaimedReward> =>
-    function Row({
-      data,
-      index,
-    }: {
-      data: UserUnclaimedReward;
-      index: number;
-    }) {
-      const {
-        token_decimals,
-        token_short_name,
-        transaction_hash,
-        win_amount,
-        block_number,
-      } = data;
+  const rewardRow = (data: UserUnclaimedReward, chain: Chain): IRow => {
+    const {
+      token_decimals,
+      token_short_name,
+      transaction_hash,
+      win_amount,
+      block_number,
+    } = data;
 
-      const rewardUsd = win_amount / 10 ** token_decimals;
+    const rewardUsd = win_amount / 10 ** token_decimals;
 
-      return (
-        <motion.tr
-          key={`${transaction_hash}-${index}`}
-          variants={{
-            enter: { opacity: [0, 1] },
-            ready: { opacity: 1 },
-            exit: { opacity: 0 },
-            transitioning: {
-              opacity: [0.75, 1, 0.75],
-              transition: { duration: 1.5, repeat: Infinity },
-            },
-          }}
-        >
-          {/* Token */}
-          <td>
-            <a
-              className="table-activity"
-              href={getAddressExplorerLink(
-                network,
-                tokenDetailsMap[token_short_name].address ?? ""
-              )}
-            >
-              <img
-                src={
-                  tokenDetailsMap[token_short_name].logo ??
-                  "/assets/tokens/usdt.svg"
-                }
-              />
-              <Text>{token_short_name}</Text>
-            </a>
-          </td>
-
-          {/* Reward */}
-          <td>
-            <Text prominent>{numberToMonetaryString(rewardUsd)}</Text>
-          </td>
-
-          {/* Transaction */}
-          {!isSmallMobile && (
-            <td>
-              <a
-                className="table-address"
-                href={getTxExplorerLink(chain, transaction_hash)}
-              >
-                <Text>{trimAddress(transaction_hash)}</Text>
-              </a>
-            </td>
-          )}
-
-          {/* Block Number */}
-          {!isSmallMobile && (
-            <td>
-              <a
-                style={{ textDecoration: "underline" }}
-                href={getBlockExplorerLink(network, block_number)}
-              >
-                <Text>{block_number}</Text>
-              </a>
-            </td>
-          )}
-        </motion.tr>
-      );
+    return {
+      RowElement: ({ heading }: { heading: string }) => {
+        switch (heading) {
+          case "TOKEN":
+            return (
+              <td>
+                <a
+                  className="table-activity"
+                  href={getAddressExplorerLink(
+                    network,
+                    tokenDetailsMap[token_short_name].address ?? ""
+                  )}
+                >
+                  <img
+                    src={
+                      tokenDetailsMap[token_short_name].logo ??
+                      "/assets/tokens/usdt.svg"
+                    }
+                  />
+                  <Text>{token_short_name}</Text>
+                </a>
+              </td>
+            );
+          case "REWARD":
+            return (
+              <td>
+                <Text prominent>{numberToMonetaryString(rewardUsd)}</Text>
+              </td>
+            );
+          case "TRANSACTION":
+            return (
+              <td>
+                <a
+                  className="table-address"
+                  href={getTxExplorerLink(chain, transaction_hash)}
+                >
+                  <Text>{trimAddress(transaction_hash)}</Text>
+                </a>
+              </td>
+            );
+          case "BLOCK":
+            return (
+              <td>
+                <a
+                  style={{ textDecoration: "underline" }}
+                  href={getBlockExplorerLink(network, block_number)}
+                >
+                  <Text>{block_number}</Text>
+                </a>
+              </td>
+            );
+          default:
+            return <></>;
+        }
+      },
     };
+  };
 
-  const BreakdownRow = (chain: Chain): IRow<TokenUnclaimedReward> =>
-    function Row({
-      data,
-      index,
-    }: {
-      data: TokenUnclaimedReward;
-      index: number;
-    }) {
-      const { reward, symbol } = data;
+  const breakdownRow = (data: TokenUnclaimedReward, chain: Chain): IRow => {
+    const { reward, symbol } = data;
 
-      return (
-        <motion.tr
-          key={`${symbol}-${index}`}
-          variants={{
-            enter: { opacity: [0, 1] },
-            ready: { opacity: 1 },
-            exit: { opacity: 0 },
-            transitioning: {
-              opacity: [0.75, 1, 0.75],
-              transition: { duration: 1.5, repeat: Infinity },
-            },
-          }}
-        >
-          {/* Token */}
-          <td>
-            <a
-              className="table-activity"
-              href={getAddressExplorerLink(
-                chain,
-                tokenDetailsMap[symbol].address ?? ""
-              )}
-            >
-              <img
-                src={tokenDetailsMap[symbol].logo ?? "/assets/tokens/usdt.svg"}
-              />
-              <Text>{symbol}</Text>
-            </a>
-          </td>
-
-          {/* Reward */}
-          <td>
-            <Text prominent>{numberToMonetaryString(reward)}</Text>
-          </td>
-        </motion.tr>
-      );
+    return {
+      RowElement: ({ heading }: { heading: string }) => {
+        switch (heading) {
+          case "TOKEN":
+            return (
+              <td>
+                <a
+                  className="table-activity"
+                  href={getAddressExplorerLink(
+                    chain,
+                    tokenDetailsMap[symbol].address ?? ""
+                  )}
+                >
+                  <img
+                    src={
+                      tokenDetailsMap[symbol].logo ?? "/assets/tokens/usdt.svg"
+                    }
+                  />
+                  <Text>{symbol}</Text>
+                </a>
+              </td>
+            );
+          case "REWARD":
+            return (
+              <td>
+                <Text prominent>{numberToMonetaryString(reward)}</Text>
+              </td>
+            );
+          default:
+            return <></>;
+        }
+      },
     };
+  };
 
   return (
     <div className="pad-main">
@@ -295,7 +272,7 @@ const UnclaimedWinnings = () => {
             headings={unclaimedTokenColumns}
             count={unclaimedTokens.length}
             data={unclaimedTokens}
-            renderRow={BreakdownRow(network)}
+            renderRow={(data) => breakdownRow(data, network)}
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
@@ -312,7 +289,7 @@ const UnclaimedWinnings = () => {
             headings={unclaimedRewardColumns}
             count={unclaimedTxs.length}
             data={unclaimedTxs}
-            renderRow={RewardRow(network)}
+            renderRow={(data) => rewardRow(data, network)}
             filters={winningTableViews}
             onFilter={setWinningTableViewIndex}
             activeFilterIndex={winningTableViewIndex}
