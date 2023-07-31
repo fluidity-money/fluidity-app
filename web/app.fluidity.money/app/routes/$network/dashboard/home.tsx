@@ -145,7 +145,7 @@ export default function Home() {
 
   const userHomeData = useFetcher();
   const userTransactionsData = useFetcher();
-  const prizePoolData = useFetcher();
+  const prizePoolData = useCache<{totalPrizePool: number}>(`/${network}/query/dashboard/prizePool`);
 
   const toolTip = useToolTip();
 
@@ -167,10 +167,6 @@ export default function Home() {
         />
       );
   };
-
-  useEffect(() => {
-    prizePoolData.load(`/${network}/query/dashboard/prizePool`);
-  }, []);
 
   useEffect(() => {
     if (!address) return;
