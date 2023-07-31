@@ -2,6 +2,7 @@ import { json } from "react-router-dom";
 import config from "~/webapp.config.server";
 import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
+import RegistryAbi from "~/util/chainUtils/ethereum/Registry.json";
 import {
   aggregatePrizePools,
   getTotalRewardPool,
@@ -24,6 +25,11 @@ export async function loader() {
           {
             network: "arbitrum",
             abi: TotalRewardPoolAbi,
+            getPrizePool: getTotalRewardPool,
+          },
+          {
+            network: "polygon_zk",
+            abi: RegistryAbi,
             getPrizePool: getTotalRewardPool,
           },
         ].map(({ network, abi, getPrizePool }) => {

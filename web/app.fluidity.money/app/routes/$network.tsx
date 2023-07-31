@@ -65,6 +65,7 @@ const Provider = ({
     ethereum: EthereumProvider(walletconnectId, tokens, network),
     solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
+    polygon_zk: EthereumProvider(walletconnectId, tokens, network),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");

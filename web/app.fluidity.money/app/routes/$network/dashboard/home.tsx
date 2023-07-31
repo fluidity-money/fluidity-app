@@ -4,7 +4,6 @@ import type Transaction from "~/types/Transaction";
 import type { HomeLoaderData } from "~/routes/$network/query/dashboard/home";
 import type { TransactionsLoaderData } from "~/routes/$network/query/userTransactions";
 
-import { motion } from "framer-motion";
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
 import { MintAddress } from "~/types/MintAddress";
@@ -50,6 +49,7 @@ type LoaderData = {
   colors: {
     [symbol: string]: string;
   };
+  debug?: boolean;
 };
 
 type CacheData = {
@@ -117,20 +117,24 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const _pageStr = url.searchParams.get("page");
   const _pageUnsafe = _pageStr ? parseInt(_pageStr) : 1;
   const txTablePage = _pageUnsafe > 0 ? _pageUnsafe : 1;
+  const debug = url.searchParams.get("debug");
 
   return json({
     network,
     page: txTablePage,
     colors: (await colors)[network],
+    debug,
   });
 };
 
 export default function Home() {
-  const { network, page, colors } = useLoaderData<LoaderData>();
+  const { network, page, colors, debug } = useLoaderData<LoaderData>();
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
   const { showExperiment } = useContext(SplitContext);
+
+  const useDebug = debug && showExperiment("show-debug");
 
   const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
@@ -238,59 +242,51 @@ export default function Home() {
   }, [connected]);
 
   const { width } = useViewport();
-  const isTablet = width < 850 && width > 0;
-  const isMobile = width < 500 && width > 0;
   const isSmallMobile = width < 375;
 
-  const txTableColumns = (() => {
-    switch (true) {
-      case isSmallMobile:
-        return [{ name: "ACTIVITY" }, { name: "VALUE" }];
-      case isMobile:
-        return [{ name: "ACTIVITY" }, { name: "VALUE" }, { name: "ACCOUNT" }];
-      case isTablet:
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "FLUID REWARDS" },
-          { name: "$UTILITY REWARDS" },
-          { name: "ACCOUNT" },
-        ];
-      default:
-        return [
-          { name: "ACTIVITY" },
-          { name: "VALUE" },
-          { name: "FLUID REWARDS" },
-          { name: "$UTILITY REWARDS" },
-          { name: "ACCOUNT" },
-          { name: "TIME", alignRight: true },
-        ];
-    }
-  })();
+  const txTableColumns = useDebug
+    ? [
+        { name: "tx" },
+        { name: "reward" },
+        { name: "app" },
+        { name: "utilities" },
+        { name: "VALUE" },
+        { name: "FLUID REWARDS" },
+        { name: "ACCOUNT" },
+        { name: "time" },
+      ]
+    : [
+        { name: "ACTIVITY" },
+        { name: "VALUE" },
+        { name: "FLUID REWARDS", show: width >= 500 },
+        { name: "$UTILITY REWARDS", show: width >= 500 },
+        { name: "ACCOUNT", show: width >= 375 },
+        { name: "TIME", show: width >= 850, alignRight: true },
+      ];
 
   const txTableFilters = address
     ? [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-      {
-        filter: ({
-          sender,
-          receiver,
-        }: {
-          sender: string;
-          receiver: string;
-        }) => [sender, receiver].includes(address),
-        name: "MY DASHBOARD",
-      },
-    ]
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+        {
+          filter: ({
+            sender,
+            receiver,
+          }: {
+            sender: string;
+            receiver: string;
+          }) => [sender, receiver].includes(address),
+          name: "MY DASHBOARD",
+        },
+      ]
     : [
-      {
-        filter: () => true,
-        name: "GLOBAL",
-      },
-    ];
+        {
+          filter: () => true,
+          name: "GLOBAL",
+        },
+      ];
 
   const {
     count,
@@ -365,133 +361,169 @@ export default function Home() {
     globalTransactionsData?.page,
   ]);
 
-  const TransactionRow = (chain: Chain): IRow<Transaction> =>
-    function Row({ data, index }: { data: Transaction; index: number }) {
-      const {
-        sender,
-        timestamp,
-        value,
-        reward,
-        hash,
-        rewardHash,
-        currency,
-        logo,
-        utilityTokens,
-        application,
-      } = data;
+  const transactionRow = (data: Transaction, chain: Chain): IRow => {
+    const {
+      sender,
+      timestamp,
+      value,
+      reward,
+      hash,
+      rewardHash,
+      currency,
+      logo,
+      utilityTokens,
+      application,
+    } = data;
 
-      const appProviderName = getProviderDisplayName(application);
+    const appProviderName = getProviderDisplayName(application);
 
-      return (
-        <motion.tr
-          key={`${timestamp}-${index}`}
-          variants={{
-            enter: { opacity: [0, 1] },
-            ready: { opacity: 1 },
-            exit: { opacity: 0 },
-            transitioning: {
-              opacity: [0.75, 1, 0.75],
-              transition: { duration: 1.5, repeat: Infinity },
-            },
-          }}
-        >
-          {/* Activity */}
-          <td>
-            <a
-              className="table-activity"
-              href={getTxExplorerLink(network, hash)}
-            >
-              {appProviderName !== "Fluidity" ? (
-                <ProviderIcon provider={appProviderName} />
-              ) : (
-                <TokenIcon token={currency} />
-              )}
-              <Text>{transactionActivityLabel(data, sender)}</Text>
-            </a>
-          </td>
-
-          {/* Value */}
-          <td>
-            <Text>{numberToMonetaryString(value)}</Text>
-          </td>
-
-          {/* Reward */}
-          {!isMobile && (
-            <td>
-              {reward ? (
+    return {
+      RowElement: ({ heading }: { heading: string }) => {
+        switch (heading) {
+          case "ACTIVITY":
+            return (
+              <td>
+                <a
+                  className="table-activity"
+                  href={getTxExplorerLink(network, hash)}
+                >
+                  {appProviderName !== "Fluidity" ? (
+                    <ProviderIcon provider={appProviderName} />
+                  ) : (
+                    <TokenIcon token={currency} />
+                  )}
+                  <Text>{transactionActivityLabel(data, sender)}</Text>
+                </a>
+              </td>
+            );
+          case "VALUE":
+            return (
+              <td>
+                <Text>{numberToMonetaryString(value)}</Text>
+              </td>
+            );
+          case "FLUID REWARDS":
+            return (
+              <td>
+                {reward ? (
+                  <a
+                    className="table-address"
+                    onClick={() =>
+                      handleRewardTransactionClick(
+                        network,
+                        currency,
+                        logo,
+                        rewardHash
+                      )
+                    }
+                  >
+                    <Text prominent={true}>
+                      {reward ? numberToMonetaryString(reward) : "-"}
+                    </Text>
+                  </a>
+                ) : (
+                  <Text>-</Text>
+                )}
+              </td>
+            );
+          case "$UTILITY REWARDS":
+            return (
+              <td>
+                {utilityTokens && Object.keys(utilityTokens).length ? (
+                  <a
+                    onClick={() =>
+                      handleRewardTransactionClick(
+                        network,
+                        currency,
+                        logo,
+                        rewardHash
+                      )
+                    }
+                  >
+                    {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
+                      <div key={utility} className="table-token">
+                        <UtilityToken utility={utility} />
+                        <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
+                      </div>
+                    ))}
+                  </a>
+                ) : (
+                  <Text>-</Text>
+                )}
+              </td>
+            );
+          case "ACCOUNT":
+            return (
+              <td>
                 <a
                   className="table-address"
-                  onClick={() =>
-                    handleRewardTransactionClick(
-                      network,
-                      currency,
-                      logo,
-                      rewardHash
-                    )
-                  }
+                  href={getAddressExplorerLink(chain, sender)}
                 >
-                  <Text prominent={true}>
-                    {reward ? numberToMonetaryString(reward) : "-"}
+                  <Text>
+                    {sender === MintAddress
+                      ? "Mint Address"
+                      : trimAddress(sender)}
                   </Text>
                 </a>
-              ) : (
-                <Text>-</Text>
-              )}
-            </td>
-          )}
-
-          {/* Utility column */}
-          {!isMobile && (
-            <td>
-              {utilityTokens && Object.keys(utilityTokens).length ? (
+              </td>
+            );
+          case "TIME":
+            return (
+              <td>
+                <Text>{transactionTimeLabel(timestamp)}</Text>
+              </td>
+            );
+          case "tx":
+            return (
+              <td>
                 <a
-                  onClick={() =>
-                    handleRewardTransactionClick(
-                      network,
-                      currency,
-                      logo,
-                      rewardHash
-                    )
-                  }
+                  className="table-activity"
+                  href={getTxExplorerLink(network, hash)}
                 >
-                  {Object.entries(utilityTokens).map(([utility, utilAmt]) => (
-                    <div key={utility} className="table-token">
-                      <UtilityToken utility={utility} />
-                      <Text>{toDecimalPlaces(utilAmt, 4)}</Text>
-                    </div>
-                  ))}
+                  <Text>{hash}</Text>
                 </a>
-              ) : (
-                <Text>-</Text>
-              )}
-            </td>
-          )}
-
-          {/* Account */}
-          {!isSmallMobile && (
-            <td>
-              <a
-                className="table-address"
-                href={getAddressExplorerLink(chain, sender)}
-              >
-                <Text>
-                  {sender === MintAddress
-                    ? "Mint Address"
-                    : trimAddress(sender)}
-                </Text>
-              </a>
-            </td>
-          )}
-
-          {/* Time */}
-          {!isTablet && (
-            <td>
-              <Text>{transactionTimeLabel(timestamp)}</Text>
-            </td>
-          )}
-        </motion.tr>
-      );
+              </td>
+            );
+          case "reward":
+            return (
+              <td>
+                {rewardHash ? (
+                  <a
+                    className="table-address"
+                    onClick={() =>
+                      handleRewardTransactionClick(
+                        network,
+                        currency,
+                        logo,
+                        rewardHash
+                      )
+                    }
+                  >
+                    <Text prominent={true}>{rewardHash}</Text>
+                  </a>
+                ) : (
+                  <Text>{reward ? "Pending" : "None"}</Text>
+                )}
+              </td>
+            );
+          case "app":
+            return (
+              <td>
+                <Text>{application}</Text>
+              </td>
+            );
+          case "utilities":
+            return (
+              <td>{utilityTokens ? JSON.stringify(utilityTokens) : "none"}</td>
+            );
+          case "time":
+            return <td>{timestamp}</td>;
+          default:
+            return <></>;
+        }
+      },
     };
+  };
 
   return (
     <>
@@ -525,8 +557,8 @@ export default function Home() {
                   {activeTableFilterIndex
                     ? "My yield"
                     : showExperiment("weekly-available-rewards")
-                      ? "Weekly available rewards"
-                      : "Total yield"}
+                    ? "Weekly available rewards"
+                    : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
@@ -536,9 +568,9 @@ export default function Home() {
                     activeTableFilterIndex ||
                       !showExperiment("weekly-available-rewards")
                       ? rewards.find(
-                        ({ network: rewardNetwork }) =>
-                          rewardNetwork === network
-                      )?.total_reward || 0
+                          ({ network: rewardNetwork }) =>
+                            rewardNetwork === network
+                        )?.total_reward || 0
                       : totalPrizePool / 52
                   )}
                 </Display>
@@ -745,7 +777,7 @@ export default function Home() {
           }}
           count={totalCount}
           data={transactions}
-          renderRow={TransactionRow(network)}
+          renderRow={(data) => transactionRow(data, network)}
           onFilter={setActiveTableFilterIndex}
           activeFilterIndex={activeTableFilterIndex}
           filters={txTableFilters}
