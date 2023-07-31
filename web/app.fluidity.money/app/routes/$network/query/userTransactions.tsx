@@ -109,7 +109,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         winner,
         reward,
         rewardHash,
-        timestamp,
+        // convert to JS timestamp
+        timestamp: timestamp * 1000,
         value,
         currency,
         application,
