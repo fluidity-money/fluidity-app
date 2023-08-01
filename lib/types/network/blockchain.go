@@ -15,7 +15,7 @@ const (
 	NetworkEthereum BlockchainNetwork = `ethereum`
 	NetworkArbitrum BlockchainNetwork = `arbitrum`
 	NetworkSolana   BlockchainNetwork = `solana`
-	NetworkPolygonZk BlockchainNetwork = `polygon-zk`
+	NetworkPolygonZk BlockchainNetwork = `polygon_zk`
 )
 
 // ParseEthereumNetwork takes a network name as a string

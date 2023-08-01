@@ -14,7 +14,7 @@ INSERT INTO worker_config_ethereum (
 )
 
 VALUES (
-	'polygon-zk',
+	'polygon_zk',
 	86400,
 	1,
 	0,
@@ -27,4 +27,4 @@ VALUES (
 
 -- migrate:down
 
-DELETE FROM worker_config_ethereum WHERE network = 'polygon-zk';
+DELETE FROM worker_config_ethereum WHERE network = 'polygon_zk';
