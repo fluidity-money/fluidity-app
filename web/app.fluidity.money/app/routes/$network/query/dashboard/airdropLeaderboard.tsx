@@ -22,12 +22,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
-  const address = url.searchParams.get("address") ?? "";
+  const address_ = url.searchParams.get("address") ?? "";
   const period = url.searchParams.get("period") ?? "";
   const provider_ = url.searchParams.get("provider") ?? "";
   const use24Hours = period === "24";
   const useAll = period === "all";
 
+  const address = address_.toLocaleLowerCase();
   const provider = AIRDROP_PROVIDERS.has(provider_) ? provider_ : "";
 
   if (!network) throw new Error("Invalid Request");

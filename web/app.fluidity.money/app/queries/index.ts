@@ -9,3 +9,5 @@ export * from "./useReferralCount";
 export * from "./addReferral";
 export * from "./useReferralCode";
 export * from "./addReferralCode";
+export * from "./useCurrentRewardEpoch";
+export * from "./useTradingCompLeaderboard";
