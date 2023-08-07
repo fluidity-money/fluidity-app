@@ -1,0 +1,16 @@
+{
+  "name": "microservice-epoch-rotation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/seedrandom": "3.0.5",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.385.0",
+    "@aws-sdk/client-lambda": "^3.385.0",
+    "aws-lambda": "^1.0.7",
+    "seedrandom": "3.0.5"
+  }
+}
