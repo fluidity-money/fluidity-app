@@ -1,16 +1,13 @@
 -- migrate:up
 CREATE TABLE reward_epoch (
-  -- id automatically counts epoch number
-  id SERIAL NOT NULL,
+  -- epoch_id automatically counts epoch number
+  epoch_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 
   -- start timestamp of epoch
-  start TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   -- end timestamp of epoch
-  end TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  -- application to be filtered for. Can be "none" (For Fluidity) or NULL (For All)
-  application ethereum_application
+  end_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
