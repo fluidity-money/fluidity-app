@@ -41,6 +41,16 @@ const options = {
         },
       },
     ],
+    zk_sync: [
+      {
+        label: "ZkSync Era",
+        testnet: false,
+        rpc: {
+          http: "",
+          ws: "",
+        },
+      },
+    ],
   },
 };
 

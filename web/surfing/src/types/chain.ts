@@ -7,6 +7,7 @@ interface ISupportedChains {
   ETH: Chain;
   ARB: Chain;
   POLY_ZK: Chain;
+  ZK_SYNC: Chain;
   SOL: Chain;
 }
 
@@ -28,5 +29,9 @@ export const SupportedChains: ISupportedChains = {
   SOL: {
     name: "Solana",
     short: "SOL",
+  },
+  ZK_SYNC: {
+    name: "ZkSync Era",
+    short: "zkSync",
   },
 };

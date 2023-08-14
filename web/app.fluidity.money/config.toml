@@ -21,6 +21,11 @@ label = "Polygon ZK"
 testnet = false
 rpc = { http = "FLU_POLYZK_RPC_HTTP", ws = "FLU_POLYZK_RPC_WS" }
 
+[[drivers.zk_sync]]
+label = "ZkSync Era"
+testnet = false
+rpc = { http = "FLU_ZKSYNC_RPC_HTTP", ws = "FLU_ZKSYNC_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -277,6 +282,11 @@ isFluidOf = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
 decimals = 6
 enabled = true
 
+[config.zk_sync]
+explorer = "https://explorer.zksync.io"
+fluidAssets = []
+tokens = []
+
 
 # liquidity_providers Configurations
 # eth providers
@@ -420,23 +430,13 @@ address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
 [contract.prize_pool]
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
-solana = ""
 polygon_zk = "0xDB6d7F5aF3caDFEBBB86DD627C68fdC58cdEB91B"
 
 [contract.staking]
-ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
-solana = ""
-polygon_zk = ""
 
 [contract.eac_aggregator_proxy]
-ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
-solana = ""
-polygon_zk = ""
 
 [contract.registry]
-ethereum = ""
 arbitrum = "0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d"
-solana = ""
-polygon_zk = ""

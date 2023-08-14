@@ -51,7 +51,11 @@ const CHAINS = [
   },
   {
     name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
+    icon: <img src="/assets/chains/polygonZkIcon.svg" />,
+  },
+  {
+    name: "ZK_SYNC",
+    icon: <img src="/assets/chains/zkSyncIcon.svg" />,
   },
   {
     name: "SOL",

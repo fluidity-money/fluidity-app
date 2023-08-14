@@ -47,7 +47,11 @@ const CHAIN_NAME_MAP: Record<
   },
   polygon_zk: {
     name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
+    icon: <img src="/assets/chains/polygonZkIcon.svg" />,
+  },
+  zk_sync: {
+    name: "ZK_SYNC",
+    icon: <img src="/assets/chains/zkSyncIcon.svg" />,
   },
   solana: {
     name: "SOL",

@@ -1,3 +1,11 @@
 public/assets/chains/ethIcon.svg filter=lfs diff=lfs merge=lfs -text
 public/assets/chains/polygonIcon.svg filter=lfs diff=lfs merge=lfs -text
 public/assets/chains/solanaIcon.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/tokens/fFRAX.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/tokens/fTUSD.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/tokens/fUSDC.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/tokens/fUSDT.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/tokens/weth.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/tokens/fDAI.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/chains/polygonZkIcon.svg filter=lfs diff=lfs merge=lfs -text
+public/assets/chains/zkSyncIcon.svg filter=lfs diff=lfs merge=lfs -text

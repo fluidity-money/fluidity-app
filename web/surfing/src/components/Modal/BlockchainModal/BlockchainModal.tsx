@@ -79,13 +79,12 @@ const BlockchainModal = ({
             style={{ flexDirection: "row", gap: "1em" }}
           >
             {option.icon}
-            <Text size={"lg"} prominent={true}>
+            <Text size={"lg"} prominent>
               <strong>{SupportedChains[option.name].name}</strong>
             </Text>
             <Checkmark style={{ marginLeft: "auto", marginRight: "24px" }} />
           </Card>
         ) : (
-          // Hardcode to disallow Solana
           <Card
             component="button"
             className={`${styles.card}`}

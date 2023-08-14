@@ -58,6 +58,10 @@ const networkMapper = (network: string) => {
       return "polygon_zk";
     case "polygon_zk":
       return "POLY_ZK";
+    case "ZK_SYNC":
+      return "zk_sync";
+    case "zk_sync":
+      return "ZK_SYNC";
     default:
       return "ETH";
   }

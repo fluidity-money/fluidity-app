@@ -1,4 +1,9 @@
-export type Chain = "ethereum" | "solana" | "arbitrum" | "polygon_zk";
+export type Chain =
+  | "ethereum"
+  | "solana"
+  | "arbitrum"
+  | "polygon_zk"
+  | "zk_sync";
 export type ChainType = "evm" | "solana";
 
 const chainType = (network: string): ChainType | undefined => {
@@ -6,6 +11,7 @@ const chainType = (network: string): ChainType | undefined => {
     case "ethereum":
     case "arbitrum":
     case "polygon_zk":
+    case "zk_sync":
       return "evm";
     case "solana":
       return "solana";
@@ -22,6 +28,8 @@ const getChainId = (network: Chain): number => {
       return 42161;
     case "polygon_zk":
       return 137;
+    case "zk_sync":
+      return 324;
     case "solana":
       return 1;
   }
@@ -40,6 +48,8 @@ const getNetworkFromChainId = (
       return "arbitrum";
     case 137:
       return "polygon_zk";
+    case 324:
+      return "zk_sync";
   }
 };
 
@@ -48,6 +58,7 @@ const getChainNativeToken = (network: string): string => {
     case "ethereum":
     case "arbitrum":
     case "polygon_zk":
+    case "zk_sync":
       return "ETH";
     case "solana":
       return "SOL";

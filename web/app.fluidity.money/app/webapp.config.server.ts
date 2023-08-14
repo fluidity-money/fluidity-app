@@ -34,23 +34,21 @@ const OptionsSchema = z.object({
     z.object({
       explorer: z.string(),
       fluidAssets: z.array(z.string()),
-      tokens: z
-        .array(
-          z.object({
-            symbol: z.string(),
-            name: z.string(),
-            logo: z.string(),
-            address: z.string(),
-            colour: z.string(),
-            isFluidOf: z.string().optional(),
-            obligationAccount: z.string().optional(),
-            dataAccount: z.string().optional(),
-            decimals: z.number(),
-            userMintLimit: z.number().optional(),
-            enabled: z.boolean(),
-          })
-        )
-        .min(1),
+      tokens: z.array(
+        z.object({
+          symbol: z.string(),
+          name: z.string(),
+          logo: z.string(),
+          address: z.string(),
+          colour: z.string(),
+          isFluidOf: z.string().optional(),
+          obligationAccount: z.string().optional(),
+          dataAccount: z.string().optional(),
+          decimals: z.number(),
+          userMintLimit: z.number().optional(),
+          enabled: z.boolean(),
+        })
+      ),
       wallets: z
         .array(
           z.object({
@@ -83,16 +81,18 @@ const OptionsSchema = z.object({
   ),
   contract: z.object({
     prize_pool: z.object({
-      ethereum: z.string(),
-      arbitrum: z.string(),
-      solana: z.string(),
-      polygon_zk: z.string(),
+      ethereum: z.string().optional(),
+      arbitrum: z.string().optional(),
+      solana: z.string().optional(),
+      polygon_zk: z.string().optional(),
+      zk_sync: z.string().optional(),
     }),
     eac_aggregator_proxy: z.object({
-      ethereum: z.string(),
-      arbitrum: z.string(),
-      solana: z.string(),
-      polygon_zk: z.string(),
+      ethereum: z.string().optional(),
+      arbitrum: z.string().optional(),
+      solana: z.string().optional(),
+      polygon_zk: z.string().optional(),
+      zk_sync: z.string().optional(),
     }),
   }),
 });
