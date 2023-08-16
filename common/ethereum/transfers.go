@@ -136,14 +136,17 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			continue
 		}
 
-		decorator = &worker.EthereumWorkerDecorator{
-			Volume: volumeBigInt,
+		// try classify sends to Utility contracts as that utility
+		utility, exists := utilities[toAddress]
+
+		// Else classify transfer as FLUID utility
+		if !exists {
+			utility, exists = utilities[ethereum.AddressFromString(transferContractAddress)]
 		}
 
-		utility, exists := utilities[ethereum.AddressFromString(transferContractAddress)]
-
-		if exists {
-			decorator.UtilityName = utility
+		decorator = &worker.EthereumWorkerDecorator{
+			Volume:      volumeBigInt,
+			UtilityName: utility,
 		}
 
 		transfer := worker.EthereumDecoratedTransfer{
