@@ -23,7 +23,7 @@ export const SupportedChains: ISupportedChains = {
   },
   POLY_ZK: {
     name: "Polygon zkEVM",
-    short: "POLY ZK",
+    short: "ZkEVM",
   },
   SOL: {
     name: "Solana",

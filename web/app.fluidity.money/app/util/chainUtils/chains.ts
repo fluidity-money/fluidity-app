@@ -21,7 +21,7 @@ const getChainId = (network: Chain): number => {
     case "arbitrum":
       return 42161;
     case "polygon_zk":
-      return 137;
+      return 1101;
     case "solana":
       return 1;
   }
@@ -38,7 +38,7 @@ const getNetworkFromChainId = (
       return "ethereum";
     case 42161:
       return "arbitrum";
-    case 137:
+    case 1101:
       return "polygon_zk";
   }
 };
