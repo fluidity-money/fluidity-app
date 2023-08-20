@@ -23,12 +23,13 @@ const RANDOM_ORG_URI = `https://api.random.org/json-rpc/4/invoke`
 const DEFAULT_UNIX = -62135596800
 
 const (
-	// EnvAwsClusterName to determine which cluster to restart the services in
+	// EnvRandomOrgSecret used for Random.org requests
 	EnvRandomOrgSecret = `FLU_RANDOM_ORG_SECRET`
 
-	// EnvAwsServiceName to match services that include it in their names
+	// EnvMeanEpochDays for gaussian distribution generation
 	EnvMeanEpochDays = `FLU_REWARD_EPOCH_MEAN_DAYS`
 
+	// EnvEpochApplications for next epoch. Empty to track all applications
 	EnvEpochApplications = `FLU_REWARD_EPOCH_APPLICATIONS`
 )
 
@@ -64,7 +65,7 @@ type RandomOrgRes struct {
 	} `json:"result"`
 }
 
-func getGaussanValues(apiKey string, n, mean, sd, sigDigits int64) []float64 {
+func getGaussianValues(apiKey string, n, mean, sd, sigDigits int64) []float64 {
 	params := RandomOrgReqBodyParams{
 		ApiKey:            apiKey,
 		N:                 n,
@@ -141,7 +142,7 @@ func listFromEnv(env string) []string {
 	return valuesList
 }
 
-func absDiff(a, b int) int {
+func absDiff(a, b int64) int64 {
 	if a < b {
 		return b - a
 	}
@@ -174,8 +175,22 @@ func main() {
 		k.Format("currTime: %v", currentEpochEndTime)
 	})
 
+	var (
+		// numValues is number of values to generate
+		numValues = int64(5)
+
+		// meanValue is meanEpochDays in seconds
+		meanEpochSeconds = int64(meanEpochDays * 24 * 60 * 60)
+
+		// sd Value is +/-12 Hours in seconds
+		sdValue = int64(12 * 60 * 60)
+
+		// significantDigits is 6, to make time values accurate between 1.16 days 11.6 days
+		significantDigits = int64(6)
+	)
+
 	// get next epoch length
-	gaussianRes := getGaussanValues(randomOrgSecret, 5, int64(meanEpochDays)*24*60*60, 12*60*60, 6)
+	gaussianRes := getGaussianValues(randomOrgSecret, numValues, meanEpochSeconds, sdValue, significantDigits)
 
 	log.Debug(func(k *log.Log) {
 		k.Format("res: %v", gaussianRes)
@@ -187,7 +202,7 @@ func main() {
 	var closestDuration time.Duration
 
 	for _, durationSeconds := range gaussianRes {
-		if closestDuration == 0 || absDiff(int(closestDuration), int(idealEndTime)) > absDiff(int(durationSeconds), int(idealEndTime)) {
+		if closestDuration == 0 || absDiff(closestDuration, idealEndTime) > absDiff(durationSeconds, idealEndTime) {
 			closestDuration = time.Duration(durationSeconds) * time.Second
 		}
 	}
