@@ -86,14 +86,14 @@ contract Token is
     ///      rewarded by this user?]]
     /// @dev deprecated, we don't do manual rewards anymore
     // solhint-disable-nex-line var-name-mixedcase
-    mapping(address => mapping(uint => uint)) private __deprecated_3;
+    mapping (address => mapping(uint => uint)) private __deprecated_3;
 
     /// @dev amount a user has manually rewarded, to be removed from their
     ///      batched rewards
     /// @dev [address] => [amount manually rewarded]
     /// @dev deprecated, we don't do manual rewards anymore
     // solhint-disable-nex-line var-name-mixedcase
-    mapping(address => uint) private __deprecated_4;
+    mapping (address => uint) private __deprecated_4;
 
     /* ~~~~~~~~~~ SECURITY FEATURES ~~~~~~~~~~ */
 
@@ -101,7 +101,7 @@ contract Token is
     uint private maxUncheckedReward_;
 
     /// @dev [address] => [number of tokens the user won that have been quarantined]
-    mapping(address => uint) private blockedRewards_;
+    mapping (address => uint) private blockedRewards_;
 
     /* ~~~~~~~~~~ DEPRECATED SLOTS ~~~~~~~~~~ */
 
@@ -118,11 +118,11 @@ contract Token is
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    mapping(address => uint) private __deprecated_6;
+    mapping (address => uint) private __deprecated_6;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
-    mapping(address => uint) private __deprecated_7;
+    mapping (address => uint) private __deprecated_7;
 
     /// @notice deprecated, mint limits no longer exist
     // solhint-disable-next-line var-name-mixedcase
@@ -148,7 +148,7 @@ contract Token is
 
     // @dev nonces_ would be used for permit only, but it could be used for
     //      every off-chain sign if needed
-    mapping(address => uint256) private nonces_;
+    mapping (address => uint256) private nonces_;
 
     uint256 private initialChainId_;
 
@@ -167,12 +167,11 @@ contract Token is
 
     /* ~~~~~~~~~~ VOLUME TRACKNG ~~~~~~~~~~ */
 
-    struct EpochVolume {
-        uint256 globalVolume;
-        mapping(address => uint256) userVolume;
-    }
+    // @dev [epochBlockNum => address => volume contributed by user in epoch]
+    mapping(uint256 => mapping(address => uint256)) private epochUserVolume_;
 
-    mapping(uint256 => EpochVolume) private epochVolume_;
+    // @dev [epochBlockNum =>  volume contributed by all users in epoch]
+    mapping(uint256 => uint256) private epochVolume_;
 
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
@@ -180,18 +179,15 @@ contract Token is
      * @notice computeDomainSeparator that's used for EIP712
      */
     function computeDomainSeparator() internal view virtual returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(
-                    keccak256(
-                        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-                    ),
-                    keccak256(bytes(name_)),
-                    keccak256("1"),
-                    block.chainid,
-                    address(this)
-                )
-            );
+        return keccak256(
+            abi.encode(
+                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                keccak256(bytes(name_)),
+                keccak256("1"),
+                block.chainid,
+                address(this)
+            )
+        );
     }
 
     function _setupEIP2612() internal {
@@ -215,7 +211,7 @@ contract Token is
      * @param _operator address that can release quarantine payouts and activate emergency mode
      * @param _oracle address that can call the reward function
      */
-    function init(
+     function init(
         address _liquidityProvider,
         uint8 _decimals,
         string memory _name,
@@ -304,9 +300,10 @@ contract Token is
         // give the user fluid tokens
 
         // calculate the fee to take
-        uint256 feeAmount = (mintFee_ != 0 && realAmount > mintFee_)
-            ? (realAmount * mintFee_) / FEE_DENOM
-            : 0;
+        uint256 feeAmount =
+            (mintFee_ != 0 && realAmount > mintFee_)
+                ? (realAmount * mintFee_) / FEE_DENOM
+                : 0;
 
         // calculate the amount to give the user
         uint256 mintAmount = realAmount - feeAmount;
@@ -328,12 +325,13 @@ contract Token is
     ) internal returns (uint256) {
         // take the user's fluid tokens
 
-        // if the fee amount > 0 and the burn fee is greater than 0, then
-        // we take burn fee% of the amount given by the user
+         // if the fee amount > 0 and the burn fee is greater than 0, then
+         // we take burn fee% of the amount given by the user
 
-        uint256 feeAmount = (burnFee_ != 0 && _amount > burnFee_)
-            ? (_amount * burnFee_) / FEE_DENOM
-            : 0;
+        uint256 feeAmount =
+            (burnFee_ != 0 && _amount > burnFee_)
+                ? (_amount * burnFee_) / FEE_DENOM
+                : 0;
 
         // burn burnAmount
 
@@ -387,6 +385,7 @@ contract Token is
         emit Reward(winner, amount, firstBlock, lastBlock);
     }
 
+
     function _reward(address winner, uint256 amount) internal {
         require(noEmergencyMode_, "emergency mode!");
 
@@ -396,7 +395,11 @@ contract Token is
     }
 
     /// @dev _transfer is implemented by OpenZeppelin
-    function _transfer(address from, address to, uint256 amount) internal {
+    function _transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
         // solhint-disable-next-line reason-string
         require(from != address(0), "ERC20: transfer from the zero address");
 
@@ -406,10 +409,7 @@ contract Token is
         uint256 fromBalance = balances_[from];
 
         // solhint-disable-next-line reason-string
-        require(
-            fromBalance >= amount,
-            "ERC20: transfer amount exceeds balance"
-        );
+        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
 
         unchecked {
             balances_[from] = fromBalance - amount;
@@ -422,9 +422,8 @@ contract Token is
         uint256 startEpoch = 0;
 
         // set epoch volume
-        EpochVolume storage currentEpochVolume = epochVolume_[startEpoch];
-        currentEpochVolume.globalVolume += amount;
-        currentEpochVolume.userVolume[from] += amount;
+        epochVolume_[startEpoch] += amount;
+        epochUserVolume_[startEpoch][from] += amount;
 
         emit Transfer(from, to, amount);
     }
@@ -441,9 +440,8 @@ contract Token is
         uint256 startEpoch = 0;
 
         // set epoch volume
-        EpochVolume storage currentEpochVolume = epochVolume_[startEpoch];
-        currentEpochVolume.globalVolume += _amount;
-        currentEpochVolume.userVolume[_account] += _amount;
+        epochVolume_[startEpoch] += _amount;
+        epochUserVolume_[startEpoch][_account] += _amount;
 
         emit Transfer(address(0), _account, _amount);
     }
@@ -456,13 +454,12 @@ contract Token is
         uint256 accountBalance = balances_[_account];
 
         // solhint-disable-next-line reason-string
-        require(
-            accountBalance >= _amount,
-            "ERC20: burn amount exceeds balance"
-        );
+        require(accountBalance >= _amount, "ERC20: burn amount exceeds balance");
+
 
         unchecked {
             balances_[_account] = accountBalance - _amount;
+
         }
 
         totalSupply_ -= _amount;
@@ -472,9 +469,8 @@ contract Token is
         uint256 startEpoch = 0;
 
         // set epoch volume
-        EpochVolume storage currentEpochVolume = epochVolume_[startEpoch];
-        currentEpochVolume.globalVolume += _amount;
-        currentEpochVolume.userVolume[_account] += _amount;
+        epochVolume_[startEpoch] += _amount;
+        epochUserVolume_[startEpoch][_account] += _amount;
 
         emit Transfer(_account, address(0), _amount);
     }
@@ -536,9 +532,7 @@ contract Token is
     /* ~~~~~~~~~~ IMPLEMENTS IOperatorOwned ~~~~~~~~~~ */
 
     /// @inheritdoc IOperatorOwned
-    function operator() public view returns (address) {
-        return operator_;
-    }
+    function operator() public view returns (address) { return operator_; }
 
     /* ~~~~~~~~~~ IMPLEMENTS IEmergencyMode ~~~~~~~~~~ */
 
@@ -546,8 +540,8 @@ contract Token is
     function enableEmergencyMode() public {
         require(
             msg.sender == operator_ ||
-                msg.sender == emergencyCouncil_ ||
-                msg.sender == oracle_,
+            msg.sender == emergencyCouncil_ ||
+            msg.sender == oracle_,
             "can't enable emergency mode!"
         );
 
@@ -628,14 +622,11 @@ contract Token is
 
     /// @inheritdoc IToken
     function erc20Out(uint256 _amount) public returns (uint256) {
-        return _erc20Out(msg.sender, msg.sender, _amount);
+        return _erc20Out(msg.sender, msg.sender,_amount);
     }
 
     /// @inheritdoc IToken
-    function erc20OutTo(
-        address _recipient,
-        uint256 _amount
-    ) public returns (uint256) {
+    function erc20OutTo(address _recipient, uint256 _amount) public returns (uint256) {
         return _erc20Out(msg.sender, _recipient, _amount);
     }
 
@@ -688,25 +679,25 @@ contract Token is
     function upgradeLiquidityProvider(
         ILiquidityProvider _newPool,
         uint256 _minTokenAfterShift
-    ) public returns (uint256) {
-        require(noEmergencyMode_, "emergency mode");
-        require(msg.sender == operator_, "operator only");
+     ) public returns (uint256) {
+      require(noEmergencyMode_, "emergency mode");
+      require(msg.sender == operator_, "operator only");
 
-        uint oldPoolAmount = pool_.totalPoolAmount();
+      uint oldPoolAmount = pool_.totalPoolAmount();
 
-        pool_.takeFromPool(oldPoolAmount);
+      pool_.takeFromPool(oldPoolAmount);
 
-        pool_ = _newPool;
+      pool_ = _newPool;
 
-        underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
+      underlyingToken().safeTransfer(address(pool_), oldPoolAmount);
 
-        pool_.addToPool(oldPoolAmount);
+      pool_.addToPool(oldPoolAmount);
 
-        uint newPoolAmount = pool_.totalPoolAmount();
+      uint newPoolAmount = pool_.totalPoolAmount();
 
-        require(newPoolAmount > _minTokenAfterShift + 1, "total amount bad");
+      require(newPoolAmount > _minTokenAfterShift + 1, "total amount bad");
 
-        return newPoolAmount;
+      return newPoolAmount;
     }
 
     /// @inheritdoc IToken
@@ -752,16 +743,15 @@ contract Token is
 
     /// @inheritdoc IFluidClient
     function getUtilityVars() external returns (UtilityVars memory) {
-        return
-            UtilityVars({
-                poolSizeNative: rewardPoolAmount(),
-                tokenDecimalScale: 10 ** decimals(),
-                exchangeRateNum: 1,
-                exchangeRateDenom: 1,
-                deltaWeightNum: 31536000,
-                deltaWeightDenom: 1,
-                customCalculationType: DEFAULT_CALCULATION_TYPE
-            });
+        return UtilityVars({
+            poolSizeNative: rewardPoolAmount(),
+            tokenDecimalScale: 10**decimals(),
+            exchangeRateNum: 1,
+            exchangeRateDenom: 1,
+            deltaWeightNum: 31536000,
+            deltaWeightDenom: 1,
+            customCalculationType: DEFAULT_CALCULATION_TYPE
+        });
     }
 
     /* ~~~~~~~~~~ IMPLEMENTS IERC2612 ~~~~~~~~~~ */
@@ -828,24 +818,12 @@ contract Token is
 
     // remaining functions are taken from OpenZeppelin's ERC20 implementation
 
-    function name() public view returns (string memory) {
-        return name_;
-    }
-
-    function symbol() public view returns (string memory) {
-        return symbol_;
-    }
-
-    function decimals() public view returns (uint8) {
-        return decimals_;
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return totalSupply_;
-    }
-
+    function name() public view returns (string memory) { return name_; }
+    function symbol() public view returns (string memory) { return symbol_; }
+    function decimals() public view returns (uint8) { return decimals_; }
+    function totalSupply() public view returns (uint256) { return totalSupply_; }
     function balanceOf(address account) public view returns (uint256) {
-        return balances_[account];
+       return balances_[account];
     }
 
     function transfer(address _to, uint256 _amount) public returns (bool) {
@@ -911,11 +889,7 @@ contract Token is
 
     /* ~~~~~~~~~~ MISC OPERATOR FUNCTIONS ~~~~~~~~~~ */
 
-    function setFeeDetails(
-        uint256 _mintFee,
-        uint256 _burnFee,
-        address _recipient
-    ) public {
+    function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) public {
         require(msg.sender == operator_, "only operator");
 
         require(_mintFee < FEE_DENOM, "mint fee too high");
@@ -931,14 +905,11 @@ contract Token is
 
     /* ~~~~~~~~~~ EPOCH VOLUME FUNCTIONS ~~~~~~~~~~ */
 
-    function volume(
-        uint256 epoch,
-        address _user
-    ) public view returns (uint256) {
-        return epochVolume_[epoch].userVolume[_user];
+    function volume(uint256 _epoch, address _user) public view returns (uint256) {
+        return epochUserVolume_[_epoch][_user];
     }
 
-    function globalVolume(uint256 epoch) public view returns (uint256) {
-        return epochVolume_[epoch].globalVolume;
+    function globalVolume(uint256 _epoch) public view returns (uint256) {
+        return epochVolume_[_epoch];
     }
 }

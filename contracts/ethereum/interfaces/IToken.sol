@@ -197,4 +197,17 @@ interface IToken is IERC20 {
      *      self-contained chains
      */
     function setFeeDetails(uint256 _mintFee, uint256 _burnFee, address _recipient) external;
+
+    /**
+     * @notice volume returns the volume of the user in the given epoch
+     * @param _epoch to query the volume of
+     * @param _user address
+     */
+    function volume(uint256 _epoch, address _user) external view returns (uint256);
+
+    /**
+     * @notice globalVolume returns the volume of all users in the given epoch
+     * @param _epoch to query the volume of
+     */
+    function globalVolume(uint256 _epoch) external view returns (uint256);
 }
