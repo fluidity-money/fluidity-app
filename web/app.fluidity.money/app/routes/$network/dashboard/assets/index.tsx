@@ -32,7 +32,9 @@ const SAFE_DEFAULT_ASSETS: AssetLoaderData = {
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
-  const { tokens } = serverConfig.config[network as unknown as string] ?? {};
+  if (!network) throw new Error("Invalid Request");
+
+  const { tokens } = serverConfig.config[network] ?? {};
 
   const fluidTokens = tokens.filter((t) => t.isFluidOf !== undefined);
 
@@ -230,6 +232,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
     return graphData.reverse().map((a, i) => ({ x: i, y: a.y }));
   }, [activity, quantities, token.decimals]);
+
 
   return (
     <motion.div style={{ marginBottom: "1em" }} variants={assetVariants}>
