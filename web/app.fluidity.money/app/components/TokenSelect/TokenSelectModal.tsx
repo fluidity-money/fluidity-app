@@ -12,7 +12,7 @@ const modalVariants = {
   visible: {
     height: "auto",
     transition: {
-      duration: 1,
+      duration: 0.5,
       staggerChildren: 0.1,
       staggerDirection: 1,
     },
@@ -20,7 +20,7 @@ const modalVariants = {
   exit: {
     height: 0,
     transition: {
-      duration: 1,
+      duration: 0.5,
       staggerChildren: 0.1,
       staggerDirection: -1,
     },
