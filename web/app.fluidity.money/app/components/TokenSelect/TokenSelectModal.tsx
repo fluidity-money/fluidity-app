@@ -1,7 +1,55 @@
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-
+import { TokenIcon, Text, numberToMonetaryString } from "@fluidity-money/surfing";
+import BN from "bn.js";
+import { motion } from "framer-motion";
 import { Asset } from "~/queries/useTokens";
+import { AugmentedAsset } from "~/routes/$network/transfer/send";
+import { getUsdFromTokenAmount } from "~/util";
+
+const modalVariants = {
+  hidden: {
+    height: 0
+  },
+  visible: {
+    height: "auto",
+    transition: {
+      duration: 1,
+      staggerChildren: 0.1,
+      staggerDirection: 1,
+    },
+  },
+  exit: {
+    height: 0,
+    transition: {
+      duration: 1,
+      staggerChildren: 0.1,
+      staggerDirection: -1,
+    },
+  },
+};
+
+
+const rowVariants = {
+  hidden: {
+    opacity: 0,
+    y: 10,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: "easeInOut",
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: {
+      duration: 0.2,
+      ease: "easeInOut",
+    },
+  },
+};
 
 const TokenSelectModal = ({
   assets,
@@ -12,54 +60,49 @@ const TokenSelectModal = ({
   onClose = () => {
     return;
   },
-  open,
 }: {
-  assets: Asset[];
-  value: Asset | undefined;
-  open: boolean;
+  assets: AugmentedAsset[];
+  value: AugmentedAsset | undefined;
   onSelect: (asset: Asset) => void;
   onClose: () => void;
 }) => {
-  const [root, setRoot] = useState<HTMLElement>();
-
-  useEffect(() => {
-    const root = document.createElement("div");
-    document.body.appendChild(root);
-    setRoot(root);
-
-    return () => {
-      if (root) {
-        document.body.removeChild(root);
-      }
-    };
-  }, []);
-
-  return open
-    ? createPortal(
-        <>
-          <h1>Select a token</h1>
-          {assets.map((asset) => (
-            <div
-              key={asset.contract_address}
-              className={
-                asset.contract_address === value?.contract_address
-                  ? "selected"
-                  : ""
-              }
-              onClick={() => {
-                onSelect(asset);
-                onClose();
-              }}
-            >
-              <img src={asset.logo} />
-              <p>{asset.name}</p>
-              <p>{asset.symbol}</p>
-            </div>
-          ))}
-        </>,
-        root as HTMLElement
-      )
-    : null;
+  return (
+    <motion.div
+      className="token-select-modal"
+      variants={modalVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      {assets.map((asset) => (
+        <motion.div
+          variants={rowVariants}
+          key={asset.contract_address}
+          className={`token-select-modal-row
+            ${asset.contract_address === value?.contract_address
+              ? "selected"
+              : ""
+            }
+              `
+          }
+          onClick={() => {
+            onSelect(asset);
+            onClose();
+          }}
+        >
+          <TokenIcon className="token-select-icon" token={asset.symbol} />
+          <div className="token-select-details">
+            <Text prominent size="lg">{asset.symbol}</Text>
+            <Text>{asset.name}</Text>
+          </div>
+          <div className="token-select-details">
+            <Text prominent size="lg">{numberToMonetaryString(getUsdFromTokenAmount(asset.userTokenBalance, asset.decimals, 1))}</Text>
+            <Text>{asset.userTokenBalance.div(new BN(10).pow(new BN(asset.decimals))).toString()} at {numberToMonetaryString(1)}</Text>
+          </div>
+        </motion.div>
+      ))}
+    </motion.div>
+  )
 };
 
 export default TokenSelectModal;
