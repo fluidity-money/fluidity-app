@@ -18,7 +18,7 @@ import (
 
 const (
 	// EnvAddressConfirmationContractAddr to get the address of the contract that confirms addresses from
-	EnvAddressConfirmationContractAddr = `FLU_ETHERUEM_ADDRESS_CONFIRMATION_CONTRACT_ADDR`
+	EnvAddressConfirmationContractAddr = `FLU_ETHEREUM_ADDRESS_CONFIRMATION_CONTRACT_ADDR`
 
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`

@@ -16,6 +16,8 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { getTokenForNetwork } from "~/util";
+import {useUserActionsAll, useUserActionsByAddress} from "~/queries/useUserActionsAggregate";
+import { chainType } from "~/util/chainUtils/chains";
 
 const FLUID_UTILITY = "FLUID";
 
@@ -52,6 +54,82 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
+  const {
+    config: {
+      [network as string]: { tokens },
+    },
+  } = config;
+
+  const tokenLogoMap = tokens.reduce(
+    (map, token) => ({
+      ...map,
+      [token.symbol]: token.logo,
+    }),
+    {} as Record<string, string>
+  );
+
+  const defaultLogo = "/assets/tokens/fUSDC.svg";
+
+  // use updated SQL aggregation
+  if (network === "arbitrum") {
+    const {data: userActionsData, errors: userActionsErr} = address ?
+      await useUserActionsByAddress(network, address, page) :
+      await useUserActionsAll(network, page);
+
+    if (userActionsErr || !userActionsData) {
+      throw userActionsErr;
+    }
+
+    const transactions = userActionsData[network].map(({
+      sender, 
+      receiver,
+      hash,
+      winner,
+      reward,
+      rewardHash,
+      timestamp,
+      value,
+      currency,
+      application,
+      utility_name, 
+      utility_amount
+    }) => {
+      const utilityName =
+        utility_name?.match(ALPHA_NUMERIC)?.[0];
+
+      const swapType = sender === MintAddress
+          ? "in" as const
+          : receiver === MintAddress
+            ? "out" as const
+            : undefined
+
+      return {
+        sender,
+        receiver,
+        hash,
+        winner,
+        reward,
+        rewardHash,
+        // convert to JS timestamp
+        timestamp: timestamp * 1000,
+        value,
+        currency,
+        application,
+        swapType,
+        provider: application ?? "Fluidity",
+        logo: tokenLogoMap[currency] || defaultLogo,
+        utilityTokens: utilityName ? {[utilityName]: utility_amount} : undefined
+      }
+    })
+
+    return json({
+      page,
+      transactions,
+      count: transactions.length,
+      loaded: true,
+    } satisfies TransactionsLoaderData);
+  }
+
   try {
     const [
       { data: winnersData, errors: winnersErr },
@@ -59,13 +137,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ] = await Promise.all(
       address
         ? [
-          useUserRewardsByAddress(network ?? "", address),
-          useUserPendingRewardsByAddress(network ?? "", address),
-        ]
+            useUserRewardsByAddress(network ?? "", address),
+            useUserPendingRewardsByAddress(network ?? "", address),
+          ]
         : [
-          useUserRewardsAll(network ?? ""),
-          useUserPendingRewardsAll(network ?? ""),
-        ]
+            useUserRewardsAll(network ?? ""),
+            useUserPendingRewardsAll(network ?? ""),
+          ]
     );
 
     if (
@@ -126,25 +204,25 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
           return winner.utility_name === FLUID_UTILITY
             ? {
-              ...map,
-              [winner.send_transaction_hash]: {
-                ...sameTxWinner,
-                normalisedAmount: normalisedAmount + currentFluidAmount,
-              },
-            }
-            : {
-              ...map,
-              [winner.send_transaction_hash]: {
-                ...sameTxWinner,
-
-                utility: {
-                  ...currentUtilityReward,
-                  [utilityName]:
-                    normalisedAmount +
-                    (currentUtilityReward[utilityName] || 0),
+                ...map,
+                [winner.send_transaction_hash]: {
+                  ...sameTxWinner,
+                  normalisedAmount: normalisedAmount + currentFluidAmount,
                 },
-              },
-            };
+              }
+            : {
+                ...map,
+                [winner.send_transaction_hash]: {
+                  ...sameTxWinner,
+
+                  utility: {
+                    ...currentUtilityReward,
+                    [utilityName]:
+                      normalisedAmount +
+                      (currentUtilityReward[utilityName] || 0),
+                  },
+                },
+              };
         },
         {} as {
           [transaction_hash: string]: Winner & {
@@ -193,20 +271,20 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           const { data: transactionsData, errors: transactionsErr } =
             await (address
               ? useUserTransactionsByAddress(
-                network,
-                token ? [token] : getTokenForNetwork(network),
-                page,
-                address as string,
-                filterHashes,
-                12
-              )
+                  network,
+                  token ? [token] : getTokenForNetwork(network),
+                  page,
+                  address as string,
+                  filterHashes,
+                  12
+                )
               : useUserTransactionsAll(
-                network,
-                token ? [token] : getTokenForNetwork(network),
-                page,
-                filterHashes,
-                12
-              ));
+                  network,
+                  token ? [token] : getTokenForNetwork(network),
+                  page,
+                  filterHashes,
+                  12
+                ));
 
           if (!transactionsData || transactionsErr) {
             captureException(
@@ -252,7 +330,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // Bitquery stores DAI decimals (6) incorrectly (should be 18)
           value:
             network !== "arbitrum" &&
-              (currency === "DAI" || currency === "fDAI")
+            (currency === "DAI" || currency === "fDAI")
               ? value / 10 ** 12
               : value,
           currency,
@@ -261,35 +339,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }
     );
 
-    const {
-      config: {
-        [network as string]: { tokens },
-      },
-    } = config;
-
-    const tokenLogoMap = tokens.reduce(
-      (map, token) => ({
-        ...map,
-        [token.symbol]: token.logo,
-      }),
-      {} as Record<string, string>
-    );
-
-    const defaultLogo = "/assets/tokens/fUSDC.svg";
-
     const mergedTransactions: Transaction[] = userTransactions.map((tx) => {
       const swapType =
         tx.sender === MintAddress
           ? "in"
           : tx.receiver === MintAddress
-            ? "out"
-            : undefined;
+          ? "out"
+          : undefined;
 
       const winner:
         | (Winner & {
-          normalisedAmount: number;
-          utility: { [utility: string]: number };
-        })
+            normalisedAmount: number;
+            utility: { [utility: string]: number };
+          })
         | undefined = jointWinnersMap[tx.hash];
 
       const winnerAddress = winner?.winning_address ?? "";
@@ -308,7 +370,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         timestamp: tx.timestamp,
         logo: tokenLogoMap[tx.currency] || defaultLogo,
         provider:
-          (network === "ethereum" || network === "arbitrum"
+          (chainType(network) === "evm"
             ? winner?.ethereum_application
             : winner?.solana_application) ?? "Fluidity",
         swapType,

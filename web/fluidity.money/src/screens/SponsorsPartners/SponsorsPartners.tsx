@@ -105,12 +105,6 @@ const SponsorsPartners = () => {
       info: "Factor's no-code platform makes DeFi asset management easy, allowing you to create innovative products, strategies, and vaults."
     },
     {
-      img: "/assets/images/Partners/Saddle.svg",
-      url: "https://saddle.finance",
-      title: "Saddle",
-      info: "Saddle is a DeFi protocol committed to building new financial primitives open to everyone."
-    },
-    {
       img: "/assets/images/Partners/Coin98.svg",
       url: "https://coin98.com",
       title: "Coin98",
