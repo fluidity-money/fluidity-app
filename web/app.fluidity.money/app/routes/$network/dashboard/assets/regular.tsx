@@ -2,25 +2,63 @@ import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
 import { LoaderFunction } from "@remix-run/node";
 import serverConfig from "~/webapp.config.server";
 import { useLoaderData, useNavigate, useParams } from "@remix-run/react";
-import { Suspense, useContext, useEffect, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { CollapsibleCard, TokenCard } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import config from "~/webapp.config.server";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { getWethUsdPrice } from "~/util/chainUtils/ethereum/transaction";
+import EACAggregatorProxyAbi from "~/util/chainUtils/ethereum/EACAggregatorProxy.json";
+import { Chain } from "~/util/chainUtils/chains";
+
+const MAINNET_ID = 0;
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
-  const { tokens } = serverConfig.config[network as unknown as string] ?? {};
+  if (!network) throw new Error("Invalid Request");
 
-  const regularTokens = tokens.filter((token) => !token.isFluidOf);
+  const { tokens } = serverConfig.config[network] ?? {};
+
+
+  const infuraRpc = config.drivers[network][MAINNET_ID].rpc.http;
+  const provider = new JsonRpcProvider(infuraRpc);
+
+  const eacAggregatorProxyAddr =
+    config.contract.eac_aggregator_proxy[network as Chain];
+
+  const wethPrice = await getWethUsdPrice(provider, eacAggregatorProxyAddr, EACAggregatorProxyAbi);
+
+  const regularTokens = tokens
+    .filter((token) => !token.isFluidOf)
+    .map((token) => ({
+      ...token,
+      price: token.symbol !== "wETH" ? 1 : wethPrice
+    }));
 
   return {
     tokens: regularTokens,
   };
 };
 
+type RegularToken = Token & {
+  price: number;
+}
+
+export type AugmentedToken = RegularToken & {
+  usdAmount: number;
+};
+
 type LoaderData = {
-  tokens: Token[];
+  tokens: RegularToken[];
 };
 
 export const ErrorBoundary: React.FC<{ error: Error }> = (props: {
@@ -60,15 +98,60 @@ const allAssetsVariants = {
 const RegularAssets = () => {
   const { tokens } = useLoaderData<LoaderData>();
 
+  const { balance } = useContext(FluidityFacadeContext);
+
+  const [augmentedTokens, setAugmentedTokens] = useState<AugmentedToken[]>([]);
+  const [sortingStrategy, setSortingStrategy] = useState<"desc">("desc");
+
+  const fetchFluidAmtForTokens = useCallback(async () => {
+    const tokensWithFluidAmt = await Promise.all(
+      tokens.map(async (token) => {
+        const fluidAmt = await balance?.(token.address);
+        return {
+          ...token,
+          usdAmount: getUsdFromTokenAmount(fluidAmt || new BN(0), token),
+        };
+      })
+    );
+
+    setAugmentedTokens(tokensWithFluidAmt);
+  }, [tokens, balance]);
+
+  useEffect(() => {
+    if (!balance) return;
+
+    fetchFluidAmtForTokens();
+  }, [tokens, balance]);
+
+  const sortedTokensMemoized = useMemo(() => {
+    if (!augmentedTokens) return [];
+
+    const sortedTokensCopy = [...augmentedTokens];
+
+    if (sortingStrategy === "desc") {
+      sortedTokensCopy.sort((a, b) => {
+        return b.usdAmount - a.usdAmount;
+      });
+    }
+
+    return sortedTokensCopy;
+  }, [augmentedTokens, sortingStrategy, setSortingStrategy]);
+
+  if (!balance) {
+    return <></>;
+  }
+
   return (
     <motion.div
+      key={`all-assets-${sortedTokensMemoized}`}
       variants={allAssetsVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
+      style={{ minHeight: 750 }}
     >
       <Suspense fallback={"loading"}>
-        {tokens.map((t, i) => {
+        {sortedTokensMemoized.map((t, i) => {
           return <CardWrapper key={i} token={t} />;
         })}
       </Suspense>
@@ -95,7 +178,7 @@ const assetVariants = {
   },
 };
 
-const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
+const CardWrapper: React.FC<{ token: RegularToken }> = (props: { token: RegularToken }) => {
   const { token } = props;
   const navigate = useNavigate();
   const { network } = useParams();
@@ -126,7 +209,7 @@ const CardWrapper: React.FC<{ token: Token }> = (props: { token: Token }) => {
             showLabels
             token={token}
             regAmt={getUsdFromTokenAmount(amount, token.decimals)}
-            value={1}
+            value={token.price}
             onButtonPress={() =>
               navigate(`/${network}/fluidify?token=${token.symbol}`)
             }

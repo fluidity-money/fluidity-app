@@ -129,6 +129,42 @@ const queryByAddress: Queryable = {
       }
     }
   `,
+
+  polygon_zk: gql`
+    query getTransactionsByAddress(
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "polygon_zk" }
+          token_short_name: { _in: $tokens }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
 };
 
 const queryByTxHash: Queryable = {
@@ -211,6 +247,35 @@ const queryByTxHash: Queryable = {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { _in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  polygon_zk: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "polygon_zk" }
           _not: { transaction_hash: { _in: $filterHashes } }
           transaction_hash: { _in: $transactions }
         }
@@ -341,6 +406,37 @@ const queryAll: Queryable = {
       }
     }
   `,
+
+  polygon_zk: gql`
+    query getTransactions(
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "polygon_zk" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          token_short_name: { _in: $tokens }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
 };
 
 type UserTransactionsByAddressBody = {
@@ -441,13 +537,13 @@ const useUserTransactionsByAddress = async (
     filterHashes,
     limit,
     tokens:
-      network !== "arbitrum"
+      network in ["ethereum", "solana"]
         ? tokens
         : // convert tokens to token_short_name
-        tokens
-          .map((addr) => getTokenFromAddress(network, addr))
-          .filter((token): token is Token => !!token)
-          .map(({ symbol }) => symbol.slice(1)),
+          tokens
+            .map((addr) => getTokenFromAddress(network, addr))
+            .filter((token): token is Token => !!token)
+            .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -465,18 +561,18 @@ const useUserTransactionsByAddress = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-        await jsonPost<
-          UserTransactionsByAddressBody,
-          HasuraUserTransactionRes
-        >(url, body, headers)
-      )
+          await jsonPost<
+            UserTransactionsByAddressBody,
+            HasuraUserTransactionRes
+          >(url, body, headers)
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<
-          UserTransactionsByAddressBody,
-          BitqueryUserTransactionRes
-        >(url, body, headers),
-        network
-      );
+          await jsonPost<
+            UserTransactionsByAddressBody,
+            BitqueryUserTransactionRes
+          >(url, body, headers),
+          network
+        );
 
   return result;
 };
@@ -510,18 +606,18 @@ const useUserTransactionsByTxHash = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-        await jsonPost<
-          UserTransactionsByTxHashBody,
-          HasuraUserTransactionRes
-        >(url, body, headers)
-      )
+          await jsonPost<
+            UserTransactionsByTxHashBody,
+            HasuraUserTransactionRes
+          >(url, body, headers)
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<
-          UserTransactionsByTxHashBody,
-          BitqueryUserTransactionRes
-        >(url, body, headers),
-        network
-      );
+          await jsonPost<
+            UserTransactionsByTxHashBody,
+            BitqueryUserTransactionRes
+          >(url, body, headers),
+          network
+        );
 
   return result;
 };
@@ -538,13 +634,13 @@ const useUserTransactionsAll = async (
     filterHashes,
     limit,
     tokens:
-      network !== "arbitrum"
+      network in ["ethereum", "solana"]
         ? tokens
         : // convert tokens to token_short_name
-        tokens
-          .map((addr) => getTokenFromAddress(network, addr))
-          .filter((token): token is Token => !!token)
-          .map(({ symbol }) => symbol.slice(1)),
+          tokens
+            .map((addr) => getTokenFromAddress(network, addr))
+            .filter((token): token is Token => !!token)
+            .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -562,20 +658,20 @@ const useUserTransactionsAll = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-        await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-          url,
-          body,
-          headers
+          await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+            url,
+            body,
+            headers
+          )
         )
-      )
       : parseBitqueryUserTransactions(
-        await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
-          url,
-          body,
-          headers
-        ),
-        network
-      );
+          await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
+            url,
+            body,
+            headers
+          ),
+          network
+        );
 
   return result;
 };

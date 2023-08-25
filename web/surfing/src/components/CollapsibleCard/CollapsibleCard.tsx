@@ -20,6 +20,7 @@ export type Token = {
   dataAccount?: string;
   decimals: number;
   colour: string;
+  enabled: boolean;
 };
 
 interface ISummary {
@@ -42,14 +43,14 @@ const Summary: React.FC<ISummary> = ({ children, onClick, canExpand, isActive })
   return (
     <div className={`${styles.Summary} ${canExpand ? styles.pointer : ''}`} onClick={onClick}>
       <div className={styles.content}>{children}</div>
-      {canExpand && <TriangleDown className={styles.caret} style={{transform: `rotate(${isActive ? "180deg" : "0"})`}}/>}
+      {canExpand && <TriangleDown className={styles.caret} style={{ transform: `rotate(${isActive ? "180deg" : "0"})` }} />}
     </div>
   )
 }
 
 const Details: React.FC<IDetails> = ({ children }) => {
   return (
-    <motion.div 
+    <motion.div
       className={styles.Details}
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: 'auto', opacity: 1 }}
@@ -69,7 +70,7 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
 
   const [isOpen, setIsOpen] = useState(expanded)
 
-  const isHeaderOnly = typeof(children) === 'object' && !Array.isArray(children) && children.type === Summary
+  const isHeaderOnly = typeof (children) === 'object' && !Array.isArray(children) && children.type === Summary
 
   const summary: ReactElement<ISummary> = isHeaderOnly ? children : ((children as ReactElement[]).find((child) => child.type === Summary) as ReactElement<ISummary>)
   const details: ReactElement<IDetails> | null = isHeaderOnly ? null : ((children as ReactElement[]).find((child) => child.type === Details) as ReactElement<IDetails>)
@@ -88,7 +89,7 @@ const CollapsibleCard: React.FC<ICollapsibleCard> = ({
 
   return (
     <Card component="div" rounded={true} className={styles.CollapsibleCard} {...props}>
-      <Summary canExpand onClick={() => {setIsOpen(prev => !prev)}} isActive={isOpen}>
+      <Summary canExpand onClick={() => { setIsOpen(prev => !prev) }} isActive={isOpen}>
         {summary.props.children}
       </Summary>
       <AnimatePresence>

@@ -408,6 +408,11 @@ body {
 .pagination-arrows {
   display: flex;
   gap: 1em;
+
+  button {
+    background: none;
+    border: none;
+  }
 }
 
 .pagination-arrows .pagination-arrow {

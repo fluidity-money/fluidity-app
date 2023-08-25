@@ -367,6 +367,10 @@ body {
   display: flex;
   gap: 1em;
 }
+.pagination-arrows button {
+  background: none;
+  border: none;
+}
 
 .pagination-arrows .pagination-arrow {
   cursor: pointer;

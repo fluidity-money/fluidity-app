@@ -5,6 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useState, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { createPortal } from "react-dom";
+import { chainType } from "~/util/chainUtils/chains";
 
 interface IConnectWalletModal {
   visible: boolean;
@@ -140,9 +141,8 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
             </div>
 
             <ul className="connect-wallet-modal-list">
-              {network === "ethereum" && <EthWalletsMap />}
-              {network === "arbitrum" && <EthWalletsMap />}
-              {network === "solana" && <SolWalletsMap />}
+              {chainType(network) === "evm" && <EthWalletsMap />}
+              {chainType(network) === "solana" && <SolWalletsMap />}
             </ul>
             <Text size="xs">
               By connecting a wallet, you agree to Fluidity Money’s Terms of

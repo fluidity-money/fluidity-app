@@ -54,7 +54,7 @@ import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { useCache } from "~/hooks/useCache";
-import Table from "~/components/Table";
+import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 
@@ -1468,124 +1468,116 @@ const MyMultiplier = ({
   );
 };
 
-interface IAirdropRankRow {
-  data: AirdropLeaderboardEntry;
-  index: number;
-  isMobile?: boolean;
-}
-
-const AirdropRankRow: React.FC<IAirdropRankRow> = ({
-  data,
-  index,
-  isMobile = false,
-}: IAirdropRankRow) => {
+const airdropRankRow = (
+  data: AirdropLeaderboardEntry,
+  isMobile = false
+): IRow => {
   const { address } = useContext(FluidityFacadeContext);
   const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
 
-  return (
-    <motion.tr
-      className={`airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
-        address === user ? "highlighted-row" : ""
-      }`}
-      key={`${rank}-${index}`}
-      variants={{
-        enter: { opacity: [0, 1] },
-        ready: { opacity: 1 },
-        exit: { opacity: 0 },
-        transitioning: {
-          opacity: [0.75, 1, 0.75],
-          transition: { duration: 1.5, repeat: Infinity },
-        },
-      }}
-    >
-      {/* Rank */}
-      <td>
-        <Text
-          prominent
-          style={
-            address === user
-              ? {
-                  color: "black",
+  return {
+    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+      address === user ? "highlighted-row" : ""
+    }`,
+    RowElement: ({ heading }: { heading: string }) => {
+      switch (heading) {
+        case "RANK":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                        color: "black",
+                      }
+                    : {}
                 }
-              : {}
-          }
-        >
-          {rank === -1 ? "???" : rank}
-        </Text>
-      </td>
-
-      {/* User */}
-      <td>
-        <a
-          className="table-address"
-          target="_blank"
-          href={getAddressExplorerLink("arbitrum", user)}
-          rel="noreferrer"
-        >
-          <Text
-            prominent
-            style={
-              address === user
-                ? {
-                    color: "black",
+              >
+                {rank === -1 ? "???" : rank}
+              </Text>
+            </td>
+          );
+        case "USER":
+          return (
+            <td>
+              <a
+                className="table-address"
+                target="_blank"
+                href={getAddressExplorerLink("arbitrum", user)}
+                rel="noreferrer"
+              >
+                <Text
+                  prominent
+                  style={
+                    address === user
+                      ? {
+                          color: "black",
+                        }
+                      : {}
                   }
-                : {}
-            }
-          >
-            {address === user ? "ME" : trimAddress(user)}
-          </Text>
-        </a>
-      </td>
-
-      {/* Bottles */}
-      <td>
-        <Text
-          prominent
-          style={
-            address === user
-              ? {
-                  color: "black",
+                >
+                  {address === user ? "ME" : trimAddress(user)}
+                </Text>
+              </a>
+            </td>
+          );
+        case "BOTTLES":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                        color: "black",
+                      }
+                    : {}
                 }
-              : {}
-          }
-        >
-          {toSignificantDecimals(bottles, 0)}
-        </Text>
-      </td>
-
-      {/* Multiplier */}
-      <td>
-        <Text
-          prominent
-          style={
-            address === user
-              ? {
-                  color: "black",
+              >
+                {toSignificantDecimals(bottles, 0)}
+              </Text>
+            </td>
+          );
+        case "STAKING MULTIPLIER":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                        color: "black",
+                      }
+                    : {}
                 }
-              : {}
-          }
-        >
-          {toSignificantDecimals(liquidityMultiplier, 1)}x
-        </Text>
-      </td>
-
-      {/* Referrals */}
-      <td>
-        <Text
-          prominent
-          style={
-            address === user
-              ? {
-                  color: "black",
+              >
+                {toSignificantDecimals(liquidityMultiplier, 1)}x
+              </Text>
+            </td>
+          );
+        case "REFERRALS":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                        color: "black",
+                      }
+                    : {}
                 }
-              : {}
-          }
-        >
-          {referralCount}
-        </Text>
-      </td>
-    </motion.tr>
-  );
+              >
+                {referralCount}
+              </Text>
+            </td>
+          );
+        default:
+          return <></>;
+      }
+    },
+  };
 };
 
 interface IAirdropLeaderboard {
@@ -1690,13 +1682,7 @@ const Leaderboard = ({
         }}
         count={0}
         data={data}
-        renderRow={(data) => (
-          <AirdropRankRow
-            data={data.data}
-            index={data.index}
-            isMobile={isMobile}
-          />
-        )}
+        renderRow={(data) => airdropRankRow(data, isMobile)}
         freezeRow={(data) => {
           return data.user === userAddress;
         }}
