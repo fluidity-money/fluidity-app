@@ -4,3 +4,5 @@ cache
 artifacts
 docker*
 hardhat-dependency-compiler
+artifacts-zk/
+cache-zk/

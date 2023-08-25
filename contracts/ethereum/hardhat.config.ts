@@ -11,6 +11,10 @@ import "hardhat-dependency-compiler";
 
 import "hardhat-docgen";
 
+import "@matterlabs/hardhat-zksync-solc";
+
+import "@matterlabs/hardhat-zksync-verify";
+
 import { task, subtask } from "hardhat/config";
 
 import type { HardhatUserConfig } from "hardhat/types";
@@ -211,6 +215,9 @@ if (process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY)
   networks['zksync'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY],
     url: process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_URL,
+    zksync: true,
+    verifyURL: "https://explorer.zksync.io/contract_verification",
+    ethNetwork: "mainnet"
   };
 
 if (process.env.FLU_ETHEREUM_DEPLOY_MAINNET_KEY)
@@ -296,7 +303,6 @@ module.exports = {
       "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol",
       "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol",
       "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol"
-
     ]
   },
   networks: {
