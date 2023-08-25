@@ -49,7 +49,9 @@ const main = async () => {
     "TransparentUpgradeableProxy"
   );
 
-  const proxyAdmin = { address: "0xD13AEe177DDaF3DC7D8265f7FBA8d8D9fb867473" };
+  const proxyAdmin = await deployArtifact(deployer, "ProxyAdmin", proxyAdminOwnerAddr);
+
+  console.log("deployed proxy admin:", proxyAdmin.address);
 
   const deployTProxyArtifact = async (
     artifact: string,
@@ -76,12 +78,18 @@ const main = async () => {
     return p;
   };
 
+  const registry = await deployTProxyArtifact(
+    "Registry",
+    "function init(address)",
+    operatorAddr
+  );
+
   const executor = await deployTProxyArtifact(
     "Executor",
     "function init(address,address,address)",
     operatorAddr,
     emergencyCouncilAddr,
-    "0xD1104dC281B68Ee3b410d65797F9826d71D3e03c"
+    registry.addr
   );
 
   // we set the owner to the sender, then set it up to use the zero
