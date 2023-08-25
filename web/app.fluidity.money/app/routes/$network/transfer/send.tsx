@@ -12,13 +12,11 @@ import TokenSelect from "~/components/TokenSelect";
 import { Asset, useTokens } from "~/queries/useTokens";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 
-import { getUsdFromTokenAmount } from "~/util";
+import { getUsdFromTokenAmount, Token } from "~/util";
 import serverConfig from "~/webapp.config.server";
 
 export const loader = async ({ params }) => {
   const { network } = params
-  // const _tokens = await useTokens() as Asset[]
-  // const tokens = _tokens.filter(t => t.is_fluid)
 
   const { tokens: _tokens } = serverConfig.config[network as unknown as string] ?? {};
 
@@ -34,10 +32,10 @@ export type AugmentedAsset = Asset & {
 };
 
 const Send = () => {
-  const fluidTokens =
+  const fluidTokens: AugmentedAsset[] =
     useLoaderData<{
-      tokens: Asset[];
-    }>().tokens.map(t => { return { ...t, userTokenBalance: new BN(0) } }) || [];
+      tokens: Token[];
+    }>().tokens.map(t => { return { ...t, userTokenBalance: new BN(0), contract_address: t.address, is_fluid: true } }) || [];
 
   const [searchParams, setSearchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -170,10 +168,9 @@ const Send = () => {
     }
   };
 
-
+  // Fees
   const [transactionFee, setTransactionFee] = useState('');
 
-  // Fees
   useEffect(() => {
     if (!signer) return;
     if (!selectedAsset) return;
@@ -196,7 +193,6 @@ const Send = () => {
         console.error('Error estimating fee:', error);
       }
     })()
-
   }, [selectedAsset, amountToSend, recipientAddress, signer]);
 
 
