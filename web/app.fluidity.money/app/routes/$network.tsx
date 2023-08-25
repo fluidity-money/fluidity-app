@@ -1,5 +1,5 @@
-import type { LoaderFunction } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import type { ActionArgs, LoaderFunction } from "@remix-run/node";
+import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
 import { useEffect, useMemo, useState, useContext } from "react";
@@ -48,6 +48,23 @@ export const loader: LoaderFunction = async ({ params }) => {
   };
 };
 
+
+
+export async function action({ request, params }: ActionArgs) {
+  const { network } = params;
+
+  if (!network)
+    return;
+
+  const formData = await request.formData();
+  const address = formData.get("address")?.toString() || "";
+
+  if (await isEllipticDisabled(address, network))
+    return redirect("/blocked");
+
+  return null;
+}
+
 const Provider = ({
   network,
   tokens,
@@ -85,22 +102,18 @@ const Provider = ({
 };
 
 const ProviderOutlet = () => {
-  const { connected, address, getDegenScore } = useContext(
+  const { connected, address } = useContext(
     FluidityFacadeContext
   );
+
+  const fetcher = useFetcher();
 
   const { client } = useContext(SplitContext);
 
   useEffect(() => {
     if (!(address && connected)) return;
 
-    (async () => {
-      if (!getDegenScore) return;
-
-      const degenScore = await getDegenScore(address);
-
-      client?.track("connected-user-degen-score", address, degenScore);
-    })();
+    fetcher.submit({address}, {method:"post"})
   }, [address, client]);
 
   return (

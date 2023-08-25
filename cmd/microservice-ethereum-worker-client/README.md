@@ -16,6 +16,9 @@ winning transactions and relays to the spooler.
 | `FLU_AMQP_QUEUE_ADDR`             | AMQP queue address connected to to receive and send messages down.            |
 | `FLU_ETHEREUM_AMQP_QUEUE_NAME`    | Queue name to receive messages from the server down.                          |
 | `FLU_ETHEREUM_AMQP_PUBLISH_NAME`  | Queue name to send reward messages down.                                      |
+| `FLU_POSTGRES_URI`                | Database URI to use when connecting to the Postgres database.                 |
+| `FLU_ELLIPTIC_KEY`                | RPC key to use for Elliptic address screening feature.                        |
+| `FLU_ELLIPTIC_SECRET`             | RPC secret to use for Elliptic address screening.                             |
 
 ## Building
 
