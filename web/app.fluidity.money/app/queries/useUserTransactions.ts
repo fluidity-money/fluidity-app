@@ -529,7 +529,7 @@ const useUserTransactionsByAddress = async (
   page: number,
   address: string,
   filterHashes: string[],
-  limit = 12
+  limit = 12,
 ) => {
   const variables = {
     address: address,
@@ -540,10 +540,10 @@ const useUserTransactionsByAddress = async (
       network in ["ethereum", "solana"]
         ? tokens
         : // convert tokens to token_short_name
-          tokens
-            .map((addr) => getTokenFromAddress(network, addr))
-            .filter((token): token is Token => !!token)
-            .map(({ symbol }) => symbol.slice(1)),
+        tokens
+          .map((addr) => getTokenFromAddress(network, addr))
+          .filter((token): token is Token => !!token)
+          .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -561,18 +561,18 @@ const useUserTransactionsByAddress = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-          await jsonPost<
-            UserTransactionsByAddressBody,
-            HasuraUserTransactionRes
-          >(url, body, headers)
-        )
+        await jsonPost<
+          UserTransactionsByAddressBody,
+          HasuraUserTransactionRes
+        >(url, body, headers),
+      )
       : parseBitqueryUserTransactions(
-          await jsonPost<
-            UserTransactionsByAddressBody,
-            BitqueryUserTransactionRes
-          >(url, body, headers),
-          network
-        );
+        await jsonPost<
+          UserTransactionsByAddressBody,
+          BitqueryUserTransactionRes
+        >(url, body, headers),
+        network,
+      );
 
   return result;
 };
@@ -582,7 +582,7 @@ const useUserTransactionsByTxHash = async (
   transactions: string[],
   filterHashes: string[],
   tokens: string[],
-  limit = 12
+  limit = 12,
 ): Promise<UserTransactionsRes> => {
   const variables = {
     transactions,
@@ -606,18 +606,18 @@ const useUserTransactionsByTxHash = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-          await jsonPost<
-            UserTransactionsByTxHashBody,
-            HasuraUserTransactionRes
-          >(url, body, headers)
-        )
+        await jsonPost<
+          UserTransactionsByTxHashBody,
+          HasuraUserTransactionRes
+        >(url, body, headers),
+      )
       : parseBitqueryUserTransactions(
-          await jsonPost<
-            UserTransactionsByTxHashBody,
-            BitqueryUserTransactionRes
-          >(url, body, headers),
-          network
-        );
+        await jsonPost<
+          UserTransactionsByTxHashBody,
+          BitqueryUserTransactionRes
+        >(url, body, headers),
+        network,
+      );
 
   return result;
 };
@@ -627,7 +627,7 @@ const useUserTransactionsAll = async (
   tokens: string[],
   page: number,
   filterHashes: string[],
-  limit = 12
+  limit = 12,
 ) => {
   const variables = {
     offset: (page - 1) * 12,
@@ -637,10 +637,10 @@ const useUserTransactionsAll = async (
       network in ["ethereum", "solana"]
         ? tokens
         : // convert tokens to token_short_name
-          tokens
-            .map((addr) => getTokenFromAddress(network, addr))
-            .filter((token): token is Token => !!token)
-            .map(({ symbol }) => symbol.slice(1)),
+        tokens
+          .map((addr) => getTokenFromAddress(network, addr))
+          .filter((token): token is Token => !!token)
+          .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -658,26 +658,26 @@ const useUserTransactionsAll = async (
   const result =
     network === "arbitrum"
       ? parseHasuraUserTransactions(
-          await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-            url,
-            body,
-            headers
-          )
-        )
+        await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+          url,
+          body,
+          headers,
+        ),
+      )
       : parseBitqueryUserTransactions(
-          await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
-            url,
-            body,
-            headers
-          ),
-          network
-        );
+        await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
+          url,
+          body,
+          headers,
+        ),
+        network,
+      );
 
   return result;
 };
 
 const parseHasuraUserTransactions = (
-  result: HasuraUserTransactionRes
+  result: HasuraUserTransactionRes,
 ): UserTransactionsRes => {
   if (!result.data || result.errors)
     return {
@@ -713,8 +713,8 @@ const parseHasuraUserTransactions = (
           amount: Number(
             addDecimalToBn(
               new BN(String(transfer.amount)),
-              transfer.token_decimals
-            )
+              transfer.token_decimals,
+            ),
           ),
           currency: { symbol: "f" + transfer.token_short_name },
           transaction: { hash: transfer.transaction_hash },
@@ -730,7 +730,7 @@ const parseHasuraUserTransactions = (
 
 const parseBitqueryUserTransactions = (
   result: BitqueryUserTransactionRes,
-  network: string
+  network: string,
 ): UserTransactionsRes => {
   if (!result.data || result.errors)
     return {
