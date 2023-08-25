@@ -92,16 +92,22 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       currency,
       application,
       utility_name, 
-      utility_amount
+      utility_amount,
+      type,
+      swap_in,
     }) => {
       const utilityName =
         utility_name?.match(ALPHA_NUMERIC)?.[0];
 
-      const swapType = sender === MintAddress
-          ? "in" as const
-          : receiver === MintAddress
-            ? "out" as const
-            : undefined
+      // if labelled as swap, use swap direction, otherwise manually check
+      const swapType = 
+        type === "swap" 
+          ? (swap_in ? "in" : "out")
+        : sender === MintAddress
+            ? "in" as const
+            : receiver === MintAddress
+              ? "out" as const
+              : undefined
 
       return {
         sender,

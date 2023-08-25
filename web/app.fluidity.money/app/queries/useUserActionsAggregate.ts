@@ -6,6 +6,8 @@ export type AggregatedTransaction = Omit<Transaction,
 > & {
   utility_amount: number, 
   utility_name: string | null
+  swap_in: boolean;
+  type: 'send' | 'swap'
 }
 
 const queryByAddress: Queryable = {
@@ -28,6 +30,8 @@ const queryByAddress: Queryable = {
       application
       currency
       timestamp: time
+      swap_in
+      type
     }
   }`
 }
@@ -50,6 +54,8 @@ const queryAll: Queryable = {
       application
       currency
       timestamp: time
+      swap_in
+      type
     }
   }`
 }
