@@ -17,7 +17,13 @@ function binom(n: number, k: number): number {
   return factorial(n) / (factorial(k) * factorial(n - k));
 }
 
-function payout(ATX: number, os: number, m: number, n: number, b: number): number {
+function payout(
+  ATX: number,
+  os: number,
+  m: number,
+  n: number,
+  b: number
+): number {
   const a: number = (1 / m) * (os / ATX);
   const w: number = a / probability(m, n, b);
   return w;
@@ -27,10 +33,12 @@ type TxReward = {
   tier: number;
   reward: number;
   probability: number;
-}
+};
 
-export const getTransactionRewards: (prizePool: number) => TxReward[] = (prizePool) => {
-  const tiers = []
+export const getTransactionRewards: (prizePool: number) => TxReward[] = (
+  prizePool
+) => {
+  const tiers = [];
   const BTX = 1;
   const deltaweight: number = 365 * 24 * 60 * 60;
   const blocktime = 60;
@@ -53,8 +61,8 @@ export const getTransactionRewards: (prizePool: number) => TxReward[] = (prizePo
     tiers.push({
       tier: m - i + 1,
       reward: w,
-      probability: p
-    })
+      probability: p,
+    });
   }
   return tiers;
-}
+};

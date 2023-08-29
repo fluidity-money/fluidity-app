@@ -57,7 +57,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return json({
     tokens,
-    wethPrice: wethPrice
+    wethPrice: wethPrice,
   });
 };
 
@@ -165,7 +165,8 @@ const Send = () => {
         setValidAmount(false);
       }
       setInputHint(
-        `${amountRemaining.toFixed(2)} ${selectedAsset.symbol
+        `${amountRemaining.toFixed(2)} ${
+          selectedAsset.symbol
         } remaining (${numberToMonetaryString(amountRemaining)})`
       );
     } else {
@@ -271,7 +272,11 @@ const Send = () => {
         const fee = gasPrice.mul(gasLimit);
         const wethDecimals = 18;
 
-        const feeUSDC = getUsdFromTokenAmount(new BN(fee.toNumber()), wethDecimals, wethPrice);
+        const feeUSDC = getUsdFromTokenAmount(
+          new BN(fee.toNumber()),
+          wethDecimals,
+          wethPrice
+        );
 
         setTransactionFee(`~$${feeUSDC.toFixed(2)}`);
       } catch (error) {
@@ -353,18 +358,24 @@ const Send = () => {
                 <Text className="send-table-header" prominent bold size="lg">
                   Potential Rewards
                 </Text>
-                {
-                  getTransactionRewards(90000)
-                    .reverse()
-                    .filter(tier => tier.tier <= 3)
-                    .map((tier) => {
-                      return <>
-                        <Text prominent>{tier.tier === 1 ? 'Top ' : `Tier ${tier.tier} `}prize</Text>
-                        <Text holo bold>{numberToMonetaryString(tier.reward)}</Text>
-                        {tier.tier < 3 && (<div className="rewards-table-rule" />)}
+                {getTransactionRewards(90000)
+                  .reverse()
+                  .filter((tier) => tier.tier <= 3)
+                  .map((tier) => {
+                    return (
+                      <>
+                        <Text prominent>
+                          {tier.tier === 1 ? "Top " : `Tier ${tier.tier} `}prize
+                        </Text>
+                        <Text holo bold>
+                          {numberToMonetaryString(tier.reward)}
+                        </Text>
+                        {tier.tier < 3 && (
+                          <div className="rewards-table-rule" />
+                        )}
                       </>
-                    })
-                }
+                    );
+                  })}
               </Card>
               <div className="send-table fees">
                 <Text className="send-table-header" size="md">
