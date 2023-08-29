@@ -1,13 +1,16 @@
-import { TokenIcon, Text, numberToMonetaryString } from "@fluidity-money/surfing";
+import {
+  TokenIcon,
+  Text,
+  numberToMonetaryString,
+} from "@fluidity-money/surfing";
 import BN from "bn.js";
 import { motion } from "framer-motion";
-import { Asset } from "~/queries/useTokens";
 import { AugmentedAsset } from "~/routes/$network/transfer/send";
 import { getUsdFromTokenAmount } from "~/util";
 
 const modalVariants = {
   hidden: {
-    height: 0
+    height: 0,
   },
   visible: {
     height: "auto",
@@ -26,7 +29,6 @@ const modalVariants = {
     },
   },
 };
-
 
 const rowVariants = {
   hidden: {
@@ -51,21 +53,19 @@ const rowVariants = {
   },
 };
 
-const TokenSelectModal = ({
-  assets,
-  value,
-  onSelect = () => {
-    return;
-  },
-  onClose = () => {
-    return;
-  },
-}: {
+interface ITokenSelectModal {
   assets: AugmentedAsset[];
   value: AugmentedAsset | undefined;
-  onSelect: (asset: Asset) => void;
+  onSelect: (asset: AugmentedAsset) => void;
   onClose: () => void;
-}) => {
+}
+
+const TokenSelectModal: React.FC<ITokenSelectModal> = ({
+  assets,
+  value,
+  onSelect,
+  onClose,
+}: ITokenSelectModal) => {
   return (
     <motion.div
       className="token-select-modal"
@@ -79,12 +79,12 @@ const TokenSelectModal = ({
           variants={rowVariants}
           key={asset.contract_address}
           className={`token-select-modal-row
-            ${asset.contract_address === value?.contract_address
-              ? "selected"
-              : ""
+            ${
+              asset.contract_address === value?.contract_address
+                ? "selected"
+                : ""
             }
-              `
-          }
+              `}
           onClick={() => {
             onSelect(asset);
             onClose();
@@ -92,17 +92,28 @@ const TokenSelectModal = ({
         >
           <TokenIcon className="token-select-icon" token={asset.symbol} />
           <div className="token-select-details">
-            <Text prominent size="lg">{asset.symbol}</Text>
+            <Text prominent size="lg">
+              {asset.symbol}
+            </Text>
             <Text>{asset.name}</Text>
           </div>
           <div className="token-select-details">
-            <Text prominent size="lg">{numberToMonetaryString(getUsdFromTokenAmount(asset.userTokenBalance, asset.decimals, 1))}</Text>
-            <Text>{asset.userTokenBalance.div(new BN(10).pow(new BN(asset.decimals))).toString()} at {numberToMonetaryString(1)}</Text>
+            <Text prominent size="lg">
+              {numberToMonetaryString(
+                getUsdFromTokenAmount(asset.userTokenBalance, asset.decimals, 1)
+              )}
+            </Text>
+            <Text>
+              {asset.userTokenBalance
+                .div(new BN(10).pow(new BN(asset.decimals)))
+                .toString()}{" "}
+              at {numberToMonetaryString(1)}
+            </Text>
           </div>
         </motion.div>
       ))}
     </motion.div>
-  )
+  );
 };
 
 export default TokenSelectModal;

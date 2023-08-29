@@ -233,7 +233,6 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
     return graphData.reverse().map((a, i) => ({ x: i, y: a.y }));
   }, [activity, quantities, token.decimals]);
 
-
   return (
     <motion.div style={{ marginBottom: "1em" }} variants={assetVariants}>
       <CollapsibleCard expanded={false}>

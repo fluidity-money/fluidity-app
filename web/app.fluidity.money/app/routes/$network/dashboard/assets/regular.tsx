@@ -28,20 +28,23 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const { tokens } = serverConfig.config[network] ?? {};
 
-
   const infuraRpc = config.drivers[network][MAINNET_ID].rpc.http;
   const provider = new JsonRpcProvider(infuraRpc);
 
   const eacAggregatorProxyAddr =
     config.contract.eac_aggregator_proxy[network as Chain];
 
-  const wethPrice = await getWethUsdPrice(provider, eacAggregatorProxyAddr, EACAggregatorProxyAbi);
+  const wethPrice = await getWethUsdPrice(
+    provider,
+    eacAggregatorProxyAddr,
+    EACAggregatorProxyAbi
+  );
 
   const regularTokens = tokens
     .filter((token) => !token.isFluidOf)
     .map((token) => ({
       ...token,
-      price: token.symbol !== "wETH" ? 1 : wethPrice
+      price: token.symbol !== "wETH" ? 1 : wethPrice,
     }));
 
   return {
@@ -51,7 +54,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 
 type RegularToken = Token & {
   price: number;
-}
+};
 
 export type AugmentedToken = RegularToken & {
   usdAmount: number;
@@ -178,7 +181,9 @@ const assetVariants = {
   },
 };
 
-const CardWrapper: React.FC<{ token: RegularToken }> = (props: { token: RegularToken }) => {
+const CardWrapper: React.FC<{ token: RegularToken }> = (props: {
+  token: RegularToken;
+}) => {
   const { token } = props;
   const navigate = useNavigate();
   const { network } = useParams();

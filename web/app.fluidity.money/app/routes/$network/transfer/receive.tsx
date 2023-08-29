@@ -1,4 +1,13 @@
-import { Checkmark, CopyIcon, GeneralButton, Heading, Text, Hoverable, InfoCircle, useViewport } from "@fluidity-money/surfing";
+import {
+  Checkmark,
+  CopyIcon,
+  GeneralButton,
+  Heading,
+  Text,
+  Hoverable,
+  InfoCircle,
+  useViewport,
+} from "@fluidity-money/surfing";
 import { LinksFunction } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -8,7 +17,6 @@ import QRCode from "react-qr-code";
 import dashboardStyles from "~/styles/dashboard.css";
 import transferStyles from "~/styles/transfer.css";
 
-
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: dashboardStyles },
@@ -17,35 +25,37 @@ export const links: LinksFunction = () => {
 };
 
 const Receive = () => {
-  const { network } = useParams()
+  const { network } = useParams();
   const { address } = useContext(FluidityFacadeContext);
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (copied) {
       setTimeout(() => {
-        setCopied(false)
-      }, 2000)
+        setCopied(false);
+      }, 2000);
     }
-  }, [copied])
+  }, [copied]);
 
-  const mobileWidthBreakpoint = 768
-  const { width } = useViewport()
-  const isMobile = width < mobileWidthBreakpoint
+  const mobileWidthBreakpoint = 768;
+  const { width } = useViewport();
+  const isMobile = width < mobileWidthBreakpoint;
 
   const { showExperiment } = useContext(SplitContext);
-  if (!showExperiment("enable-send-receive")) return <></>
+  if (!showExperiment("enable-send-receive")) return <></>;
 
   return (
-    <div className={`transfer-container receive ${isMobile ? 'mobile' : ''}`}>
+    <div className={`transfer-container receive ${isMobile ? "mobile" : ""}`}>
       <Heading className="receive-heading">Receive Fluid Assets</Heading>
       <div className="receive-badge">
         <div className="receive-qr">
           <div className="receive-qr-outline" />
           <QRCode
             className="receive-qr-code"
-            value={`https://app.fluidity.money/${network}/transfer/send&address=${address as string}`}
-            style={{ width: '50%' }}
+            value={`https://app.fluidity.money/${network}/transfer/send&address=${
+              address as string
+            }`}
+            style={{ width: "50%" }}
             size={180}
             fgColor="#000000"
             bgColor="#ffffff"
@@ -54,18 +64,22 @@ const Receive = () => {
       </div>
       <div className="receive-details">
         {isMobile && <div className="receive-card-outline" />}
-        <Text bold className="receive-your-address">YOUR ADDRESS</Text>
-        <Text prominent size="xl" className="receive-address">{address}</Text>
+        <Text bold className="receive-your-address">
+          YOUR ADDRESS
+        </Text>
+        <Text prominent size="xl" className="receive-address">
+          {address}
+        </Text>
         <GeneralButton
           type="secondary"
           onClick={() => {
             navigator.clipboard.writeText(address as string);
-            setCopied(true)
+            setCopied(true);
           }}
           icon={copied ? <Checkmark /> : <CopyIcon />}
-          className={`receive-copy-button ${copied ? 'copied' : ''}`}
+          className={`receive-copy-button ${copied ? "copied" : ""}`}
         >
-          {copied ? 'Copied!' : 'Copy Address'}
+          {copied ? "Copied!" : "Copy Address"}
         </GeneralButton>
       </div>
       <Hoverable

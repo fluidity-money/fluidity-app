@@ -1,16 +1,14 @@
 import styles from './TextField.module.scss'
 
-export interface DefaultInput extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface ControlledInput extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
+  value: string
+  onChange: (s: string) => void
   className?: string
   placeholder?: string
 }
 
-export interface ControlledInput {
-  value: string
-  onChange: (s: string) => void
-}
 
-export type ITextField = DefaultInput & (ControlledInput)
+export type ITextField = ControlledInput
 
 const TextField: React.FC<ITextField> = ({
   className = "",

@@ -16,7 +16,10 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { getTokenForNetwork } from "~/util";
-import {useUserActionsAll, useUserActionsByAddress} from "~/queries/useUserActionsAggregate";
+import {
+  useUserActionsAll,
+  useUserActionsByAddress,
+} from "~/queries/useUserActionsAggregate";
 import { chainType } from "~/util/chainUtils/chains";
 
 const FLUID_UTILITY = "FLUID";
@@ -72,55 +75,59 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   // use updated SQL aggregation
   if (network === "arbitrum") {
-    const {data: userActionsData, errors: userActionsErr} = address ?
-      await useUserActionsByAddress(network, address, page) :
-      await useUserActionsAll(network, page);
+    const { data: userActionsData, errors: userActionsErr } = address
+      ? await useUserActionsByAddress(network, address, page)
+      : await useUserActionsAll(network, page);
 
     if (userActionsErr || !userActionsData) {
       throw userActionsErr;
     }
 
-    const transactions = userActionsData[network].map(({
-      sender, 
-      receiver,
-      hash,
-      winner,
-      reward,
-      rewardHash,
-      timestamp,
-      value,
-      currency,
-      application,
-      utility_name, 
-      utility_amount
-    }) => {
-      const utilityName =
-        utility_name?.match(ALPHA_NUMERIC)?.[0];
-
-      const swapType = sender === MintAddress
-          ? "in" as const
-          : receiver === MintAddress
-            ? "out" as const
-            : undefined
-
-      return {
+    const transactions = userActionsData[network].map(
+      ({
         sender,
         receiver,
         hash,
         winner,
         reward,
         rewardHash,
-        // convert to JS timestamp
-        timestamp: timestamp * 1000,
+        timestamp,
         value,
         currency,
         application,
-        swapType,
-        provider: application ?? "Fluidity",
-        logo: tokenLogoMap[currency] || defaultLogo,
-        utilityTokens: utilityName ? {[utilityName]: utility_amount} : undefined
+        utility_name,
+        utility_amount,
+      }) => {
+        const utilityName = utility_name?.match(ALPHA_NUMERIC)?.[0];
+
+        const swapType =
+          sender === MintAddress
+            ? ("in" as const)
+            : receiver === MintAddress
+            ? ("out" as const)
+            : undefined;
+
+        return {
+          sender,
+          receiver,
+          hash,
+          winner,
+          reward,
+          rewardHash,
+          // convert to JS timestamp
+          timestamp: timestamp * 1000,
+          value,
+          currency,
+          application,
+          swapType,
+          provider: application ?? "Fluidity",
+          logo: tokenLogoMap[currency] || defaultLogo,
+          utilityTokens: utilityName
+            ? { [utilityName]: utility_amount }
+            : undefined,
+        };
       }
-    })
+    );
 
     return json({
       page,

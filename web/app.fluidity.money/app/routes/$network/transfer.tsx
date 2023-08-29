@@ -1,28 +1,21 @@
 import { LinkButton, useViewport } from "@fluidity-money/surfing";
 import { LinksFunction } from "@remix-run/node";
-import {
-  Link,
-  Outlet,
-  useParams,
-} from "@remix-run/react";
+import { Link, Outlet, useParams } from "@remix-run/react";
 import transferStyles from "~/styles/transfer.css";
 
 export const links: LinksFunction = () => {
-  return [
-    { rel: "stylesheet", href: transferStyles },
-  ];
+  return [{ rel: "stylesheet", href: transferStyles }];
 };
 
-
 const Transfer = () => {
-  const { network } = useParams()
+  const { network } = useParams();
 
-  const mobileWidthBreakpoint = 768
-  const { width } = useViewport()
-  const isMobile = width < mobileWidthBreakpoint
+  const mobileWidthBreakpoint = 768;
+  const { width } = useViewport();
+  const isMobile = width < mobileWidthBreakpoint;
 
   return (
-    <div className={`transfer-template ${isMobile ? 'mobile' : ''}`}>
+    <div className={`transfer-template ${isMobile ? "mobile" : ""}`}>
       <header className="transfer-template-header">
         {!isMobile && (
           <div id="flu-logo">
@@ -34,12 +27,11 @@ const Transfer = () => {
               />
             </Link>
           </div>
-        )
-        }
+        )}
         <Link to={`/${network}/dashboard/home`}>
           <LinkButton
             handleClick={() => {
-              return
+              return;
             }}
             size={isMobile ? "medium" : "large"}
             type="internal"
@@ -51,7 +43,8 @@ const Transfer = () => {
         </Link>
       </header>
       <Outlet />
-    </div>)
-}
+    </div>
+  );
+};
 
-export default Transfer
+export default Transfer;
