@@ -141,8 +141,7 @@ const Send = () => {
         setValidAmount(false);
       }
       setInputHint(
-        `${amountRemaining.toFixed(2)} ${
-          selectedAsset.symbol
+        `${amountRemaining.toFixed(2)} ${selectedAsset.symbol
         } remaining (${numberToMonetaryString(amountRemaining)})`
       );
     } else {
@@ -304,7 +303,7 @@ const Send = () => {
                     await navigator.clipboard
                       .readText()
                       .then((text) => {
-                        setRecipientAddress(text || "");
+                        handleRecipientAddressChange(text || "");
                       })
                       .catch((err) => {
                         console.error(
