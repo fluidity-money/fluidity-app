@@ -20,23 +20,44 @@ import { SplitContext } from "contexts/SplitProvider";
 import { ethers } from "ethers";
 import { useContext, useEffect, useState } from "react";
 import TokenSelect from "~/components/TokenSelect";
+import config from "~/webapp.config.server";
 
 import { Asset } from "~/queries/useTokens";
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 
 import { getUsdFromTokenAmount, Token } from "~/util";
 import serverConfig from "~/webapp.config.server";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { Chain } from "~/util/chainUtils/chains";
+import { getWethUsdPrice } from "~/util/chainUtils/ethereum/transaction";
+import EACAggregatorProxyAbi from "~/util/chainUtils/ethereum/EACAggregatorProxy.json";
+import { getTransactionRewards } from "~/util/chainUtils/transactionRewards";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
+  if (!network) throw new Error("Invalid Request");
 
   const { tokens: _tokens } =
     serverConfig.config[network as unknown as string] ?? {};
 
   const tokens = _tokens.filter((t) => t.isFluidOf);
 
+  const MAINNET_ID = 0;
+  const infuraRpc = config.drivers[network][MAINNET_ID].rpc.http;
+  const provider = new JsonRpcProvider(infuraRpc);
+
+  const eacAggregatorProxyAddr =
+    config.contract.eac_aggregator_proxy[network as Chain];
+
+  const wethPrice = await getWethUsdPrice(
+    provider,
+    eacAggregatorProxyAddr,
+    EACAggregatorProxyAbi
+  );
+
   return json({
     tokens,
+    wethPrice: wethPrice
   });
 };
 
@@ -57,6 +78,9 @@ const Send = () => {
       };
     }) || [];
 
+  const { wethPrice } = useLoaderData<{
+    wethPrice: number;
+  }>();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const deeplinkAddress = searchParams.get("address");
@@ -245,8 +269,11 @@ const Send = () => {
 
         // Calculate the fee in gwei
         const fee = gasPrice.mul(gasLimit);
+        const wethDecimals = 18;
 
-        setTransactionFee(ethers.utils.formatUnits(fee, "gwei"));
+        const feeUSDC = getUsdFromTokenAmount(new BN(fee.toNumber()), wethDecimals, wethPrice);
+
+        setTransactionFee(`~$${feeUSDC.toFixed(2)}`);
       } catch (error) {
         console.error("Error estimating fee:", error);
       }
@@ -326,14 +353,18 @@ const Send = () => {
                 <Text className="send-table-header" prominent bold size="lg">
                   Potential Rewards
                 </Text>
-                <Text>Top prize</Text>
-                <Text>{numberToMonetaryString(0)}</Text>
-                <div className="rewards-table-rule" />
-                <Text>Tier 2 prize</Text>
-                <Text>{numberToMonetaryString(0)}</Text>
-                <div className="rewards-table-rule" />
-                <Text>Tier 3 prize</Text>
-                <Text>{numberToMonetaryString(0)}</Text>
+                {
+                  getTransactionRewards(90000)
+                    .reverse()
+                    .filter(tier => tier.tier <= 3)
+                    .map((tier) => {
+                      return <>
+                        <Text prominent>{tier.tier === 1 ? 'Top ' : `Tier ${tier.tier} `}prize</Text>
+                        <Text holo bold>{numberToMonetaryString(tier.reward)}</Text>
+                        {tier.tier < 3 && (<div className="rewards-table-rule" />)}
+                      </>
+                    })
+                }
               </Card>
               <div className="send-table fees">
                 <Text className="send-table-header" size="md">
