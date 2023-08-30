@@ -93,12 +93,31 @@ const queryByTimestamp: Queryable = {
       }
     }
   `,
-
   arbitrum: gql`
     query VolumeTxs($filterHashes: [String!] = [], $timestamp: timestamp!) {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          time: { _gt: $timestamp }
+        }
+        order_by: { time: desc }
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        token_decimals
+        time
+        transaction_hash
+        amount_str
+      }
+    }
+  `,
+  solana: gql`
+    query VolumeTxs($filterHashes: [String!] = [], $timestamp: timestamp!) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
           time: { _gt: $timestamp }
         }

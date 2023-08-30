@@ -50,50 +50,6 @@ const queryByAddress: Queryable = {
     }
   `,
 
-  solana: gql`
-    query getTransactionsByAddress(
-      $tokens: [String!]
-      $address: String!
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      solana {
-        transfers(
-          currency: { in: $tokens }
-          any: [
-            { senderAddress: { is: $address } }
-            { receiverAddress: { is: $address } }
-          ]
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash: signature
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByAddress(
       $address: String!
@@ -105,6 +61,42 @@ const queryByAddress: Queryable = {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          token_short_name: { _in: $tokens }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactionsByAddress(
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
           token_short_name: { _in: $tokens }
           _not: { transaction_hash: { _in: $filterHashes } }
           _or: [
@@ -204,40 +196,6 @@ const queryByTxHash: Queryable = {
     }
   `,
 
-  solana: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      solana {
-        transfers(
-          options: { desc: "block.timestamp.unixtime", limit: $limit }
-          signature: { in: $transactions }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash: signature
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -247,6 +205,35 @@ const queryByTxHash: Queryable = {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { _in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
           transaction_hash: { _in: $transactions }
         }
@@ -337,45 +324,6 @@ const queryAll: Queryable = {
     }
   `,
 
-  solana: gql`
-    query getTransactions(
-      $tokens: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      solana {
-        transfers(
-          currency: { in: $tokens }
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash: signature
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactions(
       $offset: Int = 0
@@ -386,6 +334,37 @@ const queryAll: Queryable = {
       transfers: user_actions(
         where: {
           network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          token_short_name: { _in: $tokens }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactions(
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
           token_short_name: { _in: $tokens }
         }

@@ -33,6 +33,29 @@ const queryByAddress: Queryable = {
       swap_in
       type
     }
+  }`,
+  solana: gql`
+  query userActionsAggregateByAddress(
+      $offset: Int = 0,
+      $limit: Int = 12,
+      $address: String!,
+  ) {
+    solana: user_transactions_aggregate(args: {network_: "solana", filter_address: $address, limit_: $limit, offset_: $offset}) {
+      value: amount
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
+      hash: transaction_hash
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
+      application
+      currency
+      timestamp: time
+      swap_in
+      type
+    }
   }`
 }
 const queryAll: Queryable = {
@@ -42,6 +65,28 @@ const queryAll: Queryable = {
       $limit: Int = 12,
   ) {
     arbitrum: user_transactions_aggregate(args: {network_: "arbitrum",limit_: $limit, offset_: $offset}) {
+      value: amount
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
+      hash: transaction_hash
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
+      application
+      currency
+      timestamp: time
+      swap_in
+      type
+    }
+  }`,
+  solana: gql`
+  query userActionsAggregateAll(
+      $offset: Int = 0,
+      $limit: Int = 12,
+  ) {
+    solana: user_transactions_aggregate(args: {network_: "solana",limit_: $limit, offset_: $offset}) {
       value: amount
       receiver: recipient_address
       rewardHash: reward_hash
