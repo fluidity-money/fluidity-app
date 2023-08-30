@@ -1,5 +1,5 @@
 import { gql, jsonPost, Queryable } from "~/util";
-import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
+import { fetchGqlEndpoint, hasuraDateToUnix, networkGqlBackend } from "~/util/api/graphql";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import BN from "bn.js";
 
@@ -180,7 +180,7 @@ const useVolumeTxByAddressTimestamp = async (
   const variables = {
     address,
     timestamp: iso8601Timestamp,
-    ...(network !== "arbitrum" && { fluidAssets }),
+    ...(networkGqlBackend(network) !== "hasura" && { fluidAssets }),
   };
 
   const body = {
@@ -202,11 +202,11 @@ const useVolumeTxByAddressTimestamp = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
+  if (networkGqlBackend(network) === "hasura" && result.data) {
     const hasuraTransfers =
       (result as HasuraVolumeTxsResponse).data.transfers || [];
     result.data = {
-      arbitrum: {
+      [network]: {
         transfers: hasuraTransfers.map((transfer) => ({
           sender: { address: transfer.sender_address },
           receiver: { address: transfer.recipient_address },
@@ -231,7 +231,7 @@ const useVolumeTxByTimestamp = async (
 ) => {
   const variables = {
     timestamp: iso8601Timestamp,
-    ...(network !== "arbitrum" && { fluidAssets }),
+    ...(networkGqlBackend(network) !== "hasura" && { fluidAssets }),
   };
 
   const body = {
@@ -254,11 +254,11 @@ const useVolumeTxByTimestamp = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
+  if (networkGqlBackend(network) === "hasura" && result.data) {
     const hasuraTransfers =
       (result as HasuraVolumeTxsResponse).data.transfers || [];
     result.data = {
-      arbitrum: {
+      [network]: {
         transfers: hasuraTransfers.map((transfer) => ({
           sender: { address: transfer.sender_address },
           receiver: { address: transfer.recipient_address },

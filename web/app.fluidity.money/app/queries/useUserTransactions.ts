@@ -1,5 +1,5 @@
 import { gql, Queryable, jsonPost } from "~/util";
-import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
+import { fetchGqlEndpoint, hasuraDateToUnix, networkGqlBackend } from "~/util/api/graphql";
 import BN from "bn.js";
 import {
   addDecimalToBn,
@@ -537,7 +537,7 @@ const useUserTransactionsByAddress = async (
     filterHashes,
     limit,
     tokens:
-      network in ["ethereum", "solana"]
+      network in ["ethereum"]
         ? tokens
         : // convert tokens to token_short_name
           tokens
@@ -559,7 +559,7 @@ const useUserTransactionsByAddress = async (
     };
 
   const result =
-    network === "arbitrum"
+    networkGqlBackend(network) === "hasura"
       ? parseHasuraUserTransactions(
           await jsonPost<
             UserTransactionsByAddressBody,
@@ -588,7 +588,7 @@ const useUserTransactionsByTxHash = async (
     transactions,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && { tokens }),
+    ...(networkGqlBackend(network) !== "hasura" && { tokens }),
   };
 
   const body = {
@@ -604,7 +604,7 @@ const useUserTransactionsByTxHash = async (
     };
 
   const result =
-    network === "arbitrum"
+    networkGqlBackend(network) === "hasura"
       ? parseHasuraUserTransactions(
           await jsonPost<
             UserTransactionsByTxHashBody,
@@ -634,7 +634,7 @@ const useUserTransactionsAll = async (
     filterHashes,
     limit,
     tokens:
-      network in ["ethereum", "solana"]
+      network in ["ethereum"]
         ? tokens
         : // convert tokens to token_short_name
           tokens
@@ -656,7 +656,7 @@ const useUserTransactionsAll = async (
     };
 
   const result =
-    network === "arbitrum"
+    networkGqlBackend(network) === "hasura"
       ? parseHasuraUserTransactions(
           await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
             url,
