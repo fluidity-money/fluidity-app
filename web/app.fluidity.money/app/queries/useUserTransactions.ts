@@ -100,16 +100,16 @@ const queryByAddress: Queryable = {
           token_short_name: { _in: $tokens }
           _not: { transaction_hash: { _in: $filterHashes } }
           _or: [
-            { sender_address: { _eq: $address } }
-            { recipient_address: { _eq: $address } }
+            { solana_sender_owner_address: { _eq: $address } }
+            { solana_recipient_owner_address: { _eq: $address } }
           ]
         }
         order_by: { time: desc }
         limit: $limit
         offset: $offset
       ) {
-        sender_address
-        recipient_address
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         time
         transaction_hash
@@ -240,8 +240,8 @@ const queryByTxHash: Queryable = {
         order_by: { time: desc }
         limit: $limit
       ) {
-        sender_address
-        recipient_address
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         time
         transaction_hash
@@ -372,8 +372,8 @@ const queryAll: Queryable = {
         limit: $limit
         offset: $offset
       ) {
-        sender_address
-        recipient_address
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         time
         transaction_hash

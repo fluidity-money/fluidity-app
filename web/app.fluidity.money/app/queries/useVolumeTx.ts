@@ -63,6 +63,34 @@ const queryByAddressTimestamp: Queryable = {
       }
     }
   `,
+  solana: gql`
+    query VolumeTxs(
+      $address: String!
+      $filterHashes: [String!] = []
+      $timestamp: timestamp!
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          time: { _gt: $timestamp }
+          _or: [
+            { solana_sender_owner_address: { _eq: $address } }
+            { solana_recipient_owner_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+      ) {
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
+        token_short_name
+        token_decimals
+        time
+        transaction_hash
+        amount_str
+      }
+    }
+  `,
 };
 
 const queryByTimestamp: Queryable = {
@@ -123,8 +151,8 @@ const queryByTimestamp: Queryable = {
         }
         order_by: { time: desc }
       ) {
-        sender_address
-        recipient_address
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         token_decimals
         time

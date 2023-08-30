@@ -1,5 +1,5 @@
 import { gql, Queryable, getTokenForNetwork, jsonPost } from "~/util";
-import { fetchGqlEndpoint } from "~/util/api/graphql";
+import { fetchGqlEndpoint, networkGqlBackend } from "~/util/api/graphql";
 
 const queryByAddressTimestamp: Queryable = {
   ethereum: gql`
@@ -19,20 +19,17 @@ const queryByAddressTimestamp: Queryable = {
     }
   `,
   solana: gql`
-    query getTransactionCount(
-      $fluidCurrencies: [String!]
-      $address: String!
-      $timestamp: ISO8601DateTime!
-    ) {
-      solana {
-        transfers(
-          currency: { in: $fluidCurrencies }
-          any: [
-            { senderAddress: { is: $address } }
-            { receiverAddress: { is: $address } }
-          ]
-        ) {
-          count(time: { after: $timestamp })
+    query getTransactionCount($address: String!, $timestamp: timestamp!) {
+      arbitrum: user_actions_aggregate(
+        where: {
+          network: { _eq: "solana" }
+          solana_sender_owner_address: { _eq: $address }
+          _or: { solana_recipient_owner_address: { _eq: $address } }
+          time: { _gt: $timestamp }
+        }
+      ) {
+        aggregate {
+          count
         }
       }
     }
@@ -69,13 +66,12 @@ const queryByTimestamp: Queryable = {
     }
   `,
   solana: gql`
-    query getTransactionCount(
-      $fluidCurrencies: [String!]
-      $timestamp: ISO8601DateTime!
-    ) {
-      solana {
-        transfers(currency: { in: $fluidCurrencies }) {
-          count(time: { after: $timestamp })
+    query getTransactionCount($timestamp: timestamp!) {
+      arbitrum: user_actions_aggregate(
+        where: { network: { _eq: "solana" }, time: { _gt: $timestamp } }
+      ) {
+        aggregate {
+          count
         }
       }
     }
@@ -135,7 +131,7 @@ const useUserTransactionCountByAddressTimestamp = async (
 ) => {
   const variables = {
     address: address,
-    ...(network !== "arbitrum" && {
+    ...(networkGqlBackend(network) !== "hasura" && {
       fluidCurrencies: getTokenForNetwork(network),
     }),
     fluidCurrencies: getTokenForNetwork(network),
@@ -161,7 +157,7 @@ const useUserTransactionCountByAddressTimestamp = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
+  if (networkGqlBackend(network) === "hasura" && result.data) {
     result.data[network].transfers = [
       (result as unknown as HasuraUserTransactionCountRes).data.aggregate,
     ];
@@ -175,7 +171,7 @@ const useUserTransactionCountByTimestamp = async (
   iso8601Timestamp: string
 ) => {
   const variables = {
-    ...(network !== "arbitrum" && {
+    ...(networkGqlBackend(network) !== "hasura" && {
       fluidCurrencies: getTokenForNetwork(network),
     }),
     timestamp: iso8601Timestamp,
@@ -200,7 +196,7 @@ const useUserTransactionCountByTimestamp = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
+  if (networkGqlBackend(network) === "hasura" && result.data) {
     result.data[network].transfers = [
       (result as unknown as HasuraUserTransactionCountRes).data.aggregate,
     ];
