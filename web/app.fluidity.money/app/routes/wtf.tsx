@@ -56,7 +56,6 @@ const CHAINS = [
   {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
-    disabled: true,
   },
 ];
 

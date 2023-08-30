@@ -12,11 +12,11 @@ type GqlEndpoint = {
 export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
   switch (network) {
     case "ethereum":
-    case "solana":
       return {
         url: "https://graphql.bitquery.io",
         headers: { "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "" },
       };
+    case "solana":
     case "arbitrum":
     case "polygon_zk":
       return {

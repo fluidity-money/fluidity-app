@@ -52,7 +52,6 @@ const CHAIN_NAME_MAP: Record<
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
-    disabled: true,
   },
 };
 
