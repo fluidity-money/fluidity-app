@@ -421,67 +421,6 @@ body {
   }
 }
 
-.open-provider-dropdown {
-  all: unset;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2em;
-  position: relative;
-
-  &:hover {
-    h1,
-    img {
-      opacity: 0.8;
-    }
-  }
-
-  .fluid-liquidity-token {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-    margin: 0;
-  }
-}
-
-.dropdown-options {
-  background: rgba(50, 50, 50, 0.65);
-  box-sizing: border-box;
-  padding: 5px;
-  border-radius: 12px;
-  position: absolute;
-  top: 50px;
-  left: -15px;
-  width: 175px;
-  display: flex;
-  flex-direction: column;
-
-  ul {
-    margin: 0;
-    padding: 0;
-
-    li {
-      list-style: none;
-
-      .token-option {
-        all: unset;
-        font-size: 0.8rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        border-radius: 12px;
-        padding: 4px 8px;
-        box-sizing: border-box;
-
-        &:hover {
-          background: rgba(99, 99, 99, 0.75);
-        }
-      }
-    }
-  }
-}
-
 .send-terms-link {
   color: white;
   text-decoration: underline;
