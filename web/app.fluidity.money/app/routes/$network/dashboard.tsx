@@ -168,35 +168,35 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-  {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
+    {
+      airdrop: {
+        name: "airdrop",
+        path: (network: string) => `/${network}/dashboard/airdrop`,
+        icon: <AirdropIcon />,
+      },
     },
-  },
-  {
-    home: {
-      name: "dashboard",
-      path: (network: string) => `/${network}/dashboard/home`,
-      icon: <DashboardIcon />,
+    {
+      home: {
+        name: "dashboard",
+        path: (network: string) => `/${network}/dashboard/home`,
+        icon: <DashboardIcon />,
+      },
     },
-  },
-  {
-    rewards: {
-      name: "rewards",
-      path: (network: string) => `/${network}/dashboard/rewards`,
-      icon: <Trophy />,
+    {
+      rewards: {
+        name: "rewards",
+        path: (network: string) => `/${network}/dashboard/rewards`,
+        icon: <Trophy />,
+      },
     },
-  },
-  {
-    assets: {
-      name: "assets",
-      path: (network: string) => `/${network}/dashboard/assets`,
-      icon: <AssetsIcon />,
+    {
+      assets: {
+        name: "assets",
+        path: (network: string) => `/${network}/dashboard/assets`,
+        icon: <AssetsIcon />,
+      },
     },
-  },
-];
+  ];
 
 const CHAIN_NAME_MAP: Record<
   string,
@@ -256,7 +256,6 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
   const showSendReceive = showExperiment("enable-send-receive");
 
@@ -428,21 +427,21 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
   const chainNameMap = showExperiment("enable-polygonzk")
     ? CHAIN_NAME_MAP
     : (() => {
-        const {
-          polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
-          ...rest
-        } = CHAIN_NAME_MAP;
-        return rest;
-      })();
+      const {
+        polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
+        ...rest
+      } = CHAIN_NAME_MAP;
+      return rest;
+    })();
 
   return (
     <>
@@ -507,9 +506,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -538,9 +536,7 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
-          {NAVIGATION_MAP.filter((obj) =>
-            showAssets ? true : Object.keys(obj)[0] !== "assets"
-          ).map((obj, index) => {
+          {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
             const active = index === activeIndex;

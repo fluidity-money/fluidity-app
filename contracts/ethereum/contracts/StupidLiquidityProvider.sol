@@ -27,6 +27,7 @@ contract StupidLiquidityProvider is ILiquidityProvider {
     /**
      * @notice initialiser function
      *
+     * @param _underlying token that's being supported, ie USDC
      * @param _token address of the fluid token
      */
     function init(

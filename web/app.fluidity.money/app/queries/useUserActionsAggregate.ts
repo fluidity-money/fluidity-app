@@ -5,60 +5,58 @@ export type AggregatedTransaction = Omit<
   Transaction,
   "utilityTokens" | "swapType" | "logo" | "provider"
 > & {
-  utility_amount: number;
-  utility_name: string | null;
-};
+  utility_amount: number, 
+  utility_name: string | null
+  swap_in: boolean;
+  type: 'send' | 'swap'
+}
 
 const queryByAddress: Queryable = {
   arbitrum: gql`
-    query userActionsAggregateByAddress(
-      $offset: Int = 0
-      $limit: Int = 12
-      $address: String!
-    ) {
-      arbitrum: user_transactions_aggregate(
-        args: {
-          network_: "arbitrum"
-          filter_address: $address
-          limit_: $limit
-          offset_: $offset
-        }
-      ) {
-        value: amount
-        receiver: recipient_address
-        rewardHash: reward_hash
-        sender: sender_address
-        hash: transaction_hash
-        utility_amount
-        utility_name
-        winner: winning_address
-        reward: winning_amount
-        application
-        currency
-        timestamp: time
-      }
+  query userActionsAggregateByAddress(
+      $offset: Int = 0,
+      $limit: Int = 12,
+      $address: String!,
+  ) {
+    arbitrum: user_transactions_aggregate(args: {network_: "arbitrum", filter_address: $address, limit_: $limit, offset_: $offset}) {
+      value: amount
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
+      hash: transaction_hash
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
+      application
+      currency
+      timestamp: time
+      swap_in
+      type
     }
   `,
 };
 const queryAll: Queryable = {
   arbitrum: gql`
-    query userActionsAggregateAll($offset: Int = 0, $limit: Int = 12) {
-      arbitrum: user_transactions_aggregate(
-        args: { network_: "arbitrum", limit_: $limit, offset_: $offset }
-      ) {
-        value: amount
-        receiver: recipient_address
-        rewardHash: reward_hash
-        sender: sender_address
-        hash: transaction_hash
-        utility_amount
-        utility_name
-        winner: winning_address
-        reward: winning_amount
-        application
-        currency
-        timestamp: time
-      }
+  query userActionsAggregateAll(
+      $offset: Int = 0,
+      $limit: Int = 12,
+  ) {
+    arbitrum: user_transactions_aggregate(args: {network_: "arbitrum",limit_: $limit, offset_: $offset}) {
+      value: amount
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
+      hash: transaction_hash
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
+      application
+      currency
+      timestamp: time
+      swap_in
+      type
     }
   `,
 };

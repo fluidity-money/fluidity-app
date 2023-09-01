@@ -32,7 +32,7 @@ import FluidifyForm from "~/components/Fluidify/FluidifyForm";
 import SwapCompleteModal from "~/components/SwapCompleteModal";
 import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
-import { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 
 type LoaderData = {
   tokens: Token[];
@@ -224,9 +224,8 @@ export default function FluidifyToken() {
     }
 
     (async () => {
-      switch (network) {
-        case "ethereum":
-        case "arbitrum": {
+      switch (chainType(network)) {
+        case "evm": {
           const [tokensMinted, userTokenBalance] = await Promise.all([
             Promise.all(
               tokens.map(async (token) => {
