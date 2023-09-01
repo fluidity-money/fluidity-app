@@ -83,36 +83,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       throw userActionsErr;
     }
 
-    const transactions = userActionsData[network].map(({
-      sender, 
-      receiver,
-      hash,
-      winner,
-      reward,
-      rewardHash,
-      timestamp,
-      value,
-      currency,
-      application,
-      utility_name, 
-      utility_amount,
-      type,
-      swap_in,
-    }) => {
-      const utilityName =
-        utility_name?.match(ALPHA_NUMERIC)?.[0];
-
-      // if labelled as swap, use swap direction, otherwise manually check
-      const swapType = 
-        type === "swap" 
-          ? (swap_in ? "in" : "out")
-        : sender === MintAddress
-            ? "in" as const
-            : receiver === MintAddress
-              ? "out" as const
-              : undefined
-
-      return {
+    const transactions = userActionsData[network].map(
+      ({
         sender,
         receiver,
         hash,
@@ -125,11 +97,18 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         application,
         utility_name,
         utility_amount,
+        type,
+        swap_in,
       }) => {
         const utilityName = utility_name?.match(ALPHA_NUMERIC)?.[0];
 
+        // if labelled as swap, use swap direction, otherwise manually check
         const swapType =
-          sender === MintAddress
+          type === "swap"
+            ? swap_in
+              ? "in"
+              : "out"
+            : sender === MintAddress
             ? ("in" as const)
             : receiver === MintAddress
             ? ("out" as const)

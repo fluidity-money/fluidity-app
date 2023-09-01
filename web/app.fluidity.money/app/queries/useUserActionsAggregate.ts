@@ -5,11 +5,11 @@ export type AggregatedTransaction = Omit<
   Transaction,
   "utilityTokens" | "swapType" | "logo" | "provider"
 > & {
-  utility_amount: number, 
-  utility_name: string | null
+  utility_amount: number;
+  utility_name: string | null;
   swap_in: boolean;
-  type: 'send' | 'swap'
-}
+  type: "send" | "swap";
+};
 
 const queryByAddress: Queryable = {
   arbitrum: gql`
