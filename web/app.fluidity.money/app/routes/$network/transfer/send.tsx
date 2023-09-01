@@ -10,9 +10,10 @@ import {
   TokenIcon,
   numberToMonetaryString,
   LoadingDots,
+  LinkButton
 } from "@fluidity-money/surfing";
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useNavigate, useParams, useSearchParams } from "@remix-run/react";
 import { useWeb3React } from "@web3-react/core";
 import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -32,6 +33,7 @@ import { Chain } from "~/util/chainUtils/chains";
 import { getWethUsdPrice } from "~/util/chainUtils/ethereum/transaction";
 import EACAggregatorProxyAbi from "~/util/chainUtils/ethereum/EACAggregatorProxy.json";
 import { getTransactionRewards } from "~/util/chainUtils/transactionRewards";
+import React from "react";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { network } = params;
@@ -42,12 +44,14 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   const tokens = _tokens.filter((t) => t.isFluidOf);
 
+  const wethPriceNetwork = "arbitrum" satisfies Chain
+
   const MAINNET_ID = 0;
-  const infuraRpc = config.drivers[network][MAINNET_ID].rpc.http;
+  const infuraRpc = config.drivers[wethPriceNetwork][MAINNET_ID].rpc.http;
   const provider = new JsonRpcProvider(infuraRpc);
 
   const eacAggregatorProxyAddr =
-    config.contract.eac_aggregator_proxy[network as Chain];
+    config.contract.eac_aggregator_proxy[wethPriceNetwork];
 
   const wethPrice = await getWethUsdPrice(
     provider,
@@ -81,6 +85,7 @@ const Send = () => {
   const { wethPrice } = useLoaderData<{
     wethPrice: number;
   }>();
+  const { network } = useParams()
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const deeplinkAddress = searchParams.get("address");
@@ -101,8 +106,6 @@ const Send = () => {
         const bal = await balance(t.contract_address);
 
         if (bal && bal.toNumber()) {
-          console.log(t.name, bal.toString());
-
           setTokens((prev) =>
             prev.map((_t) => {
               if (_t.contract_address === t.contract_address) {
@@ -165,8 +168,7 @@ const Send = () => {
         setValidAmount(false);
       }
       setInputHint(
-        `${amountRemaining.toFixed(2)} ${
-          selectedAsset.symbol
+        `${amountRemaining.toFixed(2)} ${selectedAsset.symbol
         } remaining (${numberToMonetaryString(amountRemaining)})`
       );
     } else {
@@ -235,7 +237,8 @@ const Send = () => {
         to: selectedAsset.contract_address,
         data: transferData,
       });
-      console.log("Transaction sent:", tx);
+
+      setIsSending(true)
     } catch (error) {
       console.error("Error sending transaction:", error);
     }
@@ -285,6 +288,11 @@ const Send = () => {
     })();
   }, [selectedAsset, amountToSend, recipientAddress, signer]);
 
+  // It's Happening
+  const [isSending, setIsSending] = useState(false);
+
+  const navigate = useNavigate();
+
   const { showExperiment } = useContext(SplitContext);
   if (!showExperiment("enable-send-receive")) return <></>;
 
@@ -296,128 +304,157 @@ const Send = () => {
         type={"none"}
         loop={true}
       />
-      <div className="send-left">
-        <Heading className="send-heading">Send Fluid Assets</Heading>
-      </div>
-      <div className="send-right">
-        <div className="send-right-content">
-          <Display size="xxs">Select your asset</Display>
-          <TokenSelect
-            assets={tokens}
-            value={selectedAsset}
-            onChange={(token) => {
-              setSelectedAsset(token);
-            }}
-          />
-          {selectedAsset && (
-            <>
-              <Display size="xxs">Sending details</Display>
-              <Form.Group label="AMOUNT TO SEND" hint={inputHint}>
-                <TokenIcon token={selectedAsset.symbol} height={"32"} />
-                <Form.TextField
-                  placeholder="0"
-                  value={amountToSend}
-                  onChange={handleAmountToSendChange}
-                />
-              </Form.Group>
-              <Form.Group
-                label="RECIPIENT ADDRESS"
-                hint={!validAddress ? "Invalid address" : undefined}
-              >
-                <Form.TextField
-                  value={recipientAddress}
-                  onChange={handleRecipientAddressChange}
-                />
-                <GeneralButton
-                  type="transparent"
-                  size="small"
-                  onClick={async () => {
-                    await navigator.clipboard
-                      .readText()
-                      .then((text) => {
-                        handleRecipientAddressChange(text || "");
-                      })
-                      .catch((err) => {
-                        console.error(
-                          "Failed to read clipboard contents: ",
-                          err
-                        );
-                      });
+      {
+        isSending ? (
+          <div className="send-sending">
+            <Display size="xxs">
+              It’s happening
+            </Display>
+            <Text size="md">
+              We’ll let you know when the transaction has completed, and notify you of any rewards earned.
+            </Text>
+            <GeneralButton
+              className="send-sending-done"
+              onClick={() => {
+                window.location.reload()
+              }}
+            >
+              SEND ANOTHER
+            </GeneralButton>
+            <LinkButton size="sm" type="internal" handleClick={() => {
+              // redirect to home
+              navigate(`/${network}/dashboard/home`)
+            }}>
+              View Transactions
+            </LinkButton>
+          </div>
+        ) : (
+          <>
+            <div className="send-left">
+              <Heading className="send-heading">Send Fluid Assets</Heading>
+            </div>
+            <div className="send-right">
+              <div className="send-right-content">
+                <Display size="xxs">Select your asset</Display>
+                <TokenSelect
+                  assets={tokens}
+                  value={selectedAsset}
+                  onChange={(token) => {
+                    setSelectedAsset(token);
                   }}
-                >
-                  PASTE
-                </GeneralButton>
-              </Form.Group>
+                />
+                {selectedAsset && (
+                  <>
+                    <Display size="xxs">Sending details</Display>
+                    <Form.Group label="AMOUNT TO SEND" hint={inputHint}>
+                      <TokenIcon token={selectedAsset.symbol} height={"32"} />
+                      <Form.TextField
+                        placeholder="0"
+                        value={amountToSend}
+                        onChange={handleAmountToSendChange}
+                      />
+                    </Form.Group>
+                    <Form.Group
+                      label="RECIPIENT ADDRESS"
+                      hint={!validAddress ? "Invalid address" : undefined}
+                    >
+                      <Form.TextField
+                        value={recipientAddress}
+                        onChange={handleRecipientAddressChange}
+                      />
+                      <GeneralButton
+                        type="transparent"
+                        size="small"
+                        onClick={async () => {
+                          await navigator.clipboard
+                            .readText()
+                            .then((text) => {
+                              handleRecipientAddressChange(text || "");
+                            })
+                            .catch((err) => {
+                              console.error(
+                                "Failed to read clipboard contents: ",
+                                err
+                              );
+                            });
+                        }}
+                      >
+                        PASTE
+                      </GeneralButton>
+                    </Form.Group>
 
-              <Card
-                type="transparent"
-                border="solid"
-                color="holo"
-                className="send-table"
-              >
-                <Text className="send-table-header" prominent bold size="lg">
-                  Potential Rewards
-                </Text>
-                {getTransactionRewards(90000)
-                  .reverse()
-                  .filter((tier) => tier.tier <= 3)
-                  .map((tier) => {
-                    return (
-                      <>
-                        <Text prominent>
-                          {tier.tier === 1 ? "Top " : `Tier ${tier.tier} `}prize
-                        </Text>
-                        <Text holo bold>
-                          {numberToMonetaryString(tier.reward)}
-                        </Text>
-                        {tier.tier < 3 && (
-                          <div className="rewards-table-rule" />
+                    <Card
+                      type="transparent"
+                      border="solid"
+                      color="holo"
+                      className="send-table"
+                    >
+                      <Text className="send-table-header" prominent bold size="lg">
+                        Potential Rewards
+                      </Text>
+                      {getTransactionRewards(90000)
+                        .reverse()
+                        .filter((tier) => tier.tier <= 3)
+                        .map((tier) => {
+                          return (
+                            <React.Fragment key={`tier-${tier.tier}`}>
+                              <Text prominent>
+                                {tier.tier === 1 ? "Top " : `Tier ${tier.tier} `}prize
+                              </Text>
+                              <Text holo bold>
+                                {numberToMonetaryString(tier.reward)}
+                              </Text>
+                              {tier.tier < 3 && (
+                                <div className="rewards-table-rule" />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                    </Card>
+                    <div className="send-table fees">
+                      <Text className="send-table-header" size="md">
+                        Fees
+                      </Text>
+                      <Text>Network fee</Text>
+                      <Text>{numberToMonetaryString(0)}</Text>
+                      <div className="rewards-table-rule" />
+                      <Text>Gas fee</Text>
+                      <Text>
+                        {transactionFee || (
+                          <div style={{ transform: "scale(0.5)" }}>
+                            <LoadingDots />
+                          </div>
                         )}
-                      </>
-                    );
-                  })}
-              </Card>
-              <div className="send-table fees">
-                <Text className="send-table-header" size="md">
-                  Fees
-                </Text>
-                <Text>Network fee</Text>
-                <Text>{numberToMonetaryString(0)}</Text>
-                <div className="rewards-table-rule" />
-                <Text>Gas fee</Text>
-                <Text>
-                  {transactionFee || (
-                    <div style={{ transform: "scale(0.5)" }}>
-                      <LoadingDots />
+                      </Text>
                     </div>
-                  )}
-                </Text>
+                    <Text>
+                      Once sent, transactions cannot be reverted. By pressing send you
+                      agree to our{" "}
+                      <a
+                        className="send-terms-link"
+                        href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+                      >
+                        terms of service
+                      </a>
+                      .
+                    </Text>
+                    <GeneralButton
+                      type="primary"
+                      style={{ width: "100%", boxSizing: "border-box" }}
+                      onClick={() => {
+                        handleSubmit();
+                      }}
+                      disabled={!canSend}
+                    >
+                      Send Assets
+                    </GeneralButton>
+                  </>
+                )}
               </div>
-              <Text>
-                Once sent, transactions cannot be reverted. By pressing send you
-                agree to our{" "}
-                <a
-                  className="send-terms-link"
-                  href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
-                >
-                  terms of service
-                </a>
-                .
-              </Text>
-              <GeneralButton
-                type="primary"
-                style={{ width: "100%", boxSizing: "border-box" }}
-                onClick={() => {
-                  handleSubmit();
-                }}
-                disabled={!canSend}
-              >
-                Send Assets
-              </GeneralButton>
-            </>
-          )}
-        </div>
-      </div>
+            </div>
+          </>
+        )
+      }
     </div>
   );
 };

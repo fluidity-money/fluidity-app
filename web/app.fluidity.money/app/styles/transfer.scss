@@ -68,6 +68,27 @@ body {
     object-fit: cover;
   }
 
+  .send-sending {
+    width: 100%;
+    height: 100%;
+    grid-column: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    max-width: 350px;
+    text-align: center;
+    padding: 0 1em;
+    box-sizing: border-box;
+    justify-content: center;
+    justify-self: center;
+
+    button.send-sending-done {
+      width: 100%;
+      margin-top: 1em;
+    }
+  }
+
   .send-left {
     width: 100%;
     overflow-x: visible;
