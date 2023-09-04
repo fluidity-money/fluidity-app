@@ -149,7 +149,9 @@ export default function Home() {
 
   const userHomeData = useFetcher();
   const userTransactionsData = useFetcher();
-  const prizePoolData = useCache<{totalPrizePool: number}>(`/${network}/query/dashboard/prizePool`);
+  const prizePoolData = useCache<{ totalPrizePool: number }>(
+    `/${network}/query/dashboard/prizePool`
+  );
 
   const toolTip = useToolTip();
 

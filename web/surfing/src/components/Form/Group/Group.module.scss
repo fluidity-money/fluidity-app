@@ -1,0 +1,22 @@
+.Group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .inputRow {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: start;
+    align-items: center;
+    border-bottom: 1px solid grey;
+    padding-bottom: 10px;
+  }
+
+  &.focus {
+    .inputRow {
+      border-bottom: 1px solid white;
+    }
+  }
+}

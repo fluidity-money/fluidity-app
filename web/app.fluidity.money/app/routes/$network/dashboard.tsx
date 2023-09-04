@@ -16,8 +16,8 @@ import {
   useNavigate,
   useResolvedPath,
   useMatches,
-  useTransition,
   useLocation,
+  useTransition,
 } from "@remix-run/react";
 import { useCache } from "~/hooks/useCache";
 import { useState, useEffect, useContext } from "react";
@@ -45,6 +45,8 @@ import {
   BurgerMenu,
   Referral,
   CardModal,
+  ArrowUp,
+  ArrowDown,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -166,35 +168,35 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-    {
-      airdrop: {
-        name: "airdrop",
-        path: (network: string) => `/${network}/dashboard/airdrop`,
-        icon: <AirdropIcon />,
-      },
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
     },
-    {
-      home: {
-        name: "dashboard",
-        path: (network: string) => `/${network}/dashboard/home`,
-        icon: <DashboardIcon />,
-      },
+  },
+  {
+    home: {
+      name: "dashboard",
+      path: (network: string) => `/${network}/dashboard/home`,
+      icon: <DashboardIcon />,
     },
-    {
-      rewards: {
-        name: "rewards",
-        path: (network: string) => `/${network}/dashboard/rewards`,
-        icon: <Trophy />,
-      },
+  },
+  {
+    rewards: {
+      name: "rewards",
+      path: (network: string) => `/${network}/dashboard/rewards`,
+      icon: <Trophy />,
     },
-    {
-      assets: {
-        name: "assets",
-        path: (network: string) => `/${network}/dashboard/assets`,
-        icon: <AssetsIcon />,
-      },
+  },
+  {
+    assets: {
+      name: "assets",
+      path: (network: string) => `/${network}/dashboard/assets`,
+      icon: <AssetsIcon />,
     },
-  ];
+  },
+];
 
 const CHAIN_NAME_MAP: Record<
   string,
@@ -255,6 +257,7 @@ export default function Dashboard() {
 
   const { showExperiment, client } = useContext(SplitContext);
   const showMobileNetworkButton = showExperiment("feature-network-visible");
+  const showSendReceive = showExperiment("enable-send-receive");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -424,21 +427,21 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
   const chainNameMap = showExperiment("enable-polygonzk")
     ? CHAIN_NAME_MAP
     : (() => {
-      const {
-        polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
-        ...rest
-      } = CHAIN_NAME_MAP;
-      return rest;
-    })();
+        const {
+          polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
+          ...rest
+        } = CHAIN_NAME_MAP;
+        return rest;
+      })();
 
   return (
     <>
@@ -503,8 +506,9 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -640,6 +644,36 @@ export default function Dashboard() {
                 chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
+            )}
+
+            {/* Send & Receive */}
+            {showSendReceive && (
+              <>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
             )}
 
             {/* Referrals Button */}

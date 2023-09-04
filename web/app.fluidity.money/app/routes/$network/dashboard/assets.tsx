@@ -75,7 +75,6 @@ export const ErrorBoundary: React.FC<{ error: Error }> = (props: {
 };
 
 const AssetsRoot = () => {
-
   const { network } = useParams();
   const { tokens } = useLoaderData();
   const urlRoot = `/${network}/dashboard/assets`;
