@@ -34,7 +34,7 @@ const ChainSelectorButton = ({
       {...props}
     >
       {chain.icon}
-      <Text size={"lg"} prominent={true}>
+      <Text size={"lg"} prominent={true} style={{ whiteSpace: 'nowrap' }}>
         {SupportedChains[chain.name].short}
       </Text>
       <ArrowDiag />
