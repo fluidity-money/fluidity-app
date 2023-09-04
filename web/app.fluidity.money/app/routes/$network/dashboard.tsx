@@ -430,15 +430,21 @@ export default function Dashboard() {
       ? true
       : false;
 
-  const chainNameMap = showExperiment("enable-polygonzk")
-    ? CHAIN_NAME_MAP
-    : (() => {
-        const {
-          polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
-          ...rest
-        } = CHAIN_NAME_MAP;
-        return rest;
-      })();
+  // filter CHAIN_NAME_MAP by enabled chains
+  const chainNameMap= Object.entries(CHAIN_NAME_MAP).filter(([_, chain]) => {
+    const {name} = chain;
+
+    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+      return false;
+    if (name === "SOL" && !showExperiment("enable-solana"))
+      return false;
+    return true;
+  }).reduce((prev, [key, value]) => (
+    {
+      ...prev,
+      [key]: value
+    }), {} as typeof CHAIN_NAME_MAP
+  )
 
   return (
     <>

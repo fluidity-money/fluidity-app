@@ -176,6 +176,14 @@ export default function IndexPage() {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
+  const enabledChains = CHAINS.filter(({name}) => {
+    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+      return false;
+    if (name === "SOL" && !showExperiment("enable-solana"))
+      return false;
+    return true;
+  })
+
   return (
     <>
       <Video
@@ -267,11 +275,7 @@ export default function IndexPage() {
             <BlockchainModal
               handleModal={setShowChainDashboardModal}
               option={{ name: "", icon: <div /> }}
-              options={
-                showExperiment("enable-polygonzk")
-                  ? CHAINS
-                  : CHAINS.filter(({ name }) => name !== "POLY_ZK")
-              }
+              options={enabledChains}
               setOption={(chain: string) =>
                 navigate(`/${networkMapper(chain)}/dashboard/home`)
               }
@@ -344,11 +348,7 @@ export default function IndexPage() {
             <BlockchainModal
               handleModal={setShowChainOpportunityModal}
               option={{ name: "", icon: <div /> }}
-              options={
-                showExperiment("enable-polygonzk")
-                  ? CHAINS
-                  : CHAINS.filter(({ name }) => name !== "POLY_ZK")
-              }
+              options={enabledChains}
               setOption={(chain: string) =>
                 navigate(`/${networkMapper(chain)}`)
               }
