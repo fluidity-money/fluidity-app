@@ -15,7 +15,7 @@ import {
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
-import { getTokenForNetwork } from "~/util";
+import { getTokenForNetwork, networkGqlBackend } from "~/util";
 import {
   useUserActionsAll,
   useUserActionsByAddress,
@@ -74,10 +74,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const defaultLogo = "/assets/tokens/fUSDC.svg";
 
   // use updated SQL aggregation
-  if (network === "arbitrum") {
-    const { data: userActionsData, errors: userActionsErr } = address
-      ? await useUserActionsByAddress(network, address, page)
-      : await useUserActionsAll(network, page);
+  if (networkGqlBackend(network) === "hasura") {
+    const {data: userActionsData, errors: userActionsErr} = address ?
+      await useUserActionsByAddress(network, address, page) :
+      await useUserActionsAll(network, page);
 
     if (userActionsErr || !userActionsData) {
       throw userActionsErr;

@@ -1,5 +1,5 @@
 import { gql, jsonPost, Queryable } from "~/util";
-import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
+import { fetchGqlEndpoint, hasuraDateToUnix, networkGqlBackend } from "~/util/api/graphql";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import BN from "bn.js";
 
@@ -63,6 +63,34 @@ const queryByAddressTimestamp: Queryable = {
       }
     }
   `,
+  solana: gql`
+    query VolumeTxs(
+      $address: String!
+      $filterHashes: [String!] = []
+      $timestamp: timestamp!
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          time: { _gt: $timestamp }
+          _or: [
+            { solana_sender_owner_address: { _eq: $address } }
+            { solana_recipient_owner_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+      ) {
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
+        token_short_name
+        token_decimals
+        time
+        transaction_hash
+        amount_str
+      }
+    }
+  `,
 };
 
 const queryByTimestamp: Queryable = {
@@ -93,7 +121,6 @@ const queryByTimestamp: Queryable = {
       }
     }
   `,
-
   arbitrum: gql`
     query VolumeTxs($filterHashes: [String!] = [], $timestamp: timestamp!) {
       transfers: user_actions(
@@ -106,6 +133,26 @@ const queryByTimestamp: Queryable = {
       ) {
         sender_address
         recipient_address
+        token_short_name
+        token_decimals
+        time
+        transaction_hash
+        amount_str
+      }
+    }
+  `,
+  solana: gql`
+    query VolumeTxs($filterHashes: [String!] = [], $timestamp: timestamp!) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          time: { _gt: $timestamp }
+        }
+        order_by: { time: desc }
+      ) {
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         token_decimals
         time
@@ -180,7 +227,7 @@ const useVolumeTxByAddressTimestamp = async (
   const variables = {
     address,
     timestamp: iso8601Timestamp,
-    ...(network !== "arbitrum" && { fluidAssets }),
+    ...(networkGqlBackend(network) !== "hasura" && { fluidAssets }),
   };
 
   const body = {
@@ -202,11 +249,11 @@ const useVolumeTxByAddressTimestamp = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
+  if (networkGqlBackend(network) === "hasura" && result.data) {
     const hasuraTransfers =
       (result as HasuraVolumeTxsResponse).data.transfers || [];
     result.data = {
-      arbitrum: {
+      [network]: {
         transfers: hasuraTransfers.map((transfer) => ({
           sender: { address: transfer.sender_address },
           receiver: { address: transfer.recipient_address },
@@ -231,7 +278,7 @@ const useVolumeTxByTimestamp = async (
 ) => {
   const variables = {
     timestamp: iso8601Timestamp,
-    ...(network !== "arbitrum" && { fluidAssets }),
+    ...(networkGqlBackend(network) !== "hasura" && { fluidAssets }),
   };
 
   const body = {
@@ -254,11 +301,11 @@ const useVolumeTxByTimestamp = async (
 
   // data from hasura isn't nested, and graphql doesn't allow nesting with aliases
   // https://github.com/graphql/graphql-js/issues/297
-  if (network === "arbitrum" && result.data) {
+  if (networkGqlBackend(network) === "hasura" && result.data) {
     const hasuraTransfers =
       (result as HasuraVolumeTxsResponse).data.transfers || [];
     result.data = {
-      arbitrum: {
+      [network]: {
         transfers: hasuraTransfers.map((transfer) => ({
           sender: { address: transfer.sender_address },
           receiver: { address: transfer.recipient_address },

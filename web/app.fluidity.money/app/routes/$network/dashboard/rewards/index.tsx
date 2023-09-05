@@ -1,4 +1,4 @@
-import type { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 import type { IRow } from "~/components/Table";
 import type Transaction from "~/types/Transaction";
 import type { LinksFunction, LoaderFunction } from "@remix-run/node";
@@ -188,9 +188,11 @@ export default function Rewards() {
       `/${network}/query/winningUserTransactions?page=${page}&address=${address}`
     );
 
-    userUnclaimedRewardsData.load(
-      `/${network}/query/dashboard/unclaimedRewards?address=${address}&page=${page}`
-    );
+    if (chainType(network) === "evm") {
+      userUnclaimedRewardsData.load(
+        `/${network}/query/dashboard/unclaimedRewards?address=${address}&page=${page}`
+      );
+    }
   }, [address, page]);
 
   const [userFluidPairs, setUserFluidPairs] = useState(
