@@ -358,12 +358,6 @@ name= "camelot"
 fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xaf88d065e77c8cC2239327C5EDb3A432268e5831&token2=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 
 [[liquidity_providers.arbitrum.providers]]
-name= "Saddle"
-
-[liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://saddle.exchange/#/pools/fUSDC-USDC%20pool/deposit"
-
-[[liquidity_providers.arbitrum.providers]]
 name= "Chronos"
 
 [liquidity_providers.arbitrum.providers.link]
