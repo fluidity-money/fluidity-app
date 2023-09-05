@@ -1,0 +1,45 @@
+import { Meta, Canvas, Story, Title, Subtitle } from "@storybook/addon-docs";
+
+import { TextField } from "./";
+import { Group } from "../Group";
+
+<Meta
+    title="Form/TextField"
+    component={TextField}
+/>
+
+export const Template = (props) => {
+  const [value, setValue] = React.useState("")
+  const [hint, setHint] = React.useState("")
+  const label = "Label"
+  const onChange = (s) => {
+    setValue(s)
+  }
+  return (<div style={{
+    maxWidth: 200,
+  }}>
+    <Group
+      label="Test Label"
+      hint="Test Hint"
+    >
+      <div style={{width: 25, height: 25, background: 'red'}}/>
+      <TextField
+        value={value}
+        label={label}
+        onChange={onChange}
+        hint={hint}
+        {...props}
+      />
+    </Group>
+  </div>)
+}
+
+<Canvas columns={1} withSource="open" withToolbar >
+    <Title>Form</Title>
+    <Subtitle>For typing things.</Subtitle>
+    <Story
+        name="TextField"
+    >
+        {Template.bind({})}
+    </Story>
+</Canvas>

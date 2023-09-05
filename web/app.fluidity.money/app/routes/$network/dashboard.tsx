@@ -16,8 +16,8 @@ import {
   useNavigate,
   useResolvedPath,
   useMatches,
-  useTransition,
   useLocation,
+  useTransition,
 } from "@remix-run/react";
 import { useCache } from "~/hooks/useCache";
 import { useState, useEffect, useContext } from "react";
@@ -45,6 +45,8 @@ import {
   BurgerMenu,
   Referral,
   CardModal,
+  ArrowUp,
+  ArrowDown,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -253,8 +255,8 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
+  const showSendReceive = showExperiment("enable-send-receive");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -540,9 +542,7 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
-          {NAVIGATION_MAP.filter((obj) =>
-            showAssets ? true : Object.keys(obj)[0] !== "assets"
-          ).map((obj, index) => {
+          {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
             const active = index === activeIndex;
@@ -649,6 +649,36 @@ export default function Dashboard() {
                 chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
+            )}
+
+            {/* Send & Receive */}
+            {showSendReceive && (
+              <>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
             )}
 
             {/* Referrals Button */}
