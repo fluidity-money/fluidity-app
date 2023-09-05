@@ -42,7 +42,7 @@ const queryByAddress: Queryable = {
         type
       }
     }
-  }`,
+  `,
   solana: gql`
   query userActionsAggregateByAddress(
       $offset: Int = 0,
@@ -90,7 +90,7 @@ const queryAll: Queryable = {
         type
       }
     }
-  }`,
+  `,
   solana: gql`
   query userActionsAggregateAll(
       $offset: Int = 0,
