@@ -1,4 +1,4 @@
-import { gql, jsonPost, networkMapper, Queryable } from "~/util";
+import { gql, jsonPost } from "~/util";
 import {Chain} from "~/util/chainUtils/chains";
 
 const queryWinnersAll_ = gql`

@@ -433,7 +433,7 @@ export default function Dashboard() {
       : false;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap= Object.entries(CHAIN_NAME_MAP).filter(([_, chain]) => {
+  const chainNameMap= Object.entries(CHAIN_NAME_MAP).filter(([, chain]) => {
     const {name} = chain;
 
     if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
