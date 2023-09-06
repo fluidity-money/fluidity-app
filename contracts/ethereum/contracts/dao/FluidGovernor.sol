@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-// Uses VEGovernor which includes a hook in every stateful function which
-// updates the user's VE balance
-
 import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
@@ -12,9 +9,6 @@ import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.so
 import "@openzeppelin/contracts/governance/Governor.sol";
 
 contract FluidGovernor is Governor, GovernorSettings, GovernorCountingSimple, GovernorVotes, GovernorVotesQuorumFraction, GovernorTimelockControl {
-
-    // done this way so we don't have to edit the underlying governor.sol at
-    // the expense of a slot
 
     constructor(IVotes _token, TimelockController _timelock)
         Governor("FluidGovernor")
@@ -32,7 +26,7 @@ contract FluidGovernor is Governor, GovernorSettings, GovernorCountingSimple, Go
         override(IGovernor, GovernorSettings)
         returns (uint256)
     {
-        return super.votingDelay();
+        return 1 days;
     }
 
     function votingPeriod()
@@ -41,7 +35,7 @@ contract FluidGovernor is Governor, GovernorSettings, GovernorCountingSimple, Go
         override(IGovernor, GovernorSettings)
         returns (uint256)
     {
-        return super.votingPeriod();
+        return 3 weeks;
     }
 
     function quorum(uint256 blockNumber)
@@ -76,7 +70,7 @@ contract FluidGovernor is Governor, GovernorSettings, GovernorCountingSimple, Go
         override(Governor, GovernorSettings)
         returns (uint256)
     {
-        return super.proposalThreshold();
+        return 0; // i can't remember what this is for TODO
     }
 
     function _execute(uint256 proposalId, address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)

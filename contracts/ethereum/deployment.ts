@@ -16,7 +16,7 @@ export const getFactories = async (
 
   const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
 
-  const veGovToken = await hre.ethers.getContractFactory("VEGovToken");
+  const veGovToken = await hre.ethers.getContractFactory("VotingEscrow");
 
   const registryFactory = await hre.ethers.getContractFactory("Registry");
 
@@ -267,7 +267,7 @@ export const deployVEGovToken = async (
   signer: ethers.Signer,
   voteTokenAddress: string
 ): Promise<ethers.Contract> =>
-  factory.connect(signer).deploy(voteTokenAddress);
+  factory.connect(signer).deploy(voteTokenAddress, "VE Gov Token", "VET", "0");
 
 export const deployUtilityGauges = async (
   factory: ethers.ContractFactory,

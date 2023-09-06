@@ -11,6 +11,8 @@ import "hardhat-dependency-compiler";
 
 import "hardhat-docgen";
 
+import "@nomiclabs/hardhat-vyper";
+
 import { task, subtask } from "hardhat/config";
 
 import type { HardhatUserConfig } from "hardhat/types";
@@ -284,6 +286,9 @@ module.exports = {
         revertStrings: "debug",
       }
     },
+  },
+  vyper: {
+    version: "0.2.8"
   },
   etherscan: {
     apiKey: {
