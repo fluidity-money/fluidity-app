@@ -6,7 +6,6 @@ package rpc
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/solana"
