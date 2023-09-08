@@ -1,5 +1,9 @@
 import { gql, Queryable, jsonPost } from "~/util";
-import { fetchGqlEndpoint, hasuraDateToUnix } from "~/util/api/graphql";
+import {
+  fetchGqlEndpoint,
+  hasuraDateToUnix,
+  networkGqlBackend,
+} from "~/util/api/graphql";
 import BN from "bn.js";
 import {
   addDecimalToBn,
@@ -50,50 +54,6 @@ const queryByAddress: Queryable = {
     }
   `,
 
-  solana: gql`
-    query getTransactionsByAddress(
-      $tokens: [String!]
-      $address: String!
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      solana {
-        transfers(
-          currency: { in: $tokens }
-          any: [
-            { senderAddress: { is: $address } }
-            { receiverAddress: { is: $address } }
-          ]
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash: signature
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByAddress(
       $address: String!
@@ -118,6 +78,42 @@ const queryByAddress: Queryable = {
       ) {
         sender_address
         recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactionsByAddress(
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
+          token_short_name: { _in: $tokens }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          _or: [
+            { solana_sender_owner_address: { _eq: $address } }
+            { solana_recipient_owner_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         time
         transaction_hash
@@ -204,40 +200,6 @@ const queryByTxHash: Queryable = {
     }
   `,
 
-  solana: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      solana {
-        transfers(
-          options: { desc: "block.timestamp.unixtime", limit: $limit }
-          signature: { in: $transactions }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash: signature
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -255,6 +217,35 @@ const queryByTxHash: Queryable = {
       ) {
         sender_address
         recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { _in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+      ) {
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         time
         transaction_hash
@@ -337,45 +328,6 @@ const queryAll: Queryable = {
     }
   `,
 
-  solana: gql`
-    query getTransactions(
-      $tokens: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      solana {
-        transfers(
-          currency: { in: $tokens }
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash: signature
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactions(
       $offset: Int = 0
@@ -395,6 +347,37 @@ const queryAll: Queryable = {
       ) {
         sender_address
         recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
+
+  solana: gql`
+    query getTransactions(
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "solana" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          token_short_name: { _in: $tokens }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address: solana_sender_owner_address
+        recipient_address: solana_recipient_owner_address
         token_short_name
         time
         transaction_hash
@@ -529,7 +512,7 @@ const useUserTransactionsByAddress = async (
   page: number,
   address: string,
   filterHashes: string[],
-  limit = 12,
+  limit = 12
 ) => {
   const variables = {
     address: address,
@@ -537,13 +520,13 @@ const useUserTransactionsByAddress = async (
     filterHashes,
     limit,
     tokens:
-      network in ["ethereum", "solana"]
+      network in ["ethereum"]
         ? tokens
         : // convert tokens to token_short_name
-        tokens
-          .map((addr) => getTokenFromAddress(network, addr))
-          .filter((token): token is Token => !!token)
-          .map(({ symbol }) => symbol.slice(1)),
+          tokens
+            .map((addr) => getTokenFromAddress(network, addr))
+            .filter((token): token is Token => !!token)
+            .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -559,20 +542,20 @@ const useUserTransactionsByAddress = async (
     };
 
   const result =
-    network === "arbitrum"
+    networkGqlBackend(network) === "hasura"
       ? parseHasuraUserTransactions(
-        await jsonPost<
-          UserTransactionsByAddressBody,
-          HasuraUserTransactionRes
-        >(url, body, headers),
-      )
+          await jsonPost<
+            UserTransactionsByAddressBody,
+            HasuraUserTransactionRes
+          >(url, body, headers)
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<
-          UserTransactionsByAddressBody,
-          BitqueryUserTransactionRes
-        >(url, body, headers),
-        network,
-      );
+          await jsonPost<
+            UserTransactionsByAddressBody,
+            BitqueryUserTransactionRes
+          >(url, body, headers),
+          network
+        );
 
   return result;
 };
@@ -582,13 +565,13 @@ const useUserTransactionsByTxHash = async (
   transactions: string[],
   filterHashes: string[],
   tokens: string[],
-  limit = 12,
+  limit = 12
 ): Promise<UserTransactionsRes> => {
   const variables = {
     transactions,
     filterHashes,
     limit,
-    ...(network !== "arbitrum" && { tokens }),
+    ...(networkGqlBackend(network) !== "hasura" && { tokens }),
   };
 
   const body = {
@@ -604,20 +587,20 @@ const useUserTransactionsByTxHash = async (
     };
 
   const result =
-    network === "arbitrum"
+    networkGqlBackend(network) === "hasura"
       ? parseHasuraUserTransactions(
-        await jsonPost<
-          UserTransactionsByTxHashBody,
-          HasuraUserTransactionRes
-        >(url, body, headers),
-      )
+          await jsonPost<
+            UserTransactionsByTxHashBody,
+            HasuraUserTransactionRes
+          >(url, body, headers)
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<
-          UserTransactionsByTxHashBody,
-          BitqueryUserTransactionRes
-        >(url, body, headers),
-        network,
-      );
+          await jsonPost<
+            UserTransactionsByTxHashBody,
+            BitqueryUserTransactionRes
+          >(url, body, headers),
+          network
+        );
 
   return result;
 };
@@ -627,20 +610,20 @@ const useUserTransactionsAll = async (
   tokens: string[],
   page: number,
   filterHashes: string[],
-  limit = 12,
+  limit = 12
 ) => {
   const variables = {
     offset: (page - 1) * 12,
     filterHashes,
     limit,
     tokens:
-      network in ["ethereum", "solana"]
+      network in ["ethereum"]
         ? tokens
         : // convert tokens to token_short_name
-        tokens
-          .map((addr) => getTokenFromAddress(network, addr))
-          .filter((token): token is Token => !!token)
-          .map(({ symbol }) => symbol.slice(1)),
+          tokens
+            .map((addr) => getTokenFromAddress(network, addr))
+            .filter((token): token is Token => !!token)
+            .map(({ symbol }) => symbol.slice(1)),
   };
 
   const body = {
@@ -656,28 +639,28 @@ const useUserTransactionsAll = async (
     };
 
   const result =
-    network === "arbitrum"
+    networkGqlBackend(network) === "hasura"
       ? parseHasuraUserTransactions(
-        await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-          url,
-          body,
-          headers,
-        ),
-      )
+          await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+            url,
+            body,
+            headers
+          )
+        )
       : parseBitqueryUserTransactions(
-        await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
-          url,
-          body,
-          headers,
-        ),
-        network,
-      );
+          await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
+            url,
+            body,
+            headers
+          ),
+          network
+        );
 
   return result;
 };
 
 const parseHasuraUserTransactions = (
-  result: HasuraUserTransactionRes,
+  result: HasuraUserTransactionRes
 ): UserTransactionsRes => {
   if (!result.data || result.errors)
     return {
@@ -713,8 +696,8 @@ const parseHasuraUserTransactions = (
           amount: Number(
             addDecimalToBn(
               new BN(String(transfer.amount)),
-              transfer.token_decimals,
-            ),
+              transfer.token_decimals
+            )
           ),
           currency: { symbol: "f" + transfer.token_short_name },
           transaction: { hash: transfer.transaction_hash },
@@ -730,7 +713,7 @@ const parseHasuraUserTransactions = (
 
 const parseBitqueryUserTransactions = (
   result: BitqueryUserTransactionRes,
-  network: string,
+  network: string
 ): UserTransactionsRes => {
   if (!result.data || result.errors)
     return {

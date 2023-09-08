@@ -9,18 +9,31 @@ type GqlEndpoint = {
   headers: { [key: string]: string };
 };
 
-export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
+type GqlBackend = "hasura" | "bitquery";
+
+export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {
     case "ethereum":
+      return "bitquery";
     case "solana":
+    case "arbitrum":
+    case "polygon_zk":
+      return "hasura";
+    default:
+      return null;
+  }
+};
+
+export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
+  switch (networkGqlBackend(network)) {
+    case "bitquery":
       return {
         url: "https://graphql.bitquery.io",
         headers: { "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "" },
       };
-    case "arbitrum":
-    case "polygon_zk":
+    case "hasura":
       return {
-        url: "https://fluidity.hasura.app/v1/graphql",
+        url: "https://a321-2405-6e00-22ec-87d7-62c1-b7c4-60c6-9c4b.ngrok-free.app/v1/graphql",
         headers: {
           "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET ?? "",
         },
@@ -35,8 +48,8 @@ export const fetchInternalEndpoint = (): GqlEndpoint => ({
   headers:
     typeof process.env.FLU_HASURA_SECRET === "string"
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {},
 });
 

@@ -1,8 +1,15 @@
--- migrate:up
+--migrate:up
+
+-- return swap_in, type
+-- also include solana_application
 
 DROP FUNCTION user_transactions_aggregate;
 
-CREATE FUNCTION user_transactions_aggregate(network_ network_blockchain, filter_address VARCHAR DEFAULT NULL, token VARCHAR DEFAULT NULL, limit_ INT DEFAULT 12, offset_ INT DEFAULT NULL)
+ALTER TABLE user_transactions_aggregate_return
+    ADD type user_action,
+    ADD swap_in boolean;
+
+CREATE FUNCTION user_transactions_aggregate(network_ network_blockchain, filter_address VARCHAR DEFAULT NULL, limit_ INT DEFAULT 12, offset_ INT DEFAULT NULL)
 RETURNS SETOF user_transactions_aggregate_return
 LANGUAGE SQL
 STABLE
@@ -25,15 +32,19 @@ SELECT
 		''
     ) AS winning_address,
     COALESCE(
-        fluid_application, 
-        utility_application, 
+        ethereum_fluid_application, 
+        solana_fluid_application, 
+        ethereum_utility_application, 
+        solana_utility_application, 
         pending_fluid_application, 
         pending_utility_application,
 		''
     ) AS application,
     transaction_hash,
     sender_address,
-    recipient_address 
+    recipient_address,
+    type,
+    swap_in
 FROM 
 (
 	-- user action by hash
@@ -49,12 +60,14 @@ FROM
         application,
         fluid_reward_hash,
         fluid_winning_address,
-        fluid_application,
+        ethereum_fluid_application,
+        solana_fluid_application,
         winning_amount,
         utility_reward_hash,
         utility_winning_address,
         utility_name,
-        utility_application,
+        ethereum_utility_application,
+        solana_utility_application,
         utility_amount,
         pending_fluid_winning_address,
         pending_fluid_application,
@@ -62,16 +75,18 @@ FROM
         pending_utility_winning_address,
         pending_utility_name,
         pending_utility_application,
-        pending_utility_amount
-        from user_actions
-    /* FROM (select * from user_actions where network = network_ order by time desc limit limit_) user_actions */
+        pending_utility_amount,
+        swap_in,
+        type
+        FROM user_actions
 	-- join fluid winners
     LEFT JOIN (
         SELECT
             -- take first value for reward hash, win address
             FIRST(transaction_hash) AS fluid_reward_hash,
             FIRST(winning_address) AS fluid_winning_address,
-            FIRST(ethereum_application)::varchar AS fluid_application,
+            FIRST(ethereum_application)::VARCHAR AS ethereum_fluid_application,
+            FIRST(solana_application)::VARCHAR AS solana_fluid_application,
             send_transaction_hash, 
             SUM(winning_amount / 10^token_decimals) AS winning_amount
         FROM winners 
@@ -85,7 +100,8 @@ FROM
             FIRST(transaction_hash) AS utility_reward_hash,
             FIRST(winning_address) AS utility_winning_address,
             FIRST(utility_name) AS utility_name,
-            FIRST(ethereum_application)::VARCHAR AS utility_application,
+            FIRST(ethereum_application)::VARCHAR AS ethereum_utility_application,
+            FIRST(solana_application)::VARCHAR AS solana_utility_application,
             send_transaction_hash,
             sum(winning_amount / 10^token_decimals) AS utility_amount 
         FROM winners
@@ -120,13 +136,15 @@ FROM
 ) s  
 WHERE network = network_
     AND (filter_address IS null OR sender_address = filter_address OR recipient_address = filter_address)
-    AND (token IS NULL OR token_short_name = token)
 ORDER BY time DESC LIMIT limit_ OFFSET offset_;
 $$;
 
--- migrate:down
+--migrate:down
 
--- restore previous definition
+ALTER TABLE user_transactions_aggregate_return
+    DROP COLUMN type, 
+    DROP swap_in;
+
 DROP FUNCTION user_transactions_aggregate;
 
 CREATE FUNCTION user_transactions_aggregate(network_ network_blockchain, filter_address VARCHAR DEFAULT NULL, limit_ INT DEFAULT 12, offset_ INT DEFAULT NULL)

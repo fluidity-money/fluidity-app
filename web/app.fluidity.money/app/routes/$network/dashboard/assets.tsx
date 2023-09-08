@@ -10,7 +10,6 @@ import {
 } from "@remix-run/react";
 import { Suspense, useContext, useEffect, useState } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import BN from "bn.js";
 import { AnimatePresence, motion } from "framer-motion";
 import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
@@ -76,8 +75,6 @@ export const ErrorBoundary: React.FC<{ error: Error }> = (props: {
 };
 
 const AssetsRoot = () => {
-  const { showExperiment } = useContext(SplitContext);
-
   const { network } = useParams();
   const { tokens } = useLoaderData();
   const urlRoot = `/${network}/dashboard/assets`;
@@ -125,8 +122,6 @@ const AssetsRoot = () => {
   }, [connected, isFluidAssets]);
 
   const { toggleConnectWalletModal } = useContext(UIContext);
-
-  if (!showExperiment("enable-assets-page")) return <></>;
 
   if (!address && !connecting)
     return (

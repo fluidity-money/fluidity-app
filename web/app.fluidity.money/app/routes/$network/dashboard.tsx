@@ -16,8 +16,8 @@ import {
   useNavigate,
   useResolvedPath,
   useMatches,
-  useTransition,
   useLocation,
+  useTransition,
 } from "@remix-run/react";
 import { useCache } from "~/hooks/useCache";
 import { useState, useEffect, useContext } from "react";
@@ -45,6 +45,8 @@ import {
   BurgerMenu,
   Referral,
   CardModal,
+  ArrowUp,
+  ArrowDown,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -215,7 +217,6 @@ const CHAIN_NAME_MAP: Record<
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
-    disabled: true,
   },
 };
 
@@ -254,8 +255,8 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
+  const showSendReceive = showExperiment("enable-send-receive");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -431,15 +432,23 @@ export default function Dashboard() {
       ? true
       : false;
 
-  const chainNameMap = showExperiment("enable-polygonzk")
-    ? CHAIN_NAME_MAP
-    : (() => {
-        const {
-          polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
-          ...rest
-        } = CHAIN_NAME_MAP;
-        return rest;
-      })();
+  // filter CHAIN_NAME_MAP by enabled chains
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
+    .filter(([, chain]) => {
+      const { name } = chain;
+
+      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+        return false;
+      if (name === "SOL" && !showExperiment("enable-solana")) return false;
+      return true;
+    })
+    .reduce(
+      (prev, [key, value]) => ({
+        ...prev,
+        [key]: value,
+      }),
+      {} as typeof CHAIN_NAME_MAP
+    );
 
   return (
     <>
@@ -535,9 +544,7 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
-          {NAVIGATION_MAP.filter((obj) =>
-            showAssets ? true : Object.keys(obj)[0] !== "assets"
-          ).map((obj, index) => {
+          {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
             const active = index === activeIndex;
@@ -644,6 +651,36 @@ export default function Dashboard() {
                 chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
+            )}
+
+            {/* Send & Receive */}
+            {showSendReceive && (
+              <>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
             )}
 
             {/* Referrals Button */}

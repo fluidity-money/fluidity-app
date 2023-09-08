@@ -84,7 +84,7 @@ const FluidAssets = () => {
           ...token,
           usdAmount: getUsdFromTokenAmount(fluidAmt || new BN(0), token),
         };
-      }),
+      })
     );
 
     setAugmentedTokens(tokensWithFluidAmt);
@@ -177,7 +177,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
   const { data: assetsData } = useCache<AssetLoaderData>(
     address ? queryString : "",
-    true,
+    true
   );
 
   const navigate = useNavigate();
@@ -217,7 +217,7 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
 
     let accum = getUsdFromTokenAmount(
       quantities.fluidAmt || new BN(0),
-      token.decimals,
+      token.decimals
     );
 
     graphData.push({ y: accum });
@@ -243,11 +243,11 @@ const CardWrapper: React.FC<ICardWrapper> = (props: ICardWrapper) => {
             token={token}
             fluidAmt={getUsdFromTokenAmount(
               quantities.fluidAmt || new BN(0),
-              token.decimals,
+              token.decimals
             )}
             regAmt={getUsdFromTokenAmount(
               quantities.regAmt || new BN(0),
-              token.decimals,
+              token.decimals
             )}
             value={1}
           />

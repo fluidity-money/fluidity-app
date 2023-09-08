@@ -36,8 +36,6 @@ const BlockchainModal = ({
 }: IBlockchainModal) => {
   // if page is alredy on resources href id only otherwise switch page and then id
   const handleOnClick = (i: number) => {
-    // Hardcode to disallow Solana chain
-    if (options[i].name === "SOL") return;
 
     setOption(options[i].name);
     handleModal(false);
