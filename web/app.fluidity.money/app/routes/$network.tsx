@@ -139,7 +139,6 @@ export default function Network() {
   const { network, tokens, rpcUrls, colors, walletconnectId } =
     useLoaderData<LoaderData>();
 
-
   return (
     <Provider
       network={network}

@@ -1,5 +1,5 @@
 import { gql, jsonPost } from "~/util";
-import {Chain} from "~/util/chainUtils/chains";
+import { Chain } from "~/util/chainUtils/chains";
 
 const queryWinnersAll_ = gql`
   query WinnersAll($network: network_blockchain!) {
@@ -58,12 +58,12 @@ const queryWinnersAllSolana = gql`
   }
 `;
 
-const queryWinnersAll: {[network in Chain]: string}= {
+const queryWinnersAll: { [network in Chain]: string } = {
   ethereum: queryWinnersAll_,
   arbitrum: queryWinnersAll_,
   polygon_zk: queryWinnersAll_,
-  solana: queryWinnersAllSolana
-}
+  solana: queryWinnersAllSolana,
+};
 
 const queryWinnersByAddress_ = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
@@ -93,7 +93,10 @@ const queryWinnersByAddress_ = gql`
 const queryWinnersByAddressSolana = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
-      where: { network: { _eq: $network }, solana_winning_owner_address: { _eq: $address } }
+      where: {
+        network: { _eq: $network }
+        solana_winning_owner_address: { _eq: $address }
+      }
       order_by: { awarded_time: desc }
       limit: 240
     ) {
@@ -114,12 +117,12 @@ const queryWinnersByAddressSolana = gql`
   }
 `;
 
-const queryWinnersByAddress: {[network in Chain]: string} = {
+const queryWinnersByAddress: { [network in Chain]: string } = {
   ethereum: queryWinnersByAddress_,
   arbitrum: queryWinnersByAddress_,
   polygon_zk: queryWinnersByAddress_,
   solana: queryWinnersByAddressSolana,
-}
+};
 
 const queryPendingWinnersAll = gql`
   query PendingWinnersAll($network: network_blockchain!) {

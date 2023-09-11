@@ -9,7 +9,7 @@ type GqlEndpoint = {
   headers: { [key: string]: string };
 };
 
-type GqlBackend = "hasura" | "bitquery"
+type GqlBackend = "hasura" | "bitquery";
 
 export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {
@@ -22,7 +22,7 @@ export const networkGqlBackend = (network: string): GqlBackend | null => {
     default:
       return null;
   }
-}
+};
 
 export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
   switch (networkGqlBackend(network)) {
@@ -48,8 +48,8 @@ export const fetchInternalEndpoint = (): GqlEndpoint => ({
   headers:
     typeof process.env.FLU_HASURA_SECRET === "string"
       ? {
-          "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
-        }
+        "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET,
+      }
       : {},
 });
 
