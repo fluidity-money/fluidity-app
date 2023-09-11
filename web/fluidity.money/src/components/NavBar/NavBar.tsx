@@ -64,7 +64,7 @@ const NavBar = () => {
               </Link>
             </motion.div>
             <LaunchButton
-              version={"secondary"}
+              version={"primary"}
               type={"text"}
               size={width < breakpoint && width > 0 ? "small" : "medium"}
             >
@@ -86,13 +86,13 @@ const NavBar = () => {
                     <a
                       className={
                         windowObjDefined &&
-                        window.location.pathname.toString() === "/howitworks"
+                          window.location.pathname.toString() === "/howitworks"
                           ? styles.active
                           : ""
                       }
                       href={"/howitworks"}
                     >
-                      <Text size="md" className={styles.transparent}>
+                      <Text prominent code size="sm" className={styles.transparent}>
                         HOW IT WORKS
                       </Text>
                     </a>
@@ -128,12 +128,12 @@ const NavBar = () => {
                       href={"/resources"}
                       className={
                         windowObjDefined &&
-                        window.location.pathname.toString() === "/resources"
+                          window.location.pathname.toString() === "/resources"
                           ? styles.active
                           : ""
                       }
                     >
-                      <Text size="md" className={styles.transparent}>
+                      <Text prominent code size="sm" className={styles.transparent}>
                         RESOURCES
                       </Text>
                     </a>
@@ -175,24 +175,24 @@ const links: ILinkButton[] = [
     children: "articles",
     size: "small",
     type: "internal",
-    handleClick: () => {},
+    handleClick: () => { },
   },
   {
     children: "fluniversity",
     size: "small",
     type: "internal",
-    handleClick: () => {},
+    handleClick: () => { },
   },
   {
     children: "whitepapers",
     size: "small",
     type: "internal",
-    handleClick: () => {},
+    handleClick: () => { },
   },
   {
     children: "documentation",
     size: "small",
     type: "external",
-    handleClick: () => {},
+    handleClick: () => { },
   },
 ];

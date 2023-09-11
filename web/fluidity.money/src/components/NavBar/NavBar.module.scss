@@ -29,10 +29,13 @@
   }
 
   .navbar {
+    border: 1px solid grey;
+    height: 50px;
+    border-radius: 25px;
     box-sizing: border-box;
+
     justify-content: space-between;
     align-items: center;
-    width: fit-content;
     padding: 10px;
     z-index: 99;
     justify-self: center;
