@@ -52,9 +52,8 @@ const Receive = () => {
           <div className="receive-qr-outline" />
           <QRCode
             className="receive-qr-code"
-            value={`https://app.fluidity.money/${network}/transfer/send&address=${
-              address as string
-            }`}
+            value={`https://app.fluidity.money/${network}/transfer/send&address=${address as string
+              }`}
             style={{ width: "50%" }}
             size={180}
             fgColor="#000000"
@@ -84,8 +83,8 @@ const Receive = () => {
       </div>
       <Hoverable
         className="receive-hint"
-        tooltipContent="Lorem ipsum"
-        style={{ marginTop: 10 }}
+        tooltipContent="You can receive any token on the selected network, but only Fluid Assets like fUSDC will earn you rewards. Double-check your webapp network prior to receiving tokens!"
+        style={{ marginTop: 10, minWidth: 300 }}
       >
         <InfoCircle />
         <Text>Which assets can I receive?</Text>

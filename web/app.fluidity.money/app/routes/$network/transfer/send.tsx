@@ -173,8 +173,7 @@ const Send = () => {
         setValidAmount(false);
       }
       setInputHint(
-        `${amountRemaining.toFixed(2)} ${
-          selectedAsset.symbol
+        `${amountRemaining.toFixed(2)} ${selectedAsset.symbol
         } remaining (${numberToMonetaryString(amountRemaining)})`
       );
     } else {
@@ -349,6 +348,7 @@ const Send = () => {
                 onChange={(token) => {
                   setSelectedAsset(token);
                 }}
+                initial="open"
               />
               {selectedAsset && (
                 <>
