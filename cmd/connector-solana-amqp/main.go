@@ -16,7 +16,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/state"
 
-	// types "github.com/fluidity-money/fluidity-app/lib/types/solana"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	"github.com/fluidity-money/fluidity-app/cmd/connector-solana-amqp/lib/redis"
@@ -30,9 +29,6 @@ const (
 	// to be appended with .<token>
 	RedisOwnSentBlocks = `solana.sent-blocks`
 
-	// EnvTokensList to relate the received token names to a contract address
-	EnvTokensList = "FLU_SOLANA_TOKENS_LIST"
-
 	// BlockPageLength is the number of confirmed blocks to fetch at once
 	BlockPageLength = 1000
 
@@ -40,6 +36,11 @@ const (
 	// A hanging websocket can duplicate blocks if this buffer is overwritten
 	// before it crashes and restarts the program
 	RedisBufferSize = 100
+)
+
+const (
+	// EnvTokensList to relate the received token names to a contract address
+	EnvTokensList = "FLU_SOLANA_TOKENS_LIST"
 
 	// EnvSolanaWsUrl is the URL to connect to the Solana websocket api
 	EnvSolanaWsUrl = `FLU_SOLANA_WS_URL`
@@ -139,7 +140,9 @@ func main() {
 			lastBlock := redis.GetLastBlock(tokenRedisKey)
 
 			// choose the lowest block of any token
-			if startingBlock == 0 || startingBlock > lastBlock {
+			shouldBeLatestBlock := startingBlock == 0 || startingBlock > lastBlock
+
+			if shouldBeLatestBlock  {
 				startingBlock = lastBlock
 			}
 		}
