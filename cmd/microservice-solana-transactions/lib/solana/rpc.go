@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	types "github.com/fluidity-money/fluidity-app/lib/types/solana"
+	"github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
 const (
@@ -37,22 +37,14 @@ var (
 )
 
 type (
-	Block struct {
-		Blockhash    string                    `json:"blockhash"`
-		Transactions []types.TransactionResult `json:"transactions"`
-	}
-	RpcError struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-	}
 	rpcBlock struct {
-		Result Block     `json:"result"`
-		Error  *RpcError `json:"error"`
+		Result solana.Block     `json:"result"`
+		Error  *solana.RpcError `json:"error"`
 	}
 
 	// rpc return type for the getTransaction endpoint using jsonParsed encoding
 	rpcParsedJsonTransaction struct {
-		Error  *RpcError `json:"error"`
+		Error  *solana.RpcError `json:"error"`
 		Result struct {
 			Transaction struct {
 				Message struct {
@@ -66,7 +58,7 @@ type (
 )
 
 // GetBlock gets a full block by its slot
-func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
+func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*solana.Block, error) {
 	request := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      1,
@@ -154,7 +146,7 @@ func GetBlock(rpcUrl string, slot uint64, retries, delay int) (*Block, error) {
 	}
 }
 
-func fetchSolanaAccountList(rpcUrl string, block *Block) error {
+func fetchSolanaAccountList(rpcUrl string, block *solana.Block) error {
 	for i, txn := range block.Transactions {
 		var (
 			versionLegacyUnset = bytes.Equal(txn.Version, TransactionVersionLegacyUnset)
