@@ -998,3 +998,12 @@ ul.sidebar-nav {
 .mobile-modal-text-link > svg {
   fill: currentColor;
 }
+
+.s-r-button {
+  svg {
+    path {
+      fill: none !important;
+      stroke: currentColor;
+    }
+  }
+}

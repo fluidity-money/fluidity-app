@@ -912,4 +912,9 @@ ul.sidebar-nav li div.active {
   fill: currentColor;
 }
 
+.s-r-button svg path {
+  fill: none !important;
+  stroke: currentColor;
+}
+
 /*# sourceMappingURL=dashboard.css.map */

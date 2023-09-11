@@ -60,7 +60,7 @@ const RewardsInfoBox = ({
   const chainOptions = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
-    disabled: chain === "SOL",
+    disabled: false,
   }));
 
   const [prizePool, setPrizePool] = useState<number>(0);

@@ -16,8 +16,8 @@ import {
   useNavigate,
   useResolvedPath,
   useMatches,
-  useTransition,
   useLocation,
+  useTransition,
 } from "@remix-run/react";
 import { useCache } from "~/hooks/useCache";
 import { useState, useEffect, useContext } from "react";
@@ -45,6 +45,8 @@ import {
   BurgerMenu,
   Referral,
   CardModal,
+  ArrowUp,
+  ArrowDown,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -166,35 +168,35 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-  {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
+    {
+      airdrop: {
+        name: "airdrop",
+        path: (network: string) => `/${network}/dashboard/airdrop`,
+        icon: <AirdropIcon />,
+      },
     },
-  },
-  {
-    home: {
-      name: "dashboard",
-      path: (network: string) => `/${network}/dashboard/home`,
-      icon: <DashboardIcon />,
+    {
+      home: {
+        name: "dashboard",
+        path: (network: string) => `/${network}/dashboard/home`,
+        icon: <DashboardIcon />,
+      },
     },
-  },
-  {
-    rewards: {
-      name: "rewards",
-      path: (network: string) => `/${network}/dashboard/rewards`,
-      icon: <Trophy />,
+    {
+      rewards: {
+        name: "rewards",
+        path: (network: string) => `/${network}/dashboard/rewards`,
+        icon: <Trophy />,
+      },
     },
-  },
-  {
-    assets: {
-      name: "assets",
-      path: (network: string) => `/${network}/dashboard/assets`,
-      icon: <AssetsIcon />,
+    {
+      assets: {
+        name: "assets",
+        path: (network: string) => `/${network}/dashboard/assets`,
+        icon: <AssetsIcon />,
+      },
     },
-  },
-];
+  ];
 
 const CHAIN_NAME_MAP: Record<
   string,
@@ -215,7 +217,6 @@ const CHAIN_NAME_MAP: Record<
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
-    disabled: true,
   },
 };
 
@@ -254,8 +255,8 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
+  const showSendReceive = showExperiment("enable-send-receive");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -425,21 +426,27 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
-  const chainNameMap = showExperiment("enable-polygonzk")
-    ? CHAIN_NAME_MAP
-    : (() => {
-        const {
-          polygon_zk, // eslint-disable-line @typescript-eslint/no-unused-vars
-          ...rest
-        } = CHAIN_NAME_MAP;
-        return rest;
-      })();
+  // filter CHAIN_NAME_MAP by enabled chains
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP).filter(([, chain]) => {
+    const { name } = chain;
+
+    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+      return false;
+    if (name === "SOL" && !showExperiment("enable-solana"))
+      return false;
+    return true;
+  }).reduce((prev, [key, value]) => (
+    {
+      ...prev,
+      [key]: value
+    }), {} as typeof CHAIN_NAME_MAP
+  )
 
   return (
     <>
@@ -457,7 +464,7 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      <CardModal
+      {false && <CardModal
         id="referral-modal"
         visible={referralModalVisibility}
         closeModal={() => setReferralModalVisibility(false)}
@@ -486,27 +493,28 @@ export default function Dashboard() {
           loaded={referralCountLoaded}
           closeModal={() => setReferralModalVisibility(false)}
         />
-      </CardModal>
+      </CardModal>}
 
       {/* Accept Referral Modal */}
-      <CardModal
-        id="accept-referral-modal"
-        visible={acceptReferralModalVisibility}
-        closeModal={() => setAcceptReferralModalVisibility(false)}
-      >
-        <AcceptReferralModal
-          network={network}
-          referralCode={clickedReferralCode}
-          referrer={referralAddress}
-        />
-      </CardModal>
+      {
+        false && <CardModal
+          id="accept-referral-modal"
+          visible={acceptReferralModalVisibility}
+          closeModal={() => setAcceptReferralModalVisibility(false)}
+        >
+          <AcceptReferralModal
+            network={network}
+            referralCode={clickedReferralCode}
+            referrer={referralAddress}
+          />
+        </CardModal>
+      }
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -535,9 +543,7 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
-          {NAVIGATION_MAP.filter((obj) =>
-            showAssets ? true : Object.keys(obj)[0] !== "assets"
-          ).map((obj, index) => {
+          {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
             const active = index === activeIndex;
@@ -646,8 +652,38 @@ export default function Dashboard() {
               />
             )}
 
+            {/* Send & Receive */}
+            {showSendReceive && (
+              <>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
+            )}
+
             {/* Referrals Button */}
-            <GeneralButton
+            {false && <GeneralButton
               type="transparent"
               size="small"
               layout="before"
@@ -659,7 +695,7 @@ export default function Dashboard() {
               icon={<Referral />}
             >
               {isMobile ? "" : "Referral"}
-            </GeneralButton>
+            </GeneralButton>}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (

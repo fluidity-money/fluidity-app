@@ -12,7 +12,8 @@ const QUERY_ALL = {
         bucket
         time
       }
-    }`,
+    }
+  `,
   week: gql`
     query GraphDataWeek($network: network_blockchain!) {
       week: graph_bucket(
@@ -23,7 +24,8 @@ const QUERY_ALL = {
         bucket
         time
       }
-    }`,
+    }
+  `,
   month: gql`
     query GraphDataMonth($network: network_blockchain!) {
       month: graph_bucket(
@@ -34,7 +36,8 @@ const QUERY_ALL = {
         bucket
         time
       }
-    }`,
+    }
+  `,
   year: gql`
     query GraphDataYear($network: network_blockchain!) {
       year: graph_bucket(
@@ -45,12 +48,16 @@ const QUERY_ALL = {
         bucket
         time
       }
-    }`
-}
+    }
+  `,
+};
 
 const QUERY_BY_USER = [
   gql`
-    query GraphDataByAddressDay($network: network_blockchain!, $address: String!) {
+    query GraphDataByAddressDay(
+      $network: network_blockchain!
+      $address: String!
+    ) {
       day: graph_bucket(
         args: {
           interval_: "1 hour"
@@ -64,9 +71,13 @@ const QUERY_BY_USER = [
         bucket
         time
       }
-    }`,
+    }
+  `,
   gql`
-    query GraphDataByAddressWeek($network: network_blockchain!, $address: String!) {
+    query GraphDataByAddressWeek(
+      $network: network_blockchain!
+      $address: String!
+    ) {
       week: graph_bucket(
         args: {
           interval_: "1 day"
@@ -80,9 +91,13 @@ const QUERY_BY_USER = [
         bucket
         time
       }
-    }`,
+    }
+  `,
   gql`
-    query GraphDataByAddressMonth($network: network_blockchain!, $address: String!) {
+    query GraphDataByAddressMonth(
+      $network: network_blockchain!
+      $address: String!
+    ) {
       month: graph_bucket(
         args: {
           interval_: "1 day"
@@ -96,9 +111,13 @@ const QUERY_BY_USER = [
         bucket
         time
       }
-    }`,
+    }
+  `,
   gql`
-    query GraphDataByAddressYear($network: network_blockchain!, $address: String!) {
+    query GraphDataByAddressYear(
+      $network: network_blockchain!
+      $address: String!
+    ) {
       year: graph_bucket(
         args: {
           interval_: "1 month"
@@ -112,7 +131,8 @@ const QUERY_BY_USER = [
         bucket
         time
       }
-    }`
+    }
+  `,
 ];
 
 export type GraphEntry = {
@@ -131,9 +151,9 @@ export type GraphData = {
 };
 
 export type GraphDataResponse = {
-  data?: {[name in keyof GraphData]: GraphEntry[]}
-  errors?: Array<unknown>
-}
+  data?: { [name in keyof GraphData]: GraphEntry[] };
+  errors?: Array<unknown>;
+};
 
 type GraphDataAllBody = {
   variables: {
@@ -151,21 +171,25 @@ type GraphDataByUserBody = {
 };
 
 const useGraphDataAll = async (network: string) => {
-  const variables = {network};
-  const {url, headers} = fetchInternalEndpoint();
+  const variables = { network };
+  const { url, headers } = fetchInternalEndpoint();
   // hasura queries are sequential when combined, so submit them separately then combine manually
-  return (await Promise.all(Object.values(QUERY_ALL).map(async query => {
-    const body = {
-      variables,
-      query,
-    };
+  return (
+    await Promise.all(
+      Object.values(QUERY_ALL).map(async (query) => {
+        const body = {
+          variables,
+          query,
+        };
 
-    return await jsonPost<GraphDataAllBody, GraphDataResponse>(
-      url,
-      body,
-      headers
-    );
-  }))).reduce(graphDataReducer)
+        return await jsonPost<GraphDataAllBody, GraphDataResponse>(
+          url,
+          body,
+          headers
+        );
+      })
+    )
+  ).reduce(graphDataReducer);
 };
 
 const useGraphDataByUser = async (network: string, address: string) => {
@@ -173,29 +197,35 @@ const useGraphDataByUser = async (network: string, address: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
   // hasura queries are sequential when combined, so submit them separately then combine manually
-  return (await Promise.all(Object.values(QUERY_BY_USER).map(async query => {
-    const body = {
-      variables,
-      query,
-    };
+  return (
+    await Promise.all(
+      Object.values(QUERY_BY_USER).map(async (query) => {
+        const body = {
+          variables,
+          query,
+        };
 
-    return await jsonPost<GraphDataByUserBody, GraphDataResponse>(
-      url,
-      body,
-      headers
-    );
-  }))).reduce(graphDataReducer)
+        return await jsonPost<GraphDataByUserBody, GraphDataResponse>(
+          url,
+          body,
+          headers
+        );
+      })
+    )
+  ).reduce(graphDataReducer);
 };
 
 // graphDataReducer to combine the results of several queries into one
-const graphDataReducer = (p: GraphDataResponse, c: GraphDataResponse): GraphDataResponse => ({
-    data: p.data || c.data 
-      ? {...p.data, ...c.data} as GraphData
-      : undefined, 
-    // can't (...undefined), so nullish coalesce with []
-    errors: p.errors || c.errors 
-      ? [...p.errors || [], ...c.errors || []]
-      : undefined
-})
+const graphDataReducer = (
+  p: GraphDataResponse,
+  c: GraphDataResponse
+): GraphDataResponse => ({
+  data: p.data || c.data ? ({ ...p.data, ...c.data } as GraphData) : undefined,
+  // can't (...undefined), so nullish coalesce with []
+  errors:
+    p.errors || c.errors
+      ? [...(p.errors || []), ...(c.errors || [])]
+      : undefined,
+});
 
 export { useGraphDataAll, useGraphDataByUser };
