@@ -148,6 +148,15 @@ type (
 		Data           string `json:"data"`
 		ProgramIdIndex int    `json:"programIdIndex"`
 	}
+
+	Block struct {
+		Blockhash    string                    `json:"blockhash"`
+		Transactions []TransactionResult `json:"transactions"`
+	}
+	RpcError struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+	}
 )
 
 // Slot is the type that logs the current slot as sent by the solana RPC
