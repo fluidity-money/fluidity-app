@@ -22,7 +22,6 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { ethers } from "ethers";
 import { useContext, useEffect, useState } from "react";
 import TokenSelect from "~/components/TokenSelect";
@@ -173,7 +172,8 @@ const Send = () => {
         setValidAmount(false);
       }
       setInputHint(
-        `${amountRemaining.toFixed(2)} ${selectedAsset.symbol
+        `${amountRemaining.toFixed(2)} ${
+          selectedAsset.symbol
         } remaining (${numberToMonetaryString(amountRemaining)})`
       );
     } else {
@@ -297,9 +297,6 @@ const Send = () => {
   const [isSending, setIsSending] = useState(false);
 
   const navigate = useNavigate();
-
-  const { showExperiment } = useContext(SplitContext);
-  if (!showExperiment("enable-send-receive")) return <></>;
 
   return (
     <div className={`transfer-container send ${isMobile ? "mobile" : ""}`}>
