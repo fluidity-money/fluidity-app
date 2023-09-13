@@ -168,35 +168,35 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-    {
-      airdrop: {
-        name: "airdrop",
-        path: (network: string) => `/${network}/dashboard/airdrop`,
-        icon: <AirdropIcon />,
-      },
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
     },
-    {
-      home: {
-        name: "dashboard",
-        path: (network: string) => `/${network}/dashboard/home`,
-        icon: <DashboardIcon />,
-      },
+  },
+  {
+    home: {
+      name: "dashboard",
+      path: (network: string) => `/${network}/dashboard/home`,
+      icon: <DashboardIcon />,
     },
-    {
-      rewards: {
-        name: "rewards",
-        path: (network: string) => `/${network}/dashboard/rewards`,
-        icon: <Trophy />,
-      },
+  },
+  {
+    rewards: {
+      name: "rewards",
+      path: (network: string) => `/${network}/dashboard/rewards`,
+      icon: <Trophy />,
     },
-    {
-      assets: {
-        name: "assets",
-        path: (network: string) => `/${network}/dashboard/assets`,
-        icon: <AssetsIcon />,
-      },
+  },
+  {
+    assets: {
+      name: "assets",
+      path: (network: string) => `/${network}/dashboard/assets`,
+      icon: <AssetsIcon />,
     },
-  ];
+  },
+];
 
 const CHAIN_NAME_MAP: Record<
   string,
@@ -256,7 +256,6 @@ export default function Dashboard() {
 
   const { showExperiment, client } = useContext(SplitContext);
   const showMobileNetworkButton = showExperiment("feature-network-visible");
-  const showSendReceive = showExperiment("enable-send-receive");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -426,27 +425,29 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP).filter(([, chain]) => {
-    const { name } = chain;
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
+    .filter(([, chain]) => {
+      const { name } = chain;
 
-    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-      return false;
-    if (name === "SOL" && !showExperiment("enable-solana"))
-      return false;
-    return true;
-  }).reduce((prev, [key, value]) => (
-    {
-      ...prev,
-      [key]: value
-    }), {} as typeof CHAIN_NAME_MAP
-  )
+      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+        return false;
+      if (name === "SOL" && !showExperiment("enable-solana")) return false;
+      return true;
+    })
+    .reduce(
+      (prev, [key, value]) => ({
+        ...prev,
+        [key]: value,
+      }),
+      {} as typeof CHAIN_NAME_MAP
+    );
 
   return (
     <>
@@ -464,40 +465,42 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      {false && <CardModal
-        id="referral-modal"
-        visible={referralModalVisibility}
-        closeModal={() => setReferralModalVisibility(false)}
-        cardPositionStyle={{
-          position: "absolute",
-          top: "1em",
-          right: isTablet ? "20px" : "60px",
-          width: 500,
-        }}
-        color="holo"
-        style={{ padding: 0, width: "100%" }}
-      >
-        <ReferralModal
-          connected={!!connected}
-          network={network}
-          connectWallet={() => {
-            setReferralModalVisibility(false);
-            setWalletModalVisibility(true);
-          }}
-          referrerClaimed={numActiveReferrerReferrals}
-          refereeClaimed={numActiveReferreeReferrals}
-          refereeUnclaimed={numInactiveReferreeReferrals}
-          progress={inactiveReferrals[0]?.progress || 0}
-          progressReq={10}
-          referralCode={referralCode}
-          loaded={referralCountLoaded}
+      {false && (
+        <CardModal
+          id="referral-modal"
+          visible={referralModalVisibility}
           closeModal={() => setReferralModalVisibility(false)}
-        />
-      </CardModal>}
+          cardPositionStyle={{
+            position: "absolute",
+            top: "1em",
+            right: isTablet ? "20px" : "60px",
+            width: 500,
+          }}
+          color="holo"
+          style={{ padding: 0, width: "100%" }}
+        >
+          <ReferralModal
+            connected={!!connected}
+            network={network}
+            connectWallet={() => {
+              setReferralModalVisibility(false);
+              setWalletModalVisibility(true);
+            }}
+            referrerClaimed={numActiveReferrerReferrals}
+            refereeClaimed={numActiveReferreeReferrals}
+            refereeUnclaimed={numInactiveReferreeReferrals}
+            progress={inactiveReferrals[0]?.progress || 0}
+            progressReq={10}
+            referralCode={referralCode}
+            loaded={referralCountLoaded}
+            closeModal={() => setReferralModalVisibility(false)}
+          />
+        </CardModal>
+      )}
 
       {/* Accept Referral Modal */}
-      {
-        false && <CardModal
+      {false && (
+        <CardModal
           id="accept-referral-modal"
           visible={acceptReferralModalVisibility}
           closeModal={() => setAcceptReferralModalVisibility(false)}
@@ -508,13 +511,14 @@ export default function Dashboard() {
             referrer={referralAddress}
           />
         </CardModal>
-      }
+      )}
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -653,49 +657,47 @@ export default function Dashboard() {
             )}
 
             {/* Send & Receive */}
-            {showSendReceive && (
-              <>
-                <GeneralButton
-                  className="s-r-button"
-                  type="transparent"
-                  size="small"
-                  layout="before"
-                  handleClick={() => {
-                    navigate(`/${network}/transfer/send`);
-                  }}
-                  icon={<ArrowUp />}
-                >
-                  {isMobile ? "" : "Send"}
-                </GeneralButton>
-                <GeneralButton
-                  className="s-r-button"
-                  type="transparent"
-                  size="small"
-                  layout="before"
-                  handleClick={() => {
-                    navigate(`/${network}/transfer/receive`);
-                  }}
-                  icon={<ArrowDown />}
-                >
-                  {isMobile ? "" : "Receive"}
-                </GeneralButton>
-              </>
-            )}
-
-            {/* Referrals Button */}
-            {false && <GeneralButton
+            <GeneralButton
+              className="s-r-button"
               type="transparent"
               size="small"
               layout="before"
               handleClick={() => {
-                width < airdropMobileBreakpoint
-                  ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                  : setReferralModalVisibility(true);
+                navigate(`/${network}/transfer/send`);
               }}
-              icon={<Referral />}
+              icon={<ArrowUp />}
             >
-              {isMobile ? "" : "Referral"}
-            </GeneralButton>}
+              {isMobile ? "" : "Send"}
+            </GeneralButton>
+            <GeneralButton
+              className="s-r-button"
+              type="transparent"
+              size="small"
+              layout="before"
+              handleClick={() => {
+                navigate(`/${network}/transfer/receive`);
+              }}
+              icon={<ArrowDown />}
+            >
+              {isMobile ? "" : "Receive"}
+            </GeneralButton>
+
+            {/* Referrals Button */}
+            {false && (
+              <GeneralButton
+                type="transparent"
+                size="small"
+                layout="before"
+                handleClick={() => {
+                  width < airdropMobileBreakpoint
+                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                    : setReferralModalVisibility(true);
+                }}
+                icon={<Referral />}
+              >
+                {isMobile ? "" : "Referral"}
+              </GeneralButton>
+            )}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
