@@ -24,7 +24,6 @@ import {
 } from "~/util/chainUtils/solana/instructions";
 import FluidityFacadeContext from "./FluidityFacade";
 import { Token } from "~/util/chainUtils/tokens";
-import {PublicKey} from "@solana/web3.js";
 
 const SolanaFacade = ({
   children,
