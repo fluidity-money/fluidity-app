@@ -18,7 +18,7 @@ import config from "~/webapp.config.server";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { getWethUsdPrice } from "~/util/chainUtils/ethereum/transaction";
 import EACAggregatorProxyAbi from "~/util/chainUtils/ethereum/EACAggregatorProxy.json";
-import { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 
 const MAINNET_ID = 0;
 
@@ -34,11 +34,12 @@ export const loader: LoaderFunction = async ({ params }) => {
   const eacAggregatorProxyAddr =
     config.contract.eac_aggregator_proxy[network as Chain];
 
-  const wethPrice = await getWethUsdPrice(
-    provider,
-    eacAggregatorProxyAddr,
-    EACAggregatorProxyAbi
-  );
+  const wethPrice = chainType(network) === "evm" ?
+    await getWethUsdPrice(
+      provider,
+      eacAggregatorProxyAddr,
+      EACAggregatorProxyAbi
+    ) : 0;
 
   const regularTokens = tokens
     .filter((token) => !token.isFluidOf)
