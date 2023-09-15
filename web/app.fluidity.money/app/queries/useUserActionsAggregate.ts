@@ -115,7 +115,13 @@ const queryAll: Queryable = {
       $offset: Int = 0,
       $limit: Int = 12,
   ) {
-    solana: user_transactions_aggregate(args: {network_: "solana",limit_: $limit, offset_: $offset}) {
+    solana: user_transactions_aggregate(
+      args: {
+        network_: "solana",
+        limit_: $limit,
+        offset_: $offset
+      }
+    ) {
       value: amount
       receiver: recipient_address
       rewardHash: reward_hash
@@ -131,6 +137,7 @@ const queryAll: Queryable = {
       swap_in
       type
     }
+  }
   `,
 };
 
