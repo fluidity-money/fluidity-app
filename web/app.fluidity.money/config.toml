@@ -155,6 +155,8 @@ logo = "/assets/tokens/fUSDC.svg"
 address = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
 colour = "#2775ca"
 isFluidOf = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+obligationAccount = "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A"
+dataAccount = "Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce"
 decimals = 6
 enabled = true
 
