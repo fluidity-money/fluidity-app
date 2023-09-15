@@ -11,7 +11,6 @@ import {
 import { LinksFunction } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { useContext, useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import dashboardStyles from "~/styles/dashboard.css";
@@ -41,9 +40,6 @@ const Receive = () => {
   const { width } = useViewport();
   const isMobile = width < mobileWidthBreakpoint;
 
-  const { showExperiment } = useContext(SplitContext);
-  if (!showExperiment("enable-send-receive")) return <></>;
-
   return (
     <div className={`transfer-container receive ${isMobile ? "mobile" : ""}`}>
       <Heading className="receive-heading">Receive Fluid Assets</Heading>
@@ -52,8 +48,9 @@ const Receive = () => {
           <div className="receive-qr-outline" />
           <QRCode
             className="receive-qr-code"
-            value={`https://app.fluidity.money/${network}/transfer/send&address=${address as string
-              }`}
+            value={`https://app.fluidity.money/${network}/transfer/send&address=${
+              address as string
+            }`}
             style={{ width: "50%" }}
             size={180}
             fgColor="#000000"
