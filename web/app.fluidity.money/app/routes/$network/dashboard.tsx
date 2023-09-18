@@ -438,7 +438,7 @@ export default function Dashboard() {
 
       if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
         return false;
-      if (name === "SOL" && !showExperiment("enable-solana")) return false;
+
       return true;
     })
     .reduce(
