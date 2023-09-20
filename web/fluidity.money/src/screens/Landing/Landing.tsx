@@ -9,6 +9,7 @@ import {
   useViewport,
   IntroTile,
   Video,
+  Text
 } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import styles from "./Landing.module.scss";
@@ -33,19 +34,14 @@ const Landing = () => {
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const callout = (
-    <div className={styles.callout}>
-      <Heading as="h4" className={styles.text}>
-        MONEY DESIGNED TO MOVE MONEY DESIGNED TO MOVE
-      </Heading>
-      <Heading as="h4" className={styles.text}>
-        MONEY DESIGNED TO MOVE
-      </Heading>
-    </div>
-  );
-
   return (
     <div className={`${styles.containerLanding}`}>
+      <Heading>Fluidity is the Blockchain Inventive Layer</Heading>
+      <div className={styles.heroBar}>
+        <Text>
+          Transform your USDC into Fluid USDC, perform any on-chain transaction, and earn rewards for using your crypto.
+        </Text>
+      </div>
     </div>
   );
 };
