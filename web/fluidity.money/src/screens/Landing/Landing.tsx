@@ -4,12 +4,13 @@
 
 import { useState } from "react";
 import {
-  ContinuousCarousel,
-  Heading,
   useViewport,
-  IntroTile,
-  Video,
-  Text
+  Text,
+  Card,
+  Display,
+  GeneralButton,
+  LinkButton,
+  Video
 } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import styles from "./Landing.module.scss";
@@ -34,13 +35,60 @@ const Landing = () => {
   const { width } = useViewport();
   const breakpoint = 620;
 
+  const [hoveredChip, setHoveredChip] = useState(null);
+
   return (
     <div className={`${styles.containerLanding}`}>
-      <Heading>Fluidity is the Blockchain Inventive Layer</Heading>
+      <Video
+        loop
+        src="/assets/videos/BubbleFloat.mp4"
+        type="cover"
+        className={styles.video}
+      />
+      <Card
+        onMouseEnter={() => { setHoveredChip(true) }}
+        onMouseLeave={() => { setHoveredChip(false) }}
+        color={hoveredChip ? 'holo' : 'gray'}
+        type="frosted"
+        border="solid"
+        style={{ borderRadius: '100px', padding: '0.8em 2em' }}
+      >
+        <Text size="xs">Important announcement goes here.</Text>
+      </Card>
+      <Display size="lg" className={styles.display}>
+        Fluidity is<br />
+        <span style={{ textAlign: 'right', display: 'block', width: '100%' }}>the Block<i>chain</i> <br /></span>
+        <b>In<i>cent</i>ive Layer</b>
+      </Display>
       <div className={styles.heroBar}>
-        <Text>
-          Transform your USDC into Fluid USDC, perform any on-chain transaction, and earn rewards for using your crypto.
-        </Text>
+        <div className={styles.heroDesc}>
+          <Text size="md">
+            Transform your USDC into Fluid USDC,<br />
+            perform any on-chain transaction, and&nbsp;
+          </Text>
+          <Text
+            size="md"
+            prominent
+            style={{
+              textDecoration: 'underline',
+              textUnderlineOffset: '0.5em',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            earn rewards for using your crypto.
+          </Text>
+        </div>
+        <div className={styles.heroButtons}>
+          <GeneralButton
+            type="secondary"
+            style={{ padding: '1em 3.5em' }}
+          >
+            <Text code prominent size="md">FLUIDIFY MONEY</Text>
+          </GeneralButton>
+          <LinkButton size="small" type="external" handleClick={() => { return }}>
+            JOIN DISCORD
+          </LinkButton>
+        </div>
       </div>
     </div>
   );

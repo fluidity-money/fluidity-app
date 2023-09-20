@@ -1,141 +1,55 @@
 @import "../../../src/styles/config.scss";
 
 .containerLanding {
+  align-self: center;
+  padding-top: 100px;
+  // border: 1px dashed grey;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 50px;
   min-height: 850px;
-  width: 100%;
-  background-image: url("../../../public/assets/images/bg-blur-desktop.png");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  @include max-620px {
-    background-size: 0%;
-  }
-  padding-top: 100px;
-  h1 {
-    text-align: center;
+  width: 700px;
+  max-width: 90vw;
+
+  .display {
+    font-weight: 100;
+    margin: 0;
+    width: 100%;
+    font-size: 5em;
   }
 }
 
-.bgVid {
+.video {
   position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
+  transform: scale(1.5);
 }
 
-.video {
-  width: 444px;
-  height: 444px;
-  position: relative;
-  border: solid 1px pink;
-  border-radius: 50%;
-  background-color: gray;
-  opacity: 0;
-  visibility: hidden;
-  @include max-1080px {
-    width: 350px;
-    height: 350px;
-  }
-  @include max-900px {
-    width: 300px;
-    height: 300px;
+.containerLanding {
+  .heroDesc {
+    flex-grow: 1;
+    max-width: 300px;
+    text-align: right;
+    justify-self: flex-end;
   }
 
-  @include max-760px {
-    width: 200px;
-    height: 200px;
-  }
-
-  @include max-620px {
-    width: 350px;
-    height: 350px;
-  }
-}
-
-.text {
-  margin-right: 10px;
-  &Hollow {
-    margin-right: 10px;
-  }
-}
-
-.carousel {
-  width: 100%;
-}
-
-.content {
-  width: 100%;
-  max-width: 2500px;
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  opacity: 1;
-  align-items: center;
-  min-height: 650px;
-  padding-bottom: 45px;
-  justify-content: space-between;
-  @include max-900px {
-    min-height: 425px;
-  }
-}
-
-.tiles {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: flex-end;
-  @include max-1080px {
-    align-items: center;
-  }
-  @include max-620px {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  &.notLoaded {
-    & > .left {
-      width: 50%;
-    }
-
-    & > .right {
-      width: 50%;
-    }
-  }
-}
-
-.right {
-  margin-right: 40px;
-  @include max-1080px {
-    margin-right: 10px;
-  }
-}
-
-.left {
-  margin-left: 40px;
-  @include max-1080px {
-    margin-left: 10px;
-  }
-  @include max-620px {
-    width: 100%;
+  .heroBar {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-left: 20px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 80px;
+    row-gap: 40px;
+
+    .heroButtons {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      align-items: center;
+    }
   }
-}
-
-.carousel {
-  width: 100%;
-  align-self: flex-end;
-}
-
-.callout {
-  display: flex;
-}
-
-.title {
-  text-align: center;
 }
