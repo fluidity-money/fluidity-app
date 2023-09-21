@@ -1,57 +1,83 @@
 @import "../../styles/config.scss";
 
-.container {
+.ecosystem {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 850px;
-  width: 100%;
   flex-direction: column;
-  background-color: $fluidBlack;
-  border: 2px solid red;
+  align-items: center;
+  gap: 10px;
   position: relative;
-}
+  overflow: visible;
+  padding: 100px 0;
 
-.background {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 500px;
-}
+  .bloom {
+    transform: scaleY(0.5) scaleX(2);
+    opacity: 0.3;
+    translate: 0 -50px;
+  }
 
-.textBehind {
-  width: 100%;
-  display: flex;
-  top: 100px;
-  position: absolute;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  max-height: 850px;
-  h1 {
-    font-size: 200px;
-    height: 100%;
+  .protocol {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    border: 1px solid white;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 5px 10px;
+    height: 40px;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    .external {
+      svg > path {
+        stroke: currentColor;
+      }
+    }
   }
 }
 
-.scrollable {
+.carousel {
   width: 100%;
-  z-index: 2;
-  overflow-y: auto;
-  max-height: 850px;
-}
-
-.projects {
-  width: 100%;
-  margin-top: 900px;
-  margin-bottom: 300px;
-}
-
-.above {
+  max-width: 1200px;
+  height: 40px;
   display: flex;
-  width: 100%;
-  justify-content: space-between;
-  padding-left: 40px;
-  padding-right: 40px;
+  flex-direction: row;
+  position: relative;
+  overflow-x: hidden;
+
+  .row {
+    position: absolute;
+    width: max-content;
+    top: 0;
+    gap: 10px;
+    display: flex;
+    flex-direction: row;
+    animation: scroll-left 20s linear infinite;
+
+    &.right {
+      animation: scroll-right 20s linear infinite;
+    }
+
+    &:hover {
+      animation-play-state: paused;
+    }
+  }
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
 }

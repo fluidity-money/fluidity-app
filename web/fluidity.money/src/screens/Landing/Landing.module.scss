@@ -3,7 +3,6 @@
 .containerLanding {
   align-self: center;
   padding-top: 100px;
-  // border: 1px dashed grey;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -11,7 +10,7 @@
   gap: 50px;
   min-height: 850px;
   width: 700px;
-  max-width: 90vw;
+  max-width: 90dvw;
 
   .display {
     font-weight: 100;
