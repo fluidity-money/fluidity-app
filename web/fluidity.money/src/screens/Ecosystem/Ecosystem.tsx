@@ -108,7 +108,7 @@ const Ecosystem = () => {
 
   return (
     <div className={styles.ecosystem}>
-      <BloomEffect width={30} type={"static"} className={styles.bloom} />
+      <BloomEffect width={20} type={"static"} className={styles.bloom} />
       <Display>
         <b><Text bold holo style={{ fontFamily: 'inherit', fontSize: 'inherit' }}>31,423+</Text> REWARDS</b>
       </Display>

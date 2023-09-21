@@ -12,7 +12,7 @@
   .bloom {
     transform: scaleY(0.5) scaleX(2);
     opacity: 0.3;
-    translate: 0 -50px;
+    translate: 0 -85px;
   }
 
   .protocol {
@@ -39,12 +39,28 @@
 
 .carousel {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   height: 40px;
   display: flex;
   flex-direction: row;
   position: relative;
   overflow-x: hidden;
+
+  &::before {
+    pointer-events: none;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 1),
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0) 70%,
+      rgba(0, 0, 0, 1)
+    );
+    z-index: 1;
+  }
 
   .row {
     position: absolute;
