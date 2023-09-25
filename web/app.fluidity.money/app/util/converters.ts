@@ -16,7 +16,7 @@ export { B64ToUint8Array };
  */
 const shorthandAmountFormatter = (
   uiAmount: string,
-  decimalPlaces: number,
+  decimalPlaces: number
 ): string => {
   const num: number = parseFloat(uiAmount);
   if (num < 1) {
@@ -108,7 +108,7 @@ const trimAddress = (address: string): string => {
 };
 
 const transactionActivityLabel = (activity: Transaction, address: string) => {
-  const { sender, currency, swapType, application, provider } = activity;
+  const { sender, currency, swapType, application } = activity;
   if (swapType)
     return swapType === "in"
       ? `Fluidified ${currency[0] === "f" ? currency.slice(1) : currency}`
