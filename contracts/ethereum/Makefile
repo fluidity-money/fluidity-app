@@ -33,7 +33,7 @@ run: docker ${FILES}
 		-e FLU_ETHEREUM_ORACLE_ADDRESS=0x50Ab74ed0dac2f82924D6E748Ce22eBeE339184c \
 		-i ${TAG}
 test:
-	@HARDHAT="${HARDHAT}" ./tests.sh
+	@HARDHAT="${HARDHAT}" ./run-tests.sh
 
 clean:
 	@rm -rf docker artifacts

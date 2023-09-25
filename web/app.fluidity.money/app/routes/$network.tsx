@@ -65,6 +65,7 @@ const Provider = ({
     ethereum: EthereumProvider(walletconnectId, tokens, network),
     solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
+    polygon_zk: EthereumProvider(walletconnectId, tokens, network),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
@@ -137,9 +138,6 @@ function ErrorBoundary({ error }: { error: string }) {
 export default function Network() {
   const { network, tokens, rpcUrls, colors, walletconnectId } =
     useLoaderData<LoaderData>();
-
-  // Hardcode solana to redirect to ethereum
-  if (network === "solana") throw new Error("Solana not supported");
 
   return (
     <Provider

@@ -25,10 +25,16 @@ describe("token liquidity provider swapping", async function () {
 
     const newProviderAddress = newProvider.address;
 
-    await bindings.usdt.externalOperator.upgradeLiquidityProvider(newProviderAddress);
+    const { usdt: { externalOperator: usdt } } = bindings;
 
-    const oldProviderAddress = contracts.usdt.deployedPool.address;
+    const { usdt: { deployedPool: deployedPoolUsdt } } = contracts;
 
-    await bindings.usdt.externalOperator.upgradeLiquidityProvider(oldProviderAddress);
+    const poolAmount = await deployedPoolUsdt.callStatic.totalPoolAmount();
+
+    const oldProviderAddress = deployedPoolUsdt.address;
+
+    await usdt.upgradeLiquidityProvider(newProviderAddress, poolAmount);
+
+    await usdt.upgradeLiquidityProvider(oldProviderAddress, poolAmount);
   });
 });

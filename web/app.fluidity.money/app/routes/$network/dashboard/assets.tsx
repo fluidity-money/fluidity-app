@@ -10,7 +10,6 @@ import {
 } from "@remix-run/react";
 import { Suspense, useContext, useEffect, useState } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import BN from "bn.js";
 import { AnimatePresence, motion } from "framer-motion";
 import { getUsdFromTokenAmount, Token } from "~/util/chainUtils/tokens";
@@ -25,8 +24,8 @@ import {
   ProviderCard,
   GeneralButton,
 } from "@fluidity-money/surfing";
-import ConnectWalletModal from "~/components/ConnectWalletModal";
 import dashboardAssetsStyle from "~/styles/dashboard/assets.css";
+import { UIContext } from "contexts/UIProvider";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: dashboardAssetsStyle }];
@@ -76,8 +75,6 @@ export const ErrorBoundary: React.FC<{ error: Error }> = (props: {
 };
 
 const AssetsRoot = () => {
-  const { showExperiment } = useContext(SplitContext);
-
   const { network } = useParams();
   const { tokens } = useLoaderData();
   const urlRoot = `/${network}/dashboard/assets`;
@@ -111,10 +108,6 @@ const AssetsRoot = () => {
     undefined
   );
 
-  // Toggle Select Chain Modal
-  const [walletModalVisibility, setWalletModalVisibility] =
-    useState<boolean>(false);
-
   useEffect(() => {
     if (!connected || !balance) return;
 
@@ -128,7 +121,7 @@ const AssetsRoot = () => {
     })();
   }, [connected, isFluidAssets]);
 
-  if (!showExperiment("enable-assets-page")) return <></>;
+  const { toggleConnectWalletModal } = useContext(UIContext);
 
   if (!address && !connecting)
     return (
@@ -137,17 +130,11 @@ const AssetsRoot = () => {
         <GeneralButton
           type={connected || connecting ? "transparent" : "primary"}
           size={"medium"}
-          handleClick={() =>
-            connecting ? null : setWalletModalVisibility(true)
-          }
+          handleClick={() => (connecting ? null : toggleConnectWalletModal?.())}
           className="connect-wallet-btn"
         >
           {connecting ? `Connecting...` : `Connect Wallet`}
         </GeneralButton>
-        <ConnectWalletModal
-          visible={walletModalVisibility}
-          close={() => setWalletModalVisibility(false)}
-        />
       </div>
     );
 

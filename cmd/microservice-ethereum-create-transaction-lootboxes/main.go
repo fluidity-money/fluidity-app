@@ -301,6 +301,8 @@ func protocolMultiplier(application applications.Application) *big.Rat {
 		fallthrough
 	case "chronos":
 		fallthrough
+	case "kyber_classic":
+		fallthrough
 	case "sushiswap":
 		return big.NewRat(2, 100)
 	}

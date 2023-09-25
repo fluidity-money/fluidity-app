@@ -27,6 +27,7 @@ contract StupidLiquidityProvider is ILiquidityProvider {
     /**
      * @notice initialiser function
      *
+     * @param _underlying token that's being supported, ie USDC
      * @param _token address of the fluid token
      */
     function init(
@@ -44,7 +45,7 @@ contract StupidLiquidityProvider is ILiquidityProvider {
     }
 
     /// @inheritdoc ILiquidityProvider
-    function addToPool(uint /* _amount */) external {
+    function addToPool(uint /* _amount */) external view {
         require(msg.sender == address(fluid_), "only the owner can use this");
     }
 

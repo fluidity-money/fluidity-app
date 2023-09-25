@@ -11,6 +11,7 @@ export type Token = {
   dataAccount?: string;
   decimals: number;
   colour: string;
+  enabled: boolean;
 };
 
 const getTokenForNetwork = (network: string) => {

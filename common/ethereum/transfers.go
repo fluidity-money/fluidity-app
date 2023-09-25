@@ -5,15 +5,20 @@
 package ethereum
 
 import (
+	"fmt"
+	"math/big"
 	"strings"
 
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
+// TransferLogTopic is the signature of token transfers
 var TransferLogTopic = strings.ToLower(
 	"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
 )
@@ -47,6 +52,7 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 			transferContractAddress_ = transferLog.Address.String()
 			topics                   = transferLog.Topics
 			logIndex                 = transferLog.Index
+			logData                  = transferLog.Data
 		)
 
 		transferContractAddress := strings.ToLower(transferContractAddress_)
@@ -109,12 +115,38 @@ func GetTransfers(logs []ethereum.Log, transactions []ethereum.Transaction, bloc
 
 		var decorator *worker.EthereumWorkerDecorator
 
-		utility, exists := utilities[ethereum.AddressFromString(transferContractAddress)]
+		volumeBigInt, err := getTransferVolume(logData)
 
-		if exists {
-			decorator = &worker.EthereumWorkerDecorator{
-				UtilityName: utility,
-			}
+		if err != nil {
+			log.Debug(func(k *log.Log) {
+				k.Format(
+					"Could not coerce data to swap amount! Err: %v",
+					err,
+				)
+			})
+
+			continue
+		}
+
+		if volumeBigInt == nil {
+			log.Debug(func(k *log.Log) {
+				k.Message = "Returned big.Int was nil when decoding a transfer!"
+			})
+
+			continue
+		}
+
+		// try classify sends to Utility contracts as that utility
+		utility, exists := utilities[toAddress]
+
+		// Else classify transfer as FLUID utility
+		if !exists {
+			utility, exists = utilities[ethereum.AddressFromString(transferContractAddress)]
+		}
+
+		decorator = &worker.EthereumWorkerDecorator{
+			Volume:      volumeBigInt,
+			UtilityName: utility,
 		}
 
 		transfer := worker.EthereumDecoratedTransfer{
@@ -185,4 +217,34 @@ func GetApplicationTransfers(logs []ethereum.Log, transactions []ethereum.Transa
 // the fluid transfer ABI
 func IsTransferLogTopic(topic string) bool {
 	return topic == TransferLogTopic
+}
+
+func getTransferVolume(data []byte) (*big.Int, error) {
+	ethAbiType := ethAbi.Type{
+		T: ethAbi.UintTy,
+	}
+
+	amount, err := ethAbi.ReadInteger(ethAbiType, data)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to decode a uint256 from abi data! %w",
+			err,
+		)
+	}
+
+	var amountBigInt *big.Int
+
+	switch amount.(type) {
+	case *big.Int:
+		amountBigInt = amount.(*big.Int)
+
+	default:
+		return nil, fmt.Errorf(
+			"Failed to decode an amount (%#v)!",
+			amount,
+		)
+	}
+
+	return amountBigInt, nil
 }

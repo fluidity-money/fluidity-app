@@ -26,7 +26,7 @@ const TokenCard = ({
   value,
   showLabels = false,
   isFluid = false,
-  onButtonPress = () => {}
+  onButtonPress = () => { }
 }: ITokenCard) => {
   const mobileBreakpoint = 1200
   const { width } = useViewport()
@@ -35,15 +35,15 @@ const TokenCard = ({
   return (
     <div className={`${styles.TokenCard}  ${isMobile ? styles.isMobile : ''}`}>
       <div
-      className={styles.tokenImg}
+        className={styles.tokenImg}
       >
-      <TokenSymbol 
-        token={token.symbol as Tokens} 
-        alt={token.name} 
-        
-      />
+        <TokenSymbol
+          token={token.symbol as Tokens}
+          alt={token.name}
+
+        />
       </div>
-      
+
       <div className={`${styles.content} ${isFluid ? styles.isFluid : ''} ${showLabels ? styles.hasLabels : ''}`}>
         {(!isMobile && showLabels) && (
           <>
@@ -54,31 +54,31 @@ const TokenCard = ({
             <Text size="sm">TOTAL</Text>
           </>
         )}
-        
+
 
         <Display size="xxs" className={isMobile ? styles.top : styles.bottom}>
           {token.symbol}
         </Display>
-        { !isMobile && (
+        {!isMobile && (
           <>
             {isFluid && <Text className={styles.stat} size="md" prominent>{numberToCommaSeparated(fluidAmt)}</Text>}
             <Text className={styles.stat} size="md">{numberToCommaSeparated(regAmt)}</Text>
             <Text className={styles.stat} size="md">{numberToMonetaryString(value)}</Text>
           </>
         )}
-        <Display size="xxs" className={isMobile ? styles.top : styles.bottom}>{numberToMonetaryString(isFluid ? fluidAmt*value : regAmt*value)}</Display>
+        <Display size="xxs" className={isMobile ? styles.top : styles.bottom}>{numberToMonetaryString(isFluid ? fluidAmt * value : regAmt * value)}</Display>
         {
           isMobile && (
             <>
               {
-                isFluid ? <Text size="sm" className={`${styles.bottom} ${styles.left}`}>{token.name}</Text> : <LinkButton className={styles.bottom} type="internal" size="small" handleClick={onButtonPress}>FLUIDIFY</LinkButton>
+                isFluid ? <Text size="sm" className={`${styles.bottom} ${styles.left}`}>{token.name}</Text> : <LinkButton disabled={!token.enabled} className={styles.bottom} type="internal" size="small" handleClick={onButtonPress}>FLUIDIFY</LinkButton>
               }
               <Text className={styles.bottom} size="sm">{numberToCommaSeparated(isFluid ? fluidAmt : regAmt)} at {numberToMonetaryString(value)}</Text>
             </>
           )
         }
       </div>
-      {(!isFluid && !isMobile) && <GeneralButton className={styles.fluidifyButton} type='transparent' size="small" handleClick={onButtonPress}>FLUIDIFY</GeneralButton>}
+      {(!isFluid && !isMobile) && <GeneralButton disabled={!token.enabled} className={styles.fluidifyButton} type='transparent' size="small" handleClick={onButtonPress}>FLUIDIFY</GeneralButton>}
     </div>
   );
 };

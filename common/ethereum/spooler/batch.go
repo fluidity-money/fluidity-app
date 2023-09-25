@@ -11,13 +11,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
-	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 // BatchWinningsByUser batches winnings that have the same token, returning
 // the total winnings each user has earned
-func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details.TokenDetails) (misc.BigInt, misc.BigInt, map[applications.UtilityName]map[ethereum.Address]misc.BigInt, error) {
+func BatchWinnings(winnings []worker.EthereumReward, expectedCategory string) (misc.BigInt, misc.BigInt, map[applications.UtilityName]map[ethereum.Address]misc.BigInt, error) {
 
 	// utility => address => winnings
 	rewards := make(map[applications.UtilityName]map[ethereum.Address]misc.BigInt)
@@ -31,18 +30,18 @@ func BatchWinnings(winnings []worker.EthereumReward, expectedToken token_details
 
 	for _, reward := range winnings {
 		var (
-			token       = reward.TokenDetails
 			winner      = reward.Winner
 			winAmount   = &reward.WinAmount.Int
 			utility     = reward.Utilityname
 			blockNumber = &reward.BlockNumber.Int
+			category    = reward.Category
 		)
 
-		if token != expectedToken {
+		if category != expectedCategory {
 			return misc.BigInt{}, misc.BigInt{}, nil, fmt.Errorf(
-				"Token doesn't match when batching winnings! Expected %+v, got %+v!",
-				expectedToken,
-				token,
+				"Category doesn't match when batching winnings! Expected %+v, got %+v!",
+				expectedCategory,
+				category,
 			)
 		}
 

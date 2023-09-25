@@ -1,5 +1,7 @@
+import type Transaction from "~/types/Transaction";
 import { isYesterday, isToday, formatDistanceToNow, format } from "date-fns";
 import { Buffer } from "buffer";
+import { getProviderDisplayName } from "./provider";
 
 const B64ToUint8Array = (b64string: string): Uint8Array =>
   Buffer.from(b64string, "base64");
@@ -105,22 +107,21 @@ const trimAddress = (address: string): string => {
   return leftSide + "..." + rightSide;
 };
 
-const transactionActivityLabel = (
-  activity: {
-    sender: string;
-    currency: string;
-    swapType?: "in" | "out";
-    [key: string]: unknown;
-  },
-  address: string
-) => {
-  const { sender, currency, swapType } = activity;
+const transactionActivityLabel = (activity: Transaction, address: string) => {
+  const { sender, currency, swapType, application } = activity;
   if (swapType)
     return swapType === "in"
       ? `Fluidified ${currency[0] === "f" ? currency.slice(1) : currency}`
       : `Reverted ${currency}`;
 
-  return sender === address ? `Sent ${currency}` : `Received ${currency}`;
+  const actionLabel =
+    (sender === address ? "Sent" : "Received") + ` ${currency}`;
+
+  const applicationName = getProviderDisplayName(application);
+  const applicationLabel =
+    applicationName !== "Fluidity" ? ` on ${applicationName}` : "";
+
+  return actionLabel + applicationLabel;
 };
 
 const transactionTimeLabel = (timestamp: number) => {

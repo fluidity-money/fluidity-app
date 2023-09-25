@@ -6,7 +6,9 @@ package main
 
 import (
 	"math/big"
+	"os"
 	"strconv"
+	"strings"
 
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -48,8 +50,16 @@ const (
 	// EnvChainlinkEthPriceFeed to get the price of eth in usd from
 	EnvChainlinkEthPriceFeed = `FLU_ETHEREUM_CHAINLINK_ETH_FEED_ADDR`
 
+	// EnvChainlinkEthPriceNetworkUrl to use if the network
+	// currently in use lacks Chainlink feeds, if set to nothing
+	// defaults to FLU_ETHEREUM_HTTP_URL
+	EnvChainlinkEthPriceNetworkUrl = `FLU_ETHEREUM_CHAINLINK_HTTP_URL`
+
 	// EnvUnderlyingTokenName to be mindful of when doing price conversions to USDT
 	EnvUnderlyingTokenName = `FLU_ETHEREUM_UNDERLYING_TOKEN_NAME`
+
+	// EnvTokenDetails is a list of utility:shortname:decimals
+	EnvTokenDetails = `FLU_ETHEREUM_UTILITY_TOKEN_DETAILS`
 
 	// EnvUnderlyingTokenDecimals to use when normalising the returned value
 	// when converting to USDT
@@ -74,38 +84,70 @@ type PayoutDetails struct {
 
 func main() {
 	var (
-		serverWorkAmqpTopic      = util.GetEnvOrFatal(EnvServerWorkQueue)
-		contractAddress          = mustEthereumAddressFromEnv(EnvContractAddress)
-		registryAddress          = mustEthereumAddressFromEnv(EnvRegistryAddress)
-		chainlinkEthPriceFeed    = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
-		tokenName                = util.GetEnvOrFatal(EnvUnderlyingTokenName)
-		underlyingTokenDecimals_ = util.GetEnvOrFatal(EnvUnderlyingTokenDecimals)
-		publishAmqpQueueName     = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
-		ethereumUrl              = util.PickEnvOrFatal(EnvEthereumHttpUrl)
-		networkId                = util.GetEnvOrFatal(EnvNetwork)
+		serverWorkAmqpTopic  = util.GetEnvOrFatal(EnvServerWorkQueue)
+		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		ethereumUrl          = util.PickEnvOrFatal(EnvEthereumHttpUrl)
+		networkId            = util.GetEnvOrFatal(EnvNetwork)
+		tokenDetails_        = util.GetEnvOrFatal(EnvTokenDetails)
 
-		dbNetwork network.BlockchainNetwork
+		contractAddress       = mustEthereumAddressFromEnv(EnvContractAddress)
+		registryAddress       = mustEthereumAddressFromEnv(EnvRegistryAddress)
+		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
+
+		chainlinkEthPriceFeedUrl = os.Getenv(EnvChainlinkEthPriceNetworkUrl)
 	)
+
+	var dbNetwork network.BlockchainNetwork
+
+	if chainlinkEthPriceFeedUrl == "" {
+		chainlinkEthPriceFeedUrl = ethereumUrl
+	}
+
+	tokenDetails := make(map[appTypes.UtilityName]token_details.TokenDetails)
+
+	for _, details := range strings.Split(tokenDetails_, ",") {
+		parts := strings.Split(details, ":")
+		if len(parts) != 3 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Invalid token details split '%s'!",
+					parts,
+				)
+			})
+		}
+
+		utility := appTypes.UtilityName(parts[0])
+		shortName := parts[1]
+		decimals_ := parts[2]
+
+		decimals, err := strconv.ParseInt(decimals_, 10, 64)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to parse decimals from token list env!"
+				k.Payload = err
+			})
+		}
+
+		tokenDetails[utility] = token_details.New(shortName, int(decimals))
+	}
+
+	fluidTokenDetails, exists := tokenDetails[appTypes.UtilityFluid]
+
+	if !exists {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Fluid token not specified in token details list!"
+		})
+	}
+
+	tokenName := fluidTokenDetails.TokenShortName
+	underlyingTokenDecimals := fluidTokenDetails.TokenDecimals
 
 	dbNetwork, err := network.ParseEthereumNetwork(networkId)
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Message = "Failed to parse network from env"
-			k.Payload = err
-		})
-	}
-
-	underlyingTokenDecimals, err := strconv.Atoi(underlyingTokenDecimals_)
-
-	if err != nil {
-		log.Fatal(func(k *log.Log) {
-			k.Format(
-				"Failed to convert the decimals from %v! Was %#v!",
-				EnvUnderlyingTokenDecimals,
-				underlyingTokenDecimals_,
-			)
-
 			k.Payload = err
 		})
 	}
@@ -119,6 +161,23 @@ func main() {
 			k.Message = "Failed to connect to geth!"
 			k.Payload = err
 		})
+	}
+
+	// set the chainlink client's special geth client if needed
+
+	var chainlinkEthPriceClient *ethclient.Client
+
+	if chainlinkEthPriceFeedUrl == "" {
+		chainlinkEthPriceClient = gethClient
+	} else {
+		chainlinkEthPriceClient, err = ethclient.Dial(chainlinkEthPriceFeedUrl)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to connect to the chainlink geth!"
+				k.Payload = err
+			})
+		}
 	}
 
 	queue.GetMessages(serverWorkAmqpTopic, func(message queue.Message) {
@@ -162,8 +221,8 @@ func main() {
 			transfersInBlock int
 		)
 
-		for _, transfers := range fluidTransactions {
-			transfersInBlock += len(transfers.Transfers)
+		for _, tx := range fluidTransactions {
+			transfersInBlock += len(tx.Transfers)
 		}
 
 		movingAverageKey := createMovingAverageKey(dbNetwork, tokenName)
@@ -316,7 +375,10 @@ func main() {
 			btx = averageTransfersInBlock * epochBlocks
 		}
 
-		ethPriceUsd, err := chainlink.GetPrice(gethClient, chainlinkEthPriceFeed)
+		ethPriceUsd, err := chainlink.GetPrice(
+			chainlinkEthPriceClient,
+			chainlinkEthPriceFeed,
+		)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -482,7 +544,20 @@ func main() {
 					payouts []PayoutDetails
 				)
 
+				zeroRat := big.NewRat(0, 1)
+
 				for _, pool := range pools {
+					if pool.PoolSizeNative.Cmp(zeroRat) == 0 {
+						log.Debug(func(k *log.Log) {
+							k.Format(
+								"Skipping empty pool %+v!",
+								pool,
+							)
+						})
+
+						continue
+					}
+
 					calculationType := pool.CalculationType
 
 					if calculationType == workerTypes.CalculationTypeNormal {
@@ -532,12 +607,10 @@ func main() {
 					payouts = append(payouts, specialPayout)
 				}
 
-				tokenDetails := token_details.New(
-					tokenName,
-					underlyingTokenDecimals,
-				)
+				tokenDetails := fluidTokenDetails
 
 				for _, payoutDetails := range payouts {
+
 					log.Debug(func(k *log.Log) {
 						k.Format(
 							"Transaction with hash %v, log index %v had application %v",

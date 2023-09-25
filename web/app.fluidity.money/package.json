@@ -73,6 +73,7 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-jazzicon": "^1.0.4",
+    "react-qr-code": "^2.0.11",
     "react-router-dom": "^6.3.0",
     "relay-compiler": "^14.1.0",
     "rxjs": "^7.5.7",

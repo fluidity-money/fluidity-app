@@ -49,15 +49,14 @@ export class FluidityInstruction extends SolanaEnum {
    * @param TokenSymbol the string symbol to search for
    * @returns the bump seed as a number
    */
-  static async getBumpSeed(TokenSymbol: string): Promise<number> {
+  static getBumpSeed(TokenSymbol: string): number {
     const seedString = `FLU:${TokenSymbol}_OBLIGATION`;
     const seedBuffer = Buffer.from(seedString, "utf8");
 
-    const bump = (
-      await PublicKey.findProgramAddress(
+    const bump =
+      PublicKey.findProgramAddressSync(
         [seedBuffer],
         new PublicKey("HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR")
-      )
     )[1];
 
     return bump;
@@ -68,11 +67,11 @@ export class FluidityInstruction extends SolanaEnum {
    * @param TokenSymbol the string symbol to search for
    * @returns the account
    */
-  static async getProgramAddress(TokenSymbol: string): Promise<PublicKey> {
+  static getProgramAddress(TokenSymbol: string): PublicKey {
     const seedString = `FLU:${TokenSymbol}_OBLIGATION`;
     const seedBuffer = Buffer.from(seedString, "utf8");
 
-    const [address] = await PublicKey.findProgramAddress(
+    const [address] = PublicKey.findProgramAddressSync(
       [seedBuffer],
       new PublicKey("HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR")
     );

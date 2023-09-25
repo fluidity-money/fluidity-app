@@ -15,6 +15,7 @@ const (
 	NetworkEthereum BlockchainNetwork = `ethereum`
 	NetworkArbitrum BlockchainNetwork = `arbitrum`
 	NetworkSolana   BlockchainNetwork = `solana`
+	NetworkPolygonZk BlockchainNetwork = `polygon_zk`
 )
 
 // ParseEthereumNetwork takes a network name as a string
@@ -25,6 +26,8 @@ func ParseEthereumNetwork(network_ string) (network BlockchainNetwork, err error
 		network = NetworkEthereum
 	case string(NetworkArbitrum):
 		network = NetworkArbitrum
+	case string(NetworkPolygonZk):
+		network = NetworkPolygonZk
 	default:
 		err = fmt.Errorf(
 			"Unknown network name '%s'",

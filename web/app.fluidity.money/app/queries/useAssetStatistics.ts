@@ -77,10 +77,6 @@ const useAssetStatistics = (
   tokenName: string,
   userAddress: string
 ) => {
-  if (network === "solana") {
-    throw Error(`network ${network} not supported`);
-  }
-
   const body = {
     query: query,
     variables: {

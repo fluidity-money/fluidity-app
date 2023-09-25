@@ -473,7 +473,6 @@ $holo: linear-gradient(
   &.airdrop-mobile {
     max-width: 100%;
     box-sizing: border-box;
-    // both margin and padding required here to make the scrollbar render nicely inbetween
     padding-bottom: 0.5em;
     margin-bottom: 0.5em;
     overflow-x: scroll;
@@ -592,7 +591,7 @@ $holo: linear-gradient(
 
   .ropsten-header {
     h3 {
-        margin: 0;
+      margin: 0;
     }
 
     height: 100px;
@@ -601,7 +600,6 @@ $holo: linear-gradient(
     justify-content: center;
     gap: 0.5em;
   }
-
 
   img {
     top: 0;
@@ -646,7 +644,6 @@ $holo: linear-gradient(
       width: 16px;
       height: 16px;
 
-
       path {
         stroke: currentColor;
       }
@@ -679,19 +676,18 @@ $holo: linear-gradient(
     padding: 0.5em;
 
     &.danger {
-        background-color: rgba(255, 105, 105, 0.1);
-        color: #ff6969;
-        border: 1px solid #ff6969;
-        margin-top: 0.5em;
+      background-color: rgba(255, 105, 105, 0.1);
+      color: #ff6969;
+      border: 1px solid #ff6969;
+      margin-top: 0.5em;
     }
-
 
     svg {
       transform: translate(0, 2px);
       margin-right: 0.5em;
 
       path {
-      fill: currentColor;
+        fill: currentColor;
       }
     }
   }
@@ -702,18 +698,18 @@ $holo: linear-gradient(
   align-items: center;
   padding-bottom: 1em;
   gap: 2em;
-  
+
   h3 {
     margin: 0;
   }
 
   .leaderboard-provider-button {
-    -webkit-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
-    -moz-box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
-    box-shadow: 0px 0px 64px 7px rgba(255, 64, 163, 0.5);
+    -webkit-box-shadow: 0px 0px 64px 7px rgb(44, 84, 68);
+    -moz-box-shadow: 0px 0px 64px 7px rgb(44, 84, 68);
+    box-shadow: 0px 0px 64px 7px rgb(44, 84, 68);
     padding: 0.5em 1em;
-    border-color: #f7c8e7;
-    color: #f7c8e7;
+    border-color: rgb(53, 193, 151);
+    color: rgb(53, 193, 151);
   }
 }
 
@@ -797,6 +793,275 @@ $holo: linear-gradient(
         width: 100%;
         border: 1px solid gray;
         margin: 1em 0 1em 0;
+      }
+    }
+  }
+}
+
+.recap-container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  align-self: center;
+  box-sizing: border-box;
+  flex-direction: column;
+  gap: 150px;
+  overflow: hidden;
+  padding-top: 50px;
+  min-height: 100vh;
+  padding-bottom: 150px;
+
+  .recap-hero {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    grid-column: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    text-align: center;
+
+    .recap-hero-text {
+      z-index: 1;
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2em;
+      align-items: center;
+      height: 100%;
+
+      div {
+        max-width: 1000px;
+      }
+
+      h1 {
+        margin: 0.2em;
+      }
+
+      button {
+        svg {
+          path {
+            fill: none;
+            stroke: currentColor;
+          }
+        }
+      }
+
+      .recap-circle-scroll {
+        position: absolute;
+        bottom: 0;
+        left: 64px;
+        width: 150px;
+        height: 150px;
+
+        .recap-circle-scroll-arrow {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+
+          svg {
+            fill: none;
+            stroke: white;
+            transform: scale(3);
+          }
+        }
+
+        .recap-circle-scroll-text {
+          font-size: 10px;
+          fill: grey;
+          letter-spacing: 0.4em;
+          text-length: 100%;
+        }
+      }
+    }
+  }
+
+  .recap-stats {
+    position: relative;
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 2em;
+
+    .recap-mx-list {
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .recap-mx-provider {
+        position: absolute;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: black;
+        padding: 6px;
+        border: 1px solid white;
+        transition: transform 0.2s ease-in-out;
+        img {
+          transform: scale(0.8);
+        }
+
+        &:hover {
+          transform: scale(1.5);
+          z-index: 100 !important;
+          transition: transform 0.2s ease-in-out;
+        }
+      }
+
+      .recap-mx-plus {
+        position: absolute;
+        left: 310px;
+        top: 30px;
+        font-size: 2em;
+        transform: translate(0, -50%);
+        color: white;
+      }
+    }
+
+    .volume-border {
+      aspect-ratio: 1/1;
+      grid-column: 2 / 3;
+      grid-row: 1 / 3;
+      position: relative;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-image: url("/images/airdrop/volume_border.svg");
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+
+      h1 {
+        font-weight: 800;
+      }
+
+      span {
+        max-width: 300px;
+
+        &:first-child {
+          transform: translate(50%);
+        }
+      }
+    }
+
+    .recap-total-bottles {
+      h1 {
+        margin: 0;
+        margin-bottom: -20px;
+      }
+
+      align-items: flex-end;
+      display: flex;
+      gap: 2em;
+      grid-column: 1 / 3;
+    }
+
+    .recap-bottle-distribution-container {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      gap: 50px;
+      padding: 25px;
+      grid-column: 1 / 3;
+      overflow-x: scroll;
+      overflow-y: auto;
+
+      /* width */
+      &::-webkit-scrollbar {
+        height: 10px;
+      }
+
+      /* Track */
+      &::-webkit-scrollbar-track {
+        background: transparent;
+        border: 1px solid white;
+        border-radius: 5px;
+      }
+
+      /* Handle */
+      &::-webkit-scrollbar-thumb {
+        background: white;
+        border-radius: 5px;
+      }
+
+      .bottle-container {
+        gap: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  }
+
+  .recap-connect {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4em;
+
+    recap-connect-text {
+      flex-shrink: 1;
+      flex-grow: 1;
+    }
+
+    button {
+      white-space: nowrap;
+      cursor: pointer;
+
+      .rc-btn-svg {
+        svg {
+          fill: none;
+          path {
+            fill: none;
+            stroke: currentColor !important;
+          }
+        }
+      }
+    }
+  }
+
+  &.recap-mobile {
+    padding-top: 25px;
+
+    .recap-total-bottles {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .recap-hero {
+      h1 {
+        font-size: 2.5em;
+      }
+    }
+
+    .recap-stats {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 100px;
+
+      .recap-mx-list {
+        height: 100px;
+        justify-content: flex-start;
+      }
+
+      .volume-border {
+        width: 100%;
+        box-sizing: border-box;
+        aspect-ratio: 1/1;
       }
     }
   }

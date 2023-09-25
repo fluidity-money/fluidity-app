@@ -72,11 +72,11 @@ const UserRewards = ({
 
         {/* Auto-claims infobox */}
         <div id="infobox">
-          <Heading className="claims-title" as="h5">
+          <Heading className="claims-title" as="h4">
             Auto-claims
           </Heading>
 
-          <Text size={"xs"}>
+          <Text size={"md"}>
             Rewards will be claimed automatically without fees when market
             volume is reached.
             <br />

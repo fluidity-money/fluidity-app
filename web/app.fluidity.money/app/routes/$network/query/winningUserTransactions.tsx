@@ -12,12 +12,11 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
-import {
-  translateRewardTierToRarity,
-  useLootboxesByTxHash,
-} from "~/queries/useLootBottles";
-import { Rarity } from "@fluidity-money/surfing";
-import { BottleTiers } from "./dashboard/airdrop";
+import { chainType } from "~/util/chainUtils/chains";
+
+const FLUID_UTILITY = "FLUID";
+
+const ALPHA_NUMERIC = /[a-z0-9]*/i;
 
 type UserTransaction = {
   sender: string;
@@ -26,6 +25,7 @@ type UserTransaction = {
   timestamp: number;
   value: number;
   currency: string;
+  application: string;
 };
 
 export type TransactionsLoaderData = {
@@ -88,10 +88,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           solana_application: undefined,
           reward_type: pending_winner.reward_type,
           awarded_time: pending_winner.inserted_date,
+          utility_name: pending_winner.utility_name,
+          token_short_name: pending_winner.token_short_name,
         };
       });
 
-    winnersData.winners = castPending
+    const mergedWinners = castPending
       .concat(winnersData.winners)
       .sort(
         (first, second) =>
@@ -99,17 +101,64 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       );
 
     // If no wins found, return early
-    if (!winnersData.winners.length) {
+    if (!mergedWinners.length) {
       return json({
         page,
         transactions: [],
-        count: winnersData.winners.length,
+        count: 0,
         loaded: true,
       } satisfies TransactionsLoaderData);
     }
 
+    const mergedWinnersMap = mergedWinners.reduce(
+      (map, winner) => {
+        const sameTxWinner = map[winner.send_transaction_hash] || winner;
+
+        const currentUtilityReward = sameTxWinner.utility || {};
+
+        const normalisedAmount =
+          winner.winning_amount / 10 ** winner.token_decimals;
+
+        const utilityName =
+          winner.utility_name.match(ALPHA_NUMERIC)?.[0] ?? FLUID_UTILITY;
+
+        return winner.utility_name === FLUID_UTILITY
+          ? {
+              ...map,
+              [winner.send_transaction_hash]: {
+                ...sameTxWinner,
+                normalisedAmount:
+                  normalisedAmount + (sameTxWinner.normalisedAmount || 0),
+              },
+            }
+          : {
+              ...map,
+              [winner.send_transaction_hash]: {
+                ...sameTxWinner,
+
+                utility: {
+                  ...currentUtilityReward,
+                  [utilityName]:
+                    normalisedAmount + (currentUtilityReward[utilityName] || 0),
+                },
+              },
+            };
+      },
+      {} as {
+        [transaction_hash: string]: Winner & {
+          normalisedAmount: number;
+          utility: { [tokens: string]: number };
+        };
+      }
+    );
+
     // winnersMap looks up if a transaction was the send that caused a win
-    const winners = winnersData.winners.slice((page - 1) * 12, page * 12);
+    const winners = Object.values<
+      Winner & {
+        normalisedAmount: number;
+        utility: { [tokens: string]: number };
+      }
+    >(mergedWinnersMap).slice((page - 1) * 12, page * 12);
 
     const winnerAddrs = winners.map(
       ({ send_transaction_hash }) => send_transaction_hash
@@ -119,13 +168,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       .filter((entry) => entry.isFluidOf !== undefined)
       .map((entry) => entry.symbol);
 
-    const [
-      { data: userTransactionsData, errors: userTransactionsErr },
-      { data: lootbottlesData, errors: lootbottlesErr },
-    ] = await Promise.all([
-      useUserTransactionsByTxHash(network, winnerAddrs, [], ethereumTokens),
-      useLootboxesByTxHash(winnerAddrs),
-    ]);
+    const { data: userTransactionsData, errors: userTransactionsErr } =
+      await useUserTransactionsByTxHash(
+        network,
+        winnerAddrs,
+        [],
+        ethereumTokens,
+        100
+      );
 
     if (!userTransactionsData || userTransactionsErr) {
       captureException(
@@ -141,18 +191,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       return Error("Server could not fulfill request");
     }
 
-    if (!lootbottlesData || lootbottlesErr) {
-      captureException(new Error(`Could not fetch Lootbottles`), {
-        tags: {
-          section: "dashboard",
-        },
-      });
-      return Error("Server could not fulfill request");
-    }
-
-    const {
-      [network as string]: { transfers: transactions },
-    } = userTransactionsData;
+    const { transfers: transactions } = userTransactionsData;
 
     // Destructure GraphQL data
     const userTransactions: UserTransaction[] = transactions.map(
@@ -166,6 +205,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           transaction: { hash },
           amount: value,
           currency: { symbol: currency },
+          application,
         } = transaction;
 
         return {
@@ -181,6 +221,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               ? value / 10 ** 12
               : value,
           currency,
+          application,
         };
       }
     );
@@ -204,49 +245,13 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const transactionMap = userTransactions.reduce(
       (map, tx) => ({
         ...map,
-        [tx.hash]: tx,
+        [tx.hash]: {
+          ...tx,
+          value: tx.value + (map[tx.hash]?.value || 0),
+        },
       }),
       {} as Record<string, UserTransaction>
     );
-
-    const lootbottlesMap = lootbottlesData.lootbox.reduce(
-      (map, { txHash, rewardTier, lootboxCount }) => {
-        if (!txHash) return map;
-
-        if (!map[txHash]) {
-          return {
-            ...map,
-            [txHash]: {
-              [Rarity.Common]: 0,
-              [Rarity.Uncommon]: 0,
-              [Rarity.Rare]: 0,
-              [Rarity.UltraRare]: 0,
-              [Rarity.Legendary]: 0,
-              [translateRewardTierToRarity(rewardTier)]: lootboxCount,
-            },
-          };
-        }
-
-        return {
-          ...map,
-          [txHash]: {
-            ...map[txHash],
-            [translateRewardTierToRarity(rewardTier)]:
-              map[txHash][translateRewardTierToRarity(rewardTier)] +
-              lootboxCount,
-          },
-        };
-      },
-      {} as {
-        [txHash: string]: BottleTiers;
-      }
-    );
-
-    Object.entries(lootbottlesMap).forEach(([txHash, bottles]) => {
-      if (Object.values(bottles).every((amt: number) => amt <= 0.005)) {
-        delete lootbottlesMap[txHash];
-      }
-    });
 
     const mergedTransactions: Transaction[] = winners
       .filter(({ send_transaction_hash: hash }) => !!transactionMap[hash])
@@ -260,13 +265,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
             ? "out"
             : undefined;
 
-        const isSend = tx.sender === winner.winning_address;
-
         return {
           sender: tx.sender,
           receiver: tx.receiver,
           winner: winner.winning_address ?? "",
-          reward: winner.winning_amount / 10 ** winner.token_decimals,
+          reward: winner.normalisedAmount,
           hash: tx.hash,
           rewardHash:
             winner.ethereum_application === undefined
@@ -277,11 +280,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           timestamp: new Date(winner.awarded_time).getTime(),
           logo: tokenLogoMap[tx.currency] || defaultLogo,
           provider:
-            (network === "ethereum" || network === "arbitrum"
+            (chainType(network) === "evm"
               ? winner?.ethereum_application
               : winner?.solana_application) ?? "Fluidity",
           swapType,
-          lootBottles: isSend ? lootbottlesMap[tx.hash] : undefined,
+          utilityTokens: winner.utility,
+          application: tx.application,
         };
       });
 

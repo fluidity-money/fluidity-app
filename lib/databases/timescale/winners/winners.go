@@ -14,6 +14,7 @@ import (
 	solApps "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	ethApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -405,7 +406,7 @@ func GetAndRemovePendingRewardData(net network.BlockchainNetwork, token token_de
 
 // Ethereum Specific
 // InsertPendingRewardType to store the reward type and application of a pending win
-func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.UtilityName]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.UtilityName]worker.Payout, application Application, rewardTier int, logIndex misc.BigInt) {
+func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.TokenDetails, blockNumber uint64, sendTransactionHash ethereum.Hash, senderAddress ethereum.Address, senderWinAmount map[ethApps.UtilityName]worker.Payout, recipientAddress ethereum.Address, recipientWinAmount map[ethApps.UtilityName]worker.Payout, application Application, rewardTier int, logIndex misc.BigInt, tokenDetails map[applications.UtilityName]token_details.TokenDetails) {
 
 	timescaleClient := timescale.Client()
 
@@ -446,11 +447,28 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			winAmountNative = payout.Native
 		)
 
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						token,
+					)
+				})
+			}
+
+			details = token
+		}
+
 		// insert the sender's value
 		_, err := timescaleClient.Exec(
 			statementText,
 			net,
-			token.TokenShortName,
+			details.TokenShortName,
 			sendTransactionHash,
 			senderAddress,
 			true,
@@ -481,11 +499,28 @@ func InsertPendingRewardType(net network.BlockchainNetwork, token token_details.
 			winAmountNative = payout.Native
 		)
 
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						token,
+					)
+				})
+			}
+
+			details = token
+		}
+
 		// insert the recipient's value
 		_, err := timescaleClient.Exec(
 			statementText,
 			net,
-			token.TokenShortName,
+			details.TokenShortName,
 			sendTransactionHash,
 			recipientAddress,
 			false,

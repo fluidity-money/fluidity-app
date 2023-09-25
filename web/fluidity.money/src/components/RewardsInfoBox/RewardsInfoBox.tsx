@@ -44,6 +44,8 @@ const RewardsInfoBox = ({
         return "/assets/images/chainIcons/solanaIcon.svg";
       case "ARB":
         return "/assets/images/chainIcons/arbIcon.svg";
+      case "POLY_ZK":
+        return "/assets/images/chainIcons/polygonIcon.svg";
       case "ETH":
       default:
         return "/assets/images/chainIcons/ethIcon.svg";
@@ -58,6 +60,7 @@ const RewardsInfoBox = ({
   const chainOptions = Object.keys(SupportedChains).map((chain) => ({
     name: chain,
     icon: <img src={imgLink(chain)} alt={`${chain}-icon`} />,
+    disabled: false,
   }));
 
   const [prizePool, setPrizePool] = useState<number>(0);
@@ -68,10 +71,11 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={`${type === "black"
+      className={`${
+        type === "black"
           ? styles.infoBoxContainer
           : styles.infoBoxContainerStats
-        }`}
+      }`}
     >
       <div
         className={
@@ -85,7 +89,7 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={!loading ? changeScreen : () => { }}>
+        <div onClick={!loading ? changeScreen : () => {}}>
           <Heading as="h1">
             {showRewardPool ? (
               <Suspense>

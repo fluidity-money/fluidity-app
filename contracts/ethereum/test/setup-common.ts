@@ -66,7 +66,8 @@ before(async function () {
     compoundLiquidityProvider: compoundLiquidityProviderFactory,
     aaveV2LiquidityProvider: aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProvider: aaveV3LiquidityProviderFactory,
-    dao: daoFactory
+    dao: daoFactory,
+    permitRouterV1: permitRouterV1Factory
   } = commonFactories;
 
   const beacons = await deployBeacons(
@@ -77,7 +78,7 @@ before(async function () {
     operatorFactory,
     aaveV2LiquidityProviderFactory,
     aaveV3LiquidityProviderFactory,
-    registryFactory,
+    registryFactory
   );
 
   const [
@@ -122,7 +123,9 @@ before(async function () {
     daoFactory,
 
     registryBeacon.address,
-    operatorBeacon.address
+    operatorBeacon.address,
+
+    permitRouterV1Factory
   );
 
   const {
@@ -130,7 +133,8 @@ before(async function () {
     govToken,
     registry,
     dao,
-    veGovToken
+    veGovToken,
+    permitRouterV1
   } = commonContracts;
 
   signers = {
@@ -181,6 +185,9 @@ before(async function () {
     },
     veGovToken: {
       spender: veGovToken.connect(veGovSigner)
+    },
+    permitRouterV1: {
+      operator: permitRouterV1.connect(operatorOperatorSigner)
     }
   };
 });

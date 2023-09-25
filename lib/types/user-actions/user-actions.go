@@ -8,6 +8,8 @@ import (
 	"math/big"
 	"time"
 
+	solApplications "github.com/fluidity-money/fluidity-app/common/solana/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -72,6 +74,9 @@ type (
 
 		// Time of this user action
 		Time time.Time `json:"time"`
+
+		// this is the stringified result of either an ethereum.Application or solana.Application
+		Application string `json:"application"`
 	}
 
 	BufferedUserAction struct {
@@ -94,6 +99,7 @@ func NewSwapEthereum(network_ network.BlockchainNetwork, senderAddress ethereum.
 		AmountStr:       amount.String(),
 		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
 		Time:            time.Now(),
+		Application:     "none",
 	}
 }
 
@@ -112,13 +118,14 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 		AmountStr:       amount.String(),
 		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
 		Time:            time.Now(),
+		Application:     "none",
 	}
 }
 
 // NewSendEthereum of a Fluid Asset, from the sender to the recipient
 // with the transaction hash with the amount. The current time is set
 // within the function.
-func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt) UserAction {
+func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt, application applications.Application) UserAction {
 	return UserAction{
 		Network:          network_,
 		TransactionHash:  transactionHash.String(),
@@ -130,10 +137,17 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 		AmountStr:        amount.String(),
 		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
 		Time:             time.Now(),
+		Application:      application.String(),
 	}
 }
 
-func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int, applications []solApplications.Application) UserAction {
+	solanaApplication := "none"
+
+	if len(applications) > 0 {
+		solanaApplication = applications[0].String()
+	}
+
 	return UserAction{
 		Network:          network.NetworkSolana,
 		TransactionHash:  transactionHash,
@@ -144,6 +158,7 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 		AmountStr:        amount.String(),
 		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
 		Time:             time.Now(),
+		Application:      solanaApplication,
 	}
 }
 

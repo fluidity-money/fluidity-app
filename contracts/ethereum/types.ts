@@ -26,6 +26,7 @@ export type FluidityContracts = {
   registry: ethers.Contract,
   dao: ethers.Contract,
   veGovToken: ethers.Contract,
+  permitRouterV1: ethers.Contract
 };
 
 export type FluidityBeaconAddresses = {
@@ -49,7 +50,8 @@ export type FluidityFactories = {
   aaveV3LiquidityProvider: ethers.ContractFactory,
   dao: ethers.ContractFactory,
   staking: ethers.ContractFactory
-  utilityGauges: ethers.ContractFactory
+  utilityGauges: ethers.ContractFactory,
+  permitRouterV1: ethers.ContractFactory
 };
 
 export type FluiditySigners = {
@@ -99,6 +101,10 @@ export type FluidityBindings = {
 
   veGovToken: {
     spender: ethers.Contract
+  },
+
+  permitRouterV1: {
+    operator: ethers.Contract
   }
 };
 

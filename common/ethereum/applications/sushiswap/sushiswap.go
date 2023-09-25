@@ -91,8 +91,70 @@ const sushiswapStablePoolAbiString = `[
   }
 ]`
 
-// sushiswapStablePoolAbi set by init.go to generate the ABI code
-var sushiswapStablePoolAbi ethAbi.ABI
+const sushiswapConstantProductPoolAbiString = `[
+	{
+		"anonymous":false,
+		"inputs":[
+			{"indexed":true,"internalType":"address","name":"recipient","type":"address"},
+			{"indexed":true,"internalType":"address","name":"tokenIn","type":"address"},
+			{"indexed":true,"internalType":"address","name":"tokenOut","type":"address"},
+			{"indexed":false,"internalType":"uint256","name":"amountIn","type":"uint256"},
+			{"indexed":false,"internalType":"uint256","name":"amountOut","type":"uint256"}
+		],
+		"name":"Swap","type":"event"
+	},
+	{
+    "constant": true,
+    "inputs": [],
+    "name": "token0",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+	"constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+	  "inputs":[],
+	  "name":"swapFee",
+	  "outputs":[
+		  {
+			  "internalType":"uint256",
+			  "name":"",
+			  "type":"uint256"
+		  }
+	  ],
+	  "stateMutability":"view",
+	  "type":"function"
+  }
+]`
+
+var (
+	// sushiswapStablePoolAbi set by init.go to generate the ABI code
+	sushiswapStablePoolAbi ethAbi.ABI
+
+	// sushiswapConstantProductPoolAbi set by init.go to generate the ABI code
+	sushiswapConstantProductPoolAbi ethAbi.ABI
+)
 
 const sushiswapLogTopic = "0xcd3829a3813dc3cdd188fd3d01dcf3268c16be2fdd2dd21d0665418816e46062"
 
@@ -110,14 +172,14 @@ func GetSushiswapFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	case uniswap.UniswapV2SwapLogTopic:
 		return uniswap.GetUniswapV2Fees(transfer, client, fluidTokenContract, tokenDecimals)
 	case sushiswapLogTopic:
-		return GetSushiswapStableFees(transfer, client, fluidTokenContract, tokenDecimals, feeData, logTopic)
+		return GetSushiswapStableOrConstantProductFees(transfer, client, fluidTokenContract, tokenDecimals, feeData, logTopic)
 	default:
 		return feeData, nil
 	}
 }
 
-// GetSushiswapStableFees to determine the fee paid for a Sushiswap Trident Stable Swap
-func GetSushiswapStableFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, feeData applications.ApplicationFeeData, logTopic string) (applications.ApplicationFeeData, error) {
+// GetSushiswapStableOrConstantProductFees to determine the fee paid for a Sushiswap Trident Stable Swap or a Constant Product Swap. Both are identical except for the use of decimals0/decimals1 for Stable Swaps vs decimals for Constant Product Swaps
+func GetSushiswapStableOrConstantProductFees(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, feeData applications.ApplicationFeeData, logTopic string) (applications.ApplicationFeeData, error) {
 
 	if logTopic != sushiswapLogTopic {
 		return feeData, nil
@@ -181,15 +243,15 @@ func GetSushiswapStableFees(transfer worker.EthereumApplicationTransfer, client 
 		tokenIn  = transfer.Log.Topics[2]
 		tokenOut = transfer.Log.Topics[3]
 
-		amountIn   = swapAmounts[0]
+		amountIn = swapAmounts[0]
 
 		// per https://github.com/sushiswap/trident/blob/b4f1e3bdaa8ebfbb8881c9794b03cb439879171c/contracts/pool/stable/StablePool.sol#L37
 		// swapFee is in 100ths of a %, so 10000 represents a 100% fee
-		maxFee = big.NewRat(10000, 1) 
+		maxFee = big.NewRat(10000, 1)
 	)
 
 	var (
-		amountInDecimals *big.Rat 
+		amountInDecimals *big.Rat
 
 		tokenInAddress  = ethCommon.HexToAddress(tokenIn.String())
 		tokenOutAddress = ethCommon.HexToAddress(tokenOut.String())
@@ -223,27 +285,51 @@ func GetSushiswapStableFees(transfer worker.EthereumApplicationTransfer, client 
 			)
 		}
 
-		var decimals_ []interface{}
+		var (
+			decimals_ []interface{}
+			decimals *big.Rat
+		)
+
+		// try Stable then ConstantProduct
 		if fluidTokenContract == token0addr {
 			decimals_, err = ethereum.StaticCall(client, contractAddr, sushiswapStablePoolAbi, "decimals1")
 		} else {
 			decimals_, err = ethereum.StaticCall(client, contractAddr, sushiswapStablePoolAbi, "decimals0")
 		}
-		
-		if err != nil {
-			return feeData, fmt.Errorf(
-				"Failed to fetch decimals for non-fluid token in pair! %v",
-				err,
-			)
-		}
-
-		decimals, err := ethereum.CoerceBoundContractResultsToRat(decimals_)
 
 		if err != nil {
-			return feeData, fmt.Errorf(
-				"Failed to coerce token decimals to rat! %v",
-				err,
-			)
+			// try ConstantProduct
+			decimals_, err = ethereum.StaticCall(client, contractAddr, sushiswapConstantProductPoolAbi, "decimals")
+
+			if err != nil {
+				return feeData, fmt.Errorf(
+					"Failed to fetch decimals for non-fluid token in pair using ConstantProduct ABI! %v",
+					err,
+				)
+			}
+
+			decimalsUint8, err := ethereum.CoerceBoundContractResultsToUint8(decimals_)
+
+			if err != nil {
+				return feeData, fmt.Errorf(
+					"Failed to coerce decimals to uint8 %#v!",
+					decimals_,
+				)
+			}
+
+			// set `decimals` using the uint8 result from ConstantProduct
+			decimalsAdjusted := math.Pow10(int(decimalsUint8))
+			decimals = new(big.Rat).SetFloat64(decimalsAdjusted)
+		} else {
+			// set `decimals` using the uint256 result from Stable
+			decimals, err = ethereum.CoerceBoundContractResultsToRat(decimals_)
+
+			if err != nil {
+				return feeData, fmt.Errorf(
+					"Failed to coerce token decimals to rat! %v",
+					err,
+				)
+			}
 		}
 
 		amountInDecimals = decimals

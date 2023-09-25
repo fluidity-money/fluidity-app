@@ -49,7 +49,8 @@ func InsertUserAction(userAction UserAction) {
 			token_short_name,
 			token_decimals,
 			solana_sender_owner_address,
-			solana_recipient_owner_address
+			solana_recipient_owner_address,
+			application
 		)
 
 		VALUES (
@@ -66,7 +67,8 @@ func InsertUserAction(userAction UserAction) {
 			$11,
 			$12,
 			$13,
-			$14
+			$14,
+			$15
 		)`,
 
 		TableUserActions,
@@ -88,6 +90,7 @@ func InsertUserAction(userAction UserAction) {
 		tokenDecimals,
 		userAction.SolanaSenderOwnerAddress,
 		userAction.SolanaRecipientOwnerAddress,
+		userAction.Application,
 	)
 
 	if err != nil {
@@ -119,7 +122,7 @@ func GetUserActionsWithSenderAddressOrRecipientAddress(network network.Blockchai
 			token_short_name,
 			token_decimals,
 			solana_sender_owner_address,
-			solana_recipient_owner_address
+			solana_recipient_owner_address,
 
 		FROM %v
 		WHERE network = $1

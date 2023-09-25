@@ -32,7 +32,7 @@ import FluidifyForm from "~/components/Fluidify/FluidifyForm";
 import SwapCompleteModal from "~/components/SwapCompleteModal";
 import { captureException } from "@sentry/react";
 import { json, LoaderFunction } from "@remix-run/node";
-import { Chain } from "~/util/chainUtils/chains";
+import { Chain, chainType } from "~/util/chainUtils/chains";
 
 type LoaderData = {
   tokens: Token[];
@@ -224,9 +224,8 @@ export default function FluidifyToken() {
     }
 
     (async () => {
-      switch (network) {
-        case "ethereum":
-        case "arbitrum": {
+      switch (chainType(network)) {
+        case "evm": {
           const [tokensMinted, userTokenBalance] = await Promise.all([
             Promise.all(
               tokens.map(async (token) => {
@@ -306,18 +305,22 @@ export default function FluidifyToken() {
     }
   };
 
+  const supportedTokens = ({ enabled }: AugmentedToken) => enabled;
+
   const [filteredTokens, setFilteredTokens] = useState<AugmentedToken[]>(
-    tokens as AugmentedToken[]
+    tokens.filter(supportedTokens)
   );
 
   const debouncedSearch: DebouncedFunc<
     (tokens: AugmentedToken[]) => AugmentedToken[]
   > = debounce((tokens: AugmentedToken[]) => {
-    const filteredTokens = tokens.filter(
-      (token) =>
-        token.name.toLowerCase().includes(search.toLowerCase()) ||
-        token.symbol.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredTokens = tokens
+      .filter(supportedTokens)
+      .filter(
+        (token) =>
+          token.name.toLowerCase().includes(search.toLowerCase()) ||
+          token.symbol.toLowerCase().includes(search.toLowerCase())
+      );
 
     setFilteredTokens(filteredTokens);
   }, 500);
@@ -389,14 +392,20 @@ export default function FluidifyToken() {
             colorMap={colors}
           />
 
-          {assetToken && toToken && (
-            <FluidifyForm
-              handleSwap={handleRedirect}
-              assetToken={assetToken}
-              toToken={toToken}
-              swapping={swapping}
-            />
-          )}
+          {assetToken &&
+            toToken &&
+            (!assetToken.isFluidOf && assetToken.symbol !== "USDC" ? (
+              <Text size="lg" prominent>
+                Token no longer supported!
+              </Text>
+            ) : (
+              <FluidifyForm
+                handleSwap={handleRedirect}
+                assetToken={assetToken}
+                toToken={toToken}
+                swapping={swapping}
+              />
+            ))}
         </div>
       )}
 
@@ -606,14 +615,21 @@ export default function FluidifyToken() {
             )}
 
             {/* Swap Token Form */}
-            {!!assetToken && !isTablet && !!toToken && (
-              <FluidifyForm
-                handleSwap={handleRedirect}
-                assetToken={assetToken}
-                toToken={toToken}
-                swapping={swapping}
-              />
-            )}
+            {!!assetToken &&
+              !isTablet &&
+              !!toToken &&
+              (!assetToken.enabled ? (
+                <Text size="lg" prominent>
+                  Token no longer supported!
+                </Text>
+              ) : (
+                <FluidifyForm
+                  handleSwap={handleRedirect}
+                  assetToken={assetToken}
+                  toToken={toToken}
+                  swapping={swapping}
+                />
+              ))}
           </div>
         </>
       )}

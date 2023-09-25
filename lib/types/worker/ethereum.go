@@ -45,6 +45,7 @@ type (
 	}
 
 	EthereumReward struct {
+		Category        string                     `json:"category"`
 		Winner          ethereum.Address           `json:"winner"`
 		WinAmount       *misc.BigInt               `json:"amount"`
 		Utilityname     applications.UtilityName   `json:"utility"`
@@ -81,6 +82,7 @@ type (
 		UtilityName applications.UtilityName `json:"utility_name"`
 		// Application fee in USD
 		ApplicationFee *big.Rat `json:"application_fee"`
+		Volume         *big.Int `json:"volume"`
 	}
 
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any

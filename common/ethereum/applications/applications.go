@@ -6,6 +6,7 @@ package applications
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/apeswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
@@ -14,13 +15,16 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/curve"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/gtrade"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/kyber"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/meson"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/multichain"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/sushiswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
@@ -54,6 +58,8 @@ const (
 	ApplicationCamelot
 	ApplicationChronos
 	ApplicationSushiswap
+	ApplicationKyberClassic
+	ApplicationWombat
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -231,6 +237,24 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Chronos += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationKyberClassic:
+		feeData, err = kyberClassic.GetKyberClassicFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.KyberClassic += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationWombat:
+		feeData, err = wombat.GetWombatFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.Wombat += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(
@@ -320,6 +344,14 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+	case ApplicationKyberClassic:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationWombat:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
 
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
@@ -327,4 +359,74 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 			transfer,
 		)
 	}
+}
+
+// AppsListFromEnvOrFatal parses a list of `app:address:address,app:address:address` into a map of {address => app}
+func AppsListFromEnvOrFatal(key string) map[ethereum.Address]applications.Application {
+	applicationContracts_ := util.GetEnvOrFatal(key)
+
+	apps := make(map[ethereum.Address]applications.Application)
+
+	for _, appAddresses_ := range strings.Split(applicationContracts_, ",") {
+		appAddresses := strings.Split(appAddresses_, ":")
+
+		if len(appAddresses) < 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Malformed app address line '%s'!",
+					appAddresses_,
+				)
+			})
+		}
+
+		app, err := applications.ParseApplicationName(appAddresses[0])
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Failed to parse an etherem application from name '%s'! %v",
+					appAddresses[0],
+					err,
+				)
+			})
+		}
+
+		for _, address_ := range appAddresses[1:] {
+			address := ethereum.AddressFromString(address_)
+
+			apps[address] = app
+		}
+	}
+
+	return apps
+}
+
+// UtilityListFromEnvOrFatal parses a list of `utility:address:address,utility:address:address` into a map of {utility => app}
+func UtilityListFromEnvOrFatal(key string) map[ethereum.Address]applications.UtilityName {
+	utilitiesList := util.GetEnvOrFatal(key)
+
+	utilities := make(map[ethereum.Address]applications.UtilityName)
+
+	for _, appAddresses_ := range strings.Split(utilitiesList, ",") {
+		appAddresses := strings.Split(appAddresses_, ":")
+
+		if len(appAddresses) < 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Malformed utilities address line '%s'!",
+					appAddresses_,
+				)
+			})
+		}
+
+		utility := applications.UtilityName(appAddresses[0])
+
+		for _, address_ := range appAddresses[1:] {
+			address := ethereum.AddressFromString(address_)
+
+			utilities[address] = utility
+		}
+	}
+
+	return utilities
 }

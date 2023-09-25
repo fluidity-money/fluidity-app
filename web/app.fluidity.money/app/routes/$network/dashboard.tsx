@@ -16,8 +16,8 @@ import {
   useNavigate,
   useResolvedPath,
   useMatches,
-  useTransition,
   useLocation,
+  useTransition,
 } from "@remix-run/react";
 import { useCache } from "~/hooks/useCache";
 import { useState, useEffect, useContext } from "react";
@@ -42,10 +42,11 @@ import {
   ConnectedWallet,
   Modal,
   ProvideLiquidity,
-  ChainName,
   BurgerMenu,
   Referral,
   CardModal,
+  ArrowUp,
+  ArrowDown,
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
@@ -57,6 +58,7 @@ import { getProviderDisplayName } from "~/util/provider";
 
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
+import { UIContext } from "contexts/UIProvider";
 
 export const links: LinksFunction = () => {
   return [
@@ -196,7 +198,10 @@ const NAVIGATION_MAP: {
   },
 ];
 
-const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
+const CHAIN_NAME_MAP: Record<
+  string,
+  { name: string; icon: JSX.Element; disabled?: boolean }
+> = {
   ethereum: {
     name: "ETH",
     icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -204,6 +209,10 @@ const CHAIN_NAME_MAP: Record<string, { name: string; icon: JSX.Element }> = {
   arbitrum: {
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
+  },
+  polygon_zk: {
+    name: "POLY_ZK",
+    icon: <img src="/assets/chains/polygonIcon.svg" />,
   },
   solana: {
     name: "SOL",
@@ -246,7 +255,6 @@ export default function Dashboard() {
   );
 
   const { showExperiment, client } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
@@ -315,7 +323,7 @@ export default function Dashboard() {
     currentPath.includes(path.pathname)
   );
 
-  const handleSetChain = (network: ChainName) => {
+  const handleSetChain = (network: string) => {
     const { pathname } = location;
 
     // Get path components after $network
@@ -423,34 +431,33 @@ export default function Dashboard() {
       ? true
       : false;
 
+  // filter CHAIN_NAME_MAP by enabled chains
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
+    .filter(([, chain]) => {
+      const { name } = chain;
+
+      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+        return false;
+
+      return true;
+    })
+    .reduce(
+      (prev, [key, value]) => ({
+        ...prev,
+        [key]: value,
+      }),
+      {} as typeof CHAIN_NAME_MAP
+    );
+
   return (
     <>
-      <header id="flu-logo" className="hide-on-mobile">
-        <Link to={"./home"}>
-          <img
-            style={{ width: "5.5em", height: "2.5em" }}
-            src="/images/outlinedLogo.svg"
-            alt="Fluidity"
-          />
-        </Link>
-
-        <br />
-        <br />
-
-        <ChainSelectorButton
-          className="selector-button"
-          chain={CHAIN_NAME_MAP[network]}
-          onClick={() => setChainModalVisibility(true)}
-        />
-      </header>
-
       {/* Switch Chain Modal */}
       <Modal id="switch-chain" visible={chainModalVisibility}>
         <div className="cover">
           <BlockchainModal
             handleModal={setChainModalVisibility}
-            option={CHAIN_NAME_MAP[network]}
-            options={Object.values(CHAIN_NAME_MAP)}
+            option={chainNameMap[network]}
+            options={Object.values(chainNameMap)}
             setOption={handleSetChain}
             mobile={isMobile}
           />
@@ -458,49 +465,53 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      <CardModal
-        id="referral-modal"
-        visible={referralModalVisibility}
-        closeModal={() => setReferralModalVisibility(false)}
-        cardPositionStyle={{
-          position: "absolute",
-          top: "1em",
-          right: isTablet ? "20px" : "60px",
-          width: 500,
-        }}
-        color="holo"
-        style={{ padding: 0, width: "100%" }}
-      >
-        <ReferralModal
-          connected={!!connected}
-          network={network}
-          connectWallet={() => {
-            setReferralModalVisibility(false);
-            setWalletModalVisibility(true);
-          }}
-          referrerClaimed={numActiveReferrerReferrals}
-          refereeClaimed={numActiveReferreeReferrals}
-          refereeUnclaimed={numInactiveReferreeReferrals}
-          progress={inactiveReferrals[0]?.progress || 0}
-          progressReq={10}
-          referralCode={referralCode}
-          loaded={referralCountLoaded}
+      {false && (
+        <CardModal
+          id="referral-modal"
+          visible={referralModalVisibility}
           closeModal={() => setReferralModalVisibility(false)}
-        />
-      </CardModal>
+          cardPositionStyle={{
+            position: "absolute",
+            top: "1em",
+            right: isTablet ? "20px" : "60px",
+            width: 500,
+          }}
+          color="holo"
+          style={{ padding: 0, width: "100%" }}
+        >
+          <ReferralModal
+            connected={!!connected}
+            network={network}
+            connectWallet={() => {
+              setReferralModalVisibility(false);
+              setWalletModalVisibility(true);
+            }}
+            referrerClaimed={numActiveReferrerReferrals}
+            refereeClaimed={numActiveReferreeReferrals}
+            refereeUnclaimed={numInactiveReferreeReferrals}
+            progress={inactiveReferrals[0]?.progress || 0}
+            progressReq={10}
+            referralCode={referralCode}
+            loaded={referralCountLoaded}
+            closeModal={() => setReferralModalVisibility(false)}
+          />
+        </CardModal>
+      )}
 
       {/* Accept Referral Modal */}
-      <CardModal
-        id="accept-referral-modal"
-        visible={acceptReferralModalVisibility}
-        closeModal={() => setAcceptReferralModalVisibility(false)}
-      >
-        <AcceptReferralModal
-          network={network}
-          referralCode={clickedReferralCode}
-          referrer={referralAddress}
-        />
-      </CardModal>
+      {false && (
+        <CardModal
+          id="accept-referral-modal"
+          visible={acceptReferralModalVisibility}
+          closeModal={() => setAcceptReferralModalVisibility(false)}
+        >
+          <AcceptReferralModal
+            network={network}
+            referralCode={clickedReferralCode}
+            referrer={referralAddress}
+          />
+        </CardModal>
+      )}
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
@@ -518,12 +529,25 @@ export default function Dashboard() {
         </GeneralButton>
       </Modal>
 
-      <nav id="dashboard-navbar" className={"navbar-v2 hide-on-mobile"}>
+      <nav id="dashboard-navbar" className="hide-on-mobile">
+        <div id="flu-logo">
+          <Link to={"./home"}>
+            <img
+              style={{ width: "5.5em", height: "2.5em" }}
+              src="/images/outlinedLogo.svg"
+              alt="Fluidity"
+            />
+          </Link>
+          <ChainSelectorButton
+            className="selector-button"
+            chain={chainNameMap[network]}
+            onClick={() => setChainModalVisibility(true)}
+          />
+        </div>
+
         {/* Nav Bar */}
-        <ul>
-          {NAVIGATION_MAP.filter((obj) =>
-            showAssets ? true : Object.keys(obj)[0] !== "assets"
-          ).map((obj, index) => {
+        <ul className="sidebar-nav">
+          {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
             const active = index === activeIndex;
@@ -562,7 +586,7 @@ export default function Dashboard() {
                   !connectedWalletModalVisibility
                 );
               }}
-              className="connect-wallet-btn"
+              className="connect-wallet-btn connected"
             />
           ) : (
             <GeneralButton
@@ -585,7 +609,7 @@ export default function Dashboard() {
               connectedWalletModalVisibility &&
                 setConnectedWalletModalVisibility(false);
             }}
-            className="connect-wallet-btn"
+            className="connect-wallet-btn connected"
           />
         ) : (
           <GeneralButton
@@ -600,10 +624,12 @@ export default function Dashboard() {
           </GeneralButton>
         )}
       </nav>
+
+      {/* Main Content */}
       <main id="dashboard-body">
-        <nav id="top-navbar" className={"pad-main"}>
+        <header id="top-navbar" className={"pad-main"}>
           {/* App Name */}
-          <div className="top-navbar-left">
+          <div id="top-navbar-left">
             {(isMobile || isTablet) && (
               <a onClick={() => navigate("./home")}>
                 <img
@@ -622,52 +648,56 @@ export default function Dashboard() {
 
           {/* Navigation Buttons */}
           <div id="top-navbar-right">
-            {/* Send */}
-            {/*
-            <GeneralButton
-              version={"secondary"}
-              buttontype="icon before"
-              size={"small"}
-              handleClick={() => navigate("/send")}
-              icon={<ArrowUp />}
-            >
-              Send
-            </GeneralButton>
-            */}
-
-            {/* Receive */}
-            {/*
-            <GeneralButton
-              version={"secondary"}
-              buttontype="icon before"
-              size={"small"}
-              handleClick={() => navigate("/receive")}
-              icon={<ArrowDown />}
-            >
-              Recieve
-            </GeneralButton>
-            */}
+            {/* Network Button */}
             {(isTablet || isMobile) && showMobileNetworkButton && (
               <ChainSelectorButton
-                chain={CHAIN_NAME_MAP[network]}
+                chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
             )}
 
-            {/* Referrals Button */}
+            {/* Send & Receive */}
             <GeneralButton
+              className="s-r-button"
               type="transparent"
               size="small"
               layout="before"
               handleClick={() => {
-                width < airdropMobileBreakpoint
-                  ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                  : setReferralModalVisibility(true);
+                navigate(`/${network}/transfer/send`);
               }}
-              icon={<Referral />}
+              icon={<ArrowUp />}
             >
-              {isMobile ? "" : "Referral"}
+              {isMobile ? "" : "Send"}
             </GeneralButton>
+            <GeneralButton
+              className="s-r-button"
+              type="transparent"
+              size="small"
+              layout="before"
+              handleClick={() => {
+                navigate(`/${network}/transfer/receive`);
+              }}
+              icon={<ArrowDown />}
+            >
+              {isMobile ? "" : "Receive"}
+            </GeneralButton>
+
+            {/* Referrals Button */}
+            {false && (
+              <GeneralButton
+                type="transparent"
+                size="small"
+                layout="before"
+                handleClick={() => {
+                  width < airdropMobileBreakpoint
+                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                    : setReferralModalVisibility(true);
+                }}
+                icon={<Referral />}
+              >
+                {isMobile ? "" : "Referral"}
+              </GeneralButton>
+            )}
 
             {/* Fluidify button */}
             {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
@@ -706,7 +736,7 @@ export default function Dashboard() {
               <BurgerMenu isOpen={openMobModal} setIsOpen={setOpenMobModal} />
             )}
           </div>
-        </nav>
+        </header>
         <ConnectedWalletModal
           visible={connectedWalletModalVisibility}
           address={rawAddress ?? ""}
@@ -723,7 +753,13 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-        <Outlet />
+        <UIContext.Provider
+          value={{
+            toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+          }}
+        >
+          <Outlet />
+        </UIContext.Provider>
         {/* Provide Liquidity*/}
         <div
           className="pad-main"
@@ -839,9 +875,9 @@ export default function Dashboard() {
               return { name, icon, path };
             })}
             activeIndex={activeIndex}
-            chains={CHAIN_NAME_MAP}
+            chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}
-            network={network as ChainName}
+            network={network}
             isOpen={openMobModal}
             setIsOpen={setOpenMobModal}
             unclaimedRewards={userUnclaimedRewards}

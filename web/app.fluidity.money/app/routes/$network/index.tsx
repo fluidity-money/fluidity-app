@@ -26,9 +26,33 @@ import {
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
+import { Chain } from "~/util/chainUtils/chains";
+import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
+};
+
+const CHAIN_NAME_MAP: Record<
+  string,
+  { name: string; icon: JSX.Element; disabled?: boolean }
+> = {
+  ethereum: {
+    name: "ETH",
+    icon: <img src="/assets/chains/ethIcon.svg" />,
+  },
+  arbitrum: {
+    name: "ARB",
+    icon: <img src="/assets/chains/arbIcon.svg" />,
+  },
+  polygon_zk: {
+    name: "POLY_ZK",
+    icon: <img src="/assets/chains/polygonIcon.svg" />,
+  },
+  solana: {
+    name: "SOL",
+    icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -60,6 +84,8 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
+  const { showExperiment } = useContext(SplitContext);
+
   const projectedWinningsData = useFetcher<ProjectedWinData>();
 
   useEffect(() => {
@@ -84,25 +110,32 @@ const NetworkPage = () => {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const chainNameMap: Record<string, { name: string; icon: JSX.Element }> = {
-    ethereum: {
-      name: "ETH",
-      icon: <img src="/assets/chains/ethIcon.svg" />,
-    },
-    arbitrum: {
-      name: "ARB",
-      icon: <img src="/assets/chains/arbIcon.svg" />,
-    },
-    solana: {
-      name: "SOL",
-      icon: <img src="/assets/chains/solanaIcon.svg" />,
-    },
-  };
+  // filter CHAIN_NAME_MAP by enabled chains
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
+    .filter(([, chain]) => {
+      const { name } = chain;
+
+      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+        return false;
+
+      return true;
+    })
+    .reduce(
+      (prev, [key, value]) => ({
+        ...prev,
+        [key]: value,
+      }),
+      {} as typeof CHAIN_NAME_MAP
+    );
 
   useEffect(() => {
     // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
+
+  if (!Object.values(chainNameMap).some(({ name }) => name === network)) {
+    return <></>;
+  }
 
   return (
     <>
@@ -146,7 +179,7 @@ const NetworkPage = () => {
           <div className="connected-content">
             {/* Switch Chain Button */}
             <ChainSelectorButton
-              chain={chainNameMap[network as "ethereum" | "solana"]}
+              chain={chainNameMap[network as Chain]}
               onClick={() => setChainModalVisibility(true)}
             />
 
@@ -180,7 +213,7 @@ const NetworkPage = () => {
               <Modal id="switch-chain" visible={chainModalVisibility}>
                 <BlockchainModal
                   handleModal={setChainModalVisibility}
-                  option={chainNameMap[network as "ethereum" | "solana"]}
+                  option={chainNameMap[network as Chain]}
                   options={Object.values(chainNameMap)}
                   setOption={(chain: string) =>
                     navigate(`/${networkMapper(chain)}/dashboard/home`)

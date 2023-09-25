@@ -1,6 +1,7 @@
 import { gql, jsonPost } from "~/util";
+import { Chain } from "~/util/chainUtils/chains";
 
-const queryWinnersAll = gql`
+const queryWinnersAll_ = gql`
   query WinnersAll($network: network_blockchain!) {
     winners(
       where: {
@@ -19,15 +20,52 @@ const queryWinnersAll = gql`
       send_transaction_hash
       winning_amount
       token_decimals
+      token_short_name
       ethereum_application
       solana_application
       reward_type
       awarded_time
+      utility_name
     }
   }
 `;
 
-const queryWinnersByAddress = gql`
+const queryWinnersAllSolana = gql`
+  query WinnersAll($network: network_blockchain!) {
+    winners(
+      where: {
+        network: { _eq: $network }
+        send_transaction_hash: { _neq: "" }
+        transaction_hash: { _neq: "" }
+      }
+      order_by: { awarded_time: desc }
+      limit: 240
+    ) {
+      network
+      winning_address: solana_winning_owner_address
+      created
+      transaction_hash
+      send_transaction_hash
+      winning_amount
+      token_decimals
+      token_short_name
+      ethereum_application
+      solana_application
+      reward_type
+      awarded_time
+      utility_name
+    }
+  }
+`;
+
+const queryWinnersAll: { [network in Chain]: string } = {
+  ethereum: queryWinnersAll_,
+  arbitrum: queryWinnersAll_,
+  polygon_zk: queryWinnersAll_,
+  solana: queryWinnersAllSolana,
+};
+
+const queryWinnersByAddress_ = gql`
   query WinnersByAddress($network: network_blockchain!, $address: String!) {
     winners(
       where: { network: { _eq: $network }, winning_address: { _eq: $address } }
@@ -42,13 +80,49 @@ const queryWinnersByAddress = gql`
       send_transaction_hash
       winning_amount
       token_decimals
+      token_short_name
       ethereum_application
       solana_application
       reward_type
       awarded_time
+      utility_name
     }
   }
 `;
+
+const queryWinnersByAddressSolana = gql`
+  query WinnersByAddress($network: network_blockchain!, $address: String!) {
+    winners(
+      where: {
+        network: { _eq: $network }
+        solana_winning_owner_address: { _eq: $address }
+      }
+      order_by: { awarded_time: desc }
+      limit: 240
+    ) {
+      network
+      winning_address: solana_winning_owner_address
+      created
+      transaction_hash
+      send_transaction_hash
+      winning_amount
+      token_decimals
+      token_short_name
+      ethereum_application
+      solana_application
+      reward_type
+      awarded_time
+      utility_name
+    }
+  }
+`;
+
+const queryWinnersByAddress: { [network in Chain]: string } = {
+  ethereum: queryWinnersByAddress_,
+  arbitrum: queryWinnersByAddress_,
+  polygon_zk: queryWinnersByAddress_,
+  solana: queryWinnersByAddressSolana,
+};
 
 const queryPendingWinnersAll = gql`
   query PendingWinnersAll($network: network_blockchain!) {
@@ -59,7 +133,7 @@ const queryPendingWinnersAll = gql`
         reward_sent: { _eq: false }
       }
       order_by: { inserted_date: desc }
-      limit: 240
+      limit: 10
     ) {
       network
       address
@@ -67,7 +141,9 @@ const queryPendingWinnersAll = gql`
       transaction_hash
       win_amount
       token_decimals
+      token_short_name
       reward_type
+      utility_name
     }
   }
 `;
@@ -84,7 +160,7 @@ const queryPendingWinnersByAddress = gql`
         reward_sent: { _eq: false }
       }
       order_by: { inserted_date: desc }
-      limit: 240
+      limit: 10
     ) {
       network
       address
@@ -92,7 +168,9 @@ const queryPendingWinnersByAddress = gql`
       transaction_hash
       win_amount
       token_decimals
+      token_short_name
       reward_type
+      utility_name
     }
   }
 `;
@@ -104,7 +182,7 @@ const useUserRewardsAll = async (network: string) => {
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
-    query: queryWinnersAll,
+    query: queryWinnersAll[network as Chain],
   };
 
   return jsonPost<ExpectedWinnersAllBody, ExpectedWinnersResponse>(
@@ -123,7 +201,7 @@ const useUserRewardsByAddress = async (network: string, address: string) => {
   const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
-    query: queryWinnersByAddress,
+    query: queryWinnersByAddress[network as Chain],
   };
 
   return jsonPost<ExpectedWinnersByAddressBody, ExpectedWinnersResponse>(
@@ -224,6 +302,8 @@ export type Winner = {
   solana_application?: string;
   reward_type: "send" | "receive";
   awarded_time: string;
+  utility_name: string;
+  token_short_name: string;
 };
 
 export type PendingWinner = {
@@ -234,6 +314,8 @@ export type PendingWinner = {
   token_decimals: number;
   win_amount: number;
   reward_type: "send" | "receive";
+  utility_name: string;
+  token_short_name: string;
 };
 
 export {
