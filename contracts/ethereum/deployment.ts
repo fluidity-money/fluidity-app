@@ -414,7 +414,7 @@ export const deployFluidity = async (
     govToken: govToken,
     registry: registry,
     dao: dao,
-    veGovToken: veGovToken
+    veGovToken: veGovToken,
     permitRouterV1: permitRouterV1
   }
 };
