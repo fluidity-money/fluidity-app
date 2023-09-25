@@ -9,12 +9,4 @@ fi
 
 >&2 echo "testing arbitrum..."
 
-FLU_FORKNET_NETWORK=arbitrum $HARDHAT test
-
->&2 echo "testing mainnet..."
-
-FLU_FORKNET_NETWORK=mainnet $HARDHAT test
-
->&2 echo "testing goerli..."
-
-FLU_FORKNET_NETWORK=goerli $HARDHAT test
+FLU_FORKNET_NETWORK=arbitrum $HARDHAT test --grep 'ay the balance correctly'

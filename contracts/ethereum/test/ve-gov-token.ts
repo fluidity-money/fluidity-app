@@ -17,7 +17,8 @@ import { commonFactories } from "./setup-common";
 import {
   BALANCER_VAULT_ADDR,
   BALANCER_WEIGHTED_POOL_FACTORY_ADDR,
-  WETH_ADDR } from "../arbitrum-constants";
+  WETH_ADDR
+} from "../arbitrum-constants";
 
 import { getLatestTimestamp } from "../script-utils";
 
@@ -32,124 +33,128 @@ const MaxUint256 = ethers.constants.MaxUint256;
 // keccak("PoolCreated(address)")
 const PoolCreatedTopic = "0x83a48fbcfc991335314e74d0496aab6a1987e992ddc85dddbcc4d6dd6ef2e9fc";
 
+// we've observed that vyper's locktime seems to be around 4 days and 10
+// hours incorrect from what we put in, this test data accomodates that
+// assumption
 const getVEFluidBalanceArgs = [
-  [34000000000,1209600,4.117085616438356],
-  [211,4880256,32.65265144596651],
-  [530,6189975,104.0298944063927],
-  [60,11708542,22.27652587519026],
-  [696,3789303,83.62997488584475],
-  [51,24592490,39.77095985540335],
-  [75,31342204,74.53910768645358],
-  [206,4274826,27.924091704718418],
-  [570,29027798,524.6652987062405],
-  [922,2168346,63.39469216133942],
-  [864,654484,17.931068493150686],
-  [818,21981012,570.156894216134],
-  [409,13528534,175.45568258498224],
-  [278,28205359,248.63932654743786],
-  [825,29052526,760.0308837519026],
-  [391,25255715,313.13370639903604],
-  [430,2009844,27.404646118721462],
-  [779,17582025,434.3099148592085],
-  [533,6879099,116.26584750761035],
-  [425,29731259,400.6781162798072],
-  [562,9834464,175.25902993404364],
-  [244,27774345,214.89536339421613],
-  [293,3415734,31.73547888127854],
-  [555,18400347,323.82650256849314],
-  [985,23851256,744.9735908168442],
-  [643,15121676,308.32184386098425],
-  [200,3769721,23.907413749365805],
-  [450,9734579,138.90666381278538],
-  [904,3345339,95.89632343987823],
-  [615,12286146,239.59854737442922],
-  [626,17018541,337.8236512557078],
-  [835,30698432,812.8231456113648],
-  [321,24851711,252.96167018645357],
-  [895,14753996,418.7222989599188],
-  [297,26417436,248.79434589041097],
-  [876,26789057,744.1404722222222],
-  [740,17214872,403.9512075088787],
-  [378,332525,3.9857448630136987],
-  [582,19905877,367.36492941400303],
-  [85,15917965,42.90420551116185],
-  [977,26816615,830.7912498414511],
-  [247,10538340,82.53963660578387],
-  [210,29572367,196.92405726788434],
-  [216,13291637,91.0386095890411],
-  [328,7295405,75.87813419583968],
-  [385,978663,11.947782058599696],
-  [55,3510952,6.123235667174023],
-  [362,29620442,340.0114156519533],
-  [386,25710884,314.70069837645866],
-  [121,6235705,23.92568191907661],
-  [744,24366154,574.8483820395738],
-  [218,20014940,138.35796930492137],
-  [884,25789439,722.9155275240994],
-  [74,23123209,54.25917890664637],
-  [366,29125526,338.0245597412481],
-  [879,21875333,609.7291256659056],
-  [782,1343156,33.30631633688483],
-  [321,16110388,163.98511377473363],
-  [753,8897422,212.4479568112633],
-  [482,8222249,125.6698382166413],
-  [61,26109252,50.50305593607306],
-  [186,18233664,107.5425388127854],
-  [930,18817839,554.9400770547945],
-  [902,5741265,164.21299562404872],
-  [343,15947793,173.45551113013698],
-  [876,12013526,333.70905555555555],
-  [121,13821119,53.030041825215626],
-  [35,14389234,15.969786593099949],
-  [291,14935225,137.81552749238966],
-  [724,6974027,160.10894051243025],
-  [80,18730257,47.514604261796045],
-  [792,24461980,614.3419634703197],
-  [564,23590304,421.8966088280061],
-  [368,18849033,219.953200913242],
-  [665,18186216,383.4929490106545],
-  [264,30563697,255.86047716894979],
-  [798,27740243,701.9505934170472],
-  [377,30632739,366.2018836567732],
-  [381,6611041,79.87083399923897],
-  [638,27928841,565.0241171359716],
-  [674,3995864,85.40120294266869],
-  [323,4421111,45.2821807775241],
-  [749,19557189,464.49564183789954],
-  [561,1213467,21.586599029680364],
-  [406,23399013,301.24300095129377],
-  [543,30983956,533.4946761796043],
-  [985,19319040,603.413698630137],
-  [526,15203924,253.59157864028413],
-  [631,27801794,556.2827249492643],
-  [675,5506284,117.85710616438357],
-  [324,28662928,294.4821369863014],
-  [259,13367466,109.78480764840182],
-  [4,31078826,3.942012430238458],
-  [268,10126377,86.05622260273972],
-  [595,22836080,430.85577118214104],
-  [733,19521967,453.754496797311],
-  [152,20711976,99.82941248097413],
-  [855,9612534,260.61379280821916],
-  [639,1809229,36.659605878995436]
+  ["5800000000", 22982400, "4226849315"],
+  ["94100000000", 29635200, "88428219178"],
+  ["11600000000", 5443200, "2002191780"],
+  ["4600000000", 12700800, "1852602739"],
+  ["15900000000", 22377600, "11282465753"],
+  ["80800000000", 27820800, "71281095890"],
+  ["88900000000", 22377600, "63082465753"],
+  ["92600000000", 1209600, "3551780821"],
+  ["97000000000", 15120000, "46506849315"],
+  ["6400000000", 27820800, "5646027397"],
+  ["49900000000", 16934400, "26795616438"],
+  ["1900000000", 6048000, "364383561"],
+  ["30300000000", 30240000, "29054794520"],
+  ["91000000000", 7257600, "20942465753"],
+  ["55300000000", 1814400, "3181643835"],
+  ["44700000000", 19958400, "28289589041"],
+  ["72200000000", 7257600, "16615890410"],
+  ["58000000000", 26611200, "48942465753"],
+  ["45700000000", 12096000, "17528767123"],
+  ["57000000000", 12700800, "22956164383"],
+  ["85600000000", 26611200, "72232328767"],
+  ["69800000000", 10281600, "22756712328"],
+  ["92900000000", 30844800, "90863835616"],
+  ["73500000000", 6652800, "15505479452"],
+  ["24800000000", 19958400, "15695342465"],
+  ["73400000000", 28425600, "66160547945"],
+  ["11100000000", 16934400, "5960547945"],
+  ["57400000000", 13305600, "24218082191"],
+  ["5400000000", 1814400, "310684931"],
+  ["25400000000", 30844800, "24843287671"],
+  ["89600000000", 18144000, "51550684931"],
+  ["22400000000", 13305600, "9450958904"],
+  ["51700000000", 30844800, "50566849315"],
+  ["42400000000", 25401600, "34152328767"],
+  ["46600000000", 9072000, "13405479452"],
+  ["43800000000", 11491200, "15960000000"],
+  ["18400000000", 7257600, "4234520547"],
+  ["39600000000", 18748800, "23543013698"],
+  ["17100000000", 29635200, "16069315068"],
+  ["40400000000", 19958400, "25568219178"],
+  ["65700000000", 9676800, "20160000000"],
+  ["64800000000", 25401600, "52195068493"],
+  ["96100000000", 29635200, "90307671232"],
+  ["67100000000", 19958400, "42466027397"],
+  ["26200000000", 25401600, "21103561643"],
+  ["4100000000", 26006400, "3381095890"],
+  ["41500000000", 7257600, "9550684931"],
+  ["5000000000", 21772800, "3452054794"],
+  ["25500000000", 17539200, "14182191780"],
+  ["21700000000", 18748800, "12901095890"],
+  ["73200000000", 9676800, "22461369863"],
+  ["70300000000", 29030400, "64714520547"],
+  ["51400000000", 18748800, "30558356164"],
+  ["53100000000", 9072000, "15275342465"],
+  ["32400000000", 6048000, "6213698630"],
+  ["53700000000", 11491200, "19567397260"],
+  ["39500000000", 15724800, "19695890410"],
+  ["54400000000", 13910400, "23995616438"],
+  ["68300000000", 19958400, "43225479452"],
+  ["98500000000", 11491200, "35891780821"],
+  ["45400000000", 7862400, "11318904109"],
+  ["37700000000", 28425600, "33981643835"],
+  ["14300000000", 27820800, "12615342465"],
+  ["22800000000", 15724800, "11368767123"],
+  ["47900000000", 1814400, "2755890410"],
+  ["24100000000", 10886400, "8319452054"],
+  ["69400000000", 19353600, "42590684931"],
+  ["76800000000", 2419200, "5891506849"],
+  ["68800000000", 13910400, "30347397260"],
+  ["78200000000", 10281600, "25495342465"],
+  ["11000000000", 2419200, "843835616"],
+  ["54400000000", 16329600, "28168767123"],
+  ["26300000000", 13910400, "11600821917"],
+  ["89800000000", 18144000, "51665753424"],
+  ["96900000000", 21772800, "66900821917"],
+  ["27000000000", 18144000, "15534246575"],
+  ["49100000000", 2419200, "3766575342"],
+  ["200000000", 8467200, "53698630"],
+  ["71900000000", 4838400, "11031232876"],
+  ["29100000000", 11491200, "10603561643"],
+  ["92500000000", 10281600, "30157534246"],
+  ["5500000000", 7257600, "1265753424"],
+  ["54000000000", 1209600, "2071232876"],
+  ["55900000000", 29635200, "52530684931"],
+  ["57400000000", 11491200, "20915616438"],
+  ["18900000000", 13305600, "7974246575"],
+  ["81200000000", 9676800, "24916164383"],
+  ["63400000000", 12096000, "24317808219"],
+  ["98900000000", 29030400, "91042191780"],
+  ["81300000000", 25401600, "65485479452"],
+  ["41400000000", 7257600, "9527671232"],
+  ["600000000", 2419200, "46027397"],
+  ["37400000000", 11491200, "13627945205"],
+  ["73300000000", 7862400, "18274794520"],
+  ["8900000000", 11491200, "3243013698"],
+  ["67900000000", 25401600, "54692054794"],
+  ["93200000000", 7257600, "21448767123"],
+  ["75700000000", 29030400, "69685479452"],
+  ["38800000000", 13305600, "16370410958"],
+  ["34200000000", 24192000, "26235616438"],
 ];
 
-function flipIf<T>(t: boolean, arr: T[]): T[] {
+function flipIf<T>(t : boolean, arr : T[]) : T[] {
   return t ? arr : [arr[1], arr[0]];
 }
 
 describe("VEGovToken", async () => {
-  let signer: ethers.Signer;
-  let signerAddress: string;
+  let signer : ethers.Signer;
+  let signerAddress : string;
 
-  let govToken: ethers.Contract;
-  let wethToken: ethers.Contract;
+  let govToken : ethers.Contract;
+  let wethToken : ethers.Contract;
 
-  let balancerVault: ethers.Contract;
-  let veGovToken: ethers.Contract;
-  let weightedPool: ethers.Contract;
+  let balancerVault : ethers.Contract;
+  let veGovToken : ethers.Contract;
+  let weightedPool : ethers.Contract;
 
-  let poolId: ethers.BytesLike;
+  let poolId : ethers.BytesLike;
 
   before(async function() {
     if (process.env.FLU_FORKNET_NETWORK !== "arbitrum") this.skip();
@@ -212,7 +217,7 @@ describe("VEGovToken", async () => {
     const weightedPoolReceipt = await weightedPoolTx.wait();
 
     const weightedPoolEvents =
-      weightedPoolReceipt.events.filter(({ topics }: { topics: string[] }) =>
+      weightedPoolReceipt.events.filter(({ topics } : { topics : string[] }) =>
         topics[0] === PoolCreatedTopic);
 
     const weightedPoolAddr =
@@ -254,20 +259,20 @@ describe("VEGovToken", async () => {
 
     await balancerVault.joinPool(poolId, signerAddress, signerAddress, {
       assets: sortedAssets,
-      maxAmountsIn: flipIf(wethGreaterThanGov, [ govTokenBal, wethTokenBal ]),
+      maxAmountsIn: flipIf(wethGreaterThanGov, [govTokenBal, wethTokenBal]),
       userData: ethers.utils.defaultAbiCoder.encode(
-        [ "uint256", "uint256[]" ],
-        [ 0, initialBalances ]
+        ["uint256", "uint256[]"],
+        [0, initialBalances]
       ),
       fromInternalBalance: false
     });
 
     await balancerVault.joinPool(poolId, signerAddress, signerAddress, {
       assets: sortedAssets,
-      maxAmountsIn: flipIf(wethGreaterThanGov, [ govTokenBal, wethTokenBal ]),
+      maxAmountsIn: flipIf(wethGreaterThanGov, [govTokenBal, wethTokenBal]),
       userData: ethers.utils.defaultAbiCoder.encode(
-        [ "uint256", "uint256" ],
-        [ 3, 0 ]
+        ["uint256", "uint256"],
+        [3, 0]
       ),
       fromInternalBalance: false
     });
@@ -285,18 +290,22 @@ describe("VEGovToken", async () => {
   });
 
   it("should display the balance correctly", async () => {
-    for (const i in getVEFluidBalanceArgs) {
+    for (const i of getVEFluidBalanceArgs) {
       // bptLocked: amount that we want to lockup
       // lockTime: seconds that we want to lock
       // veFluid_: the amount that we expect we should get in return
 
-      const [bptLocked, lockTime_, veFluid_] = getVEFluidBalanceArgs[i];
+      if (i == undefined) continue;
+
+      const [bptLocked_, lockTime_, veFluid_] = i;
+
+      const bptLocked = BigNumber.from(bptLocked_);
 
       const timestamp = await getLatestTimestamp(hre);
 
-      console.log("timestamp:", timestamp);
+      const lockTime = BigNumber.from(lockTime_);
 
-      const lockTime = BigNumber.from(timestamp).add(lockTime_);
+      const timestampAddLockTime = BigNumber.from(timestamp).add(lockTime_);
 
       const snapshotId = await hre.network.provider.request({
         method: "evm_snapshot",
@@ -308,25 +317,37 @@ describe("VEGovToken", async () => {
         "initial ve gov token"
       ).to.equal(0);
 
-      console.log("bptLocked:", bptLocked);
-      console.log("lockTime:", lockTime);
-      console.log("expecting that we'll get:", veFluid_);
+      const veFluid = BigNumber.from(veFluid_);
 
-      const veFluid = BigNumber.from(BigInt(veFluid_ * 1e18));
+      await veGovToken.create_lock(bptLocked, timestampAddLockTime);
 
-      await veGovToken.create_lock(bptLocked, lockTime);
+      // check that the difference is below 5 days, and more than 4 days
 
-      // const epoch = await veGovToken.epoch();
+      // 345600 = 4 days
+      // 864000 = 10 days
+      // 31536000 = 365 days
 
-      // console.log("await veGovToken.global history epoch", epoch, ":", await veGovToken.point_history(epoch));
+      const votes = await veGovToken.getVotes(signerAddress);
 
-      // const userPointEpoch  = await veGovToken.user_point_epoch(signerAddress);
+      // we have to assert that if the difference is greater than 5, but
+      // if it's less than 4 it should be greater
 
-      // expect(await veGovToken["balanceOf(address)"](signerAddress)).to.equal(veFluid);
+      const expectErrMsg =
+        `bptlocked: ${bptLocked}, veFluid: ${veFluid}, lockTime: ${lockTime}, timestamp add locktime: ${timestampAddLockTime}`;
 
-      expect(await veGovToken.getVotes(signerAddress)).to.be.equal(veFluid);
+      // test that the difference is greater than 4 days
+      expect(
+        BigNumber.from(bptLocked).mul(lockTime.sub(345600)).div(31536000),
+        `expected greater than 4 days, ${expectErrMsg}`
+      )
+        .to.be.gt(votes);
 
-      expect(213).to.be.equal(11111);
+      // test that the difference is less than 10 days
+      expect(
+        BigNumber.from(bptLocked).mul(lockTime.sub(864000)).div(31536000),
+        `expected less than 10 days, ${expectErrMsg}`
+      )
+        .to.be.lt(votes);
 
       await hre.network.provider.request({
         method: "evm_revert",

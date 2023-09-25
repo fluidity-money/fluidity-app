@@ -8,6 +8,7 @@
 @dev Vote weight decays linearly over time. Lock time cannot be
      more than `MAXTIME` (1 year).
 @dev Modified to support IVotes interface
+@dev We've noticed that it removes a week from every lockup (a penalty?)
 """
 
 # Voting escrow to have time-weighted votes
@@ -541,15 +542,18 @@ def _balanceOf(addr: address, _t: uint256 = block.timestamp) -> uint256:
             last_point.bias = 0
         return convert(last_point.bias, uint256)
 
+
 @external
 @view
 def getVotes(addr: address) -> uint256:
     return self._balanceOf(addr)
 
+
 @external
 @view
 def getPastVotes(addr: address, _t: uint256) -> uint256:
     return self._balanceOf(addr, _t)
+
 
 @internal
 @view
@@ -591,6 +595,7 @@ def getPastTotalSupply(t: uint256 = block.timestamp) -> uint256:
     _epoch: uint256 = self.epoch
     last_point: Point = self.point_history[_epoch]
     return self.supply_at(last_point, t)
+
 
 @external
 @view
