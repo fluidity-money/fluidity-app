@@ -51,7 +51,7 @@ const Landing = () => {
       <Card
         onMouseEnter={() => { setHovered(true) }}
         onMouseLeave={() => { setHovered(false) }}
-        color={hovered ? 'holo' : 'gray'}
+        color={"holo"}
         type="frosted"
         border="solid"
         className={styles.announcement}

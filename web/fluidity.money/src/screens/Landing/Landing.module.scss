@@ -59,12 +59,16 @@
   position: relative;
   overflow: hidden;
   font-size: 15px;
-  box-shadow: 0 0 8px 2px #f3b8d8;
+  box-shadow: 0 0 8px 2px rgba(243, 184, 216, 0.3);
+
+  div {
+    z-index: 3;
+  }
 
   &::before {
     content: "";
     position: absolute;
-    z-index: -2;
+    z-index: 1;
     left: -20%;
     top: -150%;
     width: 400px;
@@ -93,11 +97,11 @@
   &::after {
     content: "";
     position: absolute;
-    z-index: -1;
-    left: 3px;
-    top: 3px;
-    width: calc(100% - 6px);
-    height: calc(100% - 6px);
+    z-index: 2;
+    left: 1px;
+    top: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
     background: black;
     border-radius: inherit;
   }
@@ -120,6 +124,21 @@
   background: transparent;
 }
 
+$holo: conic-gradient(
+  from 209.59deg at 50% 50%,
+  #f3b8d8 0deg,
+  #b793e9 50.06deg,
+  #9fd4f3 85.94deg,
+  #ffd2c4 134.97deg,
+  #fbf3f3 172.05deg,
+  #d9abdf 200.75deg,
+  #af9ce3 224.67deg,
+  #aae4e1 259.36deg,
+  #c6ead0 298.82deg,
+  #ffffff 328.72deg,
+  #fdb5e4 360deg,
+);
+
 .announcement {
   cursor: pointer;
   border-radius: 100px !important;
@@ -131,5 +150,20 @@
   svg > path {
     fill: none;
     stroke: grey;
+  }
+
+  border: none !important;
+
+  &::before {
+    border-radius: 100px !important;
+    transition: opacity 0.3s ease;
+    opacity: 0.2;
+  }
+
+  &:hover {
+    &::before {
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
   }
 }
