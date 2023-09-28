@@ -25,7 +25,7 @@ import { SplitContextProvider } from "hooks/SplitContext";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
-  const breakpoint = 620;
+  const breakpoint = 800;
 
   const location = typeof window !== "undefined" ? window.location : null;
 

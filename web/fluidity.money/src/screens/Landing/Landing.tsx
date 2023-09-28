@@ -15,7 +15,7 @@ import {
 } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import styles from "./Landing.module.scss";
-import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
+import { isSafari, isFirefox, isIOS } from "react-device-detect";
 
 import Image from "next/image";
 
@@ -37,6 +37,7 @@ const Landing = () => {
 
   const { width } = useViewport();
   const breakpoint = 620;
+  const isMobile = width < breakpoint;
 
   const [hovered, setHovered] = useState(null);
 
@@ -74,8 +75,8 @@ const Landing = () => {
         </motion.div>
       </Card>
       <Display size="lg" className={styles.display}>
-        Fluidity is<br />
-        <span style={{ textAlign: 'right', display: 'block', width: '100%' }}>the Block<i>chain</i> <br /></span>
+        {!isMobile && <>Fluidity is<br /></>}
+        <span style={{ textAlign: isMobile ? 'left' : 'right', display: 'block', width: '100%' }}>{isMobile ? 'T' : 't'}he Block<i>chain</i> <br /></span>
         <b>In<i>cent</i>ive Layer</b>
       </Display>
       <div className={styles.heroBar}>

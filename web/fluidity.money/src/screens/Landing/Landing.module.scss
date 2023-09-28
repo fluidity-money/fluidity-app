@@ -18,6 +18,15 @@
     width: 100%;
     font-size: 5em;
   }
+
+  @media (max-width: 620px) {
+  padding: 0;
+  margin-bottom: 100px;
+    min-height: auto;
+    .display {
+      font-size: 4em;
+    }
+  }
 }
 
 .video {
@@ -36,6 +45,11 @@
     max-width: 300px;
     text-align: right;
     justify-self: flex-end;
+
+    @media (max-width: 620px) {
+      text-align: center;
+      max-width: 100%;
+    }
   }
 
   .heroBar {
@@ -124,21 +138,6 @@
   background: transparent;
 }
 
-$holo: conic-gradient(
-  from 209.59deg at 50% 50%,
-  #f3b8d8 0deg,
-  #b793e9 50.06deg,
-  #9fd4f3 85.94deg,
-  #ffd2c4 134.97deg,
-  #fbf3f3 172.05deg,
-  #d9abdf 200.75deg,
-  #af9ce3 224.67deg,
-  #aae4e1 259.36deg,
-  #c6ead0 298.82deg,
-  #ffffff 328.72deg,
-  #fdb5e4 360deg,
-);
-
 .announcement {
   cursor: pointer;
   border-radius: 100px !important;
@@ -146,6 +145,7 @@ $holo: conic-gradient(
   flex-direction: row;
   align-items: center;
   gap: 1em;
+  text-align: center;
 
   svg > path {
     fill: none;

@@ -146,8 +146,8 @@ const SponsorsPartners = () => {
       <div className={styles.heading}>
         <Text size="md">Fluidity has been</Text>
         <Display size="md">
-          <b>TRUSTED &<br />
-            SUPPORTED BY</b>
+          <b>TRUSTED&nbsp;&<br />
+            SUPPORTED&nbsp;BY</b>
         </Display>
       </div>
       <div className={styles.r1}>

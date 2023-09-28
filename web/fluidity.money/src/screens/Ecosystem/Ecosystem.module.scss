@@ -9,10 +9,19 @@
   overflow: visible;
   padding: 100px 0;
 
+  @media (max-width: 700px) {
+    text-align: center;
+  }
+
   .bloom {
     transform: scaleY(0.5) scaleX(2);
     opacity: 0.3;
     translate: 0 -85px;
+
+    @media (max-width: 650px) {
+      transform: scaleY(2) scaleX(3);
+
+    }
   }
 
   .protocol {
