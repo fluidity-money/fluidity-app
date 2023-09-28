@@ -9,7 +9,7 @@ type GqlEndpoint = {
   headers: { [key: string]: string };
 };
 
-type GqlBackend = "hasura" | "bitquery"
+type GqlBackend = "hasura" | "bitquery";
 
 export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {
@@ -22,7 +22,7 @@ export const networkGqlBackend = (network: string): GqlBackend | null => {
     default:
       return null;
   }
-}
+};
 
 export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
   switch (networkGqlBackend(network)) {

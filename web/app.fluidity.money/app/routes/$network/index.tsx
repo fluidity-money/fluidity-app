@@ -111,27 +111,29 @@ const NetworkPage = () => {
   const mobileBreakpoint = 500;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP).filter(([, chain]) => {
-    const {name} = chain;
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
+    .filter(([, chain]) => {
+      const { name } = chain;
 
-    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-      return false;
-    if (name === "SOL" && !showExperiment("enable-solana"))
-      return false;
-    return true;
-  }).reduce((prev, [key, value]) => (
-    {
-      ...prev,
-      [key]: value
-    }), {} as typeof CHAIN_NAME_MAP
-  )
+      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
+        return false;
+      if (name === "SOL" && !showExperiment("enable-solana")) return false;
+      return true;
+    })
+    .reduce(
+      (prev, [key, value]) => ({
+        ...prev,
+        [key]: value,
+      }),
+      {} as typeof CHAIN_NAME_MAP
+    );
 
   useEffect(() => {
     // stop modal pop-up if connected
     connected && setWalletModalVisibility(false);
   }, [connected]);
 
-  if (!Object.values(chainNameMap).some(({name}) => name === network)) {
+  if (!Object.values(chainNameMap).some(({ name }) => name === network)) {
     return <></>;
   }
 

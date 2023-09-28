@@ -176,13 +176,11 @@ export default function IndexPage() {
   const { width } = useViewport();
   const mobileBreakpoint = 500;
 
-  const enabledChains = CHAINS.filter(({name}) => {
-    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-      return false;
-    if (name === "SOL" && !showExperiment("enable-solana"))
-      return false;
+  const enabledChains = CHAINS.filter(({ name }) => {
+    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk")) return false;
+    if (name === "SOL" && !showExperiment("enable-solana")) return false;
     return true;
-  })
+  });
 
   return (
     <>

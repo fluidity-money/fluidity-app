@@ -75,9 +75,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   // use updated SQL aggregation
   if (networkGqlBackend(network) === "hasura") {
-    const {data: userActionsData, errors: userActionsErr} = address ?
-      await useUserActionsByAddress(network, address, page) :
-      await useUserActionsAll(network, page);
+    const { data: userActionsData, errors: userActionsErr } = address
+      ? await useUserActionsByAddress(network, address, page)
+      : await useUserActionsAll(network, page);
 
     if (userActionsErr || !userActionsData) {
       throw userActionsErr;

@@ -12,7 +12,7 @@ import {
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
-import {chainType} from "~/util/chainUtils/chains";
+import { chainType } from "~/util/chainUtils/chains";
 
 const FLUID_UTILITY = "FLUID";
 

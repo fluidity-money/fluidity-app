@@ -1,5 +1,9 @@
 import { gql, Queryable, jsonPost } from "~/util";
-import { fetchGqlEndpoint, hasuraDateToUnix, networkGqlBackend } from "~/util/api/graphql";
+import {
+  fetchGqlEndpoint,
+  hasuraDateToUnix,
+  networkGqlBackend,
+} from "~/util/api/graphql";
 import BN from "bn.js";
 import {
   addDecimalToBn,

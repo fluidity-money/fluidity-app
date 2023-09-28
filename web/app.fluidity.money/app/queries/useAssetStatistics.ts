@@ -77,7 +77,6 @@ const useAssetStatistics = (
   tokenName: string,
   userAddress: string
 ) => {
-
   const body = {
     query: query,
     variables: {

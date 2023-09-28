@@ -1,5 +1,9 @@
 import { gql, jsonPost, Queryable } from "~/util";
-import { fetchGqlEndpoint, hasuraDateToUnix, networkGqlBackend } from "~/util/api/graphql";
+import {
+  fetchGqlEndpoint,
+  hasuraDateToUnix,
+  networkGqlBackend,
+} from "~/util/api/graphql";
 import { getUsdFromTokenAmount } from "~/util/chainUtils/tokens";
 import BN from "bn.js";
 

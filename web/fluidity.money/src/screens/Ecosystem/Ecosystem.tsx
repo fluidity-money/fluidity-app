@@ -2,9 +2,9 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { useRef, useState } from "react";
-import { ManualCarousel, Text, LinkButton, Display, BloomEffect, ContinuousCarousel, ArrowTopRight } from "@fluidity-money/surfing";
-import { motion, useScroll } from "framer-motion";
+import { useState } from "react";
+import { Text, Display, BloomEffect, ArrowTopRight } from "@fluidity-money/surfing";
+import { motion } from "framer-motion";
 import styles from "./Ecosystem.module.scss";
 import Image from 'next/image'
 
