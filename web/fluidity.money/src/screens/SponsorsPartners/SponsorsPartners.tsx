@@ -105,14 +105,14 @@ const partners = [
   },
   {
     title: "Aave Grants DAO",
-    url: "https://www.zonff.partners/",
+    url: "https://aavegrants.org/",
     img: "/assets/images/partners/AAVE_GRANTS.svg",
     width: 245,
     height: 161
   },
   {
     title: "Compound Grants Program",
-    url: "https://www.zonff.partners/",
+    url: "https://twitter.com/compoundgrants?lang=en",
     img: "/assets/images/partners/COMPOUND_GRANTS.svg",
     width: 348,
     height: 83

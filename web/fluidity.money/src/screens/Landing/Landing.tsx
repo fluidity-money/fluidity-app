@@ -10,11 +10,14 @@ import {
   Display,
   GeneralButton,
   LinkButton,
-  Video
+  Video,
+  ArrowTopRight
 } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import styles from "./Landing.module.scss";
 import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
+
+import Image from "next/image";
 
 const Landing = () => {
   let type = isSafari || isIOS ? "video/quicktime" : "video/webm";
@@ -35,7 +38,7 @@ const Landing = () => {
   const { width } = useViewport();
   const breakpoint = 620;
 
-  const [hoveredChip, setHoveredChip] = useState(null);
+  const [hovered, setHovered] = useState(null);
 
   return (
     <div className={`${styles.containerLanding}`}>
@@ -46,14 +49,29 @@ const Landing = () => {
         className={styles.video}
       />
       <Card
-        onMouseEnter={() => { setHoveredChip(true) }}
-        onMouseLeave={() => { setHoveredChip(false) }}
-        color={hoveredChip ? 'holo' : 'gray'}
+        onMouseEnter={() => { setHovered(true) }}
+        onMouseLeave={() => { setHovered(false) }}
+        color={hovered ? 'holo' : 'gray'}
         type="frosted"
         border="solid"
-        style={{ borderRadius: '100px', padding: '0.8em 2em' }}
+        className={styles.announcement}
+        onClick={() => {
+          window.open('https://superposition.so', '_blank')
+        }}
       >
+        <Image width={16} height={16} src="/assets/images/spn.png" />
         <Text size="xs">Announcing Superposition: Fluidity's Layer-3 Evolution</Text>
+
+        <motion.div
+          animate={{
+            opacity: hovered ? 1 : 0,
+            width: hovered ? 'auto' : 0,
+            marginLeft: hovered ? '0' : '-1em'
+          }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
+          <ArrowTopRight />
+        </motion.div>
       </Card>
       <Display size="lg" className={styles.display}>
         Fluidity is<br />
@@ -82,6 +100,10 @@ const Landing = () => {
           <GeneralButton
             type="secondary"
             style={{ padding: '1em 3.5em' }}
+            className={styles.rainbow}
+            handleClick={() => {
+              window.open('https://app.fluidity.money/arbitrum/fluidify', '_blank')
+            }}
           >
             <Text code prominent size="md">FLUIDIFY MONEY</Text>
           </GeneralButton>
