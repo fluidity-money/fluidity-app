@@ -102,6 +102,20 @@ const partners = [
     img: "/assets/images/partners/ZONFF.svg",
     width: 128,
     height: 40
+  },
+  {
+    title: "Aave Grants DAO",
+    url: "https://www.zonff.partners/",
+    img: "/assets/images/partners/AAVE_GRANTS.svg",
+    width: 245,
+    height: 161
+  },
+  {
+    title: "Compound Grants Program",
+    url: "https://www.zonff.partners/",
+    img: "/assets/images/partners/COMPOUND_GRANTS.svg",
+    width: 348,
+    height: 83
   }
 ];
 
@@ -146,7 +160,7 @@ const SponsorsPartners = () => {
         <motion.div
           className={styles.inner}
           animate={{
-            x: offset * 220 * -1
+            x: offset * 220 * -1 - 110
           }}
         >
           {

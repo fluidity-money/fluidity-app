@@ -100,31 +100,125 @@ const protocolList = [
     href: "https://crescentswap.exchange",
     width: 32,
     height: 36
-  }
+  },
+  {
+    name: "Camelot",
+    src: "/assets/images/protocols/camelot.svg",
+    href: "https://camelot.exchange/",
+    width: 83,
+    height: 20
+  },
+  {
+    name: "Dodo",
+    src: "/assets/images/protocols/dodo.svg",
+    href: "https://dodoex.io/en",
+    width: 81,
+    height: 19
+  },
+  {
+    name: "Compound",
+    src: "/assets/images/protocols/compound.svg",
+    href: "https://compound.finance/",
+    width: 80,
+    height: 17
+  },
+  {
+    name: "Aave",
+    src: "/assets/images/protocols/aave.svg",
+    href: "https://aave.com/",
+    width: 81,
+    height: 17
+  },
+  {
+    name: "Solend",
+    src: "/assets/images/protocols/solend.svg",
+    href: "https://solend.fi/",
+    width: 77,
+    height: 40
+  },
+  {
+    name: "Jupiter",
+    src: "/assets/images/protocols/jupiter.svg",
+    href: "https://jup.ag/",
+    width: 64,
+    height: 21
+  },
+  {
+    name: "Sushi",
+    src: "/assets/images/protocols/sushi.svg",
+    href: "https://www.sushi.com/",
+    width: 123,
+    height: 45
+  },
+  {
+    name: "Orca",
+    src: "/assets/images/protocols/orca.svg",
+    href: "https://www.orca.so/",
+    width: 75,
+    height: 20
+  },
+  {
+    name: "Uniswap",
+    src: "/assets/images/protocols/uniswap.svg",
+    href: "https://uniswap.org/",
+    width: 110,
+    height: 23
+  },
+  {
+    name: "OKX",
+    src: "/assets/images/protocols/okx.svg",
+    href: "https://www.okx.com/",
+    width: 55,
+    height: 16
+  },
+  {
+    name: "Saber",
+    src: "/assets/images/protocols/saber.svg",
+    href: "https://app.saber.so/swap",
+    width: 82,
+    height: 18
+  },
+  {
+    name: "Coin98",
+    src: "/assets/images/protocols/coin98.svg",
+    href: "https://coin98.com/",
+    width: 85,
+    height: 22
+  },
+  {
+    name: "The Halls of Olympia",
+    src: "/assets/images/protocols/olympia.svg",
+    href: "https://hallsofolympia.io/",
+    width: 97,
+    height: 54
+  },
 ]
 
 
 const Ecosystem = () => {
+  const length = protocolList.length
+  const row1 = protocolList.slice(0, length / 2)
+  const row2 = protocolList.slice(8, length)
 
   return (
     <div className={styles.ecosystem}>
       <BloomEffect width={20} type={"static"} className={styles.bloom} />
       <Display>
-        <b><Text bold holo style={{ fontFamily: 'inherit', fontSize: 'inherit' }}>31,423+</Text> REWARDS</b>
+        <b><Text bold holo style={{ fontFamily: 'inherit', fontSize: 'inherit' }}>37,164+</Text> REWARDS</b>
       </Display>
       <Text size="md" style={{ marginBottom: 50 }}>
-        Distributed over 15+ Integrated Protocols
+        Distributed over 25+ Integrated Protocols
       </Text>
       <BetterCarousel direction="left">
         {
-          protocolList.map((p, i) => {
+          row1.map((p, i) => {
             return <Protocol protocol={p} key={`right-${p.name}-${i}`} />
           })
         }
       </BetterCarousel>
       <BetterCarousel direction="right">
         {
-          protocolList.reverse().map((p, i) => {
+          row2.map((p, i) => {
             return <Protocol protocol={p} key={`right-${p.name}-${i}`} />
           })
         }

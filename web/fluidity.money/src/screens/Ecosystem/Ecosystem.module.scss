@@ -44,7 +44,6 @@
   display: flex;
   flex-direction: row;
   position: relative;
-  overflow-x: hidden;
 
   &::before {
     pointer-events: none;

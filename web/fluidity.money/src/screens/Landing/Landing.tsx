@@ -53,7 +53,7 @@ const Landing = () => {
         border="solid"
         style={{ borderRadius: '100px', padding: '0.8em 2em' }}
       >
-        <Text size="xs">Important announcement goes here.</Text>
+        <Text size="xs">Announcing Superposition: Fluidity's Layer-3 Evolution</Text>
       </Card>
       <Display size="lg" className={styles.display}>
         Fluidity is<br />
@@ -85,7 +85,9 @@ const Landing = () => {
           >
             <Text code prominent size="md">FLUIDIFY MONEY</Text>
           </GeneralButton>
-          <LinkButton size="small" type="external" handleClick={() => { return }}>
+          <LinkButton size="small" type="external" handleClick={() => {
+            window.open('https://discord.gg/fluidity', '_blank')
+          }}>
             JOIN DISCORD
           </LinkButton>
         </div>
