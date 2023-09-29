@@ -48,8 +48,10 @@
 
 .carousel {
   width: 100%;
+  overflow-x: hidden;
   max-width: 1400px;
-  height: 40px;
+  height: 42px;
+  overflow-y: hidden;
   display: flex;
   flex-direction: row;
   position: relative;
