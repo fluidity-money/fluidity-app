@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-import { Heading } from "@fluidity-money/surfing";
+import { Text } from "@fluidity-money/surfing";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./MobileNavModal.module.scss";
@@ -20,7 +20,7 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
         href={`/${link.replace(/\s+/g, "").toLowerCase()}`}
         onClick={() => setIsOpen(false)}
       >
-        <Heading as="h5">{link}</Heading>
+        <Text code prominent>{link}</Text>
       </a>
     </Link>
   ));
@@ -30,7 +30,7 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
       <Link href={"/"} passHref>
         <a href={"/"} className={styles.logo} onClick={() => setIsOpen(false)}>
           <Image
-            src="/assets/images/logoMetallic.png"
+            src="/assets/images/logoOutline.png"
             alt="logo"
             width="160"
             height="68"
@@ -102,21 +102,21 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
       </div>
 
       <a
-        className={`${styles.whiteButton} ${styles.smaller}`}
+        className={`${styles.whiteButton}`}
         href={`https://app.fluidity.money`}
         onClick={() => setIsOpen(false)}
       >
-        <Heading color="black" as="h3">
+        <Text code style={{ color: "black" }} prominent>
           LAUNCH FLUIDITY
-        </Heading>
+        </Text>
       </a>
       <a
-        className={`${styles.button} ${styles.smaller}`}
+        className={`${styles.button}`}
         href="https://discord.gg/fluidity"
       >
-        <Heading as="h3">DISCORD</Heading>
+        <Text code prominent>DISCORD</Text>
       </a>
-    </div>
+    </div >
   );
 };
 
