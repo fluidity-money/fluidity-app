@@ -11,7 +11,6 @@ import {
 import { LinksFunction } from "@remix-run/node";
 import { useParams } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { useContext, useEffect, useState } from "react";
 import QRCode from "react-qr-code";
 import dashboardStyles from "~/styles/dashboard.css";
@@ -40,9 +39,6 @@ const Receive = () => {
   const mobileWidthBreakpoint = 768;
   const { width } = useViewport();
   const isMobile = width < mobileWidthBreakpoint;
-
-  const { showExperiment } = useContext(SplitContext);
-  if (!showExperiment("enable-send-receive")) return <></>;
 
   return (
     <div className={`transfer-container receive ${isMobile ? "mobile" : ""}`}>
@@ -84,8 +80,8 @@ const Receive = () => {
       </div>
       <Hoverable
         className="receive-hint"
-        tooltipContent="Lorem ipsum"
-        style={{ marginTop: 10 }}
+        tooltipContent="You can receive any token on the selected network, but only Fluid Assets like fUSDC will earn you rewards. Double-check your webapp network prior to receiving tokens!"
+        style={{ marginTop: 10, minWidth: 300 }}
       >
         <InfoCircle />
         <Text>Which assets can I receive?</Text>

@@ -1,10 +1,11 @@
-import type BN from "bn.js";
+import BN from "bn.js";
 
 import { useMemo } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
   useWallet,
+  useConnection,
 } from "@solana/wallet-adapter-react";
 
 import {
@@ -19,7 +20,7 @@ import {
   getBalance,
   internalSwap,
   limit,
-  amountMinted,
+  amountMinted as amountMintedInternal,
 } from "~/util/chainUtils/solana/instructions";
 import FluidityFacadeContext from "./FluidityFacade";
 import { Token } from "~/util/chainUtils/tokens";
@@ -31,10 +32,15 @@ const SolanaFacade = ({
   children: React.ReactNode;
   tokens: Token[];
 }) => {
+  const wallet = useWallet();
   const { connected, publicKey, disconnect, connecting, signMessage } =
-    useWallet();
+    wallet;
+  const {connection} = useConnection();
 
   const swap = async (amount: string, tokenAddr: string) => {
+    if (!publicKey)
+      return;
+
     const fromToken = tokens.find((t) => t.address === tokenAddr);
 
     if (!fromToken)
@@ -54,7 +60,7 @@ const SolanaFacade = ({
         `Could not initiate Swap: Could not find dest pair token from ${tokenAddr} in solana`
       );
 
-    return internalSwap(amount, fromToken, toToken);
+    return internalSwap(wallet, connection, connected, publicKey, amount, fromToken, toToken);
   };
 
   const balance = async (tokenAddr: string): Promise<BN> => {
@@ -65,7 +71,10 @@ const SolanaFacade = ({
         `Could not fetch balance: Could not find matching token ${tokenAddr} in solana`
       );
 
-    return getBalance(token);
+    if (!publicKey)
+      return new BN(0);
+
+    return getBalance(connection, publicKey, token);
   };
 
   const signBuffer = async (buffer: string): Promise<string | undefined> => {
@@ -75,14 +84,23 @@ const SolanaFacade = ({
   };
 
   const getFluidTokens = async (): Promise<string[]> => {
+    if (!publicKey)
+      return [];
+
     const fluidTokens = tokens.filter((t) => t.isFluidOf);
 
     const fluidTokensPosBalance = await Promise.all(
-      fluidTokens.filter(async (t) => getBalance(t))
+      fluidTokens.filter(async (t) => getBalance(connection, publicKey, t))
     );
 
     return fluidTokensPosBalance.map((t) => t.address);
   };
+  
+  const amountMinted = async(tokenName: string): Promise<BN | undefined> => {
+    if (!publicKey)
+      return;
+    return amountMintedInternal(publicKey, tokenName)
+  }
 
   return (
     <FluidityFacadeContext.Provider

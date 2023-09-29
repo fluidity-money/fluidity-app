@@ -16,13 +16,15 @@ const TokenSelect = ({
   onChange,
   value,
   disabled,
+  initial = "closed",
 }: {
   assets: AugmentedAsset[];
   onChange: (token: AugmentedAsset) => void;
   value?: AugmentedAsset;
   disabled?: boolean;
+  initial?: "open" | "closed";
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initial === "open");
 
   return (
     <div className="token-select-container">

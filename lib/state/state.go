@@ -116,6 +116,37 @@ func RPush(key string, content interface{}) {
 	}
 }
 
+func ZAdd(key string, content *redis.Z) {
+	redisClient := client()
+
+	intCmd := redisClient.ZAdd(context.Background(), key, content)
+
+	if err := intCmd.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to ZAdd key!"
+			k.Payload = err
+		})
+	}
+}
+
+func ZAddSelfScore(key string, content float64) {
+	redisClient := client()
+
+	intCmd := redisClient.ZAdd(context.Background(), key, &redis.Z{
+		Score: content, 
+		Member: content,
+	})
+
+	if err := intCmd.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to ZAdd key!"
+			k.Payload = err
+		})
+	}
+}
+
 func ZRem(key, member string) {
 	redisClient := client()
 
@@ -128,6 +159,51 @@ func ZRem(key, member string) {
 			k.Payload = err
 		})
 	}
+}
+
+func ZRemRangeByRank(key string, start, stop int64) {
+	redisClient := client()
+
+	intCmd := redisClient.ZRemRangeByRank(context.Background(), key, start, stop)
+
+	if err := intCmd.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to ZRemRangeByRank!"
+			k.Payload = err
+		})
+	}
+}
+
+func ZScore(key, member string) float64 {
+	redisClient := client()
+
+	stringCmd := redisClient.ZScore(context.Background(), key, member)
+
+	score , err := stringCmd.Result()
+
+	if err != nil && err != redis.Nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to ZScore from key %v and convert to bytes!",
+				key,
+			)
+
+			k.Payload = err
+		})
+	}
+
+	if err == redis.Nil {
+		return 0
+	}
+
+	return score
+}
+
+func ZExists(key, member string) bool {
+	return ZScore(key, member) > 0
 }
 
 // ZPeep looks at the first member of a sorted set without popping it

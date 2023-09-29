@@ -22,7 +22,6 @@ import {
 import { useWeb3React } from "@web3-react/core";
 import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { ethers } from "ethers";
 import { useContext, useEffect, useState } from "react";
 import TokenSelect from "~/components/TokenSelect";
@@ -299,9 +298,6 @@ const Send = () => {
 
   const navigate = useNavigate();
 
-  const { showExperiment } = useContext(SplitContext);
-  if (!showExperiment("enable-send-receive")) return <></>;
-
   return (
     <div className={`transfer-container send ${isMobile ? "mobile" : ""}`}>
       <Video
@@ -349,6 +345,7 @@ const Send = () => {
                 onChange={(token) => {
                   setSelectedAsset(token);
                 }}
+                initial="open"
               />
               {selectedAsset && (
                 <>

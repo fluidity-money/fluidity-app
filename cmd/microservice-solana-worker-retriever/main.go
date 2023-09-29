@@ -148,12 +148,13 @@ func main() {
 
 			log.App(func(k *log.Log) {
 				k.Format(
-					"USING THE CACHED AMOUNT %v - Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! %v",
+					"USING THE CACHED AMOUNT %v - Failed to get the TVL with pubkey %#v, solend pubkey %#v, obligation pubkey %#v! (redis err %v) (err %v)",
 					tvl,
 					tvlDataPubkey,
 					solendPubkey,
 					obligationPubkey,
 					err,
+					tvlErr,
 				)
 			})
 		}
