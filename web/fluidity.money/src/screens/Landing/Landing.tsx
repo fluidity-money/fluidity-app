@@ -4,15 +4,20 @@
 
 import { useState } from "react";
 import {
-  ContinuousCarousel,
-  Heading,
   useViewport,
-  IntroTile,
+  Text,
+  Card,
+  Display,
+  GeneralButton,
+  LinkButton,
   Video,
+  ArrowTopRight
 } from "@fluidity-money/surfing";
 import { motion } from "framer-motion";
 import styles from "./Landing.module.scss";
-import { isSafari, isFirefox, isIOS, isMobile } from "react-device-detect";
+import { isSafari, isFirefox, isIOS } from "react-device-detect";
+
+import Image from "next/image";
 
 const Landing = () => {
   let type = isSafari || isIOS ? "video/quicktime" : "video/webm";
@@ -32,179 +37,84 @@ const Landing = () => {
 
   const { width } = useViewport();
   const breakpoint = 620;
+  const isMobile = width < breakpoint;
 
-  const callout = (
-    <div className={styles.callout}>
-      <Heading as="h4" className={styles.text}>
-        MONEY DESIGNED TO MOVE MONEY DESIGNED TO MOVE
-      </Heading>
-      <Heading as="h4" className={styles.text}>
-        MONEY DESIGNED TO MOVE
-      </Heading>
-    </div>
-  );
+  const [hovered, setHovered] = useState(null);
 
   return (
     <div className={`${styles.containerLanding}`}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
+      <Video
+        loop
+        src="/assets/videos/BubbleFloat.mp4"
+        type="cover"
+        className={styles.video}
+      />
+      <Card
+        onMouseEnter={() => { setHovered(true) }}
+        onMouseLeave={() => { setHovered(false) }}
+        color={"holo"}
+        type="frosted"
+        border="solid"
+        className={styles.announcement}
+        onClick={() => {
+          window.open('https://superposition.so', '_blank')
         }}
       >
-        <div className={`${styles.bgVid}`}>
-          {width > breakpoint ? (
-            <Video
-              src={state.src}
-              type={"reduce"}
-              mimeType={state.mimeType}
-              loop={state.loop}
-              videoKey={state.key}
-              scale={state.scale}
-              width={"65%"}
-            />
-          ) : isMobile ? (
-            <Video
-              src={state.src}
-              type={"reduce"}
-              mimeType={state.mimeType}
-              loop={state.loop}
-              videoKey={state.key}
-              scale={state.scale * 2}
-            />
-          ) : (
-            <></>
-          )}
-        </div>
-      </motion.div>
-      {/* Hero animation */}
-      <motion.div className={styles.content}>
-        {width < breakpoint && width > 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: "-20vh" }}
-            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 1, type: "tween" }}
-          >
-            <Heading className={styles.title} as="h3">
-              Fluidity is the <br /> blockchain incentive <br /> layer,
-              rewarding <br /> people for using <br /> their crypto.
-            </Heading>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: "-20vh" }}
-            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 1, type: "tween" }}
-          >
-            <Heading as="h3">
-              Fluidity is the blockchain incentive layer, <br />
-              rewarding people for using their crypto.
-            </Heading>
-          </motion.div>
-        )}
-        <div className={styles.tiles}>
-          {width < breakpoint && width > 0 && (
-            <motion.div
-              className={styles.video}
-              initial={{ y: -150, scale: 1 }}
-              animate={{
-                opacity: 1,
-                y: [-150, -150, -150, 0],
-                scale: [1, 1, 1, 0.8],
-              }}
-              transition={{ duration: 1, type: "tween" }}
-            ></motion.div>
-          )}
+        <Image width={16} height={16} src="/assets/images/spn.png" />
+        <Text size="xs">Announcing Superposition: Fluidity's Layer-3 Evolution</Text>
 
-          <motion.div
-            initial={{ opacity: 0, y: "-20vh" }}
-            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 1, type: "tween" }}
-            className={styles.left}
+        <motion.div
+          animate={{
+            opacity: hovered ? 1 : 0,
+            width: hovered ? 'auto' : 0,
+            marginLeft: hovered ? '0' : '-1em'
+          }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
+          <ArrowTopRight />
+        </motion.div>
+      </Card>
+      <Display size="lg" className={styles.display}>
+        {!isMobile && <>Fluidity is<br /></>}
+        <span style={{ textAlign: isMobile ? 'left' : 'right', display: 'block', width: '100%' }}>{isMobile ? 'T' : 't'}he Block<i>chain</i> <br /></span>
+        <b>In<i>cent</i>ive Layer</b>
+      </Display>
+      <div className={styles.heroBar}>
+        <div className={styles.heroDesc}>
+          <Text size="md">
+            Transform your USDC into Fluid USDC,<br />
+            perform any on-chain transaction, and&nbsp;
+          </Text>
+          <Text
+            size="md"
+            prominent
+            style={{
+              textDecoration: 'underline',
+              textUnderlineOffset: '0.5em',
+              whiteSpace: 'nowrap'
+            }}
           >
-            <IntroTile
-              img={"/assets/images/landingIcons/1to1.png"}
-              side={"left"}
-            >
-              1 to 1 exchange rate <br />
-              to base wrapped assets
-            </IntroTile>
-            <IntroTile
-              img={"/assets/images/landingIcons/sendReceive.png"}
-              side={"left"}
-            >
-              Senders and receivers <br />
-              both qualify
-            </IntroTile>
-            <IntroTile
-              img={"/assets/images/landingIcons/everyTransaction.png"}
-              side={"left"}
-            >
-              Every transaction <br />
-              qualifies as a reward
-            </IntroTile>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: "-20vh" }}
-            animate={{ opacity: [0, 0, 0, 1], y: 0 }}
-            transition={{ duration: 1, type: "tween" }}
-            className={
-              width < breakpoint && width > 0 ? styles.left : styles.right
-            }
+            earn rewards for using your crypto.
+          </Text>
+        </div>
+        <div className={styles.heroButtons}>
+          <GeneralButton
+            type="secondary"
+            style={{ padding: '1em 3.5em' }}
+            className={styles.rainbow}
+            handleClick={() => {
+              window.open('https://app.fluidity.money/arbitrum/fluidify', '_blank')
+            }}
           >
-            <IntroTile
-              img={"/assets/images/landingIcons/expectedOutcome.png"}
-              side={width < breakpoint && width > 0 ? "left" : "right"}
-            >
-              Fluidity improves your expected <br />
-              outcome over time
-            </IntroTile>
-            <IntroTile
-              img={"/assets/images/landingIcons/forReceivers.png"}
-              side={width < breakpoint && width > 0 ? "left" : "right"}
-            >
-              Rewards can range from cents
-              <br /> to millions
-            </IntroTile>
-            <IntroTile
-              img={"/assets/images/landingIcons/scalingEcosystem.png"}
-              side={width < breakpoint && width > 0 ? "left" : "right"}
-            >
-              Scaling ecosystem
-            </IntroTile>
-          </motion.div>
+            <Text code prominent size="md">FLUIDIFY MONEY</Text>
+          </GeneralButton>
+          <LinkButton size="small" type="external" handleClick={() => {
+            window.open('https://discord.gg/fluidity', '_blank')
+          }}>
+            JOIN DISCORD
+          </LinkButton>
         </div>
-      </motion.div>
-
-      <motion.div
-        className={styles.carousel}
-        initial={{ opacity: 0, y: "100vh" }}
-        animate={{ opacity: [1, 1, 1, 0], y: [0, 0, 0, 100] }}
-        transition={{ duration: 6, type: "tween" }}
-      >
-        <div className={styles.carousel}>
-          <ContinuousCarousel direction={"right"}>
-            <div>
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-              {callout}
-            </div>
-          </ContinuousCarousel>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
