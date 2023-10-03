@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/web"
@@ -19,6 +20,9 @@ import (
 
 // Context to use when logging
 const Context = `WEBSERVER/WEBSOCKET`
+
+// DeadlinePong to send after a ping request in the control message
+const DeadlinePong = 3 * time.Minute
 
 // websocketUpgrader used in every endpoint in this codebase.
 var websocketUpgrader = websocket.Upgrader{
@@ -76,6 +80,8 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 			chanHandlerRequestShutdown = make(chan error)
 
 			chanHandlerShutdown = make(chan bool)
+
+			chanPongs = make(chan bool)
 		)
 
 		go func() {
@@ -86,17 +92,41 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 			})
 
 			for {
-				_, content, err := websocketConn.ReadMessage()
+				msgType, content, err := websocketConn.ReadMessage()
 
-				log.Debug(func(k *log.Log) {
-					k.Context = Context
+				switch msgType {
+				case websocket.PongMessage:
+					// just return, we ignore these
+					return
 
-					k.Format(
-						"Received this message from the queue, ip %v: %#v",
-						ipAddress,
-						string(content),
-					)
-				})
+				case websocket.TextMessage,
+					websocket.BinaryMessage:
+					// log that we received this message, then continue with
+					// the rest of the code (we handle this normally)
+
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+
+						k.Format(
+							"Received this message from the queue, ip %v: %#v",
+							ipAddress,
+							string(content),
+						)
+					})
+
+				case websocket.PingMessage:
+					// need to handle an incoming ping!
+					// send out a request to do so and jump out!
+
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "Incoming ping was received! Going to send out a pong."
+						k.Payload = ipAddress
+					})
+
+					chanPongs <- true
+					return
+				}
 
 				if err != nil {
 					log.App(func(k *log.Log) {
@@ -150,6 +180,49 @@ func Endpoint(endpoint string, handler func(string, url.Values, <-chan []byte, c
 					})
 
 					return
+
+				case <-chanPongs:
+					deadline := time.Now().Add(DeadlinePong)
+
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+
+						k.Format(
+							"Sending out a pong in response to a ping, deadline %v!",
+							deadline,
+						)
+
+						k.Payload = ipAddress
+					})
+
+					err := websocketConn.WriteControl(
+						websocket.PongMessage,
+						nil,
+						deadline,
+					)
+
+					if err != nil {
+						log.App(func(k *log.Log) {
+							k.Context = Context
+
+							k.Format(
+								"Failed to write a pong message to IP %#v websocket!",
+								ipAddress,
+							)
+
+							k.Payload = err
+						})
+
+						chanHandlerShutdown <- true
+
+						return
+					}
+
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Message = "Wrote a pong message to the websocket!"
+						k.Payload = ipAddress
+					})
 
 				case message := <-messages:
 					log.Debug(func(k *log.Log) {
