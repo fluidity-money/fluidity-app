@@ -45,6 +45,11 @@ describe("LootboxStaking deployed infra", async () => {
     if (process.env.FLU_FORKNET_NETWORK != "arbitrum")
       this.skip();
 
+    if (process.env.FLU_DO_LOOTBOX_STAKING_REDEEM_TESTS != "yes") {
+      console.log(`FLU_DO_LOOTBOX_STAKING_REDEEM_TESTS is not set to "yes", skipping lootbox staking migration tests!`);
+      this.skip();
+    }
+
     const stakingSigner = (await hre.ethers.getSigners())[0];
 
     context.stakingSigner = stakingSigner;
