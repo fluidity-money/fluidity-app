@@ -1,5 +1,7 @@
 # ⚡ ZKSync Era
 
+ZKSync is supported in testing, but we're not able to support it without a lending market. So this is as far as we're supporting for now, waiting...
+
 | Description                   | Address                                    |
 | ----------------------------- | ------------------------------------------ |
 | Bulla NFTs                    | 0x4Fa077c904E2D16BE8A543a1016Cd7BE1E69c237 |

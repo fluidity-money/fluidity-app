@@ -1,5 +1,7 @@
 # 🐧 Polygon ZK
 
+We need a lending protocol that's on the thing!
+
 | Contract                                | Address                                    |
 | --------------------------------------- | ------------------------------------------ |
 | fUSDC                                   | 0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C |
