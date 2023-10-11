@@ -19,3 +19,7 @@
 {% content-ref url="zksync-era.md" %}
 [zksync-era.md](zksync-era.md)
 {% endcontent-ref %}
+
+{% content-ref url="stylus-testnet.md" %}
+[stylus-testnet.md](stylus-testnet.md)
+{% endcontent-ref %}
