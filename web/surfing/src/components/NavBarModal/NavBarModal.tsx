@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useClickOutside } from "~/util/hooks/useClickOutside";
 import { LinkButton } from "~/components/Button";
 import styles from "./NavBarModal.module.scss";
+import { motion } from "framer-motion";
 
 interface INavBarModal {
   handleModal: (_: boolean) => void;
@@ -22,7 +23,15 @@ const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
   useClickOutside(navBarModal, () => handleModal(false));
 
   return (
-    <div ref={navBarModal} className={styles.container}>
+    <motion.div
+      ref={navBarModal}
+      className={styles.container}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3 }}
+      style={{ x: 'calc(50vw - 40%)' }}
+    >
       {navLinks.map((link) => (
         <h4>
           <a
@@ -32,7 +41,7 @@ const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
             <LinkButton
               size={link.size}
               type={link.type}
-              handleClick={() => {}}
+              handleClick={() => { }}
             >
               {link.children}
             </LinkButton>
@@ -53,7 +62,7 @@ const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
           <img src="/assets/images/socials/linkedin.svg" />
         </a>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

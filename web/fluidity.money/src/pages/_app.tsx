@@ -4,13 +4,8 @@
 
 import { AppProps } from "next/app";
 
-import Script from "next/script";
-
 import { ApolloProvider } from "@apollo/client";
 import {
-  Card,
-  Text,
-  GeneralButton,
   useViewport,
 } from "@fluidity-money/surfing";
 import { ChainContextProvider } from "hooks/ChainContext";
@@ -30,7 +25,7 @@ import { SplitContextProvider } from "hooks/SplitContext";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const { width } = useViewport();
-  const breakpoint = 620;
+  const breakpoint = 800;
 
   const location = typeof window !== "undefined" ? window.location : null;
 
@@ -67,23 +62,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }
   }, []);
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    if (width >= breakpoint) {
-      script.src = "assets/gfx/renderer.js";
-      document.body.appendChild(script);
-    }
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, [width, breakpoint]);
-
   const splitUser =
     process.env.NODE_ENV === "development" ||
-    (!!location && location.hostname.includes("staging"))
+      (!!location && location.hostname.includes("staging"))
       ? "dev"
       : "user";
 

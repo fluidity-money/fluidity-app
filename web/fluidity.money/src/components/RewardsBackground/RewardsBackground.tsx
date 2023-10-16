@@ -6,6 +6,7 @@ import { ContinuousCarousel, useViewport } from "@fluidity-money/surfing";
 import styles from "./RewardsBackground.module.scss";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import React from "react";
 
 interface IProps {
   carouselInfo: React.ReactNode[];
@@ -36,7 +37,7 @@ const RewardsBackground = ({ carouselInfo }: IProps) => {
               iteratorCounter = 0;
 
             return (
-              <>
+              <React.Fragment>
                 <motion.div
                   initial={
                     width < 500 && width > 0 ? { x: -500 } : { x: -1500 }
@@ -65,7 +66,7 @@ const RewardsBackground = ({ carouselInfo }: IProps) => {
                     )}
                   </ContinuousCarousel>
                 </motion.div>
-              </>
+              </React.Fragment>
             );
           })(0)
         )}

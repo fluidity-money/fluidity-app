@@ -178,6 +178,7 @@ export default function IndexPage() {
 
   const enabledChains = CHAINS.filter(({ name }) => {
     if (name === "POLY_ZK" && !showExperiment("enable-polygonzk")) return false;
+    
     return true;
   });
 

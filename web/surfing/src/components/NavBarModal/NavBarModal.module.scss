@@ -1,15 +1,15 @@
 .container {
+  z-index: 10;
   width: 200px;
   height: 220px;
   border-radius: 10px;
   border: 0.5px solid grey;
   padding: 20px;
-  background-color: black;
+  backdrop-filter: blur(10px);
   opacity: 0.9;
   color: black;
   position: absolute;
-  top: 60px;
-  transform: translateX(140%);
+  top: 80px;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;

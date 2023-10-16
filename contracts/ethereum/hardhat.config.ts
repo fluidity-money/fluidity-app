@@ -11,6 +11,8 @@ import "hardhat-dependency-compiler";
 
 import "hardhat-docgen";
 
+import "@nomiclabs/hardhat-vyper";
+
 import "@matterlabs/hardhat-zksync-solc";
 
 import "@matterlabs/hardhat-zksync-verify";
@@ -281,7 +283,7 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 10000000,
+        runs: 200,
         details: {
           cse: true,
           yul: true,
@@ -291,6 +293,9 @@ module.exports = {
         revertStrings: "debug",
       }
     },
+  },
+  vyper: {
+    version: "0.2.8"
   },
   etherscan: {
     apiKey: {

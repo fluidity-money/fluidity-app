@@ -8,8 +8,8 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/IUtilityGauges.sol";
-import "../interfaces/IVEGovLockup.sol";
 import "../interfaces/IOperatorOwned.sol";
+import "../interfaces/IERC20.sol";
 
 contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     uint256 constant GAUGE_EPOCH_LENGTH = 7 days;
@@ -65,7 +65,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     */
     address private operator_;
 
-    IVEGovLockup private lockupSource_;
+    IERC20 private lockupSource_;
 
     /// @dev timestamp (!!) of the last reset
     uint256 public lastReset_;
@@ -83,7 +83,7 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
     /// @dev strictly equal to the keys of weights_
     GaugeId[] private gaugesList_;
 
-    constructor(address _operator, IVEGovLockup _lockupSource) {
+    constructor(address _operator, IERC20 _lockupSource) {
         operator_ = _operator;
         lockupSource_ = _lockupSource;
     }
@@ -275,9 +275,8 @@ contract UtilityGauges is IUtilityGauges, IOperatorOwned {
         revert("gauge not found in list!");
     }
 
-    function updateLockupGauge(IVEGovLockup _newLockup) public {
+    function updateLockupGauge(IERC20 _newLockup) public {
         require(msg.sender == operator_, "only operator");
-
         lockupSource_ = _newLockup;
     }
 }

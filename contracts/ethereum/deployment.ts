@@ -16,7 +16,7 @@ export const getFactories = async (
 
   const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
 
-  const veGovLockupFactory = await hre.ethers.getContractFactory("VEGovLockup");
+  const veGovToken = await hre.ethers.getContractFactory("VotingEscrow");
 
   const registryFactory = await hre.ethers.getContractFactory("Registry");
 
@@ -36,7 +36,7 @@ export const getFactories = async (
     "AaveV3LiquidityProvider"
   );
 
-  const daoFactory = await hre.ethers.getContractFactory("DAOStable");
+  const daoFactory = await hre.ethers.getContractFactory("FluidGovernor");
 
   const staking = await hre.ethers.getContractFactory("LootboxStaking");
 
@@ -48,7 +48,7 @@ export const getFactories = async (
     upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
     govToken: govTokenFactory,
-    veGovLockup: veGovLockupFactory,
+    veGovToken: veGovToken,
     registry: registryFactory,
     operator: operatorFactory,
     compoundLiquidityProvider: compoundLiquidityProviderFactory,
@@ -265,29 +265,30 @@ export const deployGovToken = async(
   totalSupply
 );
 
-export const deployVEGovLockup = async (
+export const deployVEGovToken = async (
   factory: ethers.ContractFactory,
   signer: ethers.Signer,
   voteTokenAddress: string
-): Promise<ethers.Contract> => factory.connect(signer).deploy(voteTokenAddress);
+): Promise<ethers.Contract> =>
+  factory.connect(signer).deploy(voteTokenAddress, "VE Gov Token", "VET", "0");
 
 export const deployUtilityGauges = async (
   factory: ethers.ContractFactory,
   signer: ethers.Signer,
   operator: ethers.Signer,
-  veGovLockupAddress: string,
+  veGovTokenAddress: string,
 ): Promise<ethers.Contract> => {
-  const contract = await factory.connect(signer).deploy(operator.getAddress(), veGovLockupAddress);
+  const contract = await factory.connect(signer).deploy(operator.getAddress(), veGovTokenAddress);
   return contract;
 };
 
 export const deployDAOStable = async(
   factory: ethers.ContractFactory,
-  emergencyCouncil: string,
-  veGovLockupAddress: string
+  veGovTokenAddress: string,
+  timelockControllerAddress: string
 ): Promise<ethers.Contract> => factory.deploy(
-  emergencyCouncil,
-  veGovLockupAddress
+  veGovTokenAddress,
+  timelockControllerAddress
 );
 
 export const deployProxyAdmin = async(
@@ -332,8 +333,8 @@ export const deployFluidity = async (
   govTokenFactory: ethers.ContractFactory,
   govTokenSigner: ethers.Signer,
 
-  veGovLockupFactory: ethers.ContractFactory,
-  veGovLockupSigner: ethers.Signer,
+  veGovTokenFactory: ethers.ContractFactory,
+  veGovTokenSigner: ethers.Signer,
 
   daoFactory: ethers.ContractFactory,
 
@@ -350,12 +351,14 @@ export const deployFluidity = async (
     await registrySigner.getAddress()
   );
 
+  const operatorAddress = await operatorSigner.getAddress();
+
   const operator = await deployOperator(
     hre,
     operatorSigner,
     operatorFactory,
     operatorBeaconAddress,
-    await operatorSigner.getAddress(),
+    operatorAddress,
     emergencyCouncilAddress,
     registry.address
   );
@@ -369,16 +372,35 @@ export const deployFluidity = async (
     govTokenTotalSupply
   );
 
-  const veGovLockup = await deployVEGovLockup(
-    veGovLockupFactory,
-    veGovLockupSigner,
+  const veGovToken = await deployVEGovToken(
+    veGovTokenFactory,
+    veGovTokenSigner,
     govToken.address
+  );
+
+  const timelockFactory = await hre.ethers.getContractFactory("TimelockController");
+
+  const timelockController = await timelockFactory.deploy(
+    3, // min delay
+    [],
+    [operatorAddress], // executors
+    timelockFactory.signer.getAddress()
   );
 
   const dao = await deployDAOStable(
     daoFactory,
-    emergencyCouncilAddress,
-    veGovLockup.address
+    veGovToken.address,
+    timelockController.address
+  );
+
+  await timelockController.grantRole(
+    timelockController.PROPOSER_ROLE(),
+    timelockController.address
+  );
+
+  await timelockController.grantRole(
+    timelockController.CANCELLER_ROLE(),
+    emergencyCouncilAddress
   );
 
   const permitRouterV1 = await permitRouterV1Factory.deploy(
@@ -392,7 +414,7 @@ export const deployFluidity = async (
     govToken: govToken,
     registry: registry,
     dao: dao,
-    veGovLockup: veGovLockup,
+    veGovToken: veGovToken,
     permitRouterV1: permitRouterV1
   }
 };

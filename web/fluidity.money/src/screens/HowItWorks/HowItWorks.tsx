@@ -15,9 +15,9 @@ import styles from "./HowItWorks.module.scss";
 import Link from "next/link";
 
 const HowItWorks = () => {
-  /* 
+  /*
   carousels at the top,
-  3 paragraphs on the left, 
+  3 paragraphs on the left,
   image on the right,
   paragraph highlighted has different specific image,
   scrolls thought automatically and constantly
@@ -107,7 +107,7 @@ const HowItWorks = () => {
               <LinkButton
                 type={"internal"}
                 size={"medium"}
-                handleClick={() => {}}
+                handleClick={() => { }}
               >
                 HOW IT WORKS
               </LinkButton>
@@ -142,7 +142,7 @@ const HowItWorks = () => {
                 type={"fit"}
                 loop={true}
                 videoKey={"abc"}
-                scale={0.6}
+                scale={0.7}
               />
             ) : currentImageIndex === 1 ? (
               <Video

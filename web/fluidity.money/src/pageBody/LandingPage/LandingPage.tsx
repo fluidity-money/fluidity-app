@@ -4,6 +4,7 @@
 
 import Head from "next/head";
 import Articles from "screens/Articles";
+import Ecosystem from "screens/Ecosystem";
 import Demo from "../../screens/Demo";
 import Footer from "../../screens/Footer";
 import HowItWorks from "../../screens/HowItWorks";
@@ -15,10 +16,10 @@ import styles from "./LandingPage.module.scss";
 
 export type onChainData =
   | {
-      ethPool: number;
-      solPool: number;
-      totalTransactions: number;
-    }
+    ethPool: number;
+    solPool: number;
+    totalTransactions: number;
+  }
   | undefined;
 
 const LandingPage = () => {
@@ -35,10 +36,9 @@ const LandingPage = () => {
         <Landing />
         <Reward />
         <HowItWorks />
+        <Ecosystem />
         <UseCases />
         <SponsorsPartners />
-        {/* Ecosystem which scrolls to projects as a component, not ready for production yet */}
-        {/* <Ecosystem /> */}
         <Articles isResourcesPage={false} />
         <Demo />
         <Footer />

@@ -10,6 +10,7 @@ import {
   SupportedChains,
   Heading,
   useViewport,
+  LoadingDots,
 } from "@fluidity-money/surfing";
 import styles from "./RewardsInfoBox.module.scss";
 import dynamic from "next/dynamic";
@@ -71,11 +72,10 @@ const RewardsInfoBox = ({
 
   return (
     <div
-      className={`${
-        type === "black"
-          ? styles.infoBoxContainer
-          : styles.infoBoxContainerStats
-      }`}
+      className={`${type === "black"
+        ? styles.infoBoxContainer
+        : styles.infoBoxContainerStats
+        }`}
     >
       <div
         className={
@@ -89,28 +89,21 @@ const RewardsInfoBox = ({
           }}
           onClick={() => setShowModal(true)}
         />
-        <div onClick={!loading ? changeScreen : () => {}}>
-          <Heading as="h1">
-            {showRewardPool ? (
-              <Suspense>
-                {!loading ? (
-                  <>
-                    $
-                    <AnimatedNumbers animateToNumber={prizePool} includeComma />
-                  </>
-                ) : (
-                  <img
-                    height="70"
-                    width="70"
-                    src="assets/images/LoopAnim.webp"
-                    alt="loading"
-                  />
-                )}
-              </Suspense>
-            ) : (
-              totalTransactions
-            )}
-          </Heading>
+        <div onClick={!loading ? changeScreen : () => { }}>
+          {showRewardPool ? (
+            <Suspense>
+              {!loading ? (
+                <Heading as="h1">
+                  $
+                  <AnimatedNumbers animateToNumber={prizePool} includeComma />
+                </Heading>
+              ) : (
+                <LoadingDots />
+              )}
+            </Suspense>
+          ) : (
+            totalTransactions
+          )}
         </div>
         <Heading as="h4" className={styles.alignCenter}>
           {!loading && (
