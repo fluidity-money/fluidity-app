@@ -6,7 +6,7 @@ import type {
 import { createContext, useContext, useEffect, useState } from "react";
 import { SplitFactory } from "@splitsoftware/splitio";
 
-export const SPLIT_BROWSER_KEY = process.env["NEXT_PUBLIC_FLU_SPLIT_BROWSER_KEY"];
+export const SPLIT_BROWSER_KEY = process.env["FLU_SPLIT_BROWSER_KEY"];
 
 type SplitWindow = Window & {
   split: IBrowserSDK | null;
