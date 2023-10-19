@@ -10,6 +10,7 @@ ARG CI
 ARG GITHUB_TOKEN
 
 ARG NEXT_PUBLIC_FLU_ETH_RPC_HTTP
+ARG NEXT_PUBLIC_FLU_ARB_RPC_HTTP
 
 ENV CI $CI
 
@@ -23,6 +24,9 @@ ARG FLU_SENTRY_DSN
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
+ENV NEXT_PUBLIC_FLU_ETH_RPC_HTTP ${NEXT_PUBLIC_FLU_ETH_RPC_HTTP}
+ENV NEXT_PUBLIC_FLU_ARB_RPC_HTTP ${NEXT_PUBLIC_FLU_ARB_RPC_HTTP}
+
 ENV NEXT_PUBLIC_FLU_GTAG_ID ${NEXT_PUBLIC_FLU_GTAG_ID}
 ENV NEXT_PUBLIC_FLU_GTM_ID ${NEXT_PUBLIC_FLU_GTM_ID}
 
@@ -33,6 +37,8 @@ FROM fluidity/runtime-web-container:latest
 WORKDIR /usr/local/src/fluidity/web
 
 COPY --from=build /usr/local/src/fluidity/web .
+
+RUN rm -rf app.fluidity.money faucet.fluidity.money surfing
 
 WORKDIR /usr/local/src/fluidity/web/fluidity.money
 
