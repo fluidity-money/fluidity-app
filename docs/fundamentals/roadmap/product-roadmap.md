@@ -30,12 +30,3 @@ Given the successful testnet and devnet deployments as well as the massive commu
 7. Web2 - Web3 and retail: Bridging adoption
 8. (🌊 ,💸 ) Join The Movement
 
-
-
-### Some other goals we want to strive for in 2023:
-
-* $20M Wrapped
-* Retail onboarding through fiat onramp
-* Retail adoption of crypto on some use cases - e.g. instant checkout technologies
-* NFT and Digital Art accessibility promotion through Fluid Assets
-
