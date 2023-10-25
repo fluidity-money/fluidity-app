@@ -20,6 +20,7 @@ import (
 
 	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	addresslinker "github.com/fluidity-money/fluidity-app/common/ethereum/address-linker"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/amm"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -44,6 +45,9 @@ const (
 
 	// EnvPaginationAmount to change the pagination length
 	EnvPaginationAmount = `FLU_ETHEREUM_LOG_PAGINATION_AMOUNT`
+
+	// EnvAmmAddress to track events emitted by the AMM
+	EnvAmmAddress = `FLU_ETHEREUM_AMM_ADDRESS`
 
 	// TopicLogs to use when writing logs found with Ethereum
 	TopicLogs = queueEth.TopicLogs
@@ -141,6 +145,7 @@ func main() {
 		ethereumWsUrl     = util.PickEnvOrFatal(EnvEthereumWsUrl)
 		tokenList_        = util.GetEnvOrFatal(EnvTokenList)
 		paginationAmount_ = util.GetEnvOrFatal(EnvPaginationAmount)
+		ammAddress_       = os.Getenv(EnvAmmAddress)
 	)
 
 	tokenList := util.GetTokensListBase(tokenList_)
@@ -149,6 +154,11 @@ func main() {
 
 	for i, token := range tokenList {
 		tokens[i] = common.HexToAddress(token.TokenAddress)
+	}
+
+	if ammAddress_ != "" {
+		ammAddress := common.HexToAddress(ammAddress_)
+		tokens = append(tokens, ammAddress)
 	}
 
 	paginationAmount, err := strconv.ParseUint(paginationAmount_, 10, 64)
@@ -170,6 +180,8 @@ func main() {
 			fluidity.FluidityContractAbi.Events["BurnFluid"].ID,
 			fluidity.StakingAbi.Events["Deposited"].ID,
 			addresslinker.AddressConfirmerAbi.Events["AddressConfirmed"].ID,
+			amm.AmmAbi.Events["MintPosition"].ID,
+			amm.AmmAbi.Events["TransferPosition"].ID,
 		},
 	}
 
