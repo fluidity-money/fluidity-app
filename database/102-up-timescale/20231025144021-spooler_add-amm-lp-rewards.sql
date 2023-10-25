@@ -4,6 +4,7 @@ CREATE TABLE amm_positions (
 	tick_lower INT NOT NULL,
 	tick_upper INT NOT NULL,
 	position_id uint256 UNIQUE NOT NULL,
+	pool VARCHAR NOT NULL,
 	liquidity uint256 NOT NULL
 );
 

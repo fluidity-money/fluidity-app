@@ -27,6 +27,7 @@ func InsertAmmPosition(mint amm.PositionMint) {
 		id    = mint.Id
 		lower = mint.Lower
 		upper = mint.Upper
+		pool  = mint.Pool
 
 		statementText string
 	)
@@ -36,12 +37,14 @@ func InsertAmmPosition(mint amm.PositionMint) {
             position_id,
             tick_lower,
             tick_upper,
+			pool,
             liquidity
 		) VALUES (
 			$1,
 			$2,
 			$3,
-            $4
+            $4,
+			$5
 		);`,
 		TableAmmPositions,
 	)
@@ -51,6 +54,7 @@ func InsertAmmPosition(mint amm.PositionMint) {
 		id,
 		lower,
 		upper,
+		pool,
 		misc.BigIntFromInt64(0),
 	)
 
@@ -83,8 +87,8 @@ func UpdateAmmPosition(update amm.PositionUpdate) {
 
 	_, err := timescaleClient.Exec(
 		statementText,
-		id,
 		delta,
+		id,
 	)
 
 	if err != nil {

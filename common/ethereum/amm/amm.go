@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 )
@@ -41,6 +43,7 @@ type (
 		Id    misc.BigInt
 		Lower int32
 		Upper int32
+		Pool  ethereum.Address
 	}
 	PositionUpdate struct {
 		Id    misc.BigInt
@@ -69,6 +72,12 @@ func DecodeMint(log ethTypes.Log) (mint PositionMint, err error) {
 		return
 	}
 
+	pool__ := log.Topics[3].String()
+
+	pool_ := common.HexToAddress(pool__)
+
+	pool := ethCommon.ConvertGethAddress(pool_)
+
 	data, err := AmmAbi.Unpack("MintPosition", log.Data)
 
 	if err != nil {
@@ -87,6 +96,7 @@ func DecodeMint(log ethTypes.Log) (mint PositionMint, err error) {
 		Id:    misc.NewBigIntFromInt(*id),
 		Lower: lower,
 		Upper: upper,
+		Pool:  pool,
 	}
 
 	return mint, nil
