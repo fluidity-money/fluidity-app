@@ -129,8 +129,6 @@ func payout(trfMode worker.TrfMode, atx, g, blockTimeRat, delta *big.Rat, winnin
 	emission.Payout.B = b
 	emission.Payout.Delta, _ = delta.Float64()
 	emission.Payout.Atx, _ = atx.Float64()
-	//emission.Payout.BlockTime = blockTime
-	//emission.Payout.RewardPool, _ = rewardPool.Float64()
 
 	return aDivP, p
 }
