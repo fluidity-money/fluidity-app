@@ -204,11 +204,11 @@ func main() {
 			}
 
 			emissionScaledRewardPool := new(big.Rat).Quo(
-				sizeOfThePool,
+				unscaledPoolRat,
 				decimalPlacesRat,
 			)
 
-			emission.Payout.RewardPool, _ = emissionScaledRewardPool.Float()
+			emission.Payout.RewardPool, _ = emissionScaledRewardPool.Float64()
 
 			randomN, randomPayouts, _ := probability.WinningChances(
 				worker_types.TrfModeNormal,
