@@ -137,7 +137,17 @@ func main() {
 
 		sizeOfThePool := new(big.Rat).SetUint64(unscaledPool)
 
+		log.Debug(func(k *log.Log) {
+			k.Message = "Unscaled reward pool size"
+			k.Payload = unscaledPool
+		})
+
 		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
+
+		log.Debug(func(k *log.Log) {
+			k.Message = "Scaled reward pool size"
+			k.Payload = sizeOfThePool.String()
+		})
 
 		for _, userAction := range userActions {
 			var (
@@ -199,6 +209,8 @@ func main() {
 					DeltaWeight:        deltaWeight,
 				},
 			}
+
+			emission.Payout.RewardPool, _ = sizeOfThePool.Float64()
 
 			randomN, randomPayouts, _ := probability.WinningChances(
 				worker_types.TrfModeNormal,
