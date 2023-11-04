@@ -135,18 +135,11 @@ func main() {
 
 		unscaledPool := tvl - mintSupply
 
-		sizeOfThePool := new(big.Rat).SetUint64(unscaledPool)
+		unscaledPoolRat := new(big.Rat).SetUint64(unscaledPool)
 
 		log.Debug(func(k *log.Log) {
 			k.Message = "Unscaled reward pool size"
 			k.Payload = unscaledPool
-		})
-
-		sizeOfThePool.Quo(sizeOfThePool, decimalPlacesRat)
-
-		log.Debug(func(k *log.Log) {
-			k.Message = "Scaled reward pool size"
-			k.Payload = sizeOfThePool.String()
 		})
 
 		for _, userAction := range userActions {
@@ -203,14 +196,19 @@ func main() {
 			pools := []worker_types.UtilityVars{
 				{
 					Name:               applications.UtilityFluid,
-					PoolSizeNative:     sizeOfThePool,
+					PoolSizeNative:     unscaledPoolRat,
 					TokenDecimalsScale: decimalPlacesRat,
 					ExchangeRate:       big.NewRat(1, 1),
 					DeltaWeight:        deltaWeight,
 				},
 			}
 
-			emission.Payout.RewardPool, _ = sizeOfThePool.Float64()
+			emissionScaledRewardPool := new(big.Rat).Quo(
+				sizeOfThePool,
+				decimalPlacesRat,
+			)
+
+			emission.Payout.RewardPool, _ = emissionScaledRewardPool.Float()
 
 			randomN, randomPayouts, _ := probability.WinningChances(
 				worker_types.TrfModeNormal,
