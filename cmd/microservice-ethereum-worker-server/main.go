@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -43,6 +44,9 @@ const (
 
 	// EnvRegistryAddress to query to get utility info
 	EnvRegistryAddress = `FLU_ETHEREUM_REGISTRY_ADDR`
+
+	// EnvAmmLpPoolAddress to switch amm rewards to
+	EnvAmmLpPoolAddress = `FLU_ETHEREUM_AMM_LP_POOL_ADDR`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
@@ -93,6 +97,9 @@ func main() {
 		contractAddress       = mustEthereumAddressFromEnv(EnvContractAddress)
 		registryAddress       = mustEthereumAddressFromEnv(EnvRegistryAddress)
 		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
+
+		ammLpPoolAddr_ = mustEthereumAddressFromEnv(EnvAmmLpPoolAddress)
+		ammLpPoolAddr  = commonEth.ConvertGethAddress(ammLpPoolAddr_)
 
 		chainlinkEthPriceFeedUrl = os.Getenv(EnvChainlinkEthPriceNetworkUrl)
 	)
@@ -495,6 +502,13 @@ func main() {
 					if utility != "" {
 						fluidClients = append(fluidClients, utility)
 					}
+				}
+
+				// mandatory fee switch
+				if application == applications.ApplicationSeawaterAmm {
+					recipientAddress = ammLpPoolAddr
+					emission.FeeSwitchRecipient.OriginalAddress = recipientAddress_.String()
+					emission.FeeSwitchRecipient.NewAddress = recipientAddress.String()
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()

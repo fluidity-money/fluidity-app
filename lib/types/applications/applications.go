@@ -7,6 +7,8 @@ package applications
 import (
 	"fmt"
 	"math/big"
+
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 // applications contains types relevant to supporting events generated
@@ -45,6 +47,17 @@ type UtilityName string
 
 // UtilityFluid is the special utility name for the fluid token itself
 var UtilityFluid UtilityName = "FLUID"
+
+type ApplicationDataAmm struct {
+	FirstToken  ethereum.Address
+	FirstTick   int32
+	SecondToken ethereum.Address
+	SecondTick  int32
+}
+
+type ApplicationData struct {
+	AmmPrices ApplicationDataAmm `json:"amm_prices"`
+}
 
 type ApplicationFeeData = struct {
 	// Fee for the fee paid to the application (in USD)

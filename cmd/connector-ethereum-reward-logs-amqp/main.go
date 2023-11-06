@@ -182,6 +182,7 @@ func main() {
 			addresslinker.AddressConfirmerAbi.Events["AddressConfirmed"].ID,
 			amm.AmmAbi.Events["MintPosition"].ID,
 			amm.AmmAbi.Events["TransferPosition"].ID,
+			amm.AmmAbi.Events["CollectFees"].ID,
 		},
 	}
 

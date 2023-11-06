@@ -10,6 +10,7 @@ import (
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 
 	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -27,6 +28,15 @@ type callRewardArguments struct {
 	client                *ethclient.Client
 	useHardhatFix         bool
 	hardcodedGasLimit     uint64
+}
+
+type callLpRewardArguments struct {
+	tokens                map[applications.UtilityName]ethCommon.Address
+	transactionOptions    *ethAbiBind.TransactOpts
+	containerAnnouncement worker.EthereumSpooledLpRewards
+	executorAddress       ethCommon.Address
+	contractAddress       ethCommon.Address
+	client                *ethclient.Client
 }
 
 func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, error) {
@@ -74,6 +84,55 @@ func callRewardFunction(arguments callRewardArguments) (*ethTypes.Transaction, e
 	}
 
 	transaction, err := fluidity.TransactBatchReward(
+		client,
+		executorAddress,
+		contractAddress,
+		transactionOptions,
+		containerAnnouncement,
+	)
+
+	if err != nil {
+		var transactionHashHex string
+
+		if transaction != nil {
+			transactionHashHex = transaction.Hash().Hex()
+		}
+
+		return nil, fmt.Errorf(
+			"failed to call the reward contract function with transaction hash %#v! %v",
+			transactionHashHex,
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+
+func callLpRewardFunction(arguments callLpRewardArguments) (*ethTypes.Transaction, error) {
+	var (
+		tokens                = arguments.tokens
+		transactionOptions    = arguments.transactionOptions
+		containerAnnouncement = arguments.containerAnnouncement
+		executorAddress       = arguments.executorAddress
+		contractAddress       = arguments.contractAddress
+		client                = arguments.client
+	)
+
+	err := libEthereum.UpdateGasAmounts(
+		context.Background(),
+		client,
+		transactionOptions,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to update the gas amounts for calling the reward! %v",
+			err,
+		)
+	}
+
+	transaction, err := fluidity.TransactLpRewards(
+		tokens,
 		client,
 		executorAddress,
 		contractAddress,

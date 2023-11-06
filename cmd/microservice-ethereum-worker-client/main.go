@@ -157,6 +157,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			)
 		})
 
+		//amm.HandleAmmWinnings()
 		id := ethereumUniqueTransfer{
 			transactionHash: announcementTransactionHash.String(),
 			logIndex:        logIndex.String(),
@@ -175,7 +176,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 				ToAddress:       toAddress,
 				ToWinAmount:     make(map[applications.UtilityName]worker.Payout),
 				TokenDetails:    tokenDetails,
-				Application:     application,
+				Decorator:       winAnnouncement.Decorator,
 				RewardTier:      winningBalls,
 			}
 		}

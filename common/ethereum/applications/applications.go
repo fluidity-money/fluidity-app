@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/amm"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/apeswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/balancer"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/camelot"
@@ -60,15 +61,17 @@ const (
 	ApplicationSushiswap
 	ApplicationKyberClassic
 	ApplicationWombat
+	ApplicationSeawaterAmm
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns (feeData wiht Fee set to nil, ni) in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt, inputData misc.Blob) (applications.ApplicationFeeData, worker.EthereumAppFees, error) {
+func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt, inputData misc.Blob) (applications.ApplicationFeeData, applications.ApplicationData, worker.EthereumAppFees, error) {
 	var (
 		feeData  applications.ApplicationFeeData
+		appData  applications.ApplicationData
 		emission worker.EthereumAppFees
 		err      error
 	)
@@ -255,6 +258,14 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Wombat += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationSeawaterAmm:
+		feeData, appData, err = amm.GetAmmFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.SeawaterAmm += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(
@@ -263,7 +274,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 	}
 
-	return feeData, emission, err
+	return feeData, appData, emission, err
 }
 
 // GetApplicationTransferParties to find the parties considered for payout from an application interaction.
@@ -351,6 +362,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 	case ApplicationWombat:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationSeawaterAmm:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool (switched to the LPs)
 		return transaction.From, logAddress, nil
 
 	default:

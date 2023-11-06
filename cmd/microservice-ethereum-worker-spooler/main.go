@@ -10,6 +10,7 @@ import (
 
 	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/amm"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -98,6 +99,7 @@ func main() {
 		for _, announcement := range announcements {
 			// write the winner into the database
 			spooler.InsertPendingWinners(announcement, tokenDetails)
+			amm.HandleAmmWinnings(announcement, tokenDetails)
 
 			var (
 				// the sender's winnings will always be higher than the recipient's

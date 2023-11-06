@@ -41,6 +41,7 @@ type (
 		ToWinAmount     map[applications.UtilityName]Payout `json:"to_win_amount"`
 		TokenDetails    token_details.TokenDetails          `json:"token_details"`
 		Application     applications.Application            `json:"application"`
+		Decorator       EthereumWorkerDecorator             `json:"decorator"`
 		RewardTier      int                                 `json:"reward_tier"`
 	}
 
@@ -63,6 +64,11 @@ type (
 		Rewards    map[applications.UtilityName]map[ethereum.Address]misc.BigInt `json:"rewards"`
 	}
 
+	EthereumSpooledLpRewards struct {
+		Rewards map[applications.UtilityName]misc.BigInt `json:"rewards"`
+		Address ethereum.Address                         `json:"address"`
+	}
+
 	EthereumBlockLog struct {
 		BlockHash    ethereum.Hash          `json:"block_hash"`
 		BlockBaseFee misc.BigInt            `json:"block_base_fee"`
@@ -83,6 +89,8 @@ type (
 		// Application fee in USD
 		ApplicationFee *big.Rat `json:"application_fee"`
 		Volume         *big.Int `json:"volume"`
+
+		ApplicationData applications.ApplicationData `json:"application_data"`
 	}
 
 	// EthereumDecoratedTransaction is a transaction, its receipt, and any
