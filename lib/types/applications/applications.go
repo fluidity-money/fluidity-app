@@ -40,6 +40,7 @@ var applicationNames = []string{
 	"sushiswap",
 	"kyber_classic",
 	"wombat",
+	"seawater-amm",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

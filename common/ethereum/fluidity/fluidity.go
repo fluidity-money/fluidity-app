@@ -219,12 +219,12 @@ const executorAbiString = `[
 			  "name": "_rewards",
 			  "type": "tuple[]"
 		  }
-		  ],
+	  ],
 	  "name": "lpReward",
 	  "outputs": [],
 	  "stateMutability": "nonpayable",
 	  "type": "function"
-  },
+  }
 ]`
 
 const registryAbiString = `[

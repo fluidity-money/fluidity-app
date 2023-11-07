@@ -2,6 +2,7 @@ package amm
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum/amm"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -46,32 +46,70 @@ func handleSwap1(transfer worker.EthereumApplicationTransfer, client *ethclient.
 		)
 	}
 
-	_ = swapData
+	var (
+		volumeInt = swapData.Amount1
+		firstTick = swapData.FinalTick
+		pool      = swapData.Pool
+	)
+
+	decimalsAdjusted := math.Pow10(tokenDecimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	// amount 1 is the fluid token
+	volume := new(big.Rat).SetInt(&volumeInt.Int)
+	volume.Quo(volume, decimalsRat)
 
 	fee := applications.ApplicationFeeData{
+		// zero fee for now
 		Fee:    big.NewRat(0, 1),
-		Volume: big.NewRat(0, 1),
+		Volume: volume,
 	}
+
 	appData := applications.ApplicationData{
 		AmmPrices: applications.ApplicationDataAmm{
-			FirstToken: ethereum.AddressFromString("0x1"),
-			FirstTick:  3,
+			FirstToken: pool,
+			FirstTick:  firstTick,
 		},
 	}
+
 	return fee, appData, nil
 }
 
 func handleSwap2(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, applications.ApplicationData, error) {
-	fee := applications.ApplicationFeeData{
-		Fee:    big.NewRat(0, 1),
-		Volume: big.NewRat(0, 1),
+	swap2Data, err := amm.DecodeSwap2(transfer.Log)
+
+	if err != nil {
+		return applications.ApplicationFeeData{}, applications.ApplicationData{}, fmt.Errorf(
+			"Failed to decode swap2 data! %w",
+			err,
+		)
 	}
+
+	var (
+		fluidVolumeInt = swap2Data.FluidVolume
+		firstToken     = swap2Data.From
+		secondToken    = swap2Data.To
+		firstTick      = swap2Data.FinalTick0
+		secondTick     = swap2Data.FinalTick1
+	)
+
+	fluidVolumeRat := new(big.Rat).SetInt(&fluidVolumeInt.Int)
+
+	// there's two fluid transfers with this volume per swap2
+	fluidVolumeRat.Mul(fluidVolumeRat, big.NewRat(2, 1))
+
+	fee := applications.ApplicationFeeData{
+		// zero fee for now
+		Fee:    big.NewRat(0, 1),
+		Volume: fluidVolumeRat,
+	}
+
 	appData := applications.ApplicationData{
 		AmmPrices: applications.ApplicationDataAmm{
-			FirstToken:  ethereum.AddressFromString("0x1"),
-			FirstTick:   3,
-			SecondToken: ethereum.AddressFromString("0x2"),
-			SecondTick:  2,
+			FirstToken:  firstToken,
+			FirstTick:   firstTick,
+			SecondToken: secondToken,
+			SecondTick:  secondTick,
 		},
 	}
 

@@ -5,15 +5,16 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/lib/queues/amm"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/amm"
+	ammQueue "github.com/fluidity-money/fluidity-app/lib/queues/amm"
 )
 
 func main() {
-	go amm.PositionMintsEthereum(func(amm.PositionMint) {
-
+	go ammQueue.PositionMintsEthereum(func(mint ammQueue.PositionMint) {
+		amm.InsertAmmPosition(mint)
 	})
 
-	amm.PositionUpdatesEthereum(func(amm.PositionUpdate) {
-
+	ammQueue.PositionUpdatesEthereum(func(update ammQueue.PositionUpdate) {
+		amm.UpdateAmmPosition(update)
 	})
 }

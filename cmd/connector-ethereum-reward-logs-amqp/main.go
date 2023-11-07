@@ -181,7 +181,7 @@ func main() {
 			fluidity.StakingAbi.Events["Deposited"].ID,
 			addresslinker.AddressConfirmerAbi.Events["AddressConfirmed"].ID,
 			amm.AmmAbi.Events["MintPosition"].ID,
-			amm.AmmAbi.Events["TransferPosition"].ID,
+			amm.AmmAbi.Events["UpdatePositionLiquidity"].ID,
 			amm.AmmAbi.Events["CollectFees"].ID,
 		},
 	}

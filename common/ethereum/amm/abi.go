@@ -67,6 +67,7 @@ const ammAbiString = `[
         { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
         { "indexed": false, "internalType": "uint256", "name": "amountIn", "type": "uint256" },
         { "indexed": false, "internalType": "uint256", "name": "amountOut", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "fluidVolume", "type": "uint256" },
         { "indexed": false, "internalType": "int32", "name": "finalTick0", "type": "int32" },
         { "indexed": false, "internalType": "int32", "name": "finalTick1", "type": "int32" }
       ],
@@ -79,14 +80,14 @@ var AmmAbi ethAbi.ABI
 
 type (
 	PositionMint struct {
-		Id    misc.BigInt
-		Lower int32
-		Upper int32
-		Pool  ethereum.Address
+		Id    misc.BigInt      `json:"id"`
+		Lower int32            `json:"lower_tick"`
+		Upper int32            `json:"upper_tick"`
+		Pool  ethereum.Address `json:"pool"`
 	}
 	PositionUpdate struct {
-		Id    misc.BigInt
-		Delta misc.BigInt
+		Id    misc.BigInt `json:"id"`
+		Delta misc.BigInt `json:"liquidity_delta"`
 	}
 	CollectFees struct {
 		Id      misc.BigInt
@@ -104,13 +105,14 @@ type (
 		FinalTick  int32
 	}
 	Swap2 struct {
-		User       ethereum.Address
-		From       ethereum.Address
-		To         ethereum.Address
-		AmountIn   misc.BigInt
-		AmountOut  misc.BigInt
-		FinalTick0 int32
-		FinalTick1 int32
+		User        ethereum.Address
+		From        ethereum.Address
+		To          ethereum.Address
+		AmountIn    misc.BigInt
+		AmountOut   misc.BigInt
+		FluidVolume misc.BigInt
+		FinalTick0  int32
+		FinalTick1  int32
 	}
 )
 
@@ -334,7 +336,7 @@ func DecodeSwap2(log ethereum.Log) (swap Swap2, err error) {
 
 	user := convertAddress(log.Topics[1])
 	from := convertAddress(log.Topics[2])
-	to := convertAddress(log.Topics[2])
+	to := convertAddress(log.Topics[3])
 
 	data, err := AmmAbi.Unpack("Swap2", log.Data)
 
@@ -361,26 +363,33 @@ func DecodeSwap2(log ethereum.Log) (swap Swap2, err error) {
 		return
 	}
 
-	finalTick0, ok := data[2].(int32)
+	fluidVolume, ok := data[2].(*big.Int)
 	if !ok {
 		err = unexpectedDecodedDataErr
 		return
 	}
 
-	finalTick1, ok := data[3].(int32)
+	finalTick0, ok := data[3].(int32)
+	if !ok {
+		err = unexpectedDecodedDataErr
+		return
+	}
+
+	finalTick1, ok := data[4].(int32)
 	if !ok {
 		err = unexpectedDecodedDataErr
 		return
 	}
 
 	swap2 := Swap2{
-		User:       user,
-		From:       from,
-		To:         to,
-		AmountIn:   misc.NewBigIntFromInt(*amountIn),
-		AmountOut:  misc.NewBigIntFromInt(*amountOut),
-		FinalTick0: finalTick0,
-		FinalTick1: finalTick1,
+		User:        user,
+		From:        from,
+		To:          to,
+		AmountIn:    misc.NewBigIntFromInt(*amountIn),
+		AmountOut:   misc.NewBigIntFromInt(*amountOut),
+		FluidVolume: misc.NewBigIntFromInt(*fluidVolume),
+		FinalTick0:  finalTick0,
+		FinalTick1:  finalTick1,
 	}
 
 	return swap2, nil
