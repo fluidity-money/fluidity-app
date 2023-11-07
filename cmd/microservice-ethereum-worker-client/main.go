@@ -98,6 +98,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 			emission                    = announcement.Emissions
 			tokenDetails                = announcement.TokenDetails
 			application                 = announcement.Application
+			decorator                   = announcement.Decorator
 		)
 
 		if fromAddress == ethereumNullAddress {
@@ -176,7 +177,7 @@ func processAnnouncements(announcements []worker.EthereumAnnouncement, rewardsAm
 				ToAddress:       toAddress,
 				ToWinAmount:     make(map[applications.UtilityName]worker.Payout),
 				TokenDetails:    tokenDetails,
-				Decorator:       winAnnouncement.Decorator,
+				Decorator:       decorator,
 				RewardTier:      winningBalls,
 			}
 		}

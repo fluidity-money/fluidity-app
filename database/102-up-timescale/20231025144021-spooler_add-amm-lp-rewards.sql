@@ -13,17 +13,12 @@ CREATE TABLE amm_positions (
 
 CREATE TABLE pending_lp_rewards (
 	-- token id
-	token_short_name VARCHAR NOT NULL,
+	fluid_token_short_name VARCHAR NOT NULL,
 	network VARCHAR NOT NULL,
 
+	utility_name VARCHAR NOT NULL,
 	position_id uint256 NOT NULL,
 	amount uint256 NOT NULL,
-
-	-- metadata
-	token_decimals VARCHAR NOT NULL,
-	winning_transaction_hash VARCHAR NOT NULL,
-	awarded_time TIMESTAMP NOT NULL,
-	utility_name VARCHAR NOT NULL,
 
 	reward_sent boolean NOT NULL
 );

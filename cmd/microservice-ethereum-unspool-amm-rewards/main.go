@@ -14,6 +14,7 @@ import (
 	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -23,13 +24,31 @@ const (
 	EnvAmmAddress = `FLU_ETHEREUM_AMM_ADDRESS`
 
 	EnvLpSenderQueue = `FLU_ETHEREUM_LP_REWARD_AMQP_QUEUE_NAME`
+
+	EnvFluidTokenName = `FLU_ETHEREUM_TOKEN_SHORT_NAME`
+
+	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
 func main() {
 	var (
-		ammAddress_ = util.GetEnvOrFatal(EnvAmmAddress)
-		lpQueue     = util.GetEnvOrFatal(EnvLpSenderQueue)
+		ammAddress_    = util.GetEnvOrFatal(EnvAmmAddress)
+		lpQueue        = util.GetEnvOrFatal(EnvLpSenderQueue)
+		tokenShortName = util.GetEnvOrFatal(EnvFluidTokenName)
+		network__      = util.GetEnvOrFatal(EnvNetwork)
 	)
+
+	network_, err := network.ParseEthereumNetwork(network__)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to parse a blockchain network from %s! %w",
+				network__,
+				err,
+			)
+		})
+	}
 
 	ammAddress := ethTypes.AddressFromString(ammAddress_)
 
@@ -50,14 +69,14 @@ func main() {
 
 		switch topic {
 		case amm.AmmAbi.Events["CollectFees"].ID:
-			handleCollect(log_, lpQueue)
+			handleCollect(network_, tokenShortName, log_, lpQueue)
 		default:
 			// swaps are handled in microservice-eth-user-actions and in the apps server
 		}
 	})
 }
 
-func handleCollect(log_ ethQueue.Log, lpQueue string) {
+func handleCollect(network network.BlockchainNetwork, tokenShortName string, log_ ethQueue.Log, lpQueue string) {
 	collect, err := amm.DecodeCollectFees(log_)
 
 	if err != nil {
@@ -67,7 +86,7 @@ func handleCollect(log_ ethQueue.Log, lpQueue string) {
 		})
 	}
 
-	rewards := ammDb.GetAndRemoveRewardsForLp(collect.Id)
+	rewards := ammDb.GetAndRemoveRewardsForLp(network, tokenShortName, collect.Id)
 
 	// collate the rewards
 	collatedRewards := make(map[appTypes.UtilityName]misc.BigInt)
@@ -90,8 +109,8 @@ func handleCollect(log_ ethQueue.Log, lpQueue string) {
 	}
 
 	announcement := worker.EthereumSpooledLpRewards{
-		Rewards: map[appTypes.UtilityName]misc.BigInt{},
-		Address: ethTypes.Address{},
+		Rewards: collatedRewards,
+		Address: collect.To,
 	}
 
 	queue.SendMessage(lpQueue, announcement)

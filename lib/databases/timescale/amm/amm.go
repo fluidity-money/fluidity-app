@@ -11,6 +11,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
@@ -107,7 +108,7 @@ func UpdateAmmPosition(update amm.PositionUpdate) {
 }
 
 func HandleAmmWinnings(win worker.EthereumWinnerAnnouncement, tokenDetails map[applications.UtilityName]token_details.TokenDetails) {
-	if win.Application != commonApps.ApplicationSeawaterAmm {
+	if win.Application != commonApps.ApplicationSeawaterAmm || win.Decorator == nil {
 		return
 	}
 
@@ -126,14 +127,14 @@ func HandleAmmWinnings(win worker.EthereumWinnerAnnouncement, tokenDetails map[a
 	}
 
 	if secondToken == ethereum.AddressFromString("") {
-		// swap2
-		addAmmWins(win, wins, tokenDetails, firstToken, firstTick, true)
-		addAmmWins(win, wins, tokenDetails, secondToken, secondTick, true)
+		// swap1
+		addAmmWins(win, wins, tokenDetails, firstToken, firstTick, false)
 		return
 	}
 
-	// swap1
-	addAmmWins(win, wins, tokenDetails, firstToken, firstTick, false)
+	// swap2
+	addAmmWins(win, wins, tokenDetails, firstToken, firstTick, true)
+	addAmmWins(win, wins, tokenDetails, secondToken, secondTick, true)
 }
 
 func addAmmWins(win worker.EthereumWinnerAnnouncement, wins map[applications.UtilityName]worker.Payout, tokenDetails map[applications.UtilityName]token_details.TokenDetails, pool ethereum.Address, tick int32, halve bool) {
@@ -153,6 +154,7 @@ func addAmmWins(win worker.EthereumWinnerAnnouncement, wins map[applications.Uti
 		)
 
 		INSERT INTO %s (
+			fluid_token_short_name,
 			network,
 			utility_name,
 			position_id,
@@ -162,8 +164,9 @@ func addAmmWins(win worker.EthereumWinnerAnnouncement, wins map[applications.Uti
 		SELECT
 			$3,
 			$4,
+			$5,
 			position_id,
-			$5 * liquidity / (SELECT sum(liquidity) FROM active_positions),
+			$6 * liquidity / (SELECT sum(liquidity) FROM active_positions),
 			false
 		FROM active_positions
 		;`,
@@ -182,6 +185,7 @@ func addAmmWins(win worker.EthereumWinnerAnnouncement, wins map[applications.Uti
 			statementText,
 			tick,
 			pool,
+			win.TokenDetails.TokenShortName,
 			win.Network,
 			utility,
 			misc.NewBigIntFromInt(*payoutAmount),
@@ -201,18 +205,20 @@ type AmmRewards struct {
 	Amount  misc.BigInt
 }
 
-func GetAndRemoveRewardsForLp(id misc.BigInt) []AmmRewards {
+func GetAndRemoveRewardsForLp(network network.BlockchainNetwork, fluidToken string, id misc.BigInt) []AmmRewards {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
 		`UPDATE %s
 			SET reward_sent = true
 		WHERE
-			position_id = $1
+			network = $1
+			AND fluid_token_short_name = $2
+			AND position_id = $3
 			AND reward_sent = false
 		RETURNING
 			amount,
-			utility
+			utility_name
 		;`,
 
 		TablePendingLpRewards,
@@ -220,6 +226,8 @@ func GetAndRemoveRewardsForLp(id misc.BigInt) []AmmRewards {
 
 	rows, err := timescaleClient.Query(
 		statementText,
+		network,
+		fluidToken,
 		id,
 	)
 

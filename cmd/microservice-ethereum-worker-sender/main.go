@@ -52,7 +52,7 @@ const (
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 
-	EnvLpRewardQueueName = `FLU_ETHEREUMLP_REWARD_AMQP_QUEUE_NAME`
+	EnvLpRewardQueueName = `FLU_ETHEREUM_LP_REWARD_AMQP_QUEUE_NAME`
 
 	EnvUtilityTokensMap = `FLU_ETHEREUM_UTILITY_TOKENS_LOOKUP`
 )

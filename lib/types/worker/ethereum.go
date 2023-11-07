@@ -28,6 +28,7 @@ type (
 		TokenDetails    token_details.TokenDetails            `json:"token_details"`
 		Emissions       Emission                              `json:"emissions"`
 		Application     applications.Application              `json:"application"`
+		Decorator       *EthereumWorkerDecorator              `json:"decorator"`
 	}
 
 	EthereumWinnerAnnouncement struct {
@@ -41,7 +42,7 @@ type (
 		ToWinAmount     map[applications.UtilityName]Payout `json:"to_win_amount"`
 		TokenDetails    token_details.TokenDetails          `json:"token_details"`
 		Application     applications.Application            `json:"application"`
-		Decorator       EthereumWorkerDecorator             `json:"decorator"`
+		Decorator       *EthereumWorkerDecorator            `json:"decorator"`
 		RewardTier      int                                 `json:"reward_tier"`
 	}
 

@@ -644,6 +644,7 @@ func main() {
 						RandomPayouts:   payoutDetails.randomPayouts,
 						TokenDetails:    tokenDetails,
 						Application:     application,
+						Decorator:       transfer.Decorator,
 					}
 
 					// Fill in emission.NaiveIsWinning

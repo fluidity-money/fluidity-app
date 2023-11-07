@@ -209,7 +209,6 @@ const executorAbiString = `[
 	  "inputs": [
 		  { "internalType": "address", "name": "_token", "type": "address" },
 		  { "internalType": "address", "name": "_user", "type": "address" },
-		  { "internalType": "uint256", "name": "_id", "type": "uint256" },
 		  {
 			  "components": [
 				  { "internalType": "address", "name": "token", "type": "address" },
@@ -445,7 +444,8 @@ func TransactLpRewards(tokens map[applications.UtilityName]ethCommon.Address, cl
 
 	var (
 		collatedRewards = announcement.Rewards
-		user            = announcement.Address
+		user_           = announcement.Address
+		user            = ethereum.ConvertInternalAddress(user_)
 
 		rewards []abiLpReward
 	)
