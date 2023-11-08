@@ -12,10 +12,11 @@ import "fmt"
 type BlockchainNetwork string
 
 const (
-	NetworkEthereum BlockchainNetwork = `ethereum`
-	NetworkArbitrum BlockchainNetwork = `arbitrum`
-	NetworkSolana   BlockchainNetwork = `solana`
-	NetworkPolygonZk BlockchainNetwork = `polygon_zk`
+	NetworkEthereum      BlockchainNetwork = `ethereum`
+	NetworkArbitrum      BlockchainNetwork = `arbitrum`
+	NetworkSolana        BlockchainNetwork = `solana`
+	NetworkPolygonZk     BlockchainNetwork = `polygon_zk`
+	NetworkStylusTestnet BlockchainNetwork = `stylus_testnet`
 )
 
 // ParseEthereumNetwork takes a network name as a string
@@ -28,10 +29,12 @@ func ParseEthereumNetwork(network_ string) (network BlockchainNetwork, err error
 		network = NetworkArbitrum
 	case string(NetworkPolygonZk):
 		network = NetworkPolygonZk
+	case string(NetworkStylusTestnet):
+		network = NetworkStylusTestnet
 	default:
 		err = fmt.Errorf(
 			"Unknown network name '%s'",
-			network,
+			network_,
 		)
 	}
 
