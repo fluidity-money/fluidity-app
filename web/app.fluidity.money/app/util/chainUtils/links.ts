@@ -2,8 +2,6 @@ import type { Chain } from "./chains";
 
 const getAddressExplorerLink = (chain: Chain, address: string): string => {
   switch (chain) {
-    case "ethereum":
-      return `https://etherscan.io/address/${address}`;
     case "solana":
       return `https://explorer.solana.com/address/${address}`;
     case "arbitrum":

@@ -13,47 +13,6 @@ import {
 import { MintAddress } from "~/types/MintAddress";
 
 const queryByAddress: Queryable = {
-  ethereum: gql`
-    query getTransactionsByAddress(
-      $tokens: [String!]
-      $address: String!
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      ethereum {
-        transfers(
-          currency: { in: $tokens }
-          any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByAddress(
       $address: String!
@@ -164,71 +123,6 @@ const queryByAddress: Queryable = {
 };
 
 const queryByTxHash: Queryable = {
-  ethereum: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $filterHashes: [String!] = []
-      $tokens: [String!] = []
-      $limit: Int = 12
-    ) {
-      ethereum {
-        transfers(
-          options: { desc: "block.timestamp.unixtime", limit: $limit }
-          txHash: { in: $transactions }
-          currency: { in: $tokens }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-        }
-      }
-    }
-  `,
-
-  arbitrum: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      transfers: user_actions(
-        where: {
-          network: { _eq: "arbitrum" }
-          _not: { transaction_hash: { _in: $filterHashes } }
-          transaction_hash: { _in: $transactions }
-        }
-        order_by: { time: desc }
-        limit: $limit
-      ) {
-        sender_address
-        recipient_address
-        token_short_name
-        time
-        transaction_hash
-        amount
-        token_decimals
-        type
-        swap_in
-        application
-      }
-    }
-  `,
-
   solana: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -289,45 +183,6 @@ const queryByTxHash: Queryable = {
 };
 
 const queryAll: Queryable = {
-  ethereum: gql`
-    query getTransactions(
-      $tokens: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      ethereum {
-        transfers(
-          currency: { in: $tokens }
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactions(
       $offset: Int = 0

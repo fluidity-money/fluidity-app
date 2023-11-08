@@ -202,10 +202,6 @@ const CHAIN_NAME_MAP: Record<
   string,
   { name: string; icon: JSX.Element; disabled?: boolean }
 > = {
-  ethereum: {
-    name: "ETH",
-    icon: <img src="/assets/chains/ethIcon.svg" />,
-  },
   arbitrum: {
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,

@@ -18,11 +18,6 @@ export async function loader() {
       Promise.all(
         [
           {
-            network: "ethereum",
-            abi: RewardAbi,
-            getPrizePool: aggregatePrizePools,
-          },
-          {
             network: "arbitrum",
             abi: TotalRewardPoolAbi,
             getPrizePool: getTotalRewardPool,
