@@ -1,0 +1,69 @@
+// Mono
+$black: #000000;
+$white: #ffffff;
+$gray: #999999;
+
+.table_content {
+  font-family: "Inter";
+  font-weight: 500;
+  width: 100%;
+  border-spacing: 0 0.25em;
+
+  .heading {
+    color: $gray;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 21px;
+  }
+}
+
+.table_content > thead > tr.highlighted_row,
+.table_content > tbody > tr.table_row.highlighted_row {
+  background: linear-gradient(
+    90deg,
+    #f3b8d8 0%,
+    #b793e9 15.1%,
+    #9fd4f3 26.04%,
+    #ffd2c4 36.46%,
+    #fbf3f3 46.88%,
+    #d9abdf 57.29%,
+    #af9ce3 72.4%,
+    #aae4e1 85.42%,
+    #c6ead0 93.23%,
+    #fdb5e4 100%
+  );
+  opacity: 20%;
+}
+
+.table_content > tbody > tr > td {
+  background-color: #ffffff0d;
+  padding: 1em 0.5em;
+}
+
+.table_content > thead > tr th:first-child,
+.table_content > thead > tr td:first-child,
+.table_content > tbody > tr.table_row th:first-child,
+.table_content > tbody > tr.table_row td:first-child {
+  padding-left: 4em;
+  text-align: left;
+}
+
+.table_content > thead > tr td,
+.table_content > tbody > tr.table_row td {
+  background-color: transparent !important;
+  border-bottom: 1px solid $white;
+}
+
+.table_content > thead > tr th,
+.table_content > thead > tr td,
+.table_content > tbody > tr.table_row th,
+.table_content > tbody > tr.table_row td {
+  padding-left: 2em;
+  padding-right: 2em;
+  text-align: left;
+}
+
+.table_content > thead > tr:last-of-type td,
+.table_content > tbody > tr.table_row:last-of-type td {
+  border-bottom: none !important;
+}

@@ -1,0 +1,91 @@
+.winnersRight {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 24px;
+  font-size: 16px;
+  background-color: transparent;
+  overflow: hidden;
+  z-index: 1;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  box-sizing: content-box;
+  &Line {
+    display: flex;
+    position: absolute;
+    font-size: 16px;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    transform: scale(2);
+    transition: all 1s ease;
+    & > div {
+      display: flex;
+      animation: scrollRight 120s infinite linear;
+      font-size: 16px;
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+  }
+}
+
+@keyframes scrollRight {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.winnersLeft {
+  @extend .winnersRight;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  &Line {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    transform: scale(2);
+    transition: all 1s ease;
+    & > div {
+      display: flex;
+      animation: scrollLeft 120s infinite linear;
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+  }
+}
+
+@keyframes scrollLeft {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+.backgroundLeft {
+  & > div {
+    animation: scrollLeft 2000s infinite linear;
+  }
+}
+
+.backgroundRight {
+  & > div {
+    animation: scrollRight 2000s infinite linear;
+  }
+}
