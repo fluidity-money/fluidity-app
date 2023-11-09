@@ -62,13 +62,12 @@ const Provider = ({
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    ethereum: EthereumProvider(walletconnectId, tokens, network),
     solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
     polygon_zk: EthereumProvider(walletconnectId, tokens, network),
   };
 
-  const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
+  const [validNetwork, setValidNetwork] = useState(network ?? "arbitrum");
 
   useEffect(() => {
     if (network && Object.keys(providers).includes(network)) {

@@ -71,7 +71,7 @@ type HighestRewardByNetworkBody = {
 };
 
 const useHighestRewardStatisticsByNetwork = async (network: string) => {
-  if (network !== "ethereum" && network !== "arbitrum") {
+  if (network !== "arbitrum") {
     throw Error(`network ${network} not supported`);
   }
 

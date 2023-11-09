@@ -55,11 +55,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
             Promise.all(
               [
                 {
-                  network: "ethereum",
-                  abi: RewardAbi,
-                  getPrizePool: aggregatePrizePools,
-                },
-                {
                   network: "arbitrum",
                   abi: TotalRewardPoolAbi,
                   getPrizePool: getTotalRewardPool,
