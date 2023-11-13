@@ -151,11 +151,13 @@ func TestString(t *testing.T) {
 	},
 	"fee_switch_sender":{
 		"original_address":"",
-		"new_address":""
+		"new_address":"",
+		"fee_switch_reason":""
 	},
 	"fee_switch_recipient":{
 		"original_address":"",
-		"new_address":""
+		"new_address":"",
+		"fee_switch_reason":""
 	},
 	"special_pool_options":{
 		"payout_freq_override":0,
