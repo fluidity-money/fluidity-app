@@ -7,6 +7,9 @@
 | StupidLiquidityProvider beacon       | 0x2F26b901590801476C5bAC1dEbc4E42379127A44 |
 | Registry implementation              | 0x3F511b0F5Ce567899DeeE6A3c80A2742272687D0 |
 | Registry proxy                       | 0x3eBb6Ac8E85F3E77976DF2Fa95b3Dc2b06Ac2741 |
+| Seawater swaps                       | 0xBEf8358A102Ee25157dcda535AaAa752927932BA |
+| Seawater positions                   | 0x5de160Cb95E6480e28741D0C961a3107Bfb76EB8 |
+| Seawater admin                       | 0x0fFC26C47FeD8C54AF2f0872cc51d79D173730a8 |
 | Executor implementation              | 0x43A878df882AF63cAa81d0267D49ec4Bb31C57d8 |
 | Executor proxy                       | 0xC4CD24FF5D4875aD651BA7543197EB400d7cBaeB |
 | "Fake-Token" token                   | 0x229A87BB4bFcB5960794570C0F70EadBf958a985 |
