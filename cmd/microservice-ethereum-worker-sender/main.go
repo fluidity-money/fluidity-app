@@ -257,11 +257,7 @@ func main() {
 
 		log.Debugf("Waiting for reward transaction to be mined...")
 
-		ctx, _ := context.WithTimeoutCause(
-			context.Background(),
-			MiningTimeout,
-			fmt.Errorf("Timeout waiting for reward transaction with hash %s!", transaction.Hash().Hex()),
-		)
+		ctx, _ := context.WithTimeout(context.Background(), MiningTimeout)
 
 		receipt, err := bind.WaitMined(ctx, ethClient, transaction)
 
