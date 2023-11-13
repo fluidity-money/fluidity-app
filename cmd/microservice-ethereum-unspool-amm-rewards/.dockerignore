@@ -1,1 +1,5 @@
-.gitignore
+*.out
+lint
+docker
+test
+Dockerfile*
