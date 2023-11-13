@@ -76,6 +76,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		err      error
 	)
 
+	// returning the default feeData and no error implies that we succeeded with no fee!
+
 	switch transfer.Application {
 	case ApplicationUniswapV3:
 		feeData, err = uniswap.GetUniswapV3Fees(

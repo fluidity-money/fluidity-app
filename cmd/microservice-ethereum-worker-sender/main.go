@@ -6,9 +6,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -52,10 +54,15 @@ const (
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
 
+	// EnvLpRewardQueueName to receive spooled rewards going to liquidity providers on the AMM
 	EnvLpRewardQueueName = `FLU_ETHEREUM_LP_REWARD_AMQP_QUEUE_NAME`
 
+	// EnvUtilityTokensMap to map utility clients to the tokens they transfer, for AMM rewards
 	EnvUtilityTokensMap = `FLU_ETHEREUM_UTILITY_TOKENS_LOOKUP`
 )
+
+// wait at most 5 minutes for our transactions to be mined
+const MiningTimeout = time.Minute * 5
 
 // details needed to update the reward type database
 type win = struct {
@@ -66,8 +73,8 @@ type win = struct {
 
 func utilityTokensListFromEnvOrFatal(env string) map[appTypes.UtilityName]ethCommon.Address {
 	var (
-		utilityTokens_   = util.GetEnvOrFatal(EnvUtilityTokensMap)
-		utilityTokensMap = make(map[appTypes.UtilityName]ethCommon.Address)
+		utilityTokens_       = util.GetEnvOrFatal(EnvUtilityTokensMap)
+		utilityToTokenLookup = make(map[appTypes.UtilityName]ethCommon.Address)
 	)
 
 	for _, entry := range strings.Split(utilityTokens_, ",") {
@@ -88,10 +95,10 @@ func utilityTokensListFromEnvOrFatal(env string) map[appTypes.UtilityName]ethCom
 			token   = ethCommon.HexToAddress(token_)
 		)
 
-		utilityTokensMap[appTypes.UtilityName(utility)] = token
+		utilityToTokenLookup[appTypes.UtilityName(utility)] = token
 	}
 
-	return utilityTokensMap
+	return utilityToTokenLookup
 }
 
 func main() {
@@ -250,7 +257,13 @@ func main() {
 
 		log.Debugf("Waiting for reward transaction to be mined...")
 
-		receipt, err := bind.WaitMined(context.Background(), ethClient, transaction)
+		ctx, _ := context.WithTimeoutCause(
+			context.Background(),
+			MiningTimeout,
+			fmt.Errorf("Timeout waiting for reward transaction with hash %s!", transaction.Hash().Hex()),
+		)
+
+		receipt, err := bind.WaitMined(ctx, ethClient, transaction)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

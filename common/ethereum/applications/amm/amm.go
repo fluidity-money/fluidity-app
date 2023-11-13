@@ -13,7 +13,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-// FIXME
+// currently we don't track amm fees
+var zeroFee = big.NewRat(0, 1)
+
 var ammSwap1LogTopic = amm.AmmAbi.Events["Swap1"].ID.String()
 var ammSwap2LogTopic = amm.AmmAbi.Events["Swap2"].ID.String()
 
@@ -36,14 +38,16 @@ func GetAmmFees(transfer worker.EthereumApplicationTransfer, client *ethclient.C
 	}
 }
 
-func handleSwap1(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, applications.ApplicationData, error) {
+func handleSwap1(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (fee applications.ApplicationFeeData, appData applications.ApplicationData, err error) {
 	swapData, err := amm.DecodeSwap1(transfer.Log)
 
 	if err != nil {
-		return applications.ApplicationFeeData{}, applications.ApplicationData{}, fmt.Errorf(
+		err = fmt.Errorf(
 			"Failed to decode swap1 data! %w",
 			err,
 		)
+
+		return
 	}
 
 	var (
@@ -52,6 +56,7 @@ func handleSwap1(transfer worker.EthereumApplicationTransfer, client *ethclient.
 		pool      = swapData.Pool
 	)
 
+	// normalise the volume to a usd amount in line with the decimals
 	decimalsAdjusted := math.Pow10(tokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
@@ -59,13 +64,13 @@ func handleSwap1(transfer worker.EthereumApplicationTransfer, client *ethclient.
 	volume := new(big.Rat).SetInt(&volumeInt.Int)
 	volume.Quo(volume, decimalsRat)
 
-	fee := applications.ApplicationFeeData{
+	fee = applications.ApplicationFeeData{
 		// zero fee for now
-		Fee:    big.NewRat(0, 1),
+		Fee:    new(big.Rat).Set(zeroFee),
 		Volume: volume,
 	}
 
-	appData := applications.ApplicationData{
+	appData = applications.ApplicationData{
 		AmmPrices: applications.ApplicationDataAmm{
 			FirstToken: pool,
 			FirstTick:  firstTick,
@@ -75,14 +80,16 @@ func handleSwap1(transfer worker.EthereumApplicationTransfer, client *ethclient.
 	return fee, appData, nil
 }
 
-func handleSwap2(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (applications.ApplicationFeeData, applications.ApplicationData, error) {
+func handleSwap2(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidContractAddress ethCommon.Address, tokenDecimals int) (fee applications.ApplicationFeeData, appData applications.ApplicationData, err error) {
 	swap2Data, err := amm.DecodeSwap2(transfer.Log)
 
 	if err != nil {
-		return applications.ApplicationFeeData{}, applications.ApplicationData{}, fmt.Errorf(
+		err = fmt.Errorf(
 			"Failed to decode swap2 data! %w",
 			err,
 		)
+
+		return
 	}
 
 	var (
@@ -98,13 +105,19 @@ func handleSwap2(transfer worker.EthereumApplicationTransfer, client *ethclient.
 	// there's two fluid transfers with this volume per swap2
 	fluidVolumeRat.Mul(fluidVolumeRat, big.NewRat(2, 1))
 
-	fee := applications.ApplicationFeeData{
+	// normalise in line with the token decimals
+	decimalsAdjusted := math.Pow10(tokenDecimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	fluidVolumeRat.Quo(fluidVolumeRat, decimalsRat)
+
+	fee = applications.ApplicationFeeData{
 		// zero fee for now
-		Fee:    big.NewRat(0, 1),
+		Fee:    new(big.Rat).Set(zeroFee),
 		Volume: fluidVolumeRat,
 	}
 
-	appData := applications.ApplicationData{
+	appData = applications.ApplicationData{
 		AmmPrices: applications.ApplicationDataAmm{
 			FirstToken:  firstToken,
 			FirstTick:   firstTick,

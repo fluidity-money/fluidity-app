@@ -40,7 +40,7 @@ var applicationNames = []string{
 	"sushiswap",
 	"kyber_classic",
 	"wombat",
-	"seawater-amm",
+	"seawater_amm",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
@@ -49,6 +49,7 @@ type UtilityName string
 // UtilityFluid is the special utility name for the fluid token itself
 var UtilityFluid UtilityName = "FLUID"
 
+// AMM data, lives in the ApplicationData struct
 type ApplicationDataAmm struct {
 	FirstToken  ethereum.Address
 	FirstTick   int32
@@ -56,6 +57,8 @@ type ApplicationDataAmm struct {
 	SecondTick  int32
 }
 
+// ApplicationData is arbitrary data that can get set by applications that gets propagated through the stack
+// currently just used for the AMM
 type ApplicationData struct {
 	AmmPrices ApplicationDataAmm `json:"amm_prices"`
 }

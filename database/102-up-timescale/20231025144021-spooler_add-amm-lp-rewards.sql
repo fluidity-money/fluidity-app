@@ -5,13 +5,16 @@ CREATE TABLE amm_positions (
 	tick_upper INT NOT NULL,
 	position_id uint256 UNIQUE NOT NULL,
 
-	-- token id
-	pool VARCHAR NOT NULL,
+	pool_address VARCHAR NOT NULL,
 
 	liquidity uint256 NOT NULL
 );
 
+-- LP rewards are spooled in this table
 CREATE TABLE pending_lp_rewards (
+	-- processing id - set to a random string if this record has not been fully processed
+	processing_snowflake BYTEA NOT NULL,
+
 	-- token id
 	fluid_token_short_name VARCHAR NOT NULL,
 	network VARCHAR NOT NULL,

@@ -1,14 +1,16 @@
 
 # microservice-ethereum-unspool-amm-rewards
 
-enter README description here!
+Watches for AMM fee collection events and unspools LP rewards from the database.
 
 ## Environment variables
 
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
-| `ENV_1`                      | Env 1 description                                                            |
-| `ENV_2`                      | Env 2 description                                                            |
+| `FLU_ETHEREUM_AMM_ADDRESS`                      | Address of the AMM to track. |
+| `FLU_ETHEREUM_LP_REWARD_AMQP_QUEUE_NAME`                      | Queue to send unspooled rewards to the sender down. |
+| `FLU_ETHEREUM_TOKEN_SHORT_NAME`                      | Short name of the token to track AMM rewards for. |
+| `FLU_ETHEREUM_NETWORK`                      | Network to unspool AMM rewards for. |
 
 ## Building
 

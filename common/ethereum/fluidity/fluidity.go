@@ -310,6 +310,12 @@ type (
 	}
 )
 
+// sets a gas limit on a transaction, including a buffer incase the calculation was wrong
+func setGasLimit(transaction *ethAbiBind.TransactOpts, gas uint64) {
+
+	transaction.GasLimit = uint64(float64(gas) * 1.5)
+}
+
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
 		fluidityAddress,
@@ -411,7 +417,7 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 		)
 	}
 
-	transactionOptions.GasLimit = uint64(float64(gas) * 1.5)
+	setGasLimit(transactionOptions, gas)
 
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,
@@ -445,10 +451,11 @@ func TransactLpRewards(tokens map[applications.UtilityName]ethCommon.Address, cl
 	var (
 		collatedRewards = announcement.Rewards
 		user_           = announcement.Address
-		user            = ethereum.ConvertInternalAddress(user_)
 
 		rewards []abiLpReward
 	)
+
+	user := ethereum.ConvertInternalAddress(user_)
 
 	for utility, amount := range collatedRewards {
 		token, exists := tokens[utility]
@@ -486,7 +493,7 @@ func TransactLpRewards(tokens map[applications.UtilityName]ethCommon.Address, cl
 		)
 	}
 
-	transactionOptions.GasLimit = uint64(float64(gas) * 1.5)
+	setGasLimit(transactionOptions, gas)
 
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,

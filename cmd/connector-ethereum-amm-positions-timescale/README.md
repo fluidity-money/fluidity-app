@@ -1,14 +1,16 @@
 
 # connector-ethereum-amm-positions-timescale
 
-enter README description here!
+Records seawater AMM position creation and updates in timescale.
 
 ## Environment variables
 
-|             Name             |                                  Description
-|------------------------------|------------------------------------------------------------------------------|
-| `ENV_1`                      | Env 1 description                                                            |
-| `ENV_2`                      | Env 2 description                                                            |
+|           Name           |                              Description
+|--------------------------|------------------------------------------------------------------------------|
+| `FLU_WORKER_ID`          | Worker ID used to identify the application in logging and to the AMQP queue. |
+| `FLU_DEBUG`              | Toggle debug messages produced by any application using the debug logger.    |
+| `FLU_AMQP_QUEUE_ADDR`    | AMQP queue address connected to to receive and send messages down.           |
+| `FLU_TIMESCALE_URI`      | Timescale URI to use when writing user actions to the database.              |
 
 ## Building
 

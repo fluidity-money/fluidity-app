@@ -99,10 +99,11 @@ func main() {
 		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 
 		ammLpPoolAddr_ = mustEthereumAddressFromEnv(EnvAmmLpPoolAddress)
-		ammLpPoolAddr  = commonEth.ConvertGethAddress(ammLpPoolAddr_)
 
 		chainlinkEthPriceFeedUrl = os.Getenv(EnvChainlinkEthPriceNetworkUrl)
 	)
+
+	ammLpPoolAddr := commonEth.ConvertGethAddress(ammLpPoolAddr_)
 
 	var dbNetwork network.BlockchainNetwork
 
@@ -476,11 +477,13 @@ func main() {
 				)
 
 				if senderAddressChanged {
+					emission.FeeSwitchSender.Reason = workerTypes.FeeSwitchReasonDatabase
 					emission.FeeSwitchSender.OriginalAddress = senderAddress_.String()
 					emission.FeeSwitchSender.NewAddress = senderAddress.String()
 				}
 
 				if recipientAddressChanged {
+					emission.FeeSwitchRecipient.Reason = workerTypes.FeeSwitchReasonDatabase
 					emission.FeeSwitchRecipient.OriginalAddress = recipientAddress_.String()
 					emission.FeeSwitchRecipient.NewAddress = recipientAddress.String()
 				}
@@ -504,8 +507,10 @@ func main() {
 					}
 				}
 
-				// mandatory fee switch
+				// proper amm behaviour requires that we switch any fees
+				// that would go to the AMM to the fee holding contract instead
 				if application == applications.ApplicationSeawaterAmm {
+					emission.FeeSwitchRecipient.Reason = workerTypes.FeeSwitchReasonAmm
 					recipientAddress = ammLpPoolAddr
 					emission.FeeSwitchRecipient.OriginalAddress = recipientAddress_.String()
 					emission.FeeSwitchRecipient.NewAddress = recipientAddress.String()

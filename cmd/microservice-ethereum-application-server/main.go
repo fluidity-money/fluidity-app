@@ -171,6 +171,7 @@ func main() {
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
 
 			for _, transfer := range transfers {
+				// appData is arbitrary data that we propagate to be consumed later
 				feeData, appData, emission, err := applications.GetApplicationFee(
 					transfer,
 					gethClient,

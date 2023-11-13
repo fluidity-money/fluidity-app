@@ -11,8 +11,8 @@ const (
 )
 
 type (
-	PositionMint   = amm.PositionMint
-	PositionUpdate = amm.PositionUpdate
+	PositionMint   = amm.AmmEventPositionMint
+	PositionUpdate = amm.AmmEventPositionUpdate
 )
 
 func PositionMintsEthereum(f func(PositionMint)) {

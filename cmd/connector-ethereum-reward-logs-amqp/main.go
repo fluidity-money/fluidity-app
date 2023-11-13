@@ -145,7 +145,8 @@ func main() {
 		ethereumWsUrl     = util.PickEnvOrFatal(EnvEthereumWsUrl)
 		tokenList_        = util.GetEnvOrFatal(EnvTokenList)
 		paginationAmount_ = util.GetEnvOrFatal(EnvPaginationAmount)
-		ammAddress_       = os.Getenv(EnvAmmAddress)
+		// optional in case we're not on a chain with the AMM deployed
+		ammAddress_ = os.Getenv(EnvAmmAddress)
 	)
 
 	tokenList := util.GetTokensListBase(tokenList_)

@@ -78,25 +78,26 @@ const ammAbiString = `[
 
 var AmmAbi ethAbi.ABI
 
+// Decoded data from the AMM events
 type (
-	PositionMint struct {
+	AmmEventPositionMint struct {
 		Id    misc.BigInt      `json:"id"`
 		Lower int32            `json:"lower_tick"`
 		Upper int32            `json:"upper_tick"`
 		Pool  ethereum.Address `json:"pool"`
 	}
-	PositionUpdate struct {
+	AmmEventPositionUpdate struct {
 		Id    misc.BigInt `json:"id"`
 		Delta misc.BigInt `json:"liquidity_delta"`
 	}
-	CollectFees struct {
+	AmmEventCollectFees struct {
 		Id      misc.BigInt
 		Pool    ethereum.Address
 		To      ethereum.Address
 		Amount0 misc.BigInt
 		Amount1 misc.BigInt
 	}
-	Swap1 struct {
+	AmmEventSwap1 struct {
 		User       ethereum.Address
 		Pool       ethereum.Address
 		ZeroForOne bool
@@ -104,7 +105,7 @@ type (
 		Amount1    misc.BigInt
 		FinalTick  int32
 	}
-	Swap2 struct {
+	AmmEventSwap2 struct {
 		User        ethereum.Address
 		From        ethereum.Address
 		To          ethereum.Address
@@ -116,7 +117,7 @@ type (
 	}
 )
 
-func DecodeMint(log ethTypes.Log) (mint PositionMint, err error) {
+func DecodeMint(log ethTypes.Log) (mint AmmEventPositionMint, err error) {
 	if len(log.Topics) != 4 {
 		err = fmt.Errorf(
 			"Wrong number of topics! Expected %d, got %d!",
@@ -147,7 +148,7 @@ func DecodeMint(log ethTypes.Log) (mint PositionMint, err error) {
 		return
 	}
 
-	mint = PositionMint{
+	mint = AmmEventPositionMint{
 		Id:    misc.NewBigIntFromInt(*id),
 		Lower: lower,
 		Upper: upper,
@@ -157,7 +158,7 @@ func DecodeMint(log ethTypes.Log) (mint PositionMint, err error) {
 	return mint, nil
 }
 
-func DecodeUpdatePosition(log ethTypes.Log) (update PositionUpdate, err error) {
+func DecodeUpdatePosition(log ethTypes.Log) (update AmmEventPositionUpdate, err error) {
 	if len(log.Topics) != 2 {
 		err = fmt.Errorf(
 			"Wrong number of topics! Expected %d, got %d!",
@@ -192,7 +193,7 @@ func DecodeUpdatePosition(log ethTypes.Log) (update PositionUpdate, err error) {
 		return
 	}
 
-	update = PositionUpdate{
+	update = AmmEventPositionUpdate{
 		Id:    misc.NewBigIntFromInt(*id),
 		Delta: misc.NewBigIntFromInt(*delta),
 	}
@@ -200,7 +201,7 @@ func DecodeUpdatePosition(log ethTypes.Log) (update PositionUpdate, err error) {
 	return update, nil
 }
 
-func DecodeCollectFees(log ethTypes.Log) (collect CollectFees, err error) {
+func DecodeCollectFees(log ethTypes.Log) (collect AmmEventCollectFees, err error) {
 	if len(log.Topics) != 4 {
 		err = fmt.Errorf(
 			"Wrong number of topics! Expected %d, got %d!",
@@ -249,7 +250,7 @@ func DecodeCollectFees(log ethTypes.Log) (collect CollectFees, err error) {
 		return
 	}
 
-	collect = CollectFees{
+	collect = AmmEventCollectFees{
 		Id:      misc.NewBigIntFromInt(*id),
 		Pool:    pool,
 		To:      to,
@@ -260,7 +261,7 @@ func DecodeCollectFees(log ethTypes.Log) (collect CollectFees, err error) {
 	return collect, nil
 }
 
-func DecodeSwap1(log ethereum.Log) (swap Swap1, err error) {
+func DecodeSwap1(log ethereum.Log) (swap AmmEventSwap1, err error) {
 	if len(log.Topics) != 3 {
 		err = fmt.Errorf(
 			"Wrong number of topics! Expected %d, got %d!",
@@ -311,7 +312,7 @@ func DecodeSwap1(log ethereum.Log) (swap Swap1, err error) {
 		return
 	}
 
-	swap1 := Swap1{
+	swap1 := AmmEventSwap1{
 		User:       user,
 		Pool:       pool,
 		ZeroForOne: zeroForOne,
@@ -323,7 +324,7 @@ func DecodeSwap1(log ethereum.Log) (swap Swap1, err error) {
 	return swap1, nil
 }
 
-func DecodeSwap2(log ethereum.Log) (swap Swap2, err error) {
+func DecodeSwap2(log ethereum.Log) (swap AmmEventSwap2, err error) {
 	if len(log.Topics) != 4 {
 		err = fmt.Errorf(
 			"Wrong number of topics! Expected %d, got %d!",
@@ -381,7 +382,7 @@ func DecodeSwap2(log ethereum.Log) (swap Swap2, err error) {
 		return
 	}
 
-	swap2 := Swap2{
+	swap2 := AmmEventSwap2{
 		User:        user,
 		From:        from,
 		To:          to,

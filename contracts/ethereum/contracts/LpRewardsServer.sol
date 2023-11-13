@@ -1,12 +1,20 @@
+// SPDX-License-Identifier: GPL
+
+// Copyright 2023 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../interfaces/ILpRewardsServer.sol";
 import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IERC20.sol";
+import "./openzeppelin/SafeERC20.sol";
 
 
 contract LpRewardsServer is ILpRewardsServer, IOperatorOwned {
+    using SafeERC20 for IERC20;
+
     /// @notice emitted when an LP reward is paid out
     event LpReward(
         address indexed recipient,
@@ -37,7 +45,7 @@ contract LpRewardsServer is ILpRewardsServer, IOperatorOwned {
             address token = _rewards[i].token;
             uint amount = _rewards[i].amount;
 
-            IERC20(token).transfer(_user, amount);
+            IERC20(token).safeTransfer(_user, amount);
 
             emit LpReward(_user, token, amount);
         }

@@ -23,10 +23,13 @@ const (
 	// EnvAmmAddress to track events emitted by the AMM
 	EnvAmmAddress = `FLU_ETHEREUM_AMM_ADDRESS`
 
+	// EnvLpSenderQueue to send LP rewards to the transaction sender
 	EnvLpSenderQueue = `FLU_ETHEREUM_LP_REWARD_AMQP_QUEUE_NAME`
 
+	// EnvFluidTokenName to only unspool rewards on the correct token
 	EnvFluidTokenName = `FLU_ETHEREUM_TOKEN_SHORT_NAME`
 
+	// EnvNetwork to only unspool rewards on the correct token
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
 )
 
@@ -43,7 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Format(
-				"Failed to parse a blockchain network from %s! %w",
+				"Failed to parse a blockchain network from %s! %v",
 				network__,
 				err,
 			)
@@ -71,11 +74,18 @@ func main() {
 		case amm.AmmAbi.Events["CollectFees"].ID:
 			handleCollect(network_, tokenShortName, log_, lpQueue)
 		default:
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Ignoring log with irrelevant topic %+v",
+					log_,
+				)
+			})
 			// swaps are handled in microservice-eth-user-actions and in the apps server
 		}
 	})
 }
 
+// on seeing a collect event, unspool the LP rewards and send them down the queue
 func handleCollect(network network.BlockchainNetwork, tokenShortName string, log_ ethQueue.Log, lpQueue string) {
 	collect, err := amm.DecodeCollectFees(log_)
 

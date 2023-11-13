@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	commonApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/amm"
@@ -99,7 +100,11 @@ func main() {
 		for _, announcement := range announcements {
 			// write the winner into the database
 			spooler.InsertPendingWinners(announcement, tokenDetails)
-			amm.HandleAmmWinnings(announcement, tokenDetails)
+
+			// if the win was an AMM win, add the LP winnings
+			if announcement.Application == commonApps.ApplicationSeawaterAmm && announcement.Decorator != nil {
+				amm.InsertAmmWinnings(announcement, tokenDetails)
+			}
 
 			var (
 				// the sender's winnings will always be higher than the recipient's

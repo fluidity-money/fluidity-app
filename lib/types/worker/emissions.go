@@ -11,6 +11,14 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 )
 
+const (
+	// FeeSwitchReasonDatabase when a fee switch is found in the database
+	FeeSwitchReasonDatabase = "database"
+
+	// FeeSwitchReasonAmm when a fee switch happens because the recipient is the AMM
+	FeeSwitchReasonAmm = "amm"
+)
+
 // Emission contains information on the modelling information that led
 // up to the rewarding of the user
 type Emission struct {
@@ -143,12 +151,14 @@ type Emission struct {
 	FeeSwitchSender struct {
 		OriginalAddress string `json:"original_address"`
 		NewAddress      string `json:"new_address"`
+		Reason          string `json:"fee_switch_reason"`
 	} `json:"fee_switch_sender"`
 
 	// FeeSwitchRecipient if enabled and their custom arguments
 	FeeSwitchRecipient struct {
 		OriginalAddress string `json:"original_address"`
 		NewAddress      string `json:"new_address"`
+		Reason          string `json:"fee_switch_reason"`
 	} `json:"fee_switch_recipient"`
 
 	// SpecialPoolOptions enabled by enabling the utility mining feature

@@ -1,14 +1,13 @@
 
 # microservice-ethereum-track-amm-positions
 
-enter README description here!
+Tracks and decodes AMM position events.
 
 ## Environment variables
 
 |             Name             |                                  Description
 |------------------------------|------------------------------------------------------------------------------|
-| `ENV_1`                      | Env 1 description                                                            |
-| `ENV_2`                      | Env 2 description                                                            |
+| `FLU_ETHEREUM_AMM_ADDRESS`                      | Address of the AMM to track events from. |
 
 ## Building
 

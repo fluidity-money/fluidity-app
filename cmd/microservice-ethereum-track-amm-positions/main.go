@@ -34,7 +34,10 @@ func main() {
 
 		if len(log_.Topics) < 1 {
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to decode a log from the AMM! No topics!"
+				k.Format(
+					"Failed to decode a log with hash %s from the AMM! No topics!",
+					log_.TxHash,
+				)
 
 				k.Payload = log_
 			})
@@ -49,6 +52,12 @@ func main() {
 			handleUpdate(log_)
 		default:
 			// swaps are handled in microservice-eth-user-actions and in the apps server
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Ignoring log with irrelevant topic %+v",
+					log_,
+				)
+			})
 		}
 	})
 }
