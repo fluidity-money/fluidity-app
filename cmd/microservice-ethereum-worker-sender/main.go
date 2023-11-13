@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -257,9 +256,12 @@ func main() {
 
 		log.Debugf("Waiting for reward transaction to be mined...")
 
-		ctx, _ := context.WithTimeout(context.Background(), MiningTimeout)
+		ctx, cancel := context.WithTimeout(context.Background(), MiningTimeout)
 
 		receipt, err := bind.WaitMined(ctx, ethClient, transaction)
+
+		// done with the context now
+		cancel()
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {

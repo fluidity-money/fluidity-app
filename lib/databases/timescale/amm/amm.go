@@ -208,7 +208,7 @@ func addAmmWins(win worker.EthereumWinnerAnnouncement, wins map[applications.Uti
 	}
 }
 
-func clearSnowflame(snowflake []byte) {
+func clearSnowflake(snowflake []byte) {
 	timescaleClient := timescale.Client()
 
 	var statementText string
