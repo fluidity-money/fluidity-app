@@ -34,7 +34,7 @@ func init() {
 		panic(err)
 	}
 
-	reader = strings.NewReader(operatorAbiString)
+	reader = strings.NewReader(executorAbiString)
 
 	if ExecutorAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)

@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
+	commonEth "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
@@ -43,6 +44,9 @@ const (
 
 	// EnvRegistryAddress to query to get utility info
 	EnvRegistryAddress = `FLU_ETHEREUM_REGISTRY_ADDR`
+
+	// EnvAmmLpPoolAddress to switch amm rewards to
+	EnvAmmLpPoolAddress = `FLU_ETHEREUM_AMM_LP_POOL_ADDR`
 
 	// EnvEthereumHttpUrl to use to get information on the apy and atx from chainlink
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
@@ -94,8 +98,12 @@ func main() {
 		registryAddress       = mustEthereumAddressFromEnv(EnvRegistryAddress)
 		chainlinkEthPriceFeed = mustEthereumAddressFromEnv(EnvChainlinkEthPriceFeed)
 
+		ammLpPoolAddr_ = mustEthereumAddressFromEnv(EnvAmmLpPoolAddress)
+
 		chainlinkEthPriceFeedUrl = os.Getenv(EnvChainlinkEthPriceNetworkUrl)
 	)
+
+	ammLpPoolAddr := commonEth.ConvertGethAddress(ammLpPoolAddr_)
 
 	var dbNetwork network.BlockchainNetwork
 
@@ -469,11 +477,13 @@ func main() {
 				)
 
 				if senderAddressChanged {
+					emission.FeeSwitchSender.Reason = workerTypes.FeeSwitchReasonDatabase
 					emission.FeeSwitchSender.OriginalAddress = senderAddress_.String()
 					emission.FeeSwitchSender.NewAddress = senderAddress.String()
 				}
 
 				if recipientAddressChanged {
+					emission.FeeSwitchRecipient.Reason = workerTypes.FeeSwitchReasonDatabase
 					emission.FeeSwitchRecipient.OriginalAddress = recipientAddress_.String()
 					emission.FeeSwitchRecipient.NewAddress = recipientAddress.String()
 				}
@@ -495,6 +505,15 @@ func main() {
 					if utility != "" {
 						fluidClients = append(fluidClients, utility)
 					}
+				}
+
+				// proper amm behaviour requires that we switch any fees
+				// that would go to the AMM to the fee holding contract instead
+				if application == applications.ApplicationSeawaterAmm {
+					emission.FeeSwitchRecipient.Reason = workerTypes.FeeSwitchReasonAmm
+					recipientAddress = ammLpPoolAddr
+					emission.FeeSwitchRecipient.OriginalAddress = recipientAddress_.String()
+					emission.FeeSwitchRecipient.NewAddress = recipientAddress.String()
 				}
 
 				emission.TransferFeeNormal, _ = transferFeeNormal.Float64()
@@ -630,6 +649,7 @@ func main() {
 						RandomPayouts:   payoutDetails.randomPayouts,
 						TokenDetails:    tokenDetails,
 						Application:     application,
+						Decorator:       transfer.Decorator,
 					}
 
 					// Fill in emission.NaiveIsWinning

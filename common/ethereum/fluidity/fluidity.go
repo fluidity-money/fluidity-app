@@ -15,6 +15,7 @@ import (
 	ethTypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -158,7 +159,7 @@ const tokenContractAbiString = `[
 ]
 `
 
-const operatorAbiString = `[
+const executorAbiString = `[
   {
       "inputs": [
         {
@@ -200,6 +201,25 @@ const operatorAbiString = `[
 		  { "internalType": "uint256", "name": "lastBlock", "type": "uint256" }
 	  ],
 	  "name": "reward",
+	  "outputs": [],
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+  },
+  {
+	  "inputs": [
+		  { "internalType": "address", "name": "_token", "type": "address" },
+		  { "internalType": "address", "name": "_user", "type": "address" },
+		  {
+			  "components": [
+				  { "internalType": "address", "name": "token", "type": "address" },
+				  { "internalType": "uint256", "name": "amount", "type": "uint256" }
+			  ],
+			  "internalType": "struct LpRewards[]",
+			  "name": "_rewards",
+			  "type": "tuple[]"
+		  }
+	  ],
+	  "name": "lpReward",
 	  "outputs": [],
 	  "stateMutability": "nonpayable",
 	  "type": "function"
@@ -278,12 +298,23 @@ type (
 		Winner    ethCommon.Address `abi:"winner"`
 		WinAmount *big.Int          `abi:"winAmount"`
 	}
-	// the FluidityReward struct from solidit, to be passed to batchReward
+	// the FluidityReward struct from solidiy, to be passed to batchReward
 	abiFluidityReward struct {
 		ClientName string      `abi:"clientName"`
 		Winners    []abiWinner `abi:"rewards"`
 	}
+	// the LpReawrds struct from solidity, to be pasesed to lpReward
+	abiLpReward struct {
+		Token  ethCommon.Address `abi:"token"`
+		Amount *big.Int          `abi:"amount"`
+	}
 )
+
+// sets a gas limit on a transaction, including a buffer incase the calculation was wrong
+func setGasLimit(transaction *ethAbiBind.TransactOpts, gas uint64) {
+
+	transaction.GasLimit = uint64(float64(gas) * 1.5)
+}
 
 func GetRewardPool(client *ethclient.Client, fluidityAddress ethCommon.Address) (*big.Rat, error) {
 	boundContract := ethAbiBind.NewBoundContract(
@@ -386,7 +417,7 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 		)
 	}
 
-	transactionOptions.GasLimit = uint64(float64(gas) * 1.5)
+	setGasLimit(transactionOptions, gas)
 
 	transaction, err := ethereum.MakeTransaction(
 		boundContract,
@@ -401,6 +432,81 @@ func TransactBatchReward(client *ethclient.Client, executorAddress, tokenAddress
 	if err != nil {
 		return nil, fmt.Errorf(
 			"failed to transact the reward function on Fluidity's contract! %v",
+			err,
+		)
+	}
+
+	return transaction, nil
+}
+
+func TransactLpRewards(tokens map[applications.UtilityName]ethCommon.Address, client *ethclient.Client, executorAddress, tokenAddress ethCommon.Address, transactionOptions *ethAbiBind.TransactOpts, announcement typesWorker.EthereumSpooledLpRewards) (*ethTypes.Transaction, error) {
+	boundContract := ethAbiBind.NewBoundContract(
+		executorAddress,
+		ExecutorAbi,
+		client,
+		client,
+		client,
+	)
+
+	var (
+		collatedRewards = announcement.Rewards
+		user_           = announcement.Address
+
+		rewards []abiLpReward
+	)
+
+	user := ethereum.ConvertInternalAddress(user_)
+
+	for utility, amount := range collatedRewards {
+		token, exists := tokens[utility]
+
+		if !exists {
+			return nil, fmt.Errorf(
+				"No token found for utility %s!",
+				utility,
+			)
+		}
+
+		abiReward := abiLpReward{
+			Token:  token,
+			Amount: &amount.Int,
+		}
+
+		rewards = append(rewards, abiReward)
+	}
+
+	gas, err := ethereum.EstimateGas(
+		client,
+		&ExecutorAbi,
+		transactionOptions,
+		&executorAddress,
+		"lpReward",
+		tokenAddress,
+		user,
+		rewards,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Failed to estimate gas for calling lpReward! %w",
+			err,
+		)
+	}
+
+	setGasLimit(transactionOptions, gas)
+
+	transaction, err := ethereum.MakeTransaction(
+		boundContract,
+		transactionOptions,
+		"lpReward",
+		tokenAddress,
+		user,
+		rewards,
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to transact the lp reward function on Fluidity's contract! %v",
 			err,
 		)
 	}

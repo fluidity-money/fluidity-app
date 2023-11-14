@@ -8,15 +8,19 @@ import (
 	"context"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	ethCommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	typesEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
@@ -48,7 +52,16 @@ const (
 
 	// EnvPublishAmqpQueueName to use to receive RLP-encoded blobs down
 	EnvPublishAmqpQueueName = `FLU_ETHEREUM_AMQP_QUEUE_NAME`
+
+	// EnvLpRewardQueueName to receive spooled rewards going to liquidity providers on the AMM
+	EnvLpRewardQueueName = `FLU_ETHEREUM_LP_REWARD_AMQP_QUEUE_NAME`
+
+	// EnvUtilityTokensMap to map utility clients to the tokens they transfer, for AMM rewards
+	EnvUtilityTokensMap = `FLU_ETHEREUM_UTILITY_TOKENS_LOOKUP`
 )
+
+// wait at most 5 minutes for our transactions to be mined
+const MiningTimeout = time.Minute * 5
 
 // details needed to update the reward type database
 type win = struct {
@@ -57,13 +70,45 @@ type win = struct {
 	winnerAddress         typesEth.Address
 }
 
+func utilityTokensListFromEnvOrFatal(env string) map[appTypes.UtilityName]ethCommon.Address {
+	var (
+		utilityTokens_       = util.GetEnvOrFatal(EnvUtilityTokensMap)
+		utilityToTokenLookup = make(map[appTypes.UtilityName]ethCommon.Address)
+	)
+
+	for _, entry := range strings.Split(utilityTokens_, ",") {
+		split := strings.Split(entry, ":")
+
+		if len(split) != 2 {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Unexpected utility tokens map entry '%s'",
+					split,
+				)
+			})
+		}
+
+		var (
+			utility = split[0]
+			token_  = split[1]
+			token   = ethCommon.HexToAddress(token_)
+		)
+
+		utilityToTokenLookup[appTypes.UtilityName(utility)] = token
+	}
+
+	return utilityToTokenLookup
+}
+
 func main() {
 	var (
-		contractAddrString   = util.GetEnvOrFatal(EnvContractAddress)
-		executorAddrString   = util.GetEnvOrFatal(EnvExecutorAddress)
-		gethHttpUrl          = util.PickEnvOrFatal(EnvEthereumHttpUrl)
-		privateKey_          = util.GetEnvOrFatal(EnvPrivateKey)
-		publishAmqpQueueName = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		contractAddrString        = util.GetEnvOrFatal(EnvContractAddress)
+		executorAddrString        = util.GetEnvOrFatal(EnvExecutorAddress)
+		gethHttpUrl               = util.PickEnvOrFatal(EnvEthereumHttpUrl)
+		privateKey_               = util.GetEnvOrFatal(EnvPrivateKey)
+		publishAmqpQueueName      = util.GetEnvOrFatal(EnvPublishAmqpQueueName)
+		publishLpRewardsQueueName = util.GetEnvOrFatal(EnvLpRewardQueueName)
+		utilityTokensMap          = utilityTokensListFromEnvOrFatal(EnvUtilityTokensMap)
 
 		useHardhatFix     bool
 		useLegacyContract        = os.Getenv(EnvUseLegacyContract) == "true"
@@ -129,8 +174,10 @@ func main() {
 		})
 	}
 
-	queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
+	rewardsQueue := make(chan worker.EthereumSpooledRewards)
+	lpRewardsQueue := make(chan worker.EthereumSpooledLpRewards)
 
+	go queue.GetMessages(publishAmqpQueueName, func(message queue.Message) {
 		var announcement worker.EthereumSpooledRewards
 
 		message.Decode(&announcement)
@@ -142,23 +189,60 @@ func main() {
 			})
 		}
 
-		rewardTransactionArguments := callRewardArguments{
-			transactionOptions:    transactionOptions,
-			containerAnnouncement: announcement,
-			executorAddress:       executorAddress_,
-			contractAddress:       contractAddress_,
-			client:                ethClient,
-			useHardhatFix:         useHardhatFix,
-			hardcodedGasLimit:     gasLimit,
+		rewardsQueue <- announcement
+	})
+
+	go queue.GetMessages(publishLpRewardsQueueName, func(message queue.Message) {
+		var announcement worker.EthereumSpooledLpRewards
+
+		message.Decode(&announcement)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Failed to decode an announcement!"
+				k.Payload = err
+			})
 		}
 
-		transactionHash, err := callRewardFunction(rewardTransactionArguments)
+		lpRewardsQueue <- announcement
+	})
+
+	for {
+		var transaction *types.Transaction
+
+		// we need this to process single threadedly to stop nonce desyncs
+		select {
+		case announcement := <-rewardsQueue:
+			rewardTransactionArguments := callRewardArguments{
+				transactionOptions:    transactionOptions,
+				containerAnnouncement: announcement,
+				executorAddress:       executorAddress_,
+				contractAddress:       contractAddress_,
+				client:                ethClient,
+				useHardhatFix:         useHardhatFix,
+				hardcodedGasLimit:     gasLimit,
+			}
+
+			transaction, err = callRewardFunction(rewardTransactionArguments)
+
+		case announcement := <-lpRewardsQueue:
+			lpRewardTransactionArguments := callLpRewardArguments{
+				tokens:                utilityTokensMap,
+				transactionOptions:    transactionOptions,
+				containerAnnouncement: announcement,
+				executorAddress:       executorAddress_,
+				contractAddress:       contractAddress_,
+				client:                ethClient,
+			}
+
+			transaction, err = callLpRewardFunction(lpRewardTransactionArguments)
+		}
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
-					"Failed to call the reward transaction with transaction hash %#v!",
-					transactionHash,
+					"Failed to call a reward transaction with transaction hash %#v!",
+					transaction,
 				)
 
 				k.Payload = err
@@ -166,13 +250,18 @@ func main() {
 		}
 
 		log.App(func(k *log.Log) {
-			k.Message = "Successfully called the reward function with hash"
-			k.Payload = transactionHash.Hash().Hex()
+			k.Message = "Successfully called a contract function with hash"
+			k.Payload = transaction.Hash().Hex()
 		})
 
 		log.Debugf("Waiting for reward transaction to be mined...")
 
-		receipt, err := bind.WaitMined(context.Background(), ethClient, transactionHash)
+		ctx, cancel := context.WithTimeout(context.Background(), MiningTimeout)
+
+		receipt, err := bind.WaitMined(ctx, ethClient, transaction)
+
+		// done with the context now
+		cancel()
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -185,5 +274,5 @@ func main() {
 			"Reward transaction mined in block %s!",
 			receipt.BlockNumber.String(),
 		)
-	})
+	}
 }

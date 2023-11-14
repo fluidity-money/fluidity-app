@@ -52,7 +52,6 @@ func (w *winnerGenerator) generateWinnerAnnouncement(from, to ethTypes.Address, 
 		FromWinAmount:   fromWin,
 		ToWinAmount:     toWin,
 		TokenDetails:    w.token,
-		Application:     0,
 	}
 }
 
