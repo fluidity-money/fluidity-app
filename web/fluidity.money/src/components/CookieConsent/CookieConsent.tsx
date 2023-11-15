@@ -5,9 +5,14 @@ import styles from "./CookieConsent.module.scss";
 const CookieConsent = () => {
   const [cookieConsent, setCookieConsent] = useState(true); // Hide until polled locally
   useEffect(() => {
-    const _cookieConsent = localStorage.getItem("cookieConsent");
-    if (!_cookieConsent) {
-      setCookieConsent(false);
+    if (!window) return;
+    try {
+      const _cookieConsent = localStorage.getItem("cookieConsent");
+      if (!_cookieConsent) {
+        setCookieConsent(false);
+      }
+    } catch (e) {
+      console.warn(e);
     }
   }, []);
 
@@ -32,8 +37,12 @@ const CookieConsent = () => {
         <button
           className={styles.button}
           onClick={() => {
-            localStorage.setItem("cookieConsent", "true");
-            setCookieConsent(true);
+            try {
+              localStorage.setItem("cookieConsent", "true");
+              setCookieConsent(true);
+            } catch (e) {
+              console.warn(e);
+            }
           }}
         >
           Got it!

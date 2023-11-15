@@ -33,7 +33,11 @@ const CacheProvider = ({
   const [useCacheProvider, setCacheProvider] = useState<Map<string, string>>();
 
   useEffect(() => {
-    setCacheProvider(localStorageProvider(sha));
+    try {
+      setCacheProvider(localStorageProvider(sha));
+    } catch (e) {
+      console.warn(e);
+    }
   }, []);
 
   return (

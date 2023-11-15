@@ -5,9 +5,7 @@
 import { AppProps } from "next/app";
 
 import { ApolloProvider } from "@apollo/client";
-import {
-  useViewport,
-} from "@fluidity-money/surfing";
+import { useViewport } from "@fluidity-money/surfing";
 import { ChainContextProvider } from "hooks/ChainContext";
 import { client } from "data/apolloClient";
 import { useEffect, useState } from "react";
@@ -56,15 +54,19 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   const [cookieConsent, setCookieConsent] = useState(true);
   useEffect(() => {
-    const _cookieConsent = localStorage.getItem("cookieConsent");
-    if (!_cookieConsent) {
-      setCookieConsent(false);
+    try {
+      const _cookieConsent = localStorage.getItem("cookieConsent");
+      if (!_cookieConsent) {
+        setCookieConsent(false);
+      }
+    } catch (e) {
+      console.warn(e);
     }
   }, []);
 
   const splitUser =
     process.env.NODE_ENV === "development" ||
-      (!!location && location.hostname.includes("staging"))
+    (!!location && location.hostname.includes("staging"))
       ? "dev"
       : "user";
 

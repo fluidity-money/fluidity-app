@@ -427,44 +427,49 @@ const Airdrop = () => {
 
   useEffect(() => {
     if (!window) return;
-    const cookieConsent = window.localStorage.getItem("cookieConsent");
 
-    if (cookieConsent === "false") {
-      setLocalCookieConsent(false);
-      return;
-    } else {
-      setLocalCookieConsent(true);
-    }
+    try {
+      const cookieConsent = window.localStorage.getItem("cookieConsent");
 
-    // const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
-    const airdropBottleCount =
-      window.localStorage.getItem("airdropBottleCount");
-    const airdropShouldShowBottleNumbers = window.localStorage.getItem(
-      "airdropShouldShowBottleNumbers"
-    );
+      if (cookieConsent === "false") {
+        setLocalCookieConsent(false);
+        return;
+      } else {
+        setLocalCookieConsent(true);
+      }
 
-    if (airdropBottleCount) {
-      setLocalBottleCount(parseInt(airdropBottleCount));
-    } else {
-      setLocalBottleCount(0);
-    }
-
-    if (airdropShouldShowBottleNumbers) {
-      setLocalShouldShowBottleNumbers(
-        airdropShouldShowBottleNumbers === "true"
+      // const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+      const airdropBottleCount =
+        window.localStorage.getItem("airdropBottleCount");
+      const airdropShouldShowBottleNumbers = window.localStorage.getItem(
+        "airdropShouldShowBottleNumbers"
       );
-    } else {
-      setLocalShouldShowBottleNumbers(true);
-    }
 
-    const airdropShouldShowRecapIntro = window.localStorage.getItem(
-      "airdropShouldShowRecapIntro"
-    );
+      if (airdropBottleCount) {
+        setLocalBottleCount(parseInt(airdropBottleCount));
+      } else {
+        setLocalBottleCount(0);
+      }
 
-    if (airdropShouldShowRecapIntro) {
-      setLocalShouldShowRecapIntro(false);
-    } else {
-      setLocalShouldShowRecapIntro(true);
+      if (airdropShouldShowBottleNumbers) {
+        setLocalShouldShowBottleNumbers(
+          airdropShouldShowBottleNumbers === "true"
+        );
+      } else {
+        setLocalShouldShowBottleNumbers(true);
+      }
+
+      const airdropShouldShowRecapIntro = window.localStorage.getItem(
+        "airdropShouldShowRecapIntro"
+      );
+
+      if (airdropShouldShowRecapIntro) {
+        setLocalShouldShowRecapIntro(false);
+      } else {
+        setLocalShouldShowRecapIntro(true);
+      }
+    } catch (err) {
+      console.log(err);
     }
 
     // if (airdropHasVisited) {
@@ -477,31 +482,46 @@ const Airdrop = () => {
   useEffect(() => {
     if (!window || !localCookieConsent) return;
     if (localShouldShowBottleNumbers === undefined) return;
-    window.localStorage.setItem(
-      "airdropShouldShowBottleNumbers",
-      localShouldShowBottleNumbers.toString()
-    );
+
+    try {
+      window.localStorage.setItem(
+        "airdropShouldShowBottleNumbers",
+        localShouldShowBottleNumbers.toString()
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }, [localShouldShowBottleNumbers]);
 
   useEffect(() => {
     if (!window || !localCookieConsent) return;
     if (localShouldShowRecapIntro !== false) return;
-    window.localStorage.setItem("airdropShouldShowRecapIntro", "false");
-    setLocalShouldShowRecapIntro(false);
+
+    try {
+      window.localStorage.setItem("airdropShouldShowRecapIntro", "false");
+      setLocalShouldShowRecapIntro(false);
+    } catch (err) {
+      console.log(err);
+    }
   }, [localShouldShowRecapIntro]);
 
   useEffect(() => {
     if (!window || !localCookieConsent) return;
     if (localShouldShowTutorial === undefined) return;
-    window.localStorage.setItem("airdropHasVisited", "true");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasUrlParams = urlParams.toString().length > 0;
+    try {
+      window.localStorage.setItem("airdropHasVisited", "true");
 
-    if (localShouldShowTutorial && !isMobile && !hasUrlParams) {
-      setTimeout(() => {
-        setCurrentModal("tutorial");
-      }, 2000);
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasUrlParams = urlParams.toString().length > 0;
+
+      if (localShouldShowTutorial && !isMobile && !hasUrlParams) {
+        setTimeout(() => {
+          setCurrentModal("tutorial");
+        }, 2000);
+      }
+    } catch (err) {
+      console.log(err);
     }
   }, [localShouldShowTutorial]);
 
