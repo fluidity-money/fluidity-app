@@ -158,8 +158,8 @@ func InsertEmissions(emission Emission) {
 			saddle_fee,
 			gtrade_v6_1_fee,
 			meson_fee,
-            camelot_fee,
-            chronos_fee,
+			camelot_fee,
+			chronos_fee,
 			sushiswap_fee,
 			kyber_classic_fee,
 			wombat_fee,
@@ -296,53 +296,54 @@ func InsertEmissions(emission Emission) {
 			$70,
 			$71,
 			$72,
-            $73,
-            $74,
+			$73,
+			$74,
 			$75,
 			$76,
 			$77,
 			$78,
-
 			$79,
+
 			$80,
 			$81,
 			$82,
 			$83,
 			$84,
-
 			$85,
+
 			$86,
 			$87,
 			$88,
 			$89,
-
 			$90,
+
 			$91,
 			$92,
 			$93,
-
 			$94,
+
 			$95,
 			$96,
 			$97,
 			$98,
-
 			$99,
-			$100,
 
+			$100,
 			$101,
 
 			$102,
+
 			$103,
 			$104,
-
 			$105,
+
 			$106,
 			$107,
-
 			$108,
+
 			$109,
-			$110
+			$110,
+			$111
 		);`,
 
 		TableEmissions,
