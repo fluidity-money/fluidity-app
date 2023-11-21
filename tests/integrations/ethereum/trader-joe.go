@@ -12,7 +12,7 @@ const integrationTestTraderJoe = `[
     "transfer": {
       "transaction": "0x22e978cddf7f2f31c7572fb87d4634287d23424cc365f12eb2520297cfbe56d3",
       "log": {
-        "data": "",
+        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAKy8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB6AmAAAAAAAAAAAGuvix2TuVs4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAnEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATiQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPo",
         "address": "0x7a08eaa93c05abd6b86bb09b0f565d6fc499ee35",
         "topics": [
           "0xad7d6f97abf51ce18e17a38f4d70e975be9c0708474987bb3e26ad21bd93ca70"
@@ -28,7 +28,7 @@ const integrationTestTraderJoe = `[
     },
     "expected_sender": "0x7a08eaa93c05abd6b86bb09b0f565d6fc499ee35",
     "expected_recipient": "0x7a08eaa93c05abd6b86bb09b0f565d6fc499ee35",
-    "expected_fees": "",
+    "expected_fees": "0/1",
     "expected_volume": "",
     "expected_emission": {
       "trader_joe": 0

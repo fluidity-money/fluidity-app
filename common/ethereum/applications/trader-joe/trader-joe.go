@@ -106,7 +106,11 @@ func GetTraderJoeFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	feeData.Fee = new(big.Rat)
+	// needing to make this 0 here explicitly because if it's
+	// new(big.Rat) it will be 0/1 causing tests to fail
+
+	feeData.Fee = new(big.Rat).SetInt64(0)
+	feeData.Volume = new(big.Rat)
 
 	return
 }
