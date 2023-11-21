@@ -41,6 +41,7 @@ var applicationNames = []string{
 	"kyber_classic",
 	"wombat",
 	"seawater_amm",
+	"trader_joe",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

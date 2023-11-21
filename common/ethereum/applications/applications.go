@@ -25,6 +25,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/trader-joe"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -62,6 +63,7 @@ const (
 	ApplicationKyberClassic
 	ApplicationWombat
 	ApplicationSeawaterAmm
+	ApplicationTraderJoe
 )
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
@@ -268,6 +270,13 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.SeawaterAmm += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationTraderJoe:
+		feeData, err = trader_joe.GetTraderJoeFees(
+			transfer,
+			client,
+			fluidTokenContract,
+		)
+		emission.TraderJoe += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(
@@ -368,6 +377,9 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 	case ApplicationSeawaterAmm:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool (switched to the LPs)
+		return transaction.From, logAddress, nil
+	case ApplicationTraderJoe:
+		// Return 0 cause stubbed (FIXME)
 		return transaction.From, logAddress, nil
 
 	default:

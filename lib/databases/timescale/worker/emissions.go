@@ -164,6 +164,7 @@ func InsertEmissions(emission Emission) {
 			kyber_classic_fee,
 			wombat_fee,
 			seawater_amm_fee,
+			trader_joe_fee,
 
 			saber_fee,
 			orca_fee,
