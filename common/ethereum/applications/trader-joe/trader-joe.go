@@ -9,6 +9,7 @@ package trader_joe
 
 import (
 	"fmt"
+	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -96,7 +97,8 @@ func GetTraderJoeFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
-	if len(unpacked) != 9 {
+	// there are 7 slots in this event, and 2 of them are indexed, so... 5
+	if len(unpacked) != 5 {
 		return feeData, fmt.Errorf(
 			"unpacked the wrong number of values! Expected %v, got %v",
 			9,
