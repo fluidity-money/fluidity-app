@@ -104,5 +104,7 @@ func GetTraderJoeFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 		)
 	}
 
+	feeData.Fee = new(big.Rat)
+
 	return
 }
