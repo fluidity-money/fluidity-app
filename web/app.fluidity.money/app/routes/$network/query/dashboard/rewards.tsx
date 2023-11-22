@@ -4,9 +4,7 @@ import type { Rewarders } from "~/util/rewardAggregates";
 import type { TokenPerformance } from "~/util/tokenAggregate";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {
-  getTotalRewardPool,
-} from "~/util/chainUtils/ethereum/transaction";
+import { getTotalRewardPool } from "~/util/chainUtils/ethereum/transaction";
 import { json } from "@remix-run/node";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";

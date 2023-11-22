@@ -376,13 +376,13 @@ const useUserTransactionsByAddress = async (
       errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
     };
 
-  const result =
-    parseHasuraUserTransactions(
-      await jsonPost<
-        UserTransactionsByAddressBody,
-        HasuraUserTransactionRes
-      >(url, body, headers)
+  const result = parseHasuraUserTransactions(
+    await jsonPost<UserTransactionsByAddressBody, HasuraUserTransactionRes>(
+      url,
+      body,
+      headers
     )
+  );
 
   return result;
 };
@@ -413,13 +413,13 @@ const useUserTransactionsByTxHash = async (
       errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
     };
 
-  const result =
-    parseHasuraUserTransactions(
-      await jsonPost<
-        UserTransactionsByTxHashBody,
-        HasuraUserTransactionRes
-      >(url, body, headers)
-    );
+  const result = parseHasuraUserTransactions(
+    await jsonPost<UserTransactionsByTxHashBody, HasuraUserTransactionRes>(
+      url,
+      body,
+      headers
+    )
+  );
 
   return result;
 };
@@ -457,14 +457,13 @@ const useUserTransactionsAll = async (
       errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
     };
 
-  const result =
-    parseHasuraUserTransactions(
-      await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-        url,
-        body,
-        headers
-      )
+  const result = parseHasuraUserTransactions(
+    await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+      url,
+      body,
+      headers
     )
+  );
 
   return result;
 };

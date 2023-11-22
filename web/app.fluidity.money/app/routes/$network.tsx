@@ -2,9 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
-import { useEffect, useMemo, useState, useContext } from "react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
+import { useEffect, useMemo, useState } from "react";
 import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";
@@ -83,16 +81,6 @@ const Provider = ({
   return <ProviderComponent>{children}</ProviderComponent>;
 };
 
-const ProviderOutlet = () => {
-  const { client } = useContext(SplitContext);
-
-  return (
-    <>
-      <Outlet />
-    </>
-  );
-};
-
 type LoaderData = {
   network: string;
   explorer: string;
@@ -134,7 +122,7 @@ export default function Network() {
         tokens={tokens}
         colorMap={colors}
       />
-      <ProviderOutlet />
+      <Outlet />
     </Provider>
   );
 }

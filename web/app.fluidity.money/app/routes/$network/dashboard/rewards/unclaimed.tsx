@@ -240,15 +240,14 @@ const UnclaimedWinnings = () => {
   return (
     <div className="pad-main">
       {/* Info Card - Only accessible for Ethereum/Arbitrum */}
-      {(network === "arbitrum") &&
-        !!userUnclaimedRewards && (
-          <UserRewards
-            claimNow={true}
-            unclaimedRewards={userUnclaimedRewards}
-            claimedRewards={userClaimedRewards}
-            network={network}
-          />
-        )}
+      {network === "arbitrum" && !!userUnclaimedRewards && (
+        <UserRewards
+          claimNow={true}
+          unclaimedRewards={userUnclaimedRewards}
+          claimedRewards={userClaimedRewards}
+          network={network}
+        />
+      )}
 
       {!!address && unclaimedData.state === "loading" && (
         <div style={{ marginBottom: "12px" }}>

@@ -21,7 +21,7 @@ import { SplitContextProvider } from "contexts/SplitProvider";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
-import {Buffer} from "buffer";
+import { Buffer } from "buffer";
 
 globalThis.Buffer = Buffer;
 

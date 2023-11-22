@@ -34,12 +34,14 @@ export const loader: LoaderFunction = async ({ params }) => {
   const eacAggregatorProxyAddr =
     config.contract.eac_aggregator_proxy[network as Chain];
 
-  const wethPrice = chainType(network) === "evm" ?
-    await getWethUsdPrice(
-      provider,
-      eacAggregatorProxyAddr,
-      EACAggregatorProxyAbi
-    ) : 0;
+  const wethPrice =
+    chainType(network) === "evm"
+      ? await getWethUsdPrice(
+          provider,
+          eacAggregatorProxyAddr,
+          EACAggregatorProxyAbi
+        )
+      : 0;
 
   const regularTokens = tokens
     .filter((token) => !token.isFluidOf)
