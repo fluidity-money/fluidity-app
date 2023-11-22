@@ -4,15 +4,11 @@ import type { Rewarders } from "~/util/rewardAggregates";
 import type { TokenPerformance } from "~/util/tokenAggregate";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {
-  aggregatePrizePools,
-  getTotalRewardPool,
-} from "~/util/chainUtils/ethereum/transaction";
+import { getTotalRewardPool } from "~/util/chainUtils/ethereum/transaction";
 import { json } from "@remix-run/node";
 import useApplicationRewardStatistics from "~/queries/useApplicationRewardStatistics";
 import { aggregateRewards } from "~/util/rewardAggregates";
 import { aggregateTokens } from "~/util/tokenAggregate";
-import RewardAbi from "~/util/chainUtils/ethereum/RewardPool.json";
 import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
 import config from "~/webapp.config.server";
 import {
@@ -54,11 +50,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
           return Promise.resolve(
             Promise.all(
               [
-                {
-                  network: "ethereum",
-                  abi: RewardAbi,
-                  getPrizePool: aggregatePrizePools,
-                },
                 {
                   network: "arbitrum",
                   abi: TotalRewardPoolAbi,

@@ -9,7 +9,7 @@ beforeAll(() => {
 describe("Unclaimed page Loader", () => {
   it("should return a response", async () => {
     const reqParams = {
-      network: "ethereum",
+      network: "arbitrum",
       address: "0xeb6b882a295d316ac62c8cfcc81c3e37c084b7c5",
     };
 

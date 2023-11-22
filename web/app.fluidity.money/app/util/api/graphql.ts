@@ -9,12 +9,10 @@ type GqlEndpoint = {
   headers: { [key: string]: string };
 };
 
-type GqlBackend = "hasura" | "bitquery";
+type GqlBackend = "hasura";
 
 export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {
-    case "ethereum":
-      return "bitquery";
     case "solana":
     case "arbitrum":
     case "polygon_zk":
@@ -26,11 +24,6 @@ export const networkGqlBackend = (network: string): GqlBackend | null => {
 
 export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
   switch (networkGqlBackend(network)) {
-    case "bitquery":
-      return {
-        url: "https://graphql.bitquery.io",
-        headers: { "X-API-KEY": process.env.FLU_BITQUERY_TOKEN ?? "" },
-      };
     case "hasura":
       return {
         url: "https://fluidity.hasura.app/v1/graphql",

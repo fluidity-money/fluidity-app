@@ -2,27 +2,6 @@ import { gql, Queryable, jsonPost } from "~/util";
 import { chainType } from "~/util/chainUtils/chains";
 
 const query: Queryable = {
-  ethereum: gql`
-    query getPendingRewards($address: String!) {
-      ethereum_pending_winners(
-        where: {
-          reward_sent: { _eq: false }
-          address: { _eq: $address }
-          network: { _eq: "ethereum" }
-        }
-        order_by: { block_number: desc }
-      ) {
-        address
-        reward_sent
-        token_decimals
-        token_short_name
-        transaction_hash
-        win_amount
-        block_number
-      }
-    }
-  `,
-
   solana: gql``,
 
   arbitrum: gql`

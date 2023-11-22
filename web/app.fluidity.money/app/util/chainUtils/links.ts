@@ -2,8 +2,6 @@ import type { Chain } from "./chains";
 
 const getAddressExplorerLink = (chain: Chain, address: string): string => {
   switch (chain) {
-    case "ethereum":
-      return `https://etherscan.io/address/${address}`;
     case "solana":
       return `https://explorer.solana.com/address/${address}`;
     case "arbitrum":
@@ -16,8 +14,6 @@ const getAddressExplorerLink = (chain: Chain, address: string): string => {
 // Ethereum only
 const getBlockExplorerLink = (chain: Chain, block: number): string => {
   switch (chain) {
-    case "ethereum":
-      return `https://etherscan.io/block/${block}`;
     case "solana":
       return `https://explorer.solana.com/block/${block}`;
     case "arbitrum":
@@ -29,8 +25,6 @@ const getBlockExplorerLink = (chain: Chain, block: number): string => {
 
 const getTxExplorerLink = (chain: Chain, address: string): string => {
   switch (chain) {
-    case "ethereum":
-      return `https://etherscan.io/tx/${address}`;
     case "solana":
       return `https://explorer.solana.com/tx/${address}`;
     case "arbitrum":
@@ -42,10 +36,6 @@ const getTxExplorerLink = (chain: Chain, address: string): string => {
 
 const networkMapper = (network: string) => {
   switch (network) {
-    case "ETH":
-      return "ethereum";
-    case "ethereum":
-      return "ETH";
     case "SOL":
       return "solana";
     case "solana":

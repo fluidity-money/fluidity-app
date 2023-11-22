@@ -8,7 +8,7 @@ beforeAll(() => {
 describe("useUserRewards successfully runs", () => {
   it("should return a valid response", async () => {
     const response = await useUserRewardsByAddress(
-      "ethereum",
+      "arbitrum",
       "0xeb6b882a295d316ac62c8cfcc81c3e37c084b7c5"
     );
     expect(response).toBeDefined();
