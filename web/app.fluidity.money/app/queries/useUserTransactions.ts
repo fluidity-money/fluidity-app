@@ -323,26 +323,6 @@ export type UserTransaction = {
   application: string;
 };
 
-type BitqueryUserTransaction = {
-  sender: {
-    address: string;
-  };
-  receiver: { address: string };
-  block: { timestamp: { unixtime: number } };
-  transaction: { hash: string };
-  amount: number;
-  currency: { symbol: string };
-};
-
-type BitqueryUserTransactionRes = {
-  data?: {
-    [network: string]: {
-      transfers: BitqueryUserTransaction[];
-    };
-  };
-  errors?: unknown;
-};
-
 type HasuraUserTransaction = {
   sender_address: string;
   recipient_address: string;
@@ -397,20 +377,12 @@ const useUserTransactionsByAddress = async (
     };
 
   const result =
-    networkGqlBackend(network) === "hasura"
-      ? parseHasuraUserTransactions(
-          await jsonPost<
-            UserTransactionsByAddressBody,
-            HasuraUserTransactionRes
-          >(url, body, headers)
-        )
-      : parseBitqueryUserTransactions(
-          await jsonPost<
-            UserTransactionsByAddressBody,
-            BitqueryUserTransactionRes
-          >(url, body, headers),
-          network
-        );
+    parseHasuraUserTransactions(
+      await jsonPost<
+        UserTransactionsByAddressBody,
+        HasuraUserTransactionRes
+      >(url, body, headers)
+    )
 
   return result;
 };
@@ -442,20 +414,12 @@ const useUserTransactionsByTxHash = async (
     };
 
   const result =
-    networkGqlBackend(network) === "hasura"
-      ? parseHasuraUserTransactions(
-          await jsonPost<
-            UserTransactionsByTxHashBody,
-            HasuraUserTransactionRes
-          >(url, body, headers)
-        )
-      : parseBitqueryUserTransactions(
-          await jsonPost<
-            UserTransactionsByTxHashBody,
-            BitqueryUserTransactionRes
-          >(url, body, headers),
-          network
-        );
+    parseHasuraUserTransactions(
+      await jsonPost<
+        UserTransactionsByTxHashBody,
+        HasuraUserTransactionRes
+      >(url, body, headers)
+    );
 
   return result;
 };
@@ -494,22 +458,13 @@ const useUserTransactionsAll = async (
     };
 
   const result =
-    networkGqlBackend(network) === "hasura"
-      ? parseHasuraUserTransactions(
-          await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-            url,
-            body,
-            headers
-          )
-        )
-      : parseBitqueryUserTransactions(
-          await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
-            url,
-            body,
-            headers
-          ),
-          network
-        );
+    parseHasuraUserTransactions(
+      await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+        url,
+        body,
+        headers
+      )
+    )
 
   return result;
 };
@@ -562,28 +517,6 @@ const parseHasuraUserTransactions = (
           application: transfer.application,
         };
       }),
-    },
-  };
-};
-
-const parseBitqueryUserTransactions = (
-  result: BitqueryUserTransactionRes,
-  network: string
-): UserTransactionsRes => {
-  if (!result.data || result.errors)
-    return {
-      errors: result.errors,
-    };
-
-  const transfers: BitqueryUserTransaction[] =
-    result.data[network]?.transfers ?? [];
-
-  return {
-    data: {
-      transfers: transfers.map((transfer) => ({
-        ...transfer,
-        application: "none",
-      })),
     },
   };
 };

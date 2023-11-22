@@ -40,8 +40,6 @@ export interface IFluidityFacade {
     | undefined
   >;
 
-  getDegenScore?: (address: string) => Promise<number>;
-
   addToken?: (symbol: string) => Promise<boolean | undefined>;
 
   getStakingRatios?: () => Promise<StakingRatioRes | undefined>;

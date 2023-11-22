@@ -108,7 +108,7 @@ type CacheData = {
 
 const SAFE_DEFAULT_REWARDS: RewardsLoaderData = {
   // Only used in Rewards
-  network: "ethereum",
+  network: "arbitrum",
   fluidTokenMap: {},
   totalPrizePool: 0,
   loaded: false,

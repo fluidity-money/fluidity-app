@@ -84,23 +84,7 @@ const Provider = ({
 };
 
 const ProviderOutlet = () => {
-  const { connected, address, getDegenScore } = useContext(
-    FluidityFacadeContext
-  );
-
   const { client } = useContext(SplitContext);
-
-  useEffect(() => {
-    if (!(address && connected)) return;
-
-    (async () => {
-      if (!getDegenScore) return;
-
-      const degenScore = await getDegenScore(address);
-
-      client?.track("connected-user-degen-score", address, degenScore);
-    })();
-  }, [address, client]);
 
   return (
     <>
