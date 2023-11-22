@@ -11,6 +11,7 @@ import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IFluidClient.sol";
 import "../interfaces/IOperatorOwned.sol";
 import "../interfaces/IRegistry.sol";
+import "../interfaces/ILpRewardsServer.sol";
 import "../interfaces/ITrfVariables.sol";
 import "../interfaces/IUtilityGauges.sol";
 
@@ -25,7 +26,6 @@ struct OracleUpdate {
 }
 
 contract Executor is IEmergencyMode, IOperatorOwned {
-
     /// @notice emitted when the rng oracles are changed to a new address
     event OracleChanged(
         address indexed contractAddr,
@@ -37,6 +37,12 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         address indexed registry_,
         address indexed _newRegistry
     );
+
+    event NewLpRewardsServer(
+        address indexed lpRewards_,
+        address indexed _newLpRewards
+    );
+
     /// @dev if false, emergency mode is active!
     bool private noEmergencyMode_;
 
@@ -54,6 +60,9 @@ contract Executor is IEmergencyMode, IOperatorOwned {
 
     /// @dev token => oracle
     mapping(address => address) private oracles_;
+
+    /// @dev token => rewards server
+    mapping(address => ILpRewardsServer) private lpRewards_;
 
     /**
      * @notice intialise the worker config for each of the tokens in the map
@@ -103,6 +112,14 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         emit NewOperator(operator_, _newOperator);
 
         operator_ = _newOperator;
+    }
+
+    function updateLpRewardsServer(address _token, ILpRewardsServer _newLpRewards) public {
+        require(msg.sender == operator_, "only operator");
+
+        emit NewLpRewardsServer(address(lpRewards_[_token]), address(_newLpRewards));
+
+        lpRewards_[_token] = _newLpRewards;
     }
 
     /**
@@ -203,5 +220,13 @@ contract Executor is IEmergencyMode, IOperatorOwned {
             // this will revert if client == address(0)
             client.batchReward(fluidReward.rewards, _firstBlock, _lastBlock);
         }
+    }
+
+    function lpReward(address _token, address _user, LpRewards[] calldata _rewards) external {
+        require(noEmergencyMode_, "emergency mode!");
+
+        require(msg.sender == oracles_[_token], "only oracle");
+
+        lpRewards_[_token].reward(_user, _rewards);
     }
 }

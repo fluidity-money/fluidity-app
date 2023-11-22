@@ -125,6 +125,9 @@ func init() {
 
 	wombatTests := unmarshalJsonTestOrFatal(integrationTestWombat)
 	tests = append(tests, wombatTests...)
+
+	traderJoeTests := unmarshalJsonTestOrFatal(integrationTestTraderJoe)
+	tests = append(tests, traderJoeTests...)
 }
 
 func TestIntegrations(t *testing.T) {
@@ -159,7 +162,7 @@ func TestIntegrations(t *testing.T) {
 			convertedReceipt = common.ConvertGethReceipt(*txReceipt)
 		}
 
-		feeData, emission, err := applications.GetApplicationFee(
+		feeData, _, emission, err := applications.GetApplicationFee(
 			transfer,
 			client,
 			fluidAddress,

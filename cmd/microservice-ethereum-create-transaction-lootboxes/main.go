@@ -172,7 +172,7 @@ func main() {
 
 			inputData := transaction.Data()
 
-			feeData, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
+			feeData, _, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {

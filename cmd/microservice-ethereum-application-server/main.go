@@ -129,17 +129,6 @@ func main() {
 			applicationContracts,
 		)
 
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Format(
-					"Failed to get application events in block %#v!",
-					blockHash,
-				)
-
-				k.Payload = err
-			})
-		}
-
 		// fetch receipts and calc app fees for each application transfer
 		// and group the transfers by transaction
 
@@ -182,7 +171,8 @@ func main() {
 			transfersWithFees := make([]worker.EthereumDecoratedTransfer, 0)
 
 			for _, transfer := range transfers {
-				feeData, emission, err := applications.GetApplicationFee(
+				// appData is arbitrary data that we propagate to be consumed later
+				feeData, appData, emission, err := applications.GetApplicationFee(
 					transfer,
 					gethClient,
 					contractAddress,
@@ -221,9 +211,10 @@ func main() {
 				}
 
 				decorator := &worker.EthereumWorkerDecorator{
-					Application:    transfer.Application,
-					UtilityName:    utility,
-					ApplicationFee: fee,
+					Application:     transfer.Application,
+					UtilityName:     utility,
+					ApplicationFee:  fee,
+					ApplicationData: appData,
 				}
 
 				sender, recipient, err := applications.GetApplicationTransferParties(

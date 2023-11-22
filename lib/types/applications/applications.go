@@ -7,6 +7,8 @@ package applications
 import (
 	"fmt"
 	"math/big"
+
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 )
 
 // applications contains types relevant to supporting events generated
@@ -38,6 +40,8 @@ var applicationNames = []string{
 	"sushiswap",
 	"kyber_classic",
 	"wombat",
+	"seawater_amm",
+	"trader_joe",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
@@ -45,6 +49,20 @@ type UtilityName string
 
 // UtilityFluid is the special utility name for the fluid token itself
 var UtilityFluid UtilityName = "FLUID"
+
+// AMM data, lives in the ApplicationData struct
+type ApplicationDataAmm struct {
+	FirstToken  ethereum.Address
+	FirstTick   int32
+	SecondToken ethereum.Address
+	SecondTick  int32
+}
+
+// ApplicationData is arbitrary data that can get set by applications that gets propagated through the stack
+// currently just used for the AMM
+type ApplicationData struct {
+	AmmPrices ApplicationDataAmm `json:"amm_prices"`
+}
 
 type ApplicationFeeData = struct {
 	// Fee for the fee paid to the application (in USD)

@@ -158,8 +158,13 @@ func InsertEmissions(emission Emission) {
 			saddle_fee,
 			gtrade_v6_1_fee,
 			meson_fee,
-            camelot_fee,
-            chronos_fee,
+			camelot_fee,
+			chronos_fee,
+			sushiswap_fee,
+			kyber_classic_fee,
+			wombat_fee,
+			seawater_amm_fee,
+			trader_joe_fee,
 
 			saber_fee,
 			orca_fee,
@@ -192,9 +197,11 @@ func InsertEmissions(emission Emission) {
 
 			fee_switch_sender_original_address,
 			fee_switch_sender_new_address,
+			fee_switch_sender_reason,
 
 			fee_switch_recipient_original_address,
 			fee_switch_recipient_new_address,
+			fee_switch_recipient_reason,
 
 			special_pool_options_payout_freq_override,
 			special_pool_options_delta_weight_override,
@@ -289,16 +296,15 @@ func InsertEmissions(emission Emission) {
 			$70,
 			$71,
 			$72,
-            $73,
-            $74,
-
+			$73,
+			$74,
 			$75,
 			$76,
 			$77,
 			$78,
 			$79,
-			$80,
 
+			$80,
 			$81,
 			$82,
 			$83,
@@ -309,8 +315,8 @@ func InsertEmissions(emission Emission) {
 			$87,
 			$88,
 			$89,
-
 			$90,
+
 			$91,
 			$92,
 			$93,
@@ -318,9 +324,7 @@ func InsertEmissions(emission Emission) {
 
 			$95,
 			$96,
-
 			$97,
-
 			$98,
 			$99,
 
@@ -328,8 +332,18 @@ func InsertEmissions(emission Emission) {
 			$101,
 
 			$102,
+
 			$103,
-			$104
+			$104,
+			$105,
+
+			$106,
+			$107,
+			$108,
+
+			$109,
+			$110,
+			$111
 		);`,
 
 		TableEmissions,
@@ -427,6 +441,11 @@ func InsertEmissions(emission Emission) {
 		ethAppFees.Meson,
 		ethAppFees.Camelot,
 		ethAppFees.Chronos,
+		ethAppFees.Sushiswap,
+		ethAppFees.KyberClassic,
+		ethAppFees.Wombat,
+		ethAppFees.SeawaterAmm,
+		ethAppFees.TraderJoe,
 
 		solAppFees.Saber,
 		solAppFees.Orca,
@@ -459,9 +478,11 @@ func InsertEmissions(emission Emission) {
 
 		feeSwitchSender.OriginalAddress,
 		feeSwitchSender.NewAddress,
+		feeSwitchSender.Reason,
 
 		feeSwitchRecipient.OriginalAddress,
 		feeSwitchRecipient.NewAddress,
+		feeSwitchRecipient.Reason,
 
 		specialPoolOptions.PayoutFreqOverride,
 		specialPoolOptions.DeltaWeightOverride,

@@ -42,6 +42,42 @@ func BigIntFromHex(s string) (*misc.BigInt, error) {
 	return &bigInt, nil
 }
 
+func CoerceBoundContractResultsToInt32Pair(results []interface{}) (int32, int32, error) {
+	var (
+		result1 int32
+		result2 int32
+	)
+
+	if resultsLen := len(results); resultsLen != 2 {
+		return 0, 0, fmt.Errorf(
+			"returned results did not have length of 2! was %#v!",
+			resultsLen,
+		)
+	}
+
+	switch results[0].(type) {
+	case int32:
+		result1 = results[0].(int32)
+
+	default:
+		return 0, 0, fmt.Errorf(
+			"failed to coerce the return value from balanceOfUnderlying to a uint16!",
+		)
+	}
+
+	switch results[1].(type) {
+	case int32:
+		result2 = results[1].(int32)
+
+	default:
+		return 0, 0, fmt.Errorf(
+			"failed to coerce the return value from balanceOfUnderlying to a uint16!",
+		)
+	}
+
+	return result1, result2, nil
+}
+
 func CoerceBoundContractResultsToUInt16(results []interface{}) (uint16, error) {
 	var result uint16
 

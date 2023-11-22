@@ -1,8 +1,8 @@
 #!/bin/sh
 
-export FLU_AMQP_QUEUE_ADDR=amqp://localhost:5672
+export FLU_AMQP_QUEUE_ADDR=${FLU_AMQP_QUEUE_ADDR:-"amqp://localhost:5672"}
 export FLU_WORKER_ID=abc
-export FLU_REDIS_ADDR=localhost:6379
+export FLU_REDIS_ADDR=${FLU_REDIS_ADDR:-"localhost:6379"}
 
 if ! pgrep -x "rabbitmq-server" > /dev/null
 then
