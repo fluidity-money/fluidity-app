@@ -5,4 +5,4 @@ ALTER TABLE worker_emissions
 
 -- migrate:down
 
-ALTER TABLE worker_emissions seawater_amm_fee;
+ALTER TABLE worker_emissions DROP COLUMN seawater_amm_fee;
