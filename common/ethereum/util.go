@@ -262,6 +262,25 @@ func CoerceBoundContractResultsToUint8(results []interface{}) (uint8, error) {
 	return result, nil
 }
 
+func CoerceBoundContractResultsToBytes32(results []interface{}) ([32]byte, error) {
+	var result [32]byte
+
+	if resultsLen := len(results); resultsLen != 1 {
+		return result, fmt.Errorf(
+			"returned results did not have length of 1! was %v",
+			resultsLen,
+		)
+	}
+
+	result, ok := results[0].([32]byte)
+
+	if !ok {
+		return result, fmt.Errorf("results did not contain bytes32 ([32]byte)!")
+	}
+
+	return result, nil
+}
+
 func BigPow(left *big.Rat, count int) *big.Rat {
 
 	if count == 0 {

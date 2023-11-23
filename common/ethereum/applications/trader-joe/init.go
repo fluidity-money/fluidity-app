@@ -18,4 +18,10 @@ func init() {
 	if traderJoeSwapAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(traderJoeLBPairAbiString)
+
+	if traderJoeLBPairAbi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }
