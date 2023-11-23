@@ -123,6 +123,34 @@ const queryByAddress: Queryable = {
 };
 
 const queryByTxHash: Queryable = {
+  arbitrum: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "arbitrum" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { _in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+      }
+    }
+  `,
   solana: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
