@@ -902,7 +902,10 @@ contract Token is
      * @param _status of whether or not it's enabled
      */
     function blacklistAddress(address _spender, bool _status) public {
-        require(msg.sender == operator_, "only operator");
+        require(
+            msg.sender == operator_ || msg.sender == emergencyCouncil_,
+            "only operator/emergency council"
+        );
         require(_spender != address(0), "no zero address");
         emit BlacklistEnabled(_spender, _status);
         blacklist_[_spender] = _status;
