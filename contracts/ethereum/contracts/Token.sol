@@ -165,6 +165,17 @@ contract Token is
     /// @notice burnFee_ that's paid by the user when they mint
     uint256 private mintFee_;
 
+    /* ~~~~~~~~~~ ADDRESS BLACKLISTING ~~~~~~~~~~ */
+
+    /// @notice blacklist_ that's used to prevent certain accounts from
+    ///         moving and unwrapping/wrapping funds.
+    mapping(address => bool) private blacklist_;
+
+    /* ~~~~~~~~~~ EVENTS ~~~~~~~~~~ */
+
+    /// @dev BlacklistEnabled activated for a specific address
+    event BlacklistEnabled(address indexed spender, bool status);
+
     /* ~~~~~~~~~~ SETUP FUNCTIONS ~~~~~~~~~~ */
 
     /**
@@ -266,6 +277,7 @@ contract Token is
         uint256 _amount
     ) internal returns (uint256) {
         require(noEmergencyMode_, "emergency mode!");
+        require(isAddressAllowed(_spender), "address blacklisted");
 
         // take underlying tokens from the user
 
@@ -315,6 +327,9 @@ contract Token is
         address _beneficiary,
         uint256 _amount
     ) internal returns (uint256) {
+        // check if the account isn't blacklisted
+        require(isAddressAllowed(_sender), "address blacklisted");
+
         // take the user's fluid tokens
 
          // if the fee amount > 0 and the burn fee is greater than 0, then
@@ -387,6 +402,7 @@ contract Token is
     }
 
     /// @dev _transfer is implemented by OpenZeppelin
+    /// @dev also checks the blacklist and responds accordingly
     function _transfer(
         address from,
         address to,
@@ -397,6 +413,8 @@ contract Token is
 
         // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
+
+        require(isAddressAllowed(from), "address blacklisted");
 
         uint256 fromBalance = balances_[from];
 
@@ -810,11 +828,19 @@ contract Token is
         return true;
     }
 
+    /**
+     * @dev transferFrom the address with the sender, if they're allowed.
+     * @param _from address to send from
+     * @param _to recipient of the amount
+     * @param _amount to send
+     * @dev note that this enforces a blacklist on the sender and _from
+     */
     function transferFrom(
         address _from,
         address _to,
         uint256 _amount
     ) public returns (bool) {
+        require(isAddressAllowed(msg.sender), "address blacklisted");
         _spendAllowance(_from, msg.sender, _amount);
         _transfer(_from, _to, _amount);
         return true;
@@ -868,5 +894,28 @@ contract Token is
 
         mintFee_ = _mintFee;
         burnFee_ = _burnFee;
+    }
+
+    /**
+     * @dev blacklistAddress, only callable by the operator.
+     * @param _spender to ban using the blacklisting feature
+     * @param _status of whether or not it's enabled
+     */
+    function blacklistAddress(address _spender, bool _status) public {
+        require(
+            msg.sender == operator_ || msg.sender == emergencyCouncil_,
+            "only operator/emergency council"
+        );
+        require(_spender != address(0), "no zero address");
+        emit BlacklistEnabled(_spender, _status);
+        blacklist_[_spender] = _status;
+    }
+
+    /**
+     * @notice isAddressAllowed (are they not blacklisted?)
+     * @param _account to test
+     */
+    function isAddressAllowed(address _account) public view returns (bool) {
+        return !blacklist_[_account];
     }
 }

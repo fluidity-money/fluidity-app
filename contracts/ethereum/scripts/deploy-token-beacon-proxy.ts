@@ -59,6 +59,9 @@ const main = async () => {
 
   let pool: ethers.Contract;
 
+  let aToken: string;
+  let aavePool: string;
+
   switch (backend) {
   case "compound":
     const cToken = mustEnv(ENV_COMPOUND_CTOKEN);
@@ -72,8 +75,8 @@ const main = async () => {
     break;
 
   case "aaveV2":
-    const aToken = mustEnv(ENV_AAVE_V2_ATOKEN);
-    const aavePool = mustEnv(ENV_AAVE_V2_ADDRESS_PROVIDER);
+    aToken = mustEnv(ENV_AAVE_V2_ATOKEN);
+    aavePool = mustEnv(ENV_AAVE_V2_ADDRESS_PROVIDER);
     console.log(`deploying aave v2 pool with beacon ${poolAddress}, atoken ${aToken}, aave pool ${aavePool}`);
     pool = await hre.upgrades.deployBeaconProxy(
       poolAddress,
@@ -84,8 +87,8 @@ const main = async () => {
     break;
 
   case "aaveV3":
-    const aToken = mustEnv(ENV_AAVE_V3_ATOKEN);
-    const aavePool = mustEnv(ENV_AAVE_V3_ADDRESS_PROVIDER);
+    aToken = mustEnv(ENV_AAVE_V3_ATOKEN);
+    aavePool = mustEnv(ENV_AAVE_V3_ADDRESS_PROVIDER);
     console.log(`deploying aave v3 pool with beacon ${poolAddress}, atoken ${aToken}, aave pool ${aavePool}`);
     pool = await hre.upgrades.deployBeaconProxy(
       poolAddress,
