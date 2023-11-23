@@ -202,7 +202,7 @@ describe("Token", async function () {
         await expect(fUsdtBlacklistedSpender.transfer(fUsdtOperatorAddr, MaxUint256))
           .to.be.revertedWith("address blacklisted");
 
-        await expect(fUsdtOperatorAddr.transfer(blacklistedAddr, MaxUint256))
+        await expect(fUsdtOperator.transfer(blacklistedAddr, MaxUint256))
           .to.be.revertedWith("address blacklisted");
 
         fUsdtBlacklistedSpender.approve(fUsdtOperatorAddr, MaxUint256);
