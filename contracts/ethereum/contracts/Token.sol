@@ -328,7 +328,7 @@ contract Token is
         uint256 _amount
     ) internal returns (uint256) {
         // check if the account isn't blacklisted
-        require(isAddressAllowed(_sender));
+        require(isAddressAllowed(_sender), "address blacklisted");
 
         // take the user's fluid tokens
 

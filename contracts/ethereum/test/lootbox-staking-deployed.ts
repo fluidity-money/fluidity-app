@@ -97,7 +97,7 @@ describe("LootboxStaking deployed infra", async () => {
       method: "hardhat_setBalance",
       params: [
         stakingOperatorAddr,
-        ethers.constants.MaxUint256.toHexString()
+        MaxUint256.toHexString()
       ]
     });
 

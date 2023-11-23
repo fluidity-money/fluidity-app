@@ -1,4 +1,6 @@
 
+import * as hre from "hardhat";
+
 import * as ethers from 'ethers';
 
 import { BigNumber } from 'ethers';
@@ -20,11 +22,15 @@ function fluidityReward(...winners: [string, number][]) {
     ]];
 }
 
+const MaxUint256 = ethers.constants.MaxUint256;
+
 describe("Token", async function () {
     let fUsdtOperator: ethers.Contract;
     let fUsdtAccount: ethers.Contract;
     let fUsdtOracle: ethers.Contract;
     let fUsdtCouncil: ethers.Contract;
+    let fUsdtBlacklistedSpender: ethers.Contract;
+
     let fluidToken: string;
     let accountAddr: string;
 
@@ -38,6 +44,7 @@ describe("Token", async function () {
                 fluidAccount1: fUsdtAccount,
                 oracleBoundOperator: fUsdtOracle,
                 emergencyCouncil: fUsdtCouncil,
+                blacklistedSpender: fUsdtBlacklistedSpender,
             },
         } = bindings);
         accountAddr = await signers.userAccount1.getAddress();
@@ -179,5 +186,49 @@ describe("Token", async function () {
     });
 
     it("does approvals correctly using eip2612", async () => {
+    });
+
+    it("ensures that the address is blacklisted and enforced correctly", async () => {
+        const blacklistedAddr = await signers.token.blacklistedSigner.getAddress();
+        const fUsdtOperatorAddr = await fUsdtOperator.signer.getAddress();
+
+        await hre.network.provider.request({
+          method: "hardhat_setBalance",
+          params: [blacklistedAddr, MaxUint256.toHexString()]
+        });
+
+        await fUsdtOperator.blacklistAddress(blacklistedAddr, true);
+
+        await expect(fUsdtBlacklistedSpender.transfer(fUsdtOperatorAddr, MaxUint256))
+          .to.be.revertedWith("address blacklisted");
+
+        fUsdtBlacklistedSpender.approve(fUsdtOperatorAddr, MaxUint256);
+
+        await expect(fUsdtOperator.transferFrom(blacklistedAddr, fUsdtOperatorAddr, MaxUint256))
+          .to.be.revertedWith("address blacklisted");
+
+        await expect(fUsdtBlacklistedSpender.transferFrom(fUsdtOperatorAddr, blacklistedAddr, MaxUint256))
+          .to.be.revertedWith("address blacklisted");
+
+        await expect(fUsdtBlacklistedSpender.erc20In(MaxUint256))
+          .to.be.revertedWith("address blacklisted");
+
+        await expect(fUsdtBlacklistedSpender.erc20Out(MaxUint256))
+          .to.be.revertedWith("address blacklisted");
+
+        await fUsdtOperator.blacklistAddress(blacklistedAddr, false);
+
+        await expect(fUsdtOperator.transferFrom(blacklistedAddr, fUsdtOperatorAddr, MaxUint256))
+          .to.be.revertedWith("ERC20: transfer amount exceeds balance");
+
+        await expect(fUsdtBlacklistedSpender.transferFrom(fUsdtOperatorAddr, blacklistedAddr, MaxUint256))
+          .to.be.revertedWith("insufficient allowance");
+
+        await expect(fUsdtBlacklistedSpender.erc20In(MaxUint256))
+          .to.be.revertedWith("SafeERC20: low-level call failed");
+
+        await expect(fUsdtBlacklistedSpender.erc20Out(MaxUint256))
+          .to.be.revertedWith("ERC20: burn amount exceeds balance");
+
     });
 });
