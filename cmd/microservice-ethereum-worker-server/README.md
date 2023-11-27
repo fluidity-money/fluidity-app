@@ -34,6 +34,16 @@ client.
 | `FLU_ETHEREUM_REDIS_APY_MOVING_AVERAGE_KEY` | Moving average key to use to track the APY with using Redis.                 |
 | `FLU_ETHEREUM_APPLICATION_CONTRACTS`        | List of comma-separated contract addresses to track as applications. (e.g. `0xae461ca67b15dc8dc81ce7615e0320da1a9ab8d5,0x3041cbd36888becc7bbcbc0045e3b1f144466f5f` ) |
 | `FLU_ETHEREUM_CHAINLINK_HTTP_URL`           | URL to use as the custom geth network for determining the price of ETH if the currently deployed network does not support it.                                        |
+| `FLU_ETHEREUM_GLOBAL_UTILITY_REWARDS`       | (<program name>,)+ is used to enable global utility rewards for each transfer. |
+
+## Notes
+
+### Global program application
+
+The global program (applications.ApplicationGlobalProgram) can be set
+to reward every FLUID transfer with an additional utility reward
+payout. FLU_ETHEREUM_GLOBAL_UTILITY_REWARDS is
+used for this.
 
 ## Building
 

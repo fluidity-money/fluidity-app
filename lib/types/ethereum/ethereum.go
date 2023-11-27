@@ -189,7 +189,7 @@ func HashFromString(str string) Hash {
 }
 
 // AddressFromString, taking the string and making it lowercase then
-// coercing
+// coercing, does no safety checks!
 func AddressFromString(str string) Address {
 	address := strings.ToLower(str)
 

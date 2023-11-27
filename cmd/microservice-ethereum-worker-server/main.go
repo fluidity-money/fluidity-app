@@ -78,6 +78,9 @@ const (
 
 	// EnvNetwork to differentiate between eth, arbitrum, etc
 	EnvNetwork = `FLU_ETHEREUM_NETWORK`
+
+	// EnvGlobalUtilityRewards to always pay out based on the internal config, just utility names.
+	EnvGlobalUtilityRewards = `FLU_ETHEREUM_GLOBAL_UTILITY_REWARDS`
 )
 
 type PayoutDetails struct {
@@ -101,6 +104,8 @@ func main() {
 		ammLpPoolAddr_ = mustEthereumAddressFromEnv(EnvAmmLpPoolAddress)
 
 		chainlinkEthPriceFeedUrl = os.Getenv(EnvChainlinkEthPriceNetworkUrl)
+
+		globalUtilityRewards_ = os.Getenv(EnvGlobalUtilityRewards)
 	)
 
 	ammLpPoolAddr := commonEth.ConvertGethAddress(ammLpPoolAddr_)
@@ -112,6 +117,14 @@ func main() {
 	}
 
 	tokenDetails := make(map[appTypes.UtilityName]token_details.TokenDetails)
+
+	// globalUtilityRewards addressed by the program name
+
+	globalUtilityRewards := make([]appTypes.UtilityName, 0)
+
+	for i, s := range strings.Split(globalUtilityRewards_, ",") {
+		globalUtilityRewards[i] = appTypes.UtilityName(s)
+	}
 
 	for _, details := range strings.Split(tokenDetails_, ",") {
 		parts := strings.Split(details, ":")
@@ -187,6 +200,15 @@ func main() {
 			})
 		}
 	}
+
+	// these are the fluid clients that we build off later during our
+	// lookup, they need to include the base FLUID client as well as
+	// the clients for global utility rewards
+
+	baseFluidClients := append(
+		[]appTypes.UtilityName{appTypes.UtilityFluid},
+		globalUtilityRewards...,
+	)
 
 	queue.GetMessages(serverWorkAmqpTopic, func(message queue.Message) {
 		var hintedBlock worker.EthereumHintedBlock
@@ -449,8 +471,6 @@ func main() {
 				feePerTransfer.Quo(transactionFeeNormal, transferCountRat)
 			}
 
-			// for each fluid transfer, calculate the actual fee and chances
-
 			for _, transfer := range transaction.Transfers {
 				// if we have an application transfer, apply the fee
 
@@ -462,8 +482,8 @@ func main() {
 					logIndex          = transfer.LogIndex
 					appEmission       = transfer.AppEmissions
 
-					// the fluid token is always included
-					fluidClients = []appTypes.UtilityName{appTypes.UtilityFluid}
+					// the fluid token is always included (this implicitly copies the slice)
+					fluidClients = baseFluidClients
 				)
 
 				senderAddress, senderAddressChanged := worker_config.LookupFeeSwitch(
@@ -530,7 +550,7 @@ func main() {
 				pools, err := fluidity.GetUtilityVars(
 					gethClient,
 					registryAddress,
-					contractAddress,
+					contractAddress, // the token address
 					fluidClients,
 				)
 
@@ -544,7 +564,7 @@ func main() {
 				for _, pool := range pools {
 					// trigger
 					log.Debugf(
-						"Looking up the utility variables at registry %v, for the contract %v and the fluid clients %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
+						"Looked up the utility variables at registry %v, for the contract %v and the fluid clients %v, pool size native %v, token decimal scale %v, exchange rate %v, delta weight %v",
 						registryAddress,
 						contractAddress,
 						fluidClients,
@@ -556,7 +576,11 @@ func main() {
 				}
 
 				var (
-					normalPools  []workerTypes.UtilityVars
+					// normalPools are set during a normal transfer based on the TRF
+					normalPools []workerTypes.UtilityVars
+
+					// specialPools are set on a per-application basis based
+					// on the type of application used
 					specialPools []workerTypes.UtilityVars
 
 					// outputs from the trf
@@ -610,7 +634,8 @@ func main() {
 
 				payouts = append(payouts, normalPayout)
 
-				// special payouts!
+				// append special (utility client) payouts
+
 				for _, specialPool := range specialPools {
 					specialPayout := calculateSpecialPayoutDetails(
 						dbNetwork,
