@@ -1,0 +1,17 @@
+%
+
+Error:
+Failed to parse `[(arbitrum`, expected value of type: (string,bool,address,address)[]
+
+Context:
+- Invalid data
+% % a --from=0x429Dc27be907e16EF40329503F501361879510e0 0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d 'updateUtilityClients((string,bool,address,address)[])' '[(swag,false,0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A,0x77f56d00fB78a701Af3A09c79f2B11cfa38f9Ff2)]'
+0x
+
+% a --from=0x429Dc27be907e16EF40329503F501361879510e0 0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d 'updateUtilityClients((string,bool,address,address)[])' '[(arbitrum 1st,false,0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A,0x77f56d00fB78a701Af3A09c79f2B11cfa38f9Ff2)]'
+Error:
+Failed to parse `[(arbitrum`, expected value of type: (string,bool,address,address)[]
+
+Context:
+- Invalid data
+%
