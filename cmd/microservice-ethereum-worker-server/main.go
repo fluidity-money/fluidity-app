@@ -634,8 +634,7 @@ func main() {
 
 				payouts = append(payouts, normalPayout)
 
-				// append special (utility client) payouts that should happen based on the address
-				// and the utility client enabled
+				// append special (utility client) payouts
 
 				for _, specialPool := range specialPools {
 					specialPayout := calculateSpecialPayoutDetails(

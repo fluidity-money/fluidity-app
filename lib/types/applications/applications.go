@@ -42,7 +42,6 @@ var applicationNames = []string{
 	"wombat",
 	"seawater_amm",
 	"trader_joe",
-	"global_program",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

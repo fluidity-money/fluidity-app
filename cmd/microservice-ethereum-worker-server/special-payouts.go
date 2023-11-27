@@ -39,18 +39,6 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 		details, isEnabled, found := workerDb.GetSpecialPoolOverrides(dbNetwork, pool.Name)
 
 		switch {
-		case found:
-			// we found the pool, but it was disabled! so we're going to return an empty PayoutDetails!
-
-			log.App(func(k *log.Log) {
-				k.Format(
-					"Found pool %v, but was not enabled! Returning nothing on this utility client!",
-					pool.Name,
-				)
-			})
-
-			return
-
 		case found && isEnabled:
 			// if the pool is enabled, then we need to handle the worker override behaviour
 
@@ -75,6 +63,18 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 				pool.DeltaWeight.Set(deltaWeightOverride)
 				emission.SpecialPoolOptions.DeltaWeightOverride, _ = deltaWeightOverride.Float64()
 			}
+
+		case found:
+			// we found the pool, but it was disabled! so we're going to return an empty PayoutDetails!
+
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Found pool %v, but was not enabled! Returning nothing on this utility client!",
+					pool.Name,
+				)
+			})
+
+			return
 
 		default:
 			log.App(func(k *log.Log) {
