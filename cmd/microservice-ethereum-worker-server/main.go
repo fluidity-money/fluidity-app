@@ -482,7 +482,7 @@ func main() {
 					logIndex          = transfer.LogIndex
 					appEmission       = transfer.AppEmissions
 
-					// the fluid token is always included
+					// the fluid token is always included (this implicitly copies the slice)
 					fluidClients = baseFluidClients
 				)
 
