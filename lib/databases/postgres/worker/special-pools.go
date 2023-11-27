@@ -19,7 +19,7 @@ import (
 
 const TablePoolOverrides = `worker_custom_pool_overrides`
 
-func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applications.UtilityName) (worker.SpecialPoolOptions, bool) {
+func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applications.UtilityName) (options worker.SpecialPoolOptions, isEnabled bool, wasFound bool) {
 	postgresClient := postgres.Client()
 
 	statementText := fmt.Sprintf(`
@@ -28,7 +28,8 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 			payout_freq_denom,
 			delta_weight_num,
 			delta_weight_denom,
-			winning_classes
+			winning_classes,
+			is_enabled
 		FROM %s
 		WHERE network = $1 AND utility_name = $2`,
 
@@ -59,6 +60,7 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 		&deltaWeightNum,
 		&deltaWeightDenom,
 		&poolOverrides.WinningClassesOverride,
+		&isEnabled,
 	)
 
 	switch err {
@@ -73,7 +75,7 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 			)
 		})
 
-		return poolOverrides, false
+		return poolOverrides, false, false
 
 	case nil:
 		// do nothing
@@ -89,5 +91,5 @@ func GetSpecialPoolOverrides(network_ network.BlockchainNetwork, poolName applic
 	poolOverrides.PayoutFreqOverride = new(big.Rat).SetFrac(&payoutFreqNum.Int, &payoutFreqDenom.Int)
 	poolOverrides.DeltaWeightOverride = new(big.Rat).SetFrac(&deltaWeightNum.Int, &deltaWeightDenom.Int)
 
-	return poolOverrides, true
+	return poolOverrides, isEnabled, true
 }

@@ -17,7 +17,12 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
-func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool workerTypes.UtilityVars, transferFeeNormal, currentAtx, payoutFreq *big.Rat, winningClasses, btx int, epochTime uint64, emission *worker.Emission) PayoutDetails {
+// calculateSpecialPayoutDetails by looking up the pool in the database
+// for overrides (and whether it's enabled), if it's not set then we
+// assume it's okay to continue, if the row exists, then we'll override
+// it. if it's set but it's disabled, then we return an empty struct.
+// logs the details via the emissions.
+func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool workerTypes.UtilityVars, transferFeeNormal, currentAtx, payoutFreq *big.Rat, winningClasses, btx int, epochTime uint64, emission *worker.Emission) (specialPayout PayoutDetails) {
 	calculationType := pool.CalculationType
 
 	switch calculationType {
@@ -31,9 +36,24 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 		)
 
 		// get overrides
-		details, found := workerDb.GetSpecialPoolOverrides(dbNetwork, pool.Name)
+		details, isEnabled, found := workerDb.GetSpecialPoolOverrides(dbNetwork, pool.Name)
 
-		if found {
+		switch {
+		case found:
+			// we found the pool, but it was disabled! so we're going to return an empty PayoutDetails!
+
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Found pool %v, but was not enabled! Returning nothing on this utility client!",
+					pool.Name,
+				)
+			})
+
+			return
+
+		case found && isEnabled:
+			// if the pool is enabled, then we need to handle the worker override behaviour
+
 			var (
 				winningClassesOverride = details.WinningClassesOverride
 				payoutFreqOverride     = details.PayoutFreqOverride
@@ -55,10 +75,18 @@ func calculateSpecialPayoutDetails(dbNetwork network.BlockchainNetwork, pool wor
 				pool.DeltaWeight.Set(deltaWeightOverride)
 				emission.SpecialPoolOptions.DeltaWeightOverride, _ = deltaWeightOverride.Float64()
 			}
+
+		default:
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Didn't find %v in the database, assuming it's enabled and that we don't want to override it",
+					pool.Name,
+				)
+			})
 		}
 
 		// call the trf normally now
-		specialPayout := calculatePayoutDetails(
+		specialPayout = calculatePayoutDetails(
 			workerTypes.TrfModeNoOptimisticSolution,
 			transferFeeNormal,
 			currentAtx,
