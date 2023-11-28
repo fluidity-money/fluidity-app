@@ -11,6 +11,7 @@ const UtilityToken = ({ utility, ...imgProps }: IUtilityToken) => {
     case "sushi":
       return <img {...imgProps} src="/images/providers/Sushiswap.svg" />;
     case "trader":
+    case "arb":
       return <img {...imgProps} src="/assets/chains/arbIcon.svg" />;
     default:
       return <img {...imgProps} src="/assets/tokens/fUSDC.svg" />;
