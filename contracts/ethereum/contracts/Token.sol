@@ -414,6 +414,7 @@ contract Token is
         // solhint-disable-next-line reason-string
         require(to != address(0), "ERC20: transfer to the zero address");
 
+        require(isAddressAllowed(to), "address blacklisted");
         require(isAddressAllowed(from), "address blacklisted");
 
         uint256 fromBalance = balances_[from];
