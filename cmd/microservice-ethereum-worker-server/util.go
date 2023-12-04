@@ -199,5 +199,11 @@ func isDecoratedTransferZeroVolume(transfer typesWorker.EthereumDecoratedTransfe
 		return true
 	}
 
-	return decorator.Volume.Cmp(&ZeroInt.Int) == 0
+	volume := decorator.Volume
+
+	if volume == nil {
+		return true
+	}
+
+	return volume.Cmp(&ZeroInt.Int) == 0
 }
