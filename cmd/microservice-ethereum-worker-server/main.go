@@ -122,11 +122,11 @@ func main() {
 
 	globalUtilityRewards := make([]appTypes.UtilityName, 0)
 
-	for i, s := range strings.Split(globalUtilityRewards_, ",") {
+	for _, s := range strings.Split(globalUtilityRewards_, ",") {
 		if s == "" {
 			continue
 		}
-		globalUtilityRewards[i] = appTypes.UtilityName(s)
+		globalUtilityRewards = append(globalUtilityRewards, appTypes.UtilityName(s))
 	}
 
 	for _, details := range strings.Split(tokenDetails_, ",") {
