@@ -489,6 +489,20 @@ func main() {
 					fluidClients = baseFluidClients
 				)
 
+				// if the amount transferred was exactly 0, then we skip to the next transfer
+
+				if isDecoratedTransferZeroVolume(transfer) {
+					log.App(func(k *log.Log) {
+						k.Format(
+							"Skipped an empty amount transferred, hash %v, log index %v",
+							transfer.TransactionHash,
+							logIndex,
+						)
+					})
+
+					continue
+				}
+
 				senderAddress, senderAddressChanged := worker_config.LookupFeeSwitch(
 					senderAddress_,
 					dbNetwork,
