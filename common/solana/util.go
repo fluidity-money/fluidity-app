@@ -177,6 +177,11 @@ type Message struct {
 
 type Signature [64]byte
 
+func (s Signature) String() string {
+	b := [64]byte(s)
+	return base58.Encode(b[:])
+}
+
 func SignatureFromBase58(b58 string) (Signature, error) {
 	sigBytes := base58.Decode(b58)
 
