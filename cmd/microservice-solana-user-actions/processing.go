@@ -83,8 +83,11 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 		if fluidityOwners[winnerAIndex] == "" {
 			log.App(func(k *log.Log) {
 				k.Format(
-					"Got a winning payout, but token mint was wrong! %v",
+					"Got a winning payout, but token mint was wrong, transaction hash %v, winnerAIndex %v, winnerBIndex %v, fluidity owners %v",
 					transactionHash,
+					winnerAIndex,
+					winnerBIndex,
+					fluidityOwners,
 				)
 			})
 			return nil, nil, nil, nil, nil
