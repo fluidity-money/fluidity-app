@@ -515,9 +515,15 @@ func main() {
 
 				if senderAddress == recipientAddress {
 					log.App(func(k *log.Log) {
-						k.Message = "Ignoring instance of sender and receiver being the same!"
+						k.Format(
+							"Ignoring instance of sender and receiver being the same, skipping log index %v!",
+							logIndex,
+						)
+
 						k.Payload = senderAddress
 					})
+
+					continue
 				}
 
 				if senderAddressChanged {
