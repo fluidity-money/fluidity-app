@@ -18,7 +18,7 @@ func GetIntermediateWinner(payoutSignature string) (winningSignature string) {
 	statementText := fmt.Sprintf(
 		`SELECT  winning_signature
 		FROM %s
-		WHERE payout_signature = $;`,
+		WHERE payout_signature = $1;`,
 
 		TableIntermediateWinners,
 	)
