@@ -15,4 +15,9 @@ const (
 
 	// TableMintLimits is used to store each token's per user mint limit
 	TableMintLimits = `solana_mint_limits`
+
+	// TableIntermediateWinners to use to track winners that were
+	// paid out and need to be linked in the winners database to the
+	// winning transaction
+	TableIntermediateWinners = `solana_intermediate_winners`
 )
