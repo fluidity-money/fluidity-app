@@ -271,8 +271,8 @@ func main() {
 
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Found winning transaction %v winning %v tokens!",
-					userAction,
+					"Found winning transaction hash %v winning %v tokens!",
+					userActionTransactionHash,
 					winningAmount,
 				)
 			})
