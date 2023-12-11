@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/solana/payout"
 	"github.com/fluidity-money/fluidity-app/common/solana/rpc"
 	"github.com/fluidity-money/fluidity-app/common/solana/spl-token"
+	postgres "github.com/fluidity-money/fluidity-app/lib/databases/postgres/solana"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -291,6 +292,10 @@ and instruction data %+v`,
 				k.Payload = err
 			})
 		}
+
+		// insert an intermediate winner so the winner connector code can track it into the database later
+
+		postgres.InsertIntermediateWinner(winningTransactionHash, sig.String())
 
 		log.App(func(k *log.Log) {
 			k.Format("Sent payout transaction with signature hash %v", sig)

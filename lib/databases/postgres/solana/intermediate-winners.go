@@ -55,3 +55,36 @@ func GetIntermediateWinner(payoutSignature string) (winningSignature string) {
 
 	return winningSignature
 }
+
+// InsertIntermediateWinner to use later in comparing the winners to the database
+func InsertIntermediateWinner(winningSignature, payoutSignature string) {
+	databaseClient := postgres.Client()
+
+	statementText := fmt.Sprintf(
+		`INSERT INTO %v (
+			winning_signature,
+			payout_signature
+		)
+		VALUES (
+			$1,
+			$2
+		)`,
+
+		TableIntermediateWinners,
+	)
+
+	_, err := databaseClient.Exec(statementText, winningSignature, payoutSignature)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"Failed to insert an intermediate winner with payout sig %v",
+				payoutSignature,
+			)
+
+			k.Payload = err
+		})
+	}
+}
