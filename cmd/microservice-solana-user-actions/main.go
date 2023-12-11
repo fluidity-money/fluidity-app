@@ -104,13 +104,11 @@ func main() {
 
 			fluidityOwners := make([]string, len(accountKeys))
 
-			log.App(func(k *log.Log) {
-				k.Format(
-					"token balances for transaction signature %v: %v",
-					signature,
-					accountKeys,
-				)
-			})
+			log.Debugf
+				"Token balances for transaction signature %v: %v",
+				signature,
+				accountKeys,
+			)
 
 			for _, bal := range tokenBalances {
 				if bal.Mint == fluidityTokenMint {
