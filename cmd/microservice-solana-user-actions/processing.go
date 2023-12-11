@@ -75,16 +75,22 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 	if fluidityTransaction.Payout != nil {
 		var (
-			winnerAIndex = instruction.Accounts[5]
-			winnerBIndex = instruction.Accounts[6]
+			winnerAIndex = instruction.Accounts[7]
+			winnerBIndex = instruction.Accounts[8]
 		)
 
 		// payout for different token
-		if fluidityOwners[winnerAIndex] == "" {
+		if ind := fluidityOwners[winnerAIndex]; ind == "" {
 			log.App(func(k *log.Log) {
 				k.Format(
-					"Got a winning payout, but token mint was wrong! %v",
+					`Got a winning payout, but token mint was wrong, transaction hash %v, winnerAIndex %v, winnerBIndex %v, fluidity owners %v, fluidity owners length %v, content when accessing winnerAIndex "%v", instruction accounts "%v"`,
 					transactionHash,
+					winnerAIndex,
+					winnerBIndex,
+					fluidityOwners,
+					len(fluidityOwners),
+					ind,
+					instruction.Accounts,
 				)
 			})
 			return nil, nil, nil, nil, nil
@@ -104,7 +110,13 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 		var (
 			winner1_ = winner_
 			winner2_ = winner_
+
+			application string
 		)
+
+		if len(applications) > 0 {
+			application = applications[0].String()
+		}
 
 		winningAmount1 := new(big.Int).Mul(winningAmount, Winner1Split)
 
@@ -116,6 +128,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 
 		winner1_.WinnerAddress = accounts[winnerAIndex]
 		winner1_.SolanaWinnerOwnerAddress = fluidityOwners[winnerAIndex]
+		winner1_.Application = application
 
 		winner1_.WinningAmount = misc.NewBigIntFromInt(*winningAmount1)
 		winner1_.RewardType = "send"
@@ -124,7 +137,8 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 		winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
 
 		winner2_.WinningAmount = misc.NewBigIntFromInt(*winningAmount2)
-		winner2.RewardType = "receive"
+		winner2._RewardType = "receive"
+		winner2_.Application = application
 
 		winner1 = &winner1_
 		winner2 = &winner2_
