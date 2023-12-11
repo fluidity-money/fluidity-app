@@ -293,7 +293,7 @@ and instruction data %+v`,
 		}
 
 		log.App(func(k *log.Log) {
-			k.Format("Sent payout transaction with signature %v", sig)
+			k.Format("Sent payout transaction with signature hash %v", sig)
 		})
 	})
 }
