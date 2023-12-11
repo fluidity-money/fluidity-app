@@ -135,10 +135,6 @@ export const FluidifyForm = ({
 
   const tokenIsFluid = !!assetToken.isFluidOf;
 
-  const fee = !tokenIsFluid ? Zero : swapAmount.mul(FeeDenom).div(Thousand);
-
-  const swapAmountAfterFee = swapAmount.sub(fee);
-
   return (
     <div className={"fluidify-form"}>
       <Text size="lg" prominent>
@@ -189,7 +185,7 @@ export const FluidifyForm = ({
 
       {/* Creating / Remaining Tokens */}
       <Text>
-        Creating {addDecimalToBn(swapAmountAfterFee, toToken.decimals)}{" "}
+        Creating {addDecimalToBn(swapAmount, toToken.decimals)}{" "}
         {toToken.symbol || ""}
       </Text>
       {/* Tokens User Holds */}
