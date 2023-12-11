@@ -59,7 +59,7 @@ func tokenIsMintEvent(senderAddress, recipientAddress, fluidityTokenMintAddress,
 	return false
 }
 
-func processFluidityTransaction(transactionHash string, instruction solana.TransactionInstruction, accounts, fluidityOwners []string, tokenDetails token_details.TokenDetails) (winner1 *winners.Winner, winner2 *winners.Winner, swapWrap *user_actions.UserAction, swapUnwrap *user_actions.UserAction, err error) {
+func processFluidityTransaction(transactionHash string, instruction solana.TransactionInstruction, accounts, fluidityOwners []string, tokenDetails token_details.TokenDetails, applications []applications.Application) (winner1 *winners.Winner, winner2 *winners.Winner, swapWrap *user_actions.UserAction, swapUnwrap *user_actions.UserAction, err error) {
 
 	fluidityTransaction, err := fluidity.DecodeFluidityInstruction(instruction.Data)
 
@@ -137,7 +137,7 @@ func processFluidityTransaction(transactionHash string, instruction solana.Trans
 		winner2_.SolanaWinnerOwnerAddress = fluidityOwners[winnerBIndex]
 
 		winner2_.WinningAmount = misc.NewBigIntFromInt(*winningAmount2)
-		winner2._RewardType = "receive"
+		winner2_.RewardType = "receive"
 		winner2_.Application = application
 
 		winner1 = &winner1_
