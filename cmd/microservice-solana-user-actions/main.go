@@ -104,7 +104,7 @@ func main() {
 
 			fluidityOwners := make([]string, len(accountKeys))
 
-			log.Debugf
+			log.Debugf(
 				"Token balances for transaction signature %v: %v",
 				signature,
 				accountKeys,
