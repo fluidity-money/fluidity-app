@@ -513,6 +513,19 @@ func main() {
 					dbNetwork,
 				)
 
+				if senderAddress == recipientAddress {
+					log.App(func(k *log.Log) {
+						k.Format(
+							"Ignoring instance of sender and receiver being the same, skipping log index %v!",
+							logIndex,
+						)
+
+						k.Payload = senderAddress
+					})
+
+					continue
+				}
+
 				if senderAddressChanged {
 					emission.FeeSwitchSender.Reason = workerTypes.FeeSwitchReasonDatabase
 					emission.FeeSwitchSender.OriginalAddress = senderAddress_.String()
