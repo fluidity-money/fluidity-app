@@ -18,12 +18,6 @@ interface IFluidifyFormProps {
   swapping: boolean;
 }
 
-const FeeDenom = new BN(5, 32);
-
-const Zero = new BN(0);
-
-const Thousand = new BN(1000);
-
 export const FluidifyForm = ({
   handleSwap,
   assetToken,
