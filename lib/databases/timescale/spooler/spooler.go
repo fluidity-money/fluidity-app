@@ -119,7 +119,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			Utility: utility,
 			BlockNumber: blockNumber,
 			Network: network_,
-			RewardType: "recipient",
+			RewardType: "receive",
 			LogIndex: logIndex,
 			Application: application,
 		})
