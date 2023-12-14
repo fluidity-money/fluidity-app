@@ -33,7 +33,7 @@ func CommitTransactionHashIndex(transactionHash ethereum.Hash, logIndex misc.Big
 			$3
 		)`,
 
-		TableFailsafeTransactionHashIndex,
+		TableFailsafeTransactionHashLogIndex,
 	)
 
 	workerId := util.GetWorkerId()

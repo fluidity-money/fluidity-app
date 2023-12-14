@@ -7,7 +7,7 @@ package failsafe
 // Context to use for when failsafe acquisition goes wrong
 const Context = "POSTGRES/FAILSAFE"
 
-// TableFailsafeTransactionHashIndex to be used as the final check before
+// TableFailsafeTransactionHashLogIndex to be used as the final check before
 // a side effectful action where duplication could possibly happen at the
 // infra level
-const TableFailsafeTransactionHashIndex = "failsafe_transaction_hash_index"
+const TableFailsafeTransactionHashLogIndex = "failsafe_transaction_hash_log_index"
