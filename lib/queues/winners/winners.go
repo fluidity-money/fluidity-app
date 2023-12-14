@@ -9,7 +9,6 @@ package winners
 
 import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	types "github.com/fluidity-money/fluidity-app/lib/types/winners"
@@ -80,12 +79,12 @@ func BlockedWinnersAll(f func(BlockedWinner)) {
 	})
 }
 
-func PendingWinners(f func(spooler.PendingWinner)) {
+func PendingWinners(f func([]types.PendingWinner)) {
 	queue.GetMessages(TopicPendingWinners, func(message queue.Message) {
-		var pendingWinner types.PendingWinner
+		var pendingWinners []types.PendingWinner
 
-		message.Decode(&pendingWinner)
+		message.Decode(&pendingWinners)
 
-		f(pendingWinner)
+		f(pendingWinners)
 	})
 }

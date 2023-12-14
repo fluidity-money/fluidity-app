@@ -115,13 +115,13 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			TransactionHash: hash,
 			SenderAddress:   recipientAddress,
 			NativeWinAmount: nativeWinAmount,
-			UsdWinAmount:    usdWinAmount,
-			Utility:         utility,
-			BlockNumber:     blockNumber,
-			Network:         network_,
-			RewardType:      "recipient",
-			LogIndex:        logIndex,
-			Application:     application,
+			UsdWinAmount: usdWinAmount,
+			Utility: utility,
+			BlockNumber: blockNumber,
+			Network: network_,
+			RewardType: "receive",
+			LogIndex: logIndex,
+			Application: application,
 		})
 	}
 	return pendingWinners
