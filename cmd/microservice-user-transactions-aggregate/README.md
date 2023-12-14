@@ -1,7 +1,7 @@
 
 # microservice-user-transactions-aggregate
 
-Aggregates user actions and wins to be displayed in the Fluidity webapp.
+Aggregates user actions and wins in Timescale to be displayed in the Fluidity webapp.
 
 ## Environment variables
 
