@@ -38,8 +38,8 @@ const (
 	// subBlockedWinnersAll to subscribe to blocked winner messages from either network
 	subBlockedWinnersAll = `blocked_winners.*`
 
-	// subPendingWinners to subscribe to pending winner messages
-	subPendingWinners = `pending_winners`
+	// TopicPendingWinners to broadcast pending winner messages
+	TopicPendingWinners = `pending_winners`
 )
 
 type (
@@ -81,7 +81,7 @@ func BlockedWinnersAll(f func(BlockedWinner)) {
 }
 
 func PendingWinners(f func(spooler.PendingWinner)) {
-	queue.GetMessages(subPendingWinners, func(message queue.Message) {
+	queue.GetMessages(TopicPendingWinners, func(message queue.Message) {
 		var pendingWinner spooler.PendingWinner
 
 		message.Decode(&pendingWinner)
