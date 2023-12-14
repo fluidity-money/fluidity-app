@@ -9,7 +9,6 @@ package winners
 
 import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	types "github.com/fluidity-money/fluidity-app/lib/types/winners"
