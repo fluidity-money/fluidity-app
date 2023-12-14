@@ -14,7 +14,7 @@ CREATE TABLE aggregated_user_transactions (
 	winning_address VARCHAR,
 	reward_hash VARCHAR,
 	type user_action,
-	swap_in,
+	swap_in BOOLEAN,
 	utility_amount DOUBLE PRECISION,
 	utility_name VARCHAR
 );
