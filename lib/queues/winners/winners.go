@@ -82,7 +82,7 @@ func BlockedWinnersAll(f func(BlockedWinner)) {
 
 func PendingWinners(f func(spooler.PendingWinner)) {
 	queue.GetMessages(TopicPendingWinners, func(message queue.Message) {
-		var pendingWinner spooler.PendingWinner
+		var pendingWinner types.PendingWinner
 
 		message.Decode(&pendingWinner)
 

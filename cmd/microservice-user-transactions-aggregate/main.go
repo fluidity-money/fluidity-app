@@ -8,12 +8,12 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	userActionsType "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	winnerTypes "github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
 func main() {
@@ -91,7 +91,7 @@ func main() {
     })
 
     // pending winners have the same behaviour as winners
-    winners.PendingWinners(func (pendingWinner spooler.PendingWinner) {
+    winners.PendingWinners(func (pendingWinner winnerTypes.PendingWinner) {
         var (
             network             = pendingWinner.Network
             transactionHash     = pendingWinner.TransactionHash.String()

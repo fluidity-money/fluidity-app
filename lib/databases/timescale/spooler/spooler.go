@@ -11,8 +11,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
-	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
@@ -28,19 +26,7 @@ const (
 	TablePendingWinners = "ethereum_pending_winners"
 )
 
-type PendingWinner struct {
-	TokenDetails token_details.TokenDetails `json:"token_details"`
-	TransactionHash ethereum.Hash `json:"transaction_hash"`
-	SenderAddress ethereum.Address `json:"sender_address"`
-	NativeWinAmount misc.BigInt `json:"native_win_amount"`
-	UsdWinAmount float64 `json:"usd_win_amount"`
-	Utility applications.UtilityName `json:"utility"`
-	BlockNumber *misc.BigInt `json:"block_number"`
-	Network network.BlockchainNetwork `json:"network"`
-	RewardType winners.RewardType `json:"reward_type"`
-	LogIndex *misc.BigInt `json:"log_index"`
-	Application applications.Application `json:"application"`
-}
+type PendingWinner = winners.PendingWinner
 
 // CreatePendingWinners to aggregate a list of pending winners in the given announcement
 func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails map[applications.UtilityName]token_details.TokenDetails) []PendingWinner {
