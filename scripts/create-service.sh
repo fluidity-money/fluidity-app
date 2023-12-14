@@ -97,6 +97,11 @@ docker
 test
 EOF
 
-ln -s .gitignore .dockerignore
+cat > .dockerignore << EOF
+*.out
+lint
+docker
+test
+EOF
 
 write_err "Done!"
