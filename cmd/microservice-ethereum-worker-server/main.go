@@ -19,6 +19,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/chainlink"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/failsafe"
 	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -489,6 +490,15 @@ func main() {
 					fluidClients = baseFluidClients
 				)
 
+				if logIndex == nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Log index for transaction hash %v is nil!",
+							transactionHash,
+						)
+					})
+				}
+
 				// if the amount transferred was exactly 0, then we skip to the next transfer
 
 				if isDecoratedTransferZeroVolume(transfer) {
@@ -678,10 +688,16 @@ func main() {
 						secondsSinceLastEpoch,
 						emission,
 					)
+
 					payouts = append(payouts, specialPayout)
 				}
 
 				tokenDetails := fluidTokenDetails
+
+				// check if we've processed this before as a final failsafe before we submit
+				// the balls via a message and store an emission
+
+				failsafe.CommitTransactionHashIndex(transactionHash, *logIndex)
 
 				for _, payoutDetails := range payouts {
 
