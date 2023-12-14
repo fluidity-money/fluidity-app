@@ -35,15 +35,15 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		fluidTokenDetails = winner.TokenDetails
 
-		network_            = winner.Network
-		hash                = winner.TransactionHash
-		blockNumber         = winner.BlockNumber
-		senderAddress       = winner.FromAddress
-		senderWinAmount     = winner.FromWinAmount
-		recipientAddress    = winner.ToAddress
-		recipientWinAmount  = winner.ToWinAmount
-		logIndex            = winner.LogIndex
-		application         = winner.Application
+		network_           = winner.Network
+		hash               = winner.TransactionHash
+		blockNumber        = winner.BlockNumber
+		senderAddress      = winner.FromAddress
+		senderWinAmount    = winner.FromWinAmount
+		recipientAddress   = winner.ToAddress
+		recipientWinAmount = winner.ToWinAmount
+		logIndex           = winner.LogIndex
+		application        = winner.Application
 	)
 
 	for utility, payout := range senderWinAmount {
@@ -71,17 +71,17 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		// create the sender
 		pendingWinners = append(pendingWinners, PendingWinner{
-			TokenDetails: details,
+			TokenDetails:    details,
 			TransactionHash: hash,
-			SenderAddress: senderAddress,
+			SenderAddress:   senderAddress,
 			NativeWinAmount: nativeWinAmount,
-			UsdWinAmount: usdWinAmount,
-			Utility: utility,
-			BlockNumber: blockNumber,
-			Network: network_,
-			RewardType: "send",
-			LogIndex: logIndex,
-			Application: application,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     blockNumber,
+			Network:         network_,
+			RewardType:      "send",
+			LogIndex:        logIndex,
+			Application:     application,
 		})
 	}
 
@@ -111,17 +111,17 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		// create the recipient
 		pendingWinners = append(pendingWinners, PendingWinner{
-			TokenDetails: details,
+			TokenDetails:    details,
 			TransactionHash: hash,
-			SenderAddress: recipientAddress,
+			SenderAddress:   recipientAddress,
 			NativeWinAmount: nativeWinAmount,
-			UsdWinAmount: usdWinAmount,
-			Utility: utility,
-			BlockNumber: blockNumber,
-			Network: network_,
-			RewardType: "recipient",
-			LogIndex: logIndex,
-			Application: application,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     blockNumber,
+			Network:         network_,
+			RewardType:      "recipient",
+			LogIndex:        logIndex,
+			Application:     application,
 		})
 	}
 	return pendingWinners
@@ -238,15 +238,18 @@ func UnpaidWinningsForCategory(network_ network.BlockchainNetwork, token token_d
 		token.TokenShortName,
 	)
 
-	var total float64
+	var total sql.NullFloat64
 
 	err := row.Scan(&total)
 
-	if err == sql.ErrNoRows {
+	switch err {
+	case sql.ErrNoRows:
 		return 0
-	}
 
-	if err != nil {
+	case nil:
+		// nothing
+
+	default:
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 
@@ -259,7 +262,11 @@ func UnpaidWinningsForCategory(network_ network.BlockchainNetwork, token token_d
 		})
 	}
 
-	return total
+	if total.Valid {
+		return total.Float64
+	} else {
+		return 0
+	}
 }
 
 func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {
