@@ -5,6 +5,7 @@
 package user_actions
 
 import (
+	"math"
 	"math/big"
 	"time"
 
@@ -83,7 +84,68 @@ type (
 		UserActions          []UserAction `json:"user_actions"`
 		SecondsSinceLastSlot uint64       `json:"seconds_since_last_slot"`
 	}
+
+	// unique on tx hash, aggregates all log indexes
+	// stored literally as it should be returned, so amount is rounded etc
+	AggregatedUserTransaction struct {
+		TokenShortName string `json:"token_short_name"`
+
+		Network network.BlockchainNetwork `json:"network"`
+
+		Time time.Time `json:"time"`
+
+		TransactionHash string `json:"transaction_hash"`
+
+		SenderAddress string `json:"sender_address"`
+
+		RecipientAddress string `json:"recipient_address"`
+
+		// scaled to usd
+		Amount float64 `json:"amount"`
+
+		Application string `json:"application"`
+
+		WinningAddress string `json:"winning_address"`
+
+		WinningAmount float64 `json:"winning_amount"`
+
+		RewardHash string `json:"reward_hash"`
+
+		// Type of the user action, currently either a swap or a send
+		Type string `json:"type"`
+
+		// SwapIn or swap out from a Fluid Asset. If true, then that would indicate
+		// that the transfer went from USDT to fUSDT for example.
+		SwapIn bool `json:"swap_in"`
+
+		// scaled to usd
+		UtilityAmount float64 `json:"utility_amount"`
+
+		UtilityName applications.UtilityName `json:"utility_name"`
+	}
 )
+
+// AggregatedTransactionFromUserAction to create a partially aggregated transaction from a user action
+func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTransaction {
+	// convert amount to a dollar float
+	decimalsAdjusted := math.Pow10(userAction.TokenDetails.TokenDecimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+	amount := new(big.Rat).SetInt(&userAction.Amount.Int)
+	amountFloat, _ := amount.Quo(amount, decimalsRat).Float64()
+
+	return AggregatedUserTransaction{
+		TokenShortName: userAction.TokenDetails.TokenShortName,
+		Network: userAction.Network,
+		Time: userAction.Time,
+		Amount: amountFloat,
+		Application: userAction.Application,
+		Type: userAction.Type,
+		SwapIn: userAction.SwapIn,
+		TransactionHash: userAction.TransactionHash,
+		SenderAddress: userAction.SenderAddress,
+		RecipientAddress: userAction.RecipientAddress,
+	}
+}
 
 // NewSwapEthereum made by the user, either swapping in (swapIn) to a
 // Fluid Asset from an underlying asset or swapping out. Sets the time to
