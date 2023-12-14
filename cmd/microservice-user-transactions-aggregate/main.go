@@ -13,7 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	uatypes "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	userActionsType "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 
         // insert if this transaction is unseen
         if existingUserTransaction == nil {
-            userTransaction := uatypes.AggregatedTransactionFromUserAction(userAction)
+            userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
             user_actions.InsertAggregatedUserTransaction(userTransaction)
         // prefer to show an application if any logs in this transaction contain one
         } else if existingUserTransaction.Application == "none" && application != "none" { 
