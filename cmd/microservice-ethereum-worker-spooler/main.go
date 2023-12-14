@@ -99,7 +99,8 @@ func main() {
 
 		for _, announcement := range announcements {
 			// write the winner into the database
-			spooler.InsertPendingWinners(announcement, tokenDetails)
+			pendingWinners := spooler.CreatePendingWinners(announcement, tokenDetails)
+			spooler.InsertPendingWinners(pendingWinners)
 
 			// if the win was an AMM win, add the LP winnings
 			if announcement.Application == commonApps.ApplicationSeawaterAmm && announcement.Decorator != nil {
