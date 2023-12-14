@@ -75,8 +75,13 @@ func main() {
         if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
             existingUserTransaction.WinningAddress = winnerAddress
             existingUserTransaction.WinningAmount = winningAmountFloat
-            existingUserTransaction.RewardHash = transactionHash
             existingUserTransaction.UtilityName = utility
+        }
+
+        // a pending winner might have set other win info
+        // but it cannot set the reward hash
+        if existingUserTransaction.RewardHash == "" {
+            existingUserTransaction.RewardHash = transactionHash
         }
 
         existingUtility := existingUserTransaction.UtilityName
@@ -123,7 +128,6 @@ func main() {
             if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
                 existingUserTransaction.WinningAddress = senderAddress
                 existingUserTransaction.WinningAmount = winningAmountFloat
-                existingUserTransaction.RewardHash = transactionHash
                 existingUserTransaction.UtilityName = utility
             }
 
