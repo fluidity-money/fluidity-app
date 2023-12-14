@@ -5,7 +5,7 @@ CREATE TABLE aggregated_user_transactions (
 	token_short_name TEXT,
 	network network_blockchain,
 	time TIMESTAMP,
-	transaction_hash VARCHAR,
+	transaction_hash VARCHAR UNIQUE,
 	sender_address VARCHAR,
 	recipient_address VARCHAR,
 	amount DOUBLE PRECISION,
