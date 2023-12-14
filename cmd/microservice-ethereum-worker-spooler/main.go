@@ -85,7 +85,10 @@ func main() {
 	}
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
-		var announcements []worker.EthereumWinnerAnnouncement
+		var (
+			announcements []worker.EthereumWinnerAnnouncement
+			pendingWinners []spooler.PendingWinner
+		)
 
 		message.Decode(&announcements)
 
@@ -99,10 +102,12 @@ func main() {
 		toSend := make(map[token_details.TokenDetails]bool)
 
 		for _, announcement := range announcements {
-			// write the winner into the database and to the pending winners queue
-			pendingWinners := spooler.CreatePendingWinners(announcement, tokenDetails)
-			spooler.InsertPendingWinners(pendingWinners)
-			queue.SendMessage(winnersQueue.TopicPendingWinners)
+			// write the winner into the database
+			pendingWinners_ := spooler.CreatePendingWinners(announcement, tokenDetails)
+			spooler.InsertPendingWinners(pendingWinners_)
+		
+			// store pending winners from all announcements to send to the queue later
+			pendingWinners = append(pendingWinners, pendingWinners_...)
 
 			// if the win was an AMM win, add the LP winnings
 			if announcement.Application == commonApps.ApplicationSeawaterAmm && announcement.Decorator != nil {
@@ -220,6 +225,7 @@ func main() {
 				})
 			}
 
+			queue.SendMessage(winnersQueue.TopicPendingWinners, pendingWinners)
 			queue.SendMessage(batchedRewardsQueue, rewards)
 		}
 	})
