@@ -25,7 +25,7 @@ const providerImgNames: { [K in Provider]: string } = {
   Mercurial: "mercurial.png",
   Mooniswap: "mooniswap.png",
   Multichain: "multichain.png",
-  Multicoin: "MULTICOIN.png",
+  Multicoin: "Multicoin.png",
   Oneinch: "1inch.svg",
   Orca: "Orca.svg",
   Polygon: "Polygon.svg",
