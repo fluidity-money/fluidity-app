@@ -162,6 +162,7 @@ func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner)
 		SenderAddress:   senderAddress,
 		// the sender is the winner of a pending win
 		WinningAddress: senderAddress,
+		Type: "send",
 	}
 
 	if pendingWinner.Utility == "FLUID" {
