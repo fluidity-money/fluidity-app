@@ -1,6 +1,8 @@
 -- migrate:up
 
 -- adapted from user_transactions_aggregate_return
+-- fields sourced from user actions may be unset if the corresponding 
+-- pending win is seen first by the aggregate service
 CREATE TABLE aggregated_user_transactions (
 	token_short_name TEXT,
 	network network_blockchain,

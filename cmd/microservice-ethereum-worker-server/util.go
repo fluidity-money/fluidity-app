@@ -19,8 +19,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
-	"github.com/fluidity-money/fluidity-app/lib/util"
 	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"

@@ -56,16 +56,15 @@ type BlockedWinner struct {
 
 // PendingWinner is a winner that has been spooled but not sent
 type PendingWinner struct {
-	TokenDetails token_details.TokenDetails `json:"token_details"`
-	TransactionHash ethereum.Hash `json:"transaction_hash"`
-	SenderAddress ethereum.Address `json:"sender_address"`
-	NativeWinAmount misc.BigInt `json:"native_win_amount"`
-	UsdWinAmount float64 `json:"usd_win_amount"`
-	Utility applications.UtilityName `json:"utility"`
-	BlockNumber *misc.BigInt `json:"block_number"`
-	Network network.BlockchainNetwork `json:"network"`
-	RewardType RewardType `json:"reward_type"`
-	LogIndex *misc.BigInt `json:"log_index"`
-	Application applications.Application `json:"application"`
+	TokenDetails    token_details.TokenDetails `json:"token_details"`
+	TransactionHash ethereum.Hash              `json:"transaction_hash"`
+	SenderAddress   ethereum.Address           `json:"sender_address"`
+	NativeWinAmount misc.BigInt                `json:"native_win_amount"`
+	UsdWinAmount    float64                    `json:"usd_win_amount"`
+	Utility         applications.UtilityName   `json:"utility"`
+	BlockNumber     *misc.BigInt               `json:"block_number"`
+	Network         network.BlockchainNetwork  `json:"network"`
+	RewardType      RewardType                 `json:"reward_type"`
+	LogIndex        *misc.BigInt               `json:"log_index"`
+	Application     applications.Application   `json:"application"`
 }
-

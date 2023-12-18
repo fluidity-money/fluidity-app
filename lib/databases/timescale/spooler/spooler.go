@@ -35,15 +35,15 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		fluidTokenDetails = winner.TokenDetails
 
-		network_            = winner.Network
-		hash                = winner.TransactionHash
-		blockNumber         = winner.BlockNumber
-		senderAddress       = winner.FromAddress
-		senderWinAmount     = winner.FromWinAmount
-		recipientAddress    = winner.ToAddress
-		recipientWinAmount  = winner.ToWinAmount
-		logIndex            = winner.LogIndex
-		application         = winner.Application
+		network_           = winner.Network
+		hash               = winner.TransactionHash
+		blockNumber        = winner.BlockNumber
+		senderAddress      = winner.FromAddress
+		senderWinAmount    = winner.FromWinAmount
+		recipientAddress   = winner.ToAddress
+		recipientWinAmount = winner.ToWinAmount
+		logIndex           = winner.LogIndex
+		application        = winner.Application
 	)
 
 	for utility, payout := range senderWinAmount {
@@ -71,17 +71,17 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		// create the sender
 		pendingWinners = append(pendingWinners, PendingWinner{
-			TokenDetails: details,
+			TokenDetails:    details,
 			TransactionHash: hash,
-			SenderAddress: senderAddress,
+			SenderAddress:   senderAddress,
 			NativeWinAmount: nativeWinAmount,
-			UsdWinAmount: usdWinAmount,
-			Utility: utility,
-			BlockNumber: blockNumber,
-			Network: network_,
-			RewardType: "send",
-			LogIndex: logIndex,
-			Application: application,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     blockNumber,
+			Network:         network_,
+			RewardType:      "send",
+			LogIndex:        logIndex,
+			Application:     application,
 		})
 	}
 
@@ -111,17 +111,17 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		// create the recipient
 		pendingWinners = append(pendingWinners, PendingWinner{
-			TokenDetails: details,
+			TokenDetails:    details,
 			TransactionHash: hash,
-			SenderAddress: recipientAddress,
+			SenderAddress:   recipientAddress,
 			NativeWinAmount: nativeWinAmount,
-			UsdWinAmount: usdWinAmount,
-			Utility: utility,
-			BlockNumber: blockNumber,
-			Network: network_,
-			RewardType: "receive",
-			LogIndex: logIndex,
-			Application: application,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     blockNumber,
+			Network:         network_,
+			RewardType:      "receive",
+			LogIndex:        logIndex,
+			Application:     application,
 		})
 	}
 	return pendingWinners

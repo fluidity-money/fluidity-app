@@ -17,129 +17,141 @@ import (
 )
 
 func main() {
-    go queue.UserActionsAll(func(userAction user_actions.UserAction) {
-        var (
-            network         = userAction.Network
-            transactionHash = userAction.TransactionHash
-            application     = userAction.Application
-        )
+	go queue.UserActionsAll(func(userAction user_actions.UserAction) {
+		var (
+			network         = userAction.Network
+			transactionHash = userAction.TransactionHash
+			application     = userAction.Application
+		)
 
-        existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, transactionHash) 
+		existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, transactionHash)
 
-        // insert if this transaction is unseen
-        if existingUserTransaction == nil {
-            userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
-            user_actions.InsertAggregatedUserTransaction(userTransaction)
-        // prefer to show an application if any logs in this transaction contain one
-        } else if existingUserTransaction.Application == "none" && application != "none" { 
-            existingUserTransaction.Application = application 
-            user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
-        }
-    }) 
+		// insert if this transaction is unseen
+		if existingUserTransaction == nil {
+			userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
+			user_actions.InsertAggregatedUserTransaction(userTransaction)
+			// corresponding pending win has already been seen, so set user action specific fields
+		} else if existingUserTransaction.RecipientAddress == "" {
+			// use aggregate function to scale amount to dollars
+			userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
 
-    go winners.WinnersAll(func(winner winners.Winner) {
-        var (
-            network             = winner.Network
-            transactionHash     = winner.TransactionHash
-            application         = winner.Application
-            sendTransactionHash = winner.SendTransactionHash
-            tokenDecimals       = winner.TokenDetails.TokenDecimals
-            winningAmountInt    = winner.WinningAmount.Int
-            winnerAddress       = winner.WinnerAddress
-            utility             = winner.Utility
-        )
+			existingUserTransaction.Time = userAction.Time
+			existingUserTransaction.RecipientAddress = userAction.RecipientAddress
+			existingUserTransaction.Amount = userTransaction.Amount
+			existingUserTransaction.Type = userAction.Type
+			existingUserTransaction.SwapIn = userAction.SwapIn
 
-        existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, sendTransactionHash) 
-        if existingUserTransaction == nil {
-            log.Fatal(func(k *log.Log) {
-                k.Format(
-                    "Found a winner in transaction %v with no corresponding send!",
-                    sendTransactionHash,
-                )
-            })
-        }
+			user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
 
-        // regardless of whether there's existing win data, always prefer to show
-        // an application if any logs in this transaction contain one
-        if existingUserTransaction.Application == "none" {
-            existingUserTransaction.Application = application 
-        }
+			// prefer to show an application if any logs in this transaction contain one
+		} else if existingUserTransaction.Application == "none" && application != "none" {
+			existingUserTransaction.Application = application
+			user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
+		}
+	})
 
-        decimalsAdjusted := math.Pow10(tokenDecimals)
-        decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-        winningAmount := new(big.Rat).SetInt(&winningAmountInt)
-        winningAmountFloat, _ := winningAmount.Quo(winningAmount, decimalsRat).Float64()
+	go winners.WinnersAll(func(winner winners.Winner) {
+		var (
+			network             = winner.Network
+			transactionHash     = winner.TransactionHash
+			application         = winner.Application
+			sendTransactionHash = winner.SendTransactionHash
+			tokenDecimals       = winner.TokenDetails.TokenDecimals
+			winningAmountInt    = winner.WinningAmount.Int
+			winnerAddress       = winner.WinnerAddress
+			utility             = winner.Utility
+		)
 
+		existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, sendTransactionHash)
+		if existingUserTransaction == nil {
+			log.Fatal(func(k *log.Log) {
+				k.Format(
+					"Found a winner in transaction %v with no corresponding send!",
+					sendTransactionHash,
+				)
+			})
+		}
 
-        // no existing info, update all win-related fields
-        if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
-            existingUserTransaction.WinningAddress = winnerAddress
-            existingUserTransaction.WinningAmount = winningAmountFloat
-            existingUserTransaction.UtilityName = utility
-        }
+		// regardless of whether there's existing win data, always prefer to show
+		// an application if any logs in this transaction contain one
+		if existingUserTransaction.Application == "none" && utility == "FLUID" {
+			existingUserTransaction.Application = application
+		}
 
-        // a pending winner might have set other win info
-        // but it cannot set the reward hash
-        if existingUserTransaction.RewardHash == "" {
-            existingUserTransaction.RewardHash = transactionHash
-        }
+		decimalsAdjusted := math.Pow10(tokenDecimals)
+		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+		winningAmount := new(big.Rat).SetInt(&winningAmountInt)
+		winningAmountFloat, _ := winningAmount.Quo(winningAmount, decimalsRat).Float64()
 
-        existingUtility := existingUserTransaction.UtilityName
+		// no existing info, update all win-related fields
+		if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
+			existingUserTransaction.WinningAddress = winnerAddress
+			existingUserTransaction.WinningAmount = winningAmountFloat
+			existingUserTransaction.UtilityName = utility
+		}
 
-        // update utility amount and name if unset
-        if utility != "FLUID" && (existingUtility == "FLUID" || existingUtility == "") {
-            existingUserTransaction.UtilityAmount = winningAmountFloat
-            existingUserTransaction.UtilityName = utility
-        }
+		// a pending winner might have set other win info
+		// but it cannot set the reward hash
+		if existingUserTransaction.RewardHash == "" {
+			existingUserTransaction.RewardHash = transactionHash
+		}
 
-        user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, sendTransactionHash)
-    })
+		existingUtility := existingUserTransaction.UtilityName
 
-    // pending winners have the same behaviour as winners
-    winners.PendingWinners(func (pendingWinners []winnerTypes.PendingWinner) {
-        for _, pendingWinner := range pendingWinners {
-            var (
-                network             = pendingWinner.Network
-                transactionHash     = pendingWinner.TransactionHash.String()
-                application         = pendingWinner.Application.String()
-                usdWinAmount        = pendingWinner.UsdWinAmount
-                senderAddress       = pendingWinner.SenderAddress.String()
-                utility             = pendingWinner.Utility
-            )
+		// update utility amount and name if unset
+		if utility != "FLUID" && (existingUtility == "FLUID" || existingUtility == "") {
+			existingUserTransaction.UtilityAmount = winningAmountFloat
+			existingUserTransaction.UtilityName = utility
+		}
 
-            existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, transactionHash) 
-            if existingUserTransaction == nil {
-                log.Fatal(func(k *log.Log) {
-                    k.Format(
-                        "Found a winner in transaction %v with no corresponding send!",
-                        transactionHash,
-                    )
-                })
-            }
-            // regardless of whether there's existing win data, always prefer to show
-            // an application if any logs in this transaction contain one
-            if existingUserTransaction.Application == "none" {
-                existingUserTransaction.Application = application
-            }
+		user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, sendTransactionHash)
+	})
 
-            winningAmountFloat := usdWinAmount
+	// pending winners have the same behaviour as winners
+	winners.PendingWinners(func(pendingWinners []winnerTypes.PendingWinner) {
+		for _, pendingWinner := range pendingWinners {
+			var (
+				network         = pendingWinner.Network
+				transactionHash = pendingWinner.TransactionHash.String()
+				application     = pendingWinner.Application.String()
+				usdWinAmount    = pendingWinner.UsdWinAmount
+				senderAddress   = pendingWinner.SenderAddress.String()
+				utility         = pendingWinner.Utility
+			)
 
-            // no existing info, update all win-related fields
-            if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
-                existingUserTransaction.WinningAddress = senderAddress
-                existingUserTransaction.WinningAmount = winningAmountFloat
-                existingUserTransaction.UtilityName = utility
-            }
+			existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, transactionHash)
 
-            existingUtility := existingUserTransaction.UtilityName
+			// corresponding user action has not yet been tracked, so create the row
+			if existingUserTransaction == nil {
+				userTransaction := userActionsType.AggregatedTransactionFromPendingWinner(pendingWinner)
+				user_actions.InsertAggregatedUserTransaction(userTransaction)
+				return
+			}
 
-            // update utility amount and name if unset
-            if utility != "FLUID" && (existingUtility == "FLUID" || existingUtility == "") {
-                existingUserTransaction.UtilityAmount = winningAmountFloat
-                existingUserTransaction.UtilityName = utility
-            }
+			// regardless of whether there's existing win data, always prefer to show
+			// an application if any logs in this transaction contain one
+			if existingUserTransaction.Application == "none" && utility == "FLUID" {
+				existingUserTransaction.Application = application
+			}
 
-            user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
-        }
-    })
+			winningAmountFloat := usdWinAmount
+
+			// no existing info, update all win-related fields
+			if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
+				existingUserTransaction.WinningAddress = senderAddress
+				existingUserTransaction.WinningAmount = winningAmountFloat
+				existingUserTransaction.UtilityName = utility
+			}
+
+			existingUtility := existingUserTransaction.UtilityName
+
+			// update utility amount and name if unset
+			if utility != "FLUID" && (existingUtility == "FLUID" || existingUtility == "") {
+				existingUserTransaction.UtilityAmount = winningAmountFloat
+				existingUserTransaction.UtilityName = utility
+			}
+
+			user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
+		}
+	})
 }

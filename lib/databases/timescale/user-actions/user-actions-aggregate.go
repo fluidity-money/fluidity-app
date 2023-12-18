@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	TableAggregatedUserTransactions= `aggregated_user_transactions`
+	TableAggregatedUserTransactions = `aggregated_user_transactions`
 )
 
 func InsertAggregatedUserTransaction(userTransaction user_actions.AggregatedUserTransaction) {
@@ -217,4 +217,4 @@ func UpdateAggregatedUserTransactionByHash(userTransaction user_actions.Aggregat
 			k.Payload = err
 		})
 	}
-} 
+}

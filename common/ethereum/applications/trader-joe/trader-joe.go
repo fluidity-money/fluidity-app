@@ -21,7 +21,7 @@ import (
 
 const (
 	// Trader Joe fees are always e18
-	FeeDecimals = 18
+	FeeDecimals           = 18
 	traderJoeSwapLogTopic = "0xad7d6f97abf51ce18e17a38f4d70e975be9c0708474987bb3e26ad21bd93ca70"
 )
 
@@ -114,7 +114,7 @@ const traderJoeSwapAbiString = `[
 `
 
 var (
-	traderJoeSwapAbi ethAbi.ABI
+	traderJoeSwapAbi   ethAbi.ABI
 	traderJoeLBPairAbi ethAbi.ABI
 )
 
@@ -190,7 +190,7 @@ func GetTraderJoeFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 	}
 
 	var (
-		zero = big.NewInt(0)
+		zero              = big.NewInt(0)
 		swapContainsFluid = fluidTokenContract == tokenXaddr || fluidTokenContract == tokenYaddr
 	)
 
@@ -239,7 +239,7 @@ func GetTraderJoeFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			// X was the in token, so set it as the transfer amount
 			fluidTransferAmount.SetInt(amountInX)
 			break
-		} 
+		}
 
 		// X was not the in token, so get the fluid volume from amountsOut
 		amountOutX := new(big.Int).SetBytes(amountsOut[16:])
@@ -254,7 +254,7 @@ func GetTraderJoeFees(transfer worker.EthereumApplicationTransfer, client *ethcl
 			// Y was the in token, so set it as the transfer amount
 			fluidTransferAmount.SetInt(amountInY)
 			break
-		} 
+		}
 
 		// Y was not the in token, so get the fluid volume from amountsOut
 		amountOutY := new(big.Int).SetBytes(amountsOut[:16])

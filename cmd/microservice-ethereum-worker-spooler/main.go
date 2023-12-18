@@ -14,9 +14,9 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/amm"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
-	winnersQueue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	winnersQueue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -86,7 +86,7 @@ func main() {
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
 		var (
-			announcements []worker.EthereumWinnerAnnouncement
+			announcements  []worker.EthereumWinnerAnnouncement
 			pendingWinners []spooler.PendingWinner
 		)
 
@@ -105,7 +105,7 @@ func main() {
 			// write the winner into the database
 			pendingWinners_ := spooler.CreatePendingWinners(announcement, tokenDetails)
 			spooler.InsertPendingWinners(pendingWinners_)
-		
+
 			// store pending winners from all announcements to send to the queue later
 			pendingWinners = append(pendingWinners, pendingWinners_...)
 
