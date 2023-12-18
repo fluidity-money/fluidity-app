@@ -192,6 +192,8 @@ func main() {
 
 				toSend[fluidTokenDetails] = true
 			}
+
+			queue.SendMessage(winnersQueue.TopicPendingWinners, pendingWinners)
 		}
 
 		for token, send := range toSend {
@@ -225,7 +227,6 @@ func main() {
 				})
 			}
 
-			queue.SendMessage(winnersQueue.TopicPendingWinners, pendingWinners)
 			queue.SendMessage(batchedRewardsQueue, rewards)
 		}
 	})
