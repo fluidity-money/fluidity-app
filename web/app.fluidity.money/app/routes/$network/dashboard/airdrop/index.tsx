@@ -624,7 +624,7 @@ const Airdrop = () => {
                   style={{ marginBottom: "0.5em" }}
                   className={"no-margin"}
                 >
-                  Welcome to Fluidity&apos;s Airdrop Event!
+                  Airdrop V2: Arbitrum&apos;s Space Expedition.
                 </Heading>
                 <Text>
                   Fluidify your assets, transact them, and boost your rewards by
@@ -944,7 +944,7 @@ const Airdrop = () => {
                     className={"no-margin"}
                     style={{ marginBottom: "0.5em" }}
                   >
-                    Welcome to Fluidity&apos;s Airdrop Event!
+                    Airdrop V2: Arbitrum&apos;s Space Expedition.
                   </Heading>
                   <Text style={{ fontSize: 14 }}>
                     Fluidify your assets, transact them, and boost your rewards
@@ -1172,16 +1172,16 @@ const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    { provider: "Jumper", link: "https://app.uniswap.org/#/swap" },
     {
-      provider: "Sushiswap",
-      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+      provider: "Uniswap",
+      link: "https://app.uniswap.org/#/swap"
     },
-    { provider: "Camelot", link: "https://app.camelot.exchange/" },
-    { provider: "Saddle", link: "https://saddle.exchange/#/" },
-    { provider: "Chronos", link: "https://app.chronos.exchange/" },
+    { provider: "Trader Joe", link: "https://app.camelot.exchange/" },
+    { provider: "Camelot", link: "https://saddle.exchange/#/" },
+    { provider: "Sushiswap", link: "https://app.chronos.exchange/" },
     {
-      provider: "Kyber",
+      provider: "Ramses",
       link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
     },
   ];
@@ -1193,7 +1193,7 @@ const MultiplierTasks = () => {
           Multiplier Tasks
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Perform displayed tasks to earn the respective multipliers.
+          Transact fUSDC on listed platforms to earn more!
         </Text>
       </div>
       <div

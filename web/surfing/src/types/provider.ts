@@ -29,4 +29,6 @@ export type Provider =
   | "Sushiswap"
   | "Trader Joe"
   | "Uniswap"
-  | "XY Finance";
+  | "XY Finance"
+  | "Ramses"
+  | "Jumper";

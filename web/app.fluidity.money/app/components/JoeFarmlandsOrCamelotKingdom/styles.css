@@ -10,7 +10,7 @@
 }
 
 .joe_farmlands_or_camelot_img_joe {
-  clip-path: polygon(0% 0%, 0% 100%, 100% 0%);
+  clip-path: polygon(0% 0%, 0% 100%, 100% 10%);
 }
 
 .joe_farmlands_or_camelot_img_camelot {
@@ -27,6 +27,5 @@
 @keyframes joe_farmlands_or_camelot_img_scale {
   to {
     transform: scale(1.025);
-    filter: drop-shadow(0px 0px 0px #333);
   }
 }
