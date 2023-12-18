@@ -30,6 +30,19 @@ func main() {
         if existingUserTransaction == nil {
             userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
             user_actions.InsertAggregatedUserTransaction(userTransaction)
+        // corresponding pending win has already been seen, so set user action specific fields
+        } else if existingUserTransaction.RecipientAddress == "" {
+            // use aggregate function to scale amount to dollars
+            userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
+
+            existingUserTransaction.Time = userAction.Time
+            existingUserTransaction.RecipientAddress = userAction.RecipientAddress
+            existingUserTransaction.Amount = userTransaction.Amount
+            existingUserTransaction.Type = userAction.Type
+            existingUserTransaction.SwapIn = userAction.SwapIn
+
+            user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
+
         // prefer to show an application if any logs in this transaction contain one
         } else if existingUserTransaction.Application == "none" && application != "none" { 
             existingUserTransaction.Application = application 
@@ -61,7 +74,7 @@ func main() {
 
         // regardless of whether there's existing win data, always prefer to show
         // an application if any logs in this transaction contain one
-        if existingUserTransaction.Application == "none" {
+        if existingUserTransaction.Application == "none" && utility == "FLUID" {
             existingUserTransaction.Application = application 
         }
 
@@ -69,7 +82,6 @@ func main() {
         decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
         winningAmount := new(big.Rat).SetInt(&winningAmountInt)
         winningAmountFloat, _ := winningAmount.Quo(winningAmount, decimalsRat).Float64()
-
 
         // no existing info, update all win-related fields
         if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
@@ -108,17 +120,17 @@ func main() {
             )
 
             existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, transactionHash) 
+
+            // corresponding user action has not yet been tracked, so create the row
             if existingUserTransaction == nil {
-                log.Fatal(func(k *log.Log) {
-                    k.Format(
-                        "Found a winner in transaction %v with no corresponding send!",
-                        transactionHash,
-                    )
-                })
+                userTransaction := userActionsType.AggregatedTransactionFromPendingWinner(pendingWinner)
+                user_actions.InsertAggregatedUserTransaction(userTransaction)
+                return
             }
+
             // regardless of whether there's existing win data, always prefer to show
             // an application if any logs in this transaction contain one
-            if existingUserTransaction.Application == "none" {
+            if existingUserTransaction.Application == "none" && utility == "FLUID" {
                 existingUserTransaction.Application = application
             }
 

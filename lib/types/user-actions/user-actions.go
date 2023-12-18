@@ -15,6 +15,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
 const (
@@ -145,6 +146,34 @@ func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTr
 		SenderAddress: userAction.SenderAddress,
 		RecipientAddress: userAction.RecipientAddress,
 	}
+}
+
+// AggregatedTransactionFromPendingWinner to create a partially aggregated transaction from a pending winner
+func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner) AggregatedUserTransaction {
+	var (
+		application   = pendingWinner.Application.String()
+		senderAddress = pendingWinner.SenderAddress.String()
+	)
+
+	userTransaction := AggregatedUserTransaction{
+		TokenShortName: pendingWinner.TokenDetails.TokenShortName,
+		Network: pendingWinner.Network,
+		TransactionHash: pendingWinner.TransactionHash.String(),
+		SenderAddress: senderAddress,
+		// the sender is the winner of a pending win
+		WinningAddress: senderAddress,
+	}
+
+	if pendingWinner.Utility == "FLUID" {
+		userTransaction.Application = application
+		userTransaction.WinningAmount = pendingWinner.UsdWinAmount
+	} else {
+		userTransaction.UtilityName = applications.UtilityName(application)
+		userTransaction.UtilityAmount = pendingWinner.UsdWinAmount
+		userTransaction.Application = "none"
+	}
+
+	return userTransaction
 }
 
 // NewSwapEthereum made by the user, either swapping in (swapIn) to a
