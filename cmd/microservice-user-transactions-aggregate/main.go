@@ -83,10 +83,21 @@ func main() {
 		winningAmount := new(big.Rat).SetInt(&winningAmountInt)
 		winningAmountFloat, _ := winningAmount.Quo(winningAmount, decimalsRat).Float64()
 
-		// no existing info, update all win-related fields
-		if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
-			existingUserTransaction.WinningAddress = winnerAddress
-			existingUserTransaction.WinningAmount = winningAmountFloat
+		existingUtility := existingUserTransaction.UtilityName
+
+		switch {
+		case utility == "FLUID":
+			// sum winning amounts
+			existingUserTransaction.WinningAmount += winningAmountFloat
+			// no existing info, update all win-related fields
+			if existingUserTransaction.WinningAddress == "" {
+				existingUserTransaction.WinningAddress = winnerAddress
+				existingUserTransaction.UtilityName = utility
+			}
+
+		// update utility amount and name if unset
+		case existingUtility == "FLUID" || existingUtility == "":
+			existingUserTransaction.UtilityAmount = winningAmountFloat
 			existingUserTransaction.UtilityName = utility
 		}
 
@@ -96,18 +107,9 @@ func main() {
 			existingUserTransaction.RewardHash = transactionHash
 		}
 
-		existingUtility := existingUserTransaction.UtilityName
-
-		// update utility amount and name if unset
-		if utility != "FLUID" && (existingUtility == "FLUID" || existingUtility == "") {
-			existingUserTransaction.UtilityAmount = winningAmountFloat
-			existingUserTransaction.UtilityName = utility
-		}
-
 		user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, sendTransactionHash)
 	})
 
-	// pending winners have the same behaviour as winners
 	winners.PendingWinners(func(pendingWinners []winnerTypes.PendingWinner) {
 		for _, pendingWinner := range pendingWinners {
 			var (
@@ -128,25 +130,26 @@ func main() {
 				return
 			}
 
-			// regardless of whether there's existing win data, always prefer to show
-			// an application if any logs in this transaction contain one
-			if existingUserTransaction.Application == "none" && utility == "FLUID" {
-				existingUserTransaction.Application = application
-			}
+			var (
+				winningAmountFloat = usdWinAmount
+				existingUtility    = existingUserTransaction.UtilityName
+			)
 
-			winningAmountFloat := usdWinAmount
-
-			// no existing info, update all win-related fields
-			if existingUserTransaction.WinningAddress == "" && utility == "FLUID" {
-				existingUserTransaction.WinningAddress = senderAddress
-				existingUserTransaction.WinningAmount = winningAmountFloat
-				existingUserTransaction.UtilityName = utility
-			}
-
-			existingUtility := existingUserTransaction.UtilityName
-
+			switch {
+			case utility == "FLUID":
+				// regardless of whether there's existing win data, always prefer to show
+				// an application if any logs in this transaction contain one
+				if existingUserTransaction.Application == "none" {
+					existingUserTransaction.Application = application
+				}
+				// no existing info, update all win-related fields
+				if existingUserTransaction.WinningAddress == "" {
+					existingUserTransaction.WinningAddress = senderAddress
+					existingUserTransaction.WinningAmount = winningAmountFloat
+					existingUserTransaction.UtilityName = utility
+				}
 			// update utility amount and name if unset
-			if utility != "FLUID" && (existingUtility == "FLUID" || existingUtility == "") {
+			case existingUtility == "FLUID" || existingUtility == "":
 				existingUserTransaction.UtilityAmount = winningAmountFloat
 				existingUserTransaction.UtilityName = utility
 			}
