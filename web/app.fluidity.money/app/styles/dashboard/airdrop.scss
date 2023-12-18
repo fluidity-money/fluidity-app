@@ -400,9 +400,6 @@ $holo: linear-gradient(
 
 .airdrop-my-multiplier {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2em;
 
   svg,
   path {
@@ -442,9 +439,6 @@ $holo: linear-gradient(
 
   #mx-see-my-staking-stats {
     width: 100%;
-    grid-area: 2 / 1;
-    box-sizing: border-box;
-    align-self: end;
   }
 
   #mx-my-stakes {

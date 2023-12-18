@@ -1,0 +1,32 @@
+
+.joe_farmlands_or_camelot_div {
+  padding-top: 20px;
+}
+
+.joe_farmlands_or_camelot_div img {
+  position: absolute;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.joe_farmlands_or_camelot_img_joe {
+  clip-path: polygon(0% 0%, 0% 100%, 100% 0%);
+}
+
+.joe_farmlands_or_camelot_img_camelot {
+  padding-top: 12px;
+  clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+}
+
+.joe_farmlands_or_camelot_div img:hover {
+  transform-origin: 50% 50% 0;
+  animation: joe_farmlands_or_camelot_img_scale 100ms ease-in-out forwards;
+  z-index: -999;
+}
+
+@keyframes joe_farmlands_or_camelot_img_scale {
+  to {
+    transform: scale(1.025);
+    filter: drop-shadow(0px 0px 0px #333);
+  }
+}

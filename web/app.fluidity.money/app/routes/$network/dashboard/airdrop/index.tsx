@@ -57,6 +57,7 @@ import { useCache } from "~/hooks/useCache";
 import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
+import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 
 const EPOCH_DAYS_TOTAL = 38;
 // temp: may 22nd, 2023
@@ -293,7 +294,7 @@ const Airdrop = () => {
   const destModal = location.hash.replace("#", "");
 
   const [currentModal, setCurrentModal] = useState<AirdropModalName | null>(
-    isAirdropModal(destModal) ? destModal : "recap"
+    isAirdropModal(destModal) ? destModal : null
   );
 
   useEffect(() => {
@@ -520,7 +521,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap"}
         >
-          Airdrop Recap
+          Epoch 1 Recap
         </TabButton>
         <TabButton
           size="small"
@@ -617,6 +618,7 @@ const Airdrop = () => {
           {currentModal === null && (
             <>
               <div>
+              <img src="/images/epoch2AirdropBanner.png" />
                 <Heading
                   as="h3"
                   style={{ marginBottom: "0.5em" }}
@@ -1339,17 +1341,6 @@ const MyMultiplier = ({
           type="static"
         />
       )}
-      <div>
-        <LabelledValue
-          align={isMobile ? "center" : "left"}
-          className="mx-my-multiplier"
-          label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
-        >
-          <Text size="xxl" holo>
-            {toSignificantDecimals(sumLiquidityMultiplier, 1)}x
-          </Text>
-        </LabelledValue>
-      </div>
       <GeneralButton
         icon={<ArrowRight />}
         layout="after"
@@ -1358,112 +1349,14 @@ const MyMultiplier = ({
         handleClick={seeMyStakingStats}
         id="mx-see-my-staking-stats"
       >
-        MY STAKING STATS
+        MY EPOCH 1 STAKING STATS
       </GeneralButton>
-      {!isMobile && (
-        <div id="mx-my-stakes">
-          {stakes
-            .map((stake) => {
-              const { fluidAmount, baseAmount, durationDays, depositDate } =
-                stake;
-
-              const stakedDays = dayDifference(
-                new Date(),
-                new Date(depositDate)
-              );
-              const multiplier = stakingLiquidityMultiplierEq(
-                stakedDays,
-                durationDays
-              );
-
-              const fluidDecimals = 6;
-              const fluidUsd = getUsdFromTokenAmount(
-                fluidAmount,
-                fluidDecimals,
-                usdcPrice
-              );
-
-              const wethDecimals = 18;
-              const usdcDecimals = 6;
-
-              // If converting base amount by weth decimals (18) is smaller than $0.01,
-              // then tentatively assume Token amount is USDC
-              // A false hit would be a USDC deposit >= $100,000
-              const baseUsd =
-                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
-                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
-
-              return {
-                stake,
-                stakedDays,
-                multiplier,
-                fluidUsd,
-                baseUsd,
-              };
-            })
-            .sort((a, b) => {
-              const stakeAVal = (a.fluidUsd + a.baseUsd) * a.multiplier;
-              const stakeBVal = (b.fluidUsd + b.baseUsd) * b.multiplier;
-
-              // Sort Descending
-              return stakeBVal > stakeAVal
-                ? 1
-                : stakeBVal === stakeAVal
-                ? 0
-                : -1;
-            })
-            .slice(0, 3)
-            .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
-              const { durationDays } = stake;
-
-              return (
-                <>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
-                    }}
-                  >
-                    <Text prominent code>
-                      {numberToMonetaryString(fluidUsd + baseUsd)} FOR{" "}
-                      {Math.floor(durationDays)} DAYS
-                    </Text>
-                    <ProgressBar
-                      value={multiplier}
-                      max={1}
-                      rounded
-                      color={multiplier === 1 ? "holo" : "gray"}
-                      size="sm"
-                    />
-                  </div>
-                  <div
-                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                  >
-                    <Text holo bold prominent>
-                      {toSignificantDecimals(multiplier, 1)}X
-                    </Text>
-                  </div>
-                </>
-              );
-            })}
-        </div>
-      )}
-      <GeneralButton
-        icon={isMobile ? <ArrowRight /> : undefined}
-        layout={"after"}
-        buttontype="text"
-        size="medium"
-        version="primary"
-        handleClick={seeStakeNow}
-        id="mx-stake-now-button"
-        disabled={true}
-      >
-        STAKE NOW
-      </GeneralButton>
+      <div>
+        <Text size="md" holo={true}>
+          Provide $fUSDC Liquidity to earn $ARB and Multipliers!
+        </Text>
+        <JoeFarmlandsOrCamelotKingdom />
+      </div>
     </div>
   );
 };
