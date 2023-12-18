@@ -134,7 +134,7 @@ func ZAddSelfScore(key string, content float64) {
 	redisClient := client()
 
 	intCmd := redisClient.ZAdd(context.Background(), key, &redis.Z{
-		Score: content, 
+		Score:  content,
 		Member: content,
 	})
 
@@ -180,7 +180,7 @@ func ZScore(key, member string) float64 {
 
 	stringCmd := redisClient.ZScore(context.Background(), key, member)
 
-	score , err := stringCmd.Result()
+	score, err := stringCmd.Result()
 
 	if err != nil && err != redis.Nil {
 		log.Fatal(func(k *log.Log) {

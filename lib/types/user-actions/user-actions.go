@@ -135,15 +135,15 @@ func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTr
 	amountFloat, _ := amount.Quo(amount, decimalsRat).Float64()
 
 	return AggregatedUserTransaction{
-		TokenShortName: userAction.TokenDetails.TokenShortName,
-		Network: userAction.Network,
-		Time: userAction.Time,
-		Amount: amountFloat,
-		Application: userAction.Application,
-		Type: userAction.Type,
-		SwapIn: userAction.SwapIn,
-		TransactionHash: userAction.TransactionHash,
-		SenderAddress: userAction.SenderAddress,
+		TokenShortName:   userAction.TokenDetails.TokenShortName,
+		Network:          userAction.Network,
+		Time:             userAction.Time,
+		Amount:           amountFloat,
+		Application:      userAction.Application,
+		Type:             userAction.Type,
+		SwapIn:           userAction.SwapIn,
+		TransactionHash:  userAction.TransactionHash,
+		SenderAddress:    userAction.SenderAddress,
 		RecipientAddress: userAction.RecipientAddress,
 	}
 }
@@ -156,10 +156,10 @@ func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner)
 	)
 
 	userTransaction := AggregatedUserTransaction{
-		TokenShortName: pendingWinner.TokenDetails.TokenShortName,
-		Network: pendingWinner.Network,
+		TokenShortName:  pendingWinner.TokenDetails.TokenShortName,
+		Network:         pendingWinner.Network,
 		TransactionHash: pendingWinner.TransactionHash.String(),
-		SenderAddress: senderAddress,
+		SenderAddress:   senderAddress,
 		// the sender is the winner of a pending win
 		WinningAddress: senderAddress,
 	}

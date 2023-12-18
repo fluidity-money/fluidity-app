@@ -150,7 +150,7 @@ type (
 	}
 
 	Block struct {
-		Blockhash    string                    `json:"blockhash"`
+		Blockhash    string              `json:"blockhash"`
 		Transactions []TransactionResult `json:"transactions"`
 	}
 	RpcError struct {

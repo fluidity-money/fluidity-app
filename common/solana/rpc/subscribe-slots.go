@@ -7,9 +7,9 @@ package rpc
 import (
 	"encoding/json"
 
+	solCommon "github.com/fluidity-money/fluidity-app/common/solana"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/solana"
-	solCommon "github.com/fluidity-money/fluidity-app/common/solana"
 )
 
 // SubscribeSlots subscribes to new slots
@@ -65,7 +65,7 @@ func (websocket Websocket) SubscribeBlocks(accountOrProgram solCommon.PublicKey,
 	} else {
 		firstParam = struct {
 			MentionsAccountOrProgram string `json:"mentionsAccountOrProgram"`
-		} {
+		}{
 			accountOrProgram.String(),
 		}
 	}
@@ -73,15 +73,15 @@ func (websocket Websocket) SubscribeBlocks(accountOrProgram solCommon.PublicKey,
 	params := []interface{}{
 		firstParam,
 		struct {
-			Encoding					   string `json:"encoding"`
-			TransactionDetails			   string `json:"transactionDetails"`
+			Encoding                       string `json:"encoding"`
+			TransactionDetails             string `json:"transactionDetails"`
 			MaxSupportedTransactionVersion int    `json:"maxSupportedTransactionVersion"`
 		}{
 			MaxSupportedTransactionVersion: 0,
-			Encoding: "jsonParsed", 
-			TransactionDetails: "none",
-		}, 
-	} 
+			Encoding:                       "jsonParsed",
+			TransactionDetails:             "none",
+		},
+	}
 
 	replies := websocket.subscribe("blockSubscribe", params)
 
@@ -126,7 +126,7 @@ func (websocket Websocket) SubscribeBlocks(accountOrProgram solCommon.PublicKey,
 
 type BlockResponse struct {
 	Value struct {
-		Slot  uint64		   `json:"slot"`
+		Slot  uint64           `json:"slot"`
 		Error *solana.RpcError `json:"err"`
 		Block solana.Block     `json:"block"`
 	} `json:"value"`
