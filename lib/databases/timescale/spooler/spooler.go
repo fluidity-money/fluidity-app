@@ -238,15 +238,18 @@ func UnpaidWinningsForCategory(network_ network.BlockchainNetwork, token token_d
 		token.TokenShortName,
 	)
 
-	var total float64
+	var total sql.NullFloat64
 
 	err := row.Scan(&total)
 
-	if err == sql.ErrNoRows {
+	switch err {
+	case sql.ErrNoRows:
 		return 0
-	}
 
-	if err != nil {
+	case nil:
+		// nothing
+
+	default:
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 
@@ -259,7 +262,11 @@ func UnpaidWinningsForCategory(network_ network.BlockchainNetwork, token token_d
 		})
 	}
 
-	return total
+	if total.Valid {
+		return total.Float64
+	} else {
+		return 0
+	}
 }
 
 func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {
