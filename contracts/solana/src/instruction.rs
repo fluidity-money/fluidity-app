@@ -36,7 +36,7 @@ pub enum FluidityInstruction {
     ///   4. `[signer]` Payer account
     ///   5. `[]` System program
     ///   6. `[]` Metaplex metadata program
-    CreateTokenMetadata(String, u8, String, String, String, u16),
+    CreateTokenMetadata(String, u8, String, String, String),
 }
 
 // solend instructions

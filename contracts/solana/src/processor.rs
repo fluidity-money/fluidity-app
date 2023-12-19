@@ -8,6 +8,9 @@ use crate::{
 
 use {
     borsh::{BorshDeserialize, BorshSerialize},
+    mpl_token_metadata::instructions::{
+        CreateMetadataAccountV3, CreateMetadataAccountV3InstructionArgs,
+    },
     solana_program::{
         account_info::{next_account_info, AccountInfo},
         entrypoint::ProgramResult,
@@ -1050,41 +1053,40 @@ fn create_token_metadata(
         panic!("not authorised to use this");
     }
 
-    let pda_pubkey = pda_account.key;
-
-    let payer_pubkey = payer_account.key;
-
-    let fluidity_token_mint_pubkey = fluidity_token_mint_account.key;
-
-    let metaplex_metadata_program_pubkey = metaplex_program_account.key;
-
     let (metadata_program_pda_address, _) = Pubkey::find_program_address(
         &[
             "metadata".as_bytes(),
-            metaplex_metadata_program_pubkey.as_ref(),
-            fluidity_token_mint_pubkey.as_ref(),
+            metaplex_program_account.key.as_ref(),
+            fluidity_token_mint_account.key.as_ref(),
         ],
-        metaplex_metadata_program_pubkey,
+        metaplex_program_account.key,
     );
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
     invoke_signed(
-        &metaplex_token_metadata::instruction::create_metadata_accounts(
-            *metaplex_metadata_program_pubkey, // program id
-            metadata_program_pda_address,      // metadata account
-            *fluidity_token_mint_pubkey,       // mint
-            *pda_pubkey,                       // mint authority
-            *payer_pubkey,                     // payer
-            *pda_pubkey,                       // update authority
-            name,                              // name
-            symbol,                            // symbol
-            uri,                               // uri
-            None,                              // creators
-            seller_fee,                        // seller fee basis points
-            true,                              // update authority is signer
-            true,                              // is mutable
-        ),
+        &CreateMetadataAccountV3 {
+            metadata: metadata_program_pda_address, // metadata pda
+            mint: fluidity_token_mint_account.key.clone(),  // mint account
+            mint_authority: pda_account.key.clone(),        // mint authority
+            payer: payer_account.key.clone(),               // payer
+            update_authority: (payer.key.clone(), false),   // update authority (disabled)
+            system_program: system_account.key.clone(),     // system program
+            rent: None,                                     // rent
+        }
+        .instruction(CreateMetadataAccountV3InstructionArgs {
+            data: mpl_token_metadata::types::DataV2 {
+                name: name,
+                symbol: symbol,
+                uri: uri,
+                seller_fee_basis_points: seller_fee,
+                creators: None,
+                collection: None,
+                uses: None,
+            },
+            is_mutable: false,
+            collection_details: None,
+        }),
         &[
             metaplex_metadata_account.clone(),   // metaplex pda
             fluidity_token_mint_account.clone(), // mint of token asset
@@ -1235,10 +1237,8 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
         FluidityInstruction::Emergency(seed) => emergency_mode(accounts, program_id, seed),
 
-        FluidityInstruction::CreateTokenMetadata(seed, bump, name, symbol, uri, seller_fee) => {
-            create_token_metadata(
-                accounts, program_id, seed, bump, name, symbol, uri, seller_fee,
-            )
+        FluidityInstruction::CreateTokenMetadata(seed, bump, name, symbol, uri) => {
+            create_token_metadata(accounts, program_id, seed, bump, name, symbol, uri, 0)
         }
     }
 }
