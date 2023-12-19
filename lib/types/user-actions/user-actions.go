@@ -171,7 +171,11 @@ func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner)
 	} else {
 		userTransaction.UtilityName = applications.UtilityName(application)
 		userTransaction.UtilityAmount = pendingWinner.UsdWinAmount
-		userTransaction.Application = "none"
+		if pendingWinner.Network == network.NetworkSolana {
+			userTransaction.Application = "spl"
+		} else {
+			userTransaction.Application = "none"
+		}
 	}
 
 	return userTransaction
@@ -210,7 +214,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 		AmountStr:       amount.String(),
 		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
 		Time:            time.Now(),
-		Application:     "none",
+		Application:     "spl",
 	}
 }
 
@@ -234,7 +238,7 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 }
 
 func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int, applications []solApplications.Application) UserAction {
-	solanaApplication := "none"
+	solanaApplication := "spl"
 
 	if len(applications) > 0 {
 		solanaApplication = applications[0].String()
