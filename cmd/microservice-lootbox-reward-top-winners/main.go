@@ -32,8 +32,44 @@ func main() {
 	// endTime is the beginning of the day after startTime (the start of the current date)
 	endTime := currentTime
 
-	// fetch and log the top 10 users
-	topUsers := lootboxes.GetTopApplicationUsersByLootboxCount(startTime, endTime, applications.ApplicationKyberClassic)
+	programFound, hasBegun, currentEpoch, currentApplication := lootboxes.GetLootboxConfig()
+
+	if !programFound {
+		log.App(func(k *log.Log) {
+			k.Message = "No lootbox epoch found! Skipping running."
+		})
+
+		return
+	}
+
+	if !hasBegun {
+		log.App(func(k *log.Log) {
+			k.Message = "Current lootbox epoch has not yet started! Skipping running."
+		})
+
+		return
+	}
+
+	var topUsers []lootboxes.UserLootboxCount
+
+	// if there's a current application focus, then we want to reward only specific winners
+
+	if currentApplication != application.ApplicationNone {
+		// fetch and log the top 10 users for a specific application
+		topUsers = lootboxes.GetTopApplicationUsersByLootboxCount(
+			startTime,
+			endTime,
+			currentApplication,
+			currentEpoch,
+		)
+	} else {
+		topUsers = lootboxes.GetTopUsersByLootboxCount(
+			startTime,
+			endTime,
+			currentEpoch,
+		)
+	}
+
 	for i, user := range topUsers {
 		log.App(func(k *log.Log) {
 			k.Format(

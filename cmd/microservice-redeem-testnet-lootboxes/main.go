@@ -34,6 +34,24 @@ func main() {
 	)
 
 	logs.Logs(func(l logs.Log) {
+		// if a user encounters this, how did they get here?
+
+		programFound, hasBegun, currentEpoch, _ := lootboxes.GetLootboxConfig()
+
+		if !programFound {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "No lootbox program found, but a log was received for a testnet redemption!"
+			})
+		}
+
+		if hasBegun {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Lootbox program that was found is not running!"
+			})
+		}
+
+		log.Debugf("Lootbox current epoch running is %v!", currentEpoch)
+
 		if l.Address != addressConfirmerContractAddress {
 			log.Debug(func(k *log.Log) {
 				k.Format(
@@ -123,7 +141,7 @@ func main() {
 		}
 
 		for _, lootbox := range boxes {
-			lootboxes.InsertLootbox(lootbox)
+			lootboxes.InsertLootbox(lootbox, currentEpoch)
 		}
 	})
 }

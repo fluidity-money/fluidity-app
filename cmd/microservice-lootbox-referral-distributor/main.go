@@ -5,7 +5,6 @@
 package main
 
 import (
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/referrals"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -13,6 +12,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 			address         = lootbox.Address
 			lootboxCount    = lootbox.LootboxCount
 			awardedTime     = lootbox.AwardedTime
+			epoch           = lootbox.Epoch
 		)
 
 		// don't track non-transaction lootboxes
@@ -62,6 +64,7 @@ func main() {
 				RewardTier:      1,
 				LootboxCount:    referralLootboxCount,
 				Application:     applications.ApplicationNone,
+				Epoch:           epoch,
 			}
 
 			queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)

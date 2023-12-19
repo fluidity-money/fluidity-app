@@ -26,9 +26,7 @@ const (
 )
 
 func main() {
-	var (
-		lootboxReferralAmount_ = util.GetEnvOrFatal(EnvLootboxReferralAmount)
-	)
+	lootboxReferralAmount_ := util.GetEnvOrFatal(EnvLootboxReferralAmount)
 
 	lootboxReferralAmount, err := strconv.ParseUint(lootboxReferralAmount_, 10, 64)
 
@@ -45,6 +43,7 @@ func main() {
 			transactionHash = lootbox.TransactionHash
 			address         = lootbox.Address
 			lootboxCount    = lootbox.LootboxCount
+			epoch           = lootbox.Epoch
 		)
 
 		// don't track non-transaction lootboxes
@@ -102,6 +101,7 @@ func main() {
 					RewardTier:      1,
 					LootboxCount:    5,
 					Application:     applications.ApplicationNone,
+					Epoch:           epoch,
 				}
 
 				queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)

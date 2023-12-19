@@ -10,11 +10,6 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
-	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
-	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
@@ -27,12 +22,20 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
+	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
 	// EnvTokensList to relate the received token names to a contract address
 	// of the form ADDR1:TOKEN1:DECIMALS1,ADDR2:TOKEN2:DECIMALS2,...
 	EnvTokensList = "FLU_ETHEREUM_TOKENS_LIST"
+
 	// EnvGethHttpUrl to use when performing RPC requests
 	EnvGethHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 )
@@ -85,6 +88,26 @@ func main() {
 			tokenShortName = tokenDetails.TokenShortName
 		)
 
+		programFound, hasBegun, currentEpoch, _ := database.GetLootboxConfig()
+
+		if !programFound {
+			log.App(func(k *log.Log) {
+				k.Message = "No lootbox epoch found, ignoring a request to track winners!"
+			})
+
+			return
+		}
+
+		if hasBegun {
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Lootbox epoch that was found is not running! Ignoring a request to track!"
+			})
+
+			return
+		}
+
+		log.Debugf("Lootbox current epoch running is %v!", currentEpoch)
+
 		// don't track fluidification
 		if winner.RewardType != "send" {
 			log.Debug(func(k *log.Log) {
@@ -114,7 +137,11 @@ func main() {
 
 			// fetch parameters to call GetApplicationFee
 			// wait for transaction to be mined before fetching receipt
-			transaction, isPending, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
+
+			transaction, isPending, err := ethClient.TransactionByHash(
+				context.Background(),
+				common.HexToHash(transactionHash),
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -172,7 +199,14 @@ func main() {
 
 			inputData := transaction.Data()
 
-			feeData, _, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
+			feeData, _, _, err := ethereumApps.GetApplicationFee(
+				applicationTransfer,
+				ethClient,
+				fluidTokenContract,
+				tokenDecimals,
+				receipt,
+				inputData,
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {

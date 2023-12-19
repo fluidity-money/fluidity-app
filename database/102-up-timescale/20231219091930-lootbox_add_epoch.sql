@@ -3,7 +3,8 @@
 
 CREATE TYPE lootbox_epoch AS ENUM (
 	'epoch_1',
-	'epoch_2'
+	'epoch_2',
+	'epoch_testing'
 );
 
 ALTER TABLE lootbox
