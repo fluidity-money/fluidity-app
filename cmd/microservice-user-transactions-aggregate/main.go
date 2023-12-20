@@ -32,7 +32,7 @@ func main() {
 			user_actions.InsertAggregatedUserTransaction(userTransaction)
 			// corresponding pending win has already been seen, so set user action specific fields
 		} else if existingUserTransaction.RecipientAddress == "" {
-			// use aggregate function to scale amount to dollars
+			// use aggregate function to scale amount to dollars and convert solana addresses
 			userTransaction := userActionsType.AggregatedTransactionFromUserAction(userAction)
 
 			existingUserTransaction.Time = userAction.Time

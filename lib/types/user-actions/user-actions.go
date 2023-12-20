@@ -97,8 +97,12 @@ type (
 
 		TransactionHash string `json:"transaction_hash"`
 
+		// SenderAddress is the owner of the ATA that sent this transaction on Solana
+		// and the normal sender address on other networks
 		SenderAddress string `json:"sender_address"`
 
+		// RecipientAddress is the owner of the ATA that received this transaction on Solana
+		// and the normal sender address on other networks
 		RecipientAddress string `json:"recipient_address"`
 
 		// scaled to usd
@@ -128,6 +132,20 @@ type (
 
 // AggregatedTransactionFromUserAction to create a partially aggregated transaction from a user action
 func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTransaction {
+	var (	
+		senderAddress    string
+		recipientAddress string
+	)
+
+	// replace ATAs with their owners
+	if userAction.Network == network.NetworkSolana {
+		senderAddress = userAction.SolanaSenderOwnerAddress
+		recipientAddress = userAction.SolanaRecipientOwnerAddress
+	} else {
+		senderAddress = userAction.SenderAddress
+		recipientAddress = userAction.RecipientAddress
+	}
+
 	// convert amount to a dollar float
 	decimalsAdjusted := math.Pow10(userAction.TokenDetails.TokenDecimals)
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
@@ -143,8 +161,8 @@ func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTr
 		Type:             userAction.Type,
 		SwapIn:           userAction.SwapIn,
 		TransactionHash:  userAction.TransactionHash,
-		SenderAddress:    userAction.SenderAddress,
-		RecipientAddress: userAction.RecipientAddress,
+		SenderAddress:    senderAddress,
+		RecipientAddress: recipientAddress,
 	}
 }
 
