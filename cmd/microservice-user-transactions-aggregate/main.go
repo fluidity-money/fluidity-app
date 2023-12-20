@@ -12,6 +12,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	userActionsType "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 	winnerTypes "github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
@@ -52,17 +53,25 @@ func main() {
 
 	go winners.WinnersAll(func(winner winners.Winner) {
 		var (
-			network             = winner.Network
+			network_             = winner.Network
 			transactionHash     = winner.TransactionHash
 			application         = winner.Application
 			sendTransactionHash = winner.SendTransactionHash
 			tokenDecimals       = winner.TokenDetails.TokenDecimals
 			winningAmountInt    = winner.WinningAmount.Int
-			winnerAddress       = winner.WinnerAddress
 			utility             = winner.Utility
+
+			winnerAddress       string
 		)
 
-		existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network, sendTransactionHash)
+		// replace ATAs with their owners
+		if winner.Network == network.NetworkSolana {
+			winnerAddress = winner.SolanaWinnerOwnerAddress
+		} else {
+			winnerAddress = winner.WinnerAddress
+		}
+
+		existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network_, sendTransactionHash)
 		if existingUserTransaction == nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
@@ -71,7 +80,6 @@ func main() {
 				)
 			})
 		}
-
 
 		decimalsAdjusted := math.Pow10(tokenDecimals)
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
