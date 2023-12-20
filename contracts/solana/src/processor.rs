@@ -8,9 +8,7 @@ use crate::{
 
 use {
     borsh::{BorshDeserialize, BorshSerialize},
-    mpl_token_metadata::instructions::{
-        CreateMetadataAccountV3, CreateMetadataAccountV3InstructionArgs,
-    },
+    mpl_token_metadata::instructions::CreateMetadataAccountV3CpiBuilder,
     solana_program::{
         account_info::{next_account_info, AccountInfo},
         entrypoint::ProgramResult,
@@ -31,7 +29,7 @@ use {
 const INIT_AUTHORITY: Pubkey = pubkey!("G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj");
 
 // the public key of the solend program
-pub const SOLEND: Pubkey = pubkey!("ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx");
+pub const SOLEND: Pubkey = pubkey!("So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo");
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
@@ -1053,52 +1051,27 @@ fn create_token_metadata(
         panic!("not authorised to use this");
     }
 
-    let (metadata_program_pda_address, _) = Pubkey::find_program_address(
-        &[
-            "metadata".as_bytes(),
-            metaplex_program_account.key.as_ref(),
-            fluidity_token_mint_account.key.as_ref(),
-        ],
-        metaplex_program_account.key,
-    );
-
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
-    invoke_signed(
-        &CreateMetadataAccountV3 {
-            metadata: metadata_program_pda_address, // metadata pda
-            mint: fluidity_token_mint_account.key.clone(),  // mint account
-            mint_authority: pda_account.key.clone(),        // mint authority
-            payer: payer_account.key.clone(),               // payer
-            update_authority: (payer.key.clone(), false),   // update authority (disabled)
-            system_program: system_account.key.clone(),     // system program
-            rent: None,                                     // rent
-        }
-        .instruction(CreateMetadataAccountV3InstructionArgs {
-            data: mpl_token_metadata::types::DataV2 {
-                name: name,
-                symbol: symbol,
-                uri: uri,
-                seller_fee_basis_points: seller_fee,
-                creators: None,
-                collection: None,
-                uses: None,
-            },
-            is_mutable: false,
-            collection_details: None,
-        }),
-        &[
-            metaplex_metadata_account.clone(),   // metaplex pda
-            fluidity_token_mint_account.clone(), // mint of token asset
-            pda_account.clone(),                 // mint authority
-            payer_account.clone(),               // signer payer
-            pda_account.clone(),                 // update authority info
-            system_account.clone(),              // system program
-            rent_info.clone(),                   // rent sysvar
-            metaplex_program_account.clone(),    // metaplex program
-        ],
-        &[&[&pda_seed.as_bytes(), &[bump]]],
-    )
+    CreateMetadataAccountV3CpiBuilder::new(&metaplex_program_account)
+        .metadata(&metaplex_metadata_account)
+        .mint(&fluidity_token_mint_account)
+        .mint_authority(&pda_account)
+        .payer(&payer_account)
+        .update_authority(&payer_account, false)
+        .system_program(&system_account)
+        .rent(Some(rent_info))
+        .is_mutable(true)
+        .data(mpl_token_metadata::types::DataV2 {
+            name: name,
+            symbol: symbol,
+            uri: uri,
+            seller_fee_basis_points: seller_fee,
+            creators: None,
+            collection: None,
+            uses: None,
+        })
+        .invoke_signed(&[&[&pda_seed.as_bytes(), &[bump]]])
 }
 
 // initialise a data account derived from PDA that stores valid token pairs
