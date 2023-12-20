@@ -72,11 +72,6 @@ func main() {
 			})
 		}
 
-		// regardless of whether there's existing win data, always prefer to show
-		// an application if any logs in this transaction contain one
-		if existingUserTransaction.Application == "none" && utility == "FLUID" {
-			existingUserTransaction.Application = application
-		}
 
 		decimalsAdjusted := math.Pow10(tokenDecimals)
 		decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
@@ -86,19 +81,32 @@ func main() {
 		existingUtility := existingUserTransaction.UtilityName
 
 		switch {
+		// a regular win
 		case utility == "FLUID":
-			// sum winning amounts
-			existingUserTransaction.WinningAmount += winningAmountFloat
+			// regardless of whether there's existing win data, always prefer to show
+			// an application if any logs in this transaction contain one
+			if existingUserTransaction.Application == "none" {
+				existingUserTransaction.Application = application
+			}
+			// use the largest win amount in this transaction as summation may double count pending wins
+			if existingUserTransaction.WinningAmount < winningAmountFloat {
+				existingUserTransaction.WinningAmount = winningAmountFloat
+			}
 			// no existing info, update all win-related fields
 			if existingUserTransaction.WinningAddress == "" {
 				existingUserTransaction.WinningAddress = winnerAddress
 				existingUserTransaction.UtilityName = utility
 			}
 
-		// update utility amount and name if unset
-		case existingUtility == "FLUID" || existingUtility == "":
-			existingUserTransaction.UtilityAmount = winningAmountFloat
+		// a utility payout
+		// update utility amount and name if unset or the existing utility is smaller
+		case existingUtility == "FLUID" :
+			fallthrough
+		case existingUtility == "":
+			fallthrough
+		case existingUserTransaction.UtilityAmount < winningAmountFloat:
 			existingUserTransaction.UtilityName = utility
+			existingUserTransaction.UtilityAmount = winningAmountFloat
 		}
 
 		// a pending winner might have set other win info
@@ -136,11 +144,16 @@ func main() {
 			)
 
 			switch {
+			// a regular win
 			case utility == "FLUID":
 				// regardless of whether there's existing win data, always prefer to show
 				// an application if any logs in this transaction contain one
 				if existingUserTransaction.Application == "none" {
 					existingUserTransaction.Application = application
+				}
+				// use the largest win amount in this transaction as summation may double count pending wins
+				if existingUserTransaction.WinningAmount < winningAmountFloat {
+					existingUserTransaction.WinningAmount = winningAmountFloat
 				}
 				// no existing info, update all win-related fields
 				if existingUserTransaction.WinningAddress == "" {
@@ -148,10 +161,15 @@ func main() {
 					existingUserTransaction.WinningAmount = winningAmountFloat
 					existingUserTransaction.UtilityName = utility
 				}
-			// update utility amount and name if unset
-			case existingUtility == "FLUID" || existingUtility == "":
-				existingUserTransaction.UtilityAmount = winningAmountFloat
+			// a utility payout
+			// update utility amount and name if unset or the existing utility is smaller
+			case existingUtility == "FLUID" :
+				fallthrough
+			case existingUtility == "":
+				fallthrough
+			case existingUserTransaction.UtilityAmount < winningAmountFloat:
 				existingUserTransaction.UtilityName = utility
+				existingUserTransaction.UtilityAmount = winningAmountFloat
 			}
 
 			user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
