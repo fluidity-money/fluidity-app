@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/solana"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
@@ -65,7 +66,6 @@ func main() {
 			network_             = winner.Network
 			transactionHash     = winner.TransactionHash
 			application         = winner.Application
-			sendTransactionHash = winner.SendTransactionHash
 			tokenDecimals       = winner.TokenDetails.TokenDecimals
 			winningAmountInt    = winner.WinningAmount.Int
 			utility             = winner.Utility
@@ -76,9 +76,13 @@ func main() {
 		// replace ATAs with their owners
 		if winner.Network == network.NetworkSolana {
 			winnerAddress = winner.SolanaWinnerOwnerAddress
+			winningSignature := solana.GetIntermediateWinner(transactionHash)
+			winner.SendTransactionHash = winningSignature
 		} else {
 			winnerAddress = winner.WinnerAddress
 		}
+
+		sendTransactionHash := winner.SendTransactionHash
 
 		existingUserTransaction := user_actions.GetAggregatedUserTransactionByHash(network_, sendTransactionHash)
 		if existingUserTransaction == nil {
