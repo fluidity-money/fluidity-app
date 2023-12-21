@@ -56,6 +56,8 @@ type BlockedWinner struct {
 
 // PendingWinner is a winner that has been spooled but not sent
 type PendingWinner struct {
+	// Category is the TokenShortName of the corresponding token (e.g. USDC)
+	Category        string                     `json:"category"`
 	TokenDetails    token_details.TokenDetails `json:"token_details"`
 	TransactionHash ethereum.Hash              `json:"transaction_hash"`
 	SenderAddress   ethereum.Address           `json:"sender_address"`
