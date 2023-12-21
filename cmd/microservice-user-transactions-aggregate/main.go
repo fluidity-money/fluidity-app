@@ -17,8 +17,7 @@ import (
 	winnerTypes "github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
-func main() {
-	go queue.UserActionsAll(func(userAction user_actions.UserAction) {
+func handleUserAction(userAction user_actions.UserAction) {
 		var (
 			network         = userAction.Network
 			transactionHash = userAction.TransactionHash
@@ -48,6 +47,16 @@ func main() {
 		} else if existingUserTransaction.Application == "none" && application != "none" {
 			existingUserTransaction.Application = application
 			user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, transactionHash)
+		}
+	}
+
+func main() {
+	go queue.UserActionsEthereum(handleUserAction)
+
+	// Solana user actions are sent over the buffered queue
+	go queue.BufferedUserActionsSolana(func(buffered queue.BufferedUserAction) {
+		for _, userAction := range buffered.UserActions {
+			handleUserAction(userAction)
 		}
 	})
 
