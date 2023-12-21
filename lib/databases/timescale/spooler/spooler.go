@@ -33,7 +33,8 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 	var (
 		pendingWinners []PendingWinner
 
-		fluidTokenDetails = winner.TokenDetails
+		fluidTokenDetails   = winner.TokenDetails
+		fluidTokenShortName = fluidTokenDetails.TokenShortName
 
 		network_           = winner.Network
 		hash               = winner.TransactionHash
@@ -111,6 +112,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		// create the recipient
 		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
 			TokenDetails:    details,
 			TransactionHash: hash,
 			SenderAddress:   recipientAddress,
@@ -171,7 +173,7 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 		var (
 			fluidTokenDetails = pendingWinner.TokenDetails
 
-			fluidTokenShortName = fluidTokenDetails.TokenShortName
+			category            = pendingWinner.Category
 			hash                = pendingWinner.TransactionHash
 			senderAddress       = pendingWinner.SenderAddress
 			nativeWinAmount     = pendingWinner.NativeWinAmount
@@ -185,7 +187,7 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 		)
 		_, err := timescaleClient.Exec(
 			statementText,
-			fluidTokenShortName,
+			category,
 			fluidTokenDetails.TokenShortName,
 			fluidTokenDetails.TokenDecimals,
 			hash,
