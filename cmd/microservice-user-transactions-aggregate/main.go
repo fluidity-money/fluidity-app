@@ -166,7 +166,8 @@ func main() {
 
 			switch {
 			// a regular win
-			case utility == "FLUID":
+			// Solana doesn't have utilities, so utility could be empty
+			case utility == "FLUID" || utility == "":
 				// regardless of whether there's existing win data, always prefer to show
 				// an application if any logs in this transaction contain one
 				if existingUserTransaction.Application == "none" {
