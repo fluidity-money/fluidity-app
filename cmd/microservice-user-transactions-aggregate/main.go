@@ -102,6 +102,9 @@ func main() {
 		existingUtility := existingUserTransaction.UtilityName
 
 		switch {
+		// Solana doesn't have utilities, so utility could be empty
+		case utility == "":
+			fallthrough
 		// a regular win
 		case utility == "FLUID":
 			// regardless of whether there's existing win data, always prefer to show
