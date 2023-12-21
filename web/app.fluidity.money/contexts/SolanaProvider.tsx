@@ -117,7 +117,8 @@ const SolanaFacade = ({
         tokens: getFluidTokens,
         amountMinted,
         rawAddress: publicKey?.toString() ?? "",
-        address: publicKey?.toString().toLowerCase() ?? "",
+        // solana addresses are case sensitive
+        address: publicKey?.toString(),
         signBuffer,
       }}
     >
