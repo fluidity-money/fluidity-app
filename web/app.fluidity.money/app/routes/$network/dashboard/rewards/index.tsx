@@ -646,7 +646,7 @@ export default function Rewards() {
              :
                <>
                 <a href="https://www.meteora.ag/">
-                  <ProviderIcon provider="Meteroa" />
+                  <ProviderIcon provider="Meteora" />
                 </a>
                 <a href="https://www.orca.so/">
                   <ProviderIcon provider="Orca" />

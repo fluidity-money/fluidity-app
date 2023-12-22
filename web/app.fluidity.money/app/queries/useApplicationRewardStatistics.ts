@@ -88,7 +88,7 @@ export type SolanaApplication =
   | "aldrinv2"
   | "lifinity"
   | "mercurial"
-  | "meteroa";
+  | "meteora";
 
 export type Application = EthereumApplication | SolanaApplication;
 

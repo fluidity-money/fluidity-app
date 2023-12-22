@@ -71,8 +71,8 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Mercurial";
     case "trader_joe":
       return "Trader Joe";
-    case "Meteroa":
-      return "meteroa";
+    case "Meteora":
+      return "meteora";
     case "fluidity":
     case "spl":
     case "none":
