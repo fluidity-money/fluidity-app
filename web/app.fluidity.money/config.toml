@@ -318,13 +318,6 @@ fDAI = "https://app.1inch.io/#/1/earn/pools"
 [liquidity_providers.solana]
 
 [[liquidity_providers.solana.providers]]
-name= "solend"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://www.solend.fi/"
-fUSDT = "https://www.solend.fi/"
-
-[[liquidity_providers.solana.providers]]
 name= "orca"
 
 [liquidity_providers.solana.providers.link]
