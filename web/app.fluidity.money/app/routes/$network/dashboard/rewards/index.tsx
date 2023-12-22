@@ -628,22 +628,37 @@ export default function Rewards() {
         </CardCarousel.Slide>
         <CardCarousel.Slide className={isMobile ? "compactSlide" : ""}>
           <div className={`rewards-cta-providers ${isMobile ? "compact" : ""}`}>
-            <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
-              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-              <ProviderIcon provider="Sushiswap" />
-            </a>
-            <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
-              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-              <ProviderIcon provider="Uniswap" />
-            </a>
-            <a href="#">
-              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-              <ProviderIcon provider="Multichain" />
-            </a>
-            <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
-              {/* <BloomEffect type="static" color={"red"} width={80}/> */}
-              <ProviderIcon provider="Dodo" />
-            </a>
+            { network == "arbitrum" ?
+                <>
+                  <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+                  <ProviderIcon provider="Sushiswap" />
+                 </a>
+                 <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
+                   <ProviderIcon provider="Uniswap" />
+                 </a>
+                 <a href="#">
+                   <ProviderIcon provider="Multichain" />
+                 </a>
+                 <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
+                   <ProviderIcon provider="Dodo" />
+                 </a>
+               </>
+             :
+               <>
+                <a href="https://www.meteora.ag/">
+                  <ProviderIcon provider="Meteroa" />
+                </a>
+                <a href="https://www.orca.so/">
+                  <ProviderIcon provider="Orca" />
+                </a>
+                <a href="https://mercurial.finance">
+                  <ProviderIcon provider="Mercurial" />
+                </a>
+                <a href="https://saber.so">
+                  <ProviderIcon provider="Saber" />
+                </a>
+              </>
+            }
           </div>
           <Display size="xxxs">Swap To Earn</Display>
           {!isMobile && <Text>Swap Fluid Assets to generate yield.</Text>}
