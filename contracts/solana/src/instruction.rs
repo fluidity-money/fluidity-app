@@ -37,6 +37,7 @@ pub enum FluidityInstruction {
     ///   5. `[]` System program
     ///   6. `[]` Metaplex metadata program
     CreateTokenMetadata(String, u8, String, String, String),
+    UpdateTokenMetadata(String, u8, String, String, String),
 }
 
 // solend instructions
