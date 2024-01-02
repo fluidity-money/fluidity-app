@@ -72,6 +72,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 		// create the sender
 		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
 			TokenDetails:    details,
 			TransactionHash: hash,
 			SenderAddress:   senderAddress,
