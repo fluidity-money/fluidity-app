@@ -20,10 +20,10 @@ CREATE TABLE lootbox_amounts_rewarded (
 	recipient VARCHAR NOT NULL,
 
 	application VARCHAR NOT NULL,
-	last_updated TIMESTAMP NOT NULL,
+	last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	-- id to prevent duplication during the upsert for updating amounts
-	CONSTRAINT id PRIMARY KEY(network, epoch, recipient, application)
+	CONSTRAINT id PRIMARY KEY(network, epoch, token_short_name, recipient, application)
 );
 
 -- migrate:down

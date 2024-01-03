@@ -30,6 +30,8 @@ const queryAllTime = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -50,6 +52,8 @@ const queryByUser24Hours = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -67,6 +71,8 @@ const query24Hours = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -88,6 +94,8 @@ const query24HoursByUserByApplication = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -108,6 +116,8 @@ const query24HoursByApplication = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -142,6 +152,8 @@ export type AirdropLeaderboardEntry = {
   bottles: number;
   highestRewardTier: number;
   liquidityMultiplier: number;
+  fusdcEarned: number;
+  arbEarned: number;
 };
 
 type AirdropLeaderboardResponse = {

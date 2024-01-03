@@ -2,8 +2,8 @@ import { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryGetConfig = gql`
-  query getLootboxConfig() {
-    lootboxConfig: lootbox_config(where: { is_current_program: true }) {
+  query getLootboxConfig {
+    lootboxConfig: lootbox_config(where: { is_current_program: { _eq: true }}) {
       program_begin,
       program_end,
       epoch_identifier,

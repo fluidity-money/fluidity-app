@@ -227,7 +227,7 @@ const Airdrop = () => {
     redeemTokens,
   } = useContext(FluidityFacadeContext);
 
-  const { data: lootboxConfig } = useCache<LootboxConfigData>(
+  const { data: lootboxConfig } = useCache<LootboxConfig>(
     `/${network}/query/lootboxConfig`
   );
 
@@ -1541,6 +1541,8 @@ const Leaderboard = ({
       liquidityMultiplier: 0,
       bottles: 0,
       highestRewardTier: 0,
+      fusdcEarned: 0,
+      arbEarned: 0
     };
 
     data.push(userEntry);
