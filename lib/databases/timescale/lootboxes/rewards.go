@@ -13,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
 const ExpectedTopUsers = 10
@@ -276,4 +277,55 @@ func GetTopApplicationUsersByLootboxCount(currentEpoch string, startTime, endTim
 	}
 
 	return topUsers
+}
+
+// UpdateOrInsertAmountsRewarded for the current user in the specific
+// epoch that's taking place.
+func UpdateOrInsertAmountsRewarded(network_ network.BlockchainNetwork, lootboxCurrentEpoch, tokenShortName string, amountNormalLossy float64, winnerAddress, application string) {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`INSERT INTO %s (
+			network,
+			epoch,
+			token_short_name,
+			amount_earned,
+			recipient,
+			application,
+			last_updated
+		)
+		VALUES (
+			$1,
+			$2,
+			$3,
+			$4,
+			$5,
+			$6,
+			$7
+		)
+		ON CONFLICT (id)
+		DO UPDATE SET
+			amount_earned = amount_earned + $4,
+			last_updated = CURRENT_TIMESTAMP`,
+
+		TableLootboxAmountsRewarded,
+	)
+
+	_, err := timescaleClient.Exec(
+		statementText,
+		network_,
+		lootboxCurrentEpoch,
+		tokenShortName,
+		amountNormalLossy,
+		application,
+		winnerAddress,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to upsert a lootbox amount rewarded!"
+			k.Payload = err
+		})
+	}
 }

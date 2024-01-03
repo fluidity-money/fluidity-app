@@ -16,7 +16,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	winners_queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -24,7 +23,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
-	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -199,7 +198,7 @@ func main() {
 
 			inputData := transaction.Data()
 
-			feeData, _, _, err := ethereumApps.GetApplicationFee(
+			feeData, _, _, err := applications.GetApplicationFee(
 				applicationTransfer,
 				ethClient,
 				fluidTokenContract,
@@ -322,22 +321,8 @@ func volumeLiquidityMultiplier(volume *big.Rat, tokenDecimals int, address strin
 }
 
 func protocolMultiplier(application applications.Application) *big.Rat {
-	switch application.String() {
-	case "uniswap_v2":
-		fallthrough
-	case "uniswap_v3":
-		fallthrough
-	case "saddle":
-		fallthrough
-	case "curve":
-		fallthrough
-	case "camelot":
-		fallthrough
-	case "chronos":
-		fallthrough
-	case "kyber_classic":
-		fallthrough
-	case "sushiswap":
+	switch application {
+	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
 		return big.NewRat(2, 100)
 	}
 

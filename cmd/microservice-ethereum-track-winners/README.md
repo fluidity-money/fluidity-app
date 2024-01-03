@@ -4,6 +4,9 @@
 Take a list of contracts to watch and report when one of them generates a
 `Reward` event.
 
+Tracks the amounts earned in the database, after scanning the current
+airdrop epoch, if any.
+
 ## Environment variables
 
 |                   Name                   |                                  Description

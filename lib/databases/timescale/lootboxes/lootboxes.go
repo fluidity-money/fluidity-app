@@ -25,6 +25,10 @@ const (
 	// TableLootboxConfig to use for setting configuration
 	// for the currently running epoch
 	TableLootboxConfig = `lootbox_config`
+
+	// TableLootboxAmountsRewarded to use for tracking cumulative
+	// amounts earned by users during a lootbox campaign
+	TableLootboxAmountsRewarded = `lootbox_amounts_rewarded`
 )
 
 type Lootbox = types.Lootbox

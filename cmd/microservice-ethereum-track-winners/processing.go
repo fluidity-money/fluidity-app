@@ -1,9 +1,11 @@
 package main
 
 import (
+	"math"
+	"math/big"
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	winnersDb "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -12,17 +14,57 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 )
+
+func lootboxUpdateTrackedRewardAmounts(lootboxCurrentEpoch string, network_ network.BlockchainNetwork, tokenDetails token_details.TokenDetails, winner winnersDb.Winner) {
+	var (
+		tokenShortName = tokenDetails.TokenShortName
+		tokenDecimals  = tokenDetails.TokenDecimals
+
+		application = winner.Application
+		amountWon   = &winner.WinningAmount.Int
+	)
+
+	winnerAddress := ""
+
+	// need to set it to the owner of the ATA if we're on solana!
+
+	switch network_ {
+	case network.NetworkSolana:
+		winnerAddress = winner.SolanaWinnerOwnerAddress
+
+	default:
+		winnerAddress = winner.WinnerAddress
+	}
+
+	decimals := math.Pow10(tokenDecimals)
+
+	amountNormal := new(big.Rat).SetInt(amountWon)
+	amountNormal.Quo(amountNormal, new(big.Rat).SetInt64(int64(decimals)))
+
+	amountNormalFloat, _ := amountNormal.Float64()
+
+	lootboxes.UpdateOrInsertAmountsRewarded(
+		network_,
+		lootboxCurrentEpoch,
+		tokenShortName,
+		amountNormalFloat, // amount normal lossy
+		winnerAddress,
+		application,
+	)
+}
 
 func processReward(contractAddress ethereum.Address, transactionHash ethereum.Hash, data fluidity.RewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
 	var (
-		winnerString  = data.Winner.String()
-		winnerAddress = ethereum.AddressFromString(winnerString)
-		startBlock    = *data.StartBlock
-		endBlock      = *data.EndBlock
+		winnerString = data.Winner.String()
+		startBlock   = *data.StartBlock
+		endBlock     = *data.EndBlock
+		blocked      = data.Blocked
 	)
 
-	blocked := data.Blocked
+	winnerAddress := ethereum.AddressFromString(winnerString)
 
 	if blocked {
 		blockedWinner := convertBlockedWinner(
@@ -38,6 +80,8 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 
 		return
 	}
+
+	_, lootboxHasBegun, lootboxCurrentEpoch, _ := lootboxes.GetLootboxConfig()
 
 	winners := winnersDb.GetAndRemovePendingRewardData(
 		network,
@@ -57,12 +101,24 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 		time.Now(),
 	)
 
+	if lootboxHasBegun {
+		for _, winner := range convertedWinners {
+			lootboxUpdateTrackedRewardAmounts(
+				lootboxCurrentEpoch,
+				network,
+				tokenDetails,
+				winner,
+			)
+		}
+	}
+
 	sendRewards(winnersQueue.TopicWinnersEthereum, convertedWinners)
 }
 
 func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
+	rewardData := data.RewardData
+
 	var (
-		rewardData   = data.RewardData
 		winnerString = rewardData.Winner.String()
 		startBlock   = *rewardData.StartBlock
 		endBlock     = *rewardData.EndBlock
@@ -78,6 +134,8 @@ func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.Unblock
 		winnerAddress,
 	)
 
+	_, lootboxHasBegun, lootboxCurrentEpoch, _ := lootboxes.GetLootboxConfig()
+
 	convertedWinners := convertWinners(
 		rewards,
 		transactionHash,
@@ -87,6 +145,17 @@ func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.Unblock
 		tokenDetails,
 		time.Now(),
 	)
+
+	if lootboxHasBegun {
+		for _, winner := range convertedWinners {
+			lootboxUpdateTrackedRewardAmounts(
+				lootboxCurrentEpoch,
+				network,
+				tokenDetails,
+				winner,
+			)
+		}
+	}
 
 	sendRewards(winnersQueue.TopicWinnersEthereum, convertedWinners)
 }

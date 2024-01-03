@@ -49,6 +49,7 @@ import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
 import { ReferralCountLoaderData } from "../../query/referrals";
+import { LootboxConfig } from "../../query/lootboxConfig";
 import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
@@ -163,6 +164,16 @@ const GLOBAL_AIRDROP_BOTTLE_TIERS = {
   [Rarity.Legendary]: 5,
 };
 
+// defaults lifted from database/20231219094456-lootbox_config_add_prev_epoch.sql
+const LOOTBOX_CONFIG_DEFAULT: LootboxConfig = {
+  found: false,
+  programBegin: new Date("2023-05-01T12:00:00+02:00"),
+  programEnd: new Date("2023-06-28 T12:00:00+02:00"),
+  epochIdentifier: "epoch_1",
+  ethereumApplication: "none",
+  loaded: false
+};
+
 const Airdrop = () => {
   const {
     epochDaysTotal,
@@ -215,6 +226,10 @@ const Airdrop = () => {
     redeemableTokens: getRedeemableTokens,
     redeemTokens,
   } = useContext(FluidityFacadeContext);
+
+  const { data: lootboxConfig } = useCache<LootboxConfigData>(
+    `/${network}/query/lootboxConfig`
+  );
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
     address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
@@ -418,10 +433,11 @@ const Airdrop = () => {
 
   const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
     useState<boolean | undefined>(undefined);
-  // const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
-  //   boolean | undefined
-  // >(undefined);
-  const localShouldShowTutorial = false;
+
+  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+    boolean | undefined
+  >(undefined);
+
   const [localShouldShowRecapIntro, setLocalShouldShowRecapIntro] = useState<
     boolean | undefined
   >(undefined);
@@ -437,9 +453,11 @@ const Airdrop = () => {
       setLocalCookieConsent(true);
     }
 
-    // const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+
     const airdropBottleCount =
       window.localStorage.getItem("airdropBottleCount");
+
     const airdropShouldShowBottleNumbers = window.localStorage.getItem(
       "airdropShouldShowBottleNumbers"
     );
@@ -462,17 +480,8 @@ const Airdrop = () => {
       "airdropShouldShowRecapIntro"
     );
 
-    if (airdropShouldShowRecapIntro) {
-      setLocalShouldShowRecapIntro(false);
-    } else {
-      setLocalShouldShowRecapIntro(true);
-    }
-
-    // if (airdropHasVisited) {
-    //   setLocalShouldShowTutorial(false);
-    // } else {
-    //   setLocalShouldShowTutorial(true);
-    // }
+    setLocalShouldShowRecapIntro(!airdropShouldShowRecapIntro);
+    setLocalShouldShowTutorial(!airdropHasVisited);
   }, []);
 
   useEffect(() => {
@@ -618,7 +627,6 @@ const Airdrop = () => {
           {currentModal === null && (
             <>
               <div>
-              <img src="/images/epoch2AirdropBanner.png" />
                 <Heading
                   as="h3"
                   style={{ marginBottom: "0.5em" }}
@@ -922,6 +930,19 @@ const Airdrop = () => {
       ) : (
         <>
           <div className="pad-main">
+            <div style={{ paddingTop: "10px", paddingBottom: "20px" }}>
+              <img
+                style={{
+                  maxWidth: "1110px",
+                  borderRadius: "10px",
+                  borderStyle: "solid",
+                  borderWidth: "1px",
+                  borderColor: "white"
+                }}
+                width="100%"
+                src="/images/epoch2AirdropBanner.png"
+              />
+            </div>
             <div
               style={{
                 display: "grid",
@@ -1366,7 +1387,7 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
+  const { user, rank, referralCount, fusdcEarned, arbEarned, bottles } = data;
 
   return {
     className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
@@ -1432,7 +1453,7 @@ const airdropRankRow = (
               </Text>
             </td>
           );
-        case "STAKING MULTIPLIER":
+        case "FUSDC EARNED":
           return (
             <td>
               <Text
@@ -1445,7 +1466,24 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toSignificantDecimals(liquidityMultiplier, 1)}x
+                {toSignificantDecimals(fusdcEarned, 0)}x
+              </Text>
+            </td>
+          );
+        case "ARB EARNED":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                        color: "black",
+                      }
+                    : {}
+                }
+              >
+                {toSignificantDecimals(arbEarned, 0)}x
               </Text>
             </td>
           );
@@ -1565,7 +1603,8 @@ const Leaderboard = ({
           { name: "RANK" },
           { name: "USER" },
           { name: "BOTTLES" },
-          { name: "STAKING MULTIPLIER" },
+          { name: "$fUSDC EARNED" },
+          { name: "$ARB EARNED" },
           { name: "REFERRALS" },
         ]}
         pagination={{

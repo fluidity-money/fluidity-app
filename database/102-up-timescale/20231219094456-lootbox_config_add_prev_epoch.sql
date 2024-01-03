@@ -16,15 +16,19 @@ CREATE TABLE lootbox_config (
 
 	-- epoch_identifier to use as the identifier for the epoch with
 	-- the enum
-	epoch_identifier lootbox_epoch NOT NULL,
+	epoch_identifier lootbox_epoch NOT NULL UNIQUE,
 
 	-- ethereum_application that should the current focus of the lootbox
-	-- mini leaderboard competitions
+	-- mini leaderboard competitions (and should be displayed in the UI
+	-- with the right query)
 	ethereum_application ethereum_application NOT NULL DEFAULT 'none'
 );
 
-INSERT INTO lootbox_config VALUES (
-	FALSE,
+INSERT INTO lootbox_config (
+	program_begin,
+	program_end,
+	epoch_identifier
+) VALUES (
 	'2023-05-01 12:00:00+02',
 	'2023-06-28 12:00:00+02',
 	'epoch_1'

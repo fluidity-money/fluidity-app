@@ -11,13 +11,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	logging "github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 )
 
 const (
@@ -81,7 +82,6 @@ func main() {
 	}
 
 	ethereum.Logs(func(log ethereum.Log) {
-
 		var (
 			logTopics        = log.Topics
 			transactionHash  = log.TxHash

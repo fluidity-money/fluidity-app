@@ -1,7 +1,10 @@
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryByUserAllTime = gql`
-  query AirdropLeaderboard($address: String!) {
+  query AirdropLeaderboard(
+    $epoch: String!
+    $address: String!
+  ) {
     airdrop_leaderboard(where: { address: { _eq: $address } }, limit: 1) {
       user: address
       rank
@@ -14,8 +17,13 @@ const queryByUserAllTime = gql`
 `;
 
 const queryAllTime = gql`
-  query AirdropLeaderboard {
-    airdrop_leaderboard(limit: 16, order_by: { total_lootboxes: desc }) {
+  query AirdropLeaderboard(
+    $epoch: String!
+  ) {
+    airdrop_leaderboard(
+      args: { epoch_: $epoch }
+      limit: 16, order_by: { total_lootboxes: desc }
+    ) {
       user: address
       rank
       referralCount: referral_count
@@ -27,8 +35,12 @@ const queryAllTime = gql`
 `;
 
 const queryByUser24Hours = gql`
-  query AirdropLeaderboard($address: String!) {
+  query AirdropLeaderboard(
+    $epoch: String!
+    $address: String!
+  ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
+      args: { epoch_: $epoch, application_: $application }
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -45,6 +57,7 @@ const queryByUser24Hours = gql`
 const query24Hours = gql`
   query AirdropLeaderboard {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
+      args: { epoch_: $epoch }
       limit: 16
       order_by: { total_lootboxes: desc }
     ) {
@@ -60,11 +73,12 @@ const query24Hours = gql`
 
 const query24HoursByUserByApplication = gql`
   query AirdropLeaderboardApplication(
+    $epoch: String!
     $application: ethereum_application!
     $address: String!
   ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
-      args: { application_: $application }
+      args: { epoch_: $epoch, application_: $application }
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -79,9 +93,12 @@ const query24HoursByUserByApplication = gql`
 `;
 
 const query24HoursByApplication = gql`
-  query AirdropLeaderboardByApplication($application: ethereum_application!) {
+  query AirdropLeaderboardByApplication(
+    $epoch: String!
+    $application: ethereum_application!
+  ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
-      args: { application_: $application }
+      args: { epoch_: $epoch, application_: $application }
       limit: 16
       order_by: { total_lootboxes: desc }
     ) {
