@@ -89,17 +89,23 @@ func main() {
 
 		programFound, hasBegun, currentEpoch, _ := database.GetLootboxConfig()
 
-		if !programFound {
+		// check that the lootbox is enabled, and that it's also
+		// running. logs separately if either fail. if the
+		// campaign has begun but isn't in progress, then we
+		// should die! that means that something was processed
+		// weirdly.
+
+		switch false {
+		case programFound:
 			log.App(func(k *log.Log) {
-				k.Message = "No lootbox epoch found, ignoring a request to track winners!"
+				k.Message = "No lootbox epoch found, skipping a request to track a winner!"
 			})
 
 			return
-		}
 
-		if hasBegun {
+		case hasBegun:
 			log.Fatal(func(k *log.Log) {
-				k.Message = "Lootbox epoch that was found is not running! Ignoring a request to track!"
+				k.Message = "Lootbox epoch that was found is not running! Terminating on request to track a winner!"
 			})
 
 			return

@@ -34,17 +34,20 @@ func main() {
 	)
 
 	logs.Logs(func(l logs.Log) {
-		// if a user encounters this, how did they get here?
-
 		programFound, hasBegun, currentEpoch, _ := lootboxes.GetLootboxConfig()
 
-		if !programFound {
+		// if the lootbox isn't enabled, or it isn't running, then we alarm
+		// because someone has called the contract to manually reward themselves
+		// whem presumably the UI isn't enabled. treated separately for logging
+		// reasons.
+
+		switch false {
+		case programFound:
 			log.Fatal(func(k *log.Log) {
 				k.Message = "No lootbox program found, but a log was received for a testnet redemption!"
 			})
-		}
 
-		if hasBegun {
+		case hasBegun:
 			log.Fatal(func(k *log.Log) {
 				k.Message = "Lootbox program that was found is not running!"
 			})

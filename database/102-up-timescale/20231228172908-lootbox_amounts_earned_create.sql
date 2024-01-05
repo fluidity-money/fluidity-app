@@ -7,6 +7,9 @@
 -- the recipient field is converted from the solana winner owner
 -- address implicitly in the go code currently!
 
+-- we're okay with DECIMAL as we can store the floating amount with a
+-- level of loss since this is user-facing.
+
 CREATE TABLE lootbox_amounts_rewarded (
 	network network_blockchain NOT NULL,
 	epoch lootbox_epoch NOT NULL,

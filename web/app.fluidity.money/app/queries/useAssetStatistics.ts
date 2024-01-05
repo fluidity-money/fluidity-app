@@ -86,7 +86,7 @@ const useAssetStatistics = (
     },
   };
 
-  const fluGqlEndpoint = "https://fluidity.hasura.app/v1/graphql";
+  const fluGqlEndpoint = process.env.FLU_HASURA_URL!;
 
   return jsonPost<AssetStatisticsRequest, AssetStatisticsResponse>(
     fluGqlEndpoint,

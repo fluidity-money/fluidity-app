@@ -42,7 +42,7 @@ const useLootboxesByTxHash = (filterHashes: string[]) => {
   };
 
   return jsonPost<LootboxesByTxHashBody, LootboxesRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    process.env.FLU_HASURA_URL!,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

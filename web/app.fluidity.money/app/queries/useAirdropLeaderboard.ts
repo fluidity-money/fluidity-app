@@ -2,7 +2,7 @@ import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryByUserAllTime = gql`
   query AirdropLeaderboard(
-    $epoch: String!
+    $epoch: lootbox_epoch!
     $address: String!
   ) {
     airdrop_leaderboard(where: { address: { _eq: $address } }, limit: 1) {
@@ -18,7 +18,7 @@ const queryByUserAllTime = gql`
 
 const queryAllTime = gql`
   query AirdropLeaderboard(
-    $epoch: String!
+    $epoch: lootbox_epoch!
   ) {
     airdrop_leaderboard(
       args: { epoch_: $epoch }
@@ -38,7 +38,7 @@ const queryAllTime = gql`
 
 const queryByUser24Hours = gql`
   query AirdropLeaderboard(
-    $epoch: String!
+    $epoch: lootbox_epoch!
     $address: String!
   ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
@@ -79,7 +79,7 @@ const query24Hours = gql`
 
 const query24HoursByUserByApplication = gql`
   query AirdropLeaderboardApplication(
-    $epoch: String!
+    $epoch: lootbox_epoch!
     $application: ethereum_application!
     $address: String!
   ) {
@@ -102,7 +102,7 @@ const query24HoursByUserByApplication = gql`
 
 const query24HoursByApplication = gql`
   query AirdropLeaderboardByApplication(
-    $epoch: String!
+    $epoch: lootbox_epoch!
     $application: ethereum_application!
   ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
@@ -163,10 +163,11 @@ type AirdropLeaderboardResponse = {
   errors?: unknown;
 };
 
-export const useAirdropLeaderboardByUserAllTime = (address: string) => {
+export const useAirdropLeaderboardByUserAllTime = (epoch: string, address: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
+    epoch,
     address,
   };
   const body = {
@@ -181,10 +182,12 @@ export const useAirdropLeaderboardByUserAllTime = (address: string) => {
   );
 };
 
-export const useAirdropLeaderboardAllTime = () => {
+export const useAirdropLeaderboardAllTime = (epoch: string) => {
   const { url, headers } = fetchInternalEndpoint();
+  const variables = { epoch };
   const body = {
     query: queryAllTime,
+    variables,
   };
 
   return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
@@ -194,11 +197,12 @@ export const useAirdropLeaderboardAllTime = () => {
   );
 };
 
-export const useAirdropLeaderboardByUser24Hours = (address: string) => {
+export const useAirdropLeaderboardByUser24Hours = (epoch: string, address: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
     address,
+    epoch
   };
   const body = {
     query: queryByUser24Hours,
@@ -212,9 +216,11 @@ export const useAirdropLeaderboardByUser24Hours = (address: string) => {
   );
 };
 
-export const useAirdropLeaderboard24Hours = () => {
+export const useAirdropLeaderboard24Hours = (epoch: string) => {
   const { url, headers } = fetchInternalEndpoint();
+  const variables = { epoch };
   const body = {
+    variables,
     query: query24Hours,
   };
 
@@ -226,12 +232,14 @@ export const useAirdropLeaderboard24Hours = () => {
 };
 
 export const useAirdropLeaderboardByUserByApplication24Hours = (
+  epoch: string,
   address: string,
   application: string
 ) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
+    epoch,
     address,
     application,
   };
@@ -247,10 +255,12 @@ export const useAirdropLeaderboardByUserByApplication24Hours = (
 };
 
 export const useAirdropLeaderboardByApplication24Hours = (
+  epoch: string,
   application: string
 ) => {
   const { url, headers } = fetchInternalEndpoint();
   const variables = {
+    epoch,
     application,
   };
   const body = {

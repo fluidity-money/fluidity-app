@@ -26,7 +26,7 @@ export const useTokens = async () => {
   const {
     data: { asset },
   } = await jsonPost(
-    "https://fluidity.hasura.app/v1/graphql",
+    process.env.FLU_HASURA_URL!,
     { query: tokenQuery },
     process.env.FLU_HASURA_SECRET
       ? {

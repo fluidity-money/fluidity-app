@@ -41,7 +41,7 @@ const addReferral = (referrer: string, referee: string) => {
   };
 
   return jsonPost<AddReferralBody, AddReferralRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    process.env.FLU_HASURA_URL!,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

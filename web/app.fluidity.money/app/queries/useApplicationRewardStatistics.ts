@@ -41,7 +41,7 @@ const useApplicationRewardStatistics = async <T extends Chain>(
   network: T | string
 ) => {
   const variables = { network };
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
   const body = {
     variables,
     query: query,

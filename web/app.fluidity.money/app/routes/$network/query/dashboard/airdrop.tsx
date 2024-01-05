@@ -5,6 +5,7 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
 import { useAirdropStatsByAddress } from "~/queries/useAirdropStats";
 import { useStakingDataByAddress } from "~/queries/useStakingData";
+import { useLootboxConfig } from "~/queries";
 import { getWethUsdPrice } from "~/util/chainUtils/ethereum/transaction";
 import EACAggregatorProxyAbi from "~/util/chainUtils/ethereum/EACAggregatorProxy.json";
 import config from "~/webapp.config.server";
@@ -29,16 +30,18 @@ export type AirdropLoaderData = {
   bottleTiers: BottleTiers;
   bottlesCount: number;
   liquidityMultiplier: number;
-  stakes: Array<StakingEvent>;
   wethPrice: number;
   usdcPrice: number;
-  loaded: boolean;
   referralCode?: string;
+  programBegin: Date;
+  programEnd: Date;
+  epochDaysTotal: number;
+  epochDaysElapsed: number;
+  epochIdentifier: string;
+  ethereumApplication: string;
+  epochFound: boolean;
+  loaded: boolean;
 };
-
-const EPOCH_DAYS_TOTAL = 31;
-// temp: april 19th, 2023
-const EPOCH_START_DATE = new Date(2023, 3, 20);
 
 const MAINNET_ID = 0;
 
@@ -50,13 +53,54 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address_ = url.searchParams.get("address");
+  const epochIdentifier = url.searchParams.get("epoch");
 
   const address = address_?.toLowerCase();
 
-  if (!address || !network) throw new Error("Invalid Request");
+  if (!address || !network || !epochIdentifier) throw new Error("Invalid Request");
 
-  const daysElapsed =
-    dayDifference(new Date(), EPOCH_START_DATE) % EPOCH_DAYS_TOTAL;
+  const { data, errors } = await useLootboxConfig({
+    identifier: epochIdentifier!,
+    shouldFind: false
+  });
+
+  if (errors) {
+    captureException(errors, {
+      tags: {
+        section: "airdrop",
+      },
+    });
+
+    return new Error("Server could not fulfill request");
+  }
+
+  if (!data) {
+    // return defaults
+    return null;
+  }
+
+  const { lootboxConfig: configs } = data;
+
+  // if we didn't find anything, then we need to return the defaults
+
+  if (configs.length != 1) {
+    return null;
+  }
+
+  const {
+    programBegin: programBegin_,
+    programEnd: programEnd_,
+    ethereumApplication,
+    found: epochFound
+  } = configs[0];
+
+  const programBegin = new Date(programBegin_);
+  const programEnd = new Date(programEnd_);
+
+  const epochDaysTotal = Math.round((programEnd.valueOf() - programBegin.valueOf()) / (1000 * 60 * 60 * 24));
+
+  const epochDaysElapsed =
+    dayDifference(new Date(), programBegin) % epochDaysTotal;
 
   const infuraRpc = config.drivers[network][MAINNET_ID].rpc.http;
   const provider = new JsonRpcProvider(infuraRpc);
@@ -64,19 +108,18 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const eacAggregatorProxyAddr =
     config.contract.eac_aggregator_proxy[network as Chain];
 
+    console.log("aaaa");
+
   try {
     const [
       { data: airdropStatsData, errors: airdropStatsErrors },
-      { data: stakingData, errors: stakingErrors },
       wethPrice,
     ] = await Promise.all([
-      useAirdropStatsByAddress(address),
-      useStakingDataByAddress(address, daysElapsed),
+      useAirdropStatsByAddress(address, epochIdentifier),
       getWethUsdPrice(provider, eacAggregatorProxyAddr, EACAggregatorProxyAbi),
     ]);
 
     if (airdropStatsErrors || !airdropStatsData) throw airdropStatsErrors;
-    if (stakingErrors || !stakingData) throw stakingErrors;
 
     const {
       lootboxCounts: [bottleTiers_],
@@ -85,15 +128,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         aggregate: { count: referralsCount },
       },
     } = airdropStatsData;
-
-    const stakes = stakingData.stakes.map(
-      ({ multiplier, durationSecs, amount, ...stake }) => ({
-        ...stake,
-        amountUsd: amount / 1e6,
-        durationDays: durationSecs / 60 / 60 / 24,
-        multiplier: multiplier[0].result,
-      })
-    );
 
     const bottleTiers = bottleTiers_ || {
       [Rarity.Common]: 0,
@@ -111,10 +145,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         (sum: number, quantity: number) => sum + quantity,
         0
       ),
-      stakes,
       wethPrice,
       usdcPrice: 1,
       loaded: true,
+      programBegin,
+      programEnd,
+      epochDaysTotal,
+      epochDaysElapsed,
+      epochIdentifier,
+      epochFound,
+      ethereumApplication
     } satisfies AirdropLoaderData);
   } catch (err) {
     captureException(new Error(`Could not fetch airdrop data: ${err}`), {
@@ -122,6 +162,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         section: "network/index",
       },
     });
+    console.log("ccccc", err);
     return new Error("Server could not fulfill request");
   }
 };

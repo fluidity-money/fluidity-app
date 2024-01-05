@@ -82,7 +82,7 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
     },
   };
 
-  const fluGqlEndpoint = "https://fluidity.hasura.app/v1/graphql";
+  const fluGqlEndpoint = process.env.FLU_HASURA_URL!;
 
   return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
     fluGqlEndpoint,

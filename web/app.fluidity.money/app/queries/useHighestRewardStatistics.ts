@@ -76,7 +76,7 @@ const useHighestRewardStatisticsByNetwork = async (network: string) => {
   }
 
   const variables = { network };
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
   const body = {
     variables,
     query: queryByNetwork,
@@ -102,7 +102,7 @@ type HighestRewardAllBody = {
 };
 
 const useHighestRewardStatisticsAll = async () => {
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
   const body = {
     query: queryAll,
   };

@@ -65,7 +65,7 @@ const useActiveReferralCountByReferrerAddress = (address: string) => {
   };
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    process.env.FLU_HASURA_URL!,
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -86,7 +86,7 @@ const useActiveReferralCountByRefereeAddress = (address: string) => {
   };
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    process.env.FLU_HASURA_URL!,
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -107,7 +107,7 @@ const useInactiveReferralCountByRefereeAddress = (address: string) => {
   };
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    process.env.FLU_HASURA_URL!,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

@@ -262,6 +262,7 @@ export default function Home() {
         { name: "VALUE" },
         { name: "FLUID REWARDS", show: width >= 500 },
         { name: "$UTILITY REWARDS", show: width >= 500 },
+        { name: "BOTTLES EARNED", show: width >= 500 },
         { name: "ACCOUNT", show: width >= 375 },
         { name: "TIME", show: width >= 850, alignRight: true },
       ];
@@ -454,12 +455,29 @@ export default function Home() {
                 )}
               </td>
             );
+          case "BOTTLES EARNED":
+            return (
+              <td>{ bottlesEarned ? (
+                  <a
+                    className="table-address"
+                    href={`/${network}/dashboard/airdrop`}
+                  >
+                    <Text prominent={true}>
+                      {bottlesEarned}
+                    </Text>
+                  </a>
+                ) : (
+                  <Text>-</Text>
+                )
+              } </td>
+            )
           case "ACCOUNT":
             return (
               <td>
                 <a
                   className="table-address"
                   href={getAddressExplorerLink(chain, sender)}
+                  target="_blank"
                 >
                   <Text>
                     {sender === MintAddress

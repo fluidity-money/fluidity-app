@@ -49,7 +49,6 @@ import airdropStyle from "~/styles/dashboard/airdrop.css";
 import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
 import { ReferralCountLoaderData } from "../../query/referrals";
-import { LootboxConfig } from "../../query/lootboxConfig";
 import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
@@ -59,10 +58,9 @@ import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
+import { LootboxConfig } from "~/queries/useLootboxConfig";
 
-const EPOCH_DAYS_TOTAL = 38;
-// temp: may 22nd, 2023
-const EPOCH_START_DATE = new Date(2023, 4, 22);
+const EPOCH_CURRENT_IDENTIFIER = "epoch_1";
 
 const AIRDROP_MODALS = [
   "recap",
@@ -88,8 +86,6 @@ export const links = () => {
 export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
 
-  const epochDays = dayDifference(new Date(), EPOCH_START_DATE);
-
   // Staking Tokens
   const allowedTokenSymbols = new Set(["fUSDC", "USDC", "wETH"]);
   const { tokens } = config.config[network];
@@ -100,16 +96,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return json({
     tokens: allowedTokens,
-    epochDaysTotal: EPOCH_DAYS_TOTAL,
-    epochDays,
     network,
   } satisfies LoaderData);
 };
 
 type LoaderData = {
   tokens: Array<Token>;
-  epochDaysTotal: number;
-  epochDays: number;
   network: string;
 };
 
@@ -124,10 +116,16 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   },
   bottlesCount: 0,
   liquidityMultiplier: 0,
-  stakes: [],
   wethPrice: 0,
   usdcPrice: 0,
-  loaded: false,
+  programBegin: new Date("2023-05-01T12:00:00+02:00"),
+  programEnd: new Date("2023-06-28 T12:00:00+02:00"),
+  epochDaysTotal: 30,
+  epochDaysElapsed: 30,
+  epochIdentifier: "epoch_1",
+  ethereumApplication: "none",
+  epochFound: false,
+  loaded: false
 };
 
 const SAFE_DEFAULT_AIRDROP_LEADERBOARD: AirdropLeaderboardLoaderData = {
@@ -164,23 +162,8 @@ const GLOBAL_AIRDROP_BOTTLE_TIERS = {
   [Rarity.Legendary]: 5,
 };
 
-// defaults lifted from database/20231219094456-lootbox_config_add_prev_epoch.sql
-const LOOTBOX_CONFIG_DEFAULT: LootboxConfig = {
-  found: false,
-  programBegin: new Date("2023-05-01T12:00:00+02:00"),
-  programEnd: new Date("2023-06-28 T12:00:00+02:00"),
-  epochIdentifier: "epoch_1",
-  ethereumApplication: "none",
-  loaded: false
-};
-
 const Airdrop = () => {
-  const {
-    epochDaysTotal,
-    epochDays,
-    tokens: defaultTokens,
-    network,
-  } = useLoaderData<LoaderData>();
+  const { tokens: defaultTokens, network } = useLoaderData<LoaderData>();
 
   if (network !== "arbitrum") {
     return (
@@ -227,20 +210,26 @@ const Airdrop = () => {
     redeemTokens,
   } = useContext(FluidityFacadeContext);
 
-  const { data: lootboxConfig } = useCache<LootboxConfig>(
-    `/${network}/query/lootboxConfig`
-  );
+  const { width } = useViewport();
+
+  const navigate = useNavigate();
+
+  const mobileBreakpoint = 768;
+
+  const isMobile = width < mobileBreakpoint;
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
-    address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
+    address ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
   );
+
+  console.log("airdropData", airdropData);
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}${
-      leaderboardFilterIndex === 0 ? "&provider=kyber_classic" : ""
-    }`
+      leaderboardFilterIndex === 0 ? "&provider=${currentApplication}" : ""
+    }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
@@ -251,14 +240,6 @@ const Airdrop = () => {
     useCache<ReferralBottlesCountLoaderData>(
       address ? `/${network}/query/referralBottles?address=${address}` : ""
     );
-
-  const { width } = useViewport();
-
-  const navigate = useNavigate();
-
-  const mobileBreakpoint = 768;
-
-  const isMobile = width < mobileBreakpoint;
 
   const data = {
     airdrop: {
@@ -286,6 +267,13 @@ const Airdrop = () => {
       bottlesCount,
       wethPrice,
       usdcPrice,
+      programBegin,
+      programEnd,
+      epochDaysTotal,
+      epochDaysElapsed,
+      epochIdentifier,
+      ethereumApplication,
+      epochFound,
     },
     referrals: {
       numActiveReferreeReferrals,
@@ -325,11 +313,6 @@ const Airdrop = () => {
       depositDate: Date;
     }>
   >([]);
-
-  const fetchUserStakes = async (address: string) => {
-    const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
-    setStakes(stakingDeposits);
-  };
 
   const fetchUserTokenBalance = async () => {
     const userTokenBalance = await Promise.all(
@@ -407,8 +390,6 @@ const Airdrop = () => {
 
     fetchUserTokenBalance();
 
-    fetchUserStakes(address);
-
     fetchUserRedeemableTokens(address);
   }, [address]);
 
@@ -419,7 +400,6 @@ const Airdrop = () => {
     const res = await (await redeemTokens?.())?.confirmTx();
 
     fetchUserTokenBalance();
-    fetchUserStakes(address);
     fetchUserRedeemableTokens(address);
 
     return res;
@@ -684,7 +664,7 @@ const Airdrop = () => {
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
                 seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
-                epochDays={epochDays}
+                epochDays={epochDaysElapsed}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
                 network={network}
@@ -770,7 +750,6 @@ const Airdrop = () => {
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
                 stakeCallback={() => {
-                  fetchUserStakes(address ?? "");
                   fetchUserTokenBalance();
                 }}
               />
@@ -872,7 +851,6 @@ const Airdrop = () => {
           usdcPrice={usdcPrice}
           isMobile={isMobile}
           stakeCallback={() => {
-            fetchUserStakes(address ?? "");
             fetchUserTokenBalance();
           }}
         />
@@ -997,7 +975,7 @@ const Airdrop = () => {
                   seeBottlesDetails={() => setCurrentModal("bottles-details")}
                   seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                   epochMax={epochDaysTotal}
-                  epochDays={epochDays}
+                  epochDays={epochDaysElapsed}
                   activatedReferrals={numActiveReferrerReferrals}
                   totalBottles={bottlesCount}
                   network={network}
@@ -1453,7 +1431,7 @@ const airdropRankRow = (
               </Text>
             </td>
           );
-        case "FUSDC EARNED":
+        case "$fUSDC EARNED":
           return (
             <td>
               <Text
@@ -1466,11 +1444,11 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toSignificantDecimals(fusdcEarned, 0)}x
+                {fusdcEarned}
               </Text>
             </td>
           );
-        case "ARB EARNED":
+        case "$ARB EARNED":
           return (
             <td>
               <Text
@@ -1483,7 +1461,7 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toSignificantDecimals(arbEarned, 0)}x
+                {arbEarned}
               </Text>
             </td>
           );

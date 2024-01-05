@@ -11,6 +11,8 @@ type GqlEndpoint = {
 
 type GqlBackend = "hasura";
 
+const HasuraUrl = "http://localhost:8080/v1/graphql";
+
 export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {
     case "solana":
@@ -26,7 +28,7 @@ export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
   switch (networkGqlBackend(network)) {
     case "hasura":
       return {
-        url: "https://fluidity.hasura.app/v1/graphql",
+        url: HasuraUrl,
         headers: {
           "x-hasura-admin-secret": process.env.FLU_HASURA_SECRET ?? "",
         },
@@ -37,7 +39,7 @@ export const fetchGqlEndpoint = (network: string): GqlEndpoint | null => {
 };
 
 export const fetchInternalEndpoint = (): GqlEndpoint => ({
-  url: "https://fluidity.hasura.app/v1/graphql",
+  url: HasuraUrl,
   headers:
     typeof process.env.FLU_HASURA_SECRET === "string"
       ? {

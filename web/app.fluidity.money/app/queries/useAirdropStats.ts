@@ -3,12 +3,15 @@ import { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryAirdropStatsByAddress = gql`
-  query AirdropStats($address: String!, $now: timestamp!) {
-    lootboxCounts: lootbox_counts(where: { address: { _eq: $address } }) {
+  query AirdropStats($epoch: lootbox_epoch!, $address: String!, $now: timestamp!) {
+    lootboxCounts: lootbox_counts(
+      args: { epoch_: $epoch }
+      where: { address: { _eq: $address } }
+    ) {
       ${Rarity.Common}: tier1
       ${Rarity.Uncommon}: tier2
       ${Rarity.Rare}: tier3
-      ${Rarity.UltraRare}: tier4 
+      ${Rarity.UltraRare}: tier4
       ${Rarity.Legendary}: tier5
     }
     liquidityMultiplier: calculate_a_y(
@@ -26,11 +29,12 @@ const queryAirdropStatsByAddress = gql`
   }
 `;
 
-export const useAirdropStatsByAddress = async (address: string) => {
+export const useAirdropStatsByAddress = async (address: string, epoch: string) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
     address,
+    epoch,
     now: new Date().toISOString(),
   };
   const body = {

@@ -34,15 +34,18 @@ func main() {
 
 	programFound, hasBegun, currentEpoch, currentApplication := lootboxes.GetLootboxConfig()
 
-	if !programFound {
+	// if the lootbox isn't enabled, or it isn't running, then we skip. we
+	// treat the cases separately for logging reasons.
+
+	switch false {
+	case programFound:
 		log.App(func(k *log.Log) {
 			k.Message = "No lootbox epoch found! Skipping running."
 		})
 
 		return
-	}
 
-	if !hasBegun {
+	case hasBegun:
 		log.App(func(k *log.Log) {
 			k.Message = "Current lootbox epoch has not yet started! Skipping running."
 		})

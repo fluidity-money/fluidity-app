@@ -95,7 +95,7 @@ type UserYieldByAddressBody = {
 
 const useUserYieldAll = async (network: string) => {
   const variables = { network };
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
   const body = {
     variables,
     query: queryAll,
@@ -114,7 +114,7 @@ const useUserYieldAll = async (network: string) => {
 
 const useUserYieldByAddress = async (network: string, address: string) => {
   const variables = { network, address };
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
   const body = {
     variables,
     query: queryByAddress,

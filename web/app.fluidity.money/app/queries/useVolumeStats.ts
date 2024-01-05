@@ -120,7 +120,7 @@ const useVolumeStatsByAddress = async (network: string, address: string) => {
     query: queryVolumeByAddress,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
 
   return await jsonPost<VolumeStatsByAddressBody, VolumeStatsResponse>(
     url,
@@ -143,7 +143,7 @@ const useVolumeStats = async (network: string) => {
     query: queryVolume,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = process.env.FLU_HASURA_URL!;
 
   return await jsonPost<VolumeStatsBody, VolumeStatsResponse>(
     url,
