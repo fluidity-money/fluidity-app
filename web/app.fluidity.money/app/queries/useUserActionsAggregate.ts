@@ -3,139 +3,125 @@ import { fetchGqlEndpoint, gql, jsonPost, Queryable } from "~/util";
 
 export type AggregatedTransaction = Omit<
   Transaction,
-  "utilityTokens" | "swapType" | "logo" | "provider"
+  "utilityTokens" | "swapType" | "logo" | "provider" | "timestamp"
 > & {
   utility_amount: number;
   utility_name: string | null;
   swap_in: boolean;
   type: "send" | "swap";
+  timestamp: string;
 };
 
 const queryByAddress: Queryable = {
   arbitrum: gql`
-    query userActionsAggregateByAddress(
-      $offset: Int = 0
-      $limit: Int = 12
-      $address: String!
-      $token: String
-    ) {
-      arbitrum: user_transactions_aggregate(
-        args: {
-          network_: "arbitrum"
-          filter_address: $address
-          limit_: $limit
-          offset_: $offset
-          token: $token
-        }
-      ) {
-        value: amount
-        receiver: recipient_address
-        rewardHash: reward_hash
-        sender: sender_address
-        hash: transaction_hash
-        utility_amount
-        utility_name
-        winner: winning_address
-        reward: winning_amount
-        application
-        currency
-        timestamp: time
-        swap_in
-        type
+    query AggregatedUserTransactionsByAddress($offset: Int = 0, $limit: Int = 12, $address: String!, $token: String) {
+    arbitrum: aggregated_user_transactions(
+      order_by: {time: desc}, 
+      limit: $limit, 
+      offset: $offset, 
+      where: {
+        network: {_eq: "arbitrum"}
+        token_short_name: {_eq: $token},
+        type: {_is_null: false}, 
+        _or: [
+          {sender_address: {_eq: $address}},
+          {recipient_address: {_eq: $address}}
+        ]
       }
+    ) {
+      value: amount
+      application
+      network
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
+      swap_in
+      timestamp: time
+      currency: token_short_name
+      hash: transaction_hash
+      type
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
     }
+  }
   `,
   solana: gql`
-    query userActionsAggregateByAddress(
-      $offset: Int = 0
-      $limit: Int = 12
-      $address: String!
-    ) {
-      solana: user_transactions_aggregate(
-        args: {
-          network_: "solana"
-          filter_address: $address
-          limit_: $limit
-          offset_: $offset
-        }
-      ) {
-        value: amount
-        receiver: recipient_address
-        rewardHash: reward_hash
-        sender: sender_address
-        hash: transaction_hash
-        utility_amount
-        utility_name
-        winner: winning_address
-        reward: winning_amount
-        application
-        currency
-        timestamp: time
-        swap_in
-        type
+    query AggregatedUserTransactionsByAddress($offset: Int = 0, $limit: Int = 12, $address: String!) {
+    solana: aggregated_user_transactions(
+      order_by: {time: desc}, 
+      limit: $limit, 
+      offset: $offset, 
+      where: {
+        network: {_eq: "solana"}
+        type: {_is_null: false}, 
+        _or: [
+          {sender_address: {_eq: $address}},
+          {recipient_address: {_eq: $address}}
+        ]
       }
+    ) {
+      value: amount
+      application
+      network
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
+      swap_in
+      timestamp: time
+      currency: token_short_name
+      hash: transaction_hash
+      type
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
     }
+  }
   `,
 };
 
 const queryAll: Queryable = {
   arbitrum: gql`
-    query userActionsAggregateAll(
-      $offset: Int = 0
-      $limit: Int = 12
-      $token: String
-    ) {
-      arbitrum: user_transactions_aggregate(
-        args: {
-          network_: "arbitrum"
-          limit_: $limit
-          offset_: $offset
-          token: $token
-        }
-      ) {
-        value: amount
-        receiver: recipient_address
-        rewardHash: reward_hash
-        sender: sender_address
-        hash: transaction_hash
-        utility_amount
-        utility_name
-        winner: winning_address
-        reward: winning_amount
-        application
-        currency
-        timestamp: time
-        swap_in
-        type
-      }
-    }
-  `,
-  solana: gql`
-  query userActionsAggregateAll(
-      $offset: Int = 0,
-      $limit: Int = 12,
-  ) {
-    solana: user_transactions_aggregate(
-      args: {
-        network_: "solana",
-        limit_: $limit,
-        offset_: $offset
-      }
-    ) {
+  query aggregatedUserTransactionsAll ($offset: Int = 0, $limit: Int = 12) {
+    arbitrum: aggregated_user_transactions(order_by: {time: desc}, limit: $limit, offset: $offset, where: {network: {_eq: "arbitrum"}, type: {_is_null: false}}) {
       value: amount
+      application
+      network
       receiver: recipient_address
       rewardHash: reward_hash
       sender: sender_address
+      swap_in
+      timestamp: time
+      currency: token_short_name
       hash: transaction_hash
+      type
       utility_amount
       utility_name
       winner: winning_address
       reward: winning_amount
+    }
+  }
+  `,
+  solana: gql`
+  query aggregatedUserTransactionsAll ($offset: Int = 0, $limit: Int = 12) {
+    solana: aggregated_user_transactions(order_by: {time: desc}, limit: $limit, offset: $offset, where: {network: {_eq: "solana"}, type: {_is_null: false}}) {
+      value: amount
       application
-      currency
-      timestamp: time
+      network
+      receiver: recipient_address
+      rewardHash: reward_hash
+      sender: sender_address
       swap_in
+      timestamp: time
+      currency: token_short_name
+      hash: transaction_hash
       type
+      utility_amount
+      utility_name
+      winner: winning_address
+      reward: winning_amount
     }
   }
   `,

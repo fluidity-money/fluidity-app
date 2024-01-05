@@ -59,7 +59,6 @@ const queryWinnersAllSolana = gql`
 `;
 
 const queryWinnersAll: { [network in Chain]: string } = {
-  ethereum: queryWinnersAll_,
   arbitrum: queryWinnersAll_,
   polygon_zk: queryWinnersAll_,
   solana: queryWinnersAllSolana,
@@ -118,7 +117,6 @@ const queryWinnersByAddressSolana = gql`
 `;
 
 const queryWinnersByAddress: { [network in Chain]: string } = {
-  ethereum: queryWinnersByAddress_,
   arbitrum: queryWinnersByAddress_,
   polygon_zk: queryWinnersByAddress_,
   solana: queryWinnersByAddressSolana,

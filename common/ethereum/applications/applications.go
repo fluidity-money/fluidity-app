@@ -22,10 +22,10 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/sushiswap"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/trader-joe"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/trader-joe"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	libApps "github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -275,6 +275,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			transfer,
 			client,
 			fluidTokenContract,
+			tokenDecimals,
 		)
 		emission.TraderJoe += util.MaybeRatToFloat(feeData.Fee)
 
@@ -379,7 +380,8 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool (switched to the LPs)
 		return transaction.From, logAddress, nil
 	case ApplicationTraderJoe:
-		// Return 0 cause stubbed (FIXME)
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
 		return transaction.From, logAddress, nil
 
 	default:

@@ -76,7 +76,7 @@ function ErrorBoundary(error: Error) {
 }
 
 const SAFE_DEFAULT_HOME: HomeLoaderData = {
-  network: "ethereum",
+  network: "arbitrum",
   loaded: false,
   graph: {
     day: [],

@@ -8,6 +8,9 @@ use crate::{
 
 use {
     borsh::{BorshDeserialize, BorshSerialize},
+    mpl_token_metadata::instructions::{
+        CreateMetadataAccountV3CpiBuilder, UpdateMetadataAccountV2CpiBuilder,
+    },
     solana_program::{
         account_info::{next_account_info, AccountInfo},
         entrypoint::ProgramResult,
@@ -28,7 +31,7 @@ use {
 const INIT_AUTHORITY: Pubkey = pubkey!("G4KJFLNtyooMjWK4hKYmbeCe4wRkewbvyQX5hjGVidfj");
 
 // the public key of the solend program
-pub const SOLEND: Pubkey = pubkey!("ALend7Ketfx5bxh6ghsCDXAoDrhvEmsXT3cynB6aPLgx");
+pub const SOLEND: Pubkey = pubkey!("So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo");
 
 // struct defining fludity data account
 #[derive(BorshDeserialize, BorshSerialize, Debug, PartialEq, Clone)]
@@ -1050,53 +1053,83 @@ fn create_token_metadata(
         panic!("not authorised to use this");
     }
 
-    let pda_pubkey = pda_account.key;
+    let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
-    let payer_pubkey = payer_account.key;
+    let modified_symbol = format!("f{symbol}");
 
-    let fluidity_token_mint_pubkey = fluidity_token_mint_account.key;
+    CreateMetadataAccountV3CpiBuilder::new(&metaplex_program_account)
+        .metadata(&metaplex_metadata_account)
+        .mint(&fluidity_token_mint_account)
+        .mint_authority(&pda_account)
+        .payer(&payer_account)
+        .update_authority(&payer_account, false)
+        .system_program(&system_account)
+        .rent(Some(rent_info))
+        .is_mutable(true)
+        .data(mpl_token_metadata::types::DataV2 {
+            name: name,
+            symbol: modified_symbol,
+            uri: uri,
+            seller_fee_basis_points: seller_fee,
+            creators: None,
+            collection: None,
+            uses: None,
+        })
+        .invoke_signed(&[&[&pda_seed.as_bytes(), &[bump]]])
+}
 
-    let metaplex_metadata_program_pubkey = metaplex_program_account.key;
+fn update_token_metadata(
+    accounts: &[AccountInfo],
+    program_id: &Pubkey,
+    seed: String,
+    bump: u8,
+    name: String,
+    symbol: String,
+    uri: String,
+    seller_fee: u16,
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
 
-    let (metadata_program_pda_address, _) = Pubkey::find_program_address(
-        &[
-            "metadata".as_bytes(),
-            metaplex_metadata_program_pubkey.as_ref(),
-            fluidity_token_mint_pubkey.as_ref(),
-        ],
-        metaplex_metadata_program_pubkey,
-    );
+    let fluidity_data_account = next_account_info(accounts_iter)?;
+    let base_token_mint_account = next_account_info(accounts_iter)?;
+    let fluidity_token_mint_account = next_account_info(accounts_iter)?;
+    let pda_account = next_account_info(accounts_iter)?;
+    let payer_account = next_account_info(accounts_iter)?;
+    let metaplex_program_account = next_account_info(accounts_iter)?;
+    let metaplex_metadata_account = next_account_info(accounts_iter)?;
+
+    let (_, fluidity_data, payer) = validate_authority(
+        &seed,
+        program_id,
+        fluidity_data_account,       // fluidity data account
+        base_token_mint_account,     // token mint
+        fluidity_token_mint_account, // fluidity mint
+        pda_account,                 // pda account
+        payer_account,               // payer
+    )?;
+
+    if *payer.key != fluidity_data.operator {
+        panic!("not authorised to use this");
+    }
 
     let pda_seed = format!("FLU:{}_OBLIGATION", seed);
 
-    invoke_signed(
-        &metaplex_token_metadata::instruction::create_metadata_accounts(
-            *metaplex_metadata_program_pubkey, // program id
-            metadata_program_pda_address,      // metadata account
-            *fluidity_token_mint_pubkey,       // mint
-            *pda_pubkey,                       // mint authority
-            *payer_pubkey,                     // payer
-            *pda_pubkey,                       // update authority
-            name,                              // name
-            symbol,                            // symbol
-            uri,                               // uri
-            None,                              // creators
-            seller_fee,                        // seller fee basis points
-            true,                              // update authority is signer
-            true,                              // is mutable
-        ),
-        &[
-            metaplex_metadata_account.clone(),   // metaplex pda
-            fluidity_token_mint_account.clone(), // mint of token asset
-            pda_account.clone(),                 // mint authority
-            payer_account.clone(),               // signer payer
-            pda_account.clone(),                 // update authority info
-            system_account.clone(),              // system program
-            rent_info.clone(),                   // rent sysvar
-            metaplex_program_account.clone(),    // metaplex program
-        ],
-        &[&[&pda_seed.as_bytes(), &[bump]]],
-    )
+    let modified_symbol = format!("f{symbol}");
+
+    UpdateMetadataAccountV2CpiBuilder::new(&metaplex_program_account)
+        .metadata(&metaplex_metadata_account)
+        .update_authority(&payer_account)
+        .is_mutable(true)
+        .data(mpl_token_metadata::types::DataV2 {
+            name: name,
+            symbol: modified_symbol,
+            uri: uri,
+            seller_fee_basis_points: seller_fee,
+            creators: None,
+            collection: None,
+            uses: None,
+        })
+        .invoke_signed(&[&[&pda_seed.as_bytes(), &[bump]]])
 }
 
 // initialise a data account derived from PDA that stores valid token pairs
@@ -1235,10 +1268,12 @@ pub fn process(program_id: &Pubkey, accounts: &[AccountInfo], input: &[u8]) -> P
 
         FluidityInstruction::Emergency(seed) => emergency_mode(accounts, program_id, seed),
 
-        FluidityInstruction::CreateTokenMetadata(seed, bump, name, symbol, uri, seller_fee) => {
-            create_token_metadata(
-                accounts, program_id, seed, bump, name, symbol, uri, seller_fee,
-            )
+        FluidityInstruction::CreateTokenMetadata(seed, bump, name, symbol, uri) => {
+            create_token_metadata(accounts, program_id, seed, bump, name, symbol, uri, 0)
+        }
+
+        FluidityInstruction::UpdateTokenMetadata(seed, bump, name, symbol, uri) => {
+            update_token_metadata(accounts, program_id, seed, bump, name, symbol, uri, 0)
         }
     }
 }

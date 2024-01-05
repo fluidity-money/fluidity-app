@@ -8,12 +8,16 @@ import {
   Connection,
 } from "@solana/web3.js";
 import { getATAAddressSync } from "@saberhq/token-utils";
-import { useWallet, useConnection, WalletContextState } from "@solana/wallet-adapter-react";
+import {
+  useWallet,
+  useConnection,
+  WalletContextState,
+} from "@solana/wallet-adapter-react";
 import BN from "bn.js";
 import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
 import { TransactionResponse } from "../instructions";
-import {jsonPost} from "~/util/api/rpc";
+import { jsonPost } from "~/util/api/rpc";
 
 export const getCheckedSolContext = () => {
   const wallet = useWallet();
@@ -36,7 +40,11 @@ export const getCheckedSolContext = () => {
   };
 };
 
-const getBalance = async (connection: Connection, publicKey: PublicKey, token: Token): Promise<BN> => {
+const getBalance = async (
+  connection: Connection,
+  publicKey: PublicKey,
+  token: Token
+): Promise<BN> => {
   try {
     //balance of SOL represented as a TokenAmount
     if (token.name === "Solana") {
@@ -55,8 +63,7 @@ const getBalance = async (connection: Connection, publicKey: PublicKey, token: T
   } catch (e) {
     // if account wasn't found, the user has no ATA and therefore none of the given token
     const trimmedError = (e as Error).message.split(":")?.[2].trim();
-    if (trimmedError === "could not find account")
-      return new BN(0);
+    if (trimmedError === "could not find account") return new BN(0);
 
     throw new Error(
       `Could not fetch balance: Could not fetch token ${token.address}: ${e}`
@@ -95,7 +102,10 @@ export type UserAmountMintedRes = {
   amount_minted: number;
 };
 
-const amountMinted = async (publicKey: PublicKey, tokenName: string): Promise<BN> => {
+const amountMinted = async (
+  publicKey: PublicKey,
+  tokenName: string
+): Promise<BN> => {
   const url = "https://api.solana.fluidity.money/user-amount-minted";
   const body = {
     address: publicKey.toString(),

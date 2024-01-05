@@ -140,14 +140,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           reward,
           rewardHash,
           // convert to JS timestamp
-          timestamp: timestamp * 1000,
+          timestamp: new Date(timestamp + "Z").getTime(),
           value,
-          currency,
+          currency: 'f' + currency,
           application,
           swapType,
           provider: application ?? "Fluidity",
           logo: tokenLogoMap[currency] || defaultLogo,
-          utilityTokens: utilityName
+          utilityTokens: utilityName && utility_amount > 0
             ? { [utilityName]: utility_amount }
             : undefined,
         };

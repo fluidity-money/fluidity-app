@@ -19,11 +19,15 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	typesWorker "github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
+
+// ZeroInt that's used for empty comparisons, shouldn't mutate
+var ZeroInt = misc.BigIntFromInt64(0)
 
 func hexToPrivateKey(hex string) *ecdsa.PrivateKey {
 	privateKey, err := ethCrypto.HexToECDSA(hex)
@@ -186,4 +190,20 @@ func concatenatePastTransfers(blocks []uint64, transactionCounts []int) string {
 	}
 
 	return buf.String()
+}
+
+func isDecoratedTransferZeroVolume(transfer typesWorker.EthereumDecoratedTransfer) bool {
+	decorator := transfer.Decorator
+
+	if decorator == nil {
+		return true
+	}
+
+	volume := decorator.Volume
+
+	if volume == nil {
+		return true
+	}
+
+	return volume.Cmp(&ZeroInt.Int) == 0
 }

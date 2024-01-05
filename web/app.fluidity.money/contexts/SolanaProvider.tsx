@@ -33,13 +33,11 @@ const SolanaFacade = ({
   tokens: Token[];
 }) => {
   const wallet = useWallet();
-  const { connected, publicKey, disconnect, connecting, signMessage } =
-    wallet;
-  const {connection} = useConnection();
+  const { connected, publicKey, disconnect, connecting, signMessage } = wallet;
+  const { connection } = useConnection();
 
   const swap = async (amount: string, tokenAddr: string) => {
-    if (!publicKey)
-      return;
+    if (!publicKey) return;
 
     const fromToken = tokens.find((t) => t.address === tokenAddr);
 
@@ -60,7 +58,15 @@ const SolanaFacade = ({
         `Could not initiate Swap: Could not find dest pair token from ${tokenAddr} in solana`
       );
 
-    return internalSwap(wallet, connection, connected, publicKey, amount, fromToken, toToken);
+    return internalSwap(
+      wallet,
+      connection,
+      connected,
+      publicKey,
+      amount,
+      fromToken,
+      toToken
+    );
   };
 
   const balance = async (tokenAddr: string): Promise<BN> => {
@@ -71,8 +77,7 @@ const SolanaFacade = ({
         `Could not fetch balance: Could not find matching token ${tokenAddr} in solana`
       );
 
-    if (!publicKey)
-      return new BN(0);
+    if (!publicKey) return new BN(0);
 
     return getBalance(connection, publicKey, token);
   };
@@ -84,8 +89,7 @@ const SolanaFacade = ({
   };
 
   const getFluidTokens = async (): Promise<string[]> => {
-    if (!publicKey)
-      return [];
+    if (!publicKey) return [];
 
     const fluidTokens = tokens.filter((t) => t.isFluidOf);
 
@@ -95,12 +99,11 @@ const SolanaFacade = ({
 
     return fluidTokensPosBalance.map((t) => t.address);
   };
-  
-  const amountMinted = async(tokenName: string): Promise<BN | undefined> => {
-    if (!publicKey)
-      return;
-    return amountMintedInternal(publicKey, tokenName)
-  }
+
+  const amountMinted = async (tokenName: string): Promise<BN | undefined> => {
+    if (!publicKey) return;
+    return amountMintedInternal(publicKey, tokenName);
+  };
 
   return (
     <FluidityFacadeContext.Provider
@@ -114,7 +117,8 @@ const SolanaFacade = ({
         tokens: getFluidTokens,
         amountMinted,
         rawAddress: publicKey?.toString() ?? "",
-        address: publicKey?.toString().toLowerCase() ?? "",
+        // solana addresses are case sensitive
+        address: publicKey?.toString(),
         signBuffer,
       }}
     >

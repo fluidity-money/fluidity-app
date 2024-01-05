@@ -50,6 +50,7 @@ before(async function () {
     fwEthAccountSigner,
     veGovSigner,
     registrySigner,
+    blacklistedSigner
   ] = await hre.ethers.getSigners();
 
   const councilAddress = await operatorCouncilSigner.getAddress();
@@ -146,6 +147,7 @@ before(async function () {
       emergencyCouncil: tokenCouncilSigner,
       externalOperator: tokenOperatorSigner,
       externalOracle: externalOracleSigner,
+      blacklistedSigner: blacklistedSigner,
     },
 
     operator: {

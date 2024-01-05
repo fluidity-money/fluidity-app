@@ -13,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
@@ -25,23 +26,112 @@ const (
 	TablePendingWinners = "ethereum_pending_winners"
 )
 
-func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails map[applications.UtilityName]token_details.TokenDetails) {
-	timescaleClient := timescale.Client()
+type PendingWinner = winners.PendingWinner
 
+// CreatePendingWinners to aggregate a list of pending winners in the given announcement
+func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails map[applications.UtilityName]token_details.TokenDetails) []PendingWinner {
 	var (
-		fluidTokenDetails = winner.TokenDetails
+		pendingWinners []PendingWinner
 
+		fluidTokenDetails   = winner.TokenDetails
 		fluidTokenShortName = fluidTokenDetails.TokenShortName
-		network_            = winner.Network
-		hash                = winner.TransactionHash
-		blockNumber         = winner.BlockNumber
-		senderAddress       = winner.FromAddress
-		senderWinAmount     = winner.FromWinAmount
-		recipientAddress    = winner.ToAddress
-		recipientWinAmount  = winner.ToWinAmount
-		logIndex            = winner.LogIndex
-		application         = winner.Application
+
+		network_           = winner.Network
+		hash               = winner.TransactionHash
+		blockNumber        = winner.BlockNumber
+		senderAddress      = winner.FromAddress
+		senderWinAmount    = winner.FromWinAmount
+		recipientAddress   = winner.ToAddress
+		recipientWinAmount = winner.ToWinAmount
+		logIndex           = winner.LogIndex
+		application        = winner.Application
 	)
+
+	for utility, payout := range senderWinAmount {
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+		)
+
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		}
+
+		// create the sender
+		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
+			TokenDetails:    details,
+			TransactionHash: hash,
+			SenderAddress:   senderAddress,
+			NativeWinAmount: nativeWinAmount,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     blockNumber,
+			Network:         network_,
+			RewardType:      "send",
+			LogIndex:        logIndex,
+			Application:     application,
+		})
+	}
+
+	for utility, payout := range recipientWinAmount {
+		// insert the recipient's winnings
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+		)
+
+		details, exists := tokenDetails[utility]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		}
+
+		// create the recipient
+		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
+			TokenDetails:    details,
+			TransactionHash: hash,
+			SenderAddress:   recipientAddress,
+			NativeWinAmount: nativeWinAmount,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     blockNumber,
+			Network:         network_,
+			RewardType:      "receive",
+			LogIndex:        logIndex,
+			Application:     application,
+		})
+	}
+	return pendingWinners
+}
+
+func InsertPendingWinners(pendingWinners []PendingWinner) {
+	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
@@ -79,35 +169,28 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 		TablePendingWinners,
 	)
 
-	for utility, payout := range senderWinAmount {
+	for _, pendingWinner := range pendingWinners {
+
 		var (
-			nativeWinAmount = payout.Native
-			usdWinAmount    = payout.Usd
+			fluidTokenDetails = pendingWinner.TokenDetails
+
+			category            = pendingWinner.Category
+			hash                = pendingWinner.TransactionHash
+			senderAddress       = pendingWinner.SenderAddress
+			nativeWinAmount     = pendingWinner.NativeWinAmount
+			usdWinAmount        = pendingWinner.UsdWinAmount
+			utility             = pendingWinner.Utility
+			blockNumber         = pendingWinner.BlockNumber
+			network_            = pendingWinner.Network
+			rewardType          = pendingWinner.RewardType
+			logIndex            = pendingWinner.LogIndex
+			application         = pendingWinner.Application
 		)
-
-		details, exists := tokenDetails[utility]
-
-		if !exists {
-			if utility != applications.UtilityFluid {
-				log.Debug(func(k *log.Log) {
-					k.Format(
-						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
-						utility,
-						tokenDetails,
-						fluidTokenDetails,
-					)
-				})
-			}
-
-			details = fluidTokenDetails
-		}
-
-		// insert the sender's winnings
 		_, err := timescaleClient.Exec(
 			statementText,
-			fluidTokenShortName,
-			details.TokenShortName,
-			details.TokenDecimals,
+			category,
+			fluidTokenDetails.TokenShortName,
+			fluidTokenDetails.TokenDecimals,
 			hash,
 			senderAddress,
 			nativeWinAmount,
@@ -115,9 +198,9 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			utility,
 			blockNumber,
 			network_,
-			"send",
+			rewardType,
 			logIndex,
-			application,
+			application.String(),
 		)
 
 		if err != nil {
@@ -126,62 +209,7 @@ func InsertPendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 
 				k.Format(
 					"Failed to insert pending winner %+v!",
-					winner,
-				)
-
-				k.Payload = err
-			})
-		}
-	}
-
-	for utility, payout := range recipientWinAmount {
-		// insert the recipient's winnings
-		var (
-			nativeWinAmount = payout.Native
-			usdWinAmount    = payout.Usd
-		)
-
-		details, exists := tokenDetails[utility]
-
-		if !exists {
-			if utility != applications.UtilityFluid {
-				log.Debug(func(k *log.Log) {
-					k.Format(
-						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
-						utility,
-						tokenDetails,
-						fluidTokenDetails,
-					)
-				})
-			}
-
-			details = fluidTokenDetails
-		}
-
-		_, err := timescaleClient.Exec(
-			statementText,
-			fluidTokenShortName,
-			details.TokenShortName,
-			details.TokenDecimals,
-			hash,
-			recipientAddress,
-			nativeWinAmount,
-			usdWinAmount,
-			utility,
-			blockNumber,
-			network_,
-			"receive",
-			logIndex,
-			application,
-		)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Context = Context
-
-				k.Format(
-					"Failed to insert pending winner %+v!",
-					winner,
+					pendingWinner,
 				)
 
 				k.Payload = err
@@ -213,15 +241,18 @@ func UnpaidWinningsForCategory(network_ network.BlockchainNetwork, token token_d
 		token.TokenShortName,
 	)
 
-	var total float64
+	var total sql.NullFloat64
 
 	err := row.Scan(&total)
 
-	if err == sql.ErrNoRows {
+	switch err {
+	case sql.ErrNoRows:
 		return 0
-	}
 
-	if err != nil {
+	case nil:
+		// nothing
+
+	default:
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 
@@ -234,7 +265,11 @@ func UnpaidWinningsForCategory(network_ network.BlockchainNetwork, token token_d
 		})
 	}
 
-	return total
+	if total.Valid {
+		return total.Float64
+	} else {
+		return 0
+	}
 }
 
 func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token token_details.TokenDetails) []worker.EthereumReward {

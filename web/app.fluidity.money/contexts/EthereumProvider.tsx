@@ -23,7 +23,6 @@ import { EIP1193 } from "@web3-react/eip1193";
 import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
-  getUserDegenScore,
   getUserStakingDeposits,
   getTokenStakingRatio,
   makeStakingDeposit,
@@ -42,7 +41,6 @@ import {
   getNetworkFromChainId,
 } from "~/util/chainUtils/chains";
 
-import DegenScoreAbi from "~/util/chainUtils/ethereum/DegenScoreBeacon.json";
 import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
 import { useToolTip } from "~/components";
@@ -334,28 +332,6 @@ const EthereumFacade = ({
   };
 
   /**
-   * getDegenScore returns the "DegenScore" of a user.
-   *
-   * Source: https://degenscore.com.
-   */
-  const getDegenScore = async (address: string): Promise<number> => {
-    const signer = provider?.getSigner();
-
-    if (!signer) {
-      return 0;
-    }
-
-    const degenScoreAddr = "0x0521FA0bf785AE9759C7cB3CBE7512EbF20Fbdaa";
-
-    return getUserDegenScore(
-      signer.provider,
-      address,
-      degenScoreAddr,
-      DegenScoreAbi
-    );
-  };
-
-  /**
    * getStakingDeposits returns total tokens staked by a user.
    */
   const getStakingDeposits = async (
@@ -615,7 +591,6 @@ const EthereumFacade = ({
         rawAddress: account ?? "",
         address: account?.toLowerCase() ?? "",
         manualReward,
-        getDegenScore,
         addToken,
         connected: isActive,
         connecting: isActivating,

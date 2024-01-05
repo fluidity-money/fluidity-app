@@ -63,6 +63,7 @@ export type FluiditySigners = {
     emergencyCouncil: ethers.Signer,
     externalOperator: ethers.Signer,
     externalOracle: ethers.Signer,
+    blacklistedSigner: ethers.Signer,
   },
 
   operator: {

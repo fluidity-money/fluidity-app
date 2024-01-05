@@ -13,47 +13,6 @@ import {
 import { MintAddress } from "~/types/MintAddress";
 
 const queryByAddress: Queryable = {
-  ethereum: gql`
-    query getTransactionsByAddress(
-      $tokens: [String!]
-      $address: String!
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      ethereum {
-        transfers(
-          currency: { in: $tokens }
-          any: [{ sender: { is: $address } }, { receiver: { is: $address } }]
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByAddress(
       $address: String!
@@ -164,42 +123,6 @@ const queryByAddress: Queryable = {
 };
 
 const queryByTxHash: Queryable = {
-  ethereum: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $filterHashes: [String!] = []
-      $tokens: [String!] = []
-      $limit: Int = 12
-    ) {
-      ethereum {
-        transfers(
-          options: { desc: "block.timestamp.unixtime", limit: $limit }
-          txHash: { in: $transactions }
-          currency: { in: $tokens }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -228,7 +151,6 @@ const queryByTxHash: Queryable = {
       }
     }
   `,
-
   solana: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -289,45 +211,6 @@ const queryByTxHash: Queryable = {
 };
 
 const queryAll: Queryable = {
-  ethereum: gql`
-    query getTransactions(
-      $tokens: [String!]
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      ethereum {
-        transfers(
-          currency: { in: $tokens }
-          options: {
-            desc: "block.timestamp.unixtime"
-            limit: $limit
-            offset: $offset
-          }
-        ) {
-          sender {
-            address
-          }
-          receiver {
-            address
-          }
-          amount
-          currency {
-            symbol
-          }
-          transaction(txHash: { notIn: $filterHashes }) {
-            hash
-          }
-          block {
-            timestamp {
-              unixtime
-            }
-          }
-        }
-      }
-    }
-  `,
-
   arbitrum: gql`
     query getTransactions(
       $offset: Int = 0
@@ -468,26 +351,6 @@ export type UserTransaction = {
   application: string;
 };
 
-type BitqueryUserTransaction = {
-  sender: {
-    address: string;
-  };
-  receiver: { address: string };
-  block: { timestamp: { unixtime: number } };
-  transaction: { hash: string };
-  amount: number;
-  currency: { symbol: string };
-};
-
-type BitqueryUserTransactionRes = {
-  data?: {
-    [network: string]: {
-      transfers: BitqueryUserTransaction[];
-    };
-  };
-  errors?: unknown;
-};
-
 type HasuraUserTransaction = {
   sender_address: string;
   recipient_address: string;
@@ -541,21 +404,13 @@ const useUserTransactionsByAddress = async (
       errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
     };
 
-  const result =
-    networkGqlBackend(network) === "hasura"
-      ? parseHasuraUserTransactions(
-          await jsonPost<
-            UserTransactionsByAddressBody,
-            HasuraUserTransactionRes
-          >(url, body, headers)
-        )
-      : parseBitqueryUserTransactions(
-          await jsonPost<
-            UserTransactionsByAddressBody,
-            BitqueryUserTransactionRes
-          >(url, body, headers),
-          network
-        );
+  const result = parseHasuraUserTransactions(
+    await jsonPost<UserTransactionsByAddressBody, HasuraUserTransactionRes>(
+      url,
+      body,
+      headers
+    )
+  );
 
   return result;
 };
@@ -586,21 +441,13 @@ const useUserTransactionsByTxHash = async (
       errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
     };
 
-  const result =
-    networkGqlBackend(network) === "hasura"
-      ? parseHasuraUserTransactions(
-          await jsonPost<
-            UserTransactionsByTxHashBody,
-            HasuraUserTransactionRes
-          >(url, body, headers)
-        )
-      : parseBitqueryUserTransactions(
-          await jsonPost<
-            UserTransactionsByTxHashBody,
-            BitqueryUserTransactionRes
-          >(url, body, headers),
-          network
-        );
+  const result = parseHasuraUserTransactions(
+    await jsonPost<UserTransactionsByTxHashBody, HasuraUserTransactionRes>(
+      url,
+      body,
+      headers
+    )
+  );
 
   return result;
 };
@@ -638,23 +485,13 @@ const useUserTransactionsAll = async (
       errors: `Failed to fetch GraphQL URL and headers for network ${network}`,
     };
 
-  const result =
-    networkGqlBackend(network) === "hasura"
-      ? parseHasuraUserTransactions(
-          await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
-            url,
-            body,
-            headers
-          )
-        )
-      : parseBitqueryUserTransactions(
-          await jsonPost<UserTransactionsAllBody, BitqueryUserTransactionRes>(
-            url,
-            body,
-            headers
-          ),
-          network
-        );
+  const result = parseHasuraUserTransactions(
+    await jsonPost<UserTransactionsAllBody, HasuraUserTransactionRes>(
+      url,
+      body,
+      headers
+    )
+  );
 
   return result;
 };
@@ -707,28 +544,6 @@ const parseHasuraUserTransactions = (
           application: transfer.application,
         };
       }),
-    },
-  };
-};
-
-const parseBitqueryUserTransactions = (
-  result: BitqueryUserTransactionRes,
-  network: string
-): UserTransactionsRes => {
-  if (!result.data || result.errors)
-    return {
-      errors: result.errors,
-    };
-
-  const transfers: BitqueryUserTransaction[] =
-    result.data[network]?.transfers ?? [];
-
-  return {
-    data: {
-      transfers: transfers.map((transfer) => ({
-        ...transfer,
-        application: "none",
-      })),
     },
   };
 };

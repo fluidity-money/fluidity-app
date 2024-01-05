@@ -6,6 +6,7 @@ package solana
 
 import (
 	"github.com/fluidity-money/fluidity-app/common/solana/applications"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/types/solana"
 )
 
@@ -13,6 +14,14 @@ func ClassifyApplication(transaction solana.TransactionResult, apps map[string]a
 	accounts := transaction.Transaction.Message.AccountKeys
 
 	foundApps := make(map[applications.Application]struct{}, 0)
+
+	log.Debug(func(k *log.Log) {
+		k.Format(
+			`About to search apps "%v" for account keys "%v"`,
+			apps,
+			accounts,
+		)
+	})
 
 	for _, account := range accounts {
 		app, exists := apps[account]

@@ -97,7 +97,7 @@ const main = async () => {
     to: impersonatedAddr
   });
 
-  const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking);
+  const [ fusdcRedeemed, usdcRedeemed, wethRedeemed ] = await redeem(staking, 0, 0, 0);
 
   console.log(
     `redeemed for addr ${impersonatedAddr}, fusdc redeemed ${fusdcRedeemed}, usdc redeemed ${usdcRedeemed}, weth redeemed ${wethRedeemed}`

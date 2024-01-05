@@ -104,6 +104,12 @@ func main() {
 
 			fluidityOwners := make([]string, len(accountKeys))
 
+			log.Debugf(
+				"Token balances for transaction signature %v: %v",
+				signature,
+				accountKeys,
+			)
+
 			for _, bal := range tokenBalances {
 				if bal.Mint == fluidityTokenMint {
 					fluidityOwners[bal.AccountIndex] = bal.Owner
@@ -135,6 +141,7 @@ func main() {
 						accountKeys,
 						fluidityOwners,
 						tokenDetails,
+						applications,
 					)
 
 				case SplProgramId:

@@ -124,15 +124,26 @@ func main() {
 		for i, transaction := range block.Transactions {
 			apps := solanaLib.ClassifyApplication(transaction, applications)
 
+			signature := transaction.Transaction.Signatures[0]
+
 			if len(apps) == 0 {
 				log.Debugf(
-					"Transaction position %d block %v didn't have an application classified!",
+					"Transaction signature %v position %d block %v didn't have an application classified!",
+					signature,
 					i,
 					slot.Slot,
 				)
 
 				continue
 			}
+
+			log.Debugf(
+				`Transaction signature %v position %d block %v had "%v" applications classified!`,
+				signature,
+				i,
+				slot.Slot,
+				apps,
+			)
 
 			transactionFeeUsd := new(big.Rat).SetUint64(transaction.Meta.Fee)
 
@@ -143,7 +154,7 @@ func main() {
 			transactionFeeUsd.Mul(transactionFeeUsd, solanaPrice)
 
 			parsed := worker.SolanaApplicationTransaction{
-				Signature:    transaction.Transaction.Signatures[0],
+				Signature:    signature,
 				Result:       transaction,
 				AdjustedFee:  transactionFeeUsd,
 				Applications: apps,

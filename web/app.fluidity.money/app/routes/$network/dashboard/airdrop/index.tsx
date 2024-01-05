@@ -177,8 +177,7 @@ const Airdrop = () => {
           Airdrop
         </Heading>
         <Text>
-          The Fluidity Airdrop is currently only available on Arbitrum. Please
-          switch to the Arbitrum network to participate.
+          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more rewards!
         </Text>
       </div>
     );

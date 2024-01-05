@@ -76,7 +76,8 @@ export type EthereumApplication =
   | "dodo_v2"
   | "curve"
   | "multichain"
-  | "xy_finance";
+  | "xy_finance"
+  | "trader_joe";
 
 export type SolanaApplication =
   | "spl"
@@ -86,7 +87,8 @@ export type SolanaApplication =
   | "aldrinv1"
   | "aldrinv2"
   | "lifinity"
-  | "mercurial";
+  | "mercurial"
+  | "meteora";
 
 export type Application = EthereumApplication | SolanaApplication;
 

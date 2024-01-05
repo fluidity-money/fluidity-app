@@ -2,9 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import serverConfig, { colors } from "~/webapp.config.server";
 import { redirect } from "@remix-run/node";
-import { useEffect, useMemo, useState, useContext } from "react";
-import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
+import { useEffect, useMemo, useState } from "react";
 import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";
@@ -62,13 +60,12 @@ const Provider = ({
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    ethereum: EthereumProvider(walletconnectId, tokens, network),
     solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
     polygon_zk: EthereumProvider(walletconnectId, tokens, network),
   };
 
-  const [validNetwork, setValidNetwork] = useState(network ?? "ethereum");
+  const [validNetwork, setValidNetwork] = useState(network ?? "arbitrum");
 
   useEffect(() => {
     if (network && Object.keys(providers).includes(network)) {
@@ -82,32 +79,6 @@ const Provider = ({
   );
 
   return <ProviderComponent>{children}</ProviderComponent>;
-};
-
-const ProviderOutlet = () => {
-  const { connected, address, getDegenScore } = useContext(
-    FluidityFacadeContext
-  );
-
-  const { client } = useContext(SplitContext);
-
-  useEffect(() => {
-    if (!(address && connected)) return;
-
-    (async () => {
-      if (!getDegenScore) return;
-
-      const degenScore = await getDegenScore(address);
-
-      client?.track("connected-user-degen-score", address, degenScore);
-    })();
-  }, [address, client]);
-
-  return (
-    <>
-      <Outlet />
-    </>
-  );
 };
 
 type LoaderData = {
@@ -151,7 +122,7 @@ export default function Network() {
         tokens={tokens}
         colorMap={colors}
       />
-      <ProviderOutlet />
+      <Outlet />
     </Provider>
   );
 }

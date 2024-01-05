@@ -27,5 +27,7 @@ export type Provider =
   | "Solana"
   | "Solend"
   | "Sushiswap"
+  | "Trader Joe"
   | "Uniswap"
-  | "XY Finance";
+  | "XY Finance"
+  | "Meteora";

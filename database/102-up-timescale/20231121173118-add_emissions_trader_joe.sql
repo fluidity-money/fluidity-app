@@ -5,4 +5,4 @@ ALTER TABLE worker_emissions
 
 -- migrate:down
 
-ALTER TABLE worker_emissions trader_joe_fee;
+ALTER TABLE worker_emissions DROP COLUMN trader_joe_fee;

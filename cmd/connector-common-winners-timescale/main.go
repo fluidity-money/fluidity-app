@@ -5,10 +5,17 @@
 package main
 
 import (
+	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/solana"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 )
 
 func main() {
-	queue.WinnersAll(database.InsertWinner)
+	go queue.WinnersEthereum(database.InsertWinner)
+
+	queue.WinnersSolana(func(winner queue.Winner) {
+		winningSignature := solana.GetIntermediateWinner(winner.TransactionHash)
+		winner.SendTransactionHash = winningSignature
+		database.InsertWinner(winner)
+	})
 }

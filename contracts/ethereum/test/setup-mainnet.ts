@@ -44,6 +44,7 @@ export let bindings: typeof commonBindings & {
     oracleBoundOperator: ethers.Contract,
     externalOperator: ethers.Contract,
     emergencyCouncil: ethers.Contract,
+    blacklistedSpender: ethers.Contract
   },
   fei: {
     base: ethers.Contract,
@@ -168,6 +169,7 @@ before(async function () {
       fluidAccount2: contracts.usdt.deployedToken.connect(signers.userAccount2),
       externalOperator: contracts.usdt.deployedToken.connect(signers.token.externalOperator),
       emergencyCouncil: contracts.usdt.deployedToken.connect(signers.token.emergencyCouncil),
+      blacklistedSpender: contracts.usdt.deployedToken.connect(signers.token.blacklistedSigner),
       oracleBoundOperator: contracts.operator.connect(signers.token.externalOracle),
     },
     fei: {

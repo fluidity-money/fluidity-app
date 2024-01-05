@@ -18,4 +18,6 @@ func init() {
 	if priceFeedAbi, err = ethAbi.JSON(priceFeedReader); err != nil {
 		panic(err)
 	}
+
+	go startDecimalsServer()
 }

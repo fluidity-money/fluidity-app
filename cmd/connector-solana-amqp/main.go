@@ -142,7 +142,7 @@ func main() {
 			// choose the lowest block of any token
 			shouldBeLatestBlock := startingBlock == 0 || startingBlock > lastBlock
 
-			if shouldBeLatestBlock  {
+			if shouldBeLatestBlock {
 				startingBlock = lastBlock
 			}
 		}
@@ -188,7 +188,7 @@ func main() {
 
 // processSlot to write a block to the queue if it hasn't been already
 func processSlot(redisKey string, slot uint64) {
-	// if redisKey is set, caller is a websocket listener 
+	// if redisKey is set, caller is a websocket listener
 	if redisKey != "" {
 		redis.WriteLastBlock(redisKey, slot)
 	}

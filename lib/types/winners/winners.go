@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -51,4 +52,21 @@ type BlockedWinner struct {
 	WinningAmount           misc.BigInt                `json:"winning_amount"`
 	BatchFirstBlock         misc.BigInt                `json:"first_block"`
 	BatchLastBlock          misc.BigInt                `json:"last_block"`
+}
+
+// PendingWinner is a winner that has been spooled but not sent
+type PendingWinner struct {
+	// Category is the TokenShortName of the corresponding token (e.g. USDC)
+	Category        string                     `json:"category"`
+	TokenDetails    token_details.TokenDetails `json:"token_details"`
+	TransactionHash ethereum.Hash              `json:"transaction_hash"`
+	SenderAddress   ethereum.Address           `json:"sender_address"`
+	NativeWinAmount misc.BigInt                `json:"native_win_amount"`
+	UsdWinAmount    float64                    `json:"usd_win_amount"`
+	Utility         applications.UtilityName   `json:"utility"`
+	BlockNumber     *misc.BigInt               `json:"block_number"`
+	Network         network.BlockchainNetwork  `json:"network"`
+	RewardType      RewardType                 `json:"reward_type"`
+	LogIndex        *misc.BigInt               `json:"log_index"`
+	Application     applications.Application   `json:"application"`
 }
