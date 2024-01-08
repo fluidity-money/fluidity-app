@@ -233,12 +233,12 @@ const Airdrop = () => {
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
-    address ? `/${network}/query/referrals?address=${address}` : ""
+    address ? `/${network}/query/referrals?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
   );
 
   const { data: referralLootboxData } =
     useCache<ReferralBottlesCountLoaderData>(
-      address ? `/${network}/query/referralBottles?address=${address}` : ""
+      address ? `/${network}/query/referralBottles?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
     );
 
   const data = {
@@ -522,14 +522,14 @@ const Airdrop = () => {
         >
           Airdrop Dashboard
         </TabButton>
-        {/* <TabButton
+        <TabButton
           size="small"
           onClick={() => setCurrentModal("tutorial")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "tutorial"}
         >
           Airdrop Tutorial
-        </TabButton> */}
+        </TabButton>
         <TabButton
           size="small"
           onClick={async () => {
@@ -552,7 +552,7 @@ const Airdrop = () => {
         >
           Leaderboard
         </TabButton>
-        {/* <TabButton
+        <TabButton
           size="small"
           onClick={() => setCurrentModal("referrals")}
           groupId="airdrop"
@@ -562,22 +562,21 @@ const Airdrop = () => {
         </TabButton>
         <TabButton
           size="small"
-          onClick={() => setCurrentModal("stake")}
-          groupId="airdrop"
-          isSelected={isMobile && currentModal === "stake"}
-          disabled={true}
-        >
-          Stake
-        </TabButton>
-        <TabButton
-          size="small"
           onClick={() => setCurrentModal("testnet-rewards")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "testnet-rewards"}
           disabled={true}
         >
           Testnet Rewards
-        </TabButton> */}
+        </TabButton>
+        <TabButton
+          size="small"
+          groupId="airdrop"
+        >
+          <a href="https://dune.com/neogeo/fluidity-airdrop-v2" target="_blank">
+            Dune
+          </a>
+        </TabButton>
       </div>
     );
   };

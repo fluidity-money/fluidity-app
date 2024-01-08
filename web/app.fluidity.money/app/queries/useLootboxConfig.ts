@@ -16,7 +16,7 @@ const queryGetConfigCurrentProgram = gql`
 `;
 
 const queryGetConfigSpecific = gql`
-  query getLootboxConfig($identifier: String!) {
+  query getLootboxConfig($identifier: lootbox_epoch!) {
     lootboxConfig: lootbox_config(
       where: { epoch_identifier: { _eq: $identifier }}
       limit: 1

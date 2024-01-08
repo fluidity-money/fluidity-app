@@ -923,4 +923,8 @@
   aspect-ratio: 1/1;
 }
 
+#tutorial, #staking-stats, #bottles-details, #testnet-rewards {
+  position: fixed;
+}
+
 /*# sourceMappingURL=airdrop.css.map */

@@ -65,6 +65,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   });
 
   if (errors) {
+    console.log("errors", errors);
     captureException(errors, {
       tags: {
         section: "airdrop",
@@ -107,8 +108,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const eacAggregatorProxyAddr =
     config.contract.eac_aggregator_proxy[network as Chain];
-
-    console.log("aaaa");
 
   try {
     const [
