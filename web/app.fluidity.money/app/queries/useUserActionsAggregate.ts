@@ -17,7 +17,7 @@ export type AggregatedTransaction = Omit<
 const queryByAddress: Queryable = {
   arbitrum: gql`
     query AggregatedUserTransactionsByAddress($offset: Int = 0, $limit: Int = 12, $address: String!, $token: String) {
-    arbitrum: aggregated_user_transactions_lootboxes(
+    arbitrum: aggregated_user_transactions_lootbottles(
       order_by: {time: desc},
       limit: $limit,
       offset: $offset,
@@ -53,7 +53,7 @@ const queryByAddress: Queryable = {
   `,
   solana: gql`
     query AggregatedUserTransactionsByAddress($offset: Int = 0, $limit: Int = 12, $address: String!) {
-    solana: aggregated_user_transactions_lootboxes(
+    solana: aggregated_user_transactions_lootbottles(
       order_by: {time: desc},
       limit: $limit,
       offset: $offset,
@@ -91,7 +91,7 @@ const queryByAddress: Queryable = {
 const queryAll: Queryable = {
   arbitrum: gql`
   query aggregatedUserTransactionsAll ($offset: Int = 0, $limit: Int = 12) {
-    arbitrum: aggregated_user_transactions_lootboxes(order_by: {time: desc}, limit: $limit, offset: $offset, where: {network: {_eq: "arbitrum"}, type: {_is_null: false}}) {
+    arbitrum: aggregated_user_transactions_lootbottles(order_by: {time: desc}, limit: $limit, offset: $offset, where: {network: {_eq: "arbitrum"}, type: {_is_null: false}}) {
       value: amount
       application
       network
@@ -114,7 +114,7 @@ const queryAll: Queryable = {
   `,
   solana: gql`
   query aggregatedUserTransactionsAll ($offset: Int = 0, $limit: Int = 12) {
-    solana: aggregated_user_transactions_lootboxes(order_by: {time: desc}, limit: $limit, offset: $offset, where: {network: {_eq: "solana"}, type: {_is_null: false}}) {
+    solana: aggregated_user_transactions_lootbottles(order_by: {time: desc}, limit: $limit, offset: $offset, where: {network: {_eq: "solana"}, type: {_is_null: false}}) {
       value: amount
       application
       network

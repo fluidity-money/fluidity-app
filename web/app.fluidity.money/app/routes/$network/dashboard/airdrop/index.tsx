@@ -221,8 +221,6 @@ const Airdrop = () => {
     address ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
   );
 
-  console.log("airdropData", airdropData);
-
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"

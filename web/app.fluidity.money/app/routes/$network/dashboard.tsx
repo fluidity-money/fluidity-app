@@ -461,38 +461,36 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      {false && (
-        <CardModal
-          id="referral-modal"
-          visible={referralModalVisibility}
-          closeModal={() => setReferralModalVisibility(false)}
-          cardPositionStyle={{
-            position: "absolute",
-            top: "1em",
-            right: isTablet ? "20px" : "60px",
-            width: 500,
+      <CardModal
+        id="referral-modal"
+        visible={referralModalVisibility}
+        closeModal={() => setReferralModalVisibility(false)}
+        cardPositionStyle={{
+          position: "absolute",
+          top: "1em",
+          right: isTablet ? "20px" : "60px",
+          width: 500,
+        }}
+        color="holo"
+        style={{ padding: 0, width: "100%" }}
+      >
+        <ReferralModal
+          connected={!!connected}
+          network={network}
+          connectWallet={() => {
+            setReferralModalVisibility(false);
+            setWalletModalVisibility(true);
           }}
-          color="holo"
-          style={{ padding: 0, width: "100%" }}
-        >
-          <ReferralModal
-            connected={!!connected}
-            network={network}
-            connectWallet={() => {
-              setReferralModalVisibility(false);
-              setWalletModalVisibility(true);
-            }}
-            referrerClaimed={numActiveReferrerReferrals}
-            refereeClaimed={numActiveReferreeReferrals}
-            refereeUnclaimed={numInactiveReferreeReferrals}
-            progress={inactiveReferrals[0]?.progress || 0}
-            progressReq={10}
-            referralCode={referralCode}
-            loaded={referralCountLoaded}
-            closeModal={() => setReferralModalVisibility(false)}
-          />
-        </CardModal>
-      )}
+          referrerClaimed={numActiveReferrerReferrals}
+          refereeClaimed={numActiveReferreeReferrals}
+          refereeUnclaimed={numInactiveReferreeReferrals}
+          progress={inactiveReferrals[0]?.progress || 0}
+          progressReq={10}
+          referralCode={referralCode}
+          loaded={referralCountLoaded}
+          closeModal={() => setReferralModalVisibility(false)}
+        />
+      </CardModal>
 
       {/* Accept Referral Modal */}
       <CardModal
