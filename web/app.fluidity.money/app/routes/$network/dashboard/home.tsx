@@ -21,6 +21,7 @@ import {
   TabButton,
   toDecimalPlaces,
   ProviderIcon,
+  LootBottle,
   TokenIcon,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
@@ -376,6 +377,8 @@ export default function Home() {
       logo,
       utilityTokens,
       application,
+      rewardTier,
+      lootboxCount
     } = data;
 
     const appProviderName = getProviderDisplayName(application);
@@ -457,14 +460,19 @@ export default function Home() {
             );
           case "BOTTLES EARNED":
             return (
-              <td>{ bottlesEarned ? (
+              <td>{ lootboxCount ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
                     <Text prominent={true}>
-                      {bottlesEarned}
+                      {lootboxCount}
                     </Text>
+                    <LootBottle
+                      size="lg"
+                      rarity={rewardTier}
+                      quantity={quantity}
+                    />
                   </a>
                 ) : (
                   <Text>-</Text>

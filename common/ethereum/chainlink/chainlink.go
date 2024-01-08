@@ -9,10 +9,15 @@ import (
 	"math/big"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 )
+
+// Context to use for logging
+const Context = "CHAINLINK"
 
 const chainlinkPriceFeedAbiString = `[
 	{
@@ -65,52 +70,27 @@ const chainlinkPriceFeedAbiString = `[
 
 var priceFeedAbi ethAbi.ABI
 
-var decimalsCache = make(map[ethCommon.Address]*big.Rat)
-
-func getFeedDecimals(client *ethclient.Client, priceFeedAddress ethCommon.Address) (*big.Rat, error) {
-	decimals, exists := decimalsCache[priceFeedAddress]
-
-	if exists {
-		return decimals, nil
-	}
-
-	decimalsRes, err := ethereum.StaticCall(
-		client,
-		priceFeedAddress,
-		priceFeedAbi,
-		"decimals",
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	decimals_, err := ethereum.CoerceBoundContractResultsToUint8(decimalsRes)
-
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Failed to read decimals result! %w",
-			err,
-		)
-	}
-
-	ten := big.NewRat(10, 1)
-
-	decimals = ethereum.BigPow(ten, int(decimals_))
-	decimalsCache[priceFeedAddress] = decimals
-
-	return decimals, nil
-}
-
+// GetPrice using a Chainlink feed, caching the results in an internal
+// server to make it thread safe
 func GetPrice(client *ethclient.Client, priceFeedAddress ethCommon.Address) (*big.Rat, error) {
-	decimals, err := getFeedDecimals(client, priceFeedAddress)
+	log.Debug(func(k *log.Log) {
+		k.Context = Context
 
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Failed to get feed decimals! %w",
-			err,
+		k.Format(
+			"Using the Chainlink decimals cache to look up decimals for price feed %v",
+			priceFeedAddress,
 		)
+	})
+
+	resp := make(chan *big.Rat)
+
+	decimalsServer <- request{
+		client:           client,
+		priceFeedAddress: priceFeedAddress,
+		resp:             resp,
 	}
+
+	decimals := <-resp
 
 	priceRes, err := ethereum.StaticCall(
 		client,

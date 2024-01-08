@@ -5,6 +5,7 @@
 package user_actions
 
 import (
+	"math"
 	"math/big"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
 const (
@@ -83,7 +85,119 @@ type (
 		UserActions          []UserAction `json:"user_actions"`
 		SecondsSinceLastSlot uint64       `json:"seconds_since_last_slot"`
 	}
+
+	// unique on tx hash, aggregates all log indexes
+	// stored literally as it should be returned, so amount is rounded etc
+	AggregatedUserTransaction struct {
+		TokenShortName string `json:"token_short_name"`
+
+		Network network.BlockchainNetwork `json:"network"`
+
+		Time time.Time `json:"time"`
+
+		TransactionHash string `json:"transaction_hash"`
+
+		// SenderAddress is the owner of the ATA that sent this transaction on Solana
+		// and the normal sender address on other networks
+		SenderAddress string `json:"sender_address"`
+
+		// RecipientAddress is the owner of the ATA that received this transaction on Solana
+		// and the normal sender address on other networks
+		RecipientAddress string `json:"recipient_address"`
+
+		// scaled to usd
+		Amount float64 `json:"amount"`
+
+		Application string `json:"application"`
+
+		WinningAddress string `json:"winning_address"`
+
+		WinningAmount float64 `json:"winning_amount"`
+
+		RewardHash string `json:"reward_hash"`
+
+		// Type of the user action, currently either a swap or a send
+		Type string `json:"type"`
+
+		// SwapIn or swap out from a Fluid Asset. If true, then that would indicate
+		// that the transfer went from USDT to fUSDT for example.
+		SwapIn bool `json:"swap_in"`
+
+		// scaled to usd
+		UtilityAmount float64 `json:"utility_amount"`
+
+		UtilityName applications.UtilityName `json:"utility_name"`
+	}
 )
+
+// AggregatedTransactionFromUserAction to create a partially aggregated transaction from a user action
+func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTransaction {
+	var (	
+		senderAddress    string
+		recipientAddress string
+	)
+
+	// replace ATAs with their owners
+	if userAction.Network == network.NetworkSolana {
+		senderAddress = userAction.SolanaSenderOwnerAddress
+		recipientAddress = userAction.SolanaRecipientOwnerAddress
+	} else {
+		senderAddress = userAction.SenderAddress
+		recipientAddress = userAction.RecipientAddress
+	}
+
+	// convert amount to a dollar float
+	decimalsAdjusted := math.Pow10(userAction.TokenDetails.TokenDecimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+	amount := new(big.Rat).SetInt(&userAction.Amount.Int)
+	amountFloat, _ := amount.Quo(amount, decimalsRat).Float64()
+
+	return AggregatedUserTransaction{
+		TokenShortName:   userAction.TokenDetails.TokenShortName,
+		Network:          userAction.Network,
+		Time:             userAction.Time,
+		Amount:           amountFloat,
+		Application:      userAction.Application,
+		Type:             userAction.Type,
+		SwapIn:           userAction.SwapIn,
+		TransactionHash:  userAction.TransactionHash,
+		SenderAddress:    senderAddress,
+		RecipientAddress: recipientAddress,
+	}
+}
+
+// AggregatedTransactionFromPendingWinner to create a partially aggregated transaction from a pending winner
+func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner) AggregatedUserTransaction {
+	var (
+		application   = pendingWinner.Application.String()
+		senderAddress = pendingWinner.SenderAddress.String()
+	)
+
+	userTransaction := AggregatedUserTransaction{
+		TokenShortName:  pendingWinner.TokenDetails.TokenShortName,
+		Network:         pendingWinner.Network,
+		TransactionHash: pendingWinner.TransactionHash.String(),
+		SenderAddress:   senderAddress,
+		// the sender is the winner of a pending win
+		WinningAddress: senderAddress,
+		Type: "send",
+	}
+
+	if pendingWinner.Utility == "FLUID" {
+		userTransaction.Application = application
+		userTransaction.WinningAmount = pendingWinner.UsdWinAmount
+	} else {
+		userTransaction.UtilityName = applications.UtilityName(application)
+		userTransaction.UtilityAmount = pendingWinner.UsdWinAmount
+		if pendingWinner.Network == network.NetworkSolana {
+			userTransaction.Application = "spl"
+		} else {
+			userTransaction.Application = "none"
+		}
+	}
+
+	return userTransaction
+}
 
 // NewSwapEthereum made by the user, either swapping in (swapIn) to a
 // Fluid Asset from an underlying asset or swapping out. Sets the time to
@@ -118,7 +232,7 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 		AmountStr:       amount.String(),
 		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
 		Time:            time.Now(),
-		Application:     "none",
+		Application:     "spl",
 	}
 }
 
@@ -142,7 +256,7 @@ func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipien
 }
 
 func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amount misc.BigInt, tokenShortName string, tokenDecimals int, applications []solApplications.Application) UserAction {
-	solanaApplication := "none"
+	solanaApplication := "spl"
 
 	if len(applications) > 0 {
 		solanaApplication = applications[0].String()

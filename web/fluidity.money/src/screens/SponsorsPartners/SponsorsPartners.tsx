@@ -30,7 +30,7 @@ const majorPartners = [
     height: 34
   },
   {
-    img: "/assets/images/partners/multicoin.svg",
+    img: "/assets/images/partners/MULTICOIN.svg",
     url: "https://multicoin.capital",
     title: "Multicoin Capital",
     width: 257,

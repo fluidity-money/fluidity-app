@@ -1,0 +1,30 @@
+{
+  "name": "Fluid USDC",
+  "symbol": "fUSDC",
+  "description": "A Fluid Asset is a wrapped token that pays you yield for using it.",
+  "seller_fee_basis_points": 0,
+  "image": "https://arweave.net/nvqvx1OGtfR4bqI7mg3MfPmubnxDoWReLgCML2DO_9c?ext=svg",
+  "external_url": "https://fluidity.money",
+  "attributes": [
+    {
+      "trait_type": "token",
+      "value": "yes"
+    },
+    {
+      "token_type": "wrapped_asset",
+      "value": "yes"
+    }
+  ],
+  "collection": {
+    "name": "Fluid Assets",
+    "family": "Fluidity Money"
+  },
+  "properties": {
+    "files": [
+      {
+        "uri": "https://arweave.net/nvqvx1OGtfR4bqI7mg3MfPmubnxDoWReLgCML2DO_9c?ext=svg",
+        "type": "image/svg+xml"
+      }
+    ]
+  }
+}

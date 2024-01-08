@@ -287,7 +287,7 @@ func GetSushiswapStableOrConstantProductFees(transfer worker.EthereumApplication
 
 		var (
 			decimals_ []interface{}
-			decimals *big.Rat
+			decimals  *big.Rat
 		)
 
 		// try Stable then ConstantProduct

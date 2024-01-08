@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
+	winnersQueue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -84,7 +85,10 @@ func main() {
 	}
 
 	queue.GetMessages(rewardsQueue, func(message queue.Message) {
-		var announcements []worker.EthereumWinnerAnnouncement
+		var (
+			announcements  []worker.EthereumWinnerAnnouncement
+			pendingWinners []spooler.PendingWinner
+		)
 
 		message.Decode(&announcements)
 
@@ -99,7 +103,11 @@ func main() {
 
 		for _, announcement := range announcements {
 			// write the winner into the database
-			spooler.InsertPendingWinners(announcement, tokenDetails)
+			pendingWinners_ := spooler.CreatePendingWinners(announcement, tokenDetails)
+			spooler.InsertPendingWinners(pendingWinners_)
+
+			// store pending winners from all announcements to send to the queue later
+			pendingWinners = append(pendingWinners, pendingWinners_...)
 
 			// if the win was an AMM win, add the LP winnings
 			if announcement.Application == commonApps.ApplicationSeawaterAmm && announcement.Decorator != nil {
@@ -184,6 +192,8 @@ func main() {
 
 				toSend[fluidTokenDetails] = true
 			}
+
+			queue.SendMessage(winnersQueue.TopicPendingWinners, pendingWinners)
 		}
 
 		for token, send := range toSend {

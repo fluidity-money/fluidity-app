@@ -102,7 +102,7 @@ type (
 		KyberClassic     float64 `json:"kyber_classic"`
 		Wombat           float64 `json:"wombat"`
 		SeawaterAmm      float64 `json:"seawater_amm"`
-		TraderJoe float64 `json:"trader_joe"`
+		TraderJoe        float64 `json:"trader_joe"`
 	}
 
 	FeeSwitch struct {

@@ -172,8 +172,7 @@ const Airdrop = () => {
           Airdrop
         </Heading>
         <Text>
-          The Fluidity Airdrop is currently only available on Arbitrum. Please
-          switch to the Arbitrum network to participate.
+          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more rewards!
         </Text>
       </div>
     );
@@ -1350,9 +1349,11 @@ const MyMultiplier = ({
         MY EPOCH 1 STAKING STATS
       </GeneralButton>
       <div>
-        <Text size="md" holo={true}>
-          Provide $fUSDC Liquidity to earn $ARB and Multipliers!
-        </Text>
+        <div className="airdrop-arb-multipliers-container">
+          <Text size="md" holo={true}>
+            Provide $fUSDC Liquidity to earn $ARB and Multipliers!
+          </Text>
+        </div>
         <JoeFarmlandsOrCamelotKingdom />
       </div>
     </div>

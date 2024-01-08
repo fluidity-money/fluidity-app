@@ -927,4 +927,14 @@
   position: fixed;
 }
 
+.airdrop-arb-multipliers-container {
+  display: flex;
+  padding-top: 20px;
+}
+
+.airdrop-arb-multipliers-container > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /*# sourceMappingURL=airdrop.css.map */

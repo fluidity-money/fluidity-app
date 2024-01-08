@@ -318,25 +318,11 @@ fDAI = "https://app.1inch.io/#/1/earn/pools"
 [liquidity_providers.solana]
 
 [[liquidity_providers.solana.providers]]
-name= "solend"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://www.solend.fi/"
-fUSDT = "https://www.solend.fi/"
-
-[[liquidity_providers.solana.providers]]
 name= "orca"
 
 [liquidity_providers.solana.providers.link]
-fUSDC = "https://www.orca.so/"
+fUSDC = "https://v1.orca.so/liquidity/browse?tokenMint=Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
 fUSDT = "https://www.orca.so/"
-
-[[liquidity_providers.solana.providers]]
-name= "saber"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://www.saber.so/"
-fUSDT = "https://www.saber.so/"
 
 [[liquidity_providers.solana.providers]]
 name= "jupiter"
@@ -344,6 +330,13 @@ name= "jupiter"
 [liquidity_providers.solana.providers.link]
 fUSDC = "https://www.jup.ag/"
 fUSDT = "https://www.jup.ag/"
+
+[[liquidity_providers.solana.providers]]
+name= "Meteora"
+
+[liquidity_providers.solana.providers.link]
+fUSDC = "https://app.meteora.ag/pools/67rm8swU7MZAekKwnPWGufWwfasqUAJkjaAYZK55SNmK"
+fUSDT = "https://app.meteora.ag"
 
 [liquidity_providers.arbitrum]
 
