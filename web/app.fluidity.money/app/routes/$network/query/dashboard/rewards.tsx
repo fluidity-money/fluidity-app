@@ -131,6 +131,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       loaded: true,
     } satisfies RewardsLoaderData);
   } catch (err) {
+    console.log("fetching rewards:", err);
     throw new Error(`Could not fetch Rewards on ${network}: ${err}`);
   } // Fail silently - for now.
 };

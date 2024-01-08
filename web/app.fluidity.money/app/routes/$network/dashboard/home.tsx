@@ -465,13 +465,10 @@ export default function Home() {
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
-                    <Text prominent={true}>
-                      {lootboxCount}
-                    </Text>
                     <LootBottle
                       size="lg"
                       rarity={rewardTier}
-                      quantity={quantity}
+                      quantity={lootboxCount}
                     />
                   </a>
                 ) : (

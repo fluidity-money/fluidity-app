@@ -38,6 +38,7 @@ import {
   WalletIcon,
   TabButton,
   toDecimalPlaces,
+  LootBottle
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip, UtilityToken } from "~/components";
@@ -257,6 +258,7 @@ export default function Rewards() {
         { name: "VALUE" },
         { name: "FLUID REWARDS", show: width >= 500 },
         { name: "$UTILITY REWARDS", show: width >= 500 },
+        { name: "BOTTLES EARNED", show: width >= 500 },
         { name: "WINNER", show: width >= 850 },
         { name: "REWARDED TIME", show: width >= 850, alignRight: true },
       ];
@@ -432,6 +434,8 @@ export default function Rewards() {
       currency,
       utilityTokens,
       application,
+      lootboxCount,
+      rewardTier
     } = data;
 
     const toolTip = useToolTip();
@@ -536,6 +540,24 @@ export default function Rewards() {
                   <Text>-</Text>
                 )}
               </td>
+            );
+          case "BOTTLES EARNED":
+            return (
+              <td>{ lootboxCount ? (
+                  <a
+                    className="table-address"
+                    href={`/${network}/dashboard/airdrop`}
+                  >
+                    <LootBottle
+                      size="lg"
+                      rarity={rewardTier}
+                      quantity={lootboxCount}
+                    />
+                  </a>
+                ) : (
+                  <Text>-</Text>
+                )
+              } </td>
             );
           case "WINNER":
             return (
