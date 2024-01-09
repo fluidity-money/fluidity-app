@@ -290,7 +290,7 @@ func UpdateOrInsertAmountsRewarded(network_ network.BlockchainNetwork, lootboxCu
 			epoch,
 			token_short_name,
 			amount_earned,
-			recipient,
+			winner,
 			application,
 			last_updated
 		)

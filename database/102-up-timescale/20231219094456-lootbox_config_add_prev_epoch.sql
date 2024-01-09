@@ -18,7 +18,7 @@ CREATE TABLE lootbox_config (
 	-- the enum
 	epoch_identifier lootbox_epoch NOT NULL UNIQUE,
 
-	-- ethereum_application that should the current focus of the lootbox
+	-- ethereum_application that should be the current focus of the lootbox
 	-- mini leaderboard competitions (and should be displayed in the UI
 	-- with the right query)
 	ethereum_application ethereum_application NOT NULL DEFAULT 'none'

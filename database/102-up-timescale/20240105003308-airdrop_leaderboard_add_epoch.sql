@@ -26,15 +26,15 @@ FROM (
     GROUP BY address
 ) lb
     LEFT JOIN (
-        SELECT amount_earned, recipient
+        SELECT amount_earned, winner
         FROM lootbox_amounts_rewarded
         WHERE token_short_name = 'USDC'
-    ) AS lootbox_amounts_rewarded_fusdc ON lb.address = lootbox_amounts_rewarded_fusdc.recipient
+    ) AS lootbox_amounts_rewarded_fusdc ON lb.address = lootbox_amounts_rewarded_fusdc.winner
     LEFT JOIN (
-        SELECT amount_earned, recipient
+        SELECT amount_earned, winner
         FROM lootbox_amounts_rewarded
         WHERE token_short_name = 'ARB'
-    ) AS lootbox_amounts_rewarded_arb ON lb.address = lootbox_amounts_rewarded_arb.recipient
+    ) AS lootbox_amounts_rewarded_arb ON lb.address = lootbox_amounts_rewarded_arb.winner
     LEFT JOIN lootbox_referrals
         ON lb.address = lootbox_referrals.referrer,
     LATERAL calculate_a_y(address, now()::TIMESTAMP) AS liquidity

@@ -4,7 +4,7 @@
 -- itself over time on a per-epoch basis. it does so so we can track
 -- cleanly in the UI the amounts earned for the lootbox presentation
 
--- the recipient field is converted from the solana winner owner
+-- the winner field is converted from the solana winner owner
 -- address implicitly in the go code currently!
 
 -- we're okay with DECIMAL as we can store the floating amount with a
@@ -19,14 +19,14 @@ CREATE TABLE lootbox_amounts_rewarded (
 	-- decimals. can be lossy
 	amount_earned DECIMAL NOT NULL,
 
-	-- recipient of the winning amount (the winner)
-	recipient VARCHAR NOT NULL,
+	-- winner of the winning (the recipient of the winning payout)
+	winner VARCHAR NOT NULL,
 
 	application VARCHAR NOT NULL,
 	last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 	-- id to prevent duplication during the upsert for updating amounts
-	CONSTRAINT id PRIMARY KEY(network, epoch, token_short_name, recipient, application)
+	CONSTRAINT id PRIMARY KEY(network, epoch, token_short_name, winner, application)
 );
 
 -- migrate:down
