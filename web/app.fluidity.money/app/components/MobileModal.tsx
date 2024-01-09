@@ -60,7 +60,6 @@ export default function MobileModal({
   );
 
   const { showExperiment } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
   const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
@@ -216,7 +215,7 @@ export default function MobileModal({
           {/* Navigation between pages */}
           <ul className="sidebar-nav">
             {navigationMap
-              .filter(({ name }) => name !== "Assets" || showAssets)
+              .filter(({ name }) => name !== "Assets")
               .map((obj, index) => {
                 const key = Object.values(obj)[0];
                 const { name, icon, path } = obj;

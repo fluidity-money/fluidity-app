@@ -562,7 +562,6 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("testnet-rewards")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "testnet-rewards"}
-          disabled={true}
         >
           Testnet Rewards
         </TabButton>
