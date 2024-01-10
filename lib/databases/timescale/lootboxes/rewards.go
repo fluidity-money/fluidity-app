@@ -25,7 +25,7 @@ type UserLootboxCount struct {
 }
 
 // buildUserRewardValuesString to build a variadic string for the values to insert for top winners
-func buildUserRewardValuesString(currentEpoch string, userCount int) (string, error) {
+func buildUserRewardValuesString(userCount int) (string, error) {
 	if userCount < 1 || userCount > 10 {
 		return "", fmt.Errorf(
 			"invalid number of leaderboard users - want 1-10, got %d",
@@ -38,11 +38,11 @@ func buildUserRewardValuesString(currentEpoch string, userCount int) (string, er
 ($3, '', 'leaderboard_prize', $1, 0, 2, 10, 'none', $2),
 ($3, '', 'leaderboard_prize', $1, 0, 3, 5, 'none', $2)`,
 
-		`($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none', $2),
+		`($4, '', 'leaderboard_prize', $1, 0, 1, 20, 'none', $2),
 ($4, '', 'leaderboard_prize', $1, 0, 2, 5, 'none', $2),
 ($4, '', 'leaderboard_prize', $1, 0, 3, 2, 'none', $2)`,
 
-		`($4, '', 'leaderboard_prize', $1, 0, 1, 15, 'none', $2),
+		`($5, '', 'leaderboard_prize', $1, 0, 1, 15, 'none', $2),
 ($5, '', 'leaderboard_prize', $1, 0, 2, 3, 'none', $2),
 ($5, '', 'leaderboard_prize', $1, 0, 3, 1, 'none', $2)`,
 
@@ -102,7 +102,7 @@ func buildUserRewardValuesString(currentEpoch string, userCount int) (string, er
 // InsertTopUserReward to insert lootboxes for the given users for their activity during the airdrop.
 // Expects 10 users to reward
 func InsertTopUserReward(currentEpoch string, currentTime time.Time, users []UserLootboxCount) {
-	valuesString, err := buildUserRewardValuesString(currentEpoch, len(users))
+	valuesString, err := buildUserRewardValuesString(len(users))
 
 	if err != nil {
 		log.Fatal(func(k *log.Log) {

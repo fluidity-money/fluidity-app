@@ -115,7 +115,7 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
 ($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
 ($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
-($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)`,
+($11, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)`,
 
 		`($3, '', 'leaderboard_prize', $1, 0, 1, 30, 'none', $2),
 ($3, '', 'leaderboard_prize', $1, 0, 2, 10, 'none', $2),
@@ -132,23 +132,23 @@ func TestBuildUserRewardValuesString(t *testing.T) {
 ($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
 ($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
 ($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
-($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
-($11, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)`,
+($11, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2),
+($12, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)`,
 	}
 
 	for i, expectedString := range expectedRewardStrings {
 		userCount := i + 1
-		rewardString, err := buildUserRewardValuesString("epoch_1", userCount)
+		rewardString, err := buildUserRewardValuesString(userCount)
 
 		require.NoError(t, err)
 		assert.Equal(t, expectedString, rewardString)
 	}
 
-	rewardString, err := buildUserRewardValuesString("epoch_1", 0)
+	rewardString, err := buildUserRewardValuesString(0)
 	assert.Empty(t, rewardString)
 	assert.Error(t, err)
 
-	rewardString, err = buildUserRewardValuesString("epoch_1", 11)
+	rewardString, err = buildUserRewardValuesString(11)
 	assert.Empty(t, rewardString)
 	assert.Error(t, err)
 }
