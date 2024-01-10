@@ -628,10 +628,10 @@ export const handleContractErrors = async (
 
     if (metaMaskError?.value.code === -32603) {
       throw new Error(
-        `Failed to make swap. Please reset your Metamask account (settings -> advanced -> reset account)`
+        `RPC error. Please reset your Metamask account (settings -> advanced -> reset account)`
       );
     } else if (metaMaskError?.value.code === -32000) {
-      throw new Error(`Failed to make swap. Gas limit too low.`);
+      throw new Error(`RPC error. Gas limit too low.`);
     }
 
     // otherwise, check for a 'non intrinsic' gas error (gas exhausted)
@@ -640,12 +640,12 @@ export const handleContractErrors = async (
     // found revert opcode, assume it's a gas error since we can't call this with an insufficient balance within the application
     if (receipt?.status === 0) {
       throw new Error(
-        `Failed to make swap. Gas limit of ${receipt?.gasUsed?.toNumber()} exhausted!`
+        `RPC error. Gas limit of ${receipt?.gasUsed?.toNumber()} exhausted!`
       );
     }
   } catch (e) {
     // otherwise, use a generic error
-    throw new Error(`Failed to make swap. ${msg}`);
+    throw new Error(`RPC error. ${msg}`);
   }
 };
 

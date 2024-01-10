@@ -34,6 +34,27 @@ func main() {
 	)
 
 	logs.Logs(func(l logs.Log) {
+		programFound, hasBegun, currentEpoch, _ := lootboxes.GetLootboxConfig()
+
+		// if the lootbox isn't enabled, or it isn't running, then we alarm
+		// because someone has called the contract to manually reward themselves
+		// whem presumably the UI isn't enabled. treated separately for logging
+		// reasons.
+
+		switch false {
+		case programFound:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "No lootbox program found, but a log was received for a testnet redemption!"
+			})
+
+		case hasBegun:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Lootbox program that was found is not running!"
+			})
+		}
+
+		log.Debugf("Lootbox current epoch running is %v!", currentEpoch)
+
 		if l.Address != addressConfirmerContractAddress {
 			log.Debug(func(k *log.Log) {
 				k.Format(
@@ -98,6 +119,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountCommon,
 				RewardTier:   1,
+				Epoch:        currentEpoch,
 			},
 			{
 				Address:      testnetOwnerString,
@@ -105,6 +127,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountUncommon,
 				RewardTier:   2,
+				Epoch:        currentEpoch,
 			},
 			{
 				Address:      testnetOwnerString,
@@ -112,6 +135,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountRare,
 				RewardTier:   3,
+				Epoch:        currentEpoch,
 			},
 			{
 				Address:      testnetOwnerString,
@@ -119,6 +143,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountUltraRare,
 				RewardTier:   4,
+				Epoch:        currentEpoch,
 			},
 		}
 

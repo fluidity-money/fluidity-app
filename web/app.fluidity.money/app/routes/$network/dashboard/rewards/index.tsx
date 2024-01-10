@@ -38,6 +38,7 @@ import {
   WalletIcon,
   TabButton,
   toDecimalPlaces,
+  LootBottle,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip, UtilityToken } from "~/components";
@@ -257,6 +258,7 @@ export default function Rewards() {
         { name: "VALUE" },
         { name: "FLUID REWARDS", show: width >= 500 },
         { name: "$UTILITY REWARDS", show: width >= 500 },
+        { name: "BOTTLES EARNED", show: width >= 500 },
         { name: "WINNER", show: width >= 850 },
         { name: "REWARDED TIME", show: width >= 850, alignRight: true },
       ];
@@ -432,6 +434,8 @@ export default function Rewards() {
       currency,
       utilityTokens,
       application,
+      lootboxCount,
+      rewardTier,
     } = data;
 
     const toolTip = useToolTip();
@@ -537,6 +541,25 @@ export default function Rewards() {
                 )}
               </td>
             );
+          case "BOTTLES EARNED":
+            return (
+              <td>
+                {lootboxCount ? (
+                  <a
+                    className="table-address"
+                    href={`/${network}/dashboard/airdrop`}
+                  >
+                    <LootBottle
+                      size="lg"
+                      rarity={rewardTier}
+                      quantity={lootboxCount}
+                    />
+                  </a>
+                ) : (
+                  <Text>-</Text>
+                )}{" "}
+              </td>
+            );
           case "WINNER":
             return (
               <td>
@@ -628,23 +651,23 @@ export default function Rewards() {
         </CardCarousel.Slide>
         <CardCarousel.Slide className={isMobile ? "compactSlide" : ""}>
           <div className={`rewards-cta-providers ${isMobile ? "compact" : ""}`}>
-            { network == "arbitrum" ?
-                <>
-                  <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+            {network == "arbitrum" ? (
+              <>
+                <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
                   <ProviderIcon provider="Sushiswap" />
-                 </a>
-                 <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
-                   <ProviderIcon provider="Uniswap" />
-                 </a>
-                 <a href="#">
-                   <ProviderIcon provider="Multichain" />
-                 </a>
-                 <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
-                   <ProviderIcon provider="Dodo" />
-                 </a>
-               </>
-             :
-               <>
+                </a>
+                <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
+                  <ProviderIcon provider="Uniswap" />
+                </a>
+                <a href="#">
+                  <ProviderIcon provider="Multichain" />
+                </a>
+                <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
+                  <ProviderIcon provider="Dodo" />
+                </a>
+              </>
+            ) : (
+              <>
                 <a href="https://www.meteora.ag/">
                   <ProviderIcon provider="Meteora" />
                 </a>
@@ -658,7 +681,7 @@ export default function Rewards() {
                   <ProviderIcon provider="Saber" />
                 </a>
               </>
-            }
+            )}
           </div>
           <Display size="xxxs">Swap To Earn</Display>
           {!isMobile && <Text>Swap Fluid Assets to generate yield.</Text>}

@@ -116,7 +116,7 @@ func TestTransactionLootboxes(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	allLootboxes := lootboxes_db.GetLootboxes(senderAddress, 1)
+	allLootboxes := lootboxes_db.GetLootboxes("epoch_1", senderAddress, 1)
 
 	assert.Len(t, allLootboxes, 1)
 	expectedLootbox := lootboxes.Lootbox{

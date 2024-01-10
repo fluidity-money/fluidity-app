@@ -14,6 +14,8 @@ type Transaction = {
   swapType?: "in" | "out";
   utilityTokens?: { [tokens: string]: number };
   application: string;
+  rewardTier: number;
+  lootboxCount: number;
 };
 
 export default Transaction;

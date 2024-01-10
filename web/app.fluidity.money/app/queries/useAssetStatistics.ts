@@ -86,10 +86,10 @@ const useAssetStatistics = (
     },
   };
 
-  const fluGqlEndpoint = "https://fluidity.hasura.app/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<AssetStatisticsRequest, AssetStatisticsResponse>(
-    fluGqlEndpoint,
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

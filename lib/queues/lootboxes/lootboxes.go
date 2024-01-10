@@ -12,13 +12,9 @@ import (
 	types "github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 )
 
-const (
-	TopicLootboxes = `lootboxes`
-)
+const TopicLootboxes = `lootboxes`
 
-type (
-	Lootbox = types.Lootbox
-)
+type Lootbox = types.Lootbox
 
 func LootboxesAll(f func(Lootbox)) {
 	queue.GetMessages(TopicLootboxes, func(message queue.Message) {

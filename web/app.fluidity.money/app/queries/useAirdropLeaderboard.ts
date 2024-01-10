@@ -1,7 +1,7 @@
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryByUserAllTime = gql`
-  query AirdropLeaderboard($address: String!) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) {
     airdrop_leaderboard(where: { address: { _eq: $address } }, limit: 1) {
       user: address
       rank
@@ -14,21 +14,28 @@ const queryByUserAllTime = gql`
 `;
 
 const queryAllTime = gql`
-  query AirdropLeaderboard {
-    airdrop_leaderboard(limit: 16, order_by: { total_lootboxes: desc }) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!) {
+    airdrop_leaderboard(
+      args: { epoch_: $epoch }
+      limit: 16
+      order_by: { total_lootboxes: desc }
+    ) {
       user: address
       rank
       referralCount: referral_count
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
 
 const queryByUser24Hours = gql`
-  query AirdropLeaderboard($address: String!) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
+      args: { epoch_: $epoch, application_: $application }
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -38,6 +45,8 @@ const queryByUser24Hours = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -45,6 +54,7 @@ const queryByUser24Hours = gql`
 const query24Hours = gql`
   query AirdropLeaderboard {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
+      args: { epoch_: $epoch }
       limit: 16
       order_by: { total_lootboxes: desc }
     ) {
@@ -54,17 +64,20 @@ const query24Hours = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
 
 const query24HoursByUserByApplication = gql`
   query AirdropLeaderboardApplication(
+    $epoch: lootbox_epoch!
     $application: ethereum_application!
     $address: String!
   ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
-      args: { application_: $application }
+      args: { epoch_: $epoch, application_: $application }
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -74,14 +87,19 @@ const query24HoursByUserByApplication = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
 
 const query24HoursByApplication = gql`
-  query AirdropLeaderboardByApplication($application: ethereum_application!) {
+  query AirdropLeaderboardByApplication(
+    $epoch: lootbox_epoch!
+    $application: ethereum_application!
+  ) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
-      args: { application_: $application }
+      args: { epoch_: $epoch, application_: $application }
       limit: 16
       order_by: { total_lootboxes: desc }
     ) {
@@ -91,6 +109,8 @@ const query24HoursByApplication = gql`
       bottles: total_lootboxes
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
+      fusdcEarned: fusdc_earned
+      arbEarned: arb_earned
     }
   }
 `;
@@ -125,6 +145,8 @@ export type AirdropLeaderboardEntry = {
   bottles: number;
   highestRewardTier: number;
   liquidityMultiplier: number;
+  fusdcEarned: number;
+  arbEarned: number;
 };
 
 type AirdropLeaderboardResponse = {
@@ -134,10 +156,14 @@ type AirdropLeaderboardResponse = {
   errors?: unknown;
 };
 
-export const useAirdropLeaderboardByUserAllTime = (address: string) => {
+export const useAirdropLeaderboardByUserAllTime = (
+  epoch: string,
+  address: string
+) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
+    epoch,
     address,
   };
   const body = {
@@ -152,10 +178,12 @@ export const useAirdropLeaderboardByUserAllTime = (address: string) => {
   );
 };
 
-export const useAirdropLeaderboardAllTime = () => {
+export const useAirdropLeaderboardAllTime = (epoch: string) => {
   const { url, headers } = fetchInternalEndpoint();
+  const variables = { epoch };
   const body = {
     query: queryAllTime,
+    variables,
   };
 
   return jsonPost<AirdropLeaderboardBody, AirdropLeaderboardResponse>(
@@ -165,11 +193,15 @@ export const useAirdropLeaderboardAllTime = () => {
   );
 };
 
-export const useAirdropLeaderboardByUser24Hours = (address: string) => {
+export const useAirdropLeaderboardByUser24Hours = (
+  epoch: string,
+  address: string
+) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
     address,
+    epoch,
   };
   const body = {
     query: queryByUser24Hours,
@@ -183,9 +215,11 @@ export const useAirdropLeaderboardByUser24Hours = (address: string) => {
   );
 };
 
-export const useAirdropLeaderboard24Hours = () => {
+export const useAirdropLeaderboard24Hours = (epoch: string) => {
   const { url, headers } = fetchInternalEndpoint();
+  const variables = { epoch };
   const body = {
+    variables,
     query: query24Hours,
   };
 
@@ -197,12 +231,14 @@ export const useAirdropLeaderboard24Hours = () => {
 };
 
 export const useAirdropLeaderboardByUserByApplication24Hours = (
+  epoch: string,
   address: string,
   application: string
 ) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const variables = {
+    epoch,
     address,
     application,
   };
@@ -218,10 +254,12 @@ export const useAirdropLeaderboardByUserByApplication24Hours = (
 };
 
 export const useAirdropLeaderboardByApplication24Hours = (
+  epoch: string,
   application: string
 ) => {
   const { url, headers } = fetchInternalEndpoint();
   const variables = {
+    epoch,
     application,
   };
   const body = {

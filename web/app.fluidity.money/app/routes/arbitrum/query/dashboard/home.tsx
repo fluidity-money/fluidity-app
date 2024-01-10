@@ -49,10 +49,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
 
     if (rewardsErr || !rewardsData) {
-      throw new Error("Could not fetch rewards data");
+      console.log("Could not fetch rewards data", rewardsErr);
+      throw new Error(`Could not fetch rewards data: ${rewardsErr}`);
     }
 
     if (graphErr || !graphData) {
+      console.log("Could not fetch graph data", graphErr);
       throw new Error("Could not fetch graph data");
     }
 

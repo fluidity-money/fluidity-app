@@ -22,6 +22,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
+
+  const epoch = url.searchParams.get("epoch");
+
+  if (!epoch) throw new Error("Invalid Request");
+
   const address = url.searchParams.get("address") ?? "";
   const period = url.searchParams.get("period") ?? "";
   const provider_ = url.searchParams.get("provider") ?? "";
@@ -38,15 +43,17 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       switch (true) {
         case useAll: {
           return [
-            useAirdropLeaderboardAllTime,
-            useAirdropLeaderboardByUserAllTime,
+            () => useAirdropLeaderboardAllTime(epoch),
+            (address: string) =>
+              useAirdropLeaderboardByUserAllTime(epoch, address),
           ];
         }
         case use24Hours && !!provider: {
           return [
-            () => useAirdropLeaderboardByApplication24Hours(provider),
+            () => useAirdropLeaderboardByApplication24Hours(epoch, provider),
             (address: string) =>
               useAirdropLeaderboardByUserByApplication24Hours(
+                epoch,
                 address,
                 provider
               ),
@@ -55,8 +62,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         case use24Hours && !provider:
         default: {
           return [
-            useAirdropLeaderboard24Hours,
-            useAirdropLeaderboardByUser24Hours,
+            () => useAirdropLeaderboard24Hours(epoch),
+            (address: string) =>
+              useAirdropLeaderboardByUser24Hours(epoch, address),
           ];
         }
       }
@@ -105,6 +113,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               referralCount: 0,
               bottles: 0,
               highestRewardTier: 0,
+              fusdcEarned: 0,
+              arbEarned: 0,
             } satisfies AirdropLeaderboardEntry,
           ]
     ).concat(leaderboard);

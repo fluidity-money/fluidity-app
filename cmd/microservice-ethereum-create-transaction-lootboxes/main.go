@@ -10,29 +10,31 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
-	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
-	ethereumApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	winners_queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 const (
 	// EnvTokensList to relate the received token names to a contract address
 	// of the form ADDR1:TOKEN1:DECIMALS1,ADDR2:TOKEN2:DECIMALS2,...
 	EnvTokensList = "FLU_ETHEREUM_TOKENS_LIST"
+
 	// EnvGethHttpUrl to use when performing RPC requests
 	EnvGethHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 )
@@ -85,6 +87,32 @@ func main() {
 			tokenShortName = tokenDetails.TokenShortName
 		)
 
+		programFound, hasBegun, currentEpoch, _ := database.GetLootboxConfig()
+
+		// check that the lootbox is enabled, and that it's also
+		// running. logs separately if either fail. if the
+		// campaign has begun but isn't in progress, then we
+		// should die! that means that something was processed
+		// weirdly.
+
+		switch false {
+		case programFound:
+			log.App(func(k *log.Log) {
+				k.Message = "No lootbox epoch found, skipping a request to track a winner!"
+			})
+
+			return
+
+		case hasBegun:
+			log.Fatal(func(k *log.Log) {
+				k.Message = "Lootbox epoch that was found is not running! Terminating on request to track a winner!"
+			})
+
+			return
+		}
+
+		log.Debugf("Lootbox current epoch running is %v!", currentEpoch)
+
 		// don't track fluidification
 		if winner.RewardType != "send" {
 			log.Debug(func(k *log.Log) {
@@ -114,7 +142,11 @@ func main() {
 
 			// fetch parameters to call GetApplicationFee
 			// wait for transaction to be mined before fetching receipt
-			transaction, isPending, err := ethClient.TransactionByHash(context.Background(), common.HexToHash(transactionHash))
+
+			transaction, isPending, err := ethClient.TransactionByHash(
+				context.Background(),
+				common.HexToHash(transactionHash),
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -172,7 +204,14 @@ func main() {
 
 			inputData := transaction.Data()
 
-			feeData, _, _, err := ethereumApps.GetApplicationFee(applicationTransfer, ethClient, fluidTokenContract, tokenDecimals, receipt, inputData)
+			feeData, _, _, err := applications.GetApplicationFee(
+				applicationTransfer,
+				ethClient,
+				fluidTokenContract,
+				tokenDecimals,
+				receipt,
+				inputData,
+			)
 
 			if err != nil {
 				log.Fatal(func(k *log.Log) {
@@ -288,22 +327,8 @@ func volumeLiquidityMultiplier(volume *big.Rat, tokenDecimals int, address strin
 }
 
 func protocolMultiplier(application applications.Application) *big.Rat {
-	switch application.String() {
-	case "uniswap_v2":
-		fallthrough
-	case "uniswap_v3":
-		fallthrough
-	case "saddle":
-		fallthrough
-	case "curve":
-		fallthrough
-	case "camelot":
-		fallthrough
-	case "chronos":
-		fallthrough
-	case "kyber_classic":
-		fallthrough
-	case "sushiswap":
+	switch application {
+	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
 		return big.NewRat(2, 100)
 	}
 

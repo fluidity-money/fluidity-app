@@ -1,7 +1,11 @@
 
 # microservice-redeem-testnet-lootboxes
 
-Watch for events indicating ownership of a testnet address and reward the owner.
+Watch for events indicating ownership of a testnet address and reward
+the owner.
+
+If an epoch is not currently running, then this should break as
+someone is using the contract improperly.
 
 ## Environment variables
 

@@ -1,3 +1,7 @@
+// Copyright 2023 Fluidity Money. All rights reserved. Use of this
+// source code is governed by a GPL-style license that can be found in the
+// LICENSE.md file.
+
 package lootboxes
 
 import (
@@ -17,6 +21,14 @@ const (
 	// TableLootboxes to use when inserting
 	// derived lootboxes to database
 	TableLootboxes = `lootbox`
+
+	// TableLootboxConfig to use for setting configuration
+	// for the currently running epoch
+	TableLootboxConfig = `lootbox_config`
+
+	// TableLootboxAmountsRewarded to use for tracking cumulative
+	// amounts earned by users during a lootbox campaign
+	TableLootboxAmountsRewarded = `lootbox_amounts_rewarded`
 )
 
 type Lootbox = types.Lootbox
@@ -34,7 +46,8 @@ func InsertLootbox(lootbox Lootbox) {
 			volume,
 			reward_tier,
 			lootbox_count,
-			application
+			application,
+			epoch
 		)
 
 		VALUES (
@@ -45,7 +58,8 @@ func InsertLootbox(lootbox Lootbox) {
 			$5,
 			$6,
 			$7,
-			$8
+			$8,
+			$9
 		)`,
 
 		TableLootboxes,
@@ -61,6 +75,7 @@ func InsertLootbox(lootbox Lootbox) {
 		lootbox.RewardTier,
 		lootbox.LootboxCount,
 		lootbox.Application.String(),
+		lootbox.Epoch,
 	)
 
 	if err != nil {
@@ -73,7 +88,7 @@ func InsertLootbox(lootbox Lootbox) {
 }
 
 // GetLootboxes gets all Lootboxes earned by address, limited by a number
-func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
+func GetLootboxes(currentEpoch string, address ethereum.Address, limit int) []Lootbox {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -87,9 +102,9 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 			lootbox_count,
 			application
 
-		FROM %s 
-		WHERE address = $1
-		LIMIT $2
+		FROM %s
+		WHERE address = $1 AND epoch = $2
+		LIMIT $3
 		`,
 
 		TableLootboxes,
@@ -98,6 +113,7 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 	rows, err := timescaleClient.Query(
 		statementText,
 		address,
+		currentEpoch,
 		limit,
 	)
 
@@ -142,6 +158,8 @@ func GetLootboxes(address ethereum.Address, limit int) []Lootbox {
 				k.Payload = err
 			})
 		}
+
+		lootbox.Epoch = currentEpoch
 
 		application, err := applications.ParseApplicationName(application_)
 

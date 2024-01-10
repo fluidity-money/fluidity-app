@@ -1,7 +1,7 @@
 
 # Winners to Timescale connector
 
-Write winners received via AMQP to Timescale.
+Write winners received via AMQP to Timescale. Also tracks epochs.
 
 ## Environment variables
 
