@@ -120,7 +120,9 @@ const useVolumeStatsByAddress = async (network: string, address: string) => {
     query: queryVolumeByAddress,
   };
 
-  const url = process.env.FLU_HASURA_URL!;
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
 
   return await jsonPost<VolumeStatsByAddressBody, VolumeStatsResponse>(
     url,
@@ -143,7 +145,9 @@ const useVolumeStats = async (network: string) => {
     query: queryVolume,
   };
 
-  const url = process.env.FLU_HASURA_URL!;
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
 
   return await jsonPost<VolumeStatsBody, VolumeStatsResponse>(
     url,

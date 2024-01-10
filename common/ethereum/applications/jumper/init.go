@@ -4,24 +4,4 @@
 
 package jumper
 
-import (
-	"strings"
-
-	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-)
-
-func init() {
-	reader := strings.NewReader(jumperSwapAbiAbiStr)
-
-	var err error
-
-	if jumperSwapAbi, err = ethAbi.JSON(reader); err != nil {
-		panic(err)
-	}
-
-	reader = strings.NewReader(jumperSwapAbiStr)
-
-	if jumperSwapAbiStr, err = ethAbi.JSON(reader); err != nil {
-		panic(err)
-	}
-}
+func init() {}

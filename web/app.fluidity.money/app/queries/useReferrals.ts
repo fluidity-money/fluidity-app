@@ -71,8 +71,12 @@ const useReferralByAddress = (referrer: string, referee: string) => {
     variables,
   };
 
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
+
   return jsonPost<ReferralsByAddressBody, ReferralsRes>(
-    process.env.FLU_HASURA_URL!,
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -92,8 +96,12 @@ const useInactiveReferralByAddress = (address: string) => {
     variables,
   };
 
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
+
   return jsonPost<InactiveReferralsByAddressBody, ReferralsRes>(
-    process.env.FLU_HASURA_URL!,
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

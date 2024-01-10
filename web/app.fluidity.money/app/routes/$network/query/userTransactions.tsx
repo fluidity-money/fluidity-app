@@ -120,7 +120,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         type,
         swap_in,
         rewardTier,
-        lootboxCount
+        lootboxCount,
       }) => {
         const utilityName = utility_name?.match(ALPHA_NUMERIC)?.[0];
 
@@ -146,16 +146,17 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // convert to JS timestamp
           timestamp: new Date(timestamp + "Z").getTime(),
           value,
-          currency: 'f' + currency,
+          currency: "f" + currency,
           application,
           swapType,
           provider: application ?? "Fluidity",
           logo: tokenLogoMap[currency] || defaultLogo,
-          utilityTokens: utilityName && utility_amount > 0
-            ? { [utilityName]: utility_amount }
-            : undefined,
+          utilityTokens:
+            utilityName && utility_amount > 0
+              ? { [utilityName]: utility_amount }
+              : undefined,
           rewardTier,
-          lootboxCount
+          lootboxCount,
         };
       }
     );
@@ -358,7 +359,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency: { symbol: currency },
           application,
           lootboxCount,
-          rewardTier
+          rewardTier,
         } = transaction;
 
         return {
@@ -376,7 +377,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency,
           application,
           lootboxCount,
-          rewardTier
+          rewardTier,
         };
       }
     );
@@ -419,7 +420,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         utilityTokens: winner?.utility,
         application: tx.application,
         rewardTier: tx.rewardTier,
-        lootboxCount: tx.lootboxCount
+        lootboxCount: tx.lootboxCount,
       };
     });
 

@@ -122,7 +122,7 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   epochIdentifier: "epoch_1",
   ethereumApplication: "none",
   epochFound: false,
-  loaded: false
+  loaded: false,
 };
 
 const SAFE_DEFAULT_AIRDROP_LEADERBOARD: AirdropLeaderboardLoaderData = {
@@ -169,7 +169,8 @@ const Airdrop = () => {
           Airdrop
         </Heading>
         <Text>
-          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more rewards!
+          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more
+          rewards!
         </Text>
       </div>
     );
@@ -214,7 +215,9 @@ const Airdrop = () => {
   const isMobile = width < mobileBreakpoint;
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
-    address ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
+    address
+      ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+      : ""
   );
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
@@ -226,12 +229,16 @@ const Airdrop = () => {
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
-    address ? `/${network}/query/referrals?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
+    address
+      ? `/${network}/query/referrals?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+      : ""
   );
 
   const { data: referralLootboxData } =
     useCache<ReferralBottlesCountLoaderData>(
-      address ? `/${network}/query/referralBottles?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}` : ""
+      address
+        ? `/${network}/query/referralBottles?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+        : ""
     );
 
   const data = {
@@ -293,14 +300,7 @@ const Airdrop = () => {
     setCurrentModal(isAirdropModal(destModal) ? destModal : null);
   }, [location.hash]);
 
-  const [stakes, _] = useState<
-    Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
-  >([]);
+  const stakes = [];
 
   const fetchUserTokenBalance = async () => {
     const userTokenBalance = await Promise.all(
@@ -557,11 +557,12 @@ const Airdrop = () => {
         >
           Testnet Rewards
         </TabButton>
-        <TabButton
-          size="small"
-          groupId="airdrop"
-        >
-          <a href="https://dune.com/neogeo/fluidity-airdrop-v2" target="_blank" rel="noreferrer">
+        <TabButton size="small" groupId="airdrop">
+          <a
+            href="https://dune.com/neogeo/fluidity-airdrop-v2"
+            target="_blank"
+            rel="noreferrer"
+          >
             Dune
           </a>
         </TabButton>
@@ -902,7 +903,7 @@ const Airdrop = () => {
                   borderRadius: "10px",
                   borderStyle: "solid",
                   borderWidth: "1px",
-                  borderColor: "white"
+                  borderColor: "white",
                 }}
                 width="100%"
                 src="/images/epoch2AirdropBanner.png"
@@ -1161,7 +1162,7 @@ const MultiplierTasks = () => {
     { provider: "Jumper", link: "https://app.uniswap.org/#/swap" },
     {
       provider: "Uniswap",
-      link: "https://app.uniswap.org/#/swap"
+      link: "https://app.uniswap.org/#/swap",
     },
     { provider: "Trader Joe", link: "https://app.camelot.exchange/" },
     { provider: "Camelot", link: "https://saddle.exchange/#/" },
@@ -1269,10 +1270,6 @@ interface IMyMultiplier {
 
 const MyMultiplier = ({
   seeMyStakingStats,
-  seeStakeNow,
-  stakes,
-  wethPrice,
-  usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
   return (
@@ -1469,7 +1466,7 @@ const Leaderboard = ({
       bottles: 0,
       highestRewardTier: 0,
       fusdcEarned: 0,
-      arbEarned: 0
+      arbEarned: 0,
     };
 
     data.push(userEntry);

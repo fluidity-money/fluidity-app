@@ -565,7 +565,7 @@ const parseHasuraUserTransactions = (
           },
           application: transfer.application,
           lootboxCount: transfer.lootboxCount,
-          rewardTier: transfer.rewardTier
+          rewardTier: transfer.rewardTier,
         };
       }),
     },

@@ -3,12 +3,12 @@ import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 const queryGetConfigCurrentProgram = gql`
   query getLootboxConfig {
     lootboxConfig: lootbox_config(
-      where: { is_current_program: { _eq: true }}
+      where: { is_current_program: { _eq: true } }
       limit: 1
     ) {
-      programBegin: program_begin,
-      programEnd: program_end,
-      epochIdentifier: epoch_identifier,
+      programBegin: program_begin
+      programEnd: program_end
+      epochIdentifier: epoch_identifier
       ethereumApplication: ethereum_application
     }
   }
@@ -17,12 +17,12 @@ const queryGetConfigCurrentProgram = gql`
 const queryGetConfigSpecific = gql`
   query getLootboxConfig($identifier: lootbox_epoch!) {
     lootboxConfig: lootbox_config(
-      where: { epoch_identifier: { _eq: $identifier }}
+      where: { epoch_identifier: { _eq: $identifier } }
       limit: 1
     ) {
-      programBegin: program_begin,
-      programEnd: program_end,
-      epochIdentifier: epoch_identifier,
+      programBegin: program_begin
+      programEnd: program_end
+      epochIdentifier: epoch_identifier
       ethereumApplication: ethereum_application
     }
   }
@@ -52,21 +52,21 @@ type IUseLootboxConfig = {
   shouldFind: boolean | undefined;
 };
 
-export const useLootboxConfig = ({ identifier, shouldFind }: IUseLootboxConfig) => {
+export const useLootboxConfig = ({
+  identifier,
+  shouldFind,
+}: IUseLootboxConfig) => {
   const { url, headers } = fetchInternalEndpoint();
 
   const body = (() =>
-    shouldFind ? {
-      query: queryGetConfigCurrentProgram
-    } : {
-      query: queryGetConfigSpecific,
-      variables: { identifier }
-    }
-  )();
+    shouldFind
+      ? {
+          query: queryGetConfigCurrentProgram,
+        }
+      : {
+          query: queryGetConfigSpecific,
+          variables: { identifier },
+        })();
 
-  return jsonPost<LootboxConfigBody, LootboxConfigResponse>(
-    url,
-    body,
-    headers
-  );
+  return jsonPost<LootboxConfigBody, LootboxConfigResponse>(url, body, headers);
 };

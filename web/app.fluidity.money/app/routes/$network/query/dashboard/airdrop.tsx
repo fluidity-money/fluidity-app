@@ -56,11 +56,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const address = address_?.toLowerCase();
 
-  if (!address || !network || !epochIdentifier) throw new Error("Invalid Request");
+  if (!address || !network || !epochIdentifier)
+    throw new Error("Invalid Request");
 
   const { data, errors } = await useLootboxConfig({
     identifier: epochIdentifier,
-    shouldFind: false
+    shouldFind: false,
   });
 
   if (errors) {
@@ -90,13 +91,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     programBegin: programBegin_,
     programEnd: programEnd_,
     ethereumApplication,
-    found: epochFound
+    found: epochFound,
   } = configs[0];
 
   const programBegin = new Date(programBegin_);
   const programEnd = new Date(programEnd_);
 
-  const epochDaysTotal = Math.round((programEnd.valueOf() - programBegin.valueOf()) / (1000 * 60 * 60 * 24));
+  const epochDaysTotal = Math.round(
+    (programEnd.valueOf() - programBegin.valueOf()) / (1000 * 60 * 60 * 24)
+  );
 
   const epochDaysElapsed =
     dayDifference(new Date(), programBegin) % epochDaysTotal;
@@ -108,13 +111,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     config.contract.eac_aggregator_proxy[network as Chain];
 
   try {
-    const [
-      { data: airdropStatsData, errors: airdropStatsErrors },
-      wethPrice,
-    ] = await Promise.all([
-      useAirdropStatsByAddress(address, epochIdentifier),
-      getWethUsdPrice(provider, eacAggregatorProxyAddr, EACAggregatorProxyAbi),
-    ]);
+    const [{ data: airdropStatsData, errors: airdropStatsErrors }, wethPrice] =
+      await Promise.all([
+        useAirdropStatsByAddress(address, epochIdentifier),
+        getWethUsdPrice(
+          provider,
+          eacAggregatorProxyAddr,
+          EACAggregatorProxyAbi
+        ),
+      ]);
 
     if (airdropStatsErrors || !airdropStatsData) throw airdropStatsErrors;
 
@@ -151,7 +156,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       epochDaysElapsed,
       epochIdentifier,
       epochFound,
-      ethereumApplication
+      ethereumApplication,
     } satisfies AirdropLoaderData);
   } catch (err) {
     captureException(new Error(`Could not fetch airdrop data: ${err}`), {

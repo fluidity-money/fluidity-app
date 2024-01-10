@@ -23,10 +23,14 @@ export type Asset = {
 };
 
 export const useTokens = async () => {
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
+
   const {
     data: { asset },
   } = await jsonPost(
-    process.env.FLU_HASURA_URL!,
+    url,
     { query: tokenQuery },
     process.env.FLU_HASURA_SECRET
       ? {

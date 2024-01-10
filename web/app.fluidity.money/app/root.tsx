@@ -15,7 +15,7 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import { JoeFarmlandsOrCamelotKingdomLinks,ToolTipLinks } from "./components";
+import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import { SplitContextProvider } from "contexts/SplitProvider";
 import CacheProvider from "contexts/CacheProvider";

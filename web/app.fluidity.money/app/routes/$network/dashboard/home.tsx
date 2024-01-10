@@ -378,7 +378,7 @@ export default function Home() {
       utilityTokens,
       application,
       rewardTier,
-      lootboxCount
+      lootboxCount,
     } = data;
 
     const appProviderName = getProviderDisplayName(application);
@@ -460,7 +460,8 @@ export default function Home() {
             );
           case "BOTTLES EARNED":
             return (
-              <td>{ lootboxCount ? (
+              <td>
+                {lootboxCount ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
@@ -473,9 +474,9 @@ export default function Home() {
                   </a>
                 ) : (
                   <Text>-</Text>
-                )
-              } </td>
-            )
+                )}{" "}
+              </td>
+            );
           case "ACCOUNT":
             return (
               <td>

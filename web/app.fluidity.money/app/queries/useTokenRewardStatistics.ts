@@ -42,7 +42,9 @@ const query = gql`
 
 const useTokenRewardStatistics = async (network: Chain | string) => {
   const variables = { network };
-  const url = process.env.FLU_HASURA_URL!;
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
   const body = {
     variables,
     query: query,

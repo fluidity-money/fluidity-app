@@ -44,7 +44,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         case useAll: {
           return [
             () => useAirdropLeaderboardAllTime(epoch),
-            (address: string) => useAirdropLeaderboardByUserAllTime(epoch, address),
+            (address: string) =>
+              useAirdropLeaderboardByUserAllTime(epoch, address),
           ];
         }
         case use24Hours && !!provider: {
@@ -62,13 +63,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         default: {
           return [
             () => useAirdropLeaderboard24Hours(epoch),
-            (address: string) => useAirdropLeaderboardByUser24Hours(epoch, address),
+            (address: string) =>
+              useAirdropLeaderboardByUser24Hours(epoch, address),
           ];
         }
       }
     })();
 
-    const { data: globalLeaderboardData, errors: globalLeaderboardErrors } = await useAllQuery();
+    const { data: globalLeaderboardData, errors: globalLeaderboardErrors } =
+      await useAllQuery();
 
     if (!globalLeaderboardData || globalLeaderboardErrors)
       throw globalLeaderboardErrors;
@@ -111,7 +114,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               bottles: 0,
               highestRewardTier: 0,
               fusdcEarned: 0,
-              arbEarned: 0
+              arbEarned: 0,
             } satisfies AirdropLeaderboardEntry,
           ]
     ).concat(leaderboard);

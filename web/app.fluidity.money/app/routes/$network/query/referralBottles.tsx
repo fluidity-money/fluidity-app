@@ -19,8 +19,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const address = address_.toLocaleLowerCase();
 
-  if (!address || !epoch)
-    throw new Error("Invalid Request");
+  if (!address || !epoch) throw new Error("Invalid Request");
 
   const { data: referralBottleCountData, errors: referralBottleCountErr } =
     await useReferralLootboxesByAddress(epoch, address);

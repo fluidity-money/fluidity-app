@@ -1,7 +1,8 @@
-
 import styles from "./styles.css";
 
-export const JoeFarmlandsOrCamelotKingdomLinks = () => [{ rel: "stylesheet", href: styles }];
+export const JoeFarmlandsOrCamelotKingdomLinks = () => [
+  { rel: "stylesheet", href: styles },
+];
 
 const JoeFarmlandsOrCamelotKingdom = () => {
   return (
@@ -9,15 +10,17 @@ const JoeFarmlandsOrCamelotKingdom = () => {
       <a href="#">
         <img
           className="joe_farmlands_or_camelot_img_joe"
-          src="/images/joe-farmlands.png" />
+          src="/images/joe-farmlands.png"
+        />
       </a>
       <a href="#">
         <img
           className="joe_farmlands_or_camelot_img_camelot"
-          src="/images/kingdom-of-camelot.png" />
+          src="/images/kingdom-of-camelot.png"
+        />
       </a>
     </div>
   );
-}
+};
 
 export default JoeFarmlandsOrCamelotKingdom;

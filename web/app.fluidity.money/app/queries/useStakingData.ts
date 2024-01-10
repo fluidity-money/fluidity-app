@@ -24,7 +24,11 @@ export const useStakingDataByAddress = async (
     address: `0x${"0".repeat(24)}${address.slice(2)}`,
     days_elapsed: daysElapsed,
   };
-  const url = process.env.FLU_HASURA_URL!;
+
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
+
   const body = {
     variables,
     query: queryStakingDataByAddress,

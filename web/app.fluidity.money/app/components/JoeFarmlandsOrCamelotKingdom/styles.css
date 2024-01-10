@@ -1,4 +1,3 @@
-
 .joe_farmlands_or_camelot_div {
   display: grid;
   padding-top: 20px;
@@ -6,7 +5,7 @@
 
 .joe_farmlands_or_camelot_div a {
   grid-area: 1/1;
-  --_p: calc(-1*var(--g));
+  --_p: calc(-1 * var(--g));
 }
 
 .joe_farmlands_or_camelot_div img {

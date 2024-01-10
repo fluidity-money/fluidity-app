@@ -209,7 +209,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency: { symbol: currency },
           application,
           lootboxCount,
-          rewardTier
+          rewardTier,
         } = transaction;
 
         return {
@@ -227,7 +227,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency,
           application,
           lootboxCount,
-          rewardTier
+          rewardTier,
         };
       }
     );
@@ -293,7 +293,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           utilityTokens: winner.utility,
           application: tx.application,
           lootboxCount: tx.lootboxCount,
-          rewardTier: tx.rewardTier
+          rewardTier: tx.rewardTier,
         };
       });
 

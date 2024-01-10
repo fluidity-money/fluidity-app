@@ -38,7 +38,7 @@ import {
   WalletIcon,
   TabButton,
   toDecimalPlaces,
-  LootBottle
+  LootBottle,
 } from "@fluidity-money/surfing";
 import { useContext, useEffect, useState, useMemo } from "react";
 import { ToolTipContent, useToolTip, UtilityToken } from "~/components";
@@ -435,7 +435,7 @@ export default function Rewards() {
       utilityTokens,
       application,
       lootboxCount,
-      rewardTier
+      rewardTier,
     } = data;
 
     const toolTip = useToolTip();
@@ -543,7 +543,8 @@ export default function Rewards() {
             );
           case "BOTTLES EARNED":
             return (
-              <td>{ lootboxCount ? (
+              <td>
+                {lootboxCount ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
@@ -556,8 +557,8 @@ export default function Rewards() {
                   </a>
                 ) : (
                   <Text>-</Text>
-                )
-              } </td>
+                )}{" "}
+              </td>
             );
           case "WINNER":
             return (
@@ -650,23 +651,23 @@ export default function Rewards() {
         </CardCarousel.Slide>
         <CardCarousel.Slide className={isMobile ? "compactSlide" : ""}>
           <div className={`rewards-cta-providers ${isMobile ? "compact" : ""}`}>
-            { network == "arbitrum" ?
-                <>
-                  <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
+            {network == "arbitrum" ? (
+              <>
+                <a href="https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&chainId=1">
                   <ProviderIcon provider="Sushiswap" />
-                 </a>
-                 <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
-                   <ProviderIcon provider="Uniswap" />
-                 </a>
-                 <a href="#">
-                   <ProviderIcon provider="Multichain" />
-                 </a>
-                 <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
-                   <ProviderIcon provider="Dodo" />
-                 </a>
-               </>
-             :
-               <>
+                </a>
+                <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
+                  <ProviderIcon provider="Uniswap" />
+                </a>
+                <a href="#">
+                  <ProviderIcon provider="Multichain" />
+                </a>
+                <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
+                  <ProviderIcon provider="Dodo" />
+                </a>
+              </>
+            ) : (
+              <>
                 <a href="https://www.meteora.ag/">
                   <ProviderIcon provider="Meteora" />
                 </a>
@@ -680,7 +681,7 @@ export default function Rewards() {
                   <ProviderIcon provider="Saber" />
                 </a>
               </>
-            }
+            )}
           </div>
           <Display size="xxxs">Swap To Earn</Display>
           {!isMobile && <Text>Swap Fluid Assets to generate yield.</Text>}
