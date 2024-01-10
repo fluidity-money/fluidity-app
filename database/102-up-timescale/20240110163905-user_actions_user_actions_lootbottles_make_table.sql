@@ -1,8 +1,8 @@
 -- migrate:up
 
-DROP TABLE aggregated_user_transactions_lootbottles_return;
-
 DROP FUNCTION aggregated_user_transactions_lootbottles;
+
+DROP TABLE aggregated_user_transactions_lootbottles_return;
 
 ALTER TABLE aggregated_user_transactions
 	ADD COLUMN lootbox_count DECIMAL,
