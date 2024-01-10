@@ -30,7 +30,6 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
-  AirdropIcon,
   AssetsIcon,
   Text,
   Heading,
