@@ -132,7 +132,7 @@ type (
 
 // AggregatedTransactionFromUserAction to create a partially aggregated transaction from a user action
 func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTransaction {
-	var (	
+	var (
 		senderAddress    string
 		recipientAddress string
 	)
@@ -180,7 +180,7 @@ func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner)
 		SenderAddress:   senderAddress,
 		// the sender is the winner of a pending win
 		WinningAddress: senderAddress,
-		Type: "send",
+		Type:           "send",
 	}
 
 	if pendingWinner.Utility == "FLUID" {

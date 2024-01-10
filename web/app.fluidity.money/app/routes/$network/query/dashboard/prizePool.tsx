@@ -25,7 +25,6 @@ export async function loader() {
           },
         ].map(({ network, abi, getPrizePool }) => {
           const infuraRpc = config.drivers[network][mainnetId].rpc.http;
-          console.log("infura rpc", infuraRpc);
           const provider = new JsonRpcProvider(infuraRpc);
 
           const rewardPoolAddr = config.contract.prize_pool[network as Chain];
