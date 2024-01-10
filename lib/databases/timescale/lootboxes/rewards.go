@@ -301,11 +301,11 @@ func UpdateOrInsertAmountsRewarded(network_ network.BlockchainNetwork, lootboxCu
 			$4,
 			$5,
 			$6,
-			$7
+			CURRENT_TIMESTAMP
 		)
-		ON CONFLICT (id)
+		ON CONFLICT (network, epoch, token_short_name, winner, application)
 		DO UPDATE SET
-			amount_earned = amount_earned + $4,
+			amount_earned = lootbox_amounts_rewarded.amount_earned + $4,
 			last_updated = CURRENT_TIMESTAMP`,
 
 		TableLootboxAmountsRewarded,
