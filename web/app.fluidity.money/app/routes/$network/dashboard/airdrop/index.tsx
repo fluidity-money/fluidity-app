@@ -57,7 +57,7 @@ import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 
-const EPOCH_CURRENT_IDENTIFIER = "epoch_1";
+const EPOCH_CURRENT_IDENTIFIER = "epoch_testing";
 
 const AIRDROP_MODALS = [
   "recap",
@@ -119,7 +119,7 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   programEnd: new Date("2023-06-28 T12:00:00+02:00"),
   epochDaysTotal: 30,
   epochDaysElapsed: 30,
-  epochIdentifier: "epoch_1",
+  epochIdentifier: "",
   ethereumApplication: "none",
   epochFound: false,
   loaded: false,
@@ -558,7 +558,6 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("testnet-rewards")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "testnet-rewards"}
-          disabled={true}
         >
           Testnet Rewards
         </TabButton>
@@ -1164,17 +1163,12 @@ const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Jumper", link: "https://app.uniswap.org/#/swap" },
-    {
-      provider: "Uniswap",
-      link: "https://app.uniswap.org/#/swap",
-    },
-    { provider: "Trader Joe", link: "https://app.camelot.exchange/" },
-    { provider: "Camelot", link: "https://saddle.exchange/#/" },
-    { provider: "Sushiswap", link: "https://app.chronos.exchange/" },
+    { provider: "Jumper", link: "https://jumper.exchange/" },
+    { provider: "Trader Joe", link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a" },
+    { provider: "Camelot", link: "https://app.camelot.exchange/" },
     {
       provider: "Ramses",
-      link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
+      link: "https://app.ramses.exchange/liquidity/v2/0xf73c87736008ad3af9973b357c97ab8c60d8ca63",
     },
   ];
 

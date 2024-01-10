@@ -3,7 +3,7 @@ import { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const QUERY_REFERRALS_BY_ADDRESS = gql`
-  query getReferralLootboxCountByAddress($epoch: String!, $address: String!) {
+  query getReferralLootboxCountByAddress($epoch: lootbox_epoch!, $address: String!) {
     referralLootboxCounts: lootbox_referral_lootbottle_counts(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
