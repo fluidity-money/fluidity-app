@@ -341,10 +341,10 @@ fUSDT = "https://app.meteora.ag"
 [liquidity_providers.arbitrum]
 
 [[liquidity_providers.arbitrum.providers]]
-name= "uniswap"
+name= "Trader Joe"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
+fUSDC = "https://traderjoexyz.com/arbitrum/pool/v21/0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a/0x912ce59144191c1204e64559fe8253a0e49e6548/25"
 
 [[liquidity_providers.arbitrum.providers]]
 name= "camelot"
@@ -353,10 +353,16 @@ name= "camelot"
 fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xaf88d065e77c8cC2239327C5EDb3A432268e5831&token2=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 
 [[liquidity_providers.arbitrum.providers]]
-name= "Chronos"
+name= "Ramses"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.chronos.exchange/liquidity"
+fUSDC = "https://app.ramses.exchange/liquidity/v2/0xf73c87736008ad3af9973b357c97ab8c60d8ca63"
+
+[[liquidity_providers.arbitrum.providers]]
+name= "uniswap"
+
+[liquidity_providers.arbitrum.providers.link]
+fUSDC = "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
 
 [[config.ethereum.wallets]]
 name = "Browser"
