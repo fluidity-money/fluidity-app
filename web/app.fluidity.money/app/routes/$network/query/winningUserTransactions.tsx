@@ -48,8 +48,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   if (!page || page < 1 || page > 20) return new Error("Invalid Request");
 
-  console.log("beginning");
-
   try {
     const [
       { data: winnersData, errors: winnersErr },
@@ -74,8 +72,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     ) {
       throw winnersErr;
     }
-
-    console.log("winnersErr", winnersErr, "pendingWinnersErr", pendingWinnersErr);
 
     const castPending: Winner[] =
       pendingWinnersData.ethereum_pending_winners.map((pending_winner) => {
@@ -103,8 +99,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         (first, second) =>
           Date.parse(second.awarded_time) - Date.parse(first.awarded_time)
       );
-
-    console.log("mergedWinners", mergedWinners);
 
     // If no wins found, return early
     if (!mergedWinners.length) {
@@ -158,8 +152,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       }
     );
 
-    console.log("mergedWinnersMap", mergedWinnersMap);
-
     // winnersMap looks up if a transaction was the send that caused a win
     const winners = Object.values<
       Winner & {
@@ -167,8 +159,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         utility: { [tokens: string]: number };
       }
     >(mergedWinnersMap).slice((page - 1) * 12, page * 12);
-
-    console.log("winners", winners);
 
     const winnerAddrs = winners.map(
       ({ send_transaction_hash }) => send_transaction_hash
@@ -188,7 +178,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       );
 
     if (!userTransactionsData || userTransactionsErr) {
-      console.log("userTransactionsErr", userTransactionsErr);
       captureException(
         new Error(
           `Could not fetch User Transactions for ${address}, on ${network}`
@@ -301,8 +290,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           lootboxCount: 0,
         };
       });
-
-    console.log("merged transactions", mergedTransactions);
 
     return json({
       page,
