@@ -4,9 +4,7 @@ import {
   hasuraDateToUnix,
   networkGqlBackend,
 } from "~/util/api/graphql";
-import BN from "bn.js";
 import {
-  addDecimalToBn,
   getTokenFromAddress,
   Token,
 } from "~/util/chainUtils/tokens";
