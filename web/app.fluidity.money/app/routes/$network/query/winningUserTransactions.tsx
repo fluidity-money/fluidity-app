@@ -26,8 +26,8 @@ type UserTransaction = {
   value: number;
   currency: string;
   application: string;
-  lootboxCount: number;
   rewardTier: number;
+  lootboxCount: number;
 };
 
 export type TransactionsLoaderData = {
@@ -208,8 +208,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           amount: value,
           currency: { symbol: currency },
           application,
-          lootboxCount,
           rewardTier,
+          lootboxCount
         } = transaction;
 
         return {
@@ -292,8 +292,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           swapType,
           utilityTokens: winner.utility,
           application: tx.application,
-          lootboxCount: tx.lootboxCount,
           rewardTier: tx.rewardTier,
+          lootboxCount: tx.lootboxCount,
         };
       });
 

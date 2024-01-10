@@ -4,9 +4,7 @@ import {
   hasuraDateToUnix,
   networkGqlBackend,
 } from "~/util/api/graphql";
-import BN from "bn.js";
 import {
-  addDecimalToBn,
   getTokenFromAddress,
   Token,
 } from "~/util/chainUtils/tokens";
@@ -21,7 +19,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "arbitrum" }
           token_short_name: { _in: $tokens }
@@ -59,7 +57,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "solana" }
           token_short_name: { _in: $tokens }
@@ -79,7 +77,6 @@ const queryByAddress: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -97,7 +94,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "polygon_zk" }
           token_short_name: { _in: $tokens }
@@ -117,7 +114,6 @@ const queryByAddress: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -135,7 +131,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -150,7 +146,6 @@ const queryByTxHash: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -165,7 +160,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -180,7 +175,6 @@ const queryByTxHash: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -196,7 +190,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "polygon_zk" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -211,7 +205,6 @@ const queryByTxHash: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -230,7 +223,7 @@ const queryAll: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -263,7 +256,7 @@ const queryAll: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -279,7 +272,6 @@ const queryAll: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -296,7 +288,7 @@ const queryAll: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions_lootbottles(
+      transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "polygon_zk" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -312,7 +304,6 @@ const queryAll: Queryable = {
         time
         transaction_hash
         amount
-        token_decimals
         type
         swap_in
         application
@@ -375,7 +366,6 @@ type HasuraUserTransaction = {
   sender_address: string;
   recipient_address: string;
   amount: number;
-  token_decimals: number;
   token_short_name: string;
   transaction_hash: string;
   time: string;
@@ -552,12 +542,7 @@ const parseHasuraUserTransactions = (
         return {
           sender: { address: senderAddress },
           receiver: { address: recipientAddress },
-          amount: Number(
-            addDecimalToBn(
-              new BN(String(transfer.amount)),
-              transfer.token_decimals
-            )
-          ),
+          amount: transfer.amount,
           currency: { symbol: "f" + transfer.token_short_name },
           transaction: { hash: transfer.transaction_hash },
           block: {
