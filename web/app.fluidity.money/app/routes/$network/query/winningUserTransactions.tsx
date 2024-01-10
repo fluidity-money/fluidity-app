@@ -286,8 +286,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           swapType,
           utilityTokens: winner.utility,
           application: tx.application,
-          rewardTier: 0,
-          lootboxCount: 0,
+          rewardTier: tx.rewardTier,
+          lootboxCount: tx.lootboxCount,
         };
       });
 
@@ -298,8 +298,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       loaded: true,
     } satisfies TransactionsLoaderData);
   } catch (err) {
-    console.error("err", err);
-
     captureException(
       new Error(
         `BitQuery returned an invalid response for ${address}, on ${network}. Maybe your API key is invalid?`
