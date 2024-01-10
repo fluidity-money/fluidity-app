@@ -54,8 +54,12 @@ const useReferralCodeByAddress = (address: string) => {
     variables,
   };
 
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
+
   return jsonPost<ReferralCodeByAddressBody, ReferralCodeRes>(
-    process.env.FLU_HASURA_URL!,
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -75,8 +79,12 @@ const useReferralCodeByCode = (code: string) => {
     variables,
   };
 
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
+
   return jsonPost<ReferralCodeByCodeBody, ReferralCodeRes>(
-    process.env.FLU_HASURA_URL!,
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

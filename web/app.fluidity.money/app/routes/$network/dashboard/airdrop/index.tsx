@@ -24,7 +24,6 @@ import {
   BloomEffect,
   toSignificantDecimals,
   useViewport,
-  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -34,7 +33,6 @@ import {
   StakingStatsModal,
   TutorialModal,
   RecapModal,
-  stakingLiquidityMultiplierEq,
   TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
@@ -58,7 +56,6 @@ import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
-import { LootboxConfig } from "~/queries/useLootboxConfig";
 
 const EPOCH_CURRENT_IDENTIFIER = "epoch_1";
 
@@ -202,7 +199,6 @@ const Airdrop = () => {
     address,
     balance,
     stakeTokens,
-    getStakingDeposits,
     testStakeTokens,
     getStakingRatios,
     redeemableTokens: getRedeemableTokens,
@@ -264,13 +260,8 @@ const Airdrop = () => {
       bottlesCount,
       wethPrice,
       usdcPrice,
-      programBegin,
-      programEnd,
       epochDaysTotal,
       epochDaysElapsed,
-      epochIdentifier,
-      ethereumApplication,
-      epochFound,
     },
     referrals: {
       numActiveReferreeReferrals,
@@ -302,7 +293,7 @@ const Airdrop = () => {
     setCurrentModal(isAirdropModal(destModal) ? destModal : null);
   }, [location.hash]);
 
-  const [stakes, setStakes] = useState<
+  const [stakes, _] = useState<
     Array<{
       fluidAmount: BN;
       baseAmount: BN;
@@ -570,7 +561,7 @@ const Airdrop = () => {
           size="small"
           groupId="airdrop"
         >
-          <a href="https://dune.com/neogeo/fluidity-airdrop-v2" target="_blank">
+          <a href="https://dune.com/neogeo/fluidity-airdrop-v2" target="_blank" rel="noreferrer">
             Dune
           </a>
         </TabButton>
@@ -1284,46 +1275,6 @@ const MyMultiplier = ({
   usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
-  const sumLiquidityMultiplier = stakes.reduce(
-    (sum, { fluidAmount, baseAmount, durationDays, depositDate }) => {
-      const fluidDecimals = 6;
-      const fluidUsd = getUsdFromTokenAmount(
-        fluidAmount,
-        fluidDecimals,
-        usdcPrice
-      );
-
-      const wethDecimals = 18;
-      const usdcDecimals = 6;
-
-      // If converting base amount by weth decimals (18) is smaller than $0.01,
-      // then tentatively assume Token amount is USDC
-      // A false hit would be a USDC deposit >= $100,000
-      const baseUsd =
-        getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
-          ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-          : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
-
-      const stakedDays = dayDifference(new Date(), new Date(depositDate));
-
-      const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
-
-      return sum + (fluidUsd + baseUsd) * multiplier;
-    },
-    0
-  );
-
-  // if there are no stakes, this renders an empty stake on the dashboard which is A PART OF THE DESIGN SPEC
-  if (stakes.length === 0)
-    stakes = [
-      {
-        fluidAmount: new BN(0),
-        baseAmount: new BN(0),
-        durationDays: 0,
-        depositDate: new Date(),
-      },
-    ];
-
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}

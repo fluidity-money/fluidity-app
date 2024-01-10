@@ -1,4 +1,3 @@
-import { BottleTiers } from "~/routes/$network/query/dashboard/airdrop";
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryGetConfigCurrentProgram = gql`

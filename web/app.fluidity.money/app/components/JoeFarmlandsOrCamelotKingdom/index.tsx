@@ -3,10 +3,7 @@ import styles from "./styles.css";
 
 export const JoeFarmlandsOrCamelotKingdomLinks = () => [{ rel: "stylesheet", href: styles }];
 
-interface IJoeFarmlandsOrCamelotKingdomProps {
-};
-
-const JoeFarmlandsOrCamelotKingdom = (props: IJoeFarmlandsOrCamelotKingdomProps) => {
+const JoeFarmlandsOrCamelotKingdom = () => {
   return (
     <div className="joe_farmlands_or_camelot_div">
       <a href="#">

@@ -82,10 +82,12 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
     },
   };
 
-  const fluGqlEndpoint = process.env.FLU_HASURA_URL!;
+  const url = process.env.FLU_HASURA_URL;
+
+  if (!url) throw new Error("FLU_HASURA_URL not set!");
 
   return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
-    fluGqlEndpoint,
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

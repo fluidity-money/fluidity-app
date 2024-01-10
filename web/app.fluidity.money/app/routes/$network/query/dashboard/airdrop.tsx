@@ -4,7 +4,6 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
 import { useAirdropStatsByAddress } from "~/queries/useAirdropStats";
-import { useStakingDataByAddress } from "~/queries/useStakingData";
 import { useLootboxConfig } from "~/queries";
 import { getWethUsdPrice } from "~/util/chainUtils/ethereum/transaction";
 import EACAggregatorProxyAbi from "~/util/chainUtils/ethereum/EACAggregatorProxy.json";
@@ -53,14 +52,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const url = new URL(request.url);
   const address_ = url.searchParams.get("address");
-  const epochIdentifier = url.searchParams.get("epoch");
+  const epochIdentifier = url.searchParams.get("epoch") ?? "";
 
   const address = address_?.toLowerCase();
 
   if (!address || !network || !epochIdentifier) throw new Error("Invalid Request");
 
   const { data, errors } = await useLootboxConfig({
-    identifier: epochIdentifier!,
+    identifier: epochIdentifier,
     shouldFind: false
   });
 

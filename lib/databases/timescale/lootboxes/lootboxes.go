@@ -34,7 +34,7 @@ const (
 type Lootbox = types.Lootbox
 
 // InsertLootbox inserts a Lootbox into the database
-func InsertLootbox(lootbox Lootbox, currentEpoch string) {
+func InsertLootbox(lootbox Lootbox) {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -88,7 +88,7 @@ func InsertLootbox(lootbox Lootbox, currentEpoch string) {
 }
 
 // GetLootboxes gets all Lootboxes earned by address, limited by a number
-func GetLootboxes(address ethereum.Address, currentEpoch string, limit int) []Lootbox {
+func GetLootboxes(currentEpoch string, address ethereum.Address, limit int) []Lootbox {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(

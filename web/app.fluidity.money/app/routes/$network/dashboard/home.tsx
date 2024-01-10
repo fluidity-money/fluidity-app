@@ -483,6 +483,7 @@ export default function Home() {
                   className="table-address"
                   href={getAddressExplorerLink(chain, sender)}
                   target="_blank"
+                  rel="noreferrer"
                 >
                   <Text>
                     {sender === MintAddress

@@ -119,6 +119,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountCommon,
 				RewardTier:   1,
+				Epoch:        currentEpoch,
 			},
 			{
 				Address:      testnetOwnerString,
@@ -126,6 +127,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountUncommon,
 				RewardTier:   2,
+				Epoch:        currentEpoch,
 			},
 			{
 				Address:      testnetOwnerString,
@@ -133,6 +135,7 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountRare,
 				RewardTier:   3,
+				Epoch:        currentEpoch,
 			},
 			{
 				Address:      testnetOwnerString,
@@ -140,11 +143,12 @@ func main() {
 				AwardedTime:  currentTime,
 				LootboxCount: LootboxCountUltraRare,
 				RewardTier:   4,
+				Epoch:        currentEpoch,
 			},
 		}
 
 		for _, lootbox := range boxes {
-			lootboxes.InsertLootbox(lootbox, currentEpoch)
+			lootboxes.InsertLootbox(lootbox)
 		}
 	})
 }
