@@ -5,8 +5,8 @@
 DROP FUNCTION airdrop_leaderboard_24_hours;
 
 ALTER TABLE airdrop_leaderboard_return
-	ADD COLUMN fusdc_earned DECIMAL NOT NULL,
-	ADD COLUMN arb_earned DECIMAL NOT NULL;
+	ADD COLUMN fusdc_earned NUMERIC NOT NULL,
+	ADD COLUMN arb_earned NUMERIC NOT NULL;
 
 CREATE FUNCTION airdrop_leaderboard_24_hours(epoch_ lootbox_epoch)
 RETURNS SETOF airdrop_leaderboard_return

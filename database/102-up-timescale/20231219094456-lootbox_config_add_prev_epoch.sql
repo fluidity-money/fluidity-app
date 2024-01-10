@@ -8,11 +8,11 @@ CREATE TABLE lootbox_config (
 
 	-- program_begin_date to begin counting lootbottles from
 	-- this date onwards, in UTC
-	program_begin TIMESTAMP,
+	program_begin TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
 	-- program_end to use as the final date for the epoch, and
 	-- when to stop counting (also in UTC)
-	program_end TIMESTAMP,
+	program_end TIMESTAMP WITHOUT TIME ZONE NOT NULL,
 
 	-- epoch_identifier to use as the identifier for the epoch with
 	-- the enum

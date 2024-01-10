@@ -57,19 +57,20 @@ func main() {
 
 	// if there's a current application focus, then we want to reward only specific winners
 
-	if currentApplication != application.ApplicationNone {
+	switch currentApplication {
+	case applications.ApplicationNone:
+		topUsers = lootboxes.GetTopUsersByLootboxCount(
+			currentEpoch,
+			startTime,
+			endTime,
+		)
+	default:
 		// fetch and log the top 10 users for a specific application
 		topUsers = lootboxes.GetTopApplicationUsersByLootboxCount(
+			currentEpoch,
 			startTime,
 			endTime,
 			currentApplication,
-			currentEpoch,
-		)
-	} else {
-		topUsers = lootboxes.GetTopUsersByLootboxCount(
-			startTime,
-			endTime,
-			currentEpoch,
 		)
 	}
 
@@ -86,5 +87,5 @@ func main() {
 	}
 
 	// reward the top 10 users
-	lootboxes.InsertTopUserReward(startTime, topUsers)
+	lootboxes.InsertTopUserReward(currentEpoch, startTime, topUsers)
 }

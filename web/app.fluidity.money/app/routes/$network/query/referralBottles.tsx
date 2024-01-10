@@ -25,8 +25,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const { data: referralBottleCountData, errors: referralBottleCountErr } =
     await useReferralLootboxesByAddress(epoch, address);
 
-  console.log("errors", referralBottleCountErr);
-
   if (referralBottleCountErr || !referralBottleCountData) {
     throw new Error("Could not fetch Referral Bottles");
   }

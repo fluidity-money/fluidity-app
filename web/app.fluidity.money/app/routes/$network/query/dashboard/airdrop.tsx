@@ -65,7 +65,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   });
 
   if (errors) {
-    console.log("errors", errors);
     captureException(errors, {
       tags: {
         section: "airdrop",
@@ -161,7 +160,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         section: "network/index",
       },
     });
-    console.log("ccccc", err);
     return new Error("Server could not fulfill request");
   }
 };

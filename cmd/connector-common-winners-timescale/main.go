@@ -8,14 +8,17 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/solana"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
+// lootboxUpdateTrackedRewardAmounts by destructuring the winner, and
+// upserting it into the database. queries the current epoch to get what
+// should be used.
 func lootboxUpdateTrackedRewardAmounts(winner queue.Winner) {
 	var (
 		network_     = winner.Network
@@ -50,6 +53,9 @@ func lootboxUpdateTrackedRewardAmounts(winner queue.Winner) {
 	default:
 		winnerAddress = winner.WinnerAddress
 	}
+
+	// we can normalise this and store it in the database to avoid an
+	// extra check, as we can afford some loss in this calculation.
 
 	decimals := math.Pow10(tokenDecimals)
 

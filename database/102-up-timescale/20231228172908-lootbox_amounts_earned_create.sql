@@ -17,7 +17,7 @@ CREATE TABLE lootbox_amounts_rewarded (
 
 	-- the amount earned, normalised according to the underlying
 	-- decimals. can be lossy
-	amount_earned DECIMAL NOT NULL,
+	amount_earned NUMERIC NOT NULL,
 
 	-- winner of the winning (the recipient of the winning payout)
 	winner VARCHAR NOT NULL,

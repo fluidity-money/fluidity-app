@@ -17,6 +17,11 @@
 | `FLU_SENTRY_DSN`        | Sentry reporting URI                                      |
 | `FLU_SPLIT_BROWSER_KEY` | Split Client-Side Key                                     |
 | `FLU_WALLETCONNECT_ID`  | WalletConnect Client-Side Project ID                      |
+| `FLU_HASURA_URL`        | Hasura API URL                                            |
+
+### Note on the Hasura API URL
+
+This is also set manually in `app/util/api/graphql.ts`.
 
 ## Building
 
