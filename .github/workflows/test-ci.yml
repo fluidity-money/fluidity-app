@@ -105,6 +105,7 @@ jobs:
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
+          FLU_HASURA_URL: ${{ secrets.FLU_HASURA_URL }}
         with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
