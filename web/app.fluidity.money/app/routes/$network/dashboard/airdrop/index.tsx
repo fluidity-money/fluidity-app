@@ -300,7 +300,12 @@ const Airdrop = () => {
     setCurrentModal(isAirdropModal(destModal) ? destModal : null);
   }, [location.hash]);
 
-  const stakes = [];
+  const stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }> = [];
 
   const fetchUserTokenBalance = async () => {
     const userTokenBalance = await Promise.all(
