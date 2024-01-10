@@ -30,7 +30,6 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
-  AirdropIcon,
   AssetsIcon,
   Text,
   Heading,
@@ -168,13 +167,6 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-  {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
-    },
-  },
   {
     home: {
       name: "dashboard",
