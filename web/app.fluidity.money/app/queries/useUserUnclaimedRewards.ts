@@ -82,9 +82,7 @@ const useUserUnclaimedRewards = async (network: string, address: string) => {
     },
   };
 
-  const url = process.env.FLU_HASURA_URL;
-
-  if (!url) throw new Error("FLU_HASURA_URL not set!");
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<UnclaimedRewardsReq, UnclaimedRewardsRes>(
     url,

@@ -12,8 +12,6 @@ RUN yarn
 
 ARG FLU_SENTRY_DSN
 
-ARG FLU_HASURA_URL
-
 WORKDIR /usr/local/src/fluidity/web/app.fluidity.money
 
 RUN make frontend

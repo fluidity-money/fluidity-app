@@ -64,9 +64,7 @@ const useActiveReferralCountByReferrerAddress = (address: string) => {
     variables,
   };
 
-  const url = process.env.FLU_HASURA_URL;
-
-  if (!url) throw new Error("FLU_HASURA_URL not set!");
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
@@ -89,9 +87,7 @@ const useActiveReferralCountByRefereeAddress = (address: string) => {
     variables,
   };
 
-  const url = process.env.FLU_HASURA_URL;
-
-  if (!url) throw new Error("FLU_HASURA_URL not set!");
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
@@ -114,9 +110,7 @@ const useInactiveReferralCountByRefereeAddress = (address: string) => {
     variables,
   };
 
-  const url = process.env.FLU_HASURA_URL;
-
-  if (!url) throw new Error("FLU_HASURA_URL not set!");
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
