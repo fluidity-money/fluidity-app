@@ -376,7 +376,6 @@ export default function Home() {
       logo,
       utilityTokens,
       application,
-      rewardTier,
       lootboxCount,
     } = data;
 
