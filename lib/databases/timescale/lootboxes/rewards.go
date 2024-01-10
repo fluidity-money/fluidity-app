@@ -13,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 )
 
 const ExpectedTopUsers = 10
@@ -33,32 +34,32 @@ func buildUserRewardValuesString(userCount int) (string, error) {
 	}
 
 	rewardStrings := []string{
-		`($2, '', 'leaderboard_prize', $1, 0, 1, 30, 'none'),
-($2, '', 'leaderboard_prize', $1, 0, 2, 10, 'none'),
-($2, '', 'leaderboard_prize', $1, 0, 3, 5, 'none')`,
+		`($3, '', 'leaderboard_prize', $1, 0, 1, 30, 'none', $2),
+($3, '', 'leaderboard_prize', $1, 0, 2, 10, 'none', $2),
+($3, '', 'leaderboard_prize', $1, 0, 3, 5, 'none', $2)`,
 
-		`($3, '', 'leaderboard_prize', $1, 0, 1, 20, 'none'),
-($3, '', 'leaderboard_prize', $1, 0, 2, 5, 'none'),
-($3, '', 'leaderboard_prize', $1, 0, 3, 2, 'none')`,
+		`($4, '', 'leaderboard_prize', $1, 0, 1, 20, 'none', $2),
+($4, '', 'leaderboard_prize', $1, 0, 2, 5, 'none', $2),
+($4, '', 'leaderboard_prize', $1, 0, 3, 2, 'none', $2)`,
 
-		`($4, '', 'leaderboard_prize', $1, 0, 1, 15, 'none'),
-($4, '', 'leaderboard_prize', $1, 0, 2, 3, 'none'),
-($4, '', 'leaderboard_prize', $1, 0, 3, 1, 'none')`,
+		`($5, '', 'leaderboard_prize', $1, 0, 1, 15, 'none', $2),
+($5, '', 'leaderboard_prize', $1, 0, 2, 3, 'none', $2),
+($5, '', 'leaderboard_prize', $1, 0, 3, 1, 'none', $2)`,
 
-		`($5, '', 'leaderboard_prize', $1, 0, 1, 12, 'none'),
-($5, '', 'leaderboard_prize', $1, 0, 2, 1, 'none')`,
+		`($6, '', 'leaderboard_prize', $1, 0, 1, 12, 'none', $2),
+($6, '', 'leaderboard_prize', $1, 0, 2, 1, 'none', $2)`,
 
-		"($6, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+		"($7, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)",
 
-		"($7, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+		"($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)",
 
-		"($8, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+		"($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)",
 
-		"($9, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+		"($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)",
 
-		"($10, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+		"($11, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)",
 
-		"($11, '', 'leaderboard_prize', $1, 0, 1, 10, 'none')",
+		"($12, '', 'leaderboard_prize', $1, 0, 1, 10, 'none', $2)",
 	}
 
 	var output strings.Builder
@@ -100,7 +101,7 @@ func buildUserRewardValuesString(userCount int) (string, error) {
 
 // InsertTopUserReward to insert lootboxes for the given users for their activity during the airdrop.
 // Expects 10 users to reward
-func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
+func InsertTopUserReward(currentEpoch string, currentTime time.Time, users []UserLootboxCount) {
 	valuesString, err := buildUserRewardValuesString(len(users))
 
 	if err != nil {
@@ -114,14 +115,15 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 
 	statementText := fmt.Sprintf(
 		`INSERT INTO %s (
-			address, 
-			transaction_hash, 
-			source, 
-			awarded_time, 
-			volume, 
-			reward_tier, 
-			lootbox_count, 
-			application
+			address,
+			transaction_hash,
+			source,
+			awarded_time,
+			volume,
+			reward_tier,
+			lootbox_count,
+			application,
+			epoch
 		) VALUES
 			%s`,
 		TableLootboxes,
@@ -129,8 +131,7 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 	)
 
 	// build variadic arguments [time, users...]
-	var args []interface{}
-	args = append(args, currentTime)
+	args := []interface{}{currentTime, currentEpoch}
 
 	for _, user := range users {
 		args = append(args, user.Address)
@@ -151,21 +152,22 @@ func InsertTopUserReward(currentTime time.Time, users []UserLootboxCount) {
 }
 
 // fetch the 10 addresses with the highest lootboxes earned during the given period
-func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount {
+func GetTopUsersByLootboxCount(currentEpoch string, startTime, endTime time.Time) []UserLootboxCount {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
-		`SELECT 
-			address, 
-			SUM(lootbox_count) AS lootbox_count 
+		`SELECT
+			address,
+			SUM(lootbox_count) AS lootbox_count
 		FROM %s
-		WHERE 
+		WHERE
 			awarded_time >= $1 AT TIME ZONE $3 AND
-			awarded_time < $2 AT TIME ZONE $4 AND 
-			source != 'leaderboard_prize'
-		GROUP BY address 
+			awarded_time < $2 AT TIME ZONE $4 AND
+			source != 'leaderboard_prize' AND
+			epoch = $5
+		GROUP BY address
 		ORDER BY lootbox_count DESC
-		LIMIT $5`,
+		LIMIT $6`,
 
 		TableLootboxes,
 	)
@@ -176,6 +178,7 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 		endTime,
 		LootboxRewardTimezone,
 		LootboxRewardTimezone,
+		currentEpoch,
 		10,
 	)
 
@@ -193,10 +196,8 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 
 	for rows.Next() {
 		var user UserLootboxCount
-		err := rows.Scan(
-			&user.Address,
-			&user.LootboxCount,
-		)
+
+		err := rows.Scan(&user.Address, &user.LootboxCount)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -215,20 +216,21 @@ func GetTopUsersByLootboxCount(startTime, endTime time.Time) []UserLootboxCount 
 const LootboxRewardTimezone = "Australia/Adelaide"
 
 // fetch the 10 addresses with the highest lootboxes earned during the given period on the given application
-func GetTopApplicationUsersByLootboxCount(startTime, endTime time.Time, application applications.Application) []UserLootboxCount {
+func GetTopApplicationUsersByLootboxCount(currentEpoch string, startTime, endTime time.Time, application applications.Application) []UserLootboxCount {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
-		`SELECT 
-			address, 
-			SUM(lootbox_count) AS lootbox_count 
+		`SELECT
+			address,
+			SUM(lootbox_count) AS lootbox_count
 		FROM %s
-		WHERE 
+		WHERE
 			awarded_time >= $1 AT TIME ZONE $3 AND
-			awarded_time < $2 AT TIME ZONE $4 AND 
+			awarded_time < $2 AT TIME ZONE $4 AND
 			source != 'leaderboard_prize' AND
-			application = $6
-		GROUP BY address 
+			application = $6 AND
+			epoch = $7
+		GROUP BY address
 		ORDER BY lootbox_count DESC
 		LIMIT $5`,
 
@@ -243,6 +245,7 @@ func GetTopApplicationUsersByLootboxCount(startTime, endTime time.Time, applicat
 		LootboxRewardTimezone,
 		10,
 		application.String(),
+		currentEpoch,
 	)
 
 	if err != nil {
@@ -259,10 +262,8 @@ func GetTopApplicationUsersByLootboxCount(startTime, endTime time.Time, applicat
 
 	for rows.Next() {
 		var user UserLootboxCount
-		err := rows.Scan(
-			&user.Address,
-			&user.LootboxCount,
-		)
+
+		err := rows.Scan(&user.Address, &user.LootboxCount)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
@@ -276,4 +277,55 @@ func GetTopApplicationUsersByLootboxCount(startTime, endTime time.Time, applicat
 	}
 
 	return topUsers
+}
+
+// UpdateOrInsertAmountsRewarded for the current user in the specific
+// epoch that's taking place.
+func UpdateOrInsertAmountsRewarded(network_ network.BlockchainNetwork, lootboxCurrentEpoch, tokenShortName string, amountNormalLossy float64, winnerAddress, application string) {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`INSERT INTO %s (
+			network,
+			epoch,
+			token_short_name,
+			amount_earned,
+			winner,
+			application,
+			last_updated
+		)
+		VALUES (
+			$1,
+			$2,
+			$3,
+			$4,
+			$5,
+			$6,
+			$7
+		)
+		ON CONFLICT (id)
+		DO UPDATE SET
+			amount_earned = amount_earned + $4,
+			last_updated = CURRENT_TIMESTAMP`,
+
+		TableLootboxAmountsRewarded,
+	)
+
+	_, err := timescaleClient.Exec(
+		statementText,
+		network_,
+		lootboxCurrentEpoch,
+		tokenShortName,
+		amountNormalLossy,
+		application,
+		winnerAddress,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to upsert a lootbox amount rewarded!"
+			k.Payload = err
+		})
+	}
 }

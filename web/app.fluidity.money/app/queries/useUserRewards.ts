@@ -196,7 +196,9 @@ const useUserRewardsAll = async (network: string) => {
 
 const useUserRewardsByAddress = async (network: string, address: string) => {
   const variables = { network, address };
+
   const url = "https://fluidity.hasura.app/v1/graphql";
+
   const body = {
     variables,
     query: queryWinnersByAddress[network as Chain],

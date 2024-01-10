@@ -10,7 +10,12 @@ const UtilityToken = ({ utility, ...imgProps }: IUtilityToken) => {
       return <img {...imgProps} src="/images/providers/wombat.svg" />;
     case "sushi":
       return <img {...imgProps} src="/images/providers/Sushiswap.svg" />;
-    case "trader":
+    case "trader_joe":
+      return <img {...imgProps} src="/images/providers/trader_joe.svg" />;
+    case "ramses":
+      return <img {...imgProps} src="/images/providers/Ramses.svg" />;
+    case "jumper":
+      return <img {...imgProps} src="/images/providers/Jumper.svg" />;
     case "arb":
       return <img {...imgProps} src="/assets/chains/arbIcon.svg" />;
     default:

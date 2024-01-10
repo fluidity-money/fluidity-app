@@ -24,7 +24,9 @@ export const useStakingDataByAddress = async (
     address: `0x${"0".repeat(24)}${address.slice(2)}`,
     days_elapsed: daysElapsed,
   };
+
   const url = "https://fluidity.hasura.app/v1/graphql";
+
   const body = {
     variables,
     query: queryStakingDataByAddress,

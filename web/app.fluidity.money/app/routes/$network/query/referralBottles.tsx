@@ -15,15 +15,14 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
 
   const address_ = url.searchParams.get("address") ?? "";
+  const epoch = url.searchParams.get("epoch");
 
   const address = address_.toLocaleLowerCase();
 
-  if (!address) {
-    throw new Error("Invalid Request");
-  }
+  if (!address || !epoch) throw new Error("Invalid Request");
 
   const { data: referralBottleCountData, errors: referralBottleCountErr } =
-    await useReferralLootboxesByAddress(address);
+    await useReferralLootboxesByAddress(epoch, address);
 
   if (referralBottleCountErr || !referralBottleCountData) {
     throw new Error("Could not fetch Referral Bottles");

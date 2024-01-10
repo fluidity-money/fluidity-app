@@ -21,6 +21,7 @@ import {
   TabButton,
   toDecimalPlaces,
   ProviderIcon,
+  LootBottle,
   TokenIcon,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
@@ -262,6 +263,7 @@ export default function Home() {
         { name: "VALUE" },
         { name: "FLUID REWARDS", show: width >= 500 },
         { name: "$UTILITY REWARDS", show: width >= 500 },
+        { name: "BOTTLES EARNED", show: width >= 500 },
         { name: "ACCOUNT", show: width >= 375 },
         { name: "TIME", show: width >= 850, alignRight: true },
       ];
@@ -375,6 +377,8 @@ export default function Home() {
       logo,
       utilityTokens,
       application,
+      rewardTier,
+      lootboxCount,
     } = data;
 
     const appProviderName = getProviderDisplayName(application);
@@ -454,12 +458,33 @@ export default function Home() {
                 )}
               </td>
             );
+          case "BOTTLES EARNED":
+            return (
+              <td>
+                {lootboxCount ? (
+                  <a
+                    className="table-address"
+                    href={`/${network}/dashboard/airdrop`}
+                  >
+                    <LootBottle
+                      size="lg"
+                      rarity={rewardTier}
+                      quantity={lootboxCount}
+                    />
+                  </a>
+                ) : (
+                  <Text>-</Text>
+                )}{" "}
+              </td>
+            );
           case "ACCOUNT":
             return (
               <td>
                 <a
                   className="table-address"
                   href={getAddressExplorerLink(chain, sender)}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   <Text>
                     {sender === MintAddress

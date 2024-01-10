@@ -391,9 +391,6 @@
 
 .airdrop-my-multiplier {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2em;
 }
 .airdrop-my-multiplier svg,
 .airdrop-my-multiplier path {
@@ -426,9 +423,6 @@
 }
 .airdrop-my-multiplier #mx-see-my-staking-stats {
   width: 100%;
-  grid-area: 2/1;
-  box-sizing: border-box;
-  align-self: end;
 }
 .airdrop-my-multiplier #mx-my-stakes {
   display: grid;
@@ -980,6 +974,23 @@
   width: 100%;
   box-sizing: border-box;
   aspect-ratio: 1/1;
+}
+
+#tutorial,
+#staking-stats,
+#bottles-details,
+#testnet-rewards {
+  position: fixed;
+}
+
+.airdrop-arb-multipliers-container {
+  display: flex;
+  padding-top: 20px;
+}
+
+.airdrop-arb-multipliers-container > * {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /*# sourceMappingURL=airdrop.css.map */

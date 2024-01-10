@@ -30,7 +30,6 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
-  AirdropIcon,
   AssetsIcon,
   Text,
   Heading,
@@ -168,13 +167,6 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-  {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
-    },
-  },
   {
     home: {
       name: "dashboard",
@@ -461,53 +453,49 @@ export default function Dashboard() {
       </Modal>
 
       {/* Referral Modal */}
-      {false && (
-        <CardModal
-          id="referral-modal"
-          visible={referralModalVisibility}
-          closeModal={() => setReferralModalVisibility(false)}
-          cardPositionStyle={{
-            position: "absolute",
-            top: "1em",
-            right: isTablet ? "20px" : "60px",
-            width: 500,
+      <CardModal
+        id="referral-modal"
+        visible={referralModalVisibility}
+        closeModal={() => setReferralModalVisibility(false)}
+        cardPositionStyle={{
+          position: "absolute",
+          top: "1em",
+          right: isTablet ? "20px" : "60px",
+          width: 500,
+        }}
+        color="holo"
+        style={{ padding: 0, width: "100%" }}
+      >
+        <ReferralModal
+          connected={!!connected}
+          network={network}
+          connectWallet={() => {
+            setReferralModalVisibility(false);
+            setWalletModalVisibility(true);
           }}
-          color="holo"
-          style={{ padding: 0, width: "100%" }}
-        >
-          <ReferralModal
-            connected={!!connected}
-            network={network}
-            connectWallet={() => {
-              setReferralModalVisibility(false);
-              setWalletModalVisibility(true);
-            }}
-            referrerClaimed={numActiveReferrerReferrals}
-            refereeClaimed={numActiveReferreeReferrals}
-            refereeUnclaimed={numInactiveReferreeReferrals}
-            progress={inactiveReferrals[0]?.progress || 0}
-            progressReq={10}
-            referralCode={referralCode}
-            loaded={referralCountLoaded}
-            closeModal={() => setReferralModalVisibility(false)}
-          />
-        </CardModal>
-      )}
+          referrerClaimed={numActiveReferrerReferrals}
+          refereeClaimed={numActiveReferreeReferrals}
+          refereeUnclaimed={numInactiveReferreeReferrals}
+          progress={inactiveReferrals[0]?.progress || 0}
+          progressReq={10}
+          referralCode={referralCode}
+          loaded={referralCountLoaded}
+          closeModal={() => setReferralModalVisibility(false)}
+        />
+      </CardModal>
 
       {/* Accept Referral Modal */}
-      {false && (
-        <CardModal
-          id="accept-referral-modal"
-          visible={acceptReferralModalVisibility}
-          closeModal={() => setAcceptReferralModalVisibility(false)}
-        >
-          <AcceptReferralModal
-            network={network}
-            referralCode={clickedReferralCode}
-            referrer={referralAddress}
-          />
-        </CardModal>
-      )}
+      <CardModal
+        id="accept-referral-modal"
+        visible={acceptReferralModalVisibility}
+        closeModal={() => setAcceptReferralModalVisibility(false)}
+      >
+        <AcceptReferralModal
+          network={network}
+          referralCode={clickedReferralCode}
+          referrer={referralAddress}
+        />
+      </CardModal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
@@ -679,36 +667,32 @@ export default function Dashboard() {
             </GeneralButton>
 
             {/* Referrals Button */}
-            {false && (
-              <GeneralButton
-                type="transparent"
-                size="small"
-                layout="before"
-                handleClick={() => {
-                  width < airdropMobileBreakpoint
-                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                    : setReferralModalVisibility(true);
-                }}
-                icon={<Referral />}
-              >
-                {isMobile ? "" : "Referral"}
-              </GeneralButton>
-            )}
+            <GeneralButton
+              type="transparent"
+              size="small"
+              layout="before"
+              handleClick={() => {
+                width < airdropMobileBreakpoint
+                  ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                  : setReferralModalVisibility(true);
+              }}
+              icon={<Referral />}
+            >
+              {isMobile ? "" : "Referral"}
+            </GeneralButton>
 
             {/* Fluidify button */}
-            {otherModalOpen && showExperiment("Fluidify-Button-Placement") && (
-              <GeneralButton
-                className="fluidify-button-dashboard "
-                type={"secondary"}
-                size={"small"}
-                handleClick={() => {
-                  client?.track("user", "click_fluidify");
-                  navigate(`/${network}/fluidify`);
-                }}
-              >
-                <b>Fluidify{isMobile ? "" : " Money"}</b>
-              </GeneralButton>
-            )}
+            <GeneralButton
+              className="fluidify-button-dashboard "
+              type={"secondary"}
+              size={"small"}
+              handleClick={() => {
+                client?.track("user", "click_fluidify");
+                navigate(`/${network}/fluidify`);
+              }}
+            >
+              <b>Fluidify{isMobile ? "" : " Money"}</b>
+            </GeneralButton>
 
             {/* Prize Money */}
             <GeneralButton

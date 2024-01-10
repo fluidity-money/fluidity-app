@@ -38,4 +38,7 @@ type Lootbox struct {
 
 	// Application is the application involved in the source transfer
 	Application applications.Application `json:"application"`
+
+	// Epoch of the lootbox program thats taking place
+	Epoch string `json:"epoch"`
 }

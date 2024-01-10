@@ -39,6 +39,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+type Application = libApps.Application
+
 const (
 	// ApplicationNone is the nil value representing a transfer.
 	ApplicationNone libApps.Application = iota
@@ -64,7 +66,14 @@ const (
 	ApplicationWombat
 	ApplicationSeawaterAmm
 	ApplicationTraderJoe
+	ApplicationRamses
+	ApplicationJumper
 )
+
+// ParseApplicationName shadows the lib types definition
+func ParseApplicationName(name string) (Application, error) {
+	return libApps.ParseApplicationName(name)
+}
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
 // returns (feeData wiht Fee set to nil, ni) in the case where the application event is legitimate, but doesn't involve
@@ -383,7 +392,6 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
-
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
 			"Transfer #%v did not contain an application",

@@ -1451,7 +1451,7 @@ const tutorialContent: {
 } = {
   "0": {
     title: "WHAT ARE LOOT BOTTLES?",
-    desc: "Welcome to the Fluidity Airdrop! Use Fluid Assets and earn Loot Bottles. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ",
+    desc: "Welcome to the Fluidity Airdrop V2! Use Fluid Assets and earn Loot Bottles and $ARB rewards. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ",
     image: "WHAT_ARE_LOOT_BOTTLES",
   },
   "1": {

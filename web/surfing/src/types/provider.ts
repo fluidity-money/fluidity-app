@@ -30,4 +30,6 @@ export type Provider =
   | "Trader Joe"
   | "Uniswap"
   | "XY Finance"
+  | "Ramses"
+  | "Jumper"
   | "Meteora";

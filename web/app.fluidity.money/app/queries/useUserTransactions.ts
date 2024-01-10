@@ -21,7 +21,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "arbitrum" }
           token_short_name: { _in: $tokens }
@@ -45,6 +45,8 @@ const queryByAddress: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -57,7 +59,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "solana" }
           token_short_name: { _in: $tokens }
@@ -81,6 +83,8 @@ const queryByAddress: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -93,7 +97,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "polygon_zk" }
           token_short_name: { _in: $tokens }
@@ -117,6 +121,8 @@ const queryByAddress: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -129,7 +135,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -148,6 +154,8 @@ const queryByTxHash: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -157,7 +165,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -176,6 +184,8 @@ const queryByTxHash: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -186,7 +196,7 @@ const queryByTxHash: Queryable = {
       $filterHashes: [String!] = []
       $limit: Int = 12
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "polygon_zk" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -205,6 +215,8 @@ const queryByTxHash: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -218,7 +230,7 @@ const queryAll: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "arbitrum" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -238,6 +250,8 @@ const queryAll: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -249,7 +263,7 @@ const queryAll: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "solana" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -269,6 +283,8 @@ const queryAll: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -280,7 +296,7 @@ const queryAll: Queryable = {
       $limit: Int = 12
       $tokens: [String!] = []
     ) {
-      transfers: user_actions(
+      transfers: user_actions_lootbottles(
         where: {
           network: { _eq: "polygon_zk" }
           _not: { transaction_hash: { _in: $filterHashes } }
@@ -300,6 +316,8 @@ const queryAll: Queryable = {
         type
         swap_in
         application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -349,6 +367,8 @@ export type UserTransaction = {
   amount: number;
   currency: { symbol: string };
   application: string;
+  lootboxCount: number;
+  rewardTier: number;
 };
 
 type HasuraUserTransaction = {
@@ -362,6 +382,8 @@ type HasuraUserTransaction = {
   type: "swap" | "send";
   swap_in: boolean;
   application: string;
+  rewardTier: number;
+  lootboxCount: number;
 };
 
 export type HasuraUserTransactionRes = {
@@ -542,6 +564,8 @@ const parseHasuraUserTransactions = (
             timestamp: { unixtime: hasuraDateToUnix(transfer.time) },
           },
           application: transfer.application,
+          lootboxCount: transfer.lootboxCount,
+          rewardTier: transfer.rewardTier,
         };
       }),
     },

@@ -54,8 +54,10 @@ const useReferralCodeByAddress = (address: string) => {
     variables,
   };
 
+  const url = "https://fluidity.hasura.app/v1/graphql";
+
   return jsonPost<ReferralCodeByAddressBody, ReferralCodeRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {
@@ -75,8 +77,10 @@ const useReferralCodeByCode = (code: string) => {
     variables,
   };
 
+  const url = "https://fluidity.hasura.app/v1/graphql";
+
   return jsonPost<ReferralCodeByCodeBody, ReferralCodeRes>(
-    "https://fluidity.hasura.app/v1/graphql",
+    url,
     body,
     process.env.FLU_HASURA_SECRET
       ? {

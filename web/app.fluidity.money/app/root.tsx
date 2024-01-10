@@ -15,7 +15,7 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import { ToolTipLinks } from "./components";
+import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import { SplitContextProvider } from "contexts/SplitProvider";
 import CacheProvider from "contexts/CacheProvider";
@@ -29,6 +29,7 @@ globalThis.Buffer = Buffer;
 export const links = () => {
   return [
     ...ToolTipLinks(),
+    ...JoeFarmlandsOrCamelotKingdomLinks(),
     { rel: "icon", href: "/favicon.ico" },
 
     { rel: "apple-touch-icon", sizes: "57x57", href: "/apple-icon-57x57.png" },

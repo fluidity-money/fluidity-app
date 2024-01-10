@@ -32,8 +32,48 @@ func main() {
 	// endTime is the beginning of the day after startTime (the start of the current date)
 	endTime := currentTime
 
-	// fetch and log the top 10 users
-	topUsers := lootboxes.GetTopApplicationUsersByLootboxCount(startTime, endTime, applications.ApplicationKyberClassic)
+	programFound, hasBegun, currentEpoch, currentApplication := lootboxes.GetLootboxConfig()
+
+	// if the lootbox isn't enabled, or it isn't running, then we skip. we
+	// treat the cases separately for logging reasons.
+
+	switch false {
+	case programFound:
+		log.App(func(k *log.Log) {
+			k.Message = "No lootbox epoch found! Skipping running."
+		})
+
+		return
+
+	case hasBegun:
+		log.App(func(k *log.Log) {
+			k.Message = "Current lootbox epoch has not yet started! Skipping running."
+		})
+
+		return
+	}
+
+	var topUsers []lootboxes.UserLootboxCount
+
+	// if there's a current application focus, then we want to reward only specific winners
+
+	switch currentApplication {
+	case applications.ApplicationNone:
+		topUsers = lootboxes.GetTopUsersByLootboxCount(
+			currentEpoch,
+			startTime,
+			endTime,
+		)
+	default:
+		// fetch and log the top 10 users for a specific application
+		topUsers = lootboxes.GetTopApplicationUsersByLootboxCount(
+			currentEpoch,
+			startTime,
+			endTime,
+			currentApplication,
+		)
+	}
+
 	for i, user := range topUsers {
 		log.App(func(k *log.Log) {
 			k.Format(
@@ -47,5 +87,5 @@ func main() {
 	}
 
 	// reward the top 10 users
-	lootboxes.InsertTopUserReward(startTime, topUsers)
+	lootboxes.InsertTopUserReward(currentEpoch, startTime, topUsers)
 }

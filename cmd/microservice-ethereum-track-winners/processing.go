@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 	winnersDb "github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -12,17 +11,19 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
 )
 
 func processReward(contractAddress ethereum.Address, transactionHash ethereum.Hash, data fluidity.RewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
 	var (
-		winnerString  = data.Winner.String()
-		winnerAddress = ethereum.AddressFromString(winnerString)
-		startBlock    = *data.StartBlock
-		endBlock      = *data.EndBlock
+		winnerString = data.Winner.String()
+		startBlock   = *data.StartBlock
+		endBlock     = *data.EndBlock
+		blocked      = data.Blocked
 	)
 
-	blocked := data.Blocked
+	winnerAddress := ethereum.AddressFromString(winnerString)
 
 	if blocked {
 		blockedWinner := convertBlockedWinner(
@@ -61,8 +62,9 @@ func processReward(contractAddress ethereum.Address, transactionHash ethereum.Ha
 }
 
 func processUnblockedReward(transactionHash ethereum.Hash, data fluidity.UnblockedRewardData, tokenDetails token_details.TokenDetails, network network.BlockchainNetwork) {
+	rewardData := data.RewardData
+
 	var (
-		rewardData   = data.RewardData
 		winnerString = rewardData.Winner.String()
 		startBlock   = *rewardData.StartBlock
 		endBlock     = *rewardData.EndBlock

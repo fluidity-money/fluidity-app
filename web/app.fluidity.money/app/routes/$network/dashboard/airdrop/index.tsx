@@ -24,7 +24,6 @@ import {
   BloomEffect,
   toSignificantDecimals,
   useViewport,
-  numberToMonetaryString,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -34,7 +33,6 @@ import {
   StakingStatsModal,
   TutorialModal,
   RecapModal,
-  stakingLiquidityMultiplierEq,
   TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
@@ -57,10 +55,9 @@ import { useCache } from "~/hooks/useCache";
 import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
+import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 
-const EPOCH_DAYS_TOTAL = 38;
-// temp: may 22nd, 2023
-const EPOCH_START_DATE = new Date(2023, 4, 22);
+const EPOCH_CURRENT_IDENTIFIER = "epoch_1";
 
 const AIRDROP_MODALS = [
   "recap",
@@ -86,8 +83,6 @@ export const links = () => {
 export const loader: LoaderFunction = async ({ params }) => {
   const network = params.network ?? "";
 
-  const epochDays = dayDifference(new Date(), EPOCH_START_DATE);
-
   // Staking Tokens
   const allowedTokenSymbols = new Set(["fUSDC", "USDC", "wETH"]);
   const { tokens } = config.config[network];
@@ -98,16 +93,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 
   return json({
     tokens: allowedTokens,
-    epochDaysTotal: EPOCH_DAYS_TOTAL,
-    epochDays,
     network,
   } satisfies LoaderData);
 };
 
 type LoaderData = {
   tokens: Array<Token>;
-  epochDaysTotal: number;
-  epochDays: number;
   network: string;
 };
 
@@ -122,9 +113,15 @@ const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
   },
   bottlesCount: 0,
   liquidityMultiplier: 0,
-  stakes: [],
   wethPrice: 0,
   usdcPrice: 0,
+  programBegin: new Date("2023-05-01T12:00:00+02:00"),
+  programEnd: new Date("2023-06-28 T12:00:00+02:00"),
+  epochDaysTotal: 30,
+  epochDaysElapsed: 30,
+  epochIdentifier: "epoch_1",
+  ethereumApplication: "none",
+  epochFound: false,
   loaded: false,
 };
 
@@ -163,12 +160,7 @@ const GLOBAL_AIRDROP_BOTTLE_TIERS = {
 };
 
 const Airdrop = () => {
-  const {
-    epochDaysTotal,
-    epochDays,
-    tokens: defaultTokens,
-    network,
-  } = useLoaderData<LoaderData>();
+  const { tokens: defaultTokens, network } = useLoaderData<LoaderData>();
 
   if (network !== "arbitrum") {
     return (
@@ -177,7 +169,8 @@ const Airdrop = () => {
           Airdrop
         </Heading>
         <Text>
-          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more rewards!
+          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more
+          rewards!
         </Text>
       </div>
     );
@@ -207,33 +200,11 @@ const Airdrop = () => {
     address,
     balance,
     stakeTokens,
-    getStakingDeposits,
     testStakeTokens,
     getStakingRatios,
     redeemableTokens: getRedeemableTokens,
     redeemTokens,
   } = useContext(FluidityFacadeContext);
-
-  const { data: airdropData } = useCache<AirdropLoaderData>(
-    address ? `/${network}/query/dashboard/airdrop?address=${address}` : ""
-  );
-
-  const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${
-      leaderboardFilterIndex === 0 ? "&provider=kyber_classic" : ""
-    }`
-  );
-
-  const { data: referralData } = useCache<AirdropLoaderData>(
-    address ? `/${network}/query/referrals?address=${address}` : ""
-  );
-
-  const { data: referralLootboxData } =
-    useCache<ReferralBottlesCountLoaderData>(
-      address ? `/${network}/query/referralBottles?address=${address}` : ""
-    );
 
   const { width } = useViewport();
 
@@ -242,6 +213,33 @@ const Airdrop = () => {
   const mobileBreakpoint = 768;
 
   const isMobile = width < mobileBreakpoint;
+
+  const { data: airdropData } = useCache<AirdropLoaderData>(
+    address
+      ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+      : ""
+  );
+
+  const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
+    `/${network}/query/dashboard/airdropLeaderboard?period=${
+      leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${
+      leaderboardFilterIndex === 0 ? "&provider=${currentApplication}" : ""
+    }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+  );
+
+  const { data: referralData } = useCache<AirdropLoaderData>(
+    address
+      ? `/${network}/query/referrals?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+      : ""
+  );
+
+  const { data: referralLootboxData } =
+    useCache<ReferralBottlesCountLoaderData>(
+      address
+        ? `/${network}/query/referralBottles?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+        : ""
+    );
 
   const data = {
     airdrop: {
@@ -269,6 +267,8 @@ const Airdrop = () => {
       bottlesCount,
       wethPrice,
       usdcPrice,
+      epochDaysTotal,
+      epochDaysElapsed,
     },
     referrals: {
       numActiveReferreeReferrals,
@@ -292,7 +292,7 @@ const Airdrop = () => {
   const destModal = location.hash.replace("#", "");
 
   const [currentModal, setCurrentModal] = useState<AirdropModalName | null>(
-    isAirdropModal(destModal) ? destModal : "recap"
+    isAirdropModal(destModal) ? destModal : null
   );
 
   useEffect(() => {
@@ -300,19 +300,12 @@ const Airdrop = () => {
     setCurrentModal(isAirdropModal(destModal) ? destModal : null);
   }, [location.hash]);
 
-  const [stakes, setStakes] = useState<
-    Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
-  >([]);
-
-  const fetchUserStakes = async (address: string) => {
-    const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
-    setStakes(stakingDeposits);
-  };
+  const stakes: Array<{
+    fluidAmount: BN;
+    baseAmount: BN;
+    durationDays: number;
+    depositDate: Date;
+  }> = [];
 
   const fetchUserTokenBalance = async () => {
     const userTokenBalance = await Promise.all(
@@ -390,8 +383,6 @@ const Airdrop = () => {
 
     fetchUserTokenBalance();
 
-    fetchUserStakes(address);
-
     fetchUserRedeemableTokens(address);
   }, [address]);
 
@@ -402,7 +393,6 @@ const Airdrop = () => {
     const res = await (await redeemTokens?.())?.confirmTx();
 
     fetchUserTokenBalance();
-    fetchUserStakes(address);
     fetchUserRedeemableTokens(address);
 
     return res;
@@ -416,10 +406,11 @@ const Airdrop = () => {
 
   const [localShouldShowBottleNumbers, setLocalShouldShowBottleNumbers] =
     useState<boolean | undefined>(undefined);
-  // const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
-  //   boolean | undefined
-  // >(undefined);
-  const localShouldShowTutorial = false;
+
+  const [localShouldShowTutorial, setLocalShouldShowTutorial] = useState<
+    boolean | undefined
+  >(undefined);
+
   const [localShouldShowRecapIntro, setLocalShouldShowRecapIntro] = useState<
     boolean | undefined
   >(undefined);
@@ -435,9 +426,11 @@ const Airdrop = () => {
       setLocalCookieConsent(true);
     }
 
-    // const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+    const airdropHasVisited = window.localStorage.getItem("airdropHasVisited");
+
     const airdropBottleCount =
       window.localStorage.getItem("airdropBottleCount");
+
     const airdropShouldShowBottleNumbers = window.localStorage.getItem(
       "airdropShouldShowBottleNumbers"
     );
@@ -460,17 +453,8 @@ const Airdrop = () => {
       "airdropShouldShowRecapIntro"
     );
 
-    if (airdropShouldShowRecapIntro) {
-      setLocalShouldShowRecapIntro(false);
-    } else {
-      setLocalShouldShowRecapIntro(true);
-    }
-
-    // if (airdropHasVisited) {
-    //   setLocalShouldShowTutorial(false);
-    // } else {
-    //   setLocalShouldShowTutorial(true);
-    // }
+    setLocalShouldShowRecapIntro(!airdropShouldShowRecapIntro);
+    setLocalShouldShowTutorial(!airdropHasVisited);
   }, []);
 
   useEffect(() => {
@@ -519,7 +503,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap"}
         >
-          Airdrop Recap
+          Epoch 1 Recap
         </TabButton>
         <TabButton
           size="small"
@@ -531,14 +515,14 @@ const Airdrop = () => {
         >
           Airdrop Dashboard
         </TabButton>
-        {/* <TabButton
+        <TabButton
           size="small"
           onClick={() => setCurrentModal("tutorial")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "tutorial"}
         >
           Airdrop Tutorial
-        </TabButton> */}
+        </TabButton>
         <TabButton
           size="small"
           onClick={async () => {
@@ -561,7 +545,7 @@ const Airdrop = () => {
         >
           Leaderboard
         </TabButton>
-        {/* <TabButton
+        <TabButton
           size="small"
           onClick={() => setCurrentModal("referrals")}
           groupId="airdrop"
@@ -571,22 +555,22 @@ const Airdrop = () => {
         </TabButton>
         <TabButton
           size="small"
-          onClick={() => setCurrentModal("stake")}
-          groupId="airdrop"
-          isSelected={isMobile && currentModal === "stake"}
-          disabled={true}
-        >
-          Stake
-        </TabButton>
-        <TabButton
-          size="small"
           onClick={() => setCurrentModal("testnet-rewards")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "testnet-rewards"}
           disabled={true}
         >
           Testnet Rewards
-        </TabButton> */}
+        </TabButton>
+        <TabButton size="small" groupId="airdrop">
+          <a
+            href="https://dune.com/neogeo/fluidity-airdrop-v2"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Dune
+          </a>
+        </TabButton>
       </div>
     );
   };
@@ -621,7 +605,7 @@ const Airdrop = () => {
                   style={{ marginBottom: "0.5em" }}
                   className={"no-margin"}
                 >
-                  Welcome to Fluidity&apos;s Airdrop Event!
+                  Airdrop V2: Arbitrum&apos;s Space Expedition.
                 </Heading>
                 <Text>
                   Fluidify your assets, transact them, and boost your rewards by
@@ -673,7 +657,7 @@ const Airdrop = () => {
                 seeBottlesDetails={() => setCurrentModal("bottles-details")}
                 seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                 epochMax={epochDaysTotal}
-                epochDays={epochDays}
+                epochDays={epochDaysElapsed}
                 activatedReferrals={numActiveReferrerReferrals}
                 totalBottles={bottlesCount}
                 network={network}
@@ -759,7 +743,6 @@ const Airdrop = () => {
                 wethPrice={wethPrice}
                 usdcPrice={usdcPrice}
                 stakeCallback={() => {
-                  fetchUserStakes(address ?? "");
                   fetchUserTokenBalance();
                 }}
               />
@@ -861,7 +844,6 @@ const Airdrop = () => {
           usdcPrice={usdcPrice}
           isMobile={isMobile}
           stakeCallback={() => {
-            fetchUserStakes(address ?? "");
             fetchUserTokenBalance();
           }}
         />
@@ -919,6 +901,19 @@ const Airdrop = () => {
       ) : (
         <>
           <div className="pad-main">
+            <div style={{ paddingTop: "10px", paddingBottom: "20px" }}>
+              <img
+                style={{
+                  maxWidth: "1110px",
+                  borderRadius: "10px",
+                  borderStyle: "solid",
+                  borderWidth: "1px",
+                  borderColor: "white",
+                }}
+                width="100%"
+                src="/images/epoch2AirdropBanner.png"
+              />
+            </div>
             <div
               style={{
                 display: "grid",
@@ -941,7 +936,7 @@ const Airdrop = () => {
                     className={"no-margin"}
                     style={{ marginBottom: "0.5em" }}
                   >
-                    Welcome to Fluidity&apos;s Airdrop Event!
+                    Airdrop V2: Arbitrum&apos;s Space Expedition.
                   </Heading>
                   <Text style={{ fontSize: 14 }}>
                     Fluidify your assets, transact them, and boost your rewards
@@ -973,7 +968,7 @@ const Airdrop = () => {
                   seeBottlesDetails={() => setCurrentModal("bottles-details")}
                   seeLeaderboardMobile={() => setCurrentModal("leaderboard")}
                   epochMax={epochDaysTotal}
-                  epochDays={epochDays}
+                  epochDays={epochDaysElapsed}
                   activatedReferrals={numActiveReferrerReferrals}
                   totalBottles={bottlesCount}
                   network={network}
@@ -1169,16 +1164,16 @@ const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "6x">("6x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    { provider: "Jumper", link: "https://app.uniswap.org/#/swap" },
     {
-      provider: "Sushiswap",
-      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+      provider: "Uniswap",
+      link: "https://app.uniswap.org/#/swap",
     },
-    { provider: "Camelot", link: "https://app.camelot.exchange/" },
-    { provider: "Saddle", link: "https://saddle.exchange/#/" },
-    { provider: "Chronos", link: "https://app.chronos.exchange/" },
+    { provider: "Trader Joe", link: "https://app.camelot.exchange/" },
+    { provider: "Camelot", link: "https://saddle.exchange/#/" },
+    { provider: "Sushiswap", link: "https://app.chronos.exchange/" },
     {
-      provider: "Kyber",
+      provider: "Ramses",
       link: "https://kyberswap.com/swap/arbitrum/fusdc-to-usdc",
     },
   ];
@@ -1190,7 +1185,7 @@ const MultiplierTasks = () => {
           Multiplier Tasks
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Perform displayed tasks to earn the respective multipliers.
+          Transact fUSDC on listed platforms to earn more!
         </Text>
       </div>
       <div
@@ -1280,52 +1275,8 @@ interface IMyMultiplier {
 
 const MyMultiplier = ({
   seeMyStakingStats,
-  seeStakeNow,
-  stakes,
-  wethPrice,
-  usdcPrice,
   isMobile = false,
 }: IMyMultiplier) => {
-  const sumLiquidityMultiplier = stakes.reduce(
-    (sum, { fluidAmount, baseAmount, durationDays, depositDate }) => {
-      const fluidDecimals = 6;
-      const fluidUsd = getUsdFromTokenAmount(
-        fluidAmount,
-        fluidDecimals,
-        usdcPrice
-      );
-
-      const wethDecimals = 18;
-      const usdcDecimals = 6;
-
-      // If converting base amount by weth decimals (18) is smaller than $0.01,
-      // then tentatively assume Token amount is USDC
-      // A false hit would be a USDC deposit >= $100,000
-      const baseUsd =
-        getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) < 0.01
-          ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-          : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
-
-      const stakedDays = dayDifference(new Date(), new Date(depositDate));
-
-      const multiplier = stakingLiquidityMultiplierEq(stakedDays, durationDays);
-
-      return sum + (fluidUsd + baseUsd) * multiplier;
-    },
-    0
-  );
-
-  // if there are no stakes, this renders an empty stake on the dashboard which is A PART OF THE DESIGN SPEC
-  if (stakes.length === 0)
-    stakes = [
-      {
-        fluidAmount: new BN(0),
-        baseAmount: new BN(0),
-        durationDays: 0,
-        depositDate: new Date(),
-      },
-    ];
-
   return (
     <div
       className={`airdrop-my-multiplier ${isMobile ? "airdrop-mobile" : ""}`}
@@ -1338,17 +1289,6 @@ const MyMultiplier = ({
           type="static"
         />
       )}
-      <div>
-        <LabelledValue
-          align={isMobile ? "center" : "left"}
-          className="mx-my-multiplier"
-          label={<Text size="xs">MY TOTAL LIQUIDITY MULTIPLIER</Text>}
-        >
-          <Text size="xxl" holo>
-            {toSignificantDecimals(sumLiquidityMultiplier, 1)}x
-          </Text>
-        </LabelledValue>
-      </div>
       <GeneralButton
         icon={<ArrowRight />}
         layout="after"
@@ -1357,112 +1297,16 @@ const MyMultiplier = ({
         handleClick={seeMyStakingStats}
         id="mx-see-my-staking-stats"
       >
-        MY STAKING STATS
+        MY EPOCH 1 STAKING STATS
       </GeneralButton>
-      {!isMobile && (
-        <div id="mx-my-stakes">
-          {stakes
-            .map((stake) => {
-              const { fluidAmount, baseAmount, durationDays, depositDate } =
-                stake;
-
-              const stakedDays = dayDifference(
-                new Date(),
-                new Date(depositDate)
-              );
-              const multiplier = stakingLiquidityMultiplierEq(
-                stakedDays,
-                durationDays
-              );
-
-              const fluidDecimals = 6;
-              const fluidUsd = getUsdFromTokenAmount(
-                fluidAmount,
-                fluidDecimals,
-                usdcPrice
-              );
-
-              const wethDecimals = 18;
-              const usdcDecimals = 6;
-
-              // If converting base amount by weth decimals (18) is smaller than $0.01,
-              // then tentatively assume Token amount is USDC
-              // A false hit would be a USDC deposit >= $100,000
-              const baseUsd =
-                getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice) <
-                0.01
-                  ? getUsdFromTokenAmount(baseAmount, usdcDecimals, usdcPrice)
-                  : getUsdFromTokenAmount(baseAmount, wethDecimals, wethPrice);
-
-              return {
-                stake,
-                stakedDays,
-                multiplier,
-                fluidUsd,
-                baseUsd,
-              };
-            })
-            .sort((a, b) => {
-              const stakeAVal = (a.fluidUsd + a.baseUsd) * a.multiplier;
-              const stakeBVal = (b.fluidUsd + b.baseUsd) * b.multiplier;
-
-              // Sort Descending
-              return stakeBVal > stakeAVal
-                ? 1
-                : stakeBVal === stakeAVal
-                ? 0
-                : -1;
-            })
-            .slice(0, 3)
-            .map(({ stake, multiplier, fluidUsd, baseUsd }) => {
-              const { durationDays } = stake;
-
-              return (
-                <>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      gap: "0.5em",
-                    }}
-                  >
-                    <Text prominent code>
-                      {numberToMonetaryString(fluidUsd + baseUsd)} FOR{" "}
-                      {Math.floor(durationDays)} DAYS
-                    </Text>
-                    <ProgressBar
-                      value={multiplier}
-                      max={1}
-                      rounded
-                      color={multiplier === 1 ? "holo" : "gray"}
-                      size="sm"
-                    />
-                  </div>
-                  <div
-                    style={{ alignSelf: "flex-end", marginBottom: "-0.2em" }}
-                  >
-                    <Text holo bold prominent>
-                      {toSignificantDecimals(multiplier, 1)}X
-                    </Text>
-                  </div>
-                </>
-              );
-            })}
+      <div>
+        <div className="airdrop-arb-multipliers-container">
+          <Text size="md" holo={true}>
+            Provide $fUSDC Liquidity to earn $ARB and Multipliers!
+          </Text>
         </div>
-      )}
-      <GeneralButton
-        icon={isMobile ? <ArrowRight /> : undefined}
-        layout={"after"}
-        buttontype="text"
-        size="medium"
-        version="primary"
-        handleClick={seeStakeNow}
-        id="mx-stake-now-button"
-        disabled={true}
-      >
-        STAKE NOW
-      </GeneralButton>
+        <JoeFarmlandsOrCamelotKingdom />
+      </div>
     </div>
   );
 };
@@ -1472,7 +1316,7 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, liquidityMultiplier, bottles } = data;
+  const { user, rank, referralCount, fusdcEarned, arbEarned, bottles } = data;
 
   return {
     className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
@@ -1538,7 +1382,7 @@ const airdropRankRow = (
               </Text>
             </td>
           );
-        case "STAKING MULTIPLIER":
+        case "$fUSDC EARNED":
           return (
             <td>
               <Text
@@ -1551,7 +1395,24 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toSignificantDecimals(liquidityMultiplier, 1)}x
+                {fusdcEarned}
+              </Text>
+            </td>
+          );
+        case "$ARB EARNED":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                        color: "black",
+                      }
+                    : {}
+                }
+              >
+                {arbEarned}
               </Text>
             </td>
           );
@@ -1609,6 +1470,8 @@ const Leaderboard = ({
       liquidityMultiplier: 0,
       bottles: 0,
       highestRewardTier: 0,
+      fusdcEarned: 0,
+      arbEarned: 0,
     };
 
     data.push(userEntry);
@@ -1671,7 +1534,8 @@ const Leaderboard = ({
           { name: "RANK" },
           { name: "USER" },
           { name: "BOTTLES" },
-          { name: "STAKING MULTIPLIER" },
+          { name: "$fUSDC EARNED" },
+          { name: "$ARB EARNED" },
           { name: "REFERRALS" },
         ]}
         pagination={{
