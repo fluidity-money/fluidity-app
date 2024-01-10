@@ -169,13 +169,6 @@ const NAVIGATION_MAP: {
   };
 }[] = [
   {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
-    },
-  },
-  {
     home: {
       name: "dashboard",
       path: (network: string) => `/${network}/dashboard/home`,
