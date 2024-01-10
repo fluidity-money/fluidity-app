@@ -21,7 +21,6 @@ import {
   TabButton,
   toDecimalPlaces,
   ProviderIcon,
-  LootBottle,
   TokenIcon,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
@@ -466,11 +465,7 @@ export default function Home() {
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
-                    <LootBottle
-                      size="lg"
-                      rarity={rewardTier}
-                      quantity={lootboxCount}
-                    />
+                    { lootboxCount }
                   </a>
                 ) : (
                   <Text>-</Text>

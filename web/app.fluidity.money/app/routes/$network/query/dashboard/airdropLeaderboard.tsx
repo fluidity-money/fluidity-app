@@ -73,6 +73,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const { data: globalLeaderboardData, errors: globalLeaderboardErrors } =
       await useAllQuery();
 
+    console.log("globalLeaderboardErrors", globalLeaderboardErrors);
+
     if (!globalLeaderboardData || globalLeaderboardErrors)
       throw globalLeaderboardErrors;
 
@@ -87,6 +89,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       !address ||
       leaderboard.find(({ user: rowAddress }) => rowAddress === address)
     ) {
+      console.log("returning leaderboard early", leaderboard);
       return json({
         leaderboard,
         loaded: true,
@@ -95,6 +98,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
     const { data: userLeaderboardData, errors: userLeaderboardErrors } =
       await useUserQuery(address);
+
+    console.log("userLeaderboardErrors", userLeaderboardErrors);
 
     if (!userLeaderboardData || userLeaderboardErrors)
       throw userLeaderboardErrors;
@@ -119,11 +124,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           ]
     ).concat(leaderboard);
 
+    console.log("asssssssss", jointLeaderboardData);
+
     return json({
       leaderboard: jointLeaderboardData,
       loaded: true,
     } satisfies AirdropLeaderboardLoaderData);
   } catch (err) {
+    console.log("err", err);
     captureException(new Error(`Could not fetch airdrop data: ${err}`), {
       tags: {
         section: "network/index",
