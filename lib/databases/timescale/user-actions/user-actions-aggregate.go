@@ -14,9 +14,7 @@ import (
 	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
-const (
-	TableAggregatedUserTransactions = `aggregated_user_transactions`
-)
+const TableAggregatedUserTransactions = `aggregated_user_transactions`
 
 func InsertAggregatedUserTransaction(userTransaction user_actions.AggregatedUserTransaction) {
 	timescaleClient := timescale.Client()
@@ -214,6 +212,49 @@ func UpdateAggregatedUserTransactionByHash(userTransaction user_actions.Aggregat
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 			k.Message = "Failed to update aggregated user transaction!"
+			k.Payload = err
+		})
+	}
+}
+
+// UpdateAggregatedUserTransactionByHashWithLootbottles after finding it first
+func UpdateAggregatedUserTransactionByHashWithLootbottles(lootbottlesCount float64, rewardTier int, transactionHash string) {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`UPDATE %s
+			SET lootbox_count = $1, reward_tier = $2
+			WHERE transaction_hash = $3`,
+
+		TableAggregatedUserTransactions,
+	)
+
+	r, err := timescaleClient.Exec(
+		statementText,
+		lootbottlesCount,
+		rewardTier,
+		transactionHash,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to update an aggregated user transaction with a lootbottle"
+			k.Payload = err
+		})
+	}
+
+	rows, _ := r.RowsAffected()
+
+	if rows != 1 {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+
+			k.Format(
+				"%d rows affected by an aggregate user transaction with lootbottle update, expected 1!",
+				rows,
+			)
+
 			k.Payload = err
 		})
 	}
