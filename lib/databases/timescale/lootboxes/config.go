@@ -33,7 +33,7 @@ func GetLootboxConfig() (programFound bool, hasBegun bool, curEpoch string, curA
 			program_begin < (select timestamp from t) AND
 			program_end > (select timestamp from t),
 			epoch_identifier,
-			current_application
+			ethereum_application
 		FROM %s
 		WHERE is_current_program;`,
 

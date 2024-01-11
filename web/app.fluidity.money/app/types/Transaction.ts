@@ -1,3 +1,5 @@
+import { Rarity } from "@fluidity-money/surfing";
+
 type Transaction = {
   sender: string;
   receiver: string;
@@ -14,7 +16,7 @@ type Transaction = {
   swapType?: "in" | "out";
   utilityTokens?: { [tokens: string]: number };
   application: string;
-  rewardTier: number;
+  rewardTier: Rarity;
   lootboxCount: number;
 };
 

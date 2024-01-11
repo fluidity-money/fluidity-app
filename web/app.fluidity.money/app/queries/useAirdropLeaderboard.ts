@@ -2,7 +2,11 @@ import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryByUserAllTime = gql`
   query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) {
-    airdrop_leaderboard(where: { address: { _eq: $address } }, limit: 1) {
+    airdrop_leaderboard(
+      args: { epoch_: $epoch }
+      where: { address: { _eq: $address } }
+      limit: 1
+    ) {
       user: address
       rank
       referralCount: referral_count

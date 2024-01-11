@@ -1,5 +1,6 @@
 import Transaction from "~/types/Transaction";
 import { fetchGqlEndpoint, gql, jsonPost, Queryable } from "~/util";
+import { Rarity } from "@fluidity-money/surfing";
 
 export type AggregatedTransaction = Omit<
   Transaction,
@@ -10,7 +11,7 @@ export type AggregatedTransaction = Omit<
   swap_in: boolean;
   type: "send" | "swap";
   timestamp: string;
-  rewardTier: number;
+  rewardTier: Rarity;
   lootboxCount: number;
 };
 
@@ -22,7 +23,7 @@ const queryByAddress: Queryable = {
       $address: String!
       $token: String
     ) {
-      arbitrum: aggregated_user_transactions_lootbottles(
+      arbitrum: aggregated_user_transactions(
         order_by: { time: desc }
         limit: $limit
         offset: $offset
@@ -62,7 +63,7 @@ const queryByAddress: Queryable = {
       $limit: Int = 12
       $address: String!
     ) {
-      solana: aggregated_user_transactions_lootbottles(
+      solana: aggregated_user_transactions(
         order_by: { time: desc }
         limit: $limit
         offset: $offset
@@ -100,7 +101,7 @@ const queryByAddress: Queryable = {
 const queryAll: Queryable = {
   arbitrum: gql`
     query aggregatedUserTransactionsAll($offset: Int = 0, $limit: Int = 12) {
-      arbitrum: aggregated_user_transactions_lootbottles(
+      arbitrum: aggregated_user_transactions(
         order_by: { time: desc }
         limit: $limit
         offset: $offset
@@ -128,7 +129,7 @@ const queryAll: Queryable = {
   `,
   solana: gql`
     query aggregatedUserTransactionsAll($offset: Int = 0, $limit: Int = 12) {
-      solana: aggregated_user_transactions_lootbottles(
+      solana: aggregated_user_transactions(
         order_by: { time: desc }
         limit: $limit
         offset: $offset

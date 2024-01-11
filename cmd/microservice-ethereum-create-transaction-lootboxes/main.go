@@ -309,6 +309,7 @@ func main() {
 			RewardTier:      rewardTier,
 			LootboxCount:    lootboxCountFloat,
 			Application:     application,
+			Epoch: currentEpoch,
 		}
 
 		queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)

@@ -1900,10 +1900,10 @@ const RecapModal = ({
   },
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Uniswap", link: "https://app.uniswap.org/#/swap" },
+    { provider: "Jumper", link: "https://jumper.exchange/" },
     {
-      provider: "Sushiswap",
-      link: "https://www.sushi.com/swap?fromChainId=42161&fromCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&toChainId=42161&toCurrency=NATIVE&amount=",
+      provider: "Trader Joe",
+      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
     },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
     { provider: "Saddle", link: "https://saddle.exchange/#/" },
