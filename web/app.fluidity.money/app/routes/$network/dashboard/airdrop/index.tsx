@@ -1297,8 +1297,8 @@ const MyMultiplier = ({
       </GeneralButton>
       <div>
         <div className="airdrop-arb-multipliers-container">
-          <Text size="md" holo={true}>
-            Provide $fUSDC Liquidity to earn $ARB and Multipliers!
+          <Text holo={true}>
+            Provide $fUSDC Liquidity to earn $ARB and Multipliers! Add liquidity to the following Trader Joe and Camelot pools to earn $ARB liquidity mining rewards! You will also retroactively earn bottles depending on your contribution at the end of the Airdrop!
           </Text>
         </div>
         <JoeFarmlandsOrCamelotKingdom />
