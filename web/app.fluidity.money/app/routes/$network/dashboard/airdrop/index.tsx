@@ -24,6 +24,8 @@ import {
   BloomEffect,
   toSignificantDecimals,
   useViewport,
+  numberToMonetaryString,
+  toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import {
   BottlesDetailsModal,
@@ -1389,7 +1391,7 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {fusdcEarned}
+                {numberToMonetaryString(fusdcEarned)}
               </Text>
             </td>
           );
@@ -1406,7 +1408,7 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {arbEarned}
+                {toDecimalPlaces(arbEarned, 4)}
               </Text>
             </td>
           );
