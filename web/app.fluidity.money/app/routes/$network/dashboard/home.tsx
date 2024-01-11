@@ -23,6 +23,7 @@ import {
   ProviderIcon,
   TokenIcon,
   LootBottle,
+  Rarity,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -108,6 +109,22 @@ const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
   page: 0,
   transactions: [],
   loaded: false,
+};
+
+const translateRewardTierToRarity = (rewardTier: any): Rarity => {
+  switch (rewardTier) {
+    case 5:
+      return Rarity.Legendary;
+    case 4:
+      return Rarity.UltraRare;
+    case 3:
+      return Rarity.Rare;
+    case 2:
+      return Rarity.Uncommon;
+    case 1:
+    default:
+      return Rarity.Common;
+  }
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -461,14 +478,15 @@ export default function Home() {
           case "BOTTLES EARNED":
             return (
               <td>
-                {lootboxCount ? (
+                { (lootboxCount && rewardTier) ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
                    <LootBottle
                       size="sm"
-                      rarity={rewardTier}
+                      /* WTF? why is this needed? REMOVEME */
+                      rarity={translateRewardTierToRarity(rewardTier)}
                       quantity={lootboxCount}
                     />
                     <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
