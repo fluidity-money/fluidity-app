@@ -547,7 +547,7 @@ export default function Rewards() {
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
-                    { lootboxCount }
+                    <Text>{ lootboxCount }</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
