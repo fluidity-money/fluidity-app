@@ -8,7 +8,9 @@ import {
   getTokenFromAddress,
   Token,
 } from "~/util/chainUtils/tokens";
+import { Rarity } from "@fluidity-money/surfing";
 import { MintAddress } from "~/types/MintAddress";
+import { translateRewardTierToRarity } from "./useLootBottles";
 
 const queryByAddress: Queryable = {
   arbitrum: gql`
@@ -359,7 +361,7 @@ export type UserTransaction = {
   currency: { symbol: string };
   application: string;
   lootboxCount: number;
-  rewardTier: number;
+  rewardTier: Rarity;
 };
 
 type HasuraUserTransaction = {
@@ -550,7 +552,7 @@ const parseHasuraUserTransactions = (
           },
           application: transfer.application,
           lootboxCount: transfer.lootboxCount,
-          rewardTier: transfer.rewardTier,
+          rewardTier: translateRewardTierToRarity(transfer.rewardTier),
         };
       }),
     },

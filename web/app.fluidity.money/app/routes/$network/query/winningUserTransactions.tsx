@@ -8,7 +8,9 @@ import {
   useUserRewardsAll,
   useUserRewardsByAddress,
   useUserTransactionsByTxHash,
+  translateRewardTierToRarity
 } from "~/queries";
+import { Rarity } from "@fluidity-money/surfing";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
 import { Winner } from "~/queries/useUserRewards";
@@ -26,7 +28,7 @@ type UserTransaction = {
   value: number;
   currency: string;
   application: string;
-  rewardTier: number;
+  rewardTier: Rarity;
   lootboxCount: number;
 };
 
@@ -227,7 +229,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency,
           application,
           lootboxCount,
-          rewardTier,
+          rewardTier: translateRewardTierToRarity(Object.values(Rarity).indexOf(rewardTier)),
         };
       }
     );
