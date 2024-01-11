@@ -550,10 +550,11 @@ export default function Rewards() {
                     href={`/${network}/dashboard/airdrop`}
                   >
                     <LootBottle
-                      size="lg"
+                      size="sm"
                       rarity={rewardTier}
                       quantity={lootboxCount}
                     />
+                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
                   </a>
                 ) : (
                   <Text>-</Text>

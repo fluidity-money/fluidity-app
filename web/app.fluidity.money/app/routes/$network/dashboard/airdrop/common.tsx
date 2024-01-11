@@ -1537,7 +1537,7 @@ const tutorialContent: {
           }}
           handleClick={() => {
             window.open(
-              "https://blog.fluidity.money/introducing-the-fluidity-airdrop-and-fluid-token-5832f6cab0e4",
+              "https://blog.fluidity.money/introducing-the-final-fluidity-airdrop-season-v2-now-live-acf6a7838ce2",
               "_blank"
             );
           }}

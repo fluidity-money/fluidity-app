@@ -22,6 +22,7 @@ import {
   toDecimalPlaces,
   ProviderIcon,
   TokenIcon,
+  LootBottle,
 } from "@fluidity-money/surfing";
 import { useState, useContext, useEffect, useMemo } from "react";
 import { useLoaderData, useFetcher, Link } from "@remix-run/react";
@@ -377,6 +378,7 @@ export default function Home() {
       utilityTokens,
       application,
       lootboxCount,
+      rewardTier,
     } = data;
 
     const appProviderName = getProviderDisplayName(application);
@@ -464,7 +466,12 @@ export default function Home() {
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
-                    { lootboxCount }
+                   <LootBottle
+                      size="sm"
+                      rarity={rewardTier}
+                      quantity={lootboxCount}
+                    />
+                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
