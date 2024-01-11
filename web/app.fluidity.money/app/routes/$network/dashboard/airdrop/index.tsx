@@ -1505,15 +1505,14 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
-          {/* <GeneralButton
+          {<GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
-            icon={<ProviderIcon provider="Kyber" />}
           >
             <Text code size="sm" style={{ color: "inherit" }}>
               24 HOURS
             </Text>
-          </GeneralButton> */}
+          </GeneralButton>
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
