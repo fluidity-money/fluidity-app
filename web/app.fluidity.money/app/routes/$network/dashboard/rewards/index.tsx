@@ -544,7 +544,7 @@ export default function Rewards() {
           case "BOTTLES EARNED":
             return (
               <td>
-                {lootboxCount ? (
+                { (lootboxCount && rewardTier) ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}

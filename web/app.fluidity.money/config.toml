@@ -341,7 +341,7 @@ fUSDT = "https://app.meteora.ag"
 [liquidity_providers.arbitrum]
 
 [[liquidity_providers.arbitrum.providers]]
-name= "Trader Joe"
+name= "trader_joe"
 
 [liquidity_providers.arbitrum.providers.link]
 fUSDC = "https://traderjoexyz.com/arbitrum/pool/v21/0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a/0x912ce59144191c1204e64559fe8253a0e49e6548/25"

@@ -150,6 +150,9 @@ export const LootBottle = ({
   className = "",
   style = {},
 }: ILootBottle) => {
+  // despite my best efforts, this happens. failsafe here.
+  if (!rarity) return <></>;
+
   const Component = getBottleIcon(
     rarity,
     quantity !== undefined ? getTier(rarity, quantity) : undefined
