@@ -166,6 +166,7 @@ const NAVIGATION_MAP: {
     name: string;
     path: (network: string) => string;
     icon: JSX.Element;
+    enabled: boolean;
   };
 }[] = [
   {
@@ -173,6 +174,7 @@ const NAVIGATION_MAP: {
       name: "airdrop",
       path: (network: string) => `/${network}/dashboard/airdrop`,
       icon: <AirdropIcon />,
+      enabled: true,
     },
   },
   {
@@ -180,6 +182,15 @@ const NAVIGATION_MAP: {
       name: "dashboard",
       path: (network: string) => `/${network}/dashboard/home`,
       icon: <DashboardIcon />,
+      enabled: true,
+    },
+  },
+  {
+    swap: {
+      name: "swap",
+      path: (network: string) => `/${network}/dashboard/swap`,
+      icon: <Trophy />,
+      enabled: true,
     },
   },
   {
@@ -187,6 +198,7 @@ const NAVIGATION_MAP: {
       name: "rewards",
       path: (network: string) => `/${network}/dashboard/rewards`,
       icon: <Trophy />,
+      enabled: true,
     },
   },
   {
@@ -194,6 +206,15 @@ const NAVIGATION_MAP: {
       name: "assets",
       path: (network: string) => `/${network}/dashboard/assets`,
       icon: <AssetsIcon />,
+      enabled: true,
+    },
+  },
+  {
+    dao: {
+      name: "dao",
+      path: (network: string) => `/${network}/dashboard/dao`,
+      icon: <AssetsIcon />,
+      enabled: false,
     },
   },
 ];
@@ -541,7 +562,7 @@ export default function Dashboard() {
         <ul className="sidebar-nav">
           {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
-            const { name, icon } = Object.values(obj)[0];
+            const { name, icon, enabled } = Object.values(obj)[0];
             const active = index === activeIndex;
 
             return (
@@ -551,18 +572,22 @@ export default function Dashboard() {
                 ) : (
                   <div />
                 )}
-                <Link to={key}>
-                  <Text
-                    prominent={active}
-                    className={
-                      active
-                        ? "dashboard-navbar-active"
-                        : "dashboard-navbar-default"
-                    }
-                  >
-                    {icon} {name}
-                  </Text>
-                </Link>
+                { (() => {
+                  const t =
+                    <Text
+                      prominent={active}
+                      className={
+                        active
+                          ? "dashboard-navbar-active"
+                          : "dashboard-navbar-default"
+                      }
+                    >
+                      {icon} {name}
+                    </Text>;
+
+                  return enabled ? <Link to={key}>{t}</Link> : t;
+                })()
+              }
               </li>
             );
           })}
@@ -889,6 +914,8 @@ const routeMapper = (route: string) => {
     case "/":
     case "/home":
       return "DASHBOARD";
+    case "/swap":
+      return "SWAP";
     case "/rewards":
       return "REWARDS";
     case "/unclaimed":
