@@ -27,6 +27,7 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
+  AirdropIcon,
   DashboardIcon,
   GeneralButton,
   Trophy,
@@ -167,6 +168,13 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
+    },
+  },
   {
     home: {
       name: "dashboard",

@@ -59,7 +59,7 @@ import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 
-const EPOCH_CURRENT_IDENTIFIER = "epoch_testing";
+const EPOCH_CURRENT_IDENTIFIER = "epoch_2";
 
 const AIRDROP_MODALS = [
   "recap",
