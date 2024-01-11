@@ -317,8 +317,8 @@ func UpdateOrInsertAmountsRewarded(network_ network.BlockchainNetwork, lootboxCu
 		lootboxCurrentEpoch,
 		tokenShortName,
 		amountNormalLossy,
-		application,
 		winnerAddress,
+		application,
 	)
 
 	if err != nil {

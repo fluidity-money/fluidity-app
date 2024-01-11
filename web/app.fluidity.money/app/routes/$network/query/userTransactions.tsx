@@ -361,8 +361,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency: { symbol: currency },
           application,
           lootboxCount,
-          rewardTier,
+          rewardTier: rewardTier_,
         } = transaction;
+
+        const rewardTier =
+          rewardTier_ ?? translateRewardTierToRarity(Object.values(Rarity).indexOf(rewardTier_));
 
         return {
           sender,
@@ -379,7 +382,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency,
           application,
           lootboxCount,
-          rewardTier: translateRewardTierToRarity(Object.values(Rarity).indexOf(rewardTier)),
+          rewardTier
         };
       }
     );
