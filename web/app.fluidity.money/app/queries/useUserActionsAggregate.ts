@@ -1,5 +1,6 @@
 import Transaction from "~/types/Transaction";
 import { fetchGqlEndpoint, gql, jsonPost, Queryable } from "~/util";
+import { Rarity } from "@fluidity-money/surfing";
 
 export type AggregatedTransaction = Omit<
   Transaction,
@@ -10,7 +11,7 @@ export type AggregatedTransaction = Omit<
   swap_in: boolean;
   type: "send" | "swap";
   timestamp: string;
-  rewardTier: number;
+  rewardTier: Rarity;
   lootboxCount: number;
 };
 

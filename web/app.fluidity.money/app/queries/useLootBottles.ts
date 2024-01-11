@@ -14,7 +14,7 @@ const QUERY_BY_TX_HASH = gql`
 export type Lootbox = {
   txHash?: string;
   lootboxCount: number;
-  rewardTier: number;
+  rewardTier: Rarity;
 };
 
 type LootboxesByTxHashBody = {
