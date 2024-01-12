@@ -111,6 +111,7 @@ const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
   loaded: false,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const translateRewardTierToRarity = (rewardTier: any): Rarity => {
   switch (rewardTier) {
     case 5:
