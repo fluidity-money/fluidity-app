@@ -8,7 +8,6 @@ import (
 	"context"
 	"math"
 	"math/big"
-	"time"
 
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
@@ -86,6 +85,22 @@ func main() {
 			tokenDecimals  = tokenDetails.TokenDecimals
 			tokenShortName = tokenDetails.TokenShortName
 		)
+
+		if tokenShortName != "USDC" {
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Ignoring NON USDC winner that has transaction hash %v, winner address %v, token short name %v, token decimals %v, reward tier %v, application string %v",
+					transactionHash,
+					winnerAddress,
+					tokenShortName,
+					tokenDecimals,
+					rewardTier,
+					applicationString,
+				)
+			})
+
+			return
+		}
 
 		programFound, hasBegun, currentEpoch, _ := database.GetLootboxConfig()
 
@@ -271,21 +286,23 @@ func main() {
 			volume = volume.Quo(volume, decimalsRat)
 		}
 
-		// Calculate lootboxes earned from transaction
-		// ((volume) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
-		lootboxCount := new(big.Rat).Mul(
-			volumeLiquidityMultiplier(
+		three := big.NewRat(3, 1)
+
+		log.App(func(k *log.Log) {
+			k.Format(
+				"Creating a lootbox for transaction %v the volume %v, application %v as the inputs...",
+				transactionHash,
 				volume,
-				tokenDetails.TokenDecimals,
-				winnerAddress,
-				awardedTime,
-			),
+				application,
+			)
+		})
+
+		// Calculate lootboxes earned from transaction
+		// ((volume) / 3) * protocol_multiplier(ethereum_application)
+		lootboxCount := new(big.Rat).Mul(
+			new(big.Rat).Quo(volume, three),
 			protocolMultiplier(application),
 		)
-
-		// add flat 30%
-		flatMultiplier := big.NewRat(13, 10)
-		lootboxCount = lootboxCount.Mul(lootboxCount, flatMultiplier)
 
 		lootboxCountFloat, exact := lootboxCount.Float64()
 
@@ -309,29 +326,18 @@ func main() {
 			RewardTier:      rewardTier,
 			LootboxCount:    lootboxCountFloat,
 			Application:     application,
-			Epoch: currentEpoch,
+			Epoch:           currentEpoch,
 		}
 
 		queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)
 	})
 }
 
-func volumeLiquidityMultiplier(volume *big.Rat, tokenDecimals int, address string, time time.Time) *big.Rat {
-	three := big.NewRat(3, 1)
-	volumeLiquidityRat := new(big.Rat).Quo(volume, three)
-
-	liquidityMultiplier := new(big.Rat).SetFloat64(database.Calculate_A_Y(address, time))
-
-	volumeLiquidityMultiplier := new(big.Rat).Add(volumeLiquidityRat, liquidityMultiplier)
-
-	return volumeLiquidityMultiplier
-}
-
 func protocolMultiplier(application applications.Application) *big.Rat {
-	switch application {
-	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
-		return big.NewRat(2, 100)
-	}
+	//switch application {
+	//case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
+	//	return big.NewRat(2, 100)
+	//}
 
-	return big.NewRat(1, 300)
+	return big.NewRat(1, 20)
 }
