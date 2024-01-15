@@ -334,10 +334,10 @@ func main() {
 }
 
 func protocolMultiplier(application applications.Application) *big.Rat {
-	//switch application {
-	//case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
-	//	return big.NewRat(2, 100)
-	//}
+	switch application {
+	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
+		return big.NewRat(2, 100)
+	}
 
 	return big.NewRat(1, 20)
 }
