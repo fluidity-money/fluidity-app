@@ -393,6 +393,8 @@ const Airdrop = () => {
 
     fetchUserTokenBalance();
 
+    fetchUserStakes(address);
+
     fetchUserRedeemableTokens(address);
   }, [address]);
 
@@ -403,6 +405,7 @@ const Airdrop = () => {
     const res = await (await redeemTokens?.())?.confirmTx();
 
     fetchUserTokenBalance();
+    fetchUserStakes(address);
     fetchUserRedeemableTokens(address);
 
     return res;
@@ -753,6 +756,7 @@ const Airdrop = () => {
                 usdcPrice={usdcPrice}
                 stakeCallback={() => {
                   fetchUserTokenBalance();
+                  fetchUserStakes(address ?? "");
                 }}
               />
               <Heading as="h3">My Staking Stats</Heading>
