@@ -39,7 +39,7 @@ const queryAllTime = gql`
 const queryByUser24Hours = gql`
   query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
-      args: { epoch_: $epoch, application_: $application }
+      args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
       limit: 1
     ) {
@@ -56,7 +56,7 @@ const queryByUser24Hours = gql`
 `;
 
 const query24Hours = gql`
-  query AirdropLeaderboard {
+  query AirdropLeaderboard($epoch: lootbox_epoch!) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
       args: { epoch_: $epoch }
       limit: 16

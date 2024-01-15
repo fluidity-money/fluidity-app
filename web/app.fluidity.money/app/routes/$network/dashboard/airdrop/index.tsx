@@ -222,11 +222,13 @@ const Airdrop = () => {
       : ""
   );
 
+  const currentApplication = "";
+
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${
       leaderboardFilterIndex === 0 ? "24" : "all"
     }&address=${address ?? ""}${
-      leaderboardFilterIndex === 0 ? "&provider=${currentApplication}" : ""
+      leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
     }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
   );
 
@@ -1479,22 +1481,9 @@ const Leaderboard = ({
         <div className="leaderboard-header-text">
           <div className="leaderboard-header-title-row">
             <Heading as="h3">Leaderboard</Heading>
-            {filterIndex === 0 && (
-              <GeneralButton
-                icon={<ProviderIcon provider="Kyber" />}
-                type="secondary"
-                disabled
-                className="leaderboard-provider-button"
-              >
-                <Text code style={{ color: "inherit" }}>
-                  KYBERSWAP
-                </Text>
-              </GeneralButton>
-            )}
           </div>
           <Text prominent>
             This leaderboard shows your rank among other users
-            {filterIndex === 0 ? " using KyberSwap " : " "}
             {filterIndex === 0 ? " per" : " for"}
             &nbsp;
             {filterIndex === 0 ? (
@@ -1505,7 +1494,7 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
-          {<GeneralButton
+          <GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(0)}
           >
