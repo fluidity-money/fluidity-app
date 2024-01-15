@@ -205,6 +205,7 @@ const Airdrop = () => {
     testStakeTokens,
     getStakingRatios,
     redeemableTokens: getRedeemableTokens,
+    getStakingDeposits,
     redeemTokens,
   } = useContext(FluidityFacadeContext);
 
@@ -302,12 +303,19 @@ const Airdrop = () => {
     setCurrentModal(isAirdropModal(destModal) ? destModal : null);
   }, [location.hash]);
 
-  const stakes: Array<{
-    fluidAmount: BN;
-    baseAmount: BN;
-    durationDays: number;
-    depositDate: Date;
-  }> = [];
+  const [stakes, setStakes] = useState<
+    Array<{
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
+  >([]);
+
+  const fetchUserStakes = async (address: string) => {
+    const stakingDeposits = (await getStakingDeposits?.(address)) ?? [];
+    setStakes(stakingDeposits);
+  };
 
   const fetchUserTokenBalance = async () => {
     const userTokenBalance = await Promise.all(
