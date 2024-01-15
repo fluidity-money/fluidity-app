@@ -2,7 +2,7 @@
 
 DROP FUNCTION airdrop_leaderboard;
 
-CREATE FUNCTION public.airdrop_leaderboard(epoch_ lootbox_epoch)
+CREATE FUNCTION airdrop_leaderboard(epoch_ lootbox_epoch)
  RETURNS SETOF airdrop_leaderboard_return
  LANGUAGE sql
  STABLE
@@ -44,7 +44,7 @@ $function$;
 
 DROP FUNCTION airdrop_leaderboard;
 
-CREATE FUNCTION public.airdrop_leaderboard(epoch_ lootbox_epoch)
+CREATE FUNCTION airdrop_leaderboard(epoch_ lootbox_epoch)
  RETURNS SETOF airdrop_leaderboard_return
  LANGUAGE sql
  STABLE
