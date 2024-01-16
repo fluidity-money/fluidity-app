@@ -69,4 +69,5 @@ type PendingWinner struct {
 	RewardType      RewardType                 `json:"reward_type"`
 	LogIndex        *misc.BigInt               `json:"log_index"`
 	Application     applications.Application   `json:"application"`
+	RewardTier      int                        `json:"reward_tier"`
 }
