@@ -223,9 +223,11 @@ func UpdateAggregatedUserTransactionByHashWithLootbottles(lootbottlesCount float
 
 	statementText := fmt.Sprintf(
 		`UPDATE %s
-			SET lootbox_count = $1, reward_tier = $2
+			SET lootbox_count = $1 + %s.lootbox_count, reward_tier = GREATEST($2, %s.reward_tier)
 			WHERE transaction_hash = $3`,
 
+		TableAggregatedUserTransactions,
+		TableAggregatedUserTransactions,
 		TableAggregatedUserTransactions,
 	)
 
@@ -239,7 +241,14 @@ func UpdateAggregatedUserTransactionByHashWithLootbottles(lootbottlesCount float
 	if err != nil {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
-			k.Message = "Failed to update an aggregated user transaction with a lootbottle"
+
+			k.Format(
+				"Failed to update an aggregated user transaction with a lootbottle, transaction hash %v, reward tier %v, lootbottles count %v",
+				transactionHash,
+				rewardTier,
+				lootbottlesCount,
+			)
+
 			k.Payload = err
 		})
 	}
@@ -251,8 +260,11 @@ func UpdateAggregatedUserTransactionByHashWithLootbottles(lootbottlesCount float
 			k.Context = Context
 
 			k.Format(
-				"%d rows affected by an aggregate user transaction with lootbottle update, expected 1!",
+				"%d rows affected by an aggregate user transaction with lootbottle update, expected 1!, transaction hash %v, reward tier %v, lootbottles count %v",
 				rows,
+				transactionHash,
+				rewardTier,
+				lootbottlesCount,
 			)
 
 			k.Payload = err
