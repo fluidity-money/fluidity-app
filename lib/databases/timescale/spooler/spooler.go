@@ -149,7 +149,8 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			network,
 			reward_type,
 			log_index,
-			application
+			application,
+			reward_tier
 		)
 
 		VALUES (
@@ -165,7 +166,8 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			$10,
 			$11,
 			$12,
-			$13
+			$13,
+			$14
 		);`,
 
 		TablePendingWinners,
@@ -187,7 +189,9 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			rewardType      = pendingWinner.RewardType
 			logIndex        = pendingWinner.LogIndex
 			application     = pendingWinner.Application
+			rewardTier      = pendingWinner.RewardTier
 		)
+
 		_, err := timescaleClient.Exec(
 			statementText,
 			category,
@@ -203,6 +207,7 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			rewardType,
 			logIndex,
 			application.String(),
+			rewardTier,
 		)
 
 		if err != nil {
@@ -325,9 +330,7 @@ func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token to
 	winners := make([]worker.EthereumReward, 0)
 
 	for rows.Next() {
-		var (
-			winner worker.EthereumReward
-		)
+		var winner worker.EthereumReward
 
 		err := rows.Scan(
 			&winner.Network,
