@@ -45,6 +45,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 		recipientWinAmount = winner.ToWinAmount
 		logIndex           = winner.LogIndex
 		application        = winner.Application
+		rewardTier         = winner.RewardTier
 	)
 
 	for utility, payout := range senderWinAmount {
@@ -84,6 +85,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			RewardType:      "send",
 			LogIndex:        logIndex,
 			Application:     application,
+			RewardTier:      rewardTier,
 		})
 	}
 
@@ -125,6 +127,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			RewardType:      "receive",
 			LogIndex:        logIndex,
 			Application:     application,
+			RewardTier:      rewardTier,
 		})
 	}
 	return pendingWinners
@@ -147,7 +150,8 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			network,
 			reward_type,
 			log_index,
-			application
+			application,
+			reward_tier
 		)
 
 		VALUES (
@@ -163,7 +167,8 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			$10,
 			$11,
 			$12,
-			$13
+			$13,
+			$14
 		);`,
 
 		TablePendingWinners,
@@ -174,18 +179,20 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 		var (
 			fluidTokenDetails = pendingWinner.TokenDetails
 
-			category            = pendingWinner.Category
-			hash                = pendingWinner.TransactionHash
-			senderAddress       = pendingWinner.SenderAddress
-			nativeWinAmount     = pendingWinner.NativeWinAmount
-			usdWinAmount        = pendingWinner.UsdWinAmount
-			utility             = pendingWinner.Utility
-			blockNumber         = pendingWinner.BlockNumber
-			network_            = pendingWinner.Network
-			rewardType          = pendingWinner.RewardType
-			logIndex            = pendingWinner.LogIndex
-			application         = pendingWinner.Application
+			category        = pendingWinner.Category
+			hash            = pendingWinner.TransactionHash
+			senderAddress   = pendingWinner.SenderAddress
+			nativeWinAmount = pendingWinner.NativeWinAmount
+			usdWinAmount    = pendingWinner.UsdWinAmount
+			utility         = pendingWinner.Utility
+			blockNumber     = pendingWinner.BlockNumber
+			network_        = pendingWinner.Network
+			rewardType      = pendingWinner.RewardType
+			logIndex        = pendingWinner.LogIndex
+			application     = pendingWinner.Application
+			rewardTier      = pendingWinner.RewardTier
 		)
+
 		_, err := timescaleClient.Exec(
 			statementText,
 			category,
@@ -201,6 +208,7 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			rewardType,
 			logIndex,
 			application.String(),
+			rewardTier,
 		)
 
 		if err != nil {
@@ -323,9 +331,7 @@ func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token to
 	winners := make([]worker.EthereumReward, 0)
 
 	for rows.Next() {
-		var (
-			winner worker.EthereumReward
-		)
+		var winner worker.EthereumReward
 
 		err := rows.Scan(
 			&winner.Network,

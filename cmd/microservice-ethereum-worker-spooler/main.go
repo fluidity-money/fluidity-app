@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	commonApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
-	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	workerDb "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/amm"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
@@ -22,6 +20,9 @@ import (
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+
+	commonApps "github.com/fluidity-money/fluidity-app/common/ethereum/applications"
+	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 )
 
 const (

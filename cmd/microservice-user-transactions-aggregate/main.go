@@ -15,7 +15,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	userActionsType "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
-	winnerTypes "github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
 func handleUserAction(userAction user_actions.UserAction) {
@@ -142,7 +141,7 @@ func main() {
 		user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, sendTransactionHash)
 	})
 
-	winners.PendingWinners(func(pendingWinners []winnerTypes.PendingWinner) {
+	winners.PendingWinners(func(pendingWinners []winners.PendingWinner) {
 		for _, pendingWinner := range pendingWinners {
 			var (
 				network         = pendingWinner.Network

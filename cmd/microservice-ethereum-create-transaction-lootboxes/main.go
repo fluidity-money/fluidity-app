@@ -16,17 +16,17 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	winners_queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
 	libEthereum "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
+	ethAbiBind "github.com/ethereum/go-ethereum/accounts/abi/bind"
+	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -51,14 +51,14 @@ func main() {
 	tokensList := util.GetTokensListBase(ethereumTokensList_)
 
 	// tokensMap to look up a token's address using its short name
-	tokensMap := make(map[string]common.Address)
+	tokensMap := make(map[string]ethCommon.Address)
 	for _, token := range tokensList {
 		var (
 			tokenAddress = token.TokenAddress
 			tokenName    = token.TokenName
 		)
 
-		tokensMap[tokenName] = common.HexToAddress(tokenAddress)
+		tokensMap[tokenName] = ethCommon.HexToAddress(tokenAddress)
 	}
 
 	ethClient, err := ethclient.Dial(gethHttpUrl)
@@ -72,21 +72,7 @@ func main() {
 
 	defer ethClient.Close()
 
-	winners_queue.WinnersEthereum(func(winner winners_queue.Winner) {
-		var (
-			network           = winner.Network
-			transactionHash   = winner.SendTransactionHash
-			winnerAddress     = winner.WinnerAddress
-			awardedTime       = winner.AwardedTime
-			tokenDetails      = winner.TokenDetails
-			rewardTier        = winner.RewardTier
-			applicationString = winner.Application
-			logIndex          = winner.SendTransactionLogIndex
-
-			tokenDecimals  = tokenDetails.TokenDecimals
-			tokenShortName = tokenDetails.TokenShortName
-		)
-
+	winners_queue.PendingWinners(func(winners []winners_queue.PendingWinner) {
 		programFound, hasBegun, currentEpoch, _ := database.GetLootboxConfig()
 
 		// check that the lootbox is enabled, and that it's also
@@ -113,225 +99,271 @@ func main() {
 
 		log.Debugf("Lootbox current epoch running is %v!", currentEpoch)
 
-		// don't track fluidification
-		if winner.RewardType != "send" {
-			log.Debug(func(k *log.Log) {
-				k.Format(
-					"Winner %s in transaction %s is a recipient, skipping!",
-					winnerAddress,
-					transactionHash,
-				)
-			})
-			return
-		}
-
-		// all applications qualify, including a regular send (ApplicationNone)
-		application, err := applications.ParseApplicationName(applicationString)
-
-		if err != nil {
-			log.Fatal(func(k *log.Log) {
-				k.Message = "Failed to parse application name!"
-				k.Payload = err
-			})
-		}
-
-		sendTransaction := user_actions.GetUserActionByLogIndex(network, transactionHash, logIndex)
-
-		if sendTransaction == nil {
-			// not a Transfer event, so look up and classify the application used
-
-			// fetch parameters to call GetApplicationFee
-			// wait for transaction to be mined before fetching receipt
-
-			transaction, isPending, err := ethClient.TransactionByHash(
-				context.Background(),
-				common.HexToHash(transactionHash),
+		for _, winner := range winners {
+			var (
+				network_        = winner.Network
+				transactionHash = winner.TransactionHash
+				tokenDetails    = winner.TokenDetails
+				rewardTier      = winner.RewardTier
+				application     = winner.Application
+				logIndex        = winner.LogIndex
 			)
 
-			if err != nil {
+			var (
+				tokenDecimals  = tokenDetails.TokenDecimals
+				tokenShortName = tokenDetails.TokenShortName
+			)
+
+			switch network_ {
+			case network.NetworkEthereum, network.NetworkArbitrum:
+				// do nothing
+
+			default:
 				log.Fatal(func(k *log.Log) {
 					k.Format(
-						"Failed to fetch transaction by hash %s!",
-						transactionHash,
+						"Network %v isn't supported for transaction lootboxes!",
+						network_,
 					)
-
-					k.Payload = err
 				})
 			}
+			winnerAddress := winner.SenderAddress
 
-			if isPending {
+			var (
+				winnerAddressString   = winnerAddress.String()
+				transactionHashString = transactionHash.String()
+			)
+
+			transactionHashHex := ethCommon.HexToHash(transactionHashString)
+
+			awardedTime := time.Now()
+
+			// don't track fluidification
+			if winner.RewardType != "send" {
 				log.Debug(func(k *log.Log) {
 					k.Format(
-						"Transaction %s is pending - waiting to be mined",
+						"Winner %s in transaction %s is a recipient, skipping!",
+						winnerAddress,
 						transactionHash,
 					)
 				})
+				return
 			}
 
-			receipt_, err := bind.WaitMined(context.Background(), ethClient, transaction)
+			// don't track fluidification
+			if winner.RewardType != "send" {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Winner %s in transaction %s is a recipient, skipping!",
+						winnerAddress,
+						transactionHash,
+					)
+				})
+				return
+			}
 
-			if err != nil {
+			if logIndex == nil {
 				log.Fatal(func(k *log.Log) {
 					k.Format(
-						"Failed to fetch receipt for transaction %s!",
+						"For pending winner for transaction hash %v, sender %v, the log index is empty!",
 						transactionHash,
+						winnerAddress,
 					)
-
-					k.Payload = err
 				})
 			}
 
-			receipt := libEthereum.ConvertGethReceipt(*receipt_)
-
-			// look up log by index
-			var logIndexInReceipt int
-			for i, receipt := range receipt.Logs {
-				if receipt.Index.Int64() == logIndex.Int64() {
-					logIndexInReceipt = i
-					break
-				}
-			}
-
-			log_ := receipt.Logs[logIndexInReceipt]
-
-			applicationTransfer := worker.EthereumApplicationTransfer{
-				TransactionHash: ethereum.HashFromString(transactionHash),
-				Log:             log_,
-				Application:     application,
-			}
-
-			fluidTokenContract := tokensMap[tokenShortName]
-
-			inputData := transaction.Data()
-
-			feeData, _, _, err := applications.GetApplicationFee(
-				applicationTransfer,
-				ethClient,
-				fluidTokenContract,
-				tokenDecimals,
-				receipt,
-				inputData,
+			sendTransaction := user_actions.GetUserActionByLogIndex(
+				network_,
+				transactionHashString,
+				*logIndex,
 			)
 
-			if err != nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Failed to get fee data for transaction %s!",
-						transactionHash,
-					)
+			if sendTransaction == nil {
+				// not a Transfer event, so look up and classify the application used
 
-					k.Payload = err
-				})
+				// fetch parameters to call GetApplicationFee
+				// wait for transaction to be mined before fetching receipt
+
+				transaction, isPending, err := ethClient.TransactionByHash(
+					context.Background(),
+					transactionHashHex,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to fetch transaction by hash %s!",
+							transactionHash,
+						)
+
+						k.Payload = err
+					})
+				}
+
+				if isPending {
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"Transaction %s is pending - waiting to be mined",
+							transactionHash,
+						)
+					})
+				}
+
+				receipt_, err := ethAbiBind.WaitMined(context.Background(), ethClient, transaction)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to fetch receipt for transaction %s!",
+							transactionHash,
+						)
+
+						k.Payload = err
+					})
+				}
+
+				receipt := libEthereum.ConvertGethReceipt(*receipt_)
+
+				// look up log by index
+				var logIndexInReceipt int
+				for i, receipt := range receipt.Logs {
+					if receipt.Index.Int64() == logIndex.Int64() {
+						logIndexInReceipt = i
+						break
+					}
+				}
+
+				log_ := receipt.Logs[logIndexInReceipt]
+
+				applicationTransfer := worker.EthereumApplicationTransfer{
+					TransactionHash: transactionHash,
+					Log:             log_,
+					Application:     application,
+				}
+
+				fluidTokenContract := tokensMap[tokenShortName]
+
+				inputData := transaction.Data()
+
+				feeData, _, _, err := applications.GetApplicationFee(
+					applicationTransfer,
+					ethClient,
+					fluidTokenContract,
+					tokenDecimals,
+					receipt,
+					inputData,
+				)
+
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to get fee data for transaction %s!",
+							transactionHash,
+						)
+
+						k.Payload = err
+					})
+				}
+
+				feeDataVolume := feeData.Volume
+
+				if feeDataVolume == nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Fee data volume for send transaction %v, winner transaction hash %v is nil!",
+							sendTransaction.TransactionHash,
+							transactionHash,
+						)
+					})
+				}
+
+				//
+
+				volume = new(big.Rat).Set(feeDataVolume)
+
+				// volumeBigInt_ to convert to the database BigInt
+				// volumeBigInt_ = (volumeRat * 10^decimals * denominator)::BigInt / denominator
+				// this is to convert to a BigInt without losing decimal places that are relevant to the token amount
+				// e.g. 1234567/100000 with 6 decimals should be adjusted to 12345670
+				volumeBigInt_ := new(big.Rat).Set(feeDataVolume)
+
+				decimalsAdjusted := math.Pow10(tokenDecimals)
+				decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+				// get denominator
+				denom := new(big.Int).Set(volumeBigInt_.Denom())
+				// multiply by decimals
+				volumeBigInt_ = volumeBigInt_.Mul(volumeBigInt_, decimalsRat)
+				// multiply by denom to get number as an int
+				volumeBigInt_ = volumeBigInt_.Mul(volumeBigInt_, new(big.Rat).SetInt(denom))
+				// convert to int
+				volumeBigIntNum := volumeBigInt_.Num()
+
+				// divide by original denom, losing any extra precision
+				volumeBigIntNum = volumeBigIntNum.Quo(volumeBigIntNum, denom)
+				volumeBigInt = misc.NewBigIntFromInt(*volumeBigIntNum)
+
+			} else {
+				volumeBigInt = sendTransaction.Amount
+				// adjust to USD
+				volume = new(big.Rat).SetInt(&sendTransaction.Amount.Int)
+				decimalsAdjusted := math.Pow10(tokenDecimals)
+				decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+				volume = volume.Quo(volume, decimalsRat)
 			}
 
-			feeDataVolume := feeData.Volume
+			three := big.NewRat(3, 1)
 
-			if feeDataVolume == nil {
-				log.Fatal(func(k *log.Log) {
-					k.Format(
-						"Fee data volume for send transaction %v, winner transaction hash %v is nil!",
-						sendTransaction.TransactionHash,
-						transactionHash,
-					)
-				})
-			}
-
-			//
-
-			volume = new(big.Rat).Set(feeDataVolume)
-
-			// volumeBigInt_ to convert to the database BigInt
-			// volumeBigInt_ = (volumeRat * 10^decimals * denominator)::BigInt / denominator
-			// this is to convert to a BigInt without losing decimal places that are relevant to the token amount
-			// e.g. 1234567/100000 with 6 decimals should be adjusted to 12345670
-			volumeBigInt_ := new(big.Rat).Set(feeDataVolume)
-
-			decimalsAdjusted := math.Pow10(tokenDecimals)
-			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-
-			// get denominator
-			denom := new(big.Int).Set(volumeBigInt_.Denom())
-			// multiply by decimals
-			volumeBigInt_ = volumeBigInt_.Mul(volumeBigInt_, decimalsRat)
-			// multiply by denom to get number as an int
-			volumeBigInt_ = volumeBigInt_.Mul(volumeBigInt_, new(big.Rat).SetInt(denom))
-			// convert to int
-			volumeBigIntNum := volumeBigInt_.Num()
-
-			// divide by original denom, losing any extra precision
-			volumeBigIntNum = volumeBigIntNum.Quo(volumeBigIntNum, denom)
-			volumeBigInt = misc.NewBigIntFromInt(*volumeBigIntNum)
-
-		} else {
-			volumeBigInt = sendTransaction.Amount
-			// adjust to USD
-			volume = new(big.Rat).SetInt(&sendTransaction.Amount.Int)
-			decimalsAdjusted := math.Pow10(tokenDecimals)
-			decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-			volume = volume.Quo(volume, decimalsRat)
-		}
-
-		// Calculate lootboxes earned from transaction
-		// ((volume) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
-		lootboxCount := new(big.Rat).Mul(
-			volumeLiquidityMultiplier(
-				volume,
-				tokenDetails.TokenDecimals,
-				winnerAddress,
-				awardedTime,
-			),
-			protocolMultiplier(application),
-		)
-
-		// add flat 30%
-		flatMultiplier := big.NewRat(13, 10)
-		lootboxCount = lootboxCount.Mul(lootboxCount, flatMultiplier)
-
-		lootboxCountFloat, exact := lootboxCount.Float64()
-
-		if exact != true {
-			log.Debug(func(k *log.Log) {
+			log.App(func(k *log.Log) {
 				k.Format(
-					"Lootbox count for hash %v and winner %v was not an exact float, was %v",
+					"Creating a lootbox for transaction %v the volume %v, application %v as the inputs...",
 					transactionHash,
-					winnerAddress,
-					lootboxCount.String(),
+					volume,
+					application,
 				)
 			})
-		}
 
-		lootbox := lootboxes_queue.Lootbox{
-			Address:         winnerAddress,
-			Source:          lootboxes.Transaction,
-			TransactionHash: transactionHash,
-			AwardedTime:     awardedTime,
-			Volume:          volumeBigInt,
-			RewardTier:      rewardTier,
-			LootboxCount:    lootboxCountFloat,
-			Application:     application,
-			Epoch: currentEpoch,
-		}
+			// Calculate lootboxes earned from transaction
+			// ((volume) / 3) * protocol_multiplier(ethereum_application)
+			lootboxCount := new(big.Rat).Mul(
+				new(big.Rat).Quo(volume, three),
+				protocolMultiplier(application),
+			)
 
-		queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)
+			lootboxCountFloat, exact := lootboxCount.Float64()
+
+			if exact != true {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Lootbox count for hash %v and winner %v was not an exact float, was %v",
+						transactionHash,
+						winnerAddress,
+						lootboxCount.String(),
+					)
+				})
+			}
+
+			lootbox := lootboxes_queue.Lootbox{
+				Address:         winnerAddressString,
+				Source:          lootboxes.Transaction,
+				TransactionHash: transactionHashString,
+				AwardedTime:     awardedTime,
+				Volume:          volumeBigInt,
+				RewardTier:      rewardTier,
+				LootboxCount:    lootboxCountFloat,
+				Application:     application,
+				Epoch:           currentEpoch,
+			}
+
+			queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)
+		}
 	})
-}
-
-func volumeLiquidityMultiplier(volume *big.Rat, tokenDecimals int, address string, time time.Time) *big.Rat {
-	three := big.NewRat(3, 1)
-	volumeLiquidityRat := new(big.Rat).Quo(volume, three)
-
-	liquidityMultiplier := new(big.Rat).SetFloat64(database.Calculate_A_Y(address, time))
-
-	volumeLiquidityMultiplier := new(big.Rat).Add(volumeLiquidityRat, liquidityMultiplier)
-
-	return volumeLiquidityMultiplier
 }
 
 func protocolMultiplier(application applications.Application) *big.Rat {
 	switch application {
 	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
-		return big.NewRat(2, 100)
+		return big.NewRat(3, 10)
 	}
 
-	return big.NewRat(1, 300)
+	return big.NewRat(1, 20)
 }

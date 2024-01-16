@@ -111,6 +111,7 @@ const SAFE_DEFAULT_TRANSACTIONS: TransactionsLoaderData = {
   loaded: false,
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const translateRewardTierToRarity = (rewardTier: any): Rarity => {
   switch (rewardTier) {
     case 5:
@@ -409,6 +410,8 @@ export default function Home() {
                 <a
                   className="table-activity"
                   href={getTxExplorerLink(network, hash)}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   {appProviderName !== "Fluidity" ? (
                     <ProviderIcon provider={appProviderName} />
@@ -525,6 +528,8 @@ export default function Home() {
                 <a
                   className="table-activity"
                   href={getTxExplorerLink(network, hash)}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   <Text>{hash}</Text>
                 </a>
