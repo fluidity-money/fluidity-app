@@ -8,7 +8,6 @@ import (
 	"context"
 	"math"
 	"math/big"
-	"time"
 
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
@@ -347,22 +346,11 @@ func main() {
 	})
 }
 
-func volumeLiquidityMultiplier(volume *big.Rat, tokenDecimals int, address string, time time.Time) *big.Rat {
-	three := big.NewRat(3, 1)
-	volumeLiquidityRat := new(big.Rat).Quo(volume, three)
-
-	liquidityMultiplier := new(big.Rat).SetFloat64(database.Calculate_A_Y(address, time))
-
-	volumeLiquidityMultiplier := new(big.Rat).Add(volumeLiquidityRat, liquidityMultiplier)
-
-	return volumeLiquidityMultiplier
-}
-
 func protocolMultiplier(application applications.Application) *big.Rat {
 	switch application {
 	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
-		return big.NewRat(2, 100)
+		return big.NewRat(3, 10)
 	}
 
-	return big.NewRat(1, 300)
+	return big.NewRat(1, 20)
 }

@@ -16,7 +16,7 @@ export type AirdropLeaderboardLoaderData = {
   loaded: boolean;
 };
 
-const AIRDROP_PROVIDERS = new Set(["chronos", "sushiswap", "kyber_classic"]);
+const AIRDROP_PROVIDERS = new Set(["chronos", "sushiswap"]);
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
