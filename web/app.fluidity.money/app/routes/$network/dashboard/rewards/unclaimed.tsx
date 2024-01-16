@@ -210,6 +210,8 @@ const UnclaimedWinnings = () => {
               <td>
                 <a
                   className="table-activity"
+                  target="_blank"
+                  rel="noreferrer"
                   href={getAddressExplorerLink(
                     chain,
                     tokenDetailsMap[symbol].address ?? ""
