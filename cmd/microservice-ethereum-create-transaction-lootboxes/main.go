@@ -8,6 +8,7 @@ import (
 	"context"
 	"math"
 	"math/big"
+	"time"
 
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/lootboxes"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
@@ -15,7 +16,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	winners_queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -126,7 +126,6 @@ func main() {
 					)
 				})
 			}
-
 			winnerAddress := winner.SenderAddress
 
 			var (
@@ -137,6 +136,18 @@ func main() {
 			transactionHashHex := ethCommon.HexToHash(transactionHashString)
 
 			awardedTime := time.Now()
+
+			// don't track fluidification
+			if winner.RewardType != "send" {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Winner %s in transaction %s is a recipient, skipping!",
+						winnerAddress,
+						transactionHash,
+					)
+				})
+				return
+			}
 
 			// don't track fluidification
 			if winner.RewardType != "send" {
@@ -162,7 +173,7 @@ func main() {
 
 			sendTransaction := user_actions.GetUserActionByLogIndex(
 				network_,
-				transactionHash.String(),
+				transactionHashString,
 				*logIndex,
 			)
 
@@ -224,7 +235,7 @@ func main() {
 				log_ := receipt.Logs[logIndexInReceipt]
 
 				applicationTransfer := worker.EthereumApplicationTransfer{
-					TransactionHash: ethereum.HashFromString(transactionHash.String()),
+					TransactionHash: transactionHash,
 					Log:             log_,
 					Application:     application,
 				}
@@ -300,21 +311,23 @@ func main() {
 				volume = volume.Quo(volume, decimalsRat)
 			}
 
-			// Calculate lootboxes earned from transaction
-			// ((volume) / 3) + calculate_a_y(address, awarded_time)) * protocol_multiplier(ethereum_application) / 100
-			lootboxCount := new(big.Rat).Mul(
-				volumeLiquidityMultiplier(
+			three := big.NewRat(3, 1)
+
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Creating a lootbox for transaction %v the volume %v, application %v as the inputs...",
+					transactionHash,
 					volume,
-					tokenDetails.TokenDecimals,
-					winnerAddressString,
-					awardedTime,
-				),
+					application,
+				)
+			})
+
+			// Calculate lootboxes earned from transaction
+			// ((volume) / 3) * protocol_multiplier(ethereum_application)
+			lootboxCount := new(big.Rat).Mul(
+				new(big.Rat).Quo(volume, three),
 				protocolMultiplier(application),
 			)
-
-			// add flat 30%
-			flatMultiplier := big.NewRat(13, 10)
-			lootboxCount = lootboxCount.Mul(lootboxCount, flatMultiplier)
 
 			lootboxCountFloat, exact := lootboxCount.Float64()
 
