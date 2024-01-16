@@ -566,6 +566,8 @@ export default function Rewards() {
               <td>
                 <a
                   className="table-address"
+                  target="_blank"
+                  rel="noreferrer"
                   href={getAddressExplorerLink(chain, winner)}
                 >
                   <Text>

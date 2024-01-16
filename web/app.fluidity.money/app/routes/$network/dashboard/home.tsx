@@ -410,6 +410,8 @@ export default function Home() {
                 <a
                   className="table-activity"
                   href={getTxExplorerLink(network, hash)}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   {appProviderName !== "Fluidity" ? (
                     <ProviderIcon provider={appProviderName} />
@@ -526,6 +528,8 @@ export default function Home() {
                 <a
                   className="table-activity"
                   href={getTxExplorerLink(network, hash)}
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   <Text>{hash}</Text>
                 </a>
