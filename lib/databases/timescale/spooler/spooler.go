@@ -127,6 +127,7 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			RewardType:      "receive",
 			LogIndex:        logIndex,
 			Application:     application,
+			RewardTier: rewardTier,
 		})
 	}
 	return pendingWinners
