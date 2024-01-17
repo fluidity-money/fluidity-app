@@ -362,8 +362,8 @@ func main() {
 func protocolMultiplier(application applications.Application) *big.Rat {
 	switch application {
 	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
-		return big.NewRat(3, 10)
+		return big.NewRat(3, 5)
 	}
 
-	return big.NewRat(1, 20)
+	return big.NewRat(1, 10)
 }
