@@ -52,7 +52,7 @@ jobs:
           lfs: true
           submodules: recursive
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -60,7 +60,7 @@ jobs:
       - name: Install nodejs
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Install python
@@ -94,7 +94,7 @@ jobs:
           lfs: true
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
       - name: npm test
         working-directory: web
         run: |
@@ -117,7 +117,7 @@ jobs:
         with:
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
