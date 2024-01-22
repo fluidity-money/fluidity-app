@@ -1,9 +1,4 @@
-import { installGlobals } from "@remix-run/node";
 import { useUserRewardsByAddress } from "./useUserRewards";
-
-//beforeAll(() => {
-//  installGlobals();
-//});
 
 describe("useUserRewards successfully runs", () => {
   it("should return a valid response", async () => {
