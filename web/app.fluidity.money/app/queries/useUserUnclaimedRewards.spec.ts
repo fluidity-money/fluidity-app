@@ -1,9 +1,9 @@
 import { installGlobals } from "@remix-run/node";
 import useUserUnclaimedRewards from "./useUserUnclaimedRewards";
 
-beforeAll(() => {
-  installGlobals();
-});
+//beforeAll(() => {
+//  installGlobals();
+//});
 
 describe("useUserUnclaimedRewards", () => {
   it("should return a valid response", async () => {
