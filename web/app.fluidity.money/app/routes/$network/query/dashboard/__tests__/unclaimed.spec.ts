@@ -1,4 +1,10 @@
 import { loader } from "../unclaimed";
+import { installGlobals } from "@remix-run/node";
+
+beforeAll(() => {
+  // This installs globals such as "fetch", "Response", "Request" and "Headers".
+  installGlobals();
+});
 
 describe("Unclaimed page Loader", () => {
   it("should return a response", async () => {
