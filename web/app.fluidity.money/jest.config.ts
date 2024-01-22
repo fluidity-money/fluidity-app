@@ -11,7 +11,6 @@ const config: Config = {
   globals: {
     fetch: require("cross-fetch"),
   },
-  testEnvironment: "jsdom",
 };
 
 export default config;
