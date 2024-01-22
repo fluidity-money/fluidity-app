@@ -832,11 +832,14 @@ export default function Dashboard() {
             </a>
 
             {/* Source code */}
-            {showExperiment("enable-source-code") && (
-              <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                <Text>Source Code</Text>
-              </a>
-            )}
+            <a href={"https://github.com/fluidity-money/fluidity-app"}>
+              <Text>Source Code</Text>
+            </a>
+
+            {/* Dune */}
+            <a href={"https://dune.com/neogeo/fluidity-arbitrum"}>
+              <Text>Dune</Text>
+            </a>
           </section>
 
           {/* Socials */}
