@@ -11,7 +11,7 @@ on:
       network:
         type: choice
         description: 'Network'
-        options: 
+        options:
           - 'fluidity'
 
 permissions:
@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -49,7 +49,7 @@ jobs:
         uses: ./scripts/actions
         with:
           command: |
-           
+
             echo ${{ env.PREVIOUS_COMMIT }}
             flu build-docker \
               --network ${{ github.event.inputs.network }} \
@@ -59,13 +59,13 @@ jobs:
               --build-root-container true \
               --build-build-container true \
               --tag ${{ env.PREVIOUS_COMMIT }}
-      
+
       - name: Deploy
         id: deploy
         uses: ./scripts/actions
         with:
           command: |
-      
+
             flu deploy-service \
               --network ${{ github.event.inputs.network }} \
               --group all \
@@ -73,13 +73,13 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
               --tag ${{ env.PREVIOUS_COMMIT }}
-      
+
       - name: Discord
         uses: ./scripts/actions
         if: always()
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        with: 
+        with:
           command: |
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
-     
+
