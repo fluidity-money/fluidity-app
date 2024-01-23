@@ -365,5 +365,5 @@ func protocolMultiplier(application applications.Application) *big.Rat {
 		return big.NewRat(3, 5)
 	}
 
-	return big.NewRat(1, 10)
+	return big.NewRat(1, 20)
 }
