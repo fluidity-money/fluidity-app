@@ -10,7 +10,6 @@ import {
 
 import {
   PhantomWalletAdapter,
-  SolletWalletAdapter,
   SolflareWalletAdapter,
   CloverWalletAdapter,
   Coin98WalletAdapter,
@@ -136,7 +135,6 @@ const SolanaProvider = (rpcUrl: string, tokens: Token[]) => {
     const wallets = useMemo(
       () => [
         new PhantomWalletAdapter(),
-        new SolletWalletAdapter(),
         new SolflareWalletAdapter(),
         new NightlyWalletAdapter(),
         new CloverWalletAdapter(),

@@ -28,15 +28,6 @@ if (process.env.NODE_ENV === "production") {
 
   Sentry.init({
     dsn,
-    tracesSampleRate: 1.0,
-    integrations: [
-      new Sentry.BrowserTracing({
-        routingInstrumentation: Sentry.remixRouterInstrumentation(
-          useEffect,
-          useLocation,
-          useMatches
-        ),
-      }),
-    ],
+    tracesSampleRate: 1.0
   });
 } else console.log("Running in development, ignoring Sentry initialisation...");
