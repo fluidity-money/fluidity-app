@@ -48,6 +48,11 @@ func main() {
 		volume       *big.Rat
 	)
 
+	log.Debugf(
+		"Running with tokens list %v",
+		ethereumTokensList_,
+	)
+
 	tokensList := util.GetTokensListBase(ethereumTokensList_)
 
 	// tokensMap to look up a token's address using its short name
