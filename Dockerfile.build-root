@@ -1,5 +1,5 @@
 
-FROM golang:1.20-alpine3.16 AS build
+FROM golang:1.20-alpine3.18 AS build
 
 RUN apk add --no-cache \
 	openssl \
@@ -29,7 +29,7 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
-RUN python3 -m pip install semgrep
+RUN python3 -m pip install --break-system-packages semgrep
 
 FROM build AS installed
 

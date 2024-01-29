@@ -45,6 +45,10 @@ const (
 	// EnvGoroutinesPerQueue for the number of goroutines to run
 	// per topic, defaults to 1
 	EnvGoroutinesPerQueue = `FLU_AMQP_GOROUTINES_PER_QUEUE`
+
+	// EnvMessageLoggingEnabled to log all incoming messages using a log
+	// debug if set to anything other than ""
+	EnvMessageLoggingEnabled = `FLU_DEBUG_MESSAGE_LOGGING_ENABLED`
 )
 
 type Message struct {
@@ -88,6 +92,7 @@ func GetMessages(topic string, f func(message Message)) {
 		deadLetterEnabled = amqpDetails.deadLetterEnabled
 		messageRetries    = amqpDetails.messageRetries
 		goroutines        = amqpDetails.goroutines
+		messageLoggingEnabled = amqpDetails.messageLoggingEnabled
 	)
 
 	var (
@@ -160,6 +165,17 @@ func GetMessages(topic string, f func(message Message)) {
 
 						continue
 					}
+				}
+
+				if messageLoggingEnabled {
+					log.Debug(func(k *log.Log) {
+						k.Context = Context
+						k.Format(
+							"Message received on topic %v, content %#v!",
+							routingKey,
+							body,
+						)
+					})
 				}
 
 				f(Message{
