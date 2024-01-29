@@ -18,4 +18,10 @@ func init() {
 	if camelotPairAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
+
+	reader = strings.NewReader(camelotV3AbiString)
+
+	if camelotV3Abi, err = ethAbi.JSON(reader); err != nil {
+		panic(err)
+	}
 }

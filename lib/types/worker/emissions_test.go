@@ -97,6 +97,7 @@ func TestString(t *testing.T) {
 		"gtrade_v6_1":0,
 		"meson":0,
 		"camelot":0,
+		"camelot_v3":0,
 		"chronos":0,
 		"sushiswap":0,
 		"kyber_classic":0,
