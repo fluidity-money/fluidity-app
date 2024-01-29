@@ -9,6 +9,7 @@ export const getProviderDisplayName = (name?: string): Provider => {
     case "aldrinv2":
       return "Aldrin";
     case "camelot":
+    case "camelot_v3":
       return "Camelot";
     case "chronos":
       return "Chronos";
