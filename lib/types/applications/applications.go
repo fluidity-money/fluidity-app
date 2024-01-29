@@ -42,6 +42,8 @@ var applicationNames = []string{
 	"wombat",
 	"seawater_amm",
 	"trader_joe",
+	"ramses",
+	"jumper",
 	"camelot_v3",
 }
 
