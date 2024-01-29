@@ -68,6 +68,7 @@ const (
 	ApplicationTraderJoe
 	ApplicationRamses
 	ApplicationJumper
+	ApplicationCamelotV3
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -244,6 +245,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 
 		emission.Camelot += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationCamelotV3:
+		feeData, err = camelot.GetCamelotV3Fees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+
+		emission.CamelotV3 += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationChronos:
 		feeData, err = chronos.GetChronosFees(
 			transfer,
@@ -364,7 +374,7 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		mesonSenderAddress := libEthereum.AddressFromString(mesonSender)
 
 		return mesonSenderAddress, contractAddress, nil
-	case ApplicationCamelot:
+	case ApplicationCamelot, ApplicationCamelotV3:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil

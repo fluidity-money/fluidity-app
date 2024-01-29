@@ -117,6 +117,9 @@ func init() {
 	camelotTests := unmarshalJsonTestOrFatal(integrationTestCamelot)
 	tests = append(tests, camelotTests...)
 
+	camelotV3Tests := unmarshalJsonTestOrFatal(integrationTestCamelotV3)
+	tests = append(tests, camelotV3Tests...)
+
 	chronosTests := unmarshalJsonTestOrFatal(integrationTestChronos)
 	tests = append(tests, chronosTests...)
 
