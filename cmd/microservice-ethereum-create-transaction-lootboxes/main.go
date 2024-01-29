@@ -276,8 +276,6 @@ func main() {
 					})
 				}
 
-				//
-
 				volume = new(big.Rat).Set(feeDataVolume)
 
 				// volumeBigInt_ to convert to the database BigInt
@@ -353,6 +351,15 @@ func main() {
 				Application:     application,
 				Epoch:           currentEpoch,
 			}
+
+			database.UpdateOrInsertAmountsRewarded(
+				network_,
+				currentEpoch,
+				tokenShortName,
+				lootboxCountFloat, // amount normal lossy
+				winnerAddressString,
+				application.String(),
+			)
 
 			queue.SendMessage(lootboxes_queue.TopicLootboxes, lootbox)
 		}
