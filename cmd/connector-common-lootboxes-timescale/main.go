@@ -9,11 +9,7 @@ import (
 
 func main() {
 	queue.LootboxesAll(func(lootbox lootboxes.Lootbox) {
-		if lootbox.TransactionHash == "" {
-			log.App(func(k *log.Log) {
-				k.Message = "Got a lootbox with an empty transaction hash! Ignoring associating it."
-			})
-
+		if lootbox.TransactionHash != "" {
 			user_actions.UpdateAggregatedUserTransactionByHashWithLootbottles(
 				lootbox.LootboxCount,
 				lootbox.RewardTier,
