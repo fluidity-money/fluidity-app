@@ -14,14 +14,12 @@ func main() {
 				k.Message = "Got a lootbox with an empty transaction hash! Ignoring associating it."
 			})
 
-			return
+			user_actions.UpdateAggregatedUserTransactionByHashWithLootbottles(
+				lootbox.LootboxCount,
+				lootbox.RewardTier,
+				lootbox.TransactionHash,
+			)
 		}
-
-		user_actions.UpdateAggregatedUserTransactionByHashWithLootbottles(
-			lootbox.LootboxCount,
-			lootbox.RewardTier,
-			lootbox.TransactionHash,
-		)
 
 		lootboxes.InsertLootbox(lootbox)
 	})
