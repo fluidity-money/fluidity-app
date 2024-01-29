@@ -48,6 +48,11 @@ func main() {
 		volume       *big.Rat
 	)
 
+	log.Debugf(
+		"Running with tokens list %v",
+		ethereumTokensList_,
+	)
+
 	tokensList := util.GetTokensListBase(ethereumTokensList_)
 
 	// tokensMap to look up a token's address using its short name
@@ -126,6 +131,7 @@ func main() {
 					)
 				})
 			}
+
 			winnerAddress := winner.SenderAddress
 
 			var (
@@ -136,6 +142,16 @@ func main() {
 			transactionHashHex := ethCommon.HexToHash(transactionHashString)
 
 			awardedTime := time.Now()
+
+			if _, found := tokensMap[tokenShortName]; !found {
+				log.Debugf(
+					"For transaction hash %v, had a winner with token short name %v that wasn't in the tokens list. Ignoring",
+					transactionHash,
+					tokenShortName,
+				)
+
+				return
+			}
 
 			// don't track fluidification
 			if winner.RewardType != "send" {
@@ -266,6 +282,12 @@ func main() {
 
 				feeDataVolume := feeData.Volume
 
+				log.Debugf(
+					"Retrieved fee data for transaction hash %v. Fee data volume %v",
+					transactionHash,
+					feeDataVolume.FloatString(5),
+				)
+
 				if feeDataVolume == nil {
 					log.Fatal(func(k *log.Log) {
 						k.Format(
@@ -311,14 +333,13 @@ func main() {
 
 			three := big.NewRat(3, 1)
 
-			log.App(func(k *log.Log) {
-				k.Format(
-					"Creating a lootbox for transaction %v the volume %v, application %v as the inputs...",
-					transactionHash,
-					volume,
-					application,
-				)
-			})
+				log.Debugf(
+					"Send transaction was not nil, for transaction hash %v, tracked existing send transaction amount is %v, decimals count %v, volume after adjustment is %v.",
+ 					transactionHash,
+					volumeBigInt,
+					tokenDecimals,
+					volume.FloatString(5),
+ 				)
 
 			// Calculate lootboxes earned from transaction
 			// ((volume) / 3) * protocol_multiplier(ethereum_application)
@@ -328,6 +349,18 @@ func main() {
 			)
 
 			lootboxCountFloat, exact := lootboxCount.Float64()
+
+			log.App(func(k *log.Log) {
+				k.Format(
+					"Creating a lootbox for transaction %v the volume %v, application %v as the inputs. Send transaction was nil? %v. Was lootbox count %v, floating point representation non-stringified %v",
+					transactionHash,
+					volume.FloatString(5),
+					application,
+					sendTransaction == nil,
+					lootboxCount.FloatString(5),
+					lootboxCountFloat,
+				)
+			})
 
 			if exact != true {
 				log.Debug(func(k *log.Log) {

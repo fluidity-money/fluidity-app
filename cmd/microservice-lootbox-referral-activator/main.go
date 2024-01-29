@@ -54,8 +54,9 @@ func main() {
 					transactionHash,
 					source,
 					lootboxCount,
-				)
-			})
+ 				)
+ 			})
+
 			return
 		}
 

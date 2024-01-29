@@ -27,6 +27,16 @@ func main() {
 			epoch           = lootbox.Epoch
 		)
 
+		log.Debugf(
+			"Received lootbottle source %v, transaction hash %v, address %v, lootbox count %v, awarded time %v, epoch %v",
+			source,
+			transactionHash,
+			address,
+			lootboxCount,
+			awardedTime,
+			epoch,
+		)
+
 		// don't track non-transaction lootboxes
 		if source != lootboxes.Transaction {
 			log.Debug(func(k *log.Log) {
