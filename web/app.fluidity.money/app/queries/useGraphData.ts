@@ -3,7 +3,7 @@ import { fetchInternalEndpoint } from "~/util";
 
 const QUERY_ALL = {
   day: gql`
-    query GraphDataDay($network: network_blockchain!) {
+    query GraphDataDay($network: network_blockchain!) @cached(ttl: 300) {
       day: graph_bucket(
         args: { interval_: "1 hour", limit_: 24, network_: $network }
       ) {
@@ -15,7 +15,7 @@ const QUERY_ALL = {
     }
   `,
   week: gql`
-    query GraphDataWeek($network: network_blockchain!) {
+    query GraphDataWeek($network: network_blockchain!) @cached(ttl: 300) {
       week: graph_bucket(
         args: { interval_: "1 day", limit_: 7, network_: $network }
       ) {
@@ -27,7 +27,7 @@ const QUERY_ALL = {
     }
   `,
   month: gql`
-    query GraphDataMonth($network: network_blockchain!) {
+    query GraphDataMonth($network: network_blockchain!) @cached(ttl: 300) {
       month: graph_bucket(
         args: { interval_: "1 day", limit_: 30, network_: $network }
       ) {
@@ -39,7 +39,7 @@ const QUERY_ALL = {
     }
   `,
   year: gql`
-    query GraphDataYear($network: network_blockchain!) {
+    query GraphDataYear($network: network_blockchain!) @cached(ttl: 300) {
       year: graph_bucket(
         args: { interval_: "1 month", limit_: 12, network_: $network }
       ) {
@@ -57,7 +57,7 @@ const QUERY_BY_USER = [
     query GraphDataByAddressDay(
       $network: network_blockchain!
       $address: String!
-    ) {
+    ) @cached(ttl: 60) {
       day: graph_bucket(
         args: {
           interval_: "1 hour"
@@ -77,7 +77,7 @@ const QUERY_BY_USER = [
     query GraphDataByAddressWeek(
       $network: network_blockchain!
       $address: String!
-    ) {
+    ) @cached(ttl: 120) {
       week: graph_bucket(
         args: {
           interval_: "1 day"
@@ -97,7 +97,7 @@ const QUERY_BY_USER = [
     query GraphDataByAddressMonth(
       $network: network_blockchain!
       $address: String!
-    ) {
+    ) @cached(ttl: 120) {
       month: graph_bucket(
         args: {
           interval_: "1 day"
@@ -117,7 +117,7 @@ const QUERY_BY_USER = [
     query GraphDataByAddressYear(
       $network: network_blockchain!
       $address: String!
-    ) {
+    ) @cached(ttl: 120) {
       year: graph_bucket(
         args: {
           interval_: "1 month"
