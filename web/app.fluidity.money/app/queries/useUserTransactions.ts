@@ -4,10 +4,7 @@ import {
   hasuraDateToUnix,
   networkGqlBackend,
 } from "~/util/api/graphql";
-import {
-  getTokenFromAddress,
-  Token,
-} from "~/util/chainUtils/tokens";
+import { getTokenFromAddress, Token } from "~/util/chainUtils/tokens";
 import { Rarity } from "@fluidity-money/surfing";
 import { MintAddress } from "~/types/MintAddress";
 import { translateRewardTierToRarity } from "./useLootBottles";

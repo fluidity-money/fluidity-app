@@ -481,18 +481,18 @@ export default function Home() {
           case "BOTTLES EARNED":
             return (
               <td>
-                { (lootboxCount && rewardTier) ? (
+                {lootboxCount && rewardTier ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
-                   <LootBottle
+                    <LootBottle
                       size="sm"
                       /* WTF? why is this needed? REMOVEME */
                       rarity={translateRewardTierToRarity(rewardTier)}
                       quantity={lootboxCount}
                     />
-                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
+                    <Text>{toDecimalPlaces(lootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>

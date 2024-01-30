@@ -1180,7 +1180,10 @@ const MultiplierTasks = () => {
 
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Jumper", link: "https://jumper.exchange/" },
-    { provider: "Trader Joe", link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a" },
+    {
+      provider: "Trader Joe",
+      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
+    },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
     {
       provider: "Ramses",
@@ -1312,7 +1315,10 @@ const MyMultiplier = ({
       <div>
         <div className="airdrop-arb-multipliers-container">
           <Text holo={true}>
-            Provide $fUSDC Liquidity to earn $ARB and Multipliers! Add liquidity to the following Trader Joe and Camelot pools to earn $ARB liquidity mining rewards! You will also retroactively earn bottles depending on your contribution at the end of the Airdrop!
+            Provide $fUSDC Liquidity to earn $ARB and Multipliers! Add liquidity
+            to the following Trader Joe and Camelot pools to earn $ARB liquidity
+            mining rewards! You will also retroactively earn bottles depending
+            on your contribution at the end of the Airdrop!
           </Text>
         </div>
         <JoeFarmlandsOrCamelotKingdom />
