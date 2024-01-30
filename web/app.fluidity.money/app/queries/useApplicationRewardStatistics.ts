@@ -77,9 +77,9 @@ export type EthereumApplication =
   | "oneinch_fixedrate"
   | "dodo_v2"
   | "curve"
-  | "multichain"
   | "xy_finance"
-  | "trader_joe";
+  | "trader_joe"
+  | "lifi";
 
 export type SolanaApplication =
   | "spl"

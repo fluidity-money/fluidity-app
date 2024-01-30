@@ -93,6 +93,9 @@ func init() {
 	balancerTests := unmarshalJsonTestOrFatal(integrationTestBalancerV2)
 	tests = append(tests, balancerTests...)
 
+	curveTests := unmarshalJsonTestOrFatal(integrationTestCurve)
+	tests = append(tests, curveTests...)
+
 	uniswapV2Tests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
 	tests = append(tests, uniswapV2Tests...)
 

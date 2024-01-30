@@ -58,8 +58,6 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Mooniswap";
     case "curve":
       return "Curve";
-    case "multichain":
-      return "Multichain";
     case "xy finance":
     case "xy":
     case "xy_finance":
@@ -78,6 +76,8 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Jumper";
     case "meteora":
       return "Meteora";
+    case "lifi":
+      return "Lifi";
     case "fluidity":
     case "spl":
     case "none":

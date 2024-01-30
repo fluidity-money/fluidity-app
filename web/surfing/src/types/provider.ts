@@ -16,7 +16,6 @@ export type Provider =
   | "Maker"
   | "Mercurial"
   | "Mooniswap"
-  | "Multichain"
   | "Multicoin"
   | "Oneinch"
   | "Orca"

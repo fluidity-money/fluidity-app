@@ -29,7 +29,6 @@ var applicationNames = []string{
 	"oneinch_fixedrate",
 	"dodo_v2",
 	"curve",
-	"multichain",
 	"xy_finance",
 	"apeswap",
 	"saddle",
@@ -45,6 +44,7 @@ var applicationNames = []string{
 	"ramses",
 	"jumper",
 	"camelot_v3",
+	"lifi",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
