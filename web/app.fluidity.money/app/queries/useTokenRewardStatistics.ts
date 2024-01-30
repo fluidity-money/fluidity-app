@@ -8,7 +8,7 @@ const query = gql`
     highest_reward
     token
   }
-  query TokenPerformance($network: network_blockchain!) {
+  query TokenPerformance($network: network_blockchain!) @cached(ttl: 300) {
     week: token_performance(
       limit: 1
       order_by: { highest_reward: asc }
