@@ -544,7 +544,7 @@ export default function Rewards() {
           case "BOTTLES EARNED":
             return (
               <td>
-                { (lootboxCount && rewardTier) ? (
+                {lootboxCount && rewardTier ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
@@ -554,7 +554,7 @@ export default function Rewards() {
                       rarity={rewardTier}
                       quantity={lootboxCount}
                     />
-                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
+                    <Text>{toDecimalPlaces(lootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>

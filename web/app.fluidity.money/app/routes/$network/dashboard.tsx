@@ -675,9 +675,8 @@ export default function Dashboard() {
             </GeneralButton>
 
             {/* Referrals Button (desktop only) */}
-            {
-              (isTablet || isMobile) || (
-                <GeneralButton
+            {isTablet || isMobile || (
+              <GeneralButton
                 type="transparent"
                 size="small"
                 layout="before"
@@ -690,25 +689,22 @@ export default function Dashboard() {
               >
                 {isMobile ? "" : "Referral"}
               </GeneralButton>
-              )
-            }
+            )}
 
             {/* Fluidify button (desktop only) */}
-            {
-              (isTablet || isMobile) || (
-                <GeneralButton
-                  className="fluidify-button-dashboard "
-                  type={"secondary"}
-                  size={"small"}
-                  handleClick={() => {
-                    client?.track("user", "click_fluidify");
-                    navigate(`/${network}/fluidify`);
-                  }}
-                >
-                  <b>Fluidify{isMobile ? "" : " Money"}</b>
-                </GeneralButton>
-              )
-            }
+            {isTablet || isMobile || (
+              <GeneralButton
+                className="fluidify-button-dashboard "
+                type={"secondary"}
+                size={"small"}
+                handleClick={() => {
+                  client?.track("user", "click_fluidify");
+                  navigate(`/${network}/fluidify`);
+                }}
+              >
+                <b>Fluidify{isMobile ? "" : " Money"}</b>
+              </GeneralButton>
+            )}
 
             {/* Prize Money */}
             <GeneralButton
