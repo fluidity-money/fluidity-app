@@ -385,11 +385,13 @@ func main() {
 				Epoch:           currentEpoch,
 			}
 
+			volumeFloat, _ := volume.Float64()
+
 			database.UpdateOrInsertAmountsRewarded(
 				network_,
 				currentEpoch,
 				tokenShortName,
-				lootboxCountFloat, // amount normal lossy
+				volumeFloat, // amount normal lossy
 				winnerAddressString,
 				application.String(),
 			)
