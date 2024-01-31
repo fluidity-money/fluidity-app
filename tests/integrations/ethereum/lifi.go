@@ -12,9 +12,9 @@ const integrationTestLifi = `[
         "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAAAGIhqcAF9uR+s5j9hneEys/c//TnAAAAAAAAAAAAAAAAr4jQZed8jMIjkyfF7bOkMiaOWDEAAAAAAAAAAAAAAABM+lC3znR+LWFyT8rFfyS3SP8rKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF9eEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAX1ee4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2p1bXBlci5leGNoYW5nZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         "address": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
         "topics": [
-          "0x38eee76fd911eabac79da7af16053e809be0e12c8637f156e77e1af309b99537",
-          "0xe95468926d2a1a6f4bfae9015db362e99c3284319bea5f29d3afe23d32c366bf"
-        ],
+					"0x38eee76fd911eabac79da7af16053e809be0e12c8637f156e77e1af309b99537",
+					"0xe95468926d2a1a6f4bfae9015db362e99c3284319bea5f29d3afe23d32c366bf"
+				],
         "log_index": "12"
       },
       "application": 22
@@ -32,9 +32,16 @@ const integrationTestLifi = `[
       "lifi": 0
     },
     "rpc_methods": {},
-    "call_methods": {},
+    "call_methods": {
+      "getTokenX()": {
+        "": "0x0000000000000000000000004cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
+      },
+      "getTokenY()": {
+        "": "0x000000000000000000000000912ce59144191c1204e64559fe8253a0e49e6548"
+      }
+    },
     "token_decimals": 6,
-    "contract_address": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae"
+    "contract_address": "0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a"
   }
 ]
 `

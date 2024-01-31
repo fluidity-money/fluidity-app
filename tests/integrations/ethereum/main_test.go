@@ -134,6 +134,9 @@ func init() {
 
 	traderJoeTests := unmarshalJsonTestOrFatal(integrationTestTraderJoe)
 	tests = append(tests, traderJoeTests...)
+
+	lifiTests := unmarshalJsonTestOrFatal(integrationTestLifi)
+	tests = append(tests, lifiTests...)
 }
 
 func TestIntegrations(t *testing.T) {
