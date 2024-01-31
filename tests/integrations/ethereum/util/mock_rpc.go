@@ -118,7 +118,7 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]m
 
 		// return expected response for that method, or failure if unimplemented
 		if method := request.Method; method != "eth_call" {
-			expectedResponse := rpcMethods[request.Method]
+			expectedResponse := rpcMethods[method]
 
 			if expectedResponse != nil {
 				response.Result = expectedResponse
