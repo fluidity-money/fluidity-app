@@ -31,4 +31,6 @@ export type Provider =
   | "XY Finance"
   | "Ramses"
   | "Jumper"
-  | "Meteora";
+  | "Meteora"
+  | "Lifi";
+
