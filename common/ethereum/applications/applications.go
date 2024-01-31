@@ -297,6 +297,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.TraderJoe += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationRamses:
+		// UNIMPLEMENTED
 	case ApplicationLifi:
 		feeData, err = lifi.GetLifiFees(
 			transfer,
@@ -314,6 +316,8 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationBetSwirl:
+		// UNIMPLEMENTED
+	case ApplicationParaswap:
 		// UNIMPLEMENTED
 
 	default:
