@@ -314,13 +314,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
 	case ApplicationBetSwirl:
-		feeData, err = betswirl.GetBetSwirlFees(
-			transfer,
-			client,
-			fluidTokenContract,
-			tokenDecimals,
-		)
-		emission.BetSwirl += util.MaybeRatToFloat(feeData.Fee)
+		// UNIMPLEMENTED
 
 	default:
 		err = fmt.Errorf(
