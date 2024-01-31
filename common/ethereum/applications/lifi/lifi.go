@@ -281,7 +281,7 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
 	if l := len(unpacked); l != 6 {
 		return feeData, fmt.Errorf(
-			"unpacked the wrong number of values! Expected 8, got %v",
+			"unpacked the wrong number of values! Expected 6, got %v",
 			l,
 		)
 	}
@@ -371,7 +371,7 @@ func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unp
 func assetSwapped(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
 	if l := len(unpacked); l != 7 {
 		return feeData, fmt.Errorf(
-			"unpacked the wrong number of values! Expected 8, got %v",
+			"unpacked the wrong number of values! Expected 7, got %v",
 			l,
 		)
 	}

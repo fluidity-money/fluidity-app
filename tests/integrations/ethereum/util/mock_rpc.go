@@ -125,8 +125,14 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]m
 				marshalResponse(response, rw)
 				return
 			} else {
-				msg := fmt.Sprintf("Unsupported method, was %v, need eth_call", method)
+				msg := fmt.Sprintf(
+					"Unsupported method, was %v, need a method supported (eth_call or %v)",
+					method,
+					rpcMethods,
+				)
+
 				marshalError(response, rw, msg)
+
 				return
 			}
 		}
