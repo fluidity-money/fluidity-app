@@ -109,6 +109,7 @@ func main() {
 				network_        = winner.Network
 				transactionHash = winner.TransactionHash
 				tokenDetails    = winner.TokenDetails
+				usdWinAmount = winner.UsdWinAmount
 				rewardTier      = winner.RewardTier
 				application     = winner.Application
 				logIndex        = winner.LogIndex
@@ -365,10 +366,12 @@ func main() {
 			if exact != true {
 				log.Debug(func(k *log.Log) {
 					k.Format(
-						"Lootbox count for hash %v and winner %v was not an exact float, was %v",
+						"Lootbox count for hash %v and winner %v was not an exact float, was %v. Token name %v, token decimals %v",
 						transactionHash,
 						winnerAddress,
 						lootboxCount.String(),
+						tokenShortName,
+						tokenDecimals,
 					)
 				})
 			}
@@ -385,13 +388,12 @@ func main() {
 				Epoch:           currentEpoch,
 			}
 
-			volumeFloat, _ := volume.Float64()
 
 			database.UpdateOrInsertAmountsRewarded(
 				network_,
 				currentEpoch,
 				tokenShortName,
-				volumeFloat, // amount normal lossy
+				usdWinAmount, // amount normal lossy
 				winnerAddressString,
 				application.String(),
 			)
