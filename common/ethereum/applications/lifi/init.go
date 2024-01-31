@@ -2,7 +2,7 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
-package multichain
+package lifi
 
 import (
 	"strings"
@@ -11,17 +11,11 @@ import (
 )
 
 func init() {
-	reader := strings.NewReader(multichainAbiString)
+	reader := strings.NewReader(lifiAbiString)
 
 	var err error
 
-	if multichainAbi, err = ethAbi.JSON(reader); err != nil {
-		panic(err)
-	}
-
-	reader = strings.NewReader(anyswapERC20AbiString)
-
-	if anyswapERC20Abi, err = ethAbi.JSON(reader); err != nil {
+	if lifiAbi, err = ethAbi.JSON(reader); err != nil {
 		panic(err)
 	}
 }

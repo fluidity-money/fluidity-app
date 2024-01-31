@@ -16,7 +16,6 @@ export type Provider =
   | "Maker"
   | "Mercurial"
   | "Mooniswap"
-  | "Multichain"
   | "Multicoin"
   | "Oneinch"
   | "Orca"
@@ -32,4 +31,6 @@ export type Provider =
   | "XY Finance"
   | "Ramses"
   | "Jumper"
-  | "Meteora";
+  | "Meteora"
+  | "Lifi";
+

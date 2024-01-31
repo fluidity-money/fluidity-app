@@ -38,7 +38,15 @@ func methodSigHash(sig string) string {
 }
 
 func responseErr(response serverResponse, err interface{}) serverResponse {
-	response.Error = err
+	response.Error = struct {
+		Code    int         `json:"code"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data,omitempty"`
+	}{
+		Code: 999,
+		Message: fmt.Sprintf("responding with err: %v", err),
+		Data: err,
+	}
 	return response
 }
 
@@ -109,15 +117,22 @@ func MockRpcClient(rpcMethods_ map[string]interface{}, callMethods_ map[string]m
 		response.Id = request.Id
 
 		// return expected response for that method, or failure if unimplemented
-		if request.Method != "eth_call" {
-			expectedResponse := rpcMethods[request.Method]
+		if method := request.Method; method != "eth_call" {
+			expectedResponse := rpcMethods[method]
 
 			if expectedResponse != nil {
 				response.Result = expectedResponse
 				marshalResponse(response, rw)
 				return
 			} else {
-				marshalError(response, rw, "Unsupported method")
+				msg := fmt.Sprintf(
+					"Unsupported method, was %v, need a method supported (eth_call or %v)",
+					method,
+					rpcMethods,
+				)
+
+				marshalError(response, rw, msg)
+
 				return
 			}
 		}
