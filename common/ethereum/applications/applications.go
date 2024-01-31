@@ -35,6 +35,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/lifi"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -75,6 +76,7 @@ const (
 	ApplicationJumper
 	ApplicationCamelotV3
 	ApplicationLifi
+	ApplicationOdos
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -302,6 +304,14 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.Lifi += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationOdos:
+		feeData, err = odos.GetOdosFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(

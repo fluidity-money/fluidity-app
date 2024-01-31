@@ -79,7 +79,8 @@ export type EthereumApplication =
   | "curve"
   | "xy_finance"
   | "trader_joe"
-  | "lifi";
+  | "lifi"
+  | "odos";
 
 export type SolanaApplication =
   | "spl"
