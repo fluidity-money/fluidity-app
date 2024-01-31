@@ -109,6 +109,7 @@ func main() {
 				network_        = winner.Network
 				transactionHash = winner.TransactionHash
 				tokenDetails    = winner.TokenDetails
+				usdWinAmount = winner.UsdWinAmount
 				rewardTier      = winner.RewardTier
 				application     = winner.Application
 				logIndex        = winner.LogIndex
@@ -365,10 +366,12 @@ func main() {
 			if exact != true {
 				log.Debug(func(k *log.Log) {
 					k.Format(
-						"Lootbox count for hash %v and winner %v was not an exact float, was %v",
+						"Lootbox count for hash %v and winner %v was not an exact float, was %v. Token name %v, token decimals %v",
 						transactionHash,
 						winnerAddress,
 						lootboxCount.String(),
+						tokenShortName,
+						tokenDecimals,
 					)
 				})
 			}
@@ -385,11 +388,22 @@ func main() {
 				Epoch:           currentEpoch,
 			}
 
+			log.Debugf(
+				"For transaction hash %v, about to insert the winning usd amount %v for the epoch %v, with the winner address %v, and he application %v, token short name %v, token decimals %v",
+				transactionHash,
+				usdWinAmount,
+				currentEpoch,
+				winnerAddressString,
+				application.String(),
+						tokenShortName,
+						tokenDecimals,
+			)
+
 			database.UpdateOrInsertAmountsRewarded(
 				network_,
 				currentEpoch,
 				tokenShortName,
-				lootboxCountFloat, // amount normal lossy
+				usdWinAmount, // amount normal lossy
 				winnerAddressString,
 				application.String(),
 			)
@@ -401,7 +415,7 @@ func main() {
 
 func protocolMultiplier(application applications.Application) *big.Rat {
 	switch application {
-	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationSushiswap, applications.ApplicationRamses:
+	case applications.ApplicationJumper, applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelot, applications.ApplicationCamelotV3, applications.ApplicationSushiswap, applications.ApplicationRamses:
 		return big.NewRat(3, 5)
 	}
 
