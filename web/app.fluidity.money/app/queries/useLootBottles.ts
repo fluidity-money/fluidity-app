@@ -54,7 +54,9 @@ const useLootboxesByTxHash = (filterHashes: string[]) => {
   );
 };
 
-const translateRewardTierToRarity = (rewardTier: number | undefined): Rarity => {
+const translateRewardTierToRarity = (
+  rewardTier: number | undefined
+): Rarity => {
   switch (rewardTier) {
     case 5:
       return Rarity.Legendary;

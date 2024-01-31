@@ -388,16 +388,6 @@ func main() {
 				Epoch:           currentEpoch,
 			}
 
-			log.Debugf(
-				"For transaction hash %v, about to insert the winning usd amount %v for the epoch %v, with the winner address %v, and he application %v, token short name %v, token decimals %v",
-				transactionHash,
-				usdWinAmount,
-				currentEpoch,
-				winnerAddressString,
-				application.String(),
-						tokenShortName,
-						tokenDecimals,
-			)
 
 			database.UpdateOrInsertAmountsRewarded(
 				network_,

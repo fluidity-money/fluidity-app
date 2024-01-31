@@ -544,7 +544,7 @@ export default function Rewards() {
           case "BOTTLES EARNED":
             return (
               <td>
-                { (lootboxCount && rewardTier) ? (
+                {lootboxCount && rewardTier ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
@@ -554,7 +554,7 @@ export default function Rewards() {
                       rarity={rewardTier}
                       quantity={lootboxCount}
                     />
-                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
+                    <Text>{toDecimalPlaces(lootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
@@ -661,9 +661,6 @@ export default function Rewards() {
                 </a>
                 <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
                   <ProviderIcon provider="Uniswap" />
-                </a>
-                <a href="#">
-                  <ProviderIcon provider="Multichain" />
                 </a>
                 <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
                   <ProviderIcon provider="Dodo" />

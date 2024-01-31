@@ -1,7 +1,7 @@
 import { gql, jsonPost } from "~/util";
 
 const query = gql`
-  query ExpectedRewards($network: network_blockchain!) {
+  query ExpectedRewards($network: network_blockchain!) @cached(ttl: 300) {
     expected_rewards(
       where: { network: { _eq: $network } }
       order_by: { awarded_month: desc, token_short_name: desc }

@@ -9,7 +9,7 @@ const query = gql`
     average_reward
     highest_reward
   }
-  query ApplicationPerformance($network: network_blockchain!) {
+  query ApplicationPerformance($network: network_blockchain!) @cached(ttl: 300) {
     week: application_performance(
       where: { network: { _eq: $network } }
       args: { i: "1 week" }
@@ -77,9 +77,9 @@ export type EthereumApplication =
   | "oneinch_fixedrate"
   | "dodo_v2"
   | "curve"
-  | "multichain"
   | "xy_finance"
-  | "trader_joe";
+  | "trader_joe"
+  | "lifi";
 
 export type SolanaApplication =
   | "spl"

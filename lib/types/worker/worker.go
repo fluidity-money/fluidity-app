@@ -90,6 +90,8 @@ type (
 		OneInchFixedRate float64 `json:"oneinch_fixedrate"`
 		DodoV2           float64 `json:"dodo_v2"`
 		Curve            float64 `json:"curve"`
+
+		// Multichain is no longer used, but is kept here to be consistent with the database.
 		Multichain       float64 `json:"multichain"`
 		XyFinance        float64 `json:"xyfinance"`
 		Apeswap          float64 `json:"apeswap"`
@@ -104,6 +106,7 @@ type (
 		Wombat           float64 `json:"wombat"`
 		SeawaterAmm      float64 `json:"seawater_amm"`
 		TraderJoe        float64 `json:"trader_joe"`
+		Lifi             float64 `json:"lifi"`
 	}
 
 	FeeSwitch struct {
