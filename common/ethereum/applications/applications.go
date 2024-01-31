@@ -77,6 +77,7 @@ const (
 	ApplicationCamelotV3
 	ApplicationLifi
 	ApplicationOdos
+	ApplicationBetSwirl
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -312,6 +313,14 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationBetSwirl:
+		feeData, err = betswirl.GetBetSwirlFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.BetSwirl += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(

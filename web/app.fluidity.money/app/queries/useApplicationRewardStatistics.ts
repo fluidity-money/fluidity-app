@@ -80,7 +80,8 @@ export type EthereumApplication =
   | "xy_finance"
   | "trader_joe"
   | "lifi"
-  | "odos";
+  | "odos"
+  | "betswirl";
 
 export type SolanaApplication =
   | "spl"
