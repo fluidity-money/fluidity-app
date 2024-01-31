@@ -9,9 +9,11 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -209,12 +211,13 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 		fluidTransferAmount.Set(toAmount)
 
 	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
+		log.Debugf(
+			"Failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,
 		)
+		return feeData, nil
 	}
 
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -299,12 +302,13 @@ func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unp
 		fluidTransferAmount.Set(toAmount)
 
 	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume for LiFiSwappedGeneric: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
+		log.Debugf(
+			"Failed to decode the volume for LiFiSwappedGeneric: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,
 		)
+		return feeData, nil
 	}
 
 	decimalsAdjusted := math.Pow10(tokenDecimals)
