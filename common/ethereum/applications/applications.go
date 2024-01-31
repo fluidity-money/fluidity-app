@@ -42,8 +42,10 @@ import (
 
 type Application = libApps.Application
 
-// Applications supported via the app. Note that this is also a
-// positional list.
+// Applications supported via the app. refer to
+// lib/types/applications/applications.go for the stringified
+// implementation. Tests depend on the number in this iota, and the
+// frontend/database depends on the stringified representation.
 const (
 	// ApplicationNone is the nil value representing a transfer.
 	ApplicationNone libApps.Application = iota

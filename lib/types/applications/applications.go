@@ -18,6 +18,8 @@ import (
 // application-specific information like fees and senders/recipients.
 type Application int64
 
+// applications supported via the app. Note that this is also a
+// positional list.
 var applicationNames = []string{
 	"none",
 	"uniswap_v3",
