@@ -6,6 +6,7 @@ package odos
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
@@ -16,6 +17,8 @@ import (
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
+
+// TODO: fees are not supported.
 
 const odosSwapLogTopic = "0x823eaf01002d7353fbcadb2ea3305cc46fa35d799cb0914846d185ac06f8ad05"
 
@@ -68,7 +71,7 @@ func GetOdosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 
 	//sender := unpacked[0]
 
-	inputAmount, err := ethereum.CoerceBoundContractResultsToRat(
+	amountInput, err := ethereum.CoerceBoundContractResultsToRat(
 		[]interface{}{unpacked[1]},
 	)
 
@@ -119,7 +122,7 @@ func GetOdosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 
 	switch fluidTokenContract {
 	case inputToken:
-		fluidTransferAmount.Set(inputAmount)
+		fluidTransferAmount.Set(amountInput)
 
 	case outputToken:
 		fluidTransferAmount.Set(amountOut)
@@ -132,6 +135,12 @@ func GetOdosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 			outputToken,
 		)
 	}
+
+	decimalsAdjusted := math.Pow10(tokenDecimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
+	feeData.Fee = new(big.Rat).SetInt64(0)
 
 	return feeData, nil
 }
