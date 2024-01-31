@@ -30,7 +30,7 @@ const integrationTestLifi = `[
     },
     "expected_sender": "0x6221a9c005f6e47eb398fd867784cacfdcfff4e7",
     "expected_recipient": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
-    "expected_fees": "1/0",
+    "expected_fees": "0/1",
     "expected_volume": "49986807/500000",
     "expected_emission": {
       "lifi": 0
@@ -61,7 +61,7 @@ const integrationTestLifi = `[
     },
     "expected_sender": "0x1f81e39d2448c2a2bce87350353a199c349614e2",
     "expected_recipient": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
-    "expected_fees": "1/0",
+    "expected_fees": "0/1",
     "expected_volume": "8230044701/50000",
     "expected_emission": {
       "lifi": 0

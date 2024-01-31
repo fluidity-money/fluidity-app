@@ -180,7 +180,7 @@ var lifiAbi ethAbi.ABI
 const (
 	lifiGenericSwapCompletedTopic = "0x38eee76fd911eabac79da7af16053e809be0e12c8637f156e77e1af309b99537"
 	lifiSwappedGenericTopic       = "0x93517b7c6f32856737008edf37cf2542b55d27d83fa299aa216f55a982a6ee1d"
-	lifiAssetSwappedTopic         = ""
+	lifiAssetSwappedTopic         = "0x7bfdfdb5e3a3776976e53cb0607060f54c5312701c8cba1155cc4d5394440b38"
 )
 
 // genericSwapCompleted decodes "LiFiGenericSwapCompleted" and is
@@ -271,6 +271,7 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
+	feeData.Fee = new(big.Rat).SetInt64(0)
 
 	return feeData, nil
 }
@@ -360,6 +361,7 @@ func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unp
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
+	feeData.Fee = new(big.Rat).SetInt64(0)
 
 	return feeData, nil
 }
@@ -449,6 +451,7 @@ func assetSwapped(fluidTokenContract ethCommon.Address, tokenDecimals int, unpac
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
+	feeData.Fee = new(big.Rat).SetInt64(0)
 
 	return feeData, nil
 }
@@ -467,8 +470,6 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 	logTopic := transferLog.Topics[0].String()
 
 	// TODO: fees are not being tracked with Lifi
-
-	feeData.Fee = new(big.Rat)
 
 	switch logTopic {
 	case lifiGenericSwapCompletedTopic:
@@ -504,20 +505,10 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 		)
 
 	case lifiAssetSwappedTopic:
-		unpacked, err := lifiAbi.Unpack("AssetSwapped", transferLogData)
-
-		if err != nil {
-			return feeData, fmt.Errorf(
-				"failed to unpack a AssetSwapped log: %v",
-				err,
-			)
-		}
-
-		return assetSwapped(
-			fluidTokenContract,
-			tokenDecimals,
-			unpacked,
+		return feeData, fmt.Errorf(
+			"unsupported feature decoding a AssetSwapped log",
 		)
+
 
 	default:
 		return feeData, nil
