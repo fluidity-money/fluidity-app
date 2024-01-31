@@ -191,7 +191,7 @@ const (
 func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
 	if l := len(unpacked); l != 7 {
 		return feeData, fmt.Errorf(
-			"unpacked the wrong number of values for LiFiGenericSwapCompleted! Expected 8, got %v",
+			"unpacked the wrong number of values for LiFiGenericSwapCompleted! Expected 7, got %v",
 			l,
 		)
 	}
