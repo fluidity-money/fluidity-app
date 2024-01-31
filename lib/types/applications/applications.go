@@ -29,6 +29,7 @@ var applicationNames = []string{
 	"oneinch_fixedrate",
 	"dodo_v2",
 	"curve",
+	"multichain",
 	"xy_finance",
 	"apeswap",
 	"saddle",

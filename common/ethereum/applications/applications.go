@@ -42,6 +42,8 @@ import (
 
 type Application = libApps.Application
 
+// Applications supported via the app. Note that this is also a
+// positional list.
 const (
 	// ApplicationNone is the nil value representing a transfer.
 	ApplicationNone libApps.Application = iota
@@ -54,6 +56,7 @@ const (
 	ApplicationOneInchFixedRateSwap
 	ApplicationDodoV2
 	ApplicationCurve
+	ApplicationMultichain
 	ApplicationXyFinance
 	ApplicationApeswap
 	ApplicationSaddle
@@ -395,6 +398,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool (switched to the LPs)
 		return transaction.From, logAddress, nil
 	case ApplicationTraderJoe:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil
+	case ApplicationLifi:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil

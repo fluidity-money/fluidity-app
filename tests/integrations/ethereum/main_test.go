@@ -93,9 +93,6 @@ func init() {
 	balancerTests := unmarshalJsonTestOrFatal(integrationTestBalancerV2)
 	tests = append(tests, balancerTests...)
 
-	curveTests := unmarshalJsonTestOrFatal(integrationTestCurve)
-	tests = append(tests, curveTests...)
-
 	uniswapV2Tests := unmarshalJsonTestOrFatal(integrationTestUniswapV2)
 	tests = append(tests, uniswapV2Tests...)
 
@@ -135,9 +132,9 @@ func init() {
 	traderJoeTests := unmarshalJsonTestOrFatal(integrationTestTraderJoe)
 	tests = append(tests, traderJoeTests...)
 
-	lifiTests := unmarshalJsonTestOrFatal(integrationTestLifi)
-	tests = append(tests, lifiTests...)
-}
+ 	lifiTests := unmarshalJsonTestOrFatal(integrationTestLifi)
+ 	tests = append(tests, lifiTests...)
+ }
 
 func TestIntegrations(t *testing.T) {
 

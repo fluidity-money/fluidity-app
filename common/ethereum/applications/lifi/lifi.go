@@ -6,8 +6,8 @@ package lifi
 
 import (
 	"fmt"
-	"math/big"
 	"math"
+	"math/big"
 
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -178,20 +178,20 @@ const lifiAbiString = `[
 var lifiAbi ethAbi.ABI
 
 const (
-	lifiGenericSwapCompletedTopic = "1"
-	liFiSwappedGenericTopic       = "2"
-	lifiAssetSwappedTopic         = "3"
+	lifiGenericSwapCompletedTopic = "0x38eee76fd911eabac79da7af16053e809be0e12c8637f156e77e1af309b99537"
+	lifiSwappedGenericTopic       = "0x93517b7c6f32856737008edf37cf2542b55d27d83fa299aa216f55a982a6ee1d"
+	lifiAssetSwappedTopic         = ""
 )
 
 // genericSwapCompleted decodes "LiFiGenericSwapCompleted" and is
 // determined by testing which side of the swap is a Fluid Asset, then
 // setting the volume based on the volume for that side of the trade.
-// Assumes 8 fields in the event decoding. Ie, if I swap 10 USDC for 9
+// Assumes 7 fields in the event decoding. Ie, if I swap 10 USDC for 9
 // fUSDC, then the volume is 9.
 func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
-	if l := len(unpacked); l != 8 {
+	if l := len(unpacked); l != 7 {
 		return feeData, fmt.Errorf(
-			"unpacked the wrong number of values! Expected 8, got %v",
+			"unpacked the wrong number of values for LiFiGenericSwapCompleted! Expected 8, got %v",
 			l,
 		)
 	}
@@ -199,98 +199,11 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 	// transaction id, the integrator, the referrer, and the receiver are ignored.
 	// the receiver is the recipient of the end result of this swap.
 
-	//transactionId := unpacked[0]
-	//integrator := unpacked[1]
-	//referrer := unpacked[2]
-	//receiver := unpacked[3]
+	//transactionId := topics[1]
 
-	fromAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
-		[]interface{}{unpacked[4]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce fromAssetId to address: %v",
-			err,
-		)
-	}
-
-	toAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
-		[]interface{}{unpacked[5]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce toAssetId to address: %v",
-			err,
-		)
-	}
-
-	fromAmount, err := ethereum.CoerceBoundContractResultsToRat(
-		[]interface{}{unpacked[6]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce fromAmount to *big.Rat: %v",
-			err,
-		)
-	}
-
-	toAmount, err := ethereum.CoerceBoundContractResultsToRat(
-		[]interface{}{unpacked[7]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce toAmount to *big.Rat: %v",
-			err,
-		)
-	}
-
-	var fluidTransferAmount *big.Rat
-
-	switch fluidTokenContract {
-	case fromAssetId:
-		fluidTransferAmount.Set(fromAmount)
-
-	case toAssetId:
-		fluidTransferAmount.Set(toAmount)
-
-	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
-			fluidTokenContract,
-			fromAssetId,
-			toAssetId,
-		)
-	}
-
-	decimalsAdjusted := math.Pow10(tokenDecimals)
-	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-
-	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
-
-	return feeData, nil
-}
-
-// swappedGeneric decodes LiFiSwappedGeneric, following largely the same
-// behaviour as genericSwapCompleted.
-func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
-	if l := len(unpacked); l != 7 {
-		return feeData, fmt.Errorf(
-			"unpacked the wrong number of values! Expected 8, got %v",
-			l,
-		)
-	}
-
-	// transaction id, the integrator, and the referrer are ignored.
-	// follows the same code as genericSwapCompleted, though it
-	// doesn't include the receiver.
-
-	//transactionId := unpacked[0]
-	//integrator := unpacked[1]
-	//referrer := unpacked[2]
+	//integrator := unpacked[0]
+	//referrer := unpacked[1]
+	//receiver := unpacked[2]
 
 	fromAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
 		[]interface{}{unpacked[3]},
@@ -336,7 +249,96 @@ func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unp
 		)
 	}
 
-	var fluidTransferAmount *big.Rat
+	fluidTransferAmount := new(big.Rat)
+
+	switch fluidTokenContract {
+	case fromAssetId:
+		fluidTransferAmount.Set(fromAmount)
+
+	case toAssetId:
+		fluidTransferAmount.Set(toAmount)
+
+	default:
+		return feeData, fmt.Errorf(
+			"failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
+			fluidTokenContract,
+			fromAssetId,
+			toAssetId,
+		)
+	}
+
+	decimalsAdjusted := math.Pow10(tokenDecimals)
+	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
+
+	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
+
+	return feeData, nil
+}
+
+// swappedGeneric decodes LiFiSwappedGeneric, following largely the same
+// behaviour as genericSwapCompleted. Expects 1 topic, and 6 unpacked items.
+func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
+	if l := len(unpacked); l != 6 {
+		return feeData, fmt.Errorf(
+			"unpacked the wrong number of values! Expected 8, got %v",
+			l,
+		)
+	}
+
+	// transaction id, the integrator, and the referrer are ignored.
+	// follows the same code as genericSwapCompleted, though it
+	// doesn't include the receiver.
+
+	//transactionId := topic[1]
+
+	//integrator := unpacked[0]
+	//referrer := unpacked[1]
+
+	fromAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
+		[]interface{}{unpacked[2]},
+	)
+
+	if err != nil {
+		return feeData, fmt.Errorf(
+			"failed to coerce fromAssetId to address: %v",
+			err,
+		)
+	}
+
+	toAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
+		[]interface{}{unpacked[3]},
+	)
+
+	if err != nil {
+		return feeData, fmt.Errorf(
+			"failed to coerce toAssetId to address: %v",
+			err,
+		)
+	}
+
+	fromAmount, err := ethereum.CoerceBoundContractResultsToRat(
+		[]interface{}{unpacked[4]},
+	)
+
+	if err != nil {
+		return feeData, fmt.Errorf(
+			"failed to coerce fromAmount to *big.Rat: %v",
+			err,
+		)
+	}
+
+	toAmount, err := ethereum.CoerceBoundContractResultsToRat(
+		[]interface{}{unpacked[5]},
+	)
+
+	if err != nil {
+		return feeData, fmt.Errorf(
+			"failed to coerce toAmount to *big.Rat: %v",
+			err,
+		)
+	}
+
+	fluidTransferAmount := new(big.Rat)
 
 	switch fluidTokenContract {
 	case fromAssetId:
@@ -425,7 +427,7 @@ func assetSwapped(fluidTokenContract ethCommon.Address, tokenDecimals int, unpac
 
 	//timestamp := unpacked[6]
 
-	var fluidTransferAmount *big.Rat
+	fluidTransferAmount := new(big.Rat)
 
 	switch fluidTokenContract {
 	case fromAssetId:
@@ -464,14 +466,20 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 
 	logTopic := transferLog.Topics[0].String()
 
+	// TODO: fees are not being tracked with Lifi
+
+	feeData.Fee = new(big.Rat)
+
 	switch logTopic {
 	case lifiGenericSwapCompletedTopic:
 		unpacked, err := lifiAbi.Unpack("LiFiGenericSwapCompleted", transferLogData)
 
-		return feeData, fmt.Errorf(
-			"failed to unpack a LiFiGenericSwapCompleted log: %v",
-			err,
-		)
+		if err != nil {
+			return feeData, fmt.Errorf(
+				"failed to unpack a LiFiGenericSwapCompleted log: %v",
+				err,
+			)
+		}
 
 		return genericSwapCompleted(
 			fluidTokenContract,
@@ -479,13 +487,15 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 			unpacked,
 		)
 
-	case liFiSwappedGenericTopic:
+	case lifiSwappedGenericTopic:
 		unpacked, err := lifiAbi.Unpack("LiFiSwappedGeneric", transferLogData)
 
-		return feeData, fmt.Errorf(
-			"failed to unpack a LiFiSwappedGeneric log: %v",
-			err,
-		)
+		if err != nil {
+			return feeData, fmt.Errorf(
+				"failed to unpack a LiFiSwappedGeneric log: %v",
+				err,
+			)
+		}
 
 		return swappedGeneric(
 			fluidTokenContract,
@@ -496,10 +506,12 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 	case lifiAssetSwappedTopic:
 		unpacked, err := lifiAbi.Unpack("AssetSwapped", transferLogData)
 
-		return feeData, fmt.Errorf(
-			"failed to unpack a AssetSwapped log: %v",
-			err,
-		)
+		if err != nil {
+			return feeData, fmt.Errorf(
+				"failed to unpack a AssetSwapped log: %v",
+				err,
+			)
+		}
 
 		return assetSwapped(
 			fluidTokenContract,
