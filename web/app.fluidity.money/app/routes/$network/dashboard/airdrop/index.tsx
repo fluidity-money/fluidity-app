@@ -196,7 +196,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
   const {
     address,
