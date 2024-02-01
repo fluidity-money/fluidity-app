@@ -48,6 +48,8 @@ var applicationNames = []string{
 	"jumper",
 	"camelot_v3",
 	"lifi",
+	"odos",
+	"betswirl",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

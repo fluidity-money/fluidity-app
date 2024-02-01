@@ -211,8 +211,8 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 		fluidTransferAmount.Set(toAmount)
 
 	default:
-		log.Debugf(
-			"Failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
+		return feeData, fmt.Errorf(
+			"failed to decode the volume: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,

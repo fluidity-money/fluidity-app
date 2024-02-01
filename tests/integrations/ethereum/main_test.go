@@ -135,6 +135,9 @@ func init() {
 
  	lifiTests := unmarshalJsonTestOrFatal(integrationTestLifi)
  	tests = append(tests, lifiTests...)
+
+ 	odosTests := unmarshalJsonTestOrFatal(integrationTestOdos)
+ 	tests = append(tests, odosTests...)
  }
 
 func TestIntegrations(t *testing.T) {
