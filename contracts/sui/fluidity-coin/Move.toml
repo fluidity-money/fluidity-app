@@ -1,0 +1,15 @@
+[package]
+name = "Fluidity Coin Contract"
+version = "0.0.1"
+# published-at = ""
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
+ScallopProtocol = { git = "https://github.com/fluidity-money/sui-lending-protocol", subdir = "contracts/protocol", rev = "main" }
+#ScallopProtocol = { local = "./on-chain-deps/contracts/protocol/" }
+
+
+[addresses]
+fluidity_coin = "0x0"
+std = "0x1"
+sui = "0x2"
