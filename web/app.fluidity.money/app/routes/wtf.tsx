@@ -1,7 +1,7 @@
 import type { HighestRewardMonthly } from "~/queries/useHighestRewardStatistics";
 
 import { useNavigate } from "@remix-run/react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import {
   json,
   LinksFunction,
@@ -39,7 +39,7 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
 };
 
-const CHAINS = [
+const enabledChains = [
   {
     name: "ETH",
     icon: <img src="/assets/chains/ethIcon.svg" />,
@@ -47,10 +47,6 @@ const CHAINS = [
   {
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
-  },
-  {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
   },
   {
     name: "SOL",

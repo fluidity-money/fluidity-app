@@ -310,7 +310,6 @@ export default function Home() {
   const {
     count,
     totalCount,
-    rewards,
     volume,
     transactions,
     graph,
