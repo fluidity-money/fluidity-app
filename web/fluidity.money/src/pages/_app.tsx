@@ -60,12 +60,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     }
   }, []);
 
-  const splitUser =
-    process.env.NODE_ENV === "development" ||
-      (!!location && location.hostname.includes("staging"))
-      ? "dev"
-      : "user";
-
   return (
     <>
       <noscript>
