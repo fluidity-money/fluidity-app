@@ -20,7 +20,6 @@ import {
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect-v2";
 import { EIP1193 } from "@web3-react/eip1193";
-import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   getUserStakingDeposits,
@@ -119,14 +118,6 @@ const EthereumFacade = ({
         .catch(() => true);
     });
   }, []);
-
-  const { setSplitUser } = useContext(SplitContext);
-
-  useEffect(() => {
-    if (!account) return;
-
-    setSplitUser(account);
-  }, [account]);
 
   const getBalance = async (
     contractAddress: string

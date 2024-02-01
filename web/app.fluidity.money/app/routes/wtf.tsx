@@ -34,7 +34,6 @@ import opportunityStyles from "~/styles/opportunity.css";
 import { Chain } from "~/util/chainUtils/chains";
 import { generateMeta } from "~/util/tweeter";
 import { MintAddress } from "~/types/MintAddress";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -171,16 +170,8 @@ export default function IndexPage() {
 
   const { highestRewards, highestWinner } = useLoaderData<LoaderData>();
 
-  const { showExperiment } = useContext(SplitContext);
-
   const { width } = useViewport();
   const mobileBreakpoint = 500;
-
-  const enabledChains = CHAINS.filter(({ name }) => {
-    if (name === "POLY_ZK" && !showExperiment("enable-polygonzk")) return false;
-
-    return true;
-  });
 
   return (
     <>

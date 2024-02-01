@@ -27,7 +27,6 @@ import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
 import { Chain } from "~/util/chainUtils/chains";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -80,8 +79,6 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
-  const { showExperiment } = useContext(SplitContext);
-
   const projectedWinningsData = useFetcher<ProjectedWinData>();
 
   useEffect(() => {
@@ -108,14 +105,6 @@ const NetworkPage = () => {
 
   // filter CHAIN_NAME_MAP by enabled chains
   const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .filter(([, chain]) => {
-      const { name } = chain;
-
-      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-        return false;
-
-      return true;
-    })
     .reduce(
       (prev, [key, value]) => ({
         ...prev,

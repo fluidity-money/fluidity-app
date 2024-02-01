@@ -9,7 +9,6 @@ import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
-import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -280,8 +279,6 @@ export default function FluidifyToken() {
       setAssetToken(tokens.find((t) => t.address === assetToken.address));
   }, [tokens]);
 
-  const { client } = useContext(SplitContext);
-
   const handleRedirect = async (
     transaction: TransactionResponse,
     amount: string
@@ -292,8 +289,6 @@ export default function FluidifyToken() {
     });
 
     setSwapping(true);
-
-    client?.track("user", swapping ? "click_swapping" : "click_reverting");
 
     try {
       const success = await transaction.confirmTx();

@@ -15,7 +15,6 @@
 | `FLU_HASURA_RPC_WS`     | URI to subscribe to winners data on db (hasura interface) |
 | `FLU_HASURA_SECRET`     | Hasura admin secret used in client headers for RPC calls  |
 | `FLU_SENTRY_DSN`        | Sentry reporting URI                                      |
-| `FLU_SPLIT_BROWSER_KEY` | Split Client-Side Key                                     |
 | `FLU_WALLETCONNECT_ID`  | WalletConnect Client-Side Project ID                      |
 
 ## Building
