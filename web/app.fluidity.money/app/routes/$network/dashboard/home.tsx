@@ -7,7 +7,6 @@ import type { TransactionsLoaderData } from "~/routes/$network/query/userTransac
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
 import { MintAddress } from "~/types/MintAddress";
-import { SplitContext } from "contexts/SplitProvider";
 import {
   Display,
   LineChart,
@@ -151,9 +150,7 @@ export default function Home() {
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
-  const { showExperiment } = useContext(SplitContext);
-
-  const useDebug = debug && showExperiment("show-debug");
+  const useDebug = debug;
 
   const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
@@ -607,8 +604,6 @@ export default function Home() {
                 <Text>
                   {activeTableFilterIndex
                     ? "My yield"
-                    : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
                     : "Total yield"}
                 </Text>
                 <Display
@@ -616,13 +611,7 @@ export default function Home() {
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
-                    activeTableFilterIndex ||
-                      !showExperiment("weekly-available-rewards")
-                      ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
-                      : totalPrizePool / 52
+                    activeTableFilterIndex || totalPrizePool / 52
                   )}
                 </Display>
                 <Link to={`/${network}/dashboard/rewards`}>
@@ -661,10 +650,7 @@ export default function Home() {
             <div className="totals-column">
               {/* Prize Pool */}
               <div className="statistics-set">
-                <Text>
-                  {showExperiment("weekly-available-rewards") ? "Total " : ""}
-                  Prize Pool
-                </Text>
+                <Text>Total Prize Pool</Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
