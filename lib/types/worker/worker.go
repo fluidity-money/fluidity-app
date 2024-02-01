@@ -108,6 +108,7 @@ type (
 		TraderJoe    float64 `json:"trader_joe"`
 		Lifi         float64 `json:"lifi"`
 		Odos         float64 `json:"odos"`
+		BetSwirl float64 `json:"betswirl"`
 	}
 
 	FeeSwitch struct {
