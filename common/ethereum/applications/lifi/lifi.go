@@ -9,9 +9,11 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -122,55 +124,6 @@ const lifiAbiString = `[
       }
     ],
     "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "AssetSwapped",
-    "inputs": [
-      {
-        "name": "transactionId",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "dex",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "fromAssetId",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "toAssetId",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "fromAmount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "toAmount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
   }
 ]
 `
@@ -180,7 +133,6 @@ var lifiAbi ethAbi.ABI
 const (
 	lifiGenericSwapCompletedTopic = "0x38eee76fd911eabac79da7af16053e809be0e12c8637f156e77e1af309b99537"
 	lifiSwappedGenericTopic       = "0x93517b7c6f32856737008edf37cf2542b55d27d83fa299aa216f55a982a6ee1d"
-	lifiAssetSwappedTopic         = "0x7bfdfdb5e3a3776976e53cb0607060f54c5312701c8cba1155cc4d5394440b38"
 )
 
 // genericSwapCompleted decodes "LiFiGenericSwapCompleted" and is
@@ -260,11 +212,12 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 
 	default:
 		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
+			"failed to decode the volume: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,
 		)
+		return feeData, nil
 	}
 
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -349,102 +302,13 @@ func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unp
 		fluidTransferAmount.Set(toAmount)
 
 	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume for LiFiSwappedGeneric: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
+		log.Debugf(
+			"Failed to decode the volume for LiFiSwappedGeneric: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,
 		)
-	}
-
-	decimalsAdjusted := math.Pow10(tokenDecimals)
-	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
-
-	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
-	feeData.Fee = new(big.Rat).SetInt64(0)
-
-	return feeData, nil
-}
-
-// assetSwapped decodes events of AssetSwapped. Follows the same
-// behaviour as it's predecessors.
-func assetSwapped(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
-	if l := len(unpacked); l != 7 {
-		return feeData, fmt.Errorf(
-			"unpacked the wrong number of values! Expected 7, got %v",
-			l,
-		)
-	}
-
-	// transaction id and the dex are ignored. finally, the timestamp
-	// (final field) is ignored
-
-	//transactionId := unpacked[0]
-	//dex := unpacked[1]
-	//timestamp := unpacked[6]
-
-	fromAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
-		[]interface{}{unpacked[2]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce fromAssetId to address: %v",
-			err,
-		)
-	}
-
-	toAssetId, err := ethereum.CoerceBoundContractResultsToAddress(
-		[]interface{}{unpacked[3]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce toAssetId to address: %v",
-			err,
-		)
-	}
-
-	fromAmount, err := ethereum.CoerceBoundContractResultsToRat(
-		[]interface{}{unpacked[4]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce fromAmount to *big.Rat: %v",
-			err,
-		)
-	}
-
-	toAmount, err := ethereum.CoerceBoundContractResultsToRat(
-		[]interface{}{unpacked[5]},
-	)
-
-	if err != nil {
-		return feeData, fmt.Errorf(
-			"failed to coerce toAmount to *big.Rat: %v",
-			err,
-		)
-	}
-
-	//timestamp := unpacked[6]
-
-	fluidTransferAmount := new(big.Rat)
-
-	switch fluidTokenContract {
-	case fromAssetId:
-		fluidTransferAmount.Set(fromAmount)
-
-	case toAssetId:
-		fluidTransferAmount.Set(toAmount)
-
-	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not  asset id (%v) nor is to asset id (%v)",
-			fluidTokenContract,
-			fromAssetId,
-			toAssetId,
-		)
+		return feeData, nil
 	}
 
 	decimalsAdjusted := math.Pow10(tokenDecimals)
@@ -503,12 +367,6 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 			tokenDecimals,
 			unpacked,
 		)
-
-	case lifiAssetSwappedTopic:
-		return feeData, fmt.Errorf(
-			"unsupported feature decoding a AssetSwapped log",
-		)
-
 
 	default:
 		return feeData, nil
