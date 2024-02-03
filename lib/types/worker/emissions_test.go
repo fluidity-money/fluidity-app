@@ -106,7 +106,8 @@ func TestString(t *testing.T) {
 		"trader_joe": 0,
 		"lifi": 0,
 		"odos": 0,
-		"betswirl": 0
+		"betswirl": 0,
+		"paraswap": 0,
 	},
 	"calculate_n":{
 		"probability_m":0,

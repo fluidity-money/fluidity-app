@@ -28,6 +28,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/kyber"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/lifi"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/meson"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/paraswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
@@ -36,7 +37,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -79,7 +79,7 @@ const (
 	ApplicationLifi
 	ApplicationOdos
 	ApplicationBetSwirl
- ApplicationParaswap
+	ApplicationParaswap
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -318,7 +318,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 
 	case ApplicationParaswap:
 		feeData, err = paraswap.GetParaswapFees(
-      transfer,
+			transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
