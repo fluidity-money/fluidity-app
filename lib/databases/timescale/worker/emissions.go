@@ -308,7 +308,6 @@ func InsertEmissions(emission Emission) {
 			$80,
 			$81,
 
-			$81,
 			$82,
 			$83,
 			$84,
