@@ -107,7 +107,7 @@ func TestString(t *testing.T) {
 		"lifi": 0,
 		"odos": 0,
 		"betswirl": 0,
-		"paraswap": 0,
+		"paraswap": 0
 	},
 	"calculate_n":{
 		"probability_m":0,

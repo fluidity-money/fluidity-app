@@ -50,7 +50,7 @@ var applicationNames = []string{
 	"lifi",
 	"odos",
 	"betswirl",
-  "paraswap",
+	"paraswap",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
