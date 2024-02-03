@@ -9,6 +9,7 @@ import (
 	"math"
 	"math/big"
 
+	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
@@ -128,12 +129,15 @@ func GetOdosFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 		fluidTransferAmount.Set(amountOut)
 
 	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not inputToken (%v) nor is outputToken (%v)",
+		log.Debugf(
+			"failed to decode the volume for transaction hash %v: fluid contract address %v is not inputToken (%v) nor is outputToken (%v)",
+			transfer.TransactionHash,
 			fluidTokenContract,
 			inputToken,
 			outputToken,
 		)
+
+		return feeData, nil
 	}
 
 	decimalsAdjusted := math.Pow10(tokenDecimals)
