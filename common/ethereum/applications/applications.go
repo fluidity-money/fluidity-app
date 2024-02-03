@@ -26,16 +26,17 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/dodo"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/gtrade"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/kyber"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/lifi"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/meson"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/oneinch"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/paraswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/saddle"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/sushiswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/trader-joe"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/lifi"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -78,6 +79,7 @@ const (
 	ApplicationLifi
 	ApplicationOdos
 	ApplicationBetSwirl
+	ApplicationParaswap
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -314,6 +316,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
 
+	case ApplicationParaswap:
+		feeData, err = paraswap.GetParaswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.Paraswap += util.MaybeRatToFloat(feeData.Fee)
+
 	default:
 		err = fmt.Errorf(
 			"Transfer #%v did not contain an application",
@@ -364,19 +375,19 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationApeswap:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationSaddle:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationGTradeV6_1:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationMeson:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		mesonSender, err := meson.GetInitiator(transaction.Data)
 		if err != nil {
@@ -387,41 +398,51 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 
 		return mesonSenderAddress, contractAddress, nil
 	case ApplicationCamelot, ApplicationCamelotV3:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationChronos:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationSushiswap:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationKyberClassic:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationWombat:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationSeawaterAmm:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool (switched to the LPs)
 		return transaction.From, logAddress, nil
 	case ApplicationTraderJoe:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationLifi:
-		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
 	case ApplicationOdos:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+	case ApplicationParaswap:
+		// Give the majority payout to the initiator of the transaction, and the
+		// rest to the pool.
+
+		// Assuming that the initiator of the transaction is the
+		// initiator. This might not hold up in practice - the
+		// contracts are not fully open source, and the only
+		// function signature we've seen is simpleSwap.
+
+		return transaction.From, contractAddress, nil
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
 			"Transfer #%v did not contain an application",

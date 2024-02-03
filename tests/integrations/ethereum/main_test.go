@@ -138,6 +138,9 @@ func init() {
 
  	odosTests := unmarshalJsonTestOrFatal(integrationTestOdos)
  	tests = append(tests, odosTests...)
+
+ 	paraswap := unmarshalJsonTestOrFatal(integrationTestParaswap)
+ 	tests = append(tests, paraswap...)
  }
 
 func TestIntegrations(t *testing.T) {

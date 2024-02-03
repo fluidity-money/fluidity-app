@@ -81,7 +81,7 @@ type (
 
 	// app fees for ethereum transactions
 	EthereumAppFees struct {
-		UniswapV3        float64 `json:"uniswap_v3"`
+		UniswapV3        float64 `json:"uniswap_v3",`
 		UniswapV2        float64 `json:"uniswap_v2"`
 		BalancerV2       float64 `json:"balancer_v2"`
 		OneInchV2        float64 `json:"oneinch_v2"`
@@ -108,7 +108,8 @@ type (
 		TraderJoe    float64 `json:"trader_joe"`
 		Lifi         float64 `json:"lifi"`
 		Odos         float64 `json:"odos"`
-		BetSwirl float64 `json:"betswirl"`
+		BetSwirl     float64 `json:"betswirl"`
+		Paraswap     float64 `json:"paraswap"`
 	}
 
 	FeeSwitch struct {
