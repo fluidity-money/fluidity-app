@@ -22,7 +22,7 @@ const integrationTestParaswap = `[
         ],
         "log_index": "7"
       },
-      "application": 27
+      "application": 29
     },
     "transaction": {
       "to": "0xdef171fe48cf0115b1d80b88dc8eab59176fee57",
@@ -55,7 +55,7 @@ const integrationTestParaswap = `[
 				],
         "log_index": "25"
       },
-      "application": 27
+      "application": 29
     },
     "transaction": {
       "to": "0xdef171fe48cf0115b1d80b88dc8eab59176fee57",

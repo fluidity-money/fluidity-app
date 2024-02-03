@@ -36,7 +36,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
-	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/lifi"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -316,7 +315,7 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
-    
+
 	case ApplicationParaswap:
 		feeData, err = paraswap.GetParaswapFees(
       transfer,
@@ -433,7 +432,7 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 	case ApplicationOdos:
 		// Gave the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
-		return transaction.From, logAddress, nil<<<<<<< develop-add-paraswap
+		return transaction.From, logAddress, nil
 	case ApplicationParaswap:
 		// Give the majority payout to the initiator of the transaction, and the
 		// rest to the pool.
