@@ -136,6 +136,9 @@ func init() {
  	lifiTests := unmarshalJsonTestOrFatal(integrationTestLifi)
  	tests = append(tests, lifiTests...)
 
+ 	odosTests := unmarshalJsonTestOrFatal(integrationTestOdos)
+ 	tests = append(tests, odosTests...)
+
  	paraswap := unmarshalJsonTestOrFatal(integrationTestParaswap)
  	tests = append(tests, paraswap...)
  }

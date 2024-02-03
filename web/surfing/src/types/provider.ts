@@ -33,4 +33,5 @@ export type Provider =
   | "Jumper"
   | "Meteora"
   | "Lifi"
+  | "Odos"
   | "Paraswap";

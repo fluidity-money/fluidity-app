@@ -104,7 +104,9 @@ func TestString(t *testing.T) {
 		"wombat":0,
 		"seawater_amm":0,
 		"trader_joe": 0,
-		"lifi": 0
+		"lifi": 0,
+		"odos": 0,
+		"betswirl": 0
 	},
 	"calculate_n":{
 		"probability_m":0,

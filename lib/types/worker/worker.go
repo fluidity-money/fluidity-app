@@ -107,7 +107,9 @@ type (
 		SeawaterAmm  float64 `json:"seawater_amm"`
 		TraderJoe    float64 `json:"trader_joe"`
 		Lifi         float64 `json:"lifi"`
-		Paraswap   float64 `json:"paraswap"`
+		Odos         float64 `json:"odos"`
+		BetSwirl     float64 `json:"betswirl"`
+		Paraswap     float64 `json:"paraswap"`
 	}
 
 	FeeSwitch struct {

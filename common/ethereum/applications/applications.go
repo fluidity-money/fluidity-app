@@ -36,6 +36,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/lifi"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/odos"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -76,7 +78,9 @@ const (
 	ApplicationJumper
 	ApplicationCamelotV3
 	ApplicationLifi
-	ApplicationParaswap
+	ApplicationOdos
+	ApplicationBetSwirl
+ ApplicationParaswap
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -304,9 +308,18 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.Lifi += util.MaybeRatToFloat(feeData.Fee)
+	case ApplicationOdos:
+		feeData, err = odos.GetOdosFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.Odos += util.MaybeRatToFloat(feeData.Fee)
+    
 	case ApplicationParaswap:
 		feeData, err = paraswap.GetParaswapFees(
-			transfer,
+      transfer,
 			client,
 			fluidTokenContract,
 			tokenDecimals,
@@ -417,6 +430,10 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// Give the majority payout to the swap-maker (i.e. transaction sender)
 		// and rest to pool
 		return transaction.From, logAddress, nil
+	case ApplicationOdos:
+		// Gave the majority payout to the swap-maker (i.e. transaction sender)
+		// and rest to pool
+		return transaction.From, logAddress, nil<<<<<<< develop-add-paraswap
 	case ApplicationParaswap:
 		// Give the majority payout to the initiator of the transaction, and the
 		// rest to the pool.
