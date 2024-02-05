@@ -77,6 +77,8 @@ function ErrorBoundary(error: Error) {
   );
 }
 
+const ADJUSTED_BOTTLE_MULTIPLIER = 12;
+
 const SAFE_DEFAULT_HOME: HomeLoaderData = {
   network: "arbitrum",
   loaded: false,
@@ -401,6 +403,8 @@ export default function Home() {
 
     const appProviderName = getProviderDisplayName(application);
 
+    const shouldMultiplyBottles = application != "none";
+
     return {
       RowElement: ({ heading }: { heading: string }) => {
         switch (heading) {
@@ -479,6 +483,9 @@ export default function Home() {
               </td>
             );
           case "BOTTLES EARNED":
+            let adjustedLootboxCount = lootboxCount;
+            if (shouldMultiplyBottles)
+              adjutedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
             return (
               <td>
                 {lootboxCount && rewardTier ? (
@@ -490,7 +497,7 @@ export default function Home() {
                       size="sm"
                       /* WTF? why is this needed? REMOVEME */
                       rarity={translateRewardTierToRarity(rewardTier)}
-                      quantity={lootboxCount}
+                      quantity={adjustedLootboxCount}
                     />
                     <Text>{toDecimalPlaces(lootboxCount, 4)}</Text>
                   </a>
