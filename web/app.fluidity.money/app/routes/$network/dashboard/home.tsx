@@ -500,7 +500,7 @@ export default function Home() {
                       rarity={translateRewardTierToRarity(rewardTier)}
                       quantity={adjustedLootboxCount}
                     />
-                    <Text>{toDecimalPlaces(lootboxCount, 4)}</Text>
+                    <Text>{toDecimalPlaces(adjustedLootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
