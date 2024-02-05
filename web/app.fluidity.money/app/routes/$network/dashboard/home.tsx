@@ -407,7 +407,7 @@ export default function Home() {
 
       const adjustedLootboxCount = lootboxCount;
       if (shouldMultiplyBottles)
-        adjutedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+        adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
 
     return {
       RowElement: ({ heading }: { heading: string }) => {
