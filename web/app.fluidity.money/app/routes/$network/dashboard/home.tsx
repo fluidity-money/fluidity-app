@@ -405,7 +405,7 @@ export default function Home() {
 
     const shouldMultiplyBottles = application != "none";
 
-      const adjustedLootboxCount = lootboxCount;
+      let adjustedLootboxCount = lootboxCount;
       if (shouldMultiplyBottles)
         adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
 
