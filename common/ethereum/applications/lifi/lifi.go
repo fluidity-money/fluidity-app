@@ -140,7 +140,7 @@ const (
 // setting the volume based on the volume for that side of the trade.
 // Assumes 7 fields in the event decoding. Ie, if I swap 10 USDC for 9
 // fUSDC, then the volume is 9.
-func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
+func genericSwapCompleted(transfer worker.EthereumApplicationTransfer, fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
 	if l := len(unpacked); l != 7 {
 		return feeData, fmt.Errorf(
 			"unpacked the wrong number of values for LiFiGenericSwapCompleted! Expected 7, got %v",
@@ -211,12 +211,14 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 		fluidTransferAmount.Set(toAmount)
 
 	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
+		log.Debugf(
+			"failed to decode the volume LiFiGenericSwapCompleted transaction hash %v: fluid contract address %v is not fromAssetId (%v) nor is toAssetId (%v)",
+			transfer.TransactionHash,
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,
 		)
+
 		return feeData, nil
 	}
 
@@ -231,7 +233,7 @@ func genericSwapCompleted(fluidTokenContract ethCommon.Address, tokenDecimals in
 
 // swappedGeneric decodes LiFiSwappedGeneric, following largely the same
 // behaviour as genericSwapCompleted. Expects 1 topic, and 6 unpacked items.
-func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
+func swappedGeneric(transfer worker.EthereumApplicationTransfer, fluidTokenContract ethCommon.Address, tokenDecimals int, unpacked []interface{}) (feeData applications.ApplicationFeeData, err error) {
 	if l := len(unpacked); l != 6 {
 		return feeData, fmt.Errorf(
 			"unpacked the wrong number of values! Expected 6, got %v",
@@ -303,11 +305,13 @@ func swappedGeneric(fluidTokenContract ethCommon.Address, tokenDecimals int, unp
 
 	default:
 		log.Debugf(
-			"Failed to decode the volume for LiFiSwappedGeneric: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
+			"Failed to decode the volume for LiFiSwappedGeneric transaction id %v: fluid contract address %v is not asset id (%v) nor is to asset id (%v)",
+			transfer.TransactionHash,
 			fluidTokenContract,
 			fromAssetId,
 			toAssetId,
 		)
+
 		return feeData, nil
 	}
 
@@ -347,6 +351,7 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 		}
 
 		return genericSwapCompleted(
+			transfer,
 			fluidTokenContract,
 			tokenDecimals,
 			unpacked,
@@ -363,6 +368,7 @@ func GetLifiFees(transfer worker.EthereumApplicationTransfer, client *ethclient.
 		}
 
 		return swappedGeneric(
+			transfer,
 			fluidTokenContract,
 			tokenDecimals,
 			unpacked,

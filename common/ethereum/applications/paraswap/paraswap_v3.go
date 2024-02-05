@@ -13,6 +13,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+	"github.com/fluidity-money/fluidity-app/lib/log"
 
 	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -329,12 +330,14 @@ func GetParaswapFees(transfer worker.EthereumApplicationTransfer, client *ethcli
 		fluidTransferAmount.Set(receivedAmount)
 
 	default:
-		return feeData, fmt.Errorf(
-			"failed to decode the volume: fluid contract address %v is not srcToken %v nor destToken %v",
+		log.Debugf(
+			"failed to decode the volume for paraswap transaction hash %v: fluid contract address %v is not srcToken %v nor destToken %v",
+			transfer.TransactionHash,
 			fluidTokenContract,
 			srcToken,
 			destToken,
 		)
+		return feeData, nil
 	}
 
 	decimalsAdjusted := math.Pow10(tokenDecimals)
