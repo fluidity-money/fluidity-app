@@ -169,6 +169,25 @@ fluidAssets = [
 ]
 
 [[config.arbitrum.tokens]]
+symbol = "USDC"
+name = "USDC Native"
+logo = "/assets/tokens/usdc.svg"
+address = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+colour = "#2775ca"
+decimals = 6
+enabled = true
+
+[[config.arbitrum.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC Native"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+colour = "#2775ca"
+isFluidOf = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+decimals = 6
+enabled = true
+
+[[config.arbitrum.tokens]]
 symbol = "USDT"
 name = "Tether USD"
 logo = "/assets/tokens/usdt.svg"

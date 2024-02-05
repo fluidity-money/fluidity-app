@@ -1176,7 +1176,7 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [tasks, setTasks] = useState<"1x" | "6x">("6x");
+  const [tasks, setTasks] = useState<"1x" | "12x">("12x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Jumper", link: "https://jumper.exchange/" },
@@ -1204,14 +1204,14 @@ const MultiplierTasks = () => {
       <div
         className="multiplier-tasks-multiplier"
         onClick={() => {
-          setTasks((prev) => (prev === "1x" ? "6x" : "1x"));
+          setTasks((prev) => (prev === "1x" ? "12x" : "1x"));
         }}
         style={{ transform: "scale(0.6)" }}
       >
         <Form.Toggle
           color="black"
           direction="vertical"
-          checked={tasks === "6x"}
+          checked={tasks === "12x"}
         />
         <TextButton style={{ textDecorationThickness: "3px" }}>
           <motion.div
@@ -1240,7 +1240,7 @@ const MultiplierTasks = () => {
           </Text>
         </motion.div>
       )}
-      {tasks === "6x" && (
+      {tasks === "12x" && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
