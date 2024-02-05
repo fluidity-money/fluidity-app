@@ -405,6 +405,10 @@ export default function Home() {
 
     const shouldMultiplyBottles = application != "none";
 
+      const adjustedLootboxCount = lootboxCount;
+      if (shouldMultiplyBottles)
+        adjutedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+
     return {
       RowElement: ({ heading }: { heading: string }) => {
         switch (heading) {
@@ -483,9 +487,6 @@ export default function Home() {
               </td>
             );
           case "BOTTLES EARNED":
-            let adjustedLootboxCount = lootboxCount;
-            if (shouldMultiplyBottles)
-              adjutedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
             return (
               <td>
                 {lootboxCount && rewardTier ? (
