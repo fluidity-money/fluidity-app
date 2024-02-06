@@ -151,6 +151,8 @@ const SAFE_DEFAULT_UNCLAIMED: UnclaimedRewardsLoaderData = {
   loaded: false,
 };
 
+const ADJUSTED_BOTTLE_MULTIPLIER = 12;
+
 export default function Rewards() {
   const { network, page, colors, debug } = useLoaderData<LoaderData>();
 
@@ -461,6 +463,12 @@ export default function Rewards() {
 
     const appProviderName = getProviderDisplayName(application);
 
+    const shouldMultiplyBottles = application != "none";
+
+      let adjustedLootboxCount = lootboxCount;
+      if (shouldMultiplyBottles)
+        adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+
     return {
       RowElement: ({ heading }: { heading: string }) => {
         switch (heading) {
@@ -552,9 +560,9 @@ export default function Rewards() {
                     <LootBottle
                       size="sm"
                       rarity={rewardTier}
-                      quantity={lootboxCount}
+                      quantity={adjustedLootboxCount}
                     />
-                    <Text>{toDecimalPlaces(lootboxCount, 4)}</Text>
+                    <Text>{toDecimalPlaces(adjustedLootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
