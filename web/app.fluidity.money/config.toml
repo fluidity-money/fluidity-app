@@ -356,7 +356,7 @@ fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xaf88d065e77c8cC2239327
 name= "Ramses"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.ramses.exchange/liquidity/v2/0xf73c87736008ad3af9973b357c97ab8c60d8ca63"
+fUSDC = "https://app.ramses.exchange/liquidity/v2/0x2c9a8c5814bbd8eb4f3531efb836f3d1fa185f38"
 
 [[liquidity_providers.arbitrum.providers]]
 name= "uniswap"
