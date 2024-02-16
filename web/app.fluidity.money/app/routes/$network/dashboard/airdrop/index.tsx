@@ -1080,10 +1080,8 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
-  const dayDiff = epochMax - epochDays;
   const epochDaysLeft = 1;
-  const percentage = 5;
-  const epochPercentage = 95;
+  const epochPercentage = 99;
 
   return (
     <div
