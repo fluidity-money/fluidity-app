@@ -3,7 +3,7 @@ name: Microservices CI
 on:
   pull_request:
     branches:
-      - production
+      - develop
     types:
       - closed
 
