@@ -674,23 +674,6 @@ export default function Dashboard() {
               {isMobile ? "" : "Receive"}
             </GeneralButton>
 
-            {/* Referrals Button (desktop only) */}
-            {isTablet || isMobile || (
-              <GeneralButton
-                type="transparent"
-                size="small"
-                layout="before"
-                handleClick={() => {
-                  width < airdropMobileBreakpoint
-                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                    : setReferralModalVisibility(true);
-                }}
-                icon={<Referral />}
-              >
-                {isMobile ? "" : "Referral"}
-              </GeneralButton>
-            )}
-
             {/* Fluidify button (desktop only) */}
             {isTablet || isMobile || (
               <GeneralButton

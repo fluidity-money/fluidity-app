@@ -196,7 +196,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
 
   const {
     address,
@@ -567,14 +567,6 @@ const Airdrop = () => {
           isSelected={isMobile && currentModal === "referrals"}
         >
           Referrals
-        </TabButton>
-        <TabButton
-          size="small"
-          onClick={() => setCurrentModal("testnet-rewards")}
-          groupId="airdrop"
-          isSelected={isMobile && currentModal === "testnet-rewards"}
-        >
-          Testnet Rewards
         </TabButton>
         <TabButton size="small" groupId="airdrop">
           <a
@@ -1512,14 +1504,6 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
-          <GeneralButton
-            type={filterIndex === 0 ? "primary" : "transparent"}
-            handleClick={() => setFilterIndex(0)}
-          >
-            <Text code size="sm" style={{ color: "inherit" }}>
-              24 HOURS
-            </Text>
-          </GeneralButton>
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
