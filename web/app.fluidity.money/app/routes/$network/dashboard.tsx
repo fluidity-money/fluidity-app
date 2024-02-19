@@ -43,7 +43,6 @@ import {
   Modal,
   ProvideLiquidity,
   BurgerMenu,
-  Referral,
   CardModal,
   ArrowUp,
   ArrowDown,
