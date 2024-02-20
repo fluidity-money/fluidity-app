@@ -1,4 +1,5 @@
-FROM alpine:3.18
+# Aligned with build-root (golang1.20-alpine3.18)
+FROM alpine:3.18.6@sha256:695ae78b4957fef4e53adc51febd07f5401eb36fcd80fff3e5107a2b4aa42ace AS build
 
 RUN apk add --no-cache \
     nodejs \
