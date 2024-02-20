@@ -1,0 +1,12 @@
+[package]
+name = "Fluidity Utility Mining Contract"
+version = "0.0.1"
+# published-at = ""
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
+
+[addresses]
+fluidity_utility_mining = "0x0"
+std = "0x1"
+sui = "0x2"
