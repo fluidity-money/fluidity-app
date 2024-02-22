@@ -27,7 +27,7 @@ func main() {
 
 	var (
 		httpClient = sui.NewSuiClient(suiHttpUrl)
-        // TODO source fluid token from env, including decimals
+		// TODO source fluid token from env, including decimals
 		fluidToken = sui_types.SuiToken{
 			PackageId: "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe",
 		}
@@ -63,7 +63,7 @@ func main() {
 			)
 
 			// process events
-            // TODO do something with events
+			// TODO do something with events
 			for _, event := range events {
 				switch event.Type {
 				case fluidToken.Wrap():
@@ -97,9 +97,9 @@ func main() {
 			}
 
 			// TODO make a parser for these map/tuples that use the same layouts
-            // such as map[string]interface{}, []interface{}
+			// such as map[string]interface{}, []interface{}
 
-            // TODO make this entire thing less brittle, moved into functions
+			// TODO make this entire thing less brittle, moved into functions
 
 			// process transactions in PTB
 			// wrap/unwrap/yield will not be double processed as their internal calls aren't emitted like a regular transaction
@@ -110,33 +110,44 @@ func main() {
 				}
 
 				// has tuple type [[]{Result int}, {Input int}]
-				t := transaction.TransferObjects
+				var (
+					transferObjects = transaction.TransferObjects
+
+					transferResults = transferObjects[0]
+					transferInputs  = transferObjects[1]
+				)
 
 				// find the recipient address in the inputs array
-				recipientIndex := int(t[1].(map[string]interface{})["Input"].(float64))
-				recipientAddress := inputs[recipientIndex]["value"].(string)
+				recipientIndex := mustIntFromMapKey(transferInputs, "Input")
+
+				recipientAddress_ := inputs[recipientIndex]["value"]
+				recipientAddress := mustStringFromInterface(recipientAddress_)
 
 				// parse either a Result or NestedResult from TransferObjects
-				result_ := t[0].([]interface{})[0].(map[string]interface{})
+				maybeNested_ := mustArrayFromInterface(transferResults)[0]
+				maybeNested := mustMapFromInterface(maybeNested_)
 
 				var i, j int
 
-				if r := result_["NestedResult"]; r != nil {
-					i = int(r.([]interface{})[0].(float64))
-					j = int(r.([]interface{})[1].(float64))
-				}
+				if nestedResult := maybeNested["NestedResult"]; nestedResult != nil {
+					results := mustArrayFromInterface(nestedResult)
 
-				if r := result_["Result"]; r != nil {
+					i = mustIntFromFloat64Interface(results[0])
+					j = mustIntFromFloat64Interface(results[1])
+				} else if result := maybeNested["Result"]; result != nil {
 					// Result(i) = NestedResult(i, 0)
-					i = int(r.(float64))
+					i = mustIntFromFloat64Interface(result)
 					j = 0
 				}
 
 				// find the SplitCoins transaction referenced by TransferObjects
-				txAtI := transactions[i]
+				var (
+					txAtI      = transactions[i]
+					splitCoins = txAtI.SplitCoins
+				)
 
 				// if SplitCoins is nil, we don't know how to parse the transfer, so skip
-				if txAtI.SplitCoins == nil {
+				if splitCoins == nil {
 					log.Debug(func(k *log.Log) {
 						k.Format(
 							"Transaction at %v was not SplitCoins - skipping!",
@@ -146,8 +157,13 @@ func main() {
 					continue
 				}
 
+				var (
+					coinArg    = splitCoins[0]
+					amountArgs = splitCoins[1]
+				)
+
 				// if the first value is GasCoin, this transfer is using the Sui token
-				if f, ok := txAtI.SplitCoins[0].(string); ok && f == "GasCoin" {
+				if f, ok := coinArg.(string); ok && f == "GasCoin" {
 					log.Debug(func(k *log.Log) {
 						k.Message = "First SplitCoins entry was GasCoin - skipping!"
 					})
@@ -156,19 +172,23 @@ func main() {
 
 				// parse the SplitCoins tuple
 				// find the index of the coin that was split in the inputs array
-				first := txAtI.SplitCoins[0].(map[string]interface{})
-				coinArgIndex := int(first["Input"].(float64))
+				first_ := mustMapFromInterface(coinArg)
+				first := first_["Input"]
+				coinArgIndex := mustIntFromFloat64Interface(first)
 
 				// find the index of the amount transferred in the inputs array
-				second := txAtI.SplitCoins[1].([]interface{})[j]
-				amountTransferredIndex := int(second.(map[string]interface{})["Input"].(float64))
+				second_ := mustArrayFromInterface(amountArgs)
+				second := second_[j]
+				amountTransferredIndex := mustIntFromMapKey(second, "Input")
 
 				// find the amount transferred in the inputs array
 				// must be u64
-				amountTransferred := inputs[amountTransferredIndex]["value"].(string)
+				amountTransferred_ := inputs[amountTransferredIndex]["value"]
+				amountTransferred := mustStringFromInterface(amountTransferred_)
 
 				// find the ID of the coin that's being split in the inputs array
-				splitCoinId := inputs[coinArgIndex]["objectId"].(string)
+				splitCoinId_ := inputs[coinArgIndex]["objectId"]
+				splitCoinId := mustStringFromInterface(splitCoinId_)
 
 				var senderAddress string
 				// find splitCoinId in objectChanges
@@ -191,10 +211,36 @@ func main() {
 					})
 				}
 
-                // TODO - do something with tx
+				// TODO - do something with tx
 				fmt.Println("tx had sender", senderAddress, "recipient", recipientAddress, "amountTransferred", amountTransferred)
 			}
 
 		}
 	})
+}
+
+// TODO fatal instead of panic
+func mustMapFromInterface(m interface{}) map[string]interface{} {
+	return m.(map[string]interface{})
+}
+
+// f is an interface{} containing a float64
+func mustIntFromFloat64Interface(f interface{}) int {
+	return int(f.(float64))
+}
+
+func mustValueFromMapKey(m interface{}, key string) interface{} {
+	return mustMapFromInterface(m)[key]
+}
+
+func mustIntFromMapKey(m interface{}, key string) int {
+	return mustIntFromFloat64Interface(mustValueFromMapKey(m, key))
+}
+
+func mustArrayFromInterface(m interface{}) []interface{} {
+	return m.([]interface{})
+}
+
+func mustStringFromInterface(s interface{}) string {
+	return s.(string)
 }
