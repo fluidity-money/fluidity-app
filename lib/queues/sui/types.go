@@ -13,4 +13,6 @@ import "github.com/fluidity-money/fluidity-app/lib/types/sui"
 
 type (
 	Checkpoint = sui.Checkpoint
+	Transfer   = sui.Transfer
+	Event      = sui.SuiEvent
 )

@@ -6,12 +6,13 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"math/big"
 
 	"github.com/block-vision/sui-go-sdk/models"
 	"github.com/block-vision/sui-go-sdk/sui"
 	"github.com/fluidity-money/fluidity-app/lib/log"
-	queue "github.com/fluidity-money/fluidity-app/lib/queues/sui"
+	"github.com/fluidity-money/fluidity-app/lib/queue"
+	sui_queue "github.com/fluidity-money/fluidity-app/lib/queues/sui"
 	sui_types "github.com/fluidity-money/fluidity-app/lib/types/sui"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
@@ -33,7 +34,7 @@ func main() {
 		}
 	)
 
-	queue.Checkpoints(func(checkpoint queue.Checkpoint) {
+	sui_queue.Checkpoints(func(checkpoint sui_queue.Checkpoint) {
 		// look up all digests
 		blocksResponse, err := httpClient.SuiMultiGetTransactionBlocks(context.Background(), models.SuiMultiGetTransactionBlocksRequest{
 			Digests: checkpoint.Transactions,
@@ -74,7 +75,9 @@ func main() {
 							k.Payload = err
 						})
 					}
-					fmt.Println(wrapEvent)
+
+					event := sui_types.SuiEvent{Wrap: wrapEvent}
+					queue.SendMessage(sui_queue.TopicEvents, event)
 				case fluidToken.Unwrap():
 					unwrapEvent, err := sui_types.ParseUnwrap(event.ParsedJson)
 					if err != nil {
@@ -83,7 +86,9 @@ func main() {
 							k.Payload = err
 						})
 					}
-					fmt.Println(unwrapEvent)
+
+					event := sui_types.SuiEvent{Unwrap: unwrapEvent}
+					queue.SendMessage(sui_queue.TopicEvents, event)
 				case fluidToken.DistributeYield():
 					distributeYieldEvent, err := sui_types.ParseDistributeYield(event.ParsedJson)
 					if err != nil {
@@ -92,7 +97,9 @@ func main() {
 							k.Payload = err
 						})
 					}
-					fmt.Println(distributeYieldEvent)
+
+					event := sui_types.SuiEvent{DistributeYield: distributeYieldEvent}
+					queue.SendMessage(sui_queue.TopicEvents, event)
 				}
 			}
 
@@ -206,10 +213,17 @@ func main() {
 					})
 				}
 
-				// TODO - do something with tx
-				fmt.Println("tx had sender", senderAddress, "recipient", recipientAddress, "amountTransferred", amountTransferred)
-			}
+				amountBig, _ := new(big.Int).SetString(amountTransferred, 10)
 
+				transfer := sui_types.Transfer{
+					Timestamp:        checkpoint.Timestamp,
+					SenderAddress:    senderAddress,
+					RecipientAddress: recipientAddress,
+					Amount:           amountBig,
+				}
+
+				queue.SendMessage(sui_queue.TopicTransfers, transfer)
+			}
 		}
 	})
 }

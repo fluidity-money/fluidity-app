@@ -169,10 +169,25 @@ func ParseDistributeYield(parsedJson map[string]interface{}) (DistributeYieldEve
 	return w, nil
 }
 
+// Checkpoint is an internal, simplified representation of a checkpoint to be processed by user actions
 type Checkpoint struct {
 	// block num
 	SequenceNumber string    `json:"sequence_number"`
 	Timestamp      time.Time `json:"timestamp"`
 	// digest of included txs
 	Transactions []string `json:"transactions"`
+}
+
+type Transfer struct {
+	Token            SuiToken  `json:"token"`
+	Timestamp        time.Time `json:"timestamp"`
+	SenderAddress    string    `json:"sender_address"`
+	RecipientAddress string    `json:"recipient_address"`
+	Amount           *big.Int  `json:"amount"`
+}
+
+type SuiEvent struct {
+	Wrap            WrapEvent            `json:"wrap,omitempty"`
+	Unwrap          UnwrapEvent          `json:"unwrap,omitempty"`
+	DistributeYield DistributeYieldEvent `json:"distribute_yield,omitempty"`
 }
