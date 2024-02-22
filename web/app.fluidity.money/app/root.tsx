@@ -17,7 +17,6 @@ import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
 import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
-import { SplitContextProvider } from "contexts/SplitProvider";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
 import { CookieConsent } from "@fluidity-money/surfing";
@@ -136,9 +135,6 @@ export const loader: LoaderFunction = async ({
 
   const gitSha = process.env?.GIT_SHA?.slice(0, 8) ?? "unknown-git-sha";
 
-  const splitBrowserKey = process.env?.FLU_SPLIT_BROWSER_KEY ?? "";
-  const splitUserKey = "user";
-
   const GTAG_ID = process.env["FLU_GTAG_ID"];
   const GTM_ID = process.env["FLU_GTM_ID"];
 
@@ -151,8 +147,6 @@ export const loader: LoaderFunction = async ({
     isStaging,
     host,
     gitSha,
-    splitBrowserKey,
-    splitUserKey,
   };
 };
 
@@ -191,8 +185,6 @@ type LoaderData = {
   isStaging: boolean;
   gitSha?: string;
   host?: string;
-  splitBrowserKey: string;
-  splitUserKey: string;
 };
 
 function App() {
@@ -203,8 +195,6 @@ function App() {
     GTM_ID,
     isProduction,
     gitSha = "unknown",
-    splitBrowserKey,
-    splitUserKey,
   } = useLoaderData<LoaderData>();
 
   switch (true) {
@@ -240,8 +230,6 @@ function App() {
       setActivatedCookieConsent(false);
     }
   }, []);
-
-  const [splitUser, setSplitUser] = useState(splitUserKey);
 
   return (
     <html lang="en">
@@ -340,13 +328,7 @@ function App() {
         />
         <CacheProvider sha={gitSha}>
           <ToolProvider>
-            <SplitContextProvider
-              splitBrowserKey={splitBrowserKey}
-              splitUser={splitUser}
-              setSplitUser={setSplitUser}
-            >
-              <Outlet />
-            </SplitContextProvider>
+            <Outlet />
             <ScrollRestoration />
             <Scripts />
             <LiveReload />

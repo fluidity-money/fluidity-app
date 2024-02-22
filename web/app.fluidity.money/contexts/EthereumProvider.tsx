@@ -11,7 +11,7 @@ import type { Token } from "~/util/chainUtils/tokens";
 
 import tokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import BN from "bn.js";
-import { useMemo, useEffect, useContext } from "react";
+import { useMemo, useEffect } from "react";
 import {
   useWeb3React,
   Web3ReactProvider,
@@ -20,7 +20,6 @@ import {
 import { MetaMask } from "@web3-react/metamask";
 import { WalletConnect } from "@web3-react/walletconnect-v2";
 import { EIP1193 } from "@web3-react/eip1193";
-import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import {
   getUserStakingDeposits,
@@ -119,14 +118,6 @@ const EthereumFacade = ({
         .catch(() => true);
     });
   }, []);
-
-  const { setSplitUser } = useContext(SplitContext);
-
-  useEffect(() => {
-    if (!account) return;
-
-    setSplitUser(account);
-  }, [account]);
 
   const getBalance = async (
     contractAddress: string

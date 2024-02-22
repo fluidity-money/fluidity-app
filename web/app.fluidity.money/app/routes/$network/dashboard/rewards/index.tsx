@@ -16,7 +16,6 @@ import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards, NoUserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { MintAddress } from "~/types/MintAddress";
 import {
   Text,
@@ -156,9 +155,7 @@ const ADJUSTED_BOTTLE_MULTIPLIER = 12;
 export default function Rewards() {
   const { network, page, colors, debug } = useLoaderData<LoaderData>();
 
-  const { showExperiment } = useContext(SplitContext);
-
-  const useDebug = debug && showExperiment("show-debug");
+  const useDebug = debug;
 
   const { data: rewardsData } = useCache<RewardsLoaderData>(
     `/${network}/query/dashboard/rewards`

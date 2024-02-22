@@ -9,7 +9,6 @@ import { debounce, DebouncedFunc } from "lodash";
 import { useContext, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import ItemTypes from "~/types/ItemTypes";
-import { SplitContext } from "contexts/SplitProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 // Use touch backend for mobile devices
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -210,8 +209,6 @@ export default function FluidifyToken() {
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
-  const trackCancelFluidify = () => client?.track("user", "cancel_fluidify");
-
   // get token data once user is connected
   useEffect(() => {
     if (!address || swapping) {
@@ -280,8 +277,6 @@ export default function FluidifyToken() {
       setAssetToken(tokens.find((t) => t.address === assetToken.address));
   }, [tokens]);
 
-  const { client } = useContext(SplitContext);
-
   const handleRedirect = async (
     transaction: TransactionResponse,
     amount: string
@@ -292,8 +287,6 @@ export default function FluidifyToken() {
     });
 
     setSwapping(true);
-
-    client?.track("user", swapping ? "click_swapping" : "click_reverting");
 
     try {
       const success = await transaction.confirmTx();
@@ -372,7 +365,6 @@ export default function FluidifyToken() {
           <div>
             <LinkButton
               handleClick={() => {
-                trackCancelFluidify();
                 setOpenMobModal(false);
               }}
               size="large"
@@ -419,7 +411,9 @@ export default function FluidifyToken() {
             </section>
             <Link to={`/${network}/dashboard/home`}>
               <LinkButton
-                handleClick={trackCancelFluidify}
+                handleClick={() => {
+                  // do nothing
+                }}
                 size="large"
                 type="internal"
                 left={true}

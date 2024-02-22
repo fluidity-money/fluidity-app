@@ -24,7 +24,6 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
   AirdropIcon,
@@ -249,9 +248,6 @@ export default function Dashboard() {
     FluidityFacadeContext
   );
 
-  const { showExperiment, client } = useContext(SplitContext);
-  const showMobileNetworkButton = showExperiment("feature-network-visible");
-
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
   const pathname = urlPaths[1] ?? "";
@@ -428,14 +424,6 @@ export default function Dashboard() {
 
   // filter CHAIN_NAME_MAP by enabled chains
   const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .filter(([, chain]) => {
-      const { name } = chain;
-
-      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-        return false;
-
-      return true;
-    })
     .reduce(
       (prev, [key, value]) => ({
         ...prev,
@@ -640,7 +628,7 @@ export default function Dashboard() {
           {/* Navigation Buttons */}
           <div id="top-navbar-right">
             {/* Network Button */}
-            {(isTablet || isMobile) && showMobileNetworkButton && (
+            {(isTablet || isMobile) && (
               <ChainSelectorButton
                 chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
@@ -679,10 +667,7 @@ export default function Dashboard() {
                 className="fluidify-button-dashboard "
                 type={"secondary"}
                 size={"small"}
-                handleClick={() => {
-                  client?.track("user", "click_fluidify");
-                  navigate(`/${network}/fluidify`);
-                }}
+                handleClick={() => navigate(`/${network}/fluidify`)}
               >
                 <b>Fluidify{isMobile ? "" : " Money"}</b>
               </GeneralButton>
@@ -758,15 +743,12 @@ export default function Dashboard() {
           )}
 
         {/* Default Fluidify button */}
-        {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
+        {otherModalOpen && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
             type={"secondary"}
             size={"medium"}
-            handleClick={() => {
-              client?.track("user", "click_fluidify");
-              navigate(`/${network}/fluidify`);
-            }}
+            handleClick={() => navigate(`/${network}/fluidify`)}
           >
             <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
