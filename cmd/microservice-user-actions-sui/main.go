@@ -219,14 +219,31 @@ func main() {
 	})
 }
 
-// TODO fatal instead of panic
 func mustMapFromInterface(m interface{}) map[string]interface{} {
-	return m.(map[string]interface{})
+	m_, ok := m.(map[string]interface{})
+
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to coerce interface to map[string]interface{}!"
+			k.Payload = m
+		})
+	}
+
+	return m_
 }
 
 // f is an interface{} containing a float64
 func mustIntFromFloat64Interface(f interface{}) int {
-	return int(f.(float64))
+	f_, ok := f.(float64)
+
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to coerce interface to int!"
+			k.Payload = f
+		})
+	}
+
+	return int(f_)
 }
 
 func mustValueFromMapKey(m interface{}, key string) interface{} {
@@ -238,9 +255,27 @@ func mustIntFromMapKey(m interface{}, key string) int {
 }
 
 func mustArrayFromInterface(m interface{}) []interface{} {
-	return m.([]interface{})
+	m_, ok := m.([]interface{})
+
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to coerce interface to []interface{}!"
+			k.Payload = m
+		})
+	}
+
+	return m_
 }
 
 func mustStringFromInterface(s interface{}) string {
-	return s.(string)
+	s_, ok := s.(string)
+
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to coerce interface string!"
+			k.Payload = s
+		})
+	}
+
+	return s_
 }
