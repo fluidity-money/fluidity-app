@@ -411,7 +411,9 @@ export default function FluidifyToken() {
             </section>
             <Link to={`/${network}/dashboard/home`}>
               <LinkButton
-                handleClick={() => {}}
+                handleClick={() => {
+                  // do nothing
+                }}
                 size="large"
                 type="internal"
                 left={true}
