@@ -96,11 +96,6 @@ func main() {
 				}
 			}
 
-			// TODO make a parser for these map/tuples that use the same layouts
-			// such as map[string]interface{}, []interface{}
-
-			// TODO make this entire thing less brittle, moved into functions
-
 			// process transactions in PTB
 			// wrap/unwrap/yield will not be double processed as their internal calls aren't emitted like a regular transaction
 			for _, transaction := range transactions {
