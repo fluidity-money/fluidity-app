@@ -209,8 +209,6 @@ export default function FluidifyToken() {
   const [swapError, setSwapError] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
-  const trackCancelFluidify = () => client?.track("user", "cancel_fluidify");
-
   // get token data once user is connected
   useEffect(() => {
     if (!address || swapping) {
@@ -367,7 +365,6 @@ export default function FluidifyToken() {
           <div>
             <LinkButton
               handleClick={() => {
-                trackCancelFluidify();
                 setOpenMobModal(false);
               }}
               size="large"
@@ -414,7 +411,7 @@ export default function FluidifyToken() {
             </section>
             <Link to={`/${network}/dashboard/home`}>
               <LinkButton
-                handleClick={trackCancelFluidify}
+                handleClick={() => {}}
                 size="large"
                 type="internal"
                 left={true}
