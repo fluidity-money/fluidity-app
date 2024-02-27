@@ -145,10 +145,10 @@ func main() {
 		for _, pendingWinner := range pendingWinners {
 			var (
 				network         = pendingWinner.Network
-				transactionHash = pendingWinner.TransactionHash.String()
-				application     = pendingWinner.Application.String()
+				transactionHash = pendingWinner.TransactionHash
+				application     = pendingWinner.Application
 				usdWinAmount    = pendingWinner.UsdWinAmount
-				senderAddress   = pendingWinner.SenderAddress.String()
+				senderAddress   = pendingWinner.SenderAddress
 				utility         = pendingWinner.Utility
 			)
 
