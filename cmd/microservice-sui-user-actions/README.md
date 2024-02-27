@@ -1,5 +1,5 @@
 
-# microservice-user-actions-sui
+# microservice-sui-user-actions
 
 enter README description here!
 
