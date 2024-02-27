@@ -42,6 +42,7 @@ type (
 		TransactionHash string `json:"transaction_hash"`
 
 		// LogIndex for the index of the log in the block
+		// For Sui, this is the index of the action in a PTB
 		LogIndex misc.BigInt `json:"log_index"`
 
 		// SwapIn or swap out from a Fluid Asset. If true, then that would indicate
@@ -169,14 +170,14 @@ func AggregatedTransactionFromUserAction(userAction UserAction) AggregatedUserTr
 // AggregatedTransactionFromPendingWinner to create a partially aggregated transaction from a pending winner
 func AggregatedTransactionFromPendingWinner(pendingWinner winners.PendingWinner) AggregatedUserTransaction {
 	var (
-		application   = pendingWinner.Application.String()
-		senderAddress = pendingWinner.SenderAddress.String()
+		application   = pendingWinner.Application
+		senderAddress = pendingWinner.SenderAddress
 	)
 
 	userTransaction := AggregatedUserTransaction{
 		TokenShortName:  pendingWinner.TokenDetails.TokenShortName,
 		Network:         pendingWinner.Network,
-		TransactionHash: pendingWinner.TransactionHash.String(),
+		TransactionHash: pendingWinner.TransactionHash,
 		SenderAddress:   senderAddress,
 		// the sender is the winner of a pending win
 		WinningAddress: senderAddress,

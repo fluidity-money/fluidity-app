@@ -19,11 +19,13 @@ import (
 const (
 	networkEthereum = string(network.NetworkEthereum)
 	networkSolana   = string(network.NetworkSolana)
+	networkSui      = string(network.NetworkSui)
 )
 
 const (
 	TopicUserActionsEthereum = `user_actions.` + networkEthereum
 	TopicUserActionsSolana   = `user_actions.` + networkSolana
+	TopicUserActionsSui      = `user_actions.` + networkSui
 	topicUserActionsAll      = `user_actions.*`
 
 	TopicBufferedUserActionsEthereum = `user_actions.buffered.` + networkEthereum

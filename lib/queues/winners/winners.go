@@ -31,13 +31,17 @@ const (
 	// a single blocked winner and their amount won
 	TopicBlockedWinnersSolana = `blocked_winners.` + string(network.NetworkSolana)
 
-	// subWinnersAll to subscribe to winner messages from either network
+	// TopicWinnersSui to broadcast winner messages containing a single
+	// winner and their amount won
+	TopicWinnersSui = `winners.` + string(network.NetworkSui)
+
+	// subWinnersAll to subscribe to winner messages from all networks
 	subWinnersAll = `winners.*`
 
-	// subBlockedWinnersAll to subscribe to blocked winner messages from either network
+	// subBlockedWinnersAll to subscribe to blocked winner messages from all networks
 	subBlockedWinnersAll = `blocked_winners.*`
 
-	// TopicPendingWinners to broadcast pending winner messages
+	// TopicPendingWinners to broadcast pending winner messages on ethereum or sui
 	TopicPendingWinners = `pending_winners`
 )
 

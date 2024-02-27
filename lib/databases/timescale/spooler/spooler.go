@@ -37,14 +37,14 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 		fluidTokenShortName = fluidTokenDetails.TokenShortName
 
 		network_           = winner.Network
-		hash               = winner.TransactionHash
+		hash               = winner.TransactionHash.String()
 		blockNumber        = winner.BlockNumber
-		senderAddress      = winner.FromAddress
+		senderAddress      = winner.FromAddress.String()
 		senderWinAmount    = winner.FromWinAmount
-		recipientAddress   = winner.ToAddress
+		recipientAddress   = winner.ToAddress.String()
 		recipientWinAmount = winner.ToWinAmount
 		logIndex           = winner.LogIndex
-		application        = winner.Application
+		application        = winner.Application.String()
 		rewardTier         = winner.RewardTier
 	)
 
@@ -207,7 +207,7 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			network_,
 			rewardType,
 			logIndex,
-			application.String(),
+			application,
 			rewardTier,
 		)
 

@@ -17,7 +17,7 @@ const (
 	NetworkSolana        BlockchainNetwork = `solana`
 	NetworkPolygonZk     BlockchainNetwork = `polygon_zk`
 	NetworkStylusTestnet BlockchainNetwork = `stylus_testnet`
-	NetworkSui BlockchainNetwork = `sui`
+	NetworkSui			 BlockchainNetwork = `sui`
 )
 
 // ParseEthereumNetwork takes a network name as a string
