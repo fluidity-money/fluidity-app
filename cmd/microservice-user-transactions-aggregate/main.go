@@ -52,6 +52,7 @@ func handleUserAction(userAction user_actions.UserAction) {
 
 func main() {
 	go queue.UserActionsEthereum(handleUserAction)
+	go queue.UserActionsSui(handleUserAction)
 
 	// Solana user actions are sent over the buffered queue
 	go queue.BufferedUserActionsSolana(func(buffered queue.BufferedUserAction) {

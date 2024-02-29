@@ -16,6 +16,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	lootboxes_queue "github.com/fluidity-money/fluidity-app/lib/queues/lootboxes"
 	winners_queue "github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/lootboxes"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
@@ -105,7 +106,7 @@ func main() {
 				transactionHash = winner.TransactionHash
 				tokenDetails    = winner.TokenDetails
 				rewardTier      = winner.RewardTier
-				application     = winner.Application
+				application_    = winner.Application
 				logIndex        = winner.LogIndex
 			)
 
@@ -119,18 +120,33 @@ func main() {
 				// do nothing
 
 			default:
-				log.Fatal(func(k *log.Log) {
+				log.App(func(k *log.Log) {
 					k.Format(
 						"Network %v isn't supported for transaction lootboxes!",
 						network_,
 					)
 				})
+
+				continue
 			}
 			winnerAddress := winner.SenderAddress
 
+			application, err := applications.ParseApplicationName(application_)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Format(
+						"Failed to parse application name %s!",
+						application_,
+					)
+
+					k.Payload = err
+				})
+			}
+
 			var (
-				winnerAddressString   = winnerAddress.String()
-				transactionHashString = transactionHash.String()
+				winnerAddressString   = winnerAddress
+				transactionHashString = transactionHash
 			)
 
 			transactionHashHex := ethCommon.HexToHash(transactionHashString)
@@ -235,7 +251,7 @@ func main() {
 				log_ := receipt.Logs[logIndexInReceipt]
 
 				applicationTransfer := worker.EthereumApplicationTransfer{
-					TransactionHash: transactionHash,
+					TransactionHash: ethereum.HashFromString(transactionHash),
 					Log:             log_,
 					Application:     application,
 				}
