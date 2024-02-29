@@ -22,7 +22,7 @@ const (
 	Context = "TIMESCALE/SPOOLER"
 
 	// TablePendingWinners to write pending winners for the
-	// ethereum spooler to use
+	// ethereum/sui spooler to use
 	TablePendingWinners = "ethereum_pending_winners"
 )
 

@@ -24,7 +24,6 @@ import (
 
 const (
 	RedisLastCheckpoint  = `sui.last-checkpoint`
-	RedisSentCheckpoints = `sui.sent-checkpoints`
 
 	// RedisBufferSize is the length of the buffer for previously seen blocks
 	RedisBufferSize = 100

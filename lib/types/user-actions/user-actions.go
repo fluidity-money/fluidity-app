@@ -237,6 +237,21 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 	}
 }
 
+func NewSwapSui(network_ network.BlockchainNetwork, senderAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
+	return UserAction{
+		Network:         network_,
+		TransactionHash: transactionHash,
+		Type:            UserActionSwap,
+		SwapIn:          swapIn,
+		SenderAddress:   senderAddress,
+		Amount:          amount,
+		AmountStr:       amount.String(),
+		TokenDetails:    token_details.New(tokenShortName, tokenDecimals),
+		Time:            time.Now(),
+		Application:     "none",
+	}
+}
+
 // NewSendEthereum of a Fluid Asset, from the sender to the recipient
 // with the transaction hash with the amount. The current time is set
 // within the function.
@@ -274,6 +289,21 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
 		Time:             time.Now(),
 		Application:      solanaApplication,
+	}
+}
+
+func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+	return UserAction{
+		Network:          network.NetworkSui,
+		Type:             "send",
+		TransactionHash:  transactionHash,
+		LogIndex:         txIndex,
+		SenderAddress:    senderAddress,
+		RecipientAddress: recipientAddress,
+		Amount:           amount,
+		AmountStr:        amount.String(),
+		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
+		Time:             time.Now(),
 	}
 }
 

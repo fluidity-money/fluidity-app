@@ -64,6 +64,18 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 	)
 }
 
+func NewSwapSui(network_ network.BlockchainNetwork, senderAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
+	return user_actions.NewSwapSui(
+		network_,
+		senderAddress,
+		transactionHash,
+		amount,
+		swapIn,
+		tokenShortName,
+		tokenDecimals,
+	)
+}
+
 func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt, application applications.Application) UserAction {
 	return user_actions.NewSendEthereum(
 		network_,
@@ -90,6 +102,19 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 	)
 }
 
+func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+	return user_actions.NewSendSui(
+		network_,
+		senderAddress,
+		recipientAddress,
+		transactionHash,
+		amount,
+		txIndex,
+		tokenShortName,
+		tokenDecimals,
+	)
+}
+
 func userActions(topic string, f func(UserAction)) {
 	queue.GetMessages(topic, func(message queue.Message) {
 		var userAction UserAction
@@ -106,6 +131,10 @@ func UserActionsEthereum(f func(UserAction)) {
 
 func UserActionsSolana(f func(UserAction)) {
 	userActions(TopicUserActionsSolana, f)
+}
+
+func UserActionsSui(f func(UserAction)) {
+	userActions(TopicUserActionsSui, f)
 }
 
 func UserActionsAll(f func(UserAction)) {
