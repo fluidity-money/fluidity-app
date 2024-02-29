@@ -7,18 +7,25 @@ package main
 import (
 	"context"
 	"math/big"
+	"time"
 
 	"github.com/block-vision/sui-go-sdk/models"
 	"github.com/block-vision/sui-go-sdk/sui"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	sui_queue "github.com/fluidity-money/fluidity-app/lib/queues/sui"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
+	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	sui_types "github.com/fluidity-money/fluidity-app/lib/types/sui"
+	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
 const (
-	EnvSuiHttpUrl = `FLU_SUI_HTTP_URL`
+	EnvSuiHttpUrl    = `FLU_SUI_HTTP_URL`
+	topicUserActions = user_actions.TopicUserActionsSui
 )
 
 func main() {
@@ -30,26 +37,21 @@ func main() {
 		httpClient = sui.NewSuiClient(suiHttpUrl)
 		// TODO source fluid token from env, including decimals
 		fluidToken = sui_types.SuiToken{
-			PackageId: "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe",
+			PackageId:      "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe",
+			TokenShortName: "USDC",
+			TokenDecimals:  9,
 		}
 	)
 
 	sui_queue.Checkpoints(func(checkpoint sui_queue.Checkpoint) {
 		// look up all digests
-		blocksResponse, err := httpClient.SuiMultiGetTransactionBlocks(context.Background(), models.SuiMultiGetTransactionBlocksRequest{
-			Digests: checkpoint.Transactions,
-			Options: models.SuiTransactionBlockOptions{
-				ShowInput:         true,
-				ShowEvents:        true,
-				ShowObjectChanges: true,
-			},
-		})
+		blocksResponse, err := getTransactionBlocks(httpClient, checkpoint.Transactions)
 
 		if err != nil {
 			log.Fatal(func(k *log.Log) {
 				k.Format(
 					"Failed to fetch transaction blocks for checkpoint %v",
-					checkpoint.SequenceNumber,
+					checkpoint.SequenceNumber.String(),
 				)
 				k.Payload = err
 			})
@@ -64,9 +66,11 @@ func main() {
 			)
 
 			// process events
-			// TODO do something with events
 			for _, event := range events {
+				transactionHash := event.Id.TxDigest
+
 				switch event.Type {
+				// TODO - ethereum doesn't assign a log index to swaps - do we need to on sui?
 				case fluidToken.Wrap():
 					wrapEvent, err := sui_types.ParseWrap(event.ParsedJson)
 					if err != nil {
@@ -76,8 +80,10 @@ func main() {
 						})
 					}
 
-					event := sui_types.SuiEvent{Wrap: wrapEvent}
-					queue.SendMessage(sui_queue.TopicEvents, event)
+					swap := userActionFromWrap(transactionHash, wrapEvent, fluidToken)
+
+					queue.SendMessage(user_actions.TopicUserActionsSui, swap)
+				// TODO - ethereum doesn't seem to assign a log index to swaps - do we need to on sui?
 				case fluidToken.Unwrap():
 					unwrapEvent, err := sui_types.ParseUnwrap(event.ParsedJson)
 					if err != nil {
@@ -87,8 +93,11 @@ func main() {
 						})
 					}
 
-					event := sui_types.SuiEvent{Unwrap: unwrapEvent}
-					queue.SendMessage(sui_queue.TopicEvents, event)
+					swap := userActionFromUnwrap(transactionHash, unwrapEvent, fluidToken)
+
+					queue.SendMessage(user_actions.TopicUserActionsSui, swap)
+				// TODO parse win events, get application from pending winners
+				// TODO use send tx log index
 				case fluidToken.DistributeYield():
 					distributeYieldEvent, err := sui_types.ParseDistributeYield(event.ParsedJson)
 					if err != nil {
@@ -98,6 +107,8 @@ func main() {
 						})
 					}
 
+					w := winnerFromDistributeYieldEvent(transactionHash, distributeYieldEvent, fluidToken)
+					queue.SendMessage(winners.TopicWinnersSui, w)
 					event := sui_types.SuiEvent{DistributeYield: distributeYieldEvent}
 					queue.SendMessage(sui_queue.TopicEvents, event)
 				}
@@ -105,7 +116,8 @@ func main() {
 
 			// process transactions in PTB
 			// wrap/unwrap/yield will not be double processed as their internal calls aren't emitted like a regular transaction
-			for _, transaction := range transactions {
+			// TODO move all of this into function, move all functions in this file into separate files
+			for txIndex, transaction := range transactions {
 				// only interested in TransferObjects
 				if transaction.TransferObjects == nil {
 					continue
@@ -127,6 +139,15 @@ func main() {
 
 				// parse either a Result or NestedResult from TransferObjects
 				maybeNested_ := mustArrayFromInterface(transferResults)[0]
+
+				// if the first value is GasCoin, this transfer is using the Sui token
+				if f, ok := maybeNested_.(string); ok && f == "GasCoin" {
+					log.Debug(func(k *log.Log) {
+						k.Message = "First TransferObjects entry was GasCoin - skipping!"
+					})
+					continue
+				}
+
 				maybeNested := mustMapFromInterface(maybeNested_)
 
 				var i, j int
@@ -199,7 +220,7 @@ func main() {
 						continue
 					}
 
-					// found the correct object, sanity check that it's right
+					// found the corresponding object, check that it's a fluid transfer
 					if objectChange.Type == "mutated" && objectChange.ObjectType == fluidToken.ObjectType() {
 						senderAddress = objectChange.Owner.AddressOwner
 						break
@@ -208,21 +229,29 @@ func main() {
 
 				// correct object didn't exist
 				if senderAddress == "" {
-					log.Fatal(func(k *log.Log) {
-						k.Message = "sender address not set - object change not found!"
+					log.Debug(func(k *log.Log) {
+						k.Format(
+							"TransferObjects in %v at %v was not a fluid transfer - skipping!",
+							response.Digest,
+							txIndex,
+						)
 					})
+					continue
 				}
 
 				amountBig, _ := new(big.Int).SetString(amountTransferred, 10)
+				amountInt := misc.NewBigIntFromInt(*amountBig)
+				txIndexInt := misc.BigIntFromInt64(int64(txIndex))
 
-				transfer := sui_types.Transfer{
-					Timestamp:        checkpoint.Timestamp,
-					SenderAddress:    senderAddress,
-					RecipientAddress: recipientAddress,
-					Amount:           amountBig,
+				send := user_actions.NewSendSui(network.NetworkSui, senderAddress, recipientAddress, response.Digest, amountInt, txIndexInt, fluidToken.TokenShortName, fluidToken.TokenDecimals)
+
+				decoratedTransfer := sui_queue.DecoratedTransfer{
+					UserAction: send,
+					Data:       response.Transaction.Data,
 				}
 
-				queue.SendMessage(sui_queue.TopicTransfers, transfer)
+				// user actions are processed by the application server to add application info
+				queue.SendMessage(sui_queue.TopicDecoratedTransfers, decoratedTransfer)
 			}
 		}
 	})
@@ -287,4 +316,100 @@ func mustStringFromInterface(s interface{}) string {
 	}
 
 	return s_
+}
+
+func userActionFromWrap(transactionHash string, wrap sui_types.WrapEvent, token sui_types.SuiToken) user_actions.UserAction {
+	var (
+		senderAddress  = wrap.UserAddress
+		amount_        = wrap.FCoinAmount
+		tokenShortName = token.TokenShortName
+		tokenDecimals  = token.TokenDecimals
+		amount         = misc.NewBigIntFromInt(*amount_)
+	)
+
+	return user_actions.NewSwapSui(network.NetworkSui, senderAddress, transactionHash, amount, true, tokenShortName, tokenDecimals)
+}
+
+func userActionFromUnwrap(transactionHash string, unwrap sui_types.UnwrapEvent, token sui_types.SuiToken) user_actions.UserAction {
+	var (
+		senderAddress  = unwrap.UserAddress
+		amount_        = unwrap.FCoinAmount
+		tokenShortName = token.TokenShortName
+		tokenDecimals  = token.TokenDecimals
+		amount         = misc.NewBigIntFromInt(*amount_)
+	)
+
+	return user_actions.NewSwapSui(network.NetworkSui, senderAddress, transactionHash, amount, false, tokenShortName, tokenDecimals)
+}
+
+// DistributeYieldEvent contains a single winner payout
+func winnerFromDistributeYieldEvent(transactionHash string, event sui_types.DistributeYieldEvent, token sui_types.SuiToken) winners.Winner {
+	currentTime := time.Now()
+	tokenDetails := token_details.New(token.TokenShortName, token.TokenDecimals)
+
+	winningAmount := misc.BigIntFromUint64(event.AmountDistributed)
+
+	// TODO will need to use pending winner info to derive many of these
+	winner := winners.Winner{
+		Network:         network.NetworkSui,
+		TransactionHash: transactionHash,
+		// TODO
+		SendTransactionHash: "",
+		WinnerAddress:       event.Recipient,
+		WinningAmount:       winningAmount,
+		AwardedTime:         currentTime,
+		// TODO
+		RewardType: "send",
+		// TODO
+		Application: "none",
+		// TODO
+		BatchFirstBlock: misc.BigIntFromInt64(0),
+		// TODO
+		BatchLastBlock: misc.BigIntFromInt64(0),
+		// TODO
+		RewardTier: 1,
+
+		TokenDetails: tokenDetails,
+	}
+
+	return winner
+}
+
+// getTransactionBlocks to get all blocks from a list of digests, batching requests if there are more than the RPC's limit
+func getTransactionBlocks(client sui.ISuiAPI, digests []string) (models.SuiMultiGetTransactionBlocksResponse, error) {
+	const BatchLimit = 50
+
+	var (
+		transactionBlocks models.SuiMultiGetTransactionBlocksResponse
+
+		options = models.SuiTransactionBlockOptions{
+			ShowInput:         true,
+			ShowEvents:        true,
+			ShowObjectChanges: true,
+		}
+	)
+
+	if len(digests) <= BatchLimit {
+		return client.SuiMultiGetTransactionBlocks(context.Background(), models.SuiMultiGetTransactionBlocksRequest{
+			Digests: digests,
+			Options: options,
+		})
+	}
+
+	for len(digests) > BatchLimit {
+		r, err := client.SuiMultiGetTransactionBlocks(context.Background(), models.SuiMultiGetTransactionBlocksRequest{
+			Digests: digests[:BatchLimit],
+			Options: options,
+		})
+
+		if err != nil {
+			return transactionBlocks, err
+		}
+
+		transactionBlocks = append(transactionBlocks, r...)
+
+		digests = digests[BatchLimit:]
+	}
+
+	return transactionBlocks, nil
 }

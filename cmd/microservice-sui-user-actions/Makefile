@@ -1,4 +1,4 @@
 
-REPO := microservice-user-actions-sui
+REPO := microservice-sui-user-actions
 
 include ../../golang.mk
