@@ -79,7 +79,7 @@ func main() {
 
 		// look up all pending winners up to the checkpoint that has already been tracked as a Winner
 		// (every win in the same checkpoint will be rewarded at the same time)
-		potentialWinners := spooler.GetPendingWinners(network.NetworkSui, lastWinnerCheckpoint)
+		potentialWinners := spooler.GetPendingSenders(network.NetworkSui, lastWinnerCheckpoint)
 		// map containing all new enough pending (sender) winners from old to new, ordered on the fields contained in the event (winner addr, win amount)
 		potentialWinnersMap := make(map[string][]spooler.PendingWinner)
 		for _, pendingWinner := range potentialWinners {
@@ -137,7 +137,7 @@ func main() {
 					}
 
 					// on Ethereum, the contract emits start/endblock as part of the reward event signature
-					// the Sui contract does not, so we have to work out which txs were actually rewarded by 
+					// the Sui contract does not, so we have to work out which txs were actually rewarded by
 					// finding pending winners with the same amount and address as emitted, sorted by oldest asumming all actions are sequential
 
 					var (
