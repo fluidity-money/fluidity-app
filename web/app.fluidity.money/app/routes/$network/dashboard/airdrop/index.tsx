@@ -15,6 +15,7 @@ import {
   ProgressBar,
   GeneralButton,
   ArrowRight,
+  ArrowTopRight,
   Display,
   ProviderIcon,
   Provider,
@@ -70,6 +71,7 @@ const AIRDROP_MODALS = [
   "referrals",
   "stake",
   "staking-stats",
+  "claim",
 ];
 
 type AirdropModalName = (typeof AIRDROP_MODALS)[number];
@@ -184,6 +186,8 @@ const Airdrop = () => {
 
     const [showTGEDetails, setShowTGEDetails] = useState(true);
 
+    const [checkYourEligibilityButtonEnabled, setCheckYourEligibilityButtonEnabled] = useState(false);
+
     useEffect(() => {
       (async () => {
         if (address) {
@@ -195,6 +199,7 @@ const Airdrop = () => {
           const { amount, error } = resp;
           if (error) throw new Error(`Airdrop request error: ${error}`);
           setFLYAmountOwed(amount);
+          setCheckYourEligibilityButtonEnabled(true);
         }
       })();
     }, [
@@ -202,6 +207,15 @@ const Airdrop = () => {
       useFLYOwedForAddress,
       setFLYAmountOwed
     ]);
+
+    const handleCheckEligibility = () => {
+      // grey out the button here
+      setCheckYourEligibilityButtonEnabled(false);
+
+      // check if the request to get information on the airdrop is
+      // done, if it is, then show the tge details
+      setShowTGEDetails(false);
+    };
 
     const ShowSolanaPrompt = () => {
     return (
@@ -212,15 +226,23 @@ const Airdrop = () => {
           </Text>
           <Heading>The Fluidity $FLY-Wheel Begins</Heading>
         </div>
-        <div className="recap-fly-count-thank-you">
+        <div className="recap-fly-count-thank-you-solana">
           <Text>Thank you for riding with us this Wave. It has come to an end, check your eligibility for rewards from your bottles, and how you surfed.</Text>
         </div>
         <div className="recap-fly-count-buttons-spread-container">
           <div className="recap-fly-count-buttons-spread">
-            <GeneralButton handleClick={() => {}}>
+            <GeneralButton
+              handleClick={handleCheckEligibility}
+              disabled={!checkYourEligibilityButtonEnabled}
+            >
               Check your eligibility
             </GeneralButton>
-            <GeneralButton>See criteria</GeneralButton>
+            <GeneralButton
+              handleClick={ () => window?.open("", "_blank") }
+              icon={<ArrowTopRight />}
+            >
+              See criteria
+            </GeneralButton>
           </div>
         </div>
       </div>
@@ -236,17 +258,27 @@ const Airdrop = () => {
             </Text>
             <Heading>You are not eligible</Heading>
           </div>
-          <div className="recap-fly-count-thank-you">
+          <div className="recap-fly-count-thank-you-solana">
             <Text>Keep transferring with Fluid Assets and participating in our upcoming Airdrops, to earn more rewards and multipliers! The next one will be even bigger!</Text>
           </div>
           <div className="recap-fly-count-buttons-spread-container">
             <div className="recap-fly-count-buttons-spread">
-              <GeneralButton
-                handleClick={() => {}}
+              <a
+                href=""
+                rel="noopener noreferrer"
+                target="_blank"
               >
-                Check another wallet
-              </GeneralButton>
-              <GeneralButton>Learn more</GeneralButton>
+                <GeneralButton
+                  type="primary"
+                  icon={<ArrowTopRight />}
+                  layout="after"
+                  handleClick={ () => {} }
+                >
+                  <Text size="sm" prominent code style={{ color: "inherit" }}>
+                    Learn more
+                  </Text>
+                </GeneralButton>
+              </a>
             </div>
           </div>
         </div>
@@ -261,15 +293,7 @@ const Airdrop = () => {
               Congratulations! You are eligible to claim
             </Text>
             <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
-          </div>
-          <div className="recap-fly-count-buttons-spread">
-            <GeneralButton disabled>Claim your FLY</GeneralButton>
-            <GeneralButton disabled>Stake your $FLY</GeneralButton>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container">
-            <GeneralButton type="primary">
-              You will be able to claim your rewards at Fluidity TGE.
-            </GeneralButton>
+            <Text>Please wait while we release delegation features.</Text>
           </div>
           <div className="recap-fly-count-buttons-spread-container">
             <LinkButton handleClick={() => {}} color="white" size="large" type="external">
@@ -631,7 +655,7 @@ const Airdrop = () => {
           size="small"
           onClick={() => setCurrentModal("recap")}
           groupId="airdrop"
-          isSelected={currentModal === "recap"}
+          isSelected={currentModal === "recap" || currentModal === "claim"}
         >
           TGE Claim
         </TabButton>
@@ -804,7 +828,7 @@ const Airdrop = () => {
               />
             </>
           )}
-          {currentModal === "recap" && (
+          {(currentModal === "recap" || currentModal === "claim") && (
             <RecapModal
               totalVolume={2000000000}
               bottlesLooted={47000000}
@@ -1002,7 +1026,7 @@ const Airdrop = () => {
 
       {/* Page Content */}
       <Header />
-      {currentModal === "recap" ? (
+      {(currentModal === "recap" || currentModal === "claim") ? (
         <RecapModal
           totalVolume={2000000000}
           bottlesLooted={47000000}
