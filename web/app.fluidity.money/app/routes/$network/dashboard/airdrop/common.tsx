@@ -2425,20 +2425,20 @@ const RecapModal = ({
         )}
 
         {/*TGE details display*/}
-        <div id="claim">
-          <motion.div
-            className={"recap-fly-count-container"}
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.1, delay: 0.1 }}
-            viewport={{
-              amount: "all",
-              once: true,
-            }}
-          >
+        <motion.div
+          className={"recap-fly-count-container"}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.1, delay: 0.1 }}
+          viewport={{
+            amount: "all",
+            once: true,
+          }}
+        >
+          <div id="claim">
             {showPageContent && <TGEDisplay />}
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
 
         <Modal id="connect-wallet" visible={walletModalVisibility}>
           <div className="cover">
