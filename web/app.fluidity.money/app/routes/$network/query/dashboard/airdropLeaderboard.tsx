@@ -38,6 +38,11 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!network) throw new Error("Invalid Request");
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
 
+  return {
+    leaderboard: [],
+    loaded: true
+  };
+
   try {
     const [useAllQuery, useUserQuery] = (() => {
       switch (true) {
