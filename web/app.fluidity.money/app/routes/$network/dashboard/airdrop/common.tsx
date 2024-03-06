@@ -66,6 +66,8 @@ const MAX_STAKING_DAYS = 365;
 // Minimum amount of Fluid USDC deposit
 const MINIMUM_FLUID_LIQUIDITY_USD = 10;
 
+const AIRDROP_BLOG_POST = "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
   showBottleNumbers?: boolean;
@@ -2044,7 +2046,7 @@ const RecapModal = ({
               type="primary"
               icon={<ArrowTopRight />}
               layout="after"
-              handleClick={() => window?.open("", "_blank")}
+              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
             >
               <Text size="sm" prominent code style={{ color: "inherit" }}>
                 Learn more
@@ -2081,7 +2083,7 @@ const RecapModal = ({
             color="white"
             size="large"
             type="external"
-            handleClick={() => window?.open("", "_blank")}
+            handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
           >
             Click here to learn more
           </LinkButton>
@@ -2123,7 +2125,7 @@ const RecapModal = ({
               Check your eligibility
             </GeneralButton>
             <GeneralButton
-              handleClick={() => window?.open("", "_blank")}
+              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
               icon={<ArrowTopRight />}
             >
               See criteria
@@ -2171,7 +2173,7 @@ const RecapModal = ({
                 <GeneralButton
                   type="transparent"
                   layout="after"
-                  handleClick={() => window?.open("", "_blank")}
+                  handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
                 >
                   <Text size="sm" prominent code style={{ color: "inherit" }}>
                     Convert your bottles to $FLY

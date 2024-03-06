@@ -64,6 +64,8 @@ import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKing
 
 const EPOCH_CURRENT_IDENTIFIER = "epoch_2";
 
+const AIRDROP_BLOG_POST = "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+
 const AIRDROP_MODALS = [
   "recap",
   "tutorial",
@@ -241,7 +243,7 @@ const Airdrop = () => {
                 Check your eligibility
               </GeneralButton>
               <GeneralButton
-                handleClick={() => window?.open("", "_blank")}
+                handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
                 icon={<ArrowTopRight />}
               >
                 See criteria
@@ -274,7 +276,7 @@ const Airdrop = () => {
                 type="primary"
                 icon={<ArrowTopRight />}
                 layout="after"
-                handleClick={() => window?.open("", "_blank")}
+                handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
               >
                 <Text size="sm" prominent code style={{ color: "inherit" }}>
                   Learn more
@@ -298,7 +300,7 @@ const Airdrop = () => {
           </div>
           <div className="recap-fly-count-buttons-spread-container">
             <LinkButton
-              handleClick={() => window?.open("", "_blank")}
+              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
               color="white"
               size="large"
               type="external"
