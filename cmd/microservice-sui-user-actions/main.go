@@ -6,16 +6,22 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"math/big"
+	"strconv"
 	"time"
 
 	"github.com/block-vision/sui-go-sdk/models"
 	"github.com/block-vision/sui-go-sdk/sui"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	sui_queue "github.com/fluidity-money/fluidity-app/lib/queues/sui"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
-	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
+
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/winners"
+	winnerTypes "github.com/fluidity-money/fluidity-app/lib/queues/winners"
+	"github.com/fluidity-money/fluidity-app/lib/state"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	sui_types "github.com/fluidity-money/fluidity-app/lib/types/sui"
@@ -24,8 +30,9 @@ import (
 )
 
 const (
-	EnvSuiHttpUrl    = `FLU_SUI_HTTP_URL`
-	topicUserActions = user_actions.TopicUserActionsSui
+	EnvSuiHttpUrl             = `FLU_SUI_HTTP_URL`
+	RedisLastWinnerCheckpoint = `sui.last-winner-checkpoint`
+	topicUserActions          = user_actions.TopicUserActionsSui
 )
 
 func main() {
@@ -43,6 +50,17 @@ func main() {
 		}
 	)
 
+	// lastWinnerCheckpoint is the most recent checkpoint that has had winning transfers tracked by this service and sent to the winners queue
+	lastWinnerCheckpoint := GetLastWinningCheckpoint(RedisLastWinnerCheckpoint)
+	// nothing found, look up in DB
+	if lastWinnerCheckpoint.Cmp(big.NewInt(0)) == 0 {
+		latestWinners := winners.GetLatestWinners(network.NetworkSui, 1)
+		// if there are any winners, find its checkpoint
+		if len(latestWinners) != 0 {
+			lastWinnerCheckpoint = latestWinners[0].BatchFirstBlock
+		}
+	}
+
 	sui_queue.Checkpoints(func(checkpoint sui_queue.Checkpoint) {
 		// look up all digests
 		blocksResponse, err := getTransactionBlocks(httpClient, checkpoint.Transactions)
@@ -57,12 +75,25 @@ func main() {
 			})
 		}
 
-		for _, response := range blocksResponse {
+		var winners []winners.Winner
+
+		// look up all pending winners up to the checkpoint that has already been tracked as a Winner
+		// (every win in the same checkpoint will be rewarded at the same time)
+		potentialWinners := spooler.GetPendingWinners(network.NetworkSui, lastWinnerCheckpoint)
+		// map containing all new enough pending (sender) winners from old to new, ordered on the fields contained in the event (winner addr, win amount)
+		potentialWinnersMap := make(map[string][]spooler.PendingWinner)
+		for _, pendingWinner := range potentialWinners {
+			key := pendingWinner.SenderAddress + pendingWinner.NativeWinAmount.String()
+			potentialWinnersMap[key] = append(potentialWinnersMap[key], pendingWinner)
+		}
+
+		var decoratedTransfers []sui_queue.DecoratedTransfer
+		for _, transactionBlock := range blocksResponse {
 			var (
-				objectChanges = response.ObjectChanges
-				events        = response.Events
-				transactions  = response.Transaction.Data.Transaction.Transactions
-				inputs        = response.Transaction.Data.Transaction.Inputs
+				objectChanges = transactionBlock.ObjectChanges
+				events        = transactionBlock.Events
+				transactions  = transactionBlock.Transaction.Data.Transaction.Transactions
+				inputs        = transactionBlock.Transaction.Data.Transaction.Inputs
 			)
 
 			// process events
@@ -96,8 +127,6 @@ func main() {
 					swap := userActionFromUnwrap(transactionHash, unwrapEvent, fluidToken)
 
 					queue.SendMessage(user_actions.TopicUserActionsSui, swap)
-				// TODO parse win events, get application from pending winners
-				// TODO use send tx log index
 				case fluidToken.DistributeYield():
 					distributeYieldEvent, err := sui_types.ParseDistributeYield(event.ParsedJson)
 					if err != nil {
@@ -107,10 +136,41 @@ func main() {
 						})
 					}
 
-					w := winnerFromDistributeYieldEvent(transactionHash, distributeYieldEvent, fluidToken)
-					queue.SendMessage(winners.TopicWinnersSui, w)
-					event := sui_types.SuiEvent{DistributeYield: distributeYieldEvent}
-					queue.SendMessage(sui_queue.TopicEvents, event)
+					// on Ethereum, the contract emits start/endblock as part of the reward event signature
+					// the Sui contract does not, so we have to work out which txs were actually rewarded by 
+					// finding pending winners with the same amount and address as emitted, sorted by oldest asumming all actions are sequential
+
+					var (
+						senderAddress     = distributeYieldEvent.Recipient
+						amountDistributed = distributeYieldEvent.AmountDistributed
+					)
+
+					key := senderAddress + strconv.Itoa(int(amountDistributed))
+					// a list of pending senders with the same win amount and winner, that aren't already winners
+					potentialPendingWinners := potentialWinnersMap[key]
+					if len(potentialPendingWinners) == 0 {
+						log.Fatal(func(k *log.Log) {
+							k.Format(
+								"No pending winners found after checkpoint %v for winner %v and amount %v!",
+								transactionBlock.Checkpoint,
+								senderAddress,
+								amountDistributed,
+							)
+						})
+					}
+
+					// take the oldest winner and remove it
+					sender := potentialPendingWinners[0]
+					potentialPendingWinners = potentialPendingWinners[1:]
+
+					// find the recipient
+					recipient := spooler.GetPendingRecipientBySend(sender.Network, sender.TransactionHash, *sender.LogIndex)
+
+					// create events to be written to the queue
+					senderWin := winnerFromDistributeYieldEvent(transactionHash, distributeYieldEvent, sender, fluidToken)
+					recipientWin := winnerFromDistributeYieldEvent(transactionHash, distributeYieldEvent, recipient, fluidToken)
+
+					winners = append(winners, senderWin, recipientWin)
 				}
 			}
 
@@ -158,7 +218,7 @@ func main() {
 					i = mustIntFromFloat64Interface(results[0])
 					j = mustIntFromFloat64Interface(results[1])
 				} else if result := maybeNested["Result"]; result != nil {
-					// Result(i) = NestedResult(i, 0)
+					// Result(i) == NestedResult(i, 0)
 					i = mustIntFromFloat64Interface(result)
 					j = 0
 				}
@@ -232,7 +292,7 @@ func main() {
 					log.Debug(func(k *log.Log) {
 						k.Format(
 							"TransferObjects in %v at %v was not a fluid transfer - skipping!",
-							response.Digest,
+							transactionBlock.Digest,
 							txIndex,
 						)
 					})
@@ -243,20 +303,30 @@ func main() {
 				amountInt := misc.NewBigIntFromInt(*amountBig)
 				txIndexInt := misc.BigIntFromInt64(int64(txIndex))
 
-				send := user_actions.NewSendSui(network.NetworkSui, senderAddress, recipientAddress, response.Digest, amountInt, txIndexInt, fluidToken.TokenShortName, fluidToken.TokenDecimals)
+				send := user_actions.NewSendSui(network.NetworkSui, senderAddress, recipientAddress, transactionBlock.Digest, amountInt, txIndexInt, fluidToken.TokenShortName, fluidToken.TokenDecimals)
 
 				decoratedTransfer := sui_queue.DecoratedTransfer{
 					UserAction: send,
-					Data:       response.Transaction.Data,
+					Data:       transactionBlock.Transaction.Data,
 				}
 
-				// user actions are processed by the application server to add application info
-				queue.SendMessage(sui_queue.TopicDecoratedTransfers, decoratedTransfer)
+				decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
 			}
+
+		}
+		// user actions are processed by the application server to add application info
+		queue.SendMessage(sui_queue.TopicDecoratedTransfers, decoratedTransfers)
+
+		// winners are directly processed into timescale
+		for _, winner := range winners {
+			queue.SendMessage(winnerTypes.TopicWinnersSui, winner)
+			// keep track of the last winning checkpoint
+			WriteLastWinningCheckpoint(RedisLastWinnerCheckpoint, checkpoint.SequenceNumber)
 		}
 	})
 }
 
+// TODO move all util functions
 func mustMapFromInterface(m interface{}) map[string]interface{} {
 	m_, ok := m.(map[string]interface{})
 
@@ -343,31 +413,31 @@ func userActionFromUnwrap(transactionHash string, unwrap sui_types.UnwrapEvent, 
 }
 
 // DistributeYieldEvent contains a single winner payout
-func winnerFromDistributeYieldEvent(transactionHash string, event sui_types.DistributeYieldEvent, token sui_types.SuiToken) winners.Winner {
+func winnerFromDistributeYieldEvent(transactionHash string, event sui_types.DistributeYieldEvent, pendingWinner winnerTypes.PendingWinner, token sui_types.SuiToken) winners.Winner {
+	var (
+		sendTransactionHash = pendingWinner.TransactionHash
+		rewardType          = pendingWinner.RewardType
+		application         = pendingWinner.Application
+		rewardTier          = pendingWinner.RewardTier
+		checkpoint          = pendingWinner.BlockNumber
+	)
 	currentTime := time.Now()
 	tokenDetails := token_details.New(token.TokenShortName, token.TokenDecimals)
 
 	winningAmount := misc.BigIntFromUint64(event.AmountDistributed)
 
-	// TODO will need to use pending winner info to derive many of these
 	winner := winners.Winner{
-		Network:         network.NetworkSui,
-		TransactionHash: transactionHash,
-		// TODO
-		SendTransactionHash: "",
+		Network:             network.NetworkSui,
+		TransactionHash:     transactionHash,
+		SendTransactionHash: sendTransactionHash,
 		WinnerAddress:       event.Recipient,
 		WinningAmount:       winningAmount,
 		AwardedTime:         currentTime,
-		// TODO
-		RewardType: "send",
-		// TODO
-		Application: "none",
-		// TODO
-		BatchFirstBlock: misc.BigIntFromInt64(0),
-		// TODO
-		BatchLastBlock: misc.BigIntFromInt64(0),
-		// TODO
-		RewardTier: 1,
+		RewardType:          rewardType,
+		Application:         application,
+		RewardTier:          rewardTier,
+		BatchFirstBlock:     *checkpoint,
+		BatchLastBlock:      *checkpoint,
 
 		TokenDetails: tokenDetails,
 	}
@@ -412,4 +482,30 @@ func getTransactionBlocks(client sui.ISuiAPI, digests []string) (models.SuiMulti
 	}
 
 	return transactionBlocks, nil
+}
+
+func GetLastWinningCheckpoint(key string) misc.BigInt {
+	bytes := state.Get(key)
+
+	if len(bytes) == 0 {
+		// not found
+		return misc.BigIntFromInt64(0)
+	}
+
+	var res misc.BigInt
+
+	err := json.Unmarshal(bytes, &res)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to get the last seen winning checkpoint from redis!"
+			k.Payload = err
+		})
+	}
+
+	return res
+}
+
+func WriteLastWinningCheckpoint(key string, checkpoint misc.BigInt) {
+	state.Set(key, checkpoint)
 }
