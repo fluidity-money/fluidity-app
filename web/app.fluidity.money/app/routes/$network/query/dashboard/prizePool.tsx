@@ -18,11 +18,6 @@ export async function loader() {
             abi: TotalRewardPoolAbi,
             getPrizePool: getTotalRewardPool,
           },
-          {
-            network: "polygon_zk",
-            abi: RegistryAbi,
-            getPrizePool: getTotalRewardPool,
-          },
         ].map(({ network, abi, getPrizePool }) => {
           const infuraRpc = config.drivers[network][mainnetId].rpc.http;
           const provider = new JsonRpcProvider(infuraRpc);

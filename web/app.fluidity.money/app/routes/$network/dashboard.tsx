@@ -204,10 +204,6 @@ const CHAIN_NAME_MAP: Record<
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
-  polygon_zk: {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
-  },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
