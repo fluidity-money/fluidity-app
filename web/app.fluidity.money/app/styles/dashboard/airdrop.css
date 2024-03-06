@@ -755,7 +755,7 @@
   text-align: center;
 }
 .recap-container .recap-hero .recap-hero-text {
-  z-index: 1;
+  z-index: -1;
   box-sizing: border-box;
   position: absolute;
   top: 0;
@@ -991,6 +991,55 @@
 .airdrop-arb-multipliers-container > * {
   margin-left: auto;
   margin-right: auto;
+}
+
+.recap-fly-count-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.recap-fly-count-child {
+  display: block;
+}
+
+.recap-fly-count-buttons-spread {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.recap-fly-count-eligible-buttons {
+  padding-bottom: 20px;
+}
+
+.recap-fly-count-buttons-spread > button:nth-child(1) {
+  margin-right: 10px;
+}
+
+.recap-fly-count-buttons-spread > button:nth-child(2) {
+  margin-left: 10px;
+}
+
+.recap-fly-count-buttons-spread-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.recap-fly-count-thank-you {
+  text-align: center;
+  max-width: 700px;
+  padding-bottom: 40px;
+}
+
+.recap-fly-count-thank-you-solana {
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+.recap-fly-count-header {
+  text-align: center;
 }
 
 /*# sourceMappingURL=airdrop.css.map */

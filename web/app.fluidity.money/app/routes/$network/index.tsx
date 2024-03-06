@@ -40,10 +40,6 @@ const CHAIN_NAME_MAP: Record<
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
-  polygon_zk: {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
-  },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
@@ -104,14 +100,13 @@ const NetworkPage = () => {
   const mobileBreakpoint = 500;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .reduce(
-      (prev, [key, value]) => ({
-        ...prev,
-        [key]: value,
-      }),
-      {} as typeof CHAIN_NAME_MAP
-    );
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP).reduce(
+    (prev, [key, value]) => ({
+      ...prev,
+      [key]: value,
+    }),
+    {} as typeof CHAIN_NAME_MAP
+  );
 
   useEffect(() => {
     // stop modal pop-up if connected

@@ -462,9 +462,9 @@ export default function Rewards() {
 
     const shouldMultiplyBottles = application != "none";
 
-      let adjustedLootboxCount = lootboxCount;
-      if (shouldMultiplyBottles)
-        adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+    let adjustedLootboxCount = lootboxCount;
+    if (shouldMultiplyBottles)
+      adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
 
     return {
       RowElement: ({ heading }: { heading: string }) => {

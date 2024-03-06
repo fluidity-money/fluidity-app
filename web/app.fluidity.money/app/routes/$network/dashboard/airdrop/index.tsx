@@ -15,6 +15,7 @@ import {
   ProgressBar,
   GeneralButton,
   ArrowRight,
+  ArrowTopRight,
   Display,
   ProviderIcon,
   Provider,
@@ -23,6 +24,7 @@ import {
   TabButton,
   BloomEffect,
   toSignificantDecimals,
+  numberToCommaSeparated,
   useViewport,
   numberToMonetaryString,
   toDecimalPlaces,
@@ -50,6 +52,7 @@ import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
 import { ReferralCountLoaderData } from "../../query/referrals";
 import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
+import { useFLYOwedForAddress } from "~/queries";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -68,6 +71,7 @@ const AIRDROP_MODALS = [
   "referrals",
   "stake",
   "staking-stats",
+  "claim",
 ];
 
 type AirdropModalName = (typeof AIRDROP_MODALS)[number];
@@ -154,26 +158,181 @@ const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
 };
 
 const GLOBAL_AIRDROP_BOTTLE_TIERS = {
-  [Rarity.Common]: 327394,
-  [Rarity.Uncommon]: 83233,
-  [Rarity.Rare]: 11010,
-  [Rarity.UltraRare]: 812,
-  [Rarity.Legendary]: 5,
+  [Rarity.Common]: 39000000,
+  [Rarity.Uncommon]: 7200000,
+  [Rarity.Rare]: 500000,
+  [Rarity.UltraRare]: 6400,
+  [Rarity.Legendary]: 0,
 };
 
 const Airdrop = () => {
   const { tokens: defaultTokens, network } = useLoaderData<LoaderData>();
 
+  const {
+    address,
+    balance,
+    stakeTokens,
+    testStakeTokens,
+    getStakingRatios,
+    redeemableTokens: getRedeemableTokens,
+    getStakingDeposits,
+    redeemTokens,
+  } = useContext(FluidityFacadeContext);
+
   if (network !== "arbitrum") {
+    // assuming this is solana
+
+    const [flyAmountOwed, setFLYAmountOwed] = useState(0);
+
+    const [showTGEDetails, setShowTGEDetails] = useState(true);
+
+    const [
+      checkYourEligibilityButtonEnabled,
+      setCheckYourEligibilityButtonEnabled,
+    ] = useState(false);
+
+    useEffect(() => {
+      (async () => {
+        if (address) {
+          const resp = await useFLYOwedForAddress(address);
+          if (!resp) {
+            console.warn(`Invalid response for airdrop request: ${resp}`);
+            return;
+          }
+          const { amount, error } = resp;
+          if (error) throw new Error(`Airdrop request error: ${error}`);
+          setFLYAmountOwed(amount);
+          setCheckYourEligibilityButtonEnabled(true);
+        }
+      })();
+    }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
+
+    const handleCheckEligibility = () => {
+      // grey out the button here
+      setCheckYourEligibilityButtonEnabled(false);
+
+      // check if the request to get information on the airdrop is
+      // done, if it is, then show the tge details
+      setShowTGEDetails(false);
+    };
+
+    const ShowSolanaPrompt = () => {
+      return (
+        <div className="recap-fly-count-block">
+          <div className="recap-fly-count-header">
+            <Text size="md" code={true} as="p">
+              FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
+            </Text>
+            <Heading>The Fluidity $FLY-Wheel Begins</Heading>
+          </div>
+          <div className="recap-fly-count-thank-you-solana">
+            <Text>
+              Thank you for riding with us this Wave. It has come to an end,
+              check your eligibility for rewards from your bottles, and how you
+              surfed.
+            </Text>
+          </div>
+          <div className="recap-fly-count-buttons-spread-container">
+            <div className="recap-fly-count-buttons-spread">
+              <GeneralButton
+                handleClick={handleCheckEligibility}
+                disabled={!checkYourEligibilityButtonEnabled}
+              >
+                Check your eligibility
+              </GeneralButton>
+              <GeneralButton
+                handleClick={() => window?.open("", "_blank")}
+                icon={<ArrowTopRight />}
+              >
+                See criteria
+              </GeneralButton>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const YoureNotEligible = () => {
+      return (
+        <div className="recap-fly-count-block">
+          <div className="recap-fly-count-header">
+            <Text size="md" code={true} as="p">
+              FLUIDITY AIRDROP WAVE 1 & 2
+            </Text>
+            <Heading>You are not eligible</Heading>
+          </div>
+          <div className="recap-fly-count-thank-you-solana">
+            <Text>
+              Keep transferring with Fluid Assets and participating in our
+              upcoming Airdrops, to earn more rewards and multipliers! The next
+              one will be even bigger!
+            </Text>
+          </div>
+          <div className="recap-fly-count-buttons-spread-container">
+            <div className="recap-fly-count-buttons-spread">
+              <GeneralButton
+                type="primary"
+                icon={<ArrowTopRight />}
+                layout="after"
+                handleClick={() => window?.open("", "_blank")}
+              >
+                <Text size="sm" prominent code style={{ color: "inherit" }}>
+                  Learn more
+                </Text>
+              </GeneralButton>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const YouAreEligible = () => {
+      return (
+        <div className="recap-fly-count-block">
+          <div className="recap-fly-count-header">
+            <Text size="md" code={true}>
+              Congratulations! You are eligible to claim
+            </Text>
+            <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
+            <Text>Please wait while we release delegation features.</Text>
+          </div>
+          <div className="recap-fly-count-buttons-spread-container">
+            <LinkButton
+              handleClick={() => window?.open("", "_blank")}
+              color="white"
+              size="large"
+              type="external"
+            >
+              Click here to learn more
+            </LinkButton>
+          </div>
+        </div>
+      );
+    };
+
+    const TGEDisplay = () => {
+      return (
+        <div className="recap-fly-count-child">
+          {(() => {
+            switch (true) {
+              case showTGEDetails:
+                return <ShowSolanaPrompt />;
+              case flyAmountOwed > 0:
+                return <YouAreEligible />;
+              default:
+                return <YoureNotEligible />;
+            }
+          })()}
+        </div>
+      );
+    };
+
     return (
       <div className="pad-main">
         <Heading as="h1" className="no-margin">
           Airdrop
         </Heading>
-        <Text>
-          Wrap, Transact and Earn using $fUSDC, provide liquidity for even more
-          rewards!
-        </Text>
+        <TGEDisplay />
       </div>
     );
   }
@@ -197,17 +356,6 @@ const Airdrop = () => {
   );
 
   const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
-
-  const {
-    address,
-    balance,
-    stakeTokens,
-    testStakeTokens,
-    getStakingRatios,
-    redeemableTokens: getRedeemableTokens,
-    getStakingDeposits,
-    redeemTokens,
-  } = useContext(FluidityFacadeContext);
 
   const { width } = useViewport();
 
@@ -516,9 +664,9 @@ const Airdrop = () => {
           size="small"
           onClick={() => setCurrentModal("recap")}
           groupId="airdrop"
-          isSelected={currentModal === "recap"}
+          isSelected={currentModal === "recap" || currentModal === "claim"}
         >
-          Epoch 1 Recap
+          TGE Claim
         </TabButton>
         <TabButton
           size="small"
@@ -689,10 +837,10 @@ const Airdrop = () => {
               />
             </>
           )}
-          {currentModal === "recap" && (
+          {(currentModal === "recap" || currentModal === "claim") && (
             <RecapModal
-              totalVolume={11390000}
-              bottlesLooted={424781}
+              totalVolume={2000000000}
+              bottlesLooted={47000000}
               bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
               userRecap={{
                 bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
@@ -887,10 +1035,10 @@ const Airdrop = () => {
 
       {/* Page Content */}
       <Header />
-      {currentModal === "recap" ? (
+      {currentModal === "recap" || currentModal === "claim" ? (
         <RecapModal
-          totalVolume={11390000}
-          bottlesLooted={424781}
+          totalVolume={2000000000}
+          bottlesLooted={47000000}
           bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
           userRecap={{
             bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
@@ -1612,7 +1760,6 @@ const BottleProgress = ({
               opacity: shouldShowBottleNumbers ? 1 : 0.3,
             }}
           />
-
           <Text size="sm" prominent={shouldShowBottleNumbers}>
             ALWAYS SHOW BOTTLE NUMBERS
           </Text>
