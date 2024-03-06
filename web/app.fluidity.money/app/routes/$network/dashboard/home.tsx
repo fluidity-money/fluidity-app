@@ -401,9 +401,9 @@ export default function Home() {
 
     const shouldMultiplyBottles = application != "none";
 
-      let adjustedLootboxCount = lootboxCount;
-      if (shouldMultiplyBottles)
-        adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+    let adjustedLootboxCount = lootboxCount;
+    if (shouldMultiplyBottles)
+      adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
 
     return {
       RowElement: ({ heading }: { heading: string }) => {
@@ -609,9 +609,7 @@ export default function Home() {
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>
-                  {activeTableFilterIndex
-                    ? "My yield"
-                    : "Total yield"}
+                  {activeTableFilterIndex ? "My yield" : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}

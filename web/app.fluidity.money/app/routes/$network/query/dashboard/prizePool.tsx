@@ -1,7 +1,6 @@
 import { json } from "react-router-dom";
 import config from "~/webapp.config.server";
 import TotalRewardPoolAbi from "~/util/chainUtils/ethereum/getTotalRewardPool.json";
-import RegistryAbi from "~/util/chainUtils/ethereum/Registry.json";
 import { getTotalRewardPool } from "~/util/chainUtils/ethereum/transaction";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { Chain } from "~/util/chainUtils/chains";

@@ -83,7 +83,7 @@ const queryByAddress: Queryable = {
         lootboxCount: lootbox_count
       }
     }
-  `
+  `,
 };
 
 const queryByTxHash: Queryable = {
@@ -144,7 +144,7 @@ const queryByTxHash: Queryable = {
         lootboxCount: lootbox_count
       }
     }
-  `
+  `,
 };
 
 const queryAll: Queryable = {

@@ -1,7 +1,8 @@
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryByUserAllTime = gql`
-  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) @cached(ttl: 120) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!)
+  @cached(ttl: 120) {
     airdrop_leaderboard(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
@@ -37,7 +38,8 @@ const queryAllTime = gql`
 `;
 
 const queryByUser24Hours = gql`
-  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) @cached(ttl: 60) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!)
+  @cached(ttl: 60) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }

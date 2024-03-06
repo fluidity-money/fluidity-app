@@ -52,7 +52,7 @@ import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
 import { ReferralCountLoaderData } from "../../query/referrals";
 import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
-import { useFLYOwedForAddress, Referral } from "~/queries";
+import { useFLYOwedForAddress } from "~/queries";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -186,7 +186,10 @@ const Airdrop = () => {
 
     const [showTGEDetails, setShowTGEDetails] = useState(true);
 
-    const [checkYourEligibilityButtonEnabled, setCheckYourEligibilityButtonEnabled] = useState(false);
+    const [
+      checkYourEligibilityButtonEnabled,
+      setCheckYourEligibilityButtonEnabled,
+    ] = useState(false);
 
     useEffect(() => {
       (async () => {
@@ -202,11 +205,7 @@ const Airdrop = () => {
           setCheckYourEligibilityButtonEnabled(true);
         }
       })();
-    }, [
-      address,
-      useFLYOwedForAddress,
-      setFLYAmountOwed
-    ]);
+    }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
 
     const handleCheckEligibility = () => {
       // grey out the button here
@@ -218,36 +217,40 @@ const Airdrop = () => {
     };
 
     const ShowSolanaPrompt = () => {
-    return (
-      <div className="recap-fly-count-block">
-        <div className="recap-fly-count-header">
-          <Text size="md" code={true} as="p">
-            FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
-          </Text>
-          <Heading>The Fluidity $FLY-Wheel Begins</Heading>
-        </div>
-        <div className="recap-fly-count-thank-you-solana">
-          <Text>Thank you for riding with us this Wave. It has come to an end, check your eligibility for rewards from your bottles, and how you surfed.</Text>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container">
-          <div className="recap-fly-count-buttons-spread">
-            <GeneralButton
-              handleClick={handleCheckEligibility}
-              disabled={!checkYourEligibilityButtonEnabled}
-            >
-              Check your eligibility
-            </GeneralButton>
-            <GeneralButton
-              handleClick={ () => window?.open("", "_blank") }
-              icon={<ArrowTopRight />}
-            >
-              See criteria
-            </GeneralButton>
+      return (
+        <div className="recap-fly-count-block">
+          <div className="recap-fly-count-header">
+            <Text size="md" code={true} as="p">
+              FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
+            </Text>
+            <Heading>The Fluidity $FLY-Wheel Begins</Heading>
+          </div>
+          <div className="recap-fly-count-thank-you-solana">
+            <Text>
+              Thank you for riding with us this Wave. It has come to an end,
+              check your eligibility for rewards from your bottles, and how you
+              surfed.
+            </Text>
+          </div>
+          <div className="recap-fly-count-buttons-spread-container">
+            <div className="recap-fly-count-buttons-spread">
+              <GeneralButton
+                handleClick={handleCheckEligibility}
+                disabled={!checkYourEligibilityButtonEnabled}
+              >
+                Check your eligibility
+              </GeneralButton>
+              <GeneralButton
+                handleClick={() => window?.open("", "_blank")}
+                icon={<ArrowTopRight />}
+              >
+                See criteria
+              </GeneralButton>
+            </div>
           </div>
         </div>
-      </div>
-    );
-  };
+      );
+    };
 
     const YoureNotEligible = () => {
       return (
@@ -259,26 +262,24 @@ const Airdrop = () => {
             <Heading>You are not eligible</Heading>
           </div>
           <div className="recap-fly-count-thank-you-solana">
-            <Text>Keep transferring with Fluid Assets and participating in our upcoming Airdrops, to earn more rewards and multipliers! The next one will be even bigger!</Text>
+            <Text>
+              Keep transferring with Fluid Assets and participating in our
+              upcoming Airdrops, to earn more rewards and multipliers! The next
+              one will be even bigger!
+            </Text>
           </div>
           <div className="recap-fly-count-buttons-spread-container">
             <div className="recap-fly-count-buttons-spread">
-              <a
-                href=""
-                rel="noopener noreferrer"
-                target="_blank"
+              <GeneralButton
+                type="primary"
+                icon={<ArrowTopRight />}
+                layout="after"
+                handleClick={() => window?.open("", "_blank")}
               >
-                <GeneralButton
-                  type="primary"
-                  icon={<ArrowTopRight />}
-                  layout="after"
-                  handleClick={ () => {} }
-                >
-                  <Text size="sm" prominent code style={{ color: "inherit" }}>
-                    Learn more
-                  </Text>
-                </GeneralButton>
-              </a>
+                <Text size="sm" prominent code style={{ color: "inherit" }}>
+                  Learn more
+                </Text>
+              </GeneralButton>
             </div>
           </div>
         </div>
@@ -288,7 +289,7 @@ const Airdrop = () => {
     const YouAreEligible = () => {
       return (
         <div className="recap-fly-count-block">
-          <div className="recap-fly-count-header">as="h4"
+          <div className="recap-fly-count-header">
             <Text size="md" code={true}>
               Congratulations! You are eligible to claim
             </Text>
@@ -296,7 +297,12 @@ const Airdrop = () => {
             <Text>Please wait while we release delegation features.</Text>
           </div>
           <div className="recap-fly-count-buttons-spread-container">
-            <LinkButton handleClick={() => {}} color="white" size="large" type="external">
+            <LinkButton
+              handleClick={() => window?.open("", "_blank")}
+              color="white"
+              size="large"
+              type="external"
+            >
               Click here to learn more
             </LinkButton>
           </div>
@@ -309,13 +315,16 @@ const Airdrop = () => {
         <div className="recap-fly-count-child">
           {(() => {
             switch (true) {
-            case (showTGEDetails): return <ShowSolanaPrompt />;
-            case (flyAmountOwed > 0): return <YouAreEligible />;
-            default: return <YoureNotEligible />;
+              case showTGEDetails:
+                return <ShowSolanaPrompt />;
+              case flyAmountOwed > 0:
+                return <YouAreEligible />;
+              default:
+                return <YoureNotEligible />;
             }
           })()}
         </div>
-      )
+      );
     };
 
     return (
@@ -1026,7 +1035,7 @@ const Airdrop = () => {
 
       {/* Page Content */}
       <Header />
-      {(currentModal === "recap" || currentModal === "claim") ? (
+      {currentModal === "recap" || currentModal === "claim" ? (
         <RecapModal
           totalVolume={2000000000}
           bottlesLooted={47000000}

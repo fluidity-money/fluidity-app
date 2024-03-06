@@ -34,7 +34,7 @@ import {
   ArrowDown,
   ArrowTopRight,
   Provider,
-  Modal
+  Modal,
 } from "@fluidity-money/surfing";
 import {
   addDecimalToBn,
@@ -55,7 +55,6 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { shorthandAmountFormatter } from "~/util";
-import { UIContext } from "contexts/UIProvider";
 
 // Epoch length
 const MAX_EPOCH_DAYS = 31;
@@ -66,10 +65,6 @@ const MAX_STAKING_DAYS = 365;
 
 // Minimum amount of Fluid USDC deposit
 const MINIMUM_FLUID_LIQUIDITY_USD = 10;
-
-// Location of the API call to make to get the airdrops/send the signed
-// amounts to redeem
-const CLAIM_SERVICE_LOCATION = "https://";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -1901,9 +1896,6 @@ const RecapModal = ({
   onIntroFinished = () => {
     return;
   },
-  navigate = () => {
-    return;
-  },
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Jumper", link: "https://jumper.exchange/" },
@@ -1912,7 +1904,10 @@ const RecapModal = ({
       link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
     },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
-    { provider: "Ramses", link: "https://app.ramses.exchange/liquidity/v2/0x2c9a8c5814bbd8eb4f3531efb836f3d1fa185f38" }
+    {
+      provider: "Ramses",
+      link: "https://app.ramses.exchange/liquidity/v2/0x2c9a8c5814bbd8eb4f3531efb836f3d1fa185f38",
+    },
   ];
 
   const bottleRarityColorIcon = {
@@ -1977,7 +1972,6 @@ const RecapModal = ({
   };
 
   const { address } = useContext(FluidityFacadeContext);
-  const { toggleConnectWalletModal } = useContext(UIContext);
 
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
@@ -1990,20 +1984,26 @@ const RecapModal = ({
 
   // if the address isn't set, then it's a good proxy for knowing if the
   // user has supplied their address or not
-  const [checkYourEligibilityButtonEnabled, setCheckYourEligibilityButtonEnabled] = useState(false);
+  const [
+    checkYourEligibilityButtonEnabled,
+    setCheckYourEligibilityButtonEnabled,
+  ] = useState(false);
 
   const TGEDisplay = () => {
     return (
       <div className="recap-fly-count-child">
         {(() => {
           switch (true) {
-          case (showTGEDetails): return <ShowEpochDetails />;
-          case (flyAmountOwed > 0): return <YouAreEligible />;
-          default: return <YoureNotEligible />;
+            case showTGEDetails:
+              return <ShowEpochDetails />;
+            case flyAmountOwed > 0:
+              return <YouAreEligible />;
+            default:
+              return <YoureNotEligible />;
           }
         })()}
       </div>
-    )
+    );
   };
 
   useEffect(() => {
@@ -2020,11 +2020,7 @@ const RecapModal = ({
         setCheckYourEligibilityButtonEnabled(true);
       }
     })();
-  }, [
-    address,
-    useFLYOwedForAddress,
-    setFLYAmountOwed
-  ]);
+  }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
 
   const YoureNotEligible = () => {
     return (
@@ -2036,26 +2032,24 @@ const RecapModal = ({
           <Heading>You are not eligible</Heading>
         </div>
         <div className="recap-fly-count-thank-you">
-          <Text>Keep transferring with Fluid Assets and participating in our upcoming Airdrops, to earn more rewards and multipliers! The next one will be even bigger!</Text>
+          <Text>
+            Keep transferring with Fluid Assets and participating in our
+            upcoming Airdrops, to earn more rewards and multipliers! The next
+            one will be even bigger!
+          </Text>
         </div>
         <div className="recap-fly-count-buttons-spread-container">
           <div className="recap-fly-count-buttons-spread">
-            <a
-              href=""
-              rel="noopener noreferrer"
-              target="_blank"
+            <GeneralButton
+              type="primary"
+              icon={<ArrowTopRight />}
+              layout="after"
+              handleClick={() => window?.open("", "_blank")}
             >
-              <GeneralButton
-                type="primary"
-                icon={<ArrowTopRight />}
-                layout="after"
-                handleClick={ () => {} }
-              >
-                <Text size="sm" prominent code style={{ color: "inherit" }}>
-                  Learn more
-                </Text>
-              </GeneralButton>
-            </a>
+              <Text size="sm" prominent code style={{ color: "inherit" }}>
+                Learn more
+              </Text>
+            </GeneralButton>
           </div>
         </div>
       </div>
@@ -2065,23 +2059,30 @@ const RecapModal = ({
   const YouAreEligible = () => {
     return (
       <div className="recap-fly-count-block">
-        <div className="recap-fly-count-header">as="h4"
+        <div className="recap-fly-count-header">
           <Text size="md" code={true}>
             Congratulations! You are eligible to claim
           </Text>
           <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
         </div>
-        <div className="recap-fly-count-buttons-spread">
-          <GeneralButton disabled>Claim your FLY</GeneralButton>
-          <GeneralButton disabled>Stake your $FLY</GeneralButton>
+        <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
+          <div className="recap-fly-count-buttons-spread">
+            <GeneralButton disabled>Claim your FLY</GeneralButton>
+            <GeneralButton disabled>Stake your $FLY</GeneralButton>
+          </div>
         </div>
-        <div className="recap-fly-count-buttons-spread-container">
+        <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <GeneralButton type="primary">
             You will be able to claim your rewards at Fluidity TGE.
           </GeneralButton>
         </div>
         <div className="recap-fly-count-buttons-spread-container">
-          <LinkButton color="white" size="large" type="external" handleClick={() => {}}>
+          <LinkButton
+            color="white"
+            size="large"
+            type="external"
+            handleClick={() => window?.open("", "_blank")}
+          >
             Click here to learn more
           </LinkButton>
         </div>
@@ -2108,7 +2109,10 @@ const RecapModal = ({
           <Heading>The Fluidity $FLY-Wheel Begins</Heading>
         </div>
         <div className="recap-fly-count-thank-you">
-          <Text>Thank you for riding with us this Wave. It has come to an end, check your eligibility for rewards from your bottles, and how you surfed.</Text>
+          <Text>
+            Thank you for riding with us this Wave. It has come to an end, check
+            your eligibility for rewards from your bottles, and how you surfed.
+          </Text>
         </div>
         <div className="recap-fly-count-buttons-spread-container">
           <div className="recap-fly-count-buttons-spread">
@@ -2119,7 +2123,7 @@ const RecapModal = ({
               Check your eligibility
             </GeneralButton>
             <GeneralButton
-              handleClick={ () => window?.open("", "_blank") }
+              handleClick={() => window?.open("", "_blank")}
               icon={<ArrowTopRight />}
             >
               See criteria
@@ -2128,7 +2132,7 @@ const RecapModal = ({
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <>
@@ -2153,21 +2157,21 @@ const RecapModal = ({
               <motion.div variants={heroItemVariants}>
                 <Text size="sm">
                   <strong style={{ color: "white" }}>
-                    Congratulations for completing Fluidity&apos;s Second Airdrop
-                    Wave!
+                    Congratulations for completing Fluidity&apos;s Second
+                    Airdrop Wave!
                   </strong>{" "}
-                  All of these loot bottles you have earned are safely secured in
-                  your personal airdrop crate, and is now{" "}
+                  All of these loot bottles you have earned are safely secured
+                  in your personal airdrop crate, and is now{" "}
                   <strong style={{ color: "white" }}>En Route</strong> to you to
-                  TGE. You will get notified for when it is time to crack
-                  open the crate!
+                  TGE. You will get notified for when it is time to crack open
+                  the crate!
                 </Text>
               </motion.div>
               <motion.div variants={heroItemVariants}>
                 <GeneralButton
                   type="transparent"
                   layout="after"
-                  handleClick={ () => {} }
+                  handleClick={() => window?.open("", "_blank")}
                 >
                   <Text size="sm" prominent code style={{ color: "inherit" }}>
                     Convert your bottles to $FLY
@@ -2250,8 +2254,8 @@ const RecapModal = ({
             >
               <Text size="xl">
                 Fluidity&apos;s second Airdrop Wave has come to an end. Here are
-                some <strong style={{ color: "white" }}>Global Stats</strong> for
-                the Wave.
+                some <strong style={{ color: "white" }}>Global Stats</strong>{" "}
+                for the Wave.
               </Text>
             </motion.div>
 
@@ -2305,9 +2309,7 @@ const RecapModal = ({
               <Display style={{ margin: "0" }}>
                 {shorthandAmountFormatter(totalVolume.toString(), 1)}+
               </Display>
-              <Text>
-                The amount of Total Volume in this Wave!{" "}
-              </Text>
+              <Text>The amount of Total Volume in this Wave! </Text>
             </motion.div>
 
             {/* Bottle Distribution */}
@@ -2333,8 +2335,8 @@ const RecapModal = ({
               <Text>
                 All of these loot bottles you have earned are safely secured in
                 your personal airdrop crate, and is now En Route to you to TGE
-                land. You will get notified for when it is time to crack open the
-                crate!
+                land. You will get notified for when it is time to crack open
+                the crate!
               </Text>
             </motion.div>
 
@@ -2374,7 +2376,13 @@ const RecapModal = ({
                       whileHover={{ scale: 1.15, y: -9, zIndex: 100 }}
                     >
                       <mask id={`mask-${tier}`}>
-                        <rect x="0" y="0" width="100" height="100" fill="white" />
+                        <rect
+                          x="0"
+                          y="0"
+                          width="100"
+                          height="100"
+                          fill="white"
+                        />
                         <circle cx="50" cy="100" r="50" fill="white" />
                       </mask>
                       <circle
@@ -2388,7 +2396,9 @@ const RecapModal = ({
                       />
                       <motion.image
                         xmlnsXlink="http://www.w3.org/1999/xlink"
-                        xlinkHref={`${bottleRarityColorIcon[tier as Rarity].img}`}
+                        xlinkHref={`${
+                          bottleRarityColorIcon[tier as Rarity].img
+                        }`}
                         mask={`url(#mask-${tier})`}
                         width="100"
                       />

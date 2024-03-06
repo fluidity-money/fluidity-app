@@ -9,7 +9,8 @@ const query = gql`
     average_reward
     highest_reward
   }
-  query ApplicationPerformance($network: network_blockchain!) @cached(ttl: 300) {
+  query ApplicationPerformance($network: network_blockchain!)
+  @cached(ttl: 300) {
     week: application_performance(
       where: { network: { _eq: $network } }
       args: { i: "1 week" }
