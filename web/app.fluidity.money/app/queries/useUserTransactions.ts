@@ -43,7 +43,7 @@ const queryByAddress: Queryable = {
         swap_in
         application
         rewardTier: reward_tier
-        lootboxCount: lootbox_count
+        lootboxCount: new_count
       }
     }
   `,
@@ -80,7 +80,7 @@ const queryByAddress: Queryable = {
         swap_in
         application
         rewardTier: reward_tier
-        lootboxCount: lootbox_count
+        lootboxCount: new_count
       }
     }
   `,
@@ -112,7 +112,7 @@ const queryByTxHash: Queryable = {
         swap_in
         application
         rewardTier: reward_tier
-        lootboxCount: lootbox_count
+        lootboxCount: new_count
       }
     }
   `,
@@ -141,7 +141,7 @@ const queryByTxHash: Queryable = {
         swap_in
         application
         rewardTier: reward_tier
-        lootboxCount: lootbox_count
+        lootboxCount: new_count
       }
     }
   `,
@@ -176,7 +176,7 @@ const queryAll: Queryable = {
         swap_in
         application
         rewardTier: reward_tier
-        lootboxCount: lootbox_count
+        lootboxCount: new_count
       }
     }
   `,
@@ -208,7 +208,7 @@ const queryAll: Queryable = {
         swap_in
         application
         rewardTier: reward_tier
-        lootboxCount: lootbox_count
+        lootboxCount: new_count
       }
     }
   `,
