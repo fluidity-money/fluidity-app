@@ -53,7 +53,7 @@ const queryByAddress: Queryable = {
         winner: winning_address
         reward: winning_amount
         rewardTier: reward_tier
-        lootboxCount: new_count
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -92,7 +92,7 @@ const queryByAddress: Queryable = {
         winner: winning_address
         reward: winning_amount
         rewardTier: reward_tier
-        lootboxCount: new_count
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -123,7 +123,7 @@ const queryAll: Queryable = {
         winner: winning_address
         reward: winning_amount
         rewardTier: reward_tier
-        lootboxCount: new_count
+        lootboxCount: lootbox_count
       }
     }
   `,
@@ -151,7 +151,7 @@ const queryAll: Queryable = {
         winner: winning_address
         reward: winning_amount
         rewardTier: reward_tier
-        lootboxCount: new_count
+        lootboxCount: lootbox_count
       }
     }
   `,
