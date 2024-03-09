@@ -630,31 +630,35 @@ export default function Dashboard() {
               />
             )}
 
-            {/* Send & Receive */}
-            <GeneralButton
-              className="s-r-button"
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                navigate(`/${network}/transfer/send`);
-              }}
-              icon={<ArrowUp />}
-            >
-              {isMobile ? "" : "Send"}
-            </GeneralButton>
-            <GeneralButton
-              className="s-r-button"
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                navigate(`/${network}/transfer/receive`);
-              }}
-              icon={<ArrowDown />}
-            >
-              {isMobile ? "" : "Receive"}
-            </GeneralButton>
+            {/* Send & Receive (only supported if Arbitrum) */}
+            {
+              network == "arbitrum" && <>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
+            }
 
             {/* Fluidify button (desktop only) */}
             {isTablet || isMobile || (
