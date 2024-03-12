@@ -432,6 +432,10 @@ main {
   margin: 0 0 1em 0;
 }
 
+.connect-wallet-modal-list.sui {
+  background-color: unset;
+}
+
 .connect-wallet-modal-names {
   margin: 10px;
 }

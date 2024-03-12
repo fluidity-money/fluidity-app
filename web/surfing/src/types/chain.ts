@@ -8,6 +8,7 @@ interface ISupportedChains {
   ARB: Chain;
   POLY_ZK: Chain;
   SOL: Chain;
+  SUI: Chain;
 }
 
 export type SupportedChainsList = keyof ISupportedChains;
@@ -28,5 +29,9 @@ export const SupportedChains: ISupportedChains = {
   SOL: {
     name: "Solana",
     short: "SOL",
+  },
+  SUI: {
+    name: "Sui",
+    short: "SUI",
   },
 };

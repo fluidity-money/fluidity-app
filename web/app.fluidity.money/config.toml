@@ -21,6 +21,11 @@ label = "Polygon ZK"
 testnet = false
 rpc = { http = "FLU_POLYZK_RPC_HTTP", ws = "FLU_POLYZK_RPC_WS" }
 
+[[drivers.sui]]
+label = "Sui"
+testnet = false
+rpc = { http = "FLU_SUI_RPC_HTTP", ws = "FLU_SUI_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -257,6 +262,34 @@ address = "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C"
 colour = "#2775ca"
 isFluidOf = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
 decimals = 6
+enabled = true
+
+[config.sui]
+explorer = "https://suiexplorer.com"
+fluidAssets = [
+    "",
+]
+
+# these are fsui, not fusdc
+[[config.sui.tokens]]
+symbol = "USDC"
+name = "USDC Native"
+logo = "/assets/tokens/usdc.svg"
+address = "0x0000000000000000000000000000000000000000000000000000000000000002"
+suiTypeName = "0x2::sui::SUI"
+colour = "#2775ca"
+decimals = 9
+enabled = true
+
+[[config.sui.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC Native"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe"
+suiTypeName = "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe::fluidity_coin::FLUIDITY_COIN"
+colour = "#2775ca"
+isFluidOf = "0x0000000000000000000000000000000000000000000000000000000000000002"
+decimals = 9
 enabled = true
 
 

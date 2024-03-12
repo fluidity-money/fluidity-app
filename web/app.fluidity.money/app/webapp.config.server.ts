@@ -42,6 +42,7 @@ const OptionsSchema = z.object({
             logo: z.string(),
             address: z.string(),
             colour: z.string(),
+            suiTypeName: z.string().optional(),
             isFluidOf: z.string().optional(),
             obligationAccount: z.string().optional(),
             dataAccount: z.string().optional(),

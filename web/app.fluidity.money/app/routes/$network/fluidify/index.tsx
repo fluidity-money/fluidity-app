@@ -270,6 +270,21 @@ export default function FluidifyToken() {
             }))
           );
         }
+        case "sui": {
+          // get user token balances
+          const userTokenBalance = await Promise.all(
+            tokens.map(
+             async ({ address }) => (await balance?.(address)) || new BN(0)
+            )
+          );
+
+          return setTokens(
+            tokens.map((token, i) => ({
+              ...token,
+              userTokenBalance: userTokenBalance[i],
+            }))
+          );
+        }
       }
     })();
   }, [address, swapping]);

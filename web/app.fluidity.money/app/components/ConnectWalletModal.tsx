@@ -6,6 +6,9 @@ import { useCallback, useEffect, useState, useContext } from "react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { createPortal } from "react-dom";
 import { chainType } from "~/util/chainUtils/chains";
+import { useWallets, useConnectWallet } from "@mysten/dapp-kit";
+import { WalletWithRequiredFeatures } from "@mysten/wallet-standard";
+
 
 interface IConnectWalletModal {
   visible: boolean;
@@ -68,6 +71,43 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
     );
   };
 
+  const SuiWalletsMap = () => {
+    const wallets = useWallets();
+    const { mutate: connect } = useConnectWallet()
+
+    const selectWallet = useCallback(
+      (
+        _event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+        wallet: WalletWithRequiredFeatures
+      ) => {
+        connect({ wallet });
+      },
+      [connect]
+    );
+
+    return (
+      <>
+        {wallets.length === 0 ?
+          <Text className="connect-wallet-modal-sui">No compatible Sui wallets found!</Text>
+          : wallets.map((wallet) => (
+            <li
+              key={`wallet-${wallet.name}`}
+              onClick={(event) => selectWallet(event, wallet)}
+            >
+              <span>
+                <img src={wallet?.icon} />
+                <Text size="sm" className="connect-wallet-modal-names">
+                  {wallet.name}
+                </Text>
+              </span>
+              <Text size="xs" className="connect-wallet-modal-status">
+              </Text>
+            </li>
+          ))}
+      </>
+    );
+  };
+
   const EthWalletsMap = () => {
     const { useConnectorType } = useContext(FluidityFacadeContext);
     const { ethereumWallets } = useLoaderData<LoaderData>();
@@ -118,15 +158,13 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
     setModal(
       createPortal(
         <div
-          className={`connect-wallet-outer-container ${
-            visible === true ? "show-modal" : "hide-modal"
-          }`}
+          className={`connect-wallet-outer-container ${visible === true ? "show-modal" : "hide-modal"
+            }`}
         >
           <div onClick={close} className="connected-wallet-background"></div>
           <div
-            className={`connect-wallet-modal-container  ${
-              visible === true ? "show-modal" : "hide-modal"
-            }`}
+            className={`connect-wallet-modal-container  ${visible === true ? "show-modal" : "hide-modal"
+              }`}
           >
             <div className="connect-wallet-modal-header">
               <Text prominent size="xxl">
@@ -140,9 +178,10 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
               />
             </div>
 
-            <ul className="connect-wallet-modal-list">
+            <ul className={`connect-wallet-modal-list ${network}`}>
               {chainType(network) === "evm" && <EthWalletsMap />}
               {chainType(network) === "solana" && <SolWalletsMap />}
+              {chainType(network) === "sui" && <SuiWalletsMap />}
             </ul>
             <Text size="xs">
               By connecting a wallet, you agree to Fluidity Money’s Terms of
