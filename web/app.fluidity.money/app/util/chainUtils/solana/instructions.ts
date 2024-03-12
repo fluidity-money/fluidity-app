@@ -14,10 +14,13 @@ import {
   WalletContextState,
 } from "@solana/wallet-adapter-react";
 import BN from "bn.js";
+
 import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
 import { TransactionResponse } from "../instructions";
 import { jsonPost } from "~/util/api/rpc";
+import airdropClaimIdl from "./associate-address-for-airdrop-idl.json";
+import { Program, Idl, AnchorProvider, setProvider, web3 } from "@coral-xyz/anchor";
 
 export const getCheckedSolContext = () => {
   const wallet = useWallet();
@@ -258,4 +261,25 @@ const internalSwap = async (
   }
 };
 
-export { internalSwap, getBalance, limit, amountMinted };
+const associateAddressForAirdrop = async (
+  program: Program,
+  connected: boolean,
+  payer: PublicKey,
+  ethAddress: string
+) => {
+  const [pdaPubkey, pdaDump] = web3.PublicKey.findProgramAddressSync(
+    [payer.toBuffer()],
+    program.programId
+  );
+
+  const sig =
+    await program.methods.associateEthereumAddress(ethAddress)
+    .accounts({
+      pda: pdaPubkey
+    })
+    .rpc();
+
+  return sig;
+};
+
+export { internalSwap, getBalance, limit, amountMinted, associateAddressForAirdrop };

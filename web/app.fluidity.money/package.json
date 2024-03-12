@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.1",
+    "@coral-xyz/anchor": "^0.29.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@ethersproject/experimental": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
