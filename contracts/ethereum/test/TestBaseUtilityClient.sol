@@ -7,7 +7,8 @@ import "../interfaces/IERC20.sol";
 import "../interfaces/IFluidClient.sol";
 
 import "../contracts/utility-clients/BaseUtilityClient.sol";
-import "../contracts/GovToken.sol";
+
+import "../contracts/tests/TestGovToken.sol";
 
 import "forge-std/Test.sol";
 
@@ -50,7 +51,7 @@ contract TestBaseUtilityClient is Test {
 
     IERC20 private token;
     function setUp() public {
-        token = new GovToken(
+        token = new TestGovToken(
             "Token!",
             "TKN",
             1,

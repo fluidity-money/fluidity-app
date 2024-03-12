@@ -61,7 +61,7 @@ before(async function () {
     upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
     govToken: govTokenFactory,
-    veGovToken: veGovTokenFactory,
+    veTestGovToken: veTestGovTokenFactory,
     registry: registryFactory,
     operator: operatorFactory,
     compoundLiquidityProvider: compoundLiquidityProviderFactory,
@@ -118,7 +118,7 @@ before(async function () {
     govTokenFactory,
     govTokenOwnerSigner,
 
-    veGovTokenFactory,
+    veTestGovTokenFactory,
     veGovSigner,
 
     daoFactory,
@@ -134,7 +134,7 @@ before(async function () {
     govToken,
     registry,
     dao,
-    veGovToken,
+    veTestGovToken,
     permitRouterV1
   } = commonContracts;
 
@@ -165,7 +165,7 @@ before(async function () {
       extraSigner2: govTokenExtraSigner2
     },
 
-    veGovToken: {
+    veTestGovToken: {
       owner: veGovSigner
     }
   };
@@ -185,8 +185,8 @@ before(async function () {
     govToken: {
       owner: govToken.connect(govTokenOwnerSigner),
     },
-    veGovToken: {
-      spender: veGovToken.connect(veGovSigner)
+    veTestGovToken: {
+      spender: veTestGovToken.connect(veGovSigner)
     },
     permitRouterV1: {
       operator: permitRouterV1.connect(operatorOperatorSigner)

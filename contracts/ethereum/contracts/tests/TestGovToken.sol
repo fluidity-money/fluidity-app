@@ -7,9 +7,9 @@
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
-import "./BaseNativeToken.sol";
+import "../BaseNativeToken.sol";
 
-contract GovToken is BaseNativeToken {
+contract TestGovToken is BaseNativeToken {
     constructor(
         string memory _name,
         string memory _symbol,

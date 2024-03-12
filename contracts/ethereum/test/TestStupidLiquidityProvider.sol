@@ -4,8 +4,9 @@ pragma solidity 0.8.16;
 pragma abicoder v2;
 
 import "../contracts/Token.sol";
-import "../contracts/GovToken.sol";
 import "../contracts/StupidLiquidityProvider.sol";
+
+import "../contracts/tests/TestGovToken.sol";
 
 contract TestStupidLiquidityProvider {
     IERC20 private underlying;
@@ -13,7 +14,7 @@ contract TestStupidLiquidityProvider {
     StupidLiquidityProvider private liq;
 
     function setUp() public {
-        underlying = new GovToken(
+        underlying = new TestGovToken(
             "testUnderlying",
             "TEST",
             6,
