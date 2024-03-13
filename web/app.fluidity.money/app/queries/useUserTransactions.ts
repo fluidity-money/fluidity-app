@@ -124,6 +124,43 @@ const queryByAddress: Queryable = {
       }
     }
   `,
+  sui: gql`
+    query getTransactionsByAddress(
+      $address: String!
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: aggregated_user_transactions(
+        where: {
+          network: { _eq: "sui" }
+          token_short_name: { _in: $tokens }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
+        type
+        swap_in
+        application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
+      }
+    }
+  `,
 };
 
 const queryByTxHash: Queryable = {
@@ -195,6 +232,35 @@ const queryByTxHash: Queryable = {
       transfers: aggregated_user_transactions(
         where: {
           network: { _eq: "polygon_zk" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          transaction_hash: { _in: $transactions }
+        }
+        order_by: { time: desc }
+        limit: $limit
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        type
+        swap_in
+        application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
+      }
+    }
+  `,
+  sui: gql`
+    query getTransactionsByTxHash(
+      $transactions: [String!]
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+    ) {
+      transfers: aggregated_user_transactions(
+        where: {
+          network: { _eq: "sui" }
           _not: { transaction_hash: { _in: $filterHashes } }
           transaction_hash: { _in: $transactions }
         }
@@ -306,6 +372,38 @@ const queryAll: Queryable = {
         time
         transaction_hash
         amount
+        type
+        swap_in
+        application
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
+      }
+    }
+  `,
+  sui: gql`
+    query getTransactions(
+      $offset: Int = 0
+      $filterHashes: [String!] = []
+      $limit: Int = 12
+      $tokens: [String!] = []
+    ) {
+      transfers: aggregated_user_transactions(
+        where: {
+          network: { _eq: "sui" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          token_short_name: { _in: $tokens }
+        }
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        time
+        transaction_hash
+        amount
+        token_decimals
         type
         swap_in
         application
