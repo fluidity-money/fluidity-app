@@ -25,7 +25,7 @@ export type FluidityContracts = {
   govToken: ethers.Contract,
   registry: ethers.Contract,
   dao: ethers.Contract,
-  veGovToken: ethers.Contract,
+  veTestGovToken: ethers.Contract,
   permitRouterV1: ethers.Contract
 };
 
@@ -41,7 +41,7 @@ export type FluidityBeaconAddresses = {
 export type FluidityFactories = {
   upgradeableBeacon: ethers.ContractFactory,
   govToken: ethers.ContractFactory,
-  veGovToken: ethers.ContractFactory,
+  veTestGovToken: ethers.ContractFactory,
   registry: ethers.ContractFactory,
   operator: ethers.ContractFactory,
   token: ethers.ContractFactory,
@@ -81,7 +81,7 @@ export type FluiditySigners = {
     extraSigner2: ethers.Signer
   },
 
-  veGovToken: {
+  veTestGovToken: {
     owner: ethers.Signer
   }
 };
@@ -100,7 +100,7 @@ export type FluidityBindings = {
     owner: ethers.Contract,
   },
 
-  veGovToken: {
+  veTestGovToken: {
     spender: ethers.Contract
   },
 

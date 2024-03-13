@@ -7,19 +7,19 @@ const decimals = 18;
 const totalSupply = BigNumber.from("1000000000000000000000000000"); // 1_000_000_000 FLUID tokens
 
 const main = async () => {
-    const factory = await hre.ethers.getContractFactory("GovToken");
+    const factory = await hre.ethers.getContractFactory("TestGovToken");
     const proxy = await hre.upgrades.deployProxy(factory);
 
     const proxyDeployHash = proxy.deployTransaction.hash;
 
     console.log(
-        `deploying proxy for GovToken to ${proxy.address} with transaction ${proxyDeployHash}...`
+        `deploying proxy for TestGovToken to ${proxy.address} with transaction ${proxyDeployHash}...`
     );
 
     await proxy.deployed();
 
     console.log(
-        `deployed proxy for GovToken to ${proxy.address} with transaction ${proxyDeployHash}`
+        `deployed proxy for TestGovToken to ${proxy.address} with transaction ${proxyDeployHash}`
     );
 
     const initTransaction = await proxy.init(

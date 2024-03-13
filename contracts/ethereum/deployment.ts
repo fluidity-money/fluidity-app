@@ -14,9 +14,9 @@ export const getFactories = async (
 ): Promise<FluidityFactories> => {
   const upgradeableBeaconFactory = await hre.ethers.getContractFactory("UpgradeableBeacon");
 
-  const govTokenFactory = await hre.ethers.getContractFactory("GovToken");
+  const govTokenFactory = await hre.ethers.getContractFactory("TestGovToken");
 
-  const veGovToken = await hre.ethers.getContractFactory("VotingEscrow");
+  const veTestGovToken = await hre.ethers.getContractFactory("VotingEscrow");
 
   const registryFactory = await hre.ethers.getContractFactory("Registry");
 
@@ -48,7 +48,7 @@ export const getFactories = async (
     upgradeableBeacon: upgradeableBeaconFactory,
     token: tokenFactory,
     govToken: govTokenFactory,
-    veGovToken: veGovToken,
+    veTestGovToken: veTestGovToken,
     registry: registryFactory,
     operator: operatorFactory,
     compoundLiquidityProvider: compoundLiquidityProviderFactory,
@@ -251,7 +251,7 @@ export const deployOperator = async(
   return beaconProxy;
 };
 
-export const deployGovToken = async(
+export const deployTestGovToken = async(
   factory: ethers.ContractFactory,
   signer: ethers.Signer,
   name: string,
@@ -265,7 +265,7 @@ export const deployGovToken = async(
   totalSupply
 );
 
-export const deployVEGovToken = async (
+export const deployVETestGovToken = async (
   factory: ethers.ContractFactory,
   signer: ethers.Signer,
   voteTokenAddress: string
@@ -276,18 +276,18 @@ export const deployUtilityGauges = async (
   factory: ethers.ContractFactory,
   signer: ethers.Signer,
   operator: ethers.Signer,
-  veGovTokenAddress: string,
+  veTestGovTokenAddress: string,
 ): Promise<ethers.Contract> => {
-  const contract = await factory.connect(signer).deploy(operator.getAddress(), veGovTokenAddress);
+  const contract = await factory.connect(signer).deploy(operator.getAddress(), veTestGovTokenAddress);
   return contract;
 };
 
 export const deployDAOStable = async(
   factory: ethers.ContractFactory,
-  veGovTokenAddress: string,
+  veTestGovTokenAddress: string,
   timelockControllerAddress: string
 ): Promise<ethers.Contract> => factory.deploy(
-  veGovTokenAddress,
+  veTestGovTokenAddress,
   timelockControllerAddress
 );
 
@@ -333,8 +333,8 @@ export const deployFluidity = async (
   govTokenFactory: ethers.ContractFactory,
   govTokenSigner: ethers.Signer,
 
-  veGovTokenFactory: ethers.ContractFactory,
-  veGovTokenSigner: ethers.Signer,
+  veTestGovTokenFactory: ethers.ContractFactory,
+  veTestGovTokenSigner: ethers.Signer,
 
   daoFactory: ethers.ContractFactory,
 
@@ -363,7 +363,7 @@ export const deployFluidity = async (
     registry.address
   );
 
-  const govToken = await deployGovToken(
+  const govToken = await deployTestGovToken(
     govTokenFactory,
     govTokenSigner,
     govTokenName,
@@ -372,9 +372,9 @@ export const deployFluidity = async (
     govTokenTotalSupply
   );
 
-  const veGovToken = await deployVEGovToken(
-    veGovTokenFactory,
-    veGovTokenSigner,
+  const veTestGovToken = await deployVETestGovToken(
+    veTestGovTokenFactory,
+    veTestGovTokenSigner,
     govToken.address
   );
 
@@ -389,7 +389,7 @@ export const deployFluidity = async (
 
   const dao = await deployDAOStable(
     daoFactory,
-    veGovToken.address,
+    veTestGovToken.address,
     timelockController.address
   );
 
@@ -414,7 +414,7 @@ export const deployFluidity = async (
     govToken: govToken,
     registry: registry,
     dao: dao,
-    veGovToken: veGovToken,
+    veTestGovToken: veTestGovToken,
     permitRouterV1: permitRouterV1
   }
 };
