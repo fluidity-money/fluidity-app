@@ -1,0 +1,49 @@
+{
+  "version": "0.1.0",
+  "name": "fluidity_associate_airdrop_addr",
+  "instructions": [
+    {
+      "name": "associateEthereumAddress",
+      "accounts": [
+        {
+          "name": "pda",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "req",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AssociateEthereumAddressStorage",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "HzvebJkgU4Gejk6vMfafLvtND37Ab8t5AM9E8MR2ZwnN"
+  }
+}

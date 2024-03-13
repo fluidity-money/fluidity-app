@@ -84,6 +84,12 @@ export interface IFluidityFacade {
     signature: string,
     address: string
   ) => Promise<void>;
+
+  // Solana only
+
+  airdropAssociateEthereumAccount?: (
+    etherumAddress: string
+  ) => Promise<string | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

@@ -1,3 +1,5 @@
+/* eslint-disable no-irregular-whitespace */
+
 import type { LoaderFunction } from "@remix-run/node";
 
 import { json } from "@remix-run/node";
@@ -5,12 +7,12 @@ import { useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import BN from "bn.js";
 import {
   Card,
-  Form,
   Heading,
   TextButton,
   LabelledValue,
   LinkButton,
   Text,
+  Modal,
   HeroCarousel,
   ProgressBar,
   GeneralButton,
@@ -19,6 +21,7 @@ import {
   Display,
   ProviderIcon,
   Provider,
+  Form,
   CardModal,
   Rarity,
   TabButton,
@@ -40,7 +43,7 @@ import {
   TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect, useRef, useMemo } from "react";
+import { useContext, useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -61,10 +64,13 @@ import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
+import { ethers } from "ethers";
 
 const EPOCH_CURRENT_IDENTIFIER = "epoch_2";
 
 const AIRDROP_BLOG_POST = "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+
+const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap"
 
 const AIRDROP_MODALS = [
   "recap",
@@ -179,6 +185,7 @@ const Airdrop = () => {
     redeemableTokens: getRedeemableTokens,
     getStakingDeposits,
     redeemTokens,
+    airdropAssociateEthereumAccount
   } = useContext(FluidityFacadeContext);
 
   if (network !== "arbitrum") {
@@ -289,20 +296,123 @@ const Airdrop = () => {
     };
 
     const YouAreEligible = () => {
+      // used to track if the button was clicked to delegate. not disabled.
+      // the user will have to reload the page to set it again. unless an error happened!
+      const [beginAssociation, setBeginAssociation] = useState(false);
+
+      // used to prevent double submitting until the request is done
+      const [airdropAssociationInProgress, setAirdropAssociationInProgress] = useState(false);
+
+      // the ethereum address they want to associate
+      const [associationEthereumAddress, setAssociationEthereumAddress] = useState("");
+
+      // association worked, make the button green and disable the button
+      const [airdropAssociationSucceeded, setAirdropAssociationSucceeded] = useState(false);
+
+      const handleSetAssociationEthereumAddress = (s: string) => {
+        setAssociationEthereumAddress(s);
+        setEthereumAddressHint("");
+      };
+
+      const [ethereumAddressHint, setEthereumAddressHint] = useState("");
+
+      useEffect(() => {
+        (async () => {
+          if (!beginAssociation)
+            return;
+          try {
+            const f = airdropAssociateEthereumAccount;
+            if (!f) return;
+            const sig = await f(associationEthereumAddress);
+            console.log("done airdrop association with signature", sig);
+            setAirdropAssociationSucceeded(true);
+            setEthereumAddressHint("Succeeded!");
+          } catch (err) {
+            // we set this to true so we can begin again with this attempt.
+            setBeginAssociation(false);
+            setEthereumAddressHint(`${err}`);
+            console.warn("error submitting claim feature", err);
+          }
+          setAirdropAssociationInProgress(false);
+        })();
+      }, [
+        beginAssociation
+      ]);
+
+      const handleAirdropAssociation = () => {
+        // first, check that the address is okay. then, if it is, begin the
+        // process of using anchor to send out the transaction using
+        // Phantom that associates the address.
+
+        const s = associationEthereumAddress;
+
+        // regex taken from the transfer route
+        const addressRegex = /(0x[a-fA-F0-9]{40})/g;
+        const validAddr = s.match(addressRegex) || ethers.utils.isAddress(s);
+        if (!validAddr) {
+          // only show if the address is non-empty, and fails the regex after
+          // the button is pressed
+          setEthereumAddressHint("Invalid address");
+          return;
+        }
+
+        setAirdropAssociationInProgress(true);
+        setBeginAssociation(true);
+      };
+
       return (
-        <div className="recap-fly-count-block">
-          <div className="recap-fly-count-header">
+        <div className="recap-fly-count-block-solana">
+          <div className="recap-fly-count-header-solana">
             <Text size="md" code={true}>
               Congratulations! You are eligible to claim
             </Text>
             <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
-            <Text>Please wait while we release delegation features.</Text>
+            <Form.Group hint={ethereumAddressHint}>
+              <Form.TextField
+                key="evm-wallet-delegate-fly"
+                value={associationEthereumAddress}
+                onChange={handleSetAssociationEthereumAddress}
+                placeholder="Enter EVM Wallet to delegate FLY..."
+              />
+              <GeneralButton
+                type="transparent"
+                size="medium"
+                onClick={handleAirdropAssociation}
+                className={airdropAssociationSucceeded ? "recap-fly-count-delegate-button-success" : ""}
+                disabled={airdropAssociationInProgress || airdropAssociationSucceeded}
+              >
+                {airdropAssociationSucceeded ? "Success!" : "Delegate"}
+              </GeneralButton>
+            </Form.Group>
+            <div className="recap-you-are-eligible-delegate-button-terms-container">
+              <Text>
+                By pressing the delegate button, you agree to our airdrop { }
+                <a
+                  className="recap-terms-of-condition-delegate"
+                  onClick={() => setTermsAndConditionsModalVis(true)}
+                >
+                  terms of service
+                </a>
+              </Text>
+            </div>
+            <div className="recap-you-are-eligible-claim-at-tge-button-container">
+              <GeneralButton
+                size="medium"
+                type="secondary"
+                className="recap-you-are-eligible-claim-at-tge-button rainbow"
+                handleClick={() => window?.open(AIRDROP_TGE_CLAIM)}
+              >
+                <Text size="sm" >
+                  You will be able to claim your rewards at Fluidity&apos;s TGE in the Arbitrum Portal &rarr;
+                </Text>
+              </GeneralButton>
+            </div>
           </div>
-          <div className="recap-fly-count-buttons-spread-container">
+          <div className="recap-fly-count-buttons-spread-container-solana">
             <LinkButton
               handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
               color="white"
-              size="large"
+              size="medium"
               type="external"
             >
               Click here to learn more
@@ -314,7 +424,7 @@ const Airdrop = () => {
 
     const TGEDisplay = () => {
       return (
-        <div className="recap-fly-count-child">
+        <div className="recap-fly-count-child-solana">
           {(() => {
             switch (true) {
               case showTGEDetails:
@@ -329,8 +439,91 @@ const Airdrop = () => {
       );
     };
 
+    const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] = useState(false);
+
+    const closeWithEsc = useCallback(
+      (event: { key: string }) => {
+        event.key === "Escape" && setTermsAndConditionsModalVis && setTermsAndConditionsModalVis(false);
+      },
+      [termsAndConditionsModalVis, setTermsAndConditionsModalVis]
+    );
+
+    useEffect(() => {
+      document.addEventListener("keydown", closeWithEsc);
+      return () => document.removeEventListener("keydown", closeWithEsc);
+    }, [termsAndConditionsModalVis, closeWithEsc]);
+
     return (
       <div className="pad-main">
+        <Modal
+          id="terms-and-conditions"
+          visible={termsAndConditionsModalVis}
+        >
+          <div className="airdrop-terms-and-conditions-modal-container">
+            <div className="airdrop-terms-and-conditions-modal-child">
+              <div className="airdrop-terms-and-conditions-modal-navbar">
+                <GeneralButton
+                  size="medium"
+                  handleClick={() => setTermsAndConditionsModalVis(false)}
+                >
+                  Close
+                </GeneralButton>
+              </div>
+              <p>
+1. Description
+
+We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+              </p>
+              <p>
+1. Terms of Airdrop Program
+
+2.1 No Purchase Necessary
+
+There is no purchase necessary to receive the Airdrop. However, you must have
+wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+              </p>
+              <p>
+2.2 Timing
+
+Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+              </p>
+              <p>
+2.3 Limited Supply
+
+An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
+has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
+suspend any Airdrop requirements at any time without notice, including the amount previously
+advertised as available.
+              </p>
+              <p>
+2.4 Eligibility
+
+You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
+
+To the best of our understanding, below is a list of countries that does not recognise digital assets;
+
+*Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
+
+Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
+
+**source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
+              </p>
+              <p>
+
+2.5 Notice of Award
+
+In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
+We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+              </p>
+              <p>
+
+3 Risk Disclosures Relating to Airdrop Program
+
+You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+              </p>
+            </div>
+          </div>
+        </Modal>
         <Heading as="h1" className="no-margin">
           Airdrop
         </Heading>

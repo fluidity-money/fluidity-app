@@ -66,7 +66,8 @@ const MAX_STAKING_DAYS = 365;
 // Minimum amount of Fluid USDC deposit
 const MINIMUM_FLUID_LIQUIDITY_USD = 10;
 
-const AIRDROP_BLOG_POST = "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+const AIRDROP_BLOG_POST =
+  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -2437,9 +2438,7 @@ const RecapModal = ({
             once: true,
           }}
         >
-          <div id="claim">
-            {showPageContent && <TGEDisplay />}
-          </div>
+          <div id="claim">{showPageContent && <TGEDisplay />}</div>
         </motion.div>
 
         <Modal id="connect-wallet" visible={walletModalVisibility}>
