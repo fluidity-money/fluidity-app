@@ -1,9 +1,7 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import BN from "bn.js";
 import {
-  ConnectionProvider,
-  WalletProvider,
   useWallet,
   useAnchorWallet,
   useConnection,
@@ -14,15 +12,7 @@ import {
   setProvider,
   Idl
 } from "@coral-xyz/anchor";
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import {
-  PhantomWalletAdapter,
-  SolletWalletAdapter,
-  SolflareWalletAdapter,
-  CloverWalletAdapter,
-  Coin98WalletAdapter,
-  NightlyWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
+import { PublicKey } from "@solana/web3.js";
 import {
   getBalance,
   internalSwap,
@@ -183,36 +173,6 @@ const SolanaFacade = ({
       {children}
     </FluidityFacadeContext.Provider>
   );
-};
-
-const SolanaProvider = (rpcUrl: string, tokens: Token[]) => {
-  const Provider = ({ children }: { children: React.ReactNode }) => {
-    const networkCluster = 0;
-    const endpoint = useMemo(() => rpcUrl, [networkCluster]);
-
-    // include more wallet suppport later once done with full implementation
-    const wallets = useMemo(
-      () => [
-        new PhantomWalletAdapter(),
-        new SolletWalletAdapter(),
-        new SolflareWalletAdapter(),
-        new NightlyWalletAdapter(),
-        new CloverWalletAdapter(),
-        new Coin98WalletAdapter(),
-      ],
-      [networkCluster]
-    );
-
-    return (
-      <ConnectionProvider endpoint={endpoint}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <SolanaFacade tokens={tokens}>{children}</SolanaFacade>
-        </WalletProvider>
-      </ConnectionProvider>
-    );
-  };
-
-  return Provider;
 };
 
 export default SolanaFacade;

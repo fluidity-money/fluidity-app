@@ -19,8 +19,7 @@ import { FluidityInstruction } from "./fluidityInstruction";
 import { getFluidInstructionKeys, getOrCreateATA } from "./solanaAddresses";
 import { TransactionResponse } from "../instructions";
 import { jsonPost } from "~/util/api/rpc";
-import airdropClaimIdl from "./associate-address-for-airdrop-idl.json";
-import { Program, Idl, AnchorProvider, setProvider, web3 } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 
 export const getCheckedSolContext = () => {
   const wallet = useWallet();
@@ -267,7 +266,7 @@ const associateAddressForAirdrop = async (
   payer: PublicKey,
   ethAddress: string
 ) => {
-  const [pdaPubkey, pdaDump] = web3.PublicKey.findProgramAddressSync(
+  const [pdaPubkey] = web3.PublicKey.findProgramAddressSync(
     [payer.toBuffer()],
     program.programId
   );

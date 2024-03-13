@@ -1,16 +1,9 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import {
   ConnectionProvider,
   WalletProvider,
-  useWallet,
-  useConnection,
 } from '@solana/wallet-adapter-react';
-import {
-  Program,
-  AnchorProvider,
-} from '@coral-xyz/anchor';
-import { Connection } from '@solana/web3.js';
 import {
   PhantomWalletAdapter,
   SolletWalletAdapter,
@@ -19,9 +12,6 @@ import {
   Coin98WalletAdapter,
   NightlyWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import FluidityFacadeContext from './FluidityFacade';
-import associateAddressForAirdropIdl from '~/util/chainUtils/solana/associate-address-for-airdrop-idl.json';
-import { PublicKey } from '@solana/web3.js';
 import { Token } from '~/util/chainUtils/tokens';
 
 const wallets = [

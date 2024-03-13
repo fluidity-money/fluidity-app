@@ -631,8 +631,8 @@ export default function Dashboard() {
             )}
 
             {/* Send & Receive (only supported if Arbitrum) */}
-            {
-              network == "arbitrum" && <>
+            {network == "arbitrum" && (
+              <>
                 <GeneralButton
                   className="s-r-button"
                   type="transparent"
@@ -658,7 +658,7 @@ export default function Dashboard() {
                   {isMobile ? "" : "Receive"}
                 </GeneralButton>
               </>
-            }
+            )}
 
             {/* Fluidify button (desktop only) */}
             {isTablet || isMobile || (
