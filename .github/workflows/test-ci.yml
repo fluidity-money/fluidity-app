@@ -12,7 +12,7 @@ permissions:
 jobs:
   test-go:
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     steps:
       - uses: actions/checkout@v3
         with:
@@ -46,7 +46,7 @@ jobs:
 
   test-contracts:
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     environment: mainnet
     steps:
       - uses: actions/checkout@v3
@@ -90,7 +90,7 @@ jobs:
 
   test-npm:
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     steps:
       - uses: actions/checkout@v3
         with:
@@ -114,7 +114,7 @@ jobs:
 
   test-pipeline:
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     environment: mainnet
     steps:
       - uses: actions/checkout@v3
