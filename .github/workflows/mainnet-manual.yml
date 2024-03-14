@@ -39,7 +39,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3

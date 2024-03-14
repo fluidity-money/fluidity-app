@@ -55,7 +55,7 @@ jobs:
   rollback-app:
     if: ${{ github.event.inputs.skip_app_rollback == 'false' }}
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
@@ -111,7 +111,7 @@ jobs:
   rollback-db:
     if: ${{ github.event.inputs.rollback_timescale == 'true' || github.event.inputs.rollback_postgres == 'true' }}
     runs-on:
-      labels: powerfulubuntu
+      group: powerfulubuntu
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
