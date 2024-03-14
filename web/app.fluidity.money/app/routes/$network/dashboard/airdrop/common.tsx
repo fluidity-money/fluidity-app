@@ -2121,7 +2121,7 @@ const RecapModal = ({
             type="secondary"
             className="recap-you-are-eligible-claim-at-tge-button rainbow"
           >
-            Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN) 🐱
+            💸 Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN) 🐱
           </GeneralButton>
         </div>
         <div className="recap-fly-count-buttons-spread-container">
