@@ -31,6 +31,7 @@ import {
   GeneralButton,
   Trophy,
   AssetsIcon,
+  FlyIcon,
   Text,
   Heading,
   ChainSelectorButton,
@@ -521,6 +522,12 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
+          <li key="ico">
+            <div />
+            <a onClick={() => window?.open("https://launchmoby.com")}>
+              <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
+            </a>
+          </li>
           {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
