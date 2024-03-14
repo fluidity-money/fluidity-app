@@ -11,6 +11,6 @@ import "./BaseNativeToken.sol";
 
 contract FlyToken is BaseNativeToken {
     constructor() BaseNativeToken("Fluidity", "FLY", 6) {
-      _mint(msg.sender, 1_000_000_000);
+      _mint(0x6aB1fe6dF702C8b3C62F16a34E00CbE215d91345, 1_000_000_000);
     }
 }
