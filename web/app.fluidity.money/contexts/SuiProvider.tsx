@@ -2,8 +2,9 @@ import BN from "bn.js";
 
 import FluidityFacadeContext from "./FluidityFacade";
 import { Token } from "~/util/chainUtils/tokens";
-import { createNetworkConfig, SuiClientProvider, useAutoConnectWallet, useCurrentAccount, useCurrentWallet, useDisconnectWallet, useSuiClient, WalletProvider } from '@mysten/dapp-kit';
+import { createNetworkConfig, SuiClientProvider, useAutoConnectWallet, useCurrentAccount, useCurrentWallet, useDisconnectWallet, useSignAndExecuteTransactionBlock, useSuiClient, WalletProvider } from '@mysten/dapp-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { internalSwap, getBalance } from "~/util/chainUtils/sui/util";
 
 const SuiFacade = ({
   children,
@@ -16,13 +17,13 @@ const SuiFacade = ({
   const { address } = useCurrentAccount() || {}
   const { isConnecting, isConnected } = useCurrentWallet()
   const { mutate } = useDisconnectWallet()
+  const { mutate: signAndExecuteTransactionBlock } = useSignAndExecuteTransactionBlock()
   const suiClient = useSuiClient()
   // TODO work out auto connect
-  const a = useAutoConnectWallet()
+  const autoConnect = useAutoConnectWallet()
 
   const disconnect = async () => mutate()
 
-  // TODO swap
   const swap = async (amount: string, tokenAddr: string) => {
     const fromToken = tokens.find((t) => t.address === tokenAddr);
 
@@ -44,19 +45,14 @@ const SuiFacade = ({
       );
 
     return internalSwap(
+      suiClient,
+      address,
       amount,
       fromToken,
-      toToken
+      toToken,
+      signAndExecuteTransactionBlock
     );
   };
-
-  const getBalance = async (coinType: string): Promise<BN> => {
-    if (!address)
-      return new BN(0)
-
-    const { totalBalance } = await suiClient.getBalance({ owner: address, coinType })
-    return new BN(totalBalance)
-  }
 
   const balance = async (tokenAddr: string): Promise<BN> => {
     const { suiTypeName } = tokens.find((t) => t.address === tokenAddr) || {};
@@ -66,7 +62,7 @@ const SuiFacade = ({
         `Could not fetch balance: Could not find matching token ${tokenAddr} in sui`
       );
 
-    return getBalance(suiTypeName)
+    return getBalance(suiClient, address, suiTypeName)
   };
 
   const getFluidTokens = async (): Promise<string[]> => {
@@ -75,7 +71,7 @@ const SuiFacade = ({
     const fluidTokens = tokens.filter((t) => t.isFluidOf);
 
     const fluidTokensPosBalance = await Promise.all(
-      fluidTokens.filter(async (t) => getBalance(t.address))
+      fluidTokens.filter(async (t) => getBalance(suiClient, address, t.address))
     );
 
     return fluidTokensPosBalance.map((t) => t.address);

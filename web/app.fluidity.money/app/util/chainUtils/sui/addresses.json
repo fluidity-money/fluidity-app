@@ -1,0 +1,13 @@
+{
+    "mainnet": {
+        "USDC": {
+            "global_vault": "0xb56ce522e3a181a3317ef9dc594552b8ea4375bcbd146737f1bd271531cfac98",
+            "user_vault": "0xec5bc2c210ce7e74129223a2cdc26605f774ef5e68213321777b4967400e6239",
+            "prize_pool_vault": "0xf0f03c7002f4eb3f1ab2ddfd5129787440f8c29304322126b5f6b4042524b846",
+            "coin_reserve": "0x9cd9a9a31bdd89443e3765f3b1d78247453f9a92d5ae255456f4de5e25a9f995",
+            "scallop_version": "0x07871c4b3c847a0f674510d4978d5cf6f960452795e8ff6f189fd2088a3f6ac7",
+            "scallop_market": "0xa757975255146dc9686aa823b7838b507f315d704f428cbadad2f4ea061939d9",
+            "clock": "0x0000000000000000000000000000000000000000000000000000000000000006"
+        }
+    }
+}
