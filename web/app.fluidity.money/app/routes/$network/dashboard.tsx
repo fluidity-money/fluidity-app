@@ -31,6 +31,7 @@ import {
   GeneralButton,
   Trophy,
   AssetsIcon,
+  FlyIcon,
   Text,
   Heading,
   ChainSelectorButton,
@@ -166,13 +167,6 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-  {
-    airdrop: {
-      name: "airdrop",
-      path: (network: string) => `/${network}/dashboard/airdrop`,
-      icon: <AirdropIcon />,
-    },
-  },
   {
     home: {
       name: "dashboard",
@@ -521,6 +515,12 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
+          <li key="ico">
+            <div />
+            <Link onClick={() => window?.open("https://launchmoby.com")}>
+              <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
+            </Link>
+          </li>
           {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
