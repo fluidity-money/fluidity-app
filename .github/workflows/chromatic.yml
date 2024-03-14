@@ -12,7 +12,7 @@ on:
 jobs:
   chromatic-deployment:
     # Operating System
-    runs-on: ubuntu-latest
+    runs-on: powerful-ubuntu-latest
     defaults:
       run:
         working-directory: web/surfing
