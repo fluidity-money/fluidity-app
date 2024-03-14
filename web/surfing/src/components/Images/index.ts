@@ -21,6 +21,7 @@ import { Referral } from "./Referral";
 import { AirdropIcon } from "./Airdrop";
 import { LinkVerticalIcon } from "./LinkVertical";
 import { Checkmark } from "./Checkmark";
+import { FlyIcon } from "./Fly";
 
 export {
   AirdropIcon,
@@ -46,4 +47,5 @@ export {
   Referral,
   LinkVerticalIcon,
   Checkmark,
+  FlyIcon,
 };
