@@ -11,8 +11,7 @@ permissions:
 
 jobs:
   test-go:
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -45,8 +44,7 @@ jobs:
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   test-contracts:
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     environment: mainnet
     steps:
       - uses: actions/checkout@v3
@@ -89,8 +87,7 @@ jobs:
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   test-npm:
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -113,8 +110,7 @@ jobs:
             flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   test-pipeline:
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     environment: mainnet
     steps:
       - uses: actions/checkout@v3

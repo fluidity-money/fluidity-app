@@ -20,8 +20,7 @@ permissions:
 
 jobs:
   rollback-app:
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3

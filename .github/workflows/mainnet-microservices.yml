@@ -17,8 +17,7 @@ env:
 jobs:
   get-diff:
     if: github.event.pull_request.merged == true
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     environment: mainnet
     outputs:
       file_exists: ${{ steps.deployment_list.outputs.exist }}
@@ -52,8 +51,7 @@ jobs:
 
   deploy-arbitrum:
     if: needs.get-diff.outputs.file_exists == 'true'
-    runs-on:
-      labels: powerfulubuntu
+    runs-on: ubuntu-latest
     environment: mainnet
     needs: [get-diff]
     steps:
