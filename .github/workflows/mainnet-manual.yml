@@ -38,7 +38,7 @@ permissions:
 
 jobs:
   build-and-deploy:
-    runs-on: powerful-powerful-ubuntu-latest
+    runs-on: powerful-ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
