@@ -42,7 +42,7 @@ on:
 
 jobs:
   del_runs:
-    runs-on: powerful-ubuntu-latest
+    runs-on: powerfulubuntu
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
