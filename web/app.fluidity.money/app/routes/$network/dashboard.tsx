@@ -524,9 +524,9 @@ export default function Dashboard() {
         <ul className="sidebar-nav">
           <li key="ico">
             <div />
-            <Link onClick={() => window?.open("https://launchmoby.com")}>
+            <a onClick={() => window?.open("https://launchmoby.com")}>
               <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
-            </Link>
+            </a>
           </li>
           {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
