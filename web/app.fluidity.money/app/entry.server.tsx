@@ -1,8 +1,7 @@
 import { EntryContext } from "@remix-run/node";
-import { RemixServer, useLocation, useMatches } from "@remix-run/react";
+import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
 import * as Sentry from "@sentry/remix";
-import { useEffect } from "react";
 
 export default function handleRequest(
   request: Request,
