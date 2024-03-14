@@ -4,7 +4,7 @@ import type {
 } from "~/util/chainUtils/ethereum/transaction";
 import type AugmentedToken from "~/types/AugmentedToken";
 
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -2059,6 +2059,26 @@ const RecapModal = ({
     );
   };
 
+  const handleClaimYourFly = () => {
+    // Get the user's address.by
+  };
+
+  const handleStakeYourFly = () => {};
+
+  const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] = useState(false);
+
+  const closeWithEsc = useCallback(
+    (event: { key: string }) => {
+      event.key === "Escape" && setTermsAndConditionsModalVis && setTermsAndConditionsModalVis(false);
+    },
+    [termsAndConditionsModalVis, setTermsAndConditionsModalVis]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeWithEsc);
+    return () => document.removeEventListener("keydown", closeWithEsc);
+  }, [termsAndConditionsModalVis, closeWithEsc]);
+
   const YouAreEligible = () => {
     return (
       <div className="recap-fly-count-block">
@@ -2070,13 +2090,38 @@ const RecapModal = ({
         </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <div className="recap-fly-count-buttons-spread">
-            <GeneralButton disabled>Claim your FLY</GeneralButton>
-            <GeneralButton disabled>Stake your $FLY</GeneralButton>
+            <GeneralButton
+              onClick={handleClaimYourFly}
+              disabled
+            >
+              Claim your FLY
+            </GeneralButton>
+            <GeneralButton
+              onClick={handleStakeYourFly}
+              disabled
+            >
+              Stake your $FLY
+            </GeneralButton>
           </div>
         </div>
+        <div className="recap-you-are-eligible-delegate-button-terms-container">
+          <Text>
+            By pressing the Claim and/or Stake button, you agree to our airdrop { }
+            <a
+              className="recap-terms-of-condition-claim-or-stake"
+              onClick={() => setTermsAndConditionsModalVis(true)}
+            >
+              terms of service
+            </a>
+          </Text>
+        </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
-          <GeneralButton type="primary">
-            You will be able to claim your rewards at Fluidity TGE.
+          <GeneralButton
+            size="medium"
+            type="secondary"
+            className="recap-you-are-eligible-claim-at-tge-button rainbow"
+          >
+            Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN) 🐱
           </GeneralButton>
         </div>
         <div className="recap-fly-count-buttons-spread-container">
@@ -2139,6 +2184,74 @@ const RecapModal = ({
 
   return (
     <>
+      <Modal
+        id="terms-and-conditions"
+        visible={termsAndConditionsModalVis}
+      >
+        <div className="airdrop-terms-and-conditions-modal-container">
+          <div className="airdrop-terms-and-conditions-modal-child">
+            <div className="airdrop-terms-and-conditions-modal-navbar">
+              <GeneralButton
+                size="medium"
+                handleClick={() => setTermsAndConditionsModalVis(false)}
+              >
+                Close
+              </GeneralButton>
+            </div>
+            <p>
+1. Description
+
+We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+            </p>
+            <p>
+1. Terms of Airdrop Program
+
+2.1 No Purchase Necessary
+
+There is no purchase necessary to receive the Airdrop. However, you must have
+wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+            </p>
+            <p>
+2.2 Timing
+
+Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+            </p>
+            <p>
+2.3 Limited Supply
+
+An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
+has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
+suspend any Airdrop requirements at any time without notice, including the amount previously
+advertised as available.
+            </p>
+            <p>
+2.4 Eligibility
+
+You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
+
+To the best of our understanding, below is a list of countries that does not recognise digital assets;
+
+*Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
+
+Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
+
+**source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
+            </p>
+            <p>
+2.5 Notice of Award
+
+In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
+We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+            </p>
+            <p>
+3 Risk Disclosures Relating to Airdrop Program
+
+You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+            </p>
+          </div>
+        </div>
+      </Modal>
+
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}
         <div className={"recap-hero"}>
