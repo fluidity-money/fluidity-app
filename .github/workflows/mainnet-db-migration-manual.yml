@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   db-migration:
-    runs-on: powerful-ubuntu-latest
+    runs-on: powerfulubuntu
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3

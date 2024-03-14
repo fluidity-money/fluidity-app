@@ -14,7 +14,7 @@ permissions:
 jobs:
   db-migration:
     if: github.event.pull_request.merged == true
-    runs-on: powerful-ubuntu-latest
+    runs-on: powerfulubuntu
     environment: mainnet
     steps:
       - uses: actions/checkout@v3
