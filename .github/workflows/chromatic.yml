@@ -4,7 +4,7 @@
 name: 'Chromatic'
 
 # Event for the workflow
-on: 
+on:
   push:
     paths: "web/**"
 
@@ -12,11 +12,12 @@ on:
 jobs:
   chromatic-deployment:
     # Operating System
-    runs-on: powerfulubuntu
+    runs-on:
+      labels: powerfulubuntu
     defaults:
       run:
         working-directory: web/surfing
-        
+
     # Job steps
     steps:
       - uses: actions/checkout@v1
