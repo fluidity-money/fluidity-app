@@ -524,7 +524,7 @@ export default function Dashboard() {
         <ul className="sidebar-nav">
           <li key="ico">
             <div />
-            <a onClick={() => window?.open("https://launchmoby.com")}>
+            <a style={{"cursor": "pointer"}} href="https://launchmoby.com" target="_blank">
               <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
             </a>
           </li>
