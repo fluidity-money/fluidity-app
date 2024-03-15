@@ -1,3 +1,5 @@
+/* eslint-disable no-irregular-whitespace */
+
 import type {
   StakingRatioRes,
   StakingDepositsRes,
@@ -2063,8 +2065,6 @@ const RecapModal = ({
     // Get the user's address.by
   };
 
-  const handleStakeYourFly = () => {};
-
   const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] = useState(false);
 
   const closeWithEsc = useCallback(
@@ -2096,10 +2096,7 @@ const RecapModal = ({
             >
               Claim your FLY
             </GeneralButton>
-            <GeneralButton
-              onClick={handleStakeYourFly}
-              disabled
-            >
+            <GeneralButton disabled>
               Stake your $FLY
             </GeneralButton>
           </div>
