@@ -20,6 +20,10 @@ const (
 	// configuration for Solana
 	TableWorkerConfigSolana = "worker_config_solana"
 
+	// TableWorkerConfigSui to use for retrieving worker server
+	// configuration for Sui
+	TableWorkerConfigSui = "worker_config_sui"
+
 	// TableFeeSwitch is used to replace addresses that would normally be
 	// paid out with another address for the fee switching feature until we
 	// have Fluidity V2 up
@@ -29,5 +33,6 @@ const (
 type (
 	WorkerConfigEthereum = worker.WorkerConfigEthereum
 	WorkerConfigSolana   = worker.WorkerConfigSolana
+	WorkerConfigSui      = worker.WorkerConfigSui
 	FeeSwitch            = worker.FeeSwitch
 )
