@@ -4,6 +4,7 @@ module fluidity_coin::fluidity_coin {
     use std::option;
     use sui::coin::{Self, Coin, TreasuryCap};
     use sui::transfer;
+    use sui::url;
     use sui::tx_context::{Self, TxContext};
     use sui::object::{ Self, UID, ID};
     use sui::balance::{ Self, Balance};
@@ -15,37 +16,41 @@ module fluidity_coin::fluidity_coin {
     use std::vector;
 
     // **************************************************** ERROR CODES ****************************************************
-    
-    const VAULTS_ALREADY_INITIALIZED: u64 = 0;
-    const CONTRACT_IS_PAUSED: u64 = 1;
-    const CONTRACT_IS_ALREADY_PAUSED: u64 = 2;
-    const CONTRACT_IS_ALREADY_UNPAUSED: u64 = 3;
-    const E_NOT_ENOUGH_COINS_IN_RESERVE: u64 = 4;
-    const VAULTS_NOT_INITIALIZED: u64 = 5;
-    const E_INVALID_SCALLOP_MARKET: u64 = 6;
-    const E_INVALID_SCALLOP_VERSION: u64 = 7;
-    const E_RECEIPIENTS_AMOUNTS_MISMATCH: u64 = 8;
 
-    // **************************************************** CONSTANTS ****************************************************
-    
-    const SCALLOP_MARKET_ID: address = @0xa757975255146dc9686aa823b7838b507f315d704f428cbadad2f4ea061939d9;
-    const SCALLOP_VERSION: address = @0x07871c4b3c847a0f674510d4978d5cf6f960452795e8ff6f189fd2088a3f6ac7;
-    
+    const E_CONTRACT_IS_PAUSED: u64 = 0;
+    const E_CONTRACT_IS_ALREADY_PAUSED: u64 = 1;
+    const E_CONTRACT_IS_ALREADY_UNPAUSED: u64 = 2;
+    const E_NOT_ENOUGH_COINS_IN_RESERVE: u64 = 3;
+    const E_VAULTS_NOT_INITIALIZED: u64 = 4;
+    const E_INVALID_SCALLOP_MARKET: u64 = 5;
+    const E_INVALID_SCALLOP_VERSION: u64 = 6;
+    const E_RECEIPIENTS_AMOUNTS_MISMATCH: u64 = 7;
+    const E_BAD_ADMIN_CAP: u64 = 8;
+    const E_BAD_WORKER_CAP: u64 = 9;
+    const E_BAD_EMERGENCY_CAP: u64 = 10;
+    const E_BAD_DAO_CAP: u64 = 11;
+
     // **************************************************** TYPES ****************************************************
-    
+
     /// The global config
-    struct Global has key  {
+    struct Global<phantom UNDERLYING> has key  {
         id: UID,
         paused: bool,
         vaults_initialized: bool,
+        scallop_market_id: address,
+        scallop_version: address,
+        admin_cap_id: ID,
+        worker_cap_id: ID,
+        emergency_cap_id: ID,
+        dao_cap_id: ID
     }
 
     struct CoinReserve has key, store {
         id: UID,
-        balance: Balance<FLUIDITY_COIN>
+        balance: Balance<FLUIDITY_COIN_CAP>
     }
 
-    struct UserVault<phantom UNDERLYING> has key, store {
+    struct UserVault<phantom UNDERLYING, FLUIDITY_COIN_CAP> has key, store {
         id: UID,
         balance: Balance<MarketCoin<UNDERLYING>>
     }
@@ -56,8 +61,8 @@ module fluidity_coin::fluidity_coin {
     }
 
     /// Name of the coin. By convention, this type has the same name as its parent module
-    /// and has no fields. The full type of the coin defined by this module will be `COIN<FLUIDITY_COIN>`.
-    struct FLUIDITY_COIN has drop {}
+    /// and has no fields. The full type of the coin defined by this module will be `COIN<FLUIDITY_COIN_CAP>`.
+    struct FLUIDITY_COIN_CAP has drop {}
 
     struct AdminCap has key { id: UID }
     struct WorkerCap has key { id: UID }
@@ -147,45 +152,138 @@ module fluidity_coin::fluidity_coin {
     }
 
     // **************************************************** FUNCTIONS ****************************************************
-    
-    fun assert_scallop_market(market: &ScallopMarket) {
-        assert!(object::id_address(market) == SCALLOP_MARKET_ID, E_INVALID_SCALLOP_MARKET);
+
+    fun assert_scallop_market<UNDERLYING>(
+        global: &Global<UNDERLYING>,
+        market: &ScallopMarket
+    ) {
+        assert!(
+            object::id_address(market) == global.scallop_market_id,
+            E_INVALID_SCALLOP_MARKET
+        );
     }
 
-    fun assert_scallop_version(version: &ScallopVersion) {
-        assert!(object::id_address(version) == SCALLOP_VERSION, E_INVALID_SCALLOP_VERSION);
+    fun assert_scallop_version<UNDERLYING>(
+        global: &Global<UNDERLYING>,
+        version: &ScallopVersion
+    ) {
+        assert!(
+            object::id_address(version) == global.scallop_version,
+            E_INVALID_SCALLOP_VERSION
+        );
     }
 
-    /// Register the managed currency to acquire its `TreasuryCap`. Because
-    /// this is a module initializer, it ensures the currency only gets
-    /// registered once.
-    fun init(
-        witness: FLUIDITY_COIN, 
+    fun assert_admin_cap<UNDERLYING>(
+        global: &Global<UNDERLYING>,
+        admin_cap: &AdminCap
+    ) {
+        assert!(global.admin_cap_id == object::id(admin_cap), E_BAD_ADMIN_CAP);
+    }
+
+    fun assert_worker_cap<UNDERLYING>(
+        global: &Global<UNDERLYING>,
+        worker_cap: &WorkerCap
+    ) {
+        assert!(global.worker_cap_id == object::id(worker_cap), E_BAD_WORKER_CAP);
+    }
+
+    fun assert_emergency_cap<UNDERLYING>(
+        global: &Global<UNDERLYING>,
+        emergency_cap: &EmergencyCap
+    ) {
+        assert!(global.emergency_cap_id == object::id(emergency_cap), E_BAD_EMERGENCY_CAP);
+    }
+
+    fun assert_dao_cap<UNDERLYING>(
+        global: &Global<UNDERLYING>,
+        dao_cap: &DAOCap
+    ) {
+        assert!(global.dao_cap_id == object::id(dao_cap), E_BAD_DAO_CAP);
+    }
+
+    entry fun new_coin<UNDERLYING>(
+        scallop_market: address,
+        scallop_version: address,
+        coin_decimals: u8,
+        coin_name: vector<u8>,
+        coin_symbol: vector<u8>,
+        coin_desc: vector<u8>,
+        coin_icon_url: vector<u8>,
         ctx: &mut TxContext
     ) {
+        let witness = FLUIDITY_COIN_CAP{};
+        let coin_icon_url = url::new_unsafe_from_bytes(coin_icon_url);
         // Get a treasury cap for the coin and give it to the transaction sender
-        let (treasury_cap, metadata) = coin::create_currency<FLUIDITY_COIN>(witness, 9, b"FSUI", b"FSUI", b"", option::none(), ctx);
-        let global = Global {
+        let (treasury_cap, metadata) = coin::create_currency<FLUIDITY_COIN_CAP>(
+            witness,                     // witness
+            coin_decimals,               // decimals (should be the underlying)
+            coin_name,                   // coin name
+            coin_symbol,                 // coin symbol
+            coin_desc,                   // coin description
+            option::some(coin_icon_url), // coin icon url
+            ctx
+        );
+
+        transfer::public_freeze_object(metadata);
+        transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
+
+        let admin_cap = AdminCap { id: object::new(ctx) };
+        let worker_cap = WorkerCap { id: object::new(ctx) };
+        let emergency_cap = EmergencyCap { id: object::new(ctx) };
+        let dao_cap = DAOCap { id: object::new(ctx) };
+
+        // Store the capability IDs in the global storage for verification later.
+
+        let admin_cap_id = object::id(&admin_cap);
+        let worker_cap_id = object::id(&worker_cap);
+        let emergency_cap_id = object::id(&emergency_cap);
+        let dao_cap_id = object::id(&dao_cap);
+
+        transfer::transfer(admin_cap, tx_context::sender(ctx));
+        transfer::transfer(worker_cap, tx_context::sender(ctx));
+        transfer::transfer(emergency_cap, tx_context::sender(ctx));
+        transfer::transfer(dao_cap, tx_context::sender(ctx));
+
+        let global = Global<UNDERLYING> {
             id: object::new(ctx),
             paused: false,
             vaults_initialized: false,
+            scallop_market_id: scallop_market,
+            scallop_version: scallop_version,
+            admin_cap_id: admin_cap_id,
+            worker_cap_id: worker_cap_id,
+            emergency_cap_id: emergency_cap_id,
+            dao_cap_id: dao_cap_id
         };
         event::emit(InitEvent { global_id: object::uid_to_inner(&global.id) });
+
+        let user_vault = UserVault<UNDERLYING, FLUIDITY_COIN_CAP> {
+            id: object::new(ctx),
+            balance: balance::zero<MarketCoin<UNDERLYING>>(),
+        };
+        let prize_pool_vault = PrizePoolVault<UNDERLYING> {
+            id: object::new(ctx),
+            balance: balance::zero<MarketCoin<UNDERLYING>>(),
+        };
+        let coin_reserve = CoinReserve {
+            id: object::new(ctx),
+            balance: balance::zero<FLUIDITY_COIN_CAP>(),
+        };
+        event::emit(InitVaultEvent {
+            user_vault_id: object::uid_to_inner(&user_vault.id),
+            prize_pool_vault_id: object::uid_to_inner(&prize_pool_vault.id),
+            coin_reserve_id: object::uid_to_inner(&coin_reserve.id),
+        });
+
+        transfer::share_object(user_vault);
+        transfer::share_object(prize_pool_vault);
+        transfer::share_object(coin_reserve);
+
+        global.vaults_initialized = true;
+        global.scallop_market_id = scallop_market;
+        global.scallop_version = scallop_version;
+
         transfer::share_object(global);
-        transfer::public_freeze_object(metadata);
-        transfer::public_transfer(treasury_cap, tx_context::sender(ctx));
-        transfer::transfer(AdminCap {
-            id: object::new(ctx)
-        }, tx_context::sender(ctx));
-        transfer::transfer(WorkerCap {
-            id: object::new(ctx)
-        }, tx_context::sender(ctx));
-        transfer::transfer(EmergencyCap {
-            id: object::new(ctx)
-        }, tx_context::sender(ctx));
-        transfer::transfer(DAOCap {
-            id: object::new(ctx)
-        }, tx_context::sender(ctx))
     }
 
     entry fun transfer_admin_cap(admin_cap: AdminCap, recipient: address) {
@@ -203,48 +301,20 @@ module fluidity_coin::fluidity_coin {
     entry fun transfer_dao_cap(_: &AdminCap, dao_cap: DAOCap, recipient: address) {
         transfer::transfer(dao_cap, recipient)
     }
-    
-    // Initialize the vaults, coin reserve, global state and caps
-    entry fun initialize<UNDERLYING>(
-        _: &AdminCap,
-        global: &mut Global,
+
+    // Manager can mint new coins to the coin reserve. Assumes the
+    // global passed is the appropriate one, as the only error state is a
+    // bad vault setup and blow up later (presumably.)
+    entry fun mint<UNDERLYING>(
+        treasury_cap: &mut TreasuryCap<FLUIDITY_COIN_CAP>,
+        admin_cap: &AdminCap,
+        global: &Global<UNDERLYING>,
+        coin_reserve: &mut CoinReserve,
+        amount: u64,
         ctx: &mut TxContext
     ) {
-        assert!(!global.vaults_initialized, VAULTS_ALREADY_INITIALIZED);
-        let user_vault = UserVault<UNDERLYING> {
-            id: object::new(ctx),
-            balance: balance::zero<MarketCoin<UNDERLYING>>(),
-        };
-        let prize_pool_vault = PrizePoolVault<UNDERLYING> {
-            id: object::new(ctx),
-            balance: balance::zero<MarketCoin<UNDERLYING>>(),
-        };
-        let coin_reserve = CoinReserve {
-            id: object::new(ctx),
-            balance: balance::zero<FLUIDITY_COIN>(),
-        };
-        event::emit(InitVaultEvent {
-            user_vault_id: object::uid_to_inner(&user_vault.id),
-            prize_pool_vault_id: object::uid_to_inner(&prize_pool_vault.id),
-            coin_reserve_id: object::uid_to_inner(&coin_reserve.id),
-        });
-
-        transfer::share_object(user_vault);
-        transfer::share_object(prize_pool_vault);
-        transfer::share_object(coin_reserve);
-        global.vaults_initialized = true;
-    }
-
-    /// Manager can mint new coins to the coin reserve
-    entry fun mint(
-        treasury_cap: &mut TreasuryCap<FLUIDITY_COIN>,
-        _: &AdminCap,
-        global: &Global, 
-        coin_reserve: &mut CoinReserve, 
-        amount: u64, 
-        ctx: &mut TxContext
-    ) {
-        assert!(global.vaults_initialized, VAULTS_NOT_INITIALIZED);
+        assert!(global.vaults_initialized, E_VAULTS_NOT_INITIALIZED);
+        assert_admin_cap(global, admin_cap);
         let minted_coin = coin::mint(treasury_cap, amount, ctx);
         balance::join(&mut coin_reserve.balance, coin::into_balance(minted_coin));
         event::emit(MintEvent {
@@ -255,16 +325,17 @@ module fluidity_coin::fluidity_coin {
     }
 
     /// Manager can burn coins from the coin reserve
-    entry fun burn(
-        treasury_cap: &mut TreasuryCap<FLUIDITY_COIN>, 
-        _: &AdminCap,
-        global: &Global, 
-        coin_reserve: &mut CoinReserve, 
-        amount: u64, 
+    entry fun burn<UNDERLYING>(
+        treasury_cap: &mut TreasuryCap<FLUIDITY_COIN_CAP>,
+        admin_cap: &AdminCap,
+        global: &Global<UNDERLYING>,
+        coin_reserve: &mut CoinReserve,
+        amount: u64,
         ctx: &mut TxContext
     ) {
-        assert!(global.vaults_initialized, VAULTS_NOT_INITIALIZED);
+        assert!(global.vaults_initialized, E_VAULTS_NOT_INITIALIZED);
         assert!(balance::value(&coin_reserve.balance) >= amount, E_NOT_ENOUGH_COINS_IN_RESERVE);
+        assert_admin_cap(global, admin_cap);
         let coins_to_burn_balance = balance::split(&mut coin_reserve.balance, amount);
         coin::burn(treasury_cap, coin::from_balance(coins_to_burn_balance, ctx));
         event::emit(BurnEvent {
@@ -275,92 +346,99 @@ module fluidity_coin::fluidity_coin {
 
     }
 
-    fun pause(
-        global: &mut Global,
+    fun pause<UNDERLYING>(
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
-        assert!(!global.paused, CONTRACT_IS_ALREADY_PAUSED);
+        assert!(!global.paused, E_CONTRACT_IS_ALREADY_PAUSED);
         global.paused = true;
         event::emit(PauseEvent { global_id: object::uid_to_inner(&global.id), caller: tx_context::sender(ctx)});
     }
 
-    fun unpause(
-        global: &mut Global,
+    fun unpause<UNDERLYING>(
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
-        assert!(global.paused, CONTRACT_IS_ALREADY_UNPAUSED);
+        assert!(global.paused, E_CONTRACT_IS_ALREADY_UNPAUSED);
         global.paused = false;
         event::emit(UnpauseEvent { global_id: object::uid_to_inner(&global.id), caller: tx_context::sender(ctx)});
     }
 
-    entry fun pause_admin(
-        _: &AdminCap,
-        global: &mut Global,
+    entry fun pause_admin<UNDERLYING>(
+        admin_cap: &AdminCap,
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
+        assert_admin_cap(global, admin_cap);
         pause(global, ctx);
     }
 
-    entry fun pause_dao(
-        _: &DAOCap,
-        global: &mut Global,
+    entry fun pause_dao<UNDERLYING>(
+        dao_cap: &DAOCap,
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
+        assert_dao_cap(global, dao_cap);
         pause(global, ctx);
     }
 
-    entry fun pause_emergency(
-        _: &EmergencyCap,
-        global: &mut Global,
+    entry fun pause_emergency<UNDERLYING>(
+        emergency_cap: &EmergencyCap,
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
+        assert_emergency_cap(global, emergency_cap);
         pause(global, ctx);
     }
 
-    entry fun unpause_admin(
-        _: &AdminCap,
-        global: &mut Global,
+    entry fun unpause_admin<UNDERLYING>(
+        admin_cap: &AdminCap,
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
+        assert_admin_cap(global, admin_cap);
         unpause(global, ctx);
     }
 
-    entry fun unpause_dao(
-        _: &DAOCap,
-        global: &mut Global,
+    entry fun unpause_dao<UNDERLYING>(
+        dao_cap: &DAOCap,
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
+        assert_dao_cap(global, dao_cap);
         unpause(global, ctx);
     }
 
-    entry fun unpause_emergency(
-        _: &EmergencyCap,
-        global: &mut Global,
+    entry fun unpause_emergency<UNDERLYING>(
+        emergency_cap: &EmergencyCap,
+        global: &mut Global<UNDERLYING>,
         ctx: &TxContext
     ) {
+        assert_emergency_cap(global, emergency_cap);
         unpause(global, ctx);
     }
 
     #[allow(lint(self_transfer))]
     public fun wrap<UNDERLYING>(
-        global: &Global,
+        global: &Global<UNDERLYING>,
         user_vault: &mut UserVault<UNDERLYING>,
         coin_reserve: &mut CoinReserve,
-        scallop_version: &ScallopVersion, 
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         coin: Coin<UNDERLYING>,
         ctx: &mut TxContext
     ) {
-        assert!(!global.paused, CONTRACT_IS_PAUSED);
-        assert!(global.vaults_initialized, VAULTS_NOT_INITIALIZED);
-        assert_scallop_market(scallop_market);
-        assert_scallop_version(scallop_version);
+        assert!(!global.paused, E_CONTRACT_IS_PAUSED);
+        assert!(global.vaults_initialized, E_VAULTS_NOT_INITIALIZED);
+        assert_user_vault(global, user_vault);
+        assert_scallop_market(global, scallop_market);
+        assert_scallop_version(global, scallop_version);
 
         let amount = coin::value(&coin);
         let user = tx_context::sender(ctx);
         let coin_obj_id = object::id(&coin);
-        
+
         // Mint s_coin to vault
         let s_coin = protocol::mint::mint(
             scallop_version, scallop_market, coin, clock, ctx
@@ -373,7 +451,7 @@ module fluidity_coin::fluidity_coin {
         transfer::public_transfer(coin::from_balance(reserve_coin_balance, ctx), user);
 
         // Join s_coin to user vault
-        balance::join(&mut user_vault.balance, coin::into_balance(s_coin)); 
+        balance::join(&mut user_vault.balance, coin::into_balance(s_coin));
 
         let now = clock::timestamp_ms(clock) / 1000;
         event::emit(WrapEvent {
@@ -391,20 +469,21 @@ module fluidity_coin::fluidity_coin {
 
     #[allow(lint(self_transfer))]
     public fun unwrap<UNDERLYING>(
-        global: &Global,
-        coin: Coin<FLUIDITY_COIN>,
-        user_vault: &mut UserVault<UNDERLYING>,
+        global: &Global<UNDERLYING>,
+        coin: Coin<FLUIDITY_COIN_CAP>,
+        user_vault: &mut UserVault<FLUIDITY_COIN_CAP>,
         prize_pool_vault: &mut PrizePoolVault<UNDERLYING>,
         coin_reserve: &mut CoinReserve,
-        scallop_version: &ScallopVersion, 
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         ctx: &mut TxContext
     ) {
-        assert!(!global.paused, CONTRACT_IS_PAUSED);
-        assert!(global.vaults_initialized, VAULTS_NOT_INITIALIZED);
-        assert_scallop_market(scallop_market);
-        assert_scallop_version(scallop_version);
+        assert!(!global.paused, E_CONTRACT_IS_PAUSED);
+        assert!(global.vaults_initialized, E_VAULTS_NOT_INITIALIZED);
+        assert_user_vault(global, user_vault);
+        assert_scallop_market(global, scallop_market);
+        assert_scallop_version(global, scallop_version);
 
         let user = tx_context::sender(ctx);
         let f_coin_amount = coin::value(&coin);
@@ -415,7 +494,7 @@ module fluidity_coin::fluidity_coin {
         let redeemed_coin = protocol::redeem::redeem(
             scallop_version, scallop_market, s_coin, clock, ctx
         );
-        
+
         // Split redeemed coin into user's coin and vault's coin
         let user_coin = coin::split<UNDERLYING>(&mut redeemed_coin, f_coin_amount, ctx);
         let user_coin_amount = coin::value(&user_coin);
@@ -433,11 +512,11 @@ module fluidity_coin::fluidity_coin {
             s_coin_amount = coin::value(&s_coin);
 
             // Join s_coin to prize pool vault
-            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin)); 
+            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin));
         } else {
             coin::destroy_zero(redeemed_coin);
         };
-        
+
         let now = clock::timestamp_ms(clock) / 1000;
         event::emit(UnwrapEvent {
             user_vault_id: object::uid_to_inner(&user_vault.id),
@@ -451,24 +530,27 @@ module fluidity_coin::fluidity_coin {
             underlying_amount: user_coin_amount,
             time: now,
         });
-        
+
         // "Burn" respective fCoin
-        balance::join(&mut coin_reserve.balance, coin::into_balance(coin));    
+        balance::join(&mut coin_reserve.balance, coin::into_balance(coin));
     }
 
     // Distribute yield to multiple addresses
     entry fun distribute_yield<UNDERLYING>(
-        _: &WorkerCap, 
+        worker_cap: &WorkerCap,
+        global: &Global<UNDERLYING>,
         prize_pool_vault: &mut PrizePoolVault<UNDERLYING>,
-        scallop_version: &ScallopVersion, 
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         recipients: vector<address>,
         amounts: vector<u64>,
         ctx: &mut TxContext
     ) {
-        assert_scallop_market(scallop_market);
-        assert_scallop_version(scallop_version);
+        assert!(global.paused, E_CONTRACT_IS_PAUSED);
+        assert_worker_cap(global, worker_cap);
+        assert_scallop_market(global, scallop_market);
+        assert_scallop_version(global, scallop_version);
         assert!(vector::length(&recipients) == vector::length(&amounts), E_RECEIPIENTS_AMOUNTS_MISMATCH);
 
         let s_coin = coin::from_balance(balance::withdraw_all<MarketCoin<UNDERLYING>>(&mut prize_pool_vault.balance), ctx);
@@ -480,7 +562,7 @@ module fluidity_coin::fluidity_coin {
         let i = 0u64;
         while (i < number_of_recipients) {
             let recipient = vector::borrow(&recipients, i);
-            let amount = vector::borrow(&amounts, i); 
+            let amount = vector::borrow(&amounts, i);
             let redeemed_coin_amount = coin::value(&redeemed_coin);
             assert!(*amount <= redeemed_coin_amount, E_NOT_ENOUGH_COINS_IN_RESERVE);
             transfer::public_transfer(coin::split(&mut redeemed_coin, *amount, ctx), *recipient);
@@ -497,9 +579,9 @@ module fluidity_coin::fluidity_coin {
             let s_coin = protocol::mint::mint(
                 scallop_version, scallop_market, redeemed_coin, clock, ctx
             );
-            
+
             // Join s_coin to prize pool vault
-            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin)); 
+            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin));
         } else { // otherwise destroy the remaining coin
             coin::destroy_zero(redeemed_coin);
         };
@@ -507,13 +589,14 @@ module fluidity_coin::fluidity_coin {
 
     #[allow(lint(self_transfer))]
     entry fun emergency_drain_prize_pool_vault<UNDERLYING>(
-        _: &DAOCap, 
-        prize_pool_vault: &mut PrizePoolVault<UNDERLYING>, 
-        scallop_version: &ScallopVersion, 
+        dao_cap: &DAOCap,
+        prize_pool_vault: &mut PrizePoolVault<UNDERLYING>,
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         ctx: &mut TxContext
     ) {
+        assert_dao_cap(global, dao_cap);
         assert!(balance::value(&prize_pool_vault.balance) != 0, E_NOT_ENOUGH_COINS_IN_RESERVE);
         let s_coin = coin::from_balance(balance::withdraw_all<MarketCoin<UNDERLYING>>(&mut prize_pool_vault.balance), ctx);
         let redeemed_coin = protocol::redeem::redeem(

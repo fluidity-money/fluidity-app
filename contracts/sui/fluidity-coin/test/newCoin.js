@@ -13,24 +13,35 @@ const {
     CONTRACT_ID,
     GLOBAL,
     ADMIN_CAP,
+    SCALLOP_MARKET,
+    SCALLOP_VERSION
 } = require('./helpers/constants');
 
 const suiClient = new SuiClient({ url: getFullnodeUrl('mainnet') });
 
-async function initialize() {
-    console.log('Executing Initialize...');
+async function newCoin() {
+    console.log('Executing NewCoin...');
 
-    const tx = new TransactionBlock(); 
+    const tx = new TransactionBlock();
     tx.setGasBudget(100000000);
     let key = fromB64(process.env.DEPLOYER_PRIVATE_KEY).slice(1);
     let signer = Ed25519Keypair.fromSecretKey(key);
     console.log("Caller address", await signer.toSuiAddress());
-    
+
     tx.moveCall({
-      target: `${CONTRACT_ID}::fluidity_coin::initialize`,
-      arguments: [tx.object(ADMIN_CAP), tx.object(GLOBAL)],
+      target: `${CONTRACT_ID}::fluidity_coin::new_coin`,
+      arguments: [
+        tx.object(SCALLOP_MARKET),
+        tx.object(SCALLOP_VERSION),
+        9,
+        "FLUID SUI",
+        "fSUI",
+        "Fluid Sui is a Fluid Asset wrapped form of Sui. Use the app at https://app.fluidity.money",
+        ""
+      ],
       typeArguments: [SUI_TYPE_ARG],
     });
+    return;
     let executeTxn = await suiClient.signAndExecuteTransactionBlock({
       transactionBlock: tx,
       signer: signer,
@@ -43,4 +54,4 @@ async function initialize() {
     extractTransactionStatusAndError(executeTxn);
 }
 
-initialize().catch(console.error);
+newCoin().catch(console.error);
