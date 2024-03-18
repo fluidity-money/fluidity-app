@@ -26,19 +26,16 @@ type SuiToken struct {
 	TokenShortName string `json:"token_short_name"`
 	TokenDecimals  int    `json:"token_decimals"`
 	PackageId      string `json:"package_id"`
+	IsFluid        bool   `json:"is_fluid"`
 }
 
 // can't define these as const as they contain the package id, which differs by token/network
 
 func (s *SuiToken) Type() string {
-	if s.IsFluid() {
+	if s.IsFluid {
 		return s.PackageId + fluidTypeSuffix
 	}
 	return s.PackageId + coinTypeSuffix
-}
-
-func (s *SuiToken) IsFluid() bool {
-	return s.TokenShortName[0] == 'f'
 }
 
 // TokenDetails to convert to the common token details format

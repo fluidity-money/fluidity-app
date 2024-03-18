@@ -14,9 +14,6 @@ const (
 	// TopicCheckpoints to get a summary of every checkpoint
 	TopicCheckpoints = "sui.checkpoint"
 
-	// TopicEvents to get wrap, unwrap, or yield distribution events
-	TopicEvents = "sui.event"
-
 	// TopicDecoratedTransfers to get decorated transfers to process with a worker
 	TopicDecoratedTransfers = "sui.decorated_transfer"
 )
@@ -28,16 +25,6 @@ func Checkpoints(f func(Checkpoint)) {
 		message.Decode(&checkpoint)
 
 		f(checkpoint)
-	})
-}
-
-func Events(f func(Event)) {
-	queue.GetMessages(TopicEvents, func(message queue.Message) {
-		var event Event
-
-		message.Decode(&event)
-
-		f(event)
 	})
 }
 

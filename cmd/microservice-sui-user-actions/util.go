@@ -1,6 +1,18 @@
 package main
 
-import "github.com/fluidity-money/fluidity-app/lib/log"
+import (
+	"fmt"
+	"math/big"
+
+	"github.com/block-vision/sui-go-sdk/models"
+	"github.com/block-vision/sui-go-sdk/sui"
+	"github.com/fluidity-money/fluidity-app/lib/log"
+)
+
+const (
+	// MistDecimalPlaces to be mindful of when tracking fees paid
+	MistDecimalPlaces = 1e9
+)
 
 func mustMapFromInterface(m interface{}) map[string]interface{} {
 	m_, ok := m.(map[string]interface{})
