@@ -86,4 +86,8 @@ func main() {
 		lootboxUpdateTrackedRewardAmounts(winner)
 		database.InsertWinner(winner)
 	})
+
+	queue.WinnersSui(func(winner queue.Winner) {
+		database.InsertWinner(winner)
+	})
 }
