@@ -292,7 +292,7 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 	}
 }
 
-func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, fee *big.Rat, application *string, tokenShortName string, tokenDecimals int) UserAction {
 	return UserAction{
 		Network:          network.NetworkSui,
 		Type:             "send",
@@ -304,6 +304,8 @@ func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddr
 		AmountStr:        amount.String(),
 		TokenDetails:     token_details.New(tokenShortName, tokenDecimals),
 		Time:             time.Now(),
+		AdjustedFee:      fee,
+		Application:      *application,
 	}
 }
 

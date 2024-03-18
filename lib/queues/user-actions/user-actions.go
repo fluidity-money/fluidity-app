@@ -7,6 +7,8 @@ package user_actions
 // user_actions contains queue code that receives user actions
 
 import (
+	"math/big"
+
 	solApplications "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -102,7 +104,7 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 	)
 }
 
-func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, tokenShortName string, tokenDecimals int) UserAction {
+func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, fee *big.Rat, application *string, tokenShortName string, tokenDecimals int) UserAction {
 	return user_actions.NewSendSui(
 		network_,
 		senderAddress,
@@ -110,6 +112,8 @@ func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddr
 		transactionHash,
 		amount,
 		txIndex,
+		fee,
+		application,
 		tokenShortName,
 		tokenDecimals,
 	)
