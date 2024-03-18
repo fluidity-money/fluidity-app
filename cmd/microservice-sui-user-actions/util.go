@@ -84,7 +84,7 @@ func getSuiGasFee(suiClient sui.ISuiAPI, suiPythPubkey string, gasUsed models.Ga
 
 	mistDecimalPlacesRat := big.NewRat(MistDecimalPlaces, 1)
 
-	// sui gas fee is computation fee + storage fee + rebate, in MIST (9 decimals)
+	// sui gas fee is computation fee + storage fee - rebate, in MIST (9 decimals)
 	gasFee, _ := new(big.Rat).SetString(computationFee_)
 	storageFee, _ := new(big.Rat).SetString(storageFee_)
 	storageRebate, _ := new(big.Rat).SetString(storageRebate_)
