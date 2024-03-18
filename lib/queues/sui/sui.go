@@ -4,11 +4,14 @@
 
 package sui
 
-// sui contains queue code that receives 
+// sui contains queue code that receives
 // from upstream, safely decoding it appropriately. Intended
 // to be used with a fanout exchange, so topic names are randomly chosen.
 
-import "github.com/fluidity-money/fluidity-app/lib/queue"
+import (
+	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+)
 
 const (
 	// TopicCheckpoints to get a summary of every checkpoint
@@ -17,6 +20,8 @@ const (
 	// TopicDecoratedTransfers to get decorated transfers to process with a worker
 	TopicDecoratedTransfers = "sui.decorated_transfer"
 )
+
+type SuiAppFees = worker.SuiAppFees
 
 func Checkpoints(f func(Checkpoint)) {
 	queue.GetMessages(TopicCheckpoints, func(message queue.Message) {

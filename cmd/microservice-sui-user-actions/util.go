@@ -74,3 +74,42 @@ func mustStringFromInterface(s interface{}) string {
 
 	return s_
 }
+
+func getSuiGasFee(suiClient sui.ISuiAPI, suiPythPubkey string, gasUsed models.GasCostSummary) (*big.Rat, error) {
+	var (
+		computationFee_ = gasUsed.ComputationCost
+		storageFee_     = gasUsed.StorageCost
+		storageRebate_  = gasUsed.StorageRebate
+	)
+
+	mistDecimalPlacesRat := big.NewRat(MistDecimalPlaces, 1)
+
+	// sui gas fee is computation fee + storage fee + rebate, in MIST (9 decimals)
+	gasFee, _ := new(big.Rat).SetString(computationFee_)
+	storageFee, _ := new(big.Rat).SetString(storageFee_)
+	storageRebate, _ := new(big.Rat).SetString(storageRebate_)
+
+	gasFee.Add(gasFee, storageFee)
+	gasFee.Sub(gasFee, storageRebate)
+
+	gasFee.Quo(gasFee, mistDecimalPlacesRat)
+
+	// normalise to usd
+	suiPrice, err := getPythPrice(suiClient, suiPythPubkey)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"failed to get the sui-USD price from pyth! %v",
+			err,
+		)
+	}
+
+	gasFee.Mul(gasFee, suiPrice)
+
+	return gasFee, nil
+}
+
+// TODO
+func getPythPrice(client sui.ISuiAPI, pythPubkey string) (*big.Rat, error) {
+
+}

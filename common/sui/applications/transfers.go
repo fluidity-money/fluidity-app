@@ -6,7 +6,6 @@ import (
 	"github.com/block-vision/sui-go-sdk/models"
 	"github.com/fluidity-money/fluidity-app/lib/queues/sui"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
-	"github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
 // ClassifyApplicationTransfer to determine the application used in a transfer based on the event type
@@ -22,11 +21,11 @@ func ClassifyApplicationTransfer(event models.SuiEventResponse) Application {
 // returns (feeData with Fee set to nil, nil) in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
-func GetApplicationFee(transfer sui.DecoratedTransfer, event models.SuiEventResponse, application Application) (applications.ApplicationFeeData, applications.ApplicationData, worker.SuiAppFees, error) {
+func GetApplicationFee(transfer sui.DecoratedTransfer, event models.SuiEventResponse, application Application) (applications.ApplicationFeeData, applications.ApplicationData, sui.SuiAppFees, error) {
 	var (
 		feeData  applications.ApplicationFeeData
 		appData  applications.ApplicationData
-		emission worker.SuiAppFees
+		emission sui.SuiAppFees
 		err      error
 	)
 

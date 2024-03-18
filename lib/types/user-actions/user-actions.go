@@ -10,7 +10,6 @@ import (
 	"time"
 
 	solApplications "github.com/fluidity-money/fluidity-app/common/solana/applications"
-	suiApplications "github.com/fluidity-money/fluidity-app/common/sui/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
@@ -294,8 +293,8 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 }
 
 func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, fee *big.Rat, application *string, tokenShortName string, tokenDecimals int) UserAction {
-	applicationString := suiApplications.ApplicationNone.String()
-	if application == nil {
+	applicationString := "none"
+	if application != nil {
 		applicationString = *application
 	}
 
