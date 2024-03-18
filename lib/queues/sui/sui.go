@@ -17,8 +17,8 @@ const (
 	// TopicEvents to get wrap, unwrap, or yield distribution events
 	TopicEvents = "sui.event"
 
-	// TopicTransfers to get fluid transfers
-	TopicTransfers = "sui.transfer"
+	// TopicDecoratedTransfers to get decorated transfers to process with a worker
+	TopicDecoratedTransfers = "sui.decorated_transfer"
 )
 
 func Checkpoints(f func(Checkpoint)) {
@@ -41,12 +41,12 @@ func Events(f func(Event)) {
 	})
 }
 
-func Transfers(f func(Transfer)) {
-	queue.GetMessages(TopicTransfers, func(message queue.Message) {
-		var transfer Transfer
+func DecoratedTransfers(f func([]DecoratedTransfer)) {
+	queue.GetMessages(TopicDecoratedTransfers, func(message queue.Message) {
+		var decoratedTransfers []DecoratedTransfer
 
-		message.Decode(&transfer)
+		message.Decode(&decoratedTransfers)
 
-		f(transfer)
+		f(decoratedTransfers)
 	})
 }

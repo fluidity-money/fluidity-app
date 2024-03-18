@@ -105,6 +105,10 @@ type (
 		TraderJoe        float64 `json:"trader_joe"`
 	}
 
+	// app fees for sui transactions
+	SuiAppFees struct {
+	}
+
 	FeeSwitch struct {
 		OriginalAddress ethereum.Address          `json:"original_address"`
 		NewAddress      ethereum.Address          `json:"new_address"`

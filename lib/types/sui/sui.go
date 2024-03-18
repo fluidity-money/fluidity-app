@@ -5,6 +5,10 @@ import (
 	"math/big"
 	"strconv"
 	"time"
+
+	"github.com/block-vision/sui-go-sdk/models"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
 )
 
 type WrapEvent struct {
@@ -172,22 +176,16 @@ func ParseDistributeYield(parsedJson map[string]interface{}) (DistributeYieldEve
 // Checkpoint is an internal, simplified representation of a checkpoint to be processed by user actions
 type Checkpoint struct {
 	// block num
-	SequenceNumber string    `json:"sequence_number"`
-	Timestamp      time.Time `json:"timestamp"`
+	SequenceNumber misc.BigInt `json:"sequence_number"`
+	Timestamp      time.Time   `json:"timestamp"`
 	// digest of included txs
 	Transactions []string `json:"transactions"`
 }
 
-type Transfer struct {
-	Token            SuiToken  `json:"token"`
-	Timestamp        time.Time `json:"timestamp"`
-	SenderAddress    string    `json:"sender_address"`
-	RecipientAddress string    `json:"recipient_address"`
-	Amount           *big.Int  `json:"amount"`
-}
-
-type SuiEvent struct {
-	Wrap            WrapEvent            `json:"wrap,omitempty"`
-	Unwrap          UnwrapEvent          `json:"unwrap,omitempty"`
-	DistributeYield DistributeYieldEvent `json:"distribute_yield,omitempty"`
+// SuiDecoratedTransfer contains information for the worker to decode
+type SuiDecoratedTransfer struct {
+	UserAction user_actions.UserAction
+	Data       models.SuiTransactionBlockData
+	Event      *models.SuiEventResponse
+	Checkpoint misc.BigInt
 }
