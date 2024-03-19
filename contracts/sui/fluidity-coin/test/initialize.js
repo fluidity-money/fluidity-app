@@ -20,13 +20,13 @@ const suiClient = new SuiClient({ url: getFullnodeUrl('mainnet') });
 async function initialize() {
     console.log('Executing Initialize...');
 
-    const tx = new TransactionBlock(); 
+    const tx = new TransactionBlock();
     tx.setGasBudget(100000000);
     let key = fromB64(process.env.DEPLOYER_PRIVATE_KEY).slice(1);
     let signer = Ed25519Keypair.fromSecretKey(key);
     console.log("Caller address", await signer.toSuiAddress());
-    
-    tx.moveCall({
+
+    const status = tx.moveCall({
       target: `${CONTRACT_ID}::fluidity_coin::initialize`,
       arguments: [tx.object(ADMIN_CAP), tx.object(GLOBAL)],
       typeArguments: [SUI_TYPE_ARG],

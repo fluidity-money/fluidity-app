@@ -4,6 +4,7 @@ module fluidity_coin::fluidity_coin {
     use std::option;
     use sui::coin::{Self, Coin, TreasuryCap};
     use sui::transfer;
+    use sui::url;
     use sui::tx_context::{Self, TxContext};
     use sui::object::{ Self, UID, ID};
     use sui::balance::{ Self, Balance};
@@ -15,7 +16,7 @@ module fluidity_coin::fluidity_coin {
     use std::vector;
 
     // **************************************************** ERROR CODES ****************************************************
-    
+
     const VAULTS_ALREADY_INITIALIZED: u64 = 0;
     const CONTRACT_IS_PAUSED: u64 = 1;
     const CONTRACT_IS_ALREADY_PAUSED: u64 = 2;
@@ -27,12 +28,12 @@ module fluidity_coin::fluidity_coin {
     const E_RECEIPIENTS_AMOUNTS_MISMATCH: u64 = 8;
 
     // **************************************************** CONSTANTS ****************************************************
-    
+
     const SCALLOP_MARKET_ID: address = @0xa757975255146dc9686aa823b7838b507f315d704f428cbadad2f4ea061939d9;
     const SCALLOP_VERSION: address = @0x07871c4b3c847a0f674510d4978d5cf6f960452795e8ff6f189fd2088a3f6ac7;
-    
+
     // **************************************************** TYPES ****************************************************
-    
+
     /// The global config
     struct Global has key  {
         id: UID,
@@ -147,7 +148,7 @@ module fluidity_coin::fluidity_coin {
     }
 
     // **************************************************** FUNCTIONS ****************************************************
-    
+
     fun assert_scallop_market(market: &ScallopMarket) {
         assert!(object::id_address(market) == SCALLOP_MARKET_ID, E_INVALID_SCALLOP_MARKET);
     }
@@ -160,11 +161,19 @@ module fluidity_coin::fluidity_coin {
     /// this is a module initializer, it ensures the currency only gets
     /// registered once.
     fun init(
-        witness: FLUIDITY_COIN, 
+        witness: FLUIDITY_COIN,
         ctx: &mut TxContext
     ) {
         // Get a treasury cap for the coin and give it to the transaction sender
-        let (treasury_cap, metadata) = coin::create_currency<FLUIDITY_COIN>(witness, 9, b"FSUI", b"FSUI", b"", option::none(), ctx);
+        let (treasury_cap, metadata) = coin::create_currency<FLUIDITY_COIN>(
+            witness,
+            6,
+            b"Fluid USDC",
+            b"fUSDC",
+            b"Fluid USDC is a wrapped asset that earns you yield per transaction. https://app.fluidity.money",
+            option::some(url::new_unsafe_from_bytes(b"https://arweave.net/nvqvx1OGtfR4bqI7mg3MfPmubnxDoWReLgCML2DO_9c")),
+            ctx
+        );
         let global = Global {
             id: object::new(ctx),
             paused: false,
@@ -203,7 +212,7 @@ module fluidity_coin::fluidity_coin {
     entry fun transfer_dao_cap(_: &AdminCap, dao_cap: DAOCap, recipient: address) {
         transfer::transfer(dao_cap, recipient)
     }
-    
+
     // Initialize the vaults, coin reserve, global state and caps
     entry fun initialize<UNDERLYING>(
         _: &AdminCap,
@@ -239,9 +248,9 @@ module fluidity_coin::fluidity_coin {
     entry fun mint(
         treasury_cap: &mut TreasuryCap<FLUIDITY_COIN>,
         _: &AdminCap,
-        global: &Global, 
-        coin_reserve: &mut CoinReserve, 
-        amount: u64, 
+        global: &Global,
+        coin_reserve: &mut CoinReserve,
+        amount: u64,
         ctx: &mut TxContext
     ) {
         assert!(global.vaults_initialized, VAULTS_NOT_INITIALIZED);
@@ -256,11 +265,11 @@ module fluidity_coin::fluidity_coin {
 
     /// Manager can burn coins from the coin reserve
     entry fun burn(
-        treasury_cap: &mut TreasuryCap<FLUIDITY_COIN>, 
+        treasury_cap: &mut TreasuryCap<FLUIDITY_COIN>,
         _: &AdminCap,
-        global: &Global, 
-        coin_reserve: &mut CoinReserve, 
-        amount: u64, 
+        global: &Global,
+        coin_reserve: &mut CoinReserve,
+        amount: u64,
         ctx: &mut TxContext
     ) {
         assert!(global.vaults_initialized, VAULTS_NOT_INITIALIZED);
@@ -346,9 +355,9 @@ module fluidity_coin::fluidity_coin {
         global: &Global,
         user_vault: &mut UserVault<UNDERLYING>,
         coin_reserve: &mut CoinReserve,
-        scallop_version: &ScallopVersion, 
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         coin: Coin<UNDERLYING>,
         ctx: &mut TxContext
     ) {
@@ -360,7 +369,7 @@ module fluidity_coin::fluidity_coin {
         let amount = coin::value(&coin);
         let user = tx_context::sender(ctx);
         let coin_obj_id = object::id(&coin);
-        
+
         // Mint s_coin to vault
         let s_coin = protocol::mint::mint(
             scallop_version, scallop_market, coin, clock, ctx
@@ -373,7 +382,7 @@ module fluidity_coin::fluidity_coin {
         transfer::public_transfer(coin::from_balance(reserve_coin_balance, ctx), user);
 
         // Join s_coin to user vault
-        balance::join(&mut user_vault.balance, coin::into_balance(s_coin)); 
+        balance::join(&mut user_vault.balance, coin::into_balance(s_coin));
 
         let now = clock::timestamp_ms(clock) / 1000;
         event::emit(WrapEvent {
@@ -396,9 +405,9 @@ module fluidity_coin::fluidity_coin {
         user_vault: &mut UserVault<UNDERLYING>,
         prize_pool_vault: &mut PrizePoolVault<UNDERLYING>,
         coin_reserve: &mut CoinReserve,
-        scallop_version: &ScallopVersion, 
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         ctx: &mut TxContext
     ) {
         assert!(!global.paused, CONTRACT_IS_PAUSED);
@@ -415,7 +424,7 @@ module fluidity_coin::fluidity_coin {
         let redeemed_coin = protocol::redeem::redeem(
             scallop_version, scallop_market, s_coin, clock, ctx
         );
-        
+
         // Split redeemed coin into user's coin and vault's coin
         let user_coin = coin::split<UNDERLYING>(&mut redeemed_coin, f_coin_amount, ctx);
         let user_coin_amount = coin::value(&user_coin);
@@ -433,11 +442,11 @@ module fluidity_coin::fluidity_coin {
             s_coin_amount = coin::value(&s_coin);
 
             // Join s_coin to prize pool vault
-            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin)); 
+            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin));
         } else {
             coin::destroy_zero(redeemed_coin);
         };
-        
+
         let now = clock::timestamp_ms(clock) / 1000;
         event::emit(UnwrapEvent {
             user_vault_id: object::uid_to_inner(&user_vault.id),
@@ -451,18 +460,18 @@ module fluidity_coin::fluidity_coin {
             underlying_amount: user_coin_amount,
             time: now,
         });
-        
+
         // "Burn" respective fCoin
-        balance::join(&mut coin_reserve.balance, coin::into_balance(coin));    
+        balance::join(&mut coin_reserve.balance, coin::into_balance(coin));
     }
 
     // Distribute yield to multiple addresses
     entry fun distribute_yield<UNDERLYING>(
-        _: &WorkerCap, 
+        _: &WorkerCap,
         prize_pool_vault: &mut PrizePoolVault<UNDERLYING>,
-        scallop_version: &ScallopVersion, 
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         recipients: vector<address>,
         amounts: vector<u64>,
         ctx: &mut TxContext
@@ -480,7 +489,7 @@ module fluidity_coin::fluidity_coin {
         let i = 0u64;
         while (i < number_of_recipients) {
             let recipient = vector::borrow(&recipients, i);
-            let amount = vector::borrow(&amounts, i); 
+            let amount = vector::borrow(&amounts, i);
             let redeemed_coin_amount = coin::value(&redeemed_coin);
             assert!(*amount <= redeemed_coin_amount, E_NOT_ENOUGH_COINS_IN_RESERVE);
             transfer::public_transfer(coin::split(&mut redeemed_coin, *amount, ctx), *recipient);
@@ -497,9 +506,9 @@ module fluidity_coin::fluidity_coin {
             let s_coin = protocol::mint::mint(
                 scallop_version, scallop_market, redeemed_coin, clock, ctx
             );
-            
+
             // Join s_coin to prize pool vault
-            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin)); 
+            balance::join(&mut prize_pool_vault.balance, coin::into_balance(s_coin));
         } else { // otherwise destroy the remaining coin
             coin::destroy_zero(redeemed_coin);
         };
@@ -507,11 +516,11 @@ module fluidity_coin::fluidity_coin {
 
     #[allow(lint(self_transfer))]
     entry fun emergency_drain_prize_pool_vault<UNDERLYING>(
-        _: &DAOCap, 
-        prize_pool_vault: &mut PrizePoolVault<UNDERLYING>, 
-        scallop_version: &ScallopVersion, 
+        _: &DAOCap,
+        prize_pool_vault: &mut PrizePoolVault<UNDERLYING>,
+        scallop_version: &ScallopVersion,
         scallop_market: &mut ScallopMarket,
-        clock: &Clock, 
+        clock: &Clock,
         ctx: &mut TxContext
     ) {
         assert!(balance::value(&prize_pool_vault.balance) != 0, E_NOT_ENOUGH_COINS_IN_RESERVE);
