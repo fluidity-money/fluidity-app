@@ -69,7 +69,6 @@ const (
 	SuiClockId = `0x0000000000000000000000000000000000000000000000000000000000000006`
 )
 
-// TODO - doesn't make utility mining payouts
 func main() {
 	var (
 		utilities      = suiApps.UtilityListFromEnvOrFatal(EnvUtilityContracts)
@@ -183,20 +182,6 @@ func main() {
 				// application will be set by sui-user-actions
 			)
 
-			// we set the decorator and if there's an app fee
-			// if this is a non-application transfer, it has already been tracked as a user action
-			if fee == nil {
-				log.App(func(k *log.Log) {
-					k.Format(
-						"Skipping an application transfer for transaction %#v and application %#v!",
-						transactionDigest,
-						application,
-					)
-				})
-
-				continue
-			}
-
 			decorator := &worker_types.SuiWorkerDecorator{
 				SuiAppFees:     emission,
 				UtilityName:    utility,
@@ -210,7 +195,22 @@ func main() {
 				Checkpoint: checkpoint,
 				Decorator:  decorator,
 			}
+
 			transfersWithFees = append(transfersWithFees, transferWithFee)
+
+			// we set the decorator and if there's an app fee
+			// if this is a non-application transfer, it has already been tracked as a user action
+			if fee == nil {
+				log.App(func(k *log.Log) {
+					k.Format(
+						"Skipping an application transfer for transaction %#v and application %#v!",
+						transactionDigest,
+						application,
+					)
+				})
+
+				continue
+			}
 
 			sender, recipient, err := suiApps.GetApplicationTransferParties(
 				transfer,

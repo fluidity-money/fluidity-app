@@ -13,7 +13,6 @@ import (
 	worker_types "github.com/fluidity-money/fluidity-app/lib/types/worker"
 )
 
-// TODO create payouts for utility mining using the utility contract
 // TODO utility in EthereumSpooledRewards has to be the address of the utility token
 // createPayoutTransaction to call distribute_yield on the fluid token contract
 func createPayoutTransaction(client suiSdk.ISuiAPI, fluidToken, baseToken sui.SuiToken, rewards worker_types.EthereumSpooledRewards, suiPayoutArgs payoutArgs, workerAddress string) (models.TxnMetaData, error) {
