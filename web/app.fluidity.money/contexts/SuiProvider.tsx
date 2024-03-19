@@ -2,7 +2,7 @@ import BN from "bn.js";
 
 import FluidityFacadeContext from "./FluidityFacade";
 import { Token } from "~/util/chainUtils/tokens";
-import { createNetworkConfig, SuiClientProvider, useAutoConnectWallet, useCurrentAccount, useCurrentWallet, useDisconnectWallet, useSignAndExecuteTransactionBlock, useSuiClient, WalletProvider } from '@mysten/dapp-kit';
+import { createNetworkConfig, SuiClientProvider, useCurrentAccount, useCurrentWallet, useDisconnectWallet, useSignAndExecuteTransactionBlock, useSuiClient, WalletProvider } from '@mysten/dapp-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { internalSwap, getBalance } from "~/util/chainUtils/sui/util";
 
