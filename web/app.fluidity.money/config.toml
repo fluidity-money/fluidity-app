@@ -219,18 +219,18 @@ logo = "/assets/tokens/usdc.svg"
 address = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
 suiTypeName = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN"
 colour = "#2775ca"
-decimals = 9
+decimals = 6
 enabled = true
 
 [[config.sui.tokens]]
 symbol = "fUSDC"
-name = "Fluid USDC Native"
+name = "Fluid USDC Wormhole"
 logo = "/assets/tokens/fUSDC.svg"
 address = "0xb6d4291df1ed161ff1e831104a1fd3e3985b7767075e814466ec94c36b19a3b4"
 suiTypeName = "0xb6d4291df1ed161ff1e831104a1fd3e3985b7767075e814466ec94c36b19a3b4::fluidity_coin::FLUIDITY_COIN"
 colour = "#2775ca"
-isFluidOf = "0x0000000000000000000000000000000000000000000000000000000000000002"
-decimals = 9
+isFluidOf = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
+decimals = 6
 enabled = true
 
 
@@ -337,6 +337,16 @@ name= "uniswap"
 
 [liquidity_providers.arbitrum.providers.link]
 fUSDC = "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
+
+# TODO fill in real providers
+# sui providers
+[liquidity_providers.sui]
+
+[[liquidity_providers.sui.providers]]
+name= "uniswap"
+
+[liquidity_providers.sui.providers.link]
+fUSDC = ""
 
 [[config.ethereum.wallets]]
 name = "Browser"
