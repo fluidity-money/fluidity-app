@@ -189,7 +189,14 @@ func paginateCheckpoints(client sui.ISuiAPI, firstCheckpoint uint64, waitDuratio
 
 			redis.WriteLastBlock(RedisLastCheckpoint, sequenceNumber)
 
-			sequenceNumberInt, _ := new(big.Int).SetString(sequenceNumberString, 10)
+			sequenceNumberInt, ok := new(big.Int).SetString(sequenceNumberString, 10)
+
+			if !ok {
+				log.Fatal(func(k *log.Log) {
+					k.Message = "Failed to convert sequence number to bigint!"
+					k.Payload = sequenceNumberString
+				})
+			}
 
 			checkpoint := sui_types.Checkpoint{
 				SequenceNumber: misc.NewBigIntFromInt(*sequenceNumberInt),

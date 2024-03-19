@@ -392,7 +392,14 @@ func main() {
 					continue
 				}
 
-				amountBig, _ := new(big.Int).SetString(amountTransferred, 10)
+				amountBig, ok := new(big.Int).SetString(amountTransferred, 10)
+				if !ok {
+					log.Fatal(func(k *log.Log) {
+						k.Message = "Failed to convert amount transferred to bigint!"
+						k.Payload = amountTransferred
+					})
+				}
+
 				amountInt := misc.NewBigIntFromInt(*amountBig)
 				txIndexInt := misc.BigIntFromInt64(int64(txIndex))
 

@@ -2,6 +2,7 @@ package sui
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"strconv"
 	"time"
@@ -96,9 +97,27 @@ func (r *rawWrapEvent) WrapEvent() (WrapEvent, error) {
 }
 
 func (r *rawUnwrapEvent) UnwrapEvent() (UnwrapEvent, error) {
-	fCoinAmount, _ := new(big.Int).SetString(r.FCoinAmount, 10)
-	prizePoolAmount, _ := new(big.Int).SetString(r.PrizePoolVaultAmount, 10)
-	underlyingAmount, _ := new(big.Int).SetString(r.UnderlyingAmount, 10)
+	fCoinAmount, ok := new(big.Int).SetString(r.FCoinAmount, 10)
+	if !ok {
+		return UnwrapEvent{}, fmt.Errorf(
+			"failed to convert FCoinAmount to bigint! %v",
+			r.FCoinAmount,
+		)
+	}
+	prizePoolAmount, ok := new(big.Int).SetString(r.PrizePoolVaultAmount, 10)
+	if !ok {
+		return UnwrapEvent{}, fmt.Errorf(
+			"failed to convert prize pool vault amount to bigint! %v",
+			r.PrizePoolVaultAmount,
+		)
+	}
+	underlyingAmount, ok := new(big.Int).SetString(r.UnderlyingAmount, 10)
+	if !ok {
+		return UnwrapEvent{}, fmt.Errorf(
+			"failed to convert underlying amount to bigint! %v",
+			r.UnderlyingAmount,
+		)
+	}
 
 	time, err := strconv.ParseInt(r.Time, 10, 64)
 	if err != nil {

@@ -85,9 +85,27 @@ func getSuiGasFee(suiClient sui.ISuiAPI, suiPythPubkey string, gasUsed models.Ga
 	mistDecimalPlacesRat := big.NewRat(MistDecimalPlaces, 1)
 
 	// sui gas fee is computation fee + storage fee - rebate, in MIST (9 decimals)
-	gasFee, _ := new(big.Rat).SetString(computationFee_)
-	storageFee, _ := new(big.Rat).SetString(storageFee_)
-	storageRebate, _ := new(big.Rat).SetString(storageRebate_)
+	gasFee, ok := new(big.Rat).SetString(computationFee_)
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to convert computation fee to bigint!"
+			k.Payload = computationFee_
+		})
+	}
+	storageFee, ok := new(big.Rat).SetString(storageFee_)
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to convert storage fee to bigint!"
+			k.Payload = storageFee_
+		})
+	}
+	storageRebate, ok := new(big.Rat).SetString(storageRebate_)
+	if !ok {
+		log.Fatal(func(k *log.Log) {
+			k.Message = "Failed to convert storage rebate to bigint!"
+			k.Payload = storageRebate_
+		})
+	}
 
 	gasFee.Add(gasFee, storageFee)
 	gasFee.Sub(gasFee, storageRebate)

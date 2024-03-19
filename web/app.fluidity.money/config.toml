@@ -270,13 +270,12 @@ fluidAssets = [
     "",
 ]
 
-# these are fsui, not fusdc
 [[config.sui.tokens]]
 symbol = "USDC"
-name = "USDC Native"
+name = "USDC Wormhole"
 logo = "/assets/tokens/usdc.svg"
-address = "0x0000000000000000000000000000000000000000000000000000000000000002"
-suiTypeName = "0x2::sui::SUI"
+address = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
+suiTypeName = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN"
 colour = "#2775ca"
 decimals = 9
 enabled = true
@@ -285,8 +284,8 @@ enabled = true
 symbol = "fUSDC"
 name = "Fluid USDC Native"
 logo = "/assets/tokens/fUSDC.svg"
-address = "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe"
-suiTypeName = "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe::fluidity_coin::FLUIDITY_COIN"
+address = "0xb6d4291df1ed161ff1e831104a1fd3e3985b7767075e814466ec94c36b19a3b4"
+suiTypeName = "0xb6d4291df1ed161ff1e831104a1fd3e3985b7767075e814466ec94c36b19a3b4::fluidity_coin::FLUIDITY_COIN"
 colour = "#2775ca"
 isFluidOf = "0x0000000000000000000000000000000000000000000000000000000000000002"
 decimals = 9

@@ -5,12 +5,11 @@ CREATE TABLE worker_config_sui (
 	spooler_batched_reward_threshold REAL NOT NULL
 );
 
-INSERT INTO worker_config_ethereum (
+INSERT INTO worker_config_sui (
 	network,
-	compound_blocks_per_day,
-	default_seconds_since_last_block,
-	current_atx_transaction_margin,
-	default_transfers_in_block
+	sui_block_time,
+	spooler_instant_reward_threshold,
+	spooler_batched_reward_threshold
 )
 
 VALUES (
