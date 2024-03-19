@@ -9,6 +9,7 @@ export type Token = {
   isFluidOf?: string;
   obligationAccount?: string;
   dataAccount?: string;
+  suiTypeName?: string;
   decimals: number;
   colour: string;
   enabled: boolean;

@@ -42,6 +42,7 @@ const OptionsSchema = z.object({
             logo: z.string(),
             address: z.string(),
             colour: z.string(),
+            suiTypeName: z.string().optional(),
             isFluidOf: z.string().optional(),
             obligationAccount: z.string().optional(),
             dataAccount: z.string().optional(),
@@ -85,10 +86,12 @@ const OptionsSchema = z.object({
     prize_pool: z.object({
       arbitrum: z.string(),
       solana: z.string(),
+      sui: z.string(),
     }),
     eac_aggregator_proxy: z.object({
       arbitrum: z.string(),
       solana: z.string(),
+      sui: z.string(),
     }),
   }),
 });

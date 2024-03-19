@@ -209,6 +209,10 @@ const CHAIN_NAME_MAP: Record<
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
   },
+  sui: {
+    name: "SUI",
+    icon: <img src="/assets/chains/suiIcon.svg" />,
+  }
 };
 
 const SAFE_DEFAULT_REFERRAL_COUNT = {

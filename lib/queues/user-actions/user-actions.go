@@ -7,6 +7,8 @@ package user_actions
 // user_actions contains queue code that receives user actions
 
 import (
+	"math/big"
+
 	solApplications "github.com/fluidity-money/fluidity-app/common/solana/applications"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -19,11 +21,13 @@ import (
 const (
 	networkEthereum = string(network.NetworkEthereum)
 	networkSolana   = string(network.NetworkSolana)
+	networkSui      = string(network.NetworkSui)
 )
 
 const (
 	TopicUserActionsEthereum = `user_actions.` + networkEthereum
 	TopicUserActionsSolana   = `user_actions.` + networkSolana
+	TopicUserActionsSui      = `user_actions.` + networkSui
 	topicUserActionsAll      = `user_actions.*`
 
 	TopicBufferedUserActionsEthereum = `user_actions.buffered.` + networkEthereum
@@ -62,6 +66,18 @@ func NewSwapSolana(senderAddress, transactionHash string, amount misc.BigInt, sw
 	)
 }
 
+func NewSwapSui(network_ network.BlockchainNetwork, senderAddress, transactionHash string, amount misc.BigInt, swapIn bool, tokenShortName string, tokenDecimals int) UserAction {
+	return user_actions.NewSwapSui(
+		network_,
+		senderAddress,
+		transactionHash,
+		amount,
+		swapIn,
+		tokenShortName,
+		tokenDecimals,
+	)
+}
+
 func NewSendEthereum(network_ network.BlockchainNetwork, senderAddress, recipientAddress ethereum.Address, transactionHash ethereum.Hash, amount misc.BigInt, tokenShortName string, tokenDecimals int, logIndex misc.BigInt, application applications.Application) UserAction {
 	return user_actions.NewSendEthereum(
 		network_,
@@ -88,6 +104,21 @@ func NewSendSolana(senderAddress, recipientAddress, transactionHash string, amou
 	)
 }
 
+func NewSendSui(network_ network.BlockchainNetwork, senderAddress, recipientAddress, transactionHash string, amount, txIndex misc.BigInt, fee *big.Rat, application *string, tokenShortName string, tokenDecimals int) UserAction {
+	return user_actions.NewSendSui(
+		network_,
+		senderAddress,
+		recipientAddress,
+		transactionHash,
+		amount,
+		txIndex,
+		fee,
+		application,
+		tokenShortName,
+		tokenDecimals,
+	)
+}
+
 func userActions(topic string, f func(UserAction)) {
 	queue.GetMessages(topic, func(message queue.Message) {
 		var userAction UserAction
@@ -104,6 +135,10 @@ func UserActionsEthereum(f func(UserAction)) {
 
 func UserActionsSolana(f func(UserAction)) {
 	userActions(TopicUserActionsSolana, f)
+}
+
+func UserActionsSui(f func(UserAction)) {
+	userActions(TopicUserActionsSui, f)
 }
 
 func UserActionsAll(f func(UserAction)) {

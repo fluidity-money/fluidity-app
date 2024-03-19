@@ -8,9 +8,11 @@ import (
 	"database/sql"
 	"fmt"
 
+	suiApps "github.com/fluidity-money/fluidity-app/common/sui/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/winners"
@@ -22,7 +24,7 @@ const (
 	Context = "TIMESCALE/SPOOLER"
 
 	// TablePendingWinners to write pending winners for the
-	// ethereum spooler to use
+	// ethereum/sui spooler to use
 	TablePendingWinners = "ethereum_pending_winners"
 )
 
@@ -37,14 +39,14 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 		fluidTokenShortName = fluidTokenDetails.TokenShortName
 
 		network_           = winner.Network
-		hash               = winner.TransactionHash
+		hash               = winner.TransactionHash.String()
 		blockNumber        = winner.BlockNumber
-		senderAddress      = winner.FromAddress
+		senderAddress      = winner.FromAddress.String()
 		senderWinAmount    = winner.FromWinAmount
-		recipientAddress   = winner.ToAddress
+		recipientAddress   = winner.ToAddress.String()
 		recipientWinAmount = winner.ToWinAmount
 		logIndex           = winner.LogIndex
-		application        = winner.Application
+		application        = winner.Application.String()
 		rewardTier         = winner.RewardTier
 	)
 
@@ -133,6 +135,121 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 	return pendingWinners
 }
 
+// CreatePendingWinnersSui to create pending winners from the Sui transfer/payout types
+func CreatePendingWinnersSui(transfer worker.TransferWithFee, senderPayouts map[applications.UtilityName]worker.Payout, recipientPayouts map[applications.UtilityName]worker.Payout, tokenDetails map[string]suiApps.UtilityDetails, rewardTier int) []PendingWinner {
+	var pendingWinners []PendingWinner
+
+	for utility, payout := range senderPayouts {
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+
+			fluidTokenDetails   = transfer.UserAction.TokenDetails
+			fluidTokenShortName = fluidTokenDetails.TokenShortName
+			hash                = transfer.UserAction.TransactionHash
+			senderAddress       = transfer.UserAction.SenderAddress
+			checkpoint          = transfer.Checkpoint
+			network             = transfer.UserAction.Network
+			logIndex            = transfer.UserAction.LogIndex
+			application         = transfer.UserAction.Application
+		)
+
+		var details token_details.TokenDetails
+
+		utilityDetails, exists := tokenDetails[string(utility)]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		} else {
+			details = utilityDetails.TokenDetails
+		}
+
+		// create the sender
+		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
+			TokenDetails:    details,
+			TransactionHash: hash,
+			SenderAddress:   senderAddress,
+			NativeWinAmount: nativeWinAmount,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     &checkpoint,
+			Network:         network,
+			RewardType:      "send",
+			LogIndex:        &logIndex,
+			Application:     application,
+			RewardTier:      rewardTier,
+		})
+	}
+
+	for utility, payout := range recipientPayouts {
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+
+			fluidTokenDetails   = transfer.UserAction.TokenDetails
+			fluidTokenShortName = fluidTokenDetails.TokenShortName
+			hash                = transfer.UserAction.TransactionHash
+			recipientAddress    = transfer.UserAction.RecipientAddress
+			checkpoint          = transfer.Checkpoint
+			network             = transfer.UserAction.Network
+			logIndex            = transfer.UserAction.LogIndex
+			application         = transfer.UserAction.Application
+		)
+
+		var details token_details.TokenDetails
+
+		utilityDetails, exists := tokenDetails[string(utility)]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		} else {
+			details = utilityDetails.TokenDetails
+		}
+
+		// create the recipient
+		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
+			TokenDetails:    details,
+			TransactionHash: hash,
+			SenderAddress:   recipientAddress,
+			NativeWinAmount: nativeWinAmount,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     &checkpoint,
+			Network:         network,
+			RewardType:      "send",
+			LogIndex:        &logIndex,
+			Application:     application,
+			RewardTier:      rewardTier,
+		})
+	}
+
+	return pendingWinners
+}
+
 func InsertPendingWinners(pendingWinners []PendingWinner) {
 	timescaleClient := timescale.Client()
 
@@ -207,7 +324,7 @@ func InsertPendingWinners(pendingWinners []PendingWinner) {
 			network_,
 			rewardType,
 			logIndex,
-			application.String(),
+			application,
 			rewardTier,
 		)
 
@@ -357,4 +474,164 @@ func GetAndRemoveRewardsForCategory(network_ network.BlockchainNetwork, token to
 	}
 
 	return winners
+}
+
+// GetPendingSenders to fetch pending winners with a reward type of "send" that are newer than maxBlockNumber
+func GetPendingSenders(network_ network.BlockchainNetwork, maxBlockNumber misc.BigInt) []PendingWinner {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`
+		SELECT
+			category,
+			token_short_name,
+			token_decimals,
+			transction_hash,
+			sender_address,
+			native_win_amount,
+			usd_win_amount,
+			utility,
+			block_number,
+			network,
+			reward_type,
+			log_index,
+			application,
+			reward_tier,
+		FROM %v
+		WHERE 
+			network = $1 AND
+			block_number > $2
+			reward_type = 'send'
+		ORDER BY block_number DESC
+		`,
+		TablePendingWinners,
+	)
+
+	rows, err := timescaleClient.Query(
+		statementText,
+		network_,
+		maxBlockNumber,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to fetch pending senders!"
+			k.Payload = err
+		})
+	}
+
+	defer rows.Close()
+
+	pendingWinners := make([]winners.PendingWinner, 0)
+
+	for rows.Next() {
+		var pendingWinner winners.PendingWinner
+
+		err := rows.Scan(
+			&pendingWinner.Category,
+			&pendingWinner.TokenDetails.TokenShortName,
+			&pendingWinner.TokenDetails.TokenDecimals,
+			&pendingWinner.TransactionHash,
+			&pendingWinner.SenderAddress,
+			&pendingWinner.NativeWinAmount,
+			&pendingWinner.UsdWinAmount,
+			&pendingWinner.Utility,
+			&pendingWinner.BlockNumber,
+			&pendingWinner.Network,
+			&pendingWinner.RewardType,
+			&pendingWinner.LogIndex,
+			&pendingWinner.Application,
+			&pendingWinner.RewardTier,
+		)
+
+		if err != nil {
+			log.Fatal(func(k *log.Log) {
+				k.Context = Context
+				k.Message = "Failed to scan a row of the pending winners!"
+				k.Payload = err
+			})
+		}
+
+		pendingWinners = append(pendingWinners, pendingWinner)
+	}
+
+	return pendingWinners
+}
+
+// GetPendingRecipientBySend to find the recipient of a unique send
+func GetPendingRecipientBySend(network_ network.BlockchainNetwork, sendTransactionHash string, logIndex misc.BigInt) PendingWinner {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`
+		SELECT
+			category,
+			token_short_name,
+			token_decimals,
+			transction_hash,
+			sender_address,
+			native_win_amount,
+			usd_win_amount,
+			utility,
+			block_number,
+			network,
+			reward_type,
+			log_index,
+			application,
+			reward_tier,
+		FROM %v
+		WHERE 
+			network = $1 AND
+			transaction_hash = $2 AND
+			log_index = $3
+			reward_type = 'receive'
+		ORDER BY block_number DESC
+		`,
+		TablePendingWinners,
+	)
+
+	row := timescaleClient.QueryRow(
+		statementText,
+		network_,
+		sendTransactionHash,
+		logIndex,
+	)
+
+	if err := row.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to fetch a pending recipient!"
+			k.Payload = err
+		})
+	}
+
+	var pendingWinner winners.PendingWinner
+
+	err := row.Scan(
+		&pendingWinner.Category,
+		&pendingWinner.TokenDetails.TokenShortName,
+		&pendingWinner.TokenDetails.TokenDecimals,
+		&pendingWinner.TransactionHash,
+		&pendingWinner.SenderAddress,
+		&pendingWinner.NativeWinAmount,
+		&pendingWinner.UsdWinAmount,
+		&pendingWinner.Utility,
+		&pendingWinner.BlockNumber,
+		&pendingWinner.Network,
+		&pendingWinner.RewardType,
+		&pendingWinner.LogIndex,
+		&pendingWinner.Application,
+		&pendingWinner.RewardTier,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to scan a row of the pending winners!"
+			k.Payload = err
+		})
+	}
+
+	return pendingWinner
 }

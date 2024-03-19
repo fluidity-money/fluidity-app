@@ -6,6 +6,8 @@ const getAddressExplorerLink = (chain: Chain, address: string): string => {
       return `https://explorer.solana.com/address/${address}`;
     case "arbitrum":
       return `https://arbiscan.io/address/${address}`;
+    case "sui":
+      return `https://suiexplorer.com/address/${address}`;
   }
 };
 
@@ -16,6 +18,8 @@ const getBlockExplorerLink = (chain: Chain, block: number): string => {
       return `https://explorer.solana.com/block/${block}`;
     case "arbitrum":
       return `https://arbiscan.io/block/${block}`;
+    case "sui":
+      return `https://suiexplorer.com/checkpoint/${block}`;
   }
 };
 
@@ -25,6 +29,8 @@ const getTxExplorerLink = (chain: Chain, address: string): string => {
       return `https://explorer.solana.com/tx/${address}`;
     case "arbitrum":
       return `https://arbiscan.io/tx/${address}`;
+    case "sui":
+      return `https://suiexplorer.com/txblock/${address}`;
   }
 };
 
@@ -36,8 +42,12 @@ const networkMapper = (network: string) => {
       return "SOL";
     case "ARB":
       return "arbitrum";
+    case "SUI":
+      return "sui";
     case "arbitrum":
       return "ARB";
+    case "sui":
+      return "SUI";
     default:
       return "ETH";
   }

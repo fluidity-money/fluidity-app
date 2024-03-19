@@ -20,4 +20,8 @@ func main() {
 		winner.SendTransactionHash = winningSignature
 		database.InsertWinner(winner)
 	})
+
+	queue.WinnersSui(func(winner queue.Winner) {
+		database.InsertWinner(winner)
+	})
 }

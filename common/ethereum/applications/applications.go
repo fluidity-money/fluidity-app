@@ -88,7 +88,7 @@ func ParseApplicationName(name string) (Application, error) {
 }
 
 // GetApplicationFee to find the fee (in USD) paid by a user for the application interaction
-// returns (feeData wiht Fee set to nil, ni) in the case where the application event is legitimate, but doesn't involve
+// returns (feeData with Fee set to nil, nil) in the case where the application event is legitimate, but doesn't involve
 // the fluid asset we're tracking, e.g. in a multi-token pool where two other tokens are swapped
 // if a receipt is passed, will be passed to the application if it can use it
 func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethclient.Client, fluidTokenContract ethCommon.Address, tokenDecimals int, txReceipt ethereum.Receipt, inputData misc.Blob) (applications.ApplicationFeeData, applications.ApplicationData, worker.EthereumAppFees, error) {

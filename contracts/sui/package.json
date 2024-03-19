@@ -1,0 +1,26 @@
+{
+  "name": "fluidity",
+  "version": "1.0.0",
+  "description": "This repository is still in development.",
+  "main": "test/test.ts",
+  "scripts": {
+    "test": "ts-mocha test/test2.ts -t 100000",
+    "postinstall": "patch-package"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.2.4",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.11.5",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@mysten/sui.js": "^0.49.1",
+    "commander": "^9.4.1",
+    "dotenv": "^16.4.1",
+    "fs": "^0.0.1-security",
+    "patch-package": "^6.5.0",
+    "random-seed": "^0.3.0",
+    "tweetnacl": "^1.0.3"
+  }
+}

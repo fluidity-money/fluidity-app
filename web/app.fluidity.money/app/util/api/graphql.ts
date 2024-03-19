@@ -17,6 +17,7 @@ export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {
     case "solana":
     case "arbitrum":
+    case "sui":
       return "hasura";
     default:
       return null;

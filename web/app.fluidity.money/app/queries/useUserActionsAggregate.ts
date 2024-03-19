@@ -96,6 +96,47 @@ const queryByAddress: Queryable = {
       }
     }
   `,
+  sui: gql`
+    query AggregatedUserTransactionsByAddress(
+      $offset: Int = 0
+      $limit: Int = 12
+      $address: String!
+      $token: String
+    ) {
+      sui: aggregated_user_transactions(
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+        where: {
+          network: { _eq: "sui" }
+          token_short_name: { _eq: $token }
+          type: { _is_null: false }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
+        }
+      ) {
+        value: amount
+        application
+        network
+        receiver: recipient_address
+        rewardHash: reward_hash
+        sender: sender_address
+        swap_in
+        timestamp: time
+        currency: token_short_name
+        hash: transaction_hash
+        type
+        utility_amount
+        utility_name
+        winner: winning_address
+        reward: winning_amount
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
+      }
+    }
+  `,
 };
 
 const queryAll: Queryable = {
@@ -134,6 +175,34 @@ const queryAll: Queryable = {
         limit: $limit
         offset: $offset
         where: { network: { _eq: "solana" }, type: { _is_null: false } }
+      ) {
+        value: amount
+        application
+        network
+        receiver: recipient_address
+        rewardHash: reward_hash
+        sender: sender_address
+        swap_in
+        timestamp: time
+        currency: token_short_name
+        hash: transaction_hash
+        type
+        utility_amount
+        utility_name
+        winner: winning_address
+        reward: winning_amount
+        rewardTier: reward_tier
+        lootboxCount: lootbox_count
+      }
+    }
+  `,
+  sui: gql`
+    query aggregatedUserTransactionsAll($offset: Int = 0, $limit: Int = 12) {
+      sui: aggregated_user_transactions(
+        order_by: { time: desc }
+        limit: $limit
+        offset: $offset
+        where: { network: { _eq: "sui" }, type: { _is_null: false } }
       ) {
         value: amount
         application

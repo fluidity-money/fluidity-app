@@ -16,6 +16,11 @@ label = "Arbitrum"
 testnet = false
 rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
 
+[[drivers.sui]]
+label = "Sui"
+testnet = false
+rpc = { http = "FLU_SUI_RPC_HTTP", ws = "FLU_SUI_RPC_WS" }
+
 [[drivers.hasura]]
 label= "Hasura"
 testnet = false
@@ -201,33 +206,33 @@ isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
 decimals = 6
 enabled = true
 
-[[config.arbitrum.tokens]]
-symbol = "DAI"
-name = "Dai Stablecoin"
-logo = "/assets/tokens/dai.svg"
-address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
-colour = "#825902"
-decimals = 18
+[config.sui]
+explorer = "https://suiexplorer.com"
+fluidAssets = [
+    "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69",
+]
+
+[[config.sui.tokens]]
+symbol = "USDC"
+name = "USDC Wormhole"
+logo = "/assets/tokens/usdc.svg"
+address = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
+suiTypeName = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN"
+colour = "#2775ca"
+decimals = 6
 enabled = true
 
-[[config.arbitrum.tokens]]
-symbol = "fDAI"
-name = "Fluid DAI"
-logo = "/assets/tokens/fDAI.svg"
-address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
-colour = "#825902"
-isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
-decimals = 18
+[[config.sui.tokens]]
+symbol = "fUSDC"
+name = "Fluid USDC Wormhole"
+logo = "/assets/tokens/fUSDC.svg"
+address = "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69"
+suiTypeName = "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69::fluidity_coin::FLUIDITY_COIN"
+colour = "#2775ca"
+isFluidOf = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
+decimals = 6
 enabled = true
 
-[[config.arbitrum.tokens]]
-symbol = "wETH"
-name = "Wrapped Ether"
-logo = "/assets/tokens/weth.svg"
-address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
-colour = "#eb2077"
-decimals = 18
-enabled = false
 
 # liquidity_providers Configurations
 # eth providers
@@ -333,6 +338,16 @@ name= "uniswap"
 [liquidity_providers.arbitrum.providers.link]
 fUSDC = "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
 
+# TODO fill in real providers
+# sui providers
+[liquidity_providers.sui]
+
+[[liquidity_providers.sui.providers]]
+name= "uniswap"
+
+[liquidity_providers.sui.providers.link]
+fUSDC = ""
+
 [[config.ethereum.wallets]]
 name = "Browser"
 id = "metamask"
@@ -365,16 +380,19 @@ address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
+sui = ""
 
 [contract.staking]
 ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
 solana = ""
+sui = ""
 
 [contract.eac_aggregator_proxy]
 ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
+sui = ""
 
 [contract.registry]
 ethereum = ""

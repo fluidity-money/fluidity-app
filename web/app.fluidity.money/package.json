@@ -34,6 +34,8 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
     "@fluidity-money/surfing": "*",
+    "@mysten/dapp-kit": "^0.12.2",
+    "@mysten/sui.js": "^0.50.1",
     "@openzeppelin/contracts": "^4.8.0",
     "@remix-run/react": "^1.7.1",
     "@remix-run/serve": "^1.7.1",
@@ -105,7 +107,7 @@
     "@types/compression": "^1.7.2",
     "@types/express": "^4.17.14",
     "@types/get-image-colors": "^4.0.1",
-    "@types/gtag.js": "^0.0.12",
+    "@types/gtag.js": "^0.0.19",
     "@types/jest": "^29.2.4",
     "@types/lodash": "^4.14.189",
     "@types/morgan": "^1.9.3",
@@ -129,7 +131,7 @@
     "remix-esbuild-override": "^3.0.4",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "typescript": "^5.4.2"
   },
   "engines": {
     "node": ">=16"

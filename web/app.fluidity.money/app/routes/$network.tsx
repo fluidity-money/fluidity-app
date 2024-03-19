@@ -11,11 +11,12 @@ import SolanaProvider from "contexts/SolanaProvider";
 import { Fragment } from "react";
 import { Token } from "~/util/chainUtils/tokens.js";
 import { NotificationSubscription } from "~/components/NotificationSubscription";
+import SuiProvider from "contexts/SuiProvider";
 
 type ProviderMap = {
   [key: string]:
-    | ((props: { children: React.ReactNode }) => JSX.Element)
-    | undefined;
+  | ((props: { children: React.ReactNode }) => JSX.Element)
+  | undefined;
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -25,6 +26,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     serverConfig.config[network as unknown as string] ?? {};
 
   const solanaRpcUrl = process.env.FLU_SOL_RPC_HTTP;
+  const suiRpcUrl = process.env.FLU_SUI_RPC_HTTP;
 
   const walletconnectId = process.env.FLU_WALLETCONNECT_ID;
 
@@ -40,6 +42,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     tokens,
     rpcUrls: {
       solana: solanaRpcUrl,
+      sui: suiRpcUrl,
     },
     walletconnectId,
     colors: (await colors)[network as string],
@@ -50,18 +53,21 @@ const Provider = ({
   network,
   tokens,
   solRpc,
+  suiRpc,
   walletconnectId,
   children,
 }: {
   network?: string;
   tokens: Token[];
   solRpc: string;
+  suiRpc: string;
   walletconnectId: string;
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
     solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
+    sui: SuiProvider(suiRpc, tokens),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "arbitrum");
@@ -86,6 +92,7 @@ type LoaderData = {
   tokens: Token[];
   rpcUrls: {
     solana: string;
+    sui: string;
   };
   walletconnectId: string;
   colors: {
@@ -114,6 +121,7 @@ export default function Network() {
       network={network}
       tokens={tokens}
       solRpc={rpcUrls.solana}
+      suiRpc={rpcUrls.sui}
       walletconnectId={walletconnectId}
     >
       <NotificationSubscription

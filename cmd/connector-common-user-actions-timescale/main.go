@@ -8,6 +8,10 @@ import (
 func main() {
 	go queue.UserActionsEthereum(database.InsertUserAction)
 
+	go queue.UserActionsSolana(database.InsertUserAction)
+
+	go queue.UserActionsSui(database.InsertUserAction)
+
 	queue.BufferedUserActionsSolana(func(bufferedUserActions queue.BufferedUserAction) {
 		for _, userAction := range bufferedUserActions.UserActions {
 			database.InsertUserAction(userAction)
