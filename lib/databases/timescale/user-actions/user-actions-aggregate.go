@@ -221,15 +221,14 @@ func UpdateAggregatedUserTransactionByHash(userTransaction user_actions.Aggregat
 func UpdateAggregatedUserTransactionByHashWithLootbottles(lootbottlesCount float64, rewardTier int, transactionHash string) {
 	timescaleClient := timescale.Client()
 
-	statementText := fmt.Sprintf(
-		`UPDATE %s
-			SET lootbox_count = $1 + %s.lootbox_count, reward_tier = GREATEST($2, %s.reward_tier)
-			WHERE transaction_hash = $3`,
+ 	statementText := fmt.Sprintf(
+ 		`UPDATE %s
+			SET lootbox_count = $1, reward_tier = $2
+ 			WHERE transaction_hash = $3`,
 
-		TableAggregatedUserTransactions,
-		TableAggregatedUserTransactions,
-		TableAggregatedUserTransactions,
-	)
+ 		TableAggregatedUserTransactions,
+ 	)
+
 
 	r, err := timescaleClient.Exec(
 		statementText,

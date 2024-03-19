@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  width: 100%;
+  align-self: flex-start;
+  .content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .imageContainer {
+      width: 11px;
+      height: 19px;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+}
+
+.social {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.socialText {
+  // Important here because surfing keeps overriding styles
+  font-size: 8px !important;
+  font-family: "Aeonik Mono" !important;
+}

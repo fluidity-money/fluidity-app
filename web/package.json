@@ -6,7 +6,8 @@
     "app.fluidity.money",
     "fluidity.money",
     "surfing",
-    "fanfare"
+    "fanfare",
+    "leaderboard"
   ],
   "dependencies": {
     "prettier": "^2.8.1",

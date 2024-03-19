@@ -20,6 +20,7 @@ type amqpDetails struct {
 	deadLetterEnabled bool
 	messageRetries    int
 	goroutines        int
+	messageLoggingEnabled bool
 }
 
 var chanAmqpDetails = make(chan amqpDetails)

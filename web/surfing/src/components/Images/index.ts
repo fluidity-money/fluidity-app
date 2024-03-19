@@ -45,5 +45,5 @@ export {
   CaretRight,
   Referral,
   LinkVerticalIcon,
-  Checkmark
+  Checkmark,
 };

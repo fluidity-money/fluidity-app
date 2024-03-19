@@ -1,0 +1,13 @@
+version: 0.0
+Resources:
+  - TargetService:
+      Type: AWS::ECS::Service
+      Properties:
+        TaskDefinition: {{ CONFIG.TASKDEFARN }}
+        LoadBalancerInfo:
+          ContainerName: {{ CONFIG.SERVICE_NAME }}
+          ContainerPort: 80
+        PlatformVersion: "LATEST"
+
+Hooks:
+  - AfterAllowTraffic: "arn:aws:lambda:ap-southeast-2:{{ CONFIG.AWS_ACCOUNT_ID }}:function:{{ CONFIG.CODEDEPLOY_CACHE_PURGE_LAMBDA }}"  

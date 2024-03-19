@@ -1,0 +1,285 @@
+$white-a40: rgba(255, 255, 255, 0.4);
+$white-a20: rgba(255, 255, 255, 0.2);
+$white-a10: rgba(255, 255, 255, 0.1);
+$white-a5: rgba(255, 255, 255, 0.05);
+$white: #ffffff;
+
+$holo: conic-gradient(
+  from 209.59deg at 50% 50%,
+  #f3b8d8 0deg,
+  #b793e9 50.06deg,
+  #9fd4f3 85.94deg,
+  #ffd2c4 134.97deg,
+  #fbf3f3 172.05deg,
+  #d9abdf 200.75deg,
+  #af9ce3 224.67deg,
+  #aae4e1 259.36deg,
+  #c6ead0 298.82deg,
+  #ffffff 328.72deg,
+  #fdb5e4 360deg
+);
+
+$holo-linear: linear-gradient(
+  90deg,
+  #f3b8d8 0%,
+  #b793e9 15.1%,
+  #9fd4f3 26.04%,
+  #ffd2c4 36.46%,
+  #fbf3f3 46.88%,
+  #d9abdf 57.29%,
+  #af9ce3 72.4%,
+  #aae4e1 85.42%,
+  #c6ead0 93.23%,
+  #fdb5e4 100%
+);
+
+$border: (
+  "disabled": $white-a10,
+  "default": $white-a20,
+  "prominent": $white,
+  "focus": $white-a40,
+);
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  height: fit-content;
+  padding: 1em;
+  box-sizing: border-box;
+
+  &.shimmer {
+    -webkit-mask: linear-gradient(
+        -60deg,
+        #000000 40%,
+        rgba(0, 0, 0, 0.717),
+        #000 60%
+      )
+      right/300% 100%;
+    mask: linear-gradient(-60deg, #000000 40%, rgba(0, 0, 0, 0.715), #000 60%)
+      right/300% 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 5s infinite;
+    background-color: black;
+  }
+
+  &.fill {
+    width: 100%;
+  }
+
+  &.button {
+    all: unset;
+    font-size: 1em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    padding: 1em;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    border-color: map-get($border, "disabled");
+    filter: grayscale(100%);
+  }
+
+  // Borders
+  border-width: 0;
+  border-style: none;
+
+  &.solid {
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  &.dashed {
+    border-width: 1px;
+    border-style: dashed;
+  }
+
+  // Colors
+  &.gray {
+    background-color: $white-a5;
+    border-color: map-get($border, "default");
+  }
+
+  &.white {
+    background-color: $white;
+    border-color: $white;
+  }
+
+  &.holo {
+    position: relative;
+    border: none;
+    overflow: hidden;
+    background: $holo-linear;
+    background-size: 1600px;
+    animation: gradient 15s ease infinite;
+
+    &.transparent {
+      background: none;
+
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 2px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
+      }
+
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
+      }
+
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
+      }
+    }
+
+    &.frosted {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(50px);
+      -webkit-backdrop-filter: blur(50px);
+
+      &::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 1px;
+        background: $holo;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+      }
+
+      &.rounded {
+        &::before {
+          border-radius: 12px;
+        }
+      }
+
+      &.dashed {
+        &::before {
+          border: 1px dashed black;
+          padding: 0;
+        }
+      }
+
+      &.none {
+        &::before {
+          border: 1px solid black;
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  // Backgrounds
+  &.transparent {
+    background-color: transparent;
+  }
+
+  &.dashed {
+    border-style: dashed;
+  }
+
+  &.frosted {
+    // background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+
+    // Override border styles
+    &.dashed,
+    &.solid,
+    &.none {
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.102);
+    }
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  10% {
+    -webkit-mask-position: right/300%;
+  }
+  90%,
+  100% {
+    -webkit-mask-position: -50%;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 600px 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.shimmerWrapper {
+  position: relative;
+  overflow: hidden;
+
+  &.fill {
+    width: 100%;
+  }
+
+  &.rounded {
+    border-radius: 12px;
+  }
+
+  &.heading {
+    > * {
+      flex: 0 0;
+    }
+  }
+
+  .shimmerBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    filter: blur(100px);
+    z-index: -1;
+  }
+}

@@ -1,5 +1,5 @@
 
-FROM alpine:3.16 AS build
+FROM alpine:3.18 AS build
 
 RUN apk add --no-cache \
 	nodejs \

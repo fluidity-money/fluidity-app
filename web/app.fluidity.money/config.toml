@@ -166,11 +166,9 @@ decimals = 6
 enabled = true
 
 [config.arbitrum]
-explorer = "https://etherscan.io"
+explorer = "https://arbiscan.io"
 fluidAssets = [
-    "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
-    "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62",
-    "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b",
+    "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
 ]
 
 [[config.arbitrum.tokens]]
@@ -191,53 +189,6 @@ colour = "#2775ca"
 isFluidOf = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 decimals = 6
 enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "USDT"
-name = "Tether USD"
-logo = "/assets/tokens/usdt.svg"
-address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
-colour = "#12946c"
-decimals = 6
-enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "fUSDT"
-name = "Fluid USDT"
-logo = "/assets/tokens/fUSDT.svg"
-address = "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62"
-colour = "#12946c"
-isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
-decimals = 6
-enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "DAI"
-name = "Dai Stablecoin"
-logo = "/assets/tokens/dai.svg"
-address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
-colour = "#825902"
-decimals = 18
-enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "fDAI"
-name = "Fluid DAI"
-logo = "/assets/tokens/fDAI.svg"
-address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
-colour = "#825902"
-isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
-decimals = 18
-enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "wETH"
-name = "Wrapped Ether"
-logo = "/assets/tokens/weth.svg"
-address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
-colour = "#eb2077"
-decimals = 18
-enabled = false
 
 [config.polygon_zk]
 explorer = "https://zkevm.polygonscan.com"
