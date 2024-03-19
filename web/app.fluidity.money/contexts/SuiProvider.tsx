@@ -20,7 +20,7 @@ const SuiFacade = ({
   const { mutate: signAndExecuteTransactionBlock } = useSignAndExecuteTransactionBlock()
   const suiClient = useSuiClient()
   // TODO work out auto connect
-  const autoConnect = useAutoConnectWallet()
+  // const autoConnect = useAutoConnectWallet()
 
   const disconnect = async () => mutate()
 

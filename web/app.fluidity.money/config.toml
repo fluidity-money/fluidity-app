@@ -209,7 +209,7 @@ enabled = true
 [config.sui]
 explorer = "https://suiexplorer.com"
 fluidAssets = [
-    "",
+    "0xb6d4291df1ed161ff1e831104a1fd3e3985b7767075e814466ec94c36b19a3b4",
 ]
 
 [[config.sui.tokens]]

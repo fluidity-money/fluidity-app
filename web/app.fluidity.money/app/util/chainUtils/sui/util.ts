@@ -130,7 +130,7 @@ const internalSwap = async (suiClient: SuiClient, address: string | undefined, a
   // get the digest out of the signing callback
   const digest = await new Promise<string>(resolve => {
     signAndExecuteTransactionBlock({ transactionBlock: txb }, {
-      onError: (_ => {
+      onError: (() => {
         resolve("")
       }),
       onSuccess: (result => {
