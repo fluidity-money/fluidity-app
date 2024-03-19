@@ -1,7 +1,7 @@
 import styles from "./Text.module.scss";
 
 type TextProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   size?: "xxs" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
   prominent?: boolean;
   className?: string;

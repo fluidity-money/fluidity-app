@@ -107,7 +107,7 @@
     "@types/compression": "^1.7.2",
     "@types/express": "^4.17.14",
     "@types/get-image-colors": "^4.0.1",
-    "@types/gtag.js": "^0.0.12",
+    "@types/gtag.js": "^0.0.19",
     "@types/jest": "^29.2.4",
     "@types/lodash": "^4.14.189",
     "@types/morgan": "^1.9.3",
