@@ -244,7 +244,9 @@ module fluidity_coin::fluidity_coin {
         global.vaults_initialized = true;
     }
 
-    /// Manager can mint new coins to the coin reserve
+    /// Manager can mint new coins to the coin reserve. This is used to
+    /// control the maximum supply in circulation, someone will need to
+    /// check this manually via Suiscan.
     entry fun mint(
         treasury_cap: &mut TreasuryCap<FLUIDITY_COIN>,
         _: &AdminCap,

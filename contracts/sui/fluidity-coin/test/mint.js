@@ -2,7 +2,6 @@ const { getFullnodeUrl, SuiClient } = require('@mysten/sui.js/client');
 const { Ed25519Keypair } = require('@mysten/sui.js/keypairs/ed25519');
 const { TransactionBlock } = require('@mysten/sui.js/transactions');
 const { fromB64 } = require('@mysten/bcs');
-const { SUI_DECIMALS } = require("@mysten/sui.js/utils");
 const { extractTransactionStatusAndError } = require('./helpers/utils');
 const {
   CONTRACT_ID,
@@ -10,6 +9,7 @@ const {
   FLUIDITY_COIN_TREASURY_CAP,
   COIN_RESERVE,
   ADMIN_CAP,
+  DECIMALS
 } = require('./helpers/constants');
 
 require('dotenv').config();
@@ -20,7 +20,7 @@ const suiClient = new SuiClient({ url: getFullnodeUrl('mainnet') });
 async function mint() {
     console.log('Minting coins...');
 
-    const tx = new TransactionBlock(); 
+    const tx = new TransactionBlock();
     tx.setGasBudget(100000000);
 
     let key = fromB64(process.env.DEPLOYER_PRIVATE_KEY).slice(1);
@@ -34,7 +34,7 @@ async function mint() {
         tx.object(ADMIN_CAP),
         tx.object(GLOBAL),
         tx.object(COIN_RESERVE),
-        tx.pure(amount * 10 ** SUI_DECIMALS),
+        tx.pure(amount * 10 ** DECIMALS),
       ],
       typeArguments: [],
     });
