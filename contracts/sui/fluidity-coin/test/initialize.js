@@ -3,9 +3,6 @@ const { Ed25519Keypair } = require('@mysten/sui.js/keypairs/ed25519');
 const { TransactionBlock } = require('@mysten/sui.js/transactions');
 const { fromB64 } = require('@mysten/bcs');
 const { extractTransactionStatusAndError } = require('./helpers/utils');
-const {
-  SUI_TYPE_ARG,
-} = require("@mysten/sui.js/utils");
 
 require('dotenv').config();
 
@@ -13,6 +10,7 @@ const {
     CONTRACT_ID,
     GLOBAL,
     ADMIN_CAP,
+    UNDERLYING_TOKEN_MOD
 } = require('./helpers/constants');
 
 const suiClient = new SuiClient({ url: getFullnodeUrl('mainnet') });
@@ -29,7 +27,7 @@ async function initialize() {
     const status = tx.moveCall({
       target: `${CONTRACT_ID}::fluidity_coin::initialize`,
       arguments: [tx.object(ADMIN_CAP), tx.object(GLOBAL)],
-      typeArguments: [SUI_TYPE_ARG],
+      typeArguments: [UNDERLYING_TOKEN_MOD],
     });
     let executeTxn = await suiClient.signAndExecuteTransactionBlock({
       transactionBlock: tx,

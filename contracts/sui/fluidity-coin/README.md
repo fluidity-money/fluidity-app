@@ -10,6 +10,11 @@ sui move build
 sui move test
 ```
 
+# Configuring the deployment
+
+Currently, the test/helpers/constants.js file is used. Make sure to set the token you want
+to deploy for!
+
 # Deploy Move contract
 
 It is critical to carefully update the fluidity coin CoinMetadata when deploying the coin, such that it reflects the CoinMetadata of the underlying coin for which it wraps and unwraps.
