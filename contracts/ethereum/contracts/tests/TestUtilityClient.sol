@@ -5,17 +5,17 @@ pragma abicoder v2;
 
 import "../../interfaces/IFluidClient.sol";
 
-import "../GovToken.sol";
+import "./TestGovToken.sol";
 
 contract TestClient is IFluidClient {
     address oracle_;
-    GovToken govToken_;
+    TestGovToken govToken_;
 
     event GotTransfered(address indexed from, address indexed to, uint amount);
 
     constructor(address o) {
         oracle_ = o;
-        govToken_ = new GovToken(
+        govToken_ = new TestGovToken(
             "Test utility token!",
             "UTILCLIENT",
             8,
@@ -23,7 +23,7 @@ contract TestClient is IFluidClient {
         );
     }
 
-    function transferFrom(GovToken token, uint amount) external {
+    function transferFrom(TestGovToken token, uint amount) external {
         emit GotTransfered(msg.sender, address(token), amount);
         token.transferFrom(msg.sender, address(this), amount);
     }

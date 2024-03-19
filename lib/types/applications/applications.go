@@ -18,6 +18,8 @@ import (
 // application-specific information like fees and senders/recipients.
 type Application int64
 
+// applications supported via the app. Note that this is also a
+// positional list.
 var applicationNames = []string{
 	"none",
 	"uniswap_v3",
@@ -45,6 +47,10 @@ var applicationNames = []string{
 	"ramses",
 	"jumper",
 	"camelot_v3",
+	"lifi",
+	"odos",
+	"betswirl",
+	"paraswap",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry

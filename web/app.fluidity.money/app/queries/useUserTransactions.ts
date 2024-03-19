@@ -4,10 +4,7 @@ import {
   hasuraDateToUnix,
   networkGqlBackend,
 } from "~/util/api/graphql";
-import {
-  getTokenFromAddress,
-  Token,
-} from "~/util/chainUtils/tokens";
+import { getTokenFromAddress, Token } from "~/util/chainUtils/tokens";
 import { Rarity } from "@fluidity-money/surfing";
 import { MintAddress } from "~/types/MintAddress";
 import { translateRewardTierToRarity } from "./useLootBottles";
@@ -75,43 +72,6 @@ const queryByAddress: Queryable = {
       ) {
         sender_address: solana_sender_owner_address
         recipient_address: solana_recipient_owner_address
-        token_short_name
-        time
-        transaction_hash
-        amount
-        type
-        swap_in
-        application
-        rewardTier: reward_tier
-        lootboxCount: lootbox_count
-      }
-    }
-  `,
-
-  polygon_zk: gql`
-    query getTransactionsByAddress(
-      $address: String!
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-      $tokens: [String!] = []
-    ) {
-      transfers: aggregated_user_transactions(
-        where: {
-          network: { _eq: "polygon_zk" }
-          token_short_name: { _in: $tokens }
-          _not: { transaction_hash: { _in: $filterHashes } }
-          _or: [
-            { sender_address: { _eq: $address } }
-            { recipient_address: { _eq: $address } }
-          ]
-        }
-        order_by: { time: desc }
-        limit: $limit
-        offset: $offset
-      ) {
-        sender_address
-        recipient_address
         token_short_name
         time
         transaction_hash
@@ -222,36 +182,6 @@ const queryByTxHash: Queryable = {
       }
     }
   `,
-
-  polygon_zk: gql`
-    query getTransactionsByTxHash(
-      $transactions: [String!]
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-    ) {
-      transfers: aggregated_user_transactions(
-        where: {
-          network: { _eq: "polygon_zk" }
-          _not: { transaction_hash: { _in: $filterHashes } }
-          transaction_hash: { _in: $transactions }
-        }
-        order_by: { time: desc }
-        limit: $limit
-      ) {
-        sender_address
-        recipient_address
-        token_short_name
-        time
-        transaction_hash
-        amount
-        type
-        swap_in
-        application
-        rewardTier: reward_tier
-        lootboxCount: lootbox_count
-      }
-    }
-  `,
   sui: gql`
     query getTransactionsByTxHash(
       $transactions: [String!]
@@ -336,38 +266,6 @@ const queryAll: Queryable = {
       ) {
         sender_address: solana_sender_owner_address
         recipient_address: solana_recipient_owner_address
-        token_short_name
-        time
-        transaction_hash
-        amount
-        type
-        swap_in
-        application
-        rewardTier: reward_tier
-        lootboxCount: lootbox_count
-      }
-    }
-  `,
-
-  polygon_zk: gql`
-    query getTransactions(
-      $offset: Int = 0
-      $filterHashes: [String!] = []
-      $limit: Int = 12
-      $tokens: [String!] = []
-    ) {
-      transfers: aggregated_user_transactions(
-        where: {
-          network: { _eq: "polygon_zk" }
-          _not: { transaction_hash: { _in: $filterHashes } }
-          token_short_name: { _in: $tokens }
-        }
-        order_by: { time: desc }
-        limit: $limit
-        offset: $offset
-      ) {
-        sender_address
-        recipient_address
         token_short_name
         time
         transaction_hash

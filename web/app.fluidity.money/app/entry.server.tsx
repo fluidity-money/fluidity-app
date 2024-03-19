@@ -1,8 +1,7 @@
 import { EntryContext } from "@remix-run/node";
-import { RemixServer, useLocation, useMatches } from "@remix-run/react";
+import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
 import * as Sentry from "@sentry/remix";
-import { useEffect } from "react";
 
 export default function handleRequest(
   request: Request,
@@ -28,15 +27,6 @@ if (process.env.NODE_ENV === "production") {
 
   Sentry.init({
     dsn,
-    tracesSampleRate: 1.0,
-    integrations: [
-      new Sentry.BrowserTracing({
-        routingInstrumentation: Sentry.remixRouterInstrumentation(
-          useEffect,
-          useLocation,
-          useMatches
-        ),
-      }),
-    ],
+    tracesSampleRate: 1.0
   });
 } else console.log("Running in development, ignoring Sentry initialisation...");

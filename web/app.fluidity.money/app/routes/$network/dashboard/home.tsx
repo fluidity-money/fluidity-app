@@ -7,7 +7,6 @@ import type { TransactionsLoaderData } from "~/routes/$network/query/userTransac
 import { json, LinksFunction, LoaderFunction } from "@remix-run/node";
 import { format } from "date-fns";
 import { MintAddress } from "~/types/MintAddress";
-import { SplitContext } from "contexts/SplitProvider";
 import {
   Display,
   LineChart,
@@ -76,6 +75,8 @@ function ErrorBoundary(error: Error) {
     </div>
   );
 }
+
+const ADJUSTED_BOTTLE_MULTIPLIER = 12;
 
 const SAFE_DEFAULT_HOME: HomeLoaderData = {
   network: "arbitrum",
@@ -151,9 +152,7 @@ export default function Home() {
 
   const { address, connected, tokens } = useContext(FluidityFacadeContext);
 
-  const { showExperiment } = useContext(SplitContext);
-
-  const useDebug = debug && showExperiment("show-debug");
+  const useDebug = debug;
 
   const { data: homeData } = useCache<HomeLoaderData>(
     `/${network}/query/dashboard/home`
@@ -313,7 +312,6 @@ export default function Home() {
   const {
     count,
     totalCount,
-    rewards,
     volume,
     transactions,
     graph,
@@ -401,6 +399,12 @@ export default function Home() {
 
     const appProviderName = getProviderDisplayName(application);
 
+    const shouldMultiplyBottles = application != "none";
+
+    let adjustedLootboxCount = lootboxCount;
+    if (shouldMultiplyBottles)
+      adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+
     return {
       RowElement: ({ heading }: { heading: string }) => {
         switch (heading) {
@@ -481,18 +485,18 @@ export default function Home() {
           case "BOTTLES EARNED":
             return (
               <td>
-                { (lootboxCount && rewardTier) ? (
+                {lootboxCount && rewardTier ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
                   >
-                   <LootBottle
+                    <LootBottle
                       size="sm"
                       /* WTF? why is this needed? REMOVEME */
                       rarity={translateRewardTierToRarity(rewardTier)}
-                      quantity={lootboxCount}
+                      quantity={adjustedLootboxCount}
                     />
-                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
+                    <Text>{toDecimalPlaces(adjustedLootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
@@ -605,24 +609,14 @@ export default function Home() {
               {/* Rewards */}
               <div className="statistics-set">
                 <Text>
-                  {activeTableFilterIndex
-                    ? "My yield"
-                    : showExperiment("weekly-available-rewards")
-                    ? "Weekly available rewards"
-                    : "Total yield"}
+                  {activeTableFilterIndex ? "My yield" : "Total yield"}
                 </Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}
                 >
                   {numberToMonetaryString(
-                    activeTableFilterIndex ||
-                      !showExperiment("weekly-available-rewards")
-                      ? rewards.find(
-                          ({ network: rewardNetwork }) =>
-                            rewardNetwork === network
-                        )?.total_reward || 0
-                      : totalPrizePool / 52
+                    activeTableFilterIndex || totalPrizePool / 52
                   )}
                 </Display>
                 <Link to={`/${network}/dashboard/rewards`}>
@@ -661,10 +655,7 @@ export default function Home() {
             <div className="totals-column">
               {/* Prize Pool */}
               <div className="statistics-set">
-                <Text>
-                  {showExperiment("weekly-available-rewards") ? "Total " : ""}
-                  Prize Pool
-                </Text>
+                <Text>Total Prize Pool</Text>
                 <Display
                   size={width < 500 && width > 0 ? "xxxs" : "xxs"}
                   style={{ margin: 0 }}

@@ -16,11 +16,6 @@ label = "Arbitrum"
 testnet = false
 rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
 
-[[drivers.polygon_zk]]
-label = "Polygon ZK"
-testnet = false
-rpc = { http = "FLU_POLYZK_RPC_HTTP", ws = "FLU_POLYZK_RPC_WS" }
-
 [[drivers.sui]]
 label = "Sui"
 testnet = false
@@ -168,7 +163,9 @@ enabled = true
 [config.arbitrum]
 explorer = "https://arbiscan.io"
 fluidAssets = [
-    "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A"
+    "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
+    "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62",
+    "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
 ]
 
 [[config.arbitrum.tokens]]
@@ -190,28 +187,22 @@ isFluidOf = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 decimals = 6
 enabled = true
 
-[config.polygon_zk]
-explorer = "https://zkevm.polygonscan.com"
-fluidAssets = [
-    "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C",
-]
-
-[[config.polygon_zk.tokens]]
-symbol = "USDC"
-name = "USDC Native"
-logo = "/assets/tokens/usdc.svg"
-address = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
-colour = "#2775ca"
+[[config.arbitrum.tokens]]
+symbol = "USDT"
+name = "Tether USD"
+logo = "/assets/tokens/usdt.svg"
+address = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+colour = "#12946c"
 decimals = 6
 enabled = true
 
-[[config.polygon_zk.tokens]]
-symbol = "fUSDC"
-name = "Fluid USDC Native"
-logo = "/assets/tokens/fUSDC.svg"
-address = "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C"
-colour = "#2775ca"
-isFluidOf = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
+[[config.arbitrum.tokens]]
+symbol = "fUSDT"
+name = "Fluid USDT"
+logo = "/assets/tokens/fUSDT.svg"
+address = "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62"
+colour = "#12946c"
+isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
 decimals = 6
 enabled = true
 
@@ -339,7 +330,7 @@ fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xaf88d065e77c8cC2239327
 name= "Ramses"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.ramses.exchange/liquidity/v2/0xf73c87736008ad3af9973b357c97ab8c60d8ca63"
+fUSDC = "https://app.ramses.exchange/liquidity/v2/0x2c9a8c5814bbd8eb4f3531efb836f3d1fa185f38"
 
 [[liquidity_providers.arbitrum.providers]]
 name= "uniswap"
@@ -379,22 +370,18 @@ address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
-polygon_zk = "0xDB6d7F5aF3caDFEBBB86DD627C68fdC58cdEB91B"
 
 [contract.staking]
 ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
 solana = ""
-polygon_zk = ""
 
 [contract.eac_aggregator_proxy]
 ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
-polygon_zk = ""
 
 [contract.registry]
 ethereum = ""
 arbitrum = "0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d"
 solana = ""
-polygon_zk = ""

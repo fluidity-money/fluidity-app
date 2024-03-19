@@ -19,6 +19,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -131,7 +132,16 @@ func init() {
 
 	traderJoeTests := unmarshalJsonTestOrFatal(integrationTestTraderJoe)
 	tests = append(tests, traderJoeTests...)
-}
+
+ 	lifiTests := unmarshalJsonTestOrFatal(integrationTestLifi)
+ 	tests = append(tests, lifiTests...)
+
+ 	odosTests := unmarshalJsonTestOrFatal(integrationTestOdos)
+ 	tests = append(tests, odosTests...)
+
+ 	paraswap := unmarshalJsonTestOrFatal(integrationTestParaswap)
+ 	tests = append(tests, paraswap...)
+ }
 
 func TestIntegrations(t *testing.T) {
 
@@ -185,7 +195,7 @@ func TestIntegrations(t *testing.T) {
 
 		// correct fees
 		expectedFeesRat, ok := new(big.Rat).SetString(event.ExpectedFees)
-		assert.True(t, ok)
+		assert.Truef(t, ok, "expected fees were not converted to string cleanly. was %v", event.ExpectedFees)
 		assert.Equal(t, expectedFeesRat, feeData.Fee)
 
 		// correct volume, if supported

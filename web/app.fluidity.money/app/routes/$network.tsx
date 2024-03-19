@@ -67,7 +67,6 @@ const Provider = ({
   const providers: ProviderMap = {
     solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
-    polygon_zk: EthereumProvider(walletconnectId, tokens, network),
     sui: SuiProvider(suiRpc, tokens),
   };
 

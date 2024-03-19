@@ -12,6 +12,7 @@ AUTOMATION_DIR := automation
 	test \
 	test-go \
 	test-contracts \
+        test-docker \
 	docker-test \
 	install
 
@@ -93,6 +94,15 @@ docker-node: docker-build
 
 	@touch docker-node
 
+docker-testing: docker
+	@${DOCKER_BUILD} \
+		${DOCKERFLAGS} \
+		-t ${ORG_ROOT}/docker-testing-container \
+		-f Dockerfile.testing \
+		.
+
+	@touch docker-test
+
 docker: \
 	docker-root \
 	docker-root-web \
@@ -102,8 +112,8 @@ docker: \
 	docker-build-web \
 	docker-node
 
-docker-test: docker
-	@${DOCKER_RUN} -f Dockerfile.test
+test-docker: docker-testing
+	@${DOCKER_RUN} ${ORG_ROOT}/docker-testing-container
 
 docker-compose-build:
 	@./scripts/docker-compose-all.sh build

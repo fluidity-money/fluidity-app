@@ -21,16 +21,6 @@ const options = {
         },
       },
     ],
-    polygon_zk: [
-      {
-        label: "Polygon ZK",
-        testnet: false,
-        rpc: {
-          http: "",
-          ws: "",
-        },
-      },
-    ],
     sui: [
       {
         label: "Sui",

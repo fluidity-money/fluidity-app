@@ -7,7 +7,7 @@ const queryAll = gql`
     total_reward
     count
   }
-  query TotalRewards($network: network_blockchain!) {
+  query TotalRewards($network: network_blockchain!) @cached(ttl: 300) {
     day: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 day" }
@@ -51,7 +51,8 @@ const queryByAddress = gql`
     total_reward
     count
   }
-  query TotalRewards($network: network_blockchain!, $address: String!) {
+  query TotalRewards($network: network_blockchain!, $address: String!)
+  @cached(ttl: 300) {
     day: total_reward(
       where: { network: { _eq: $network } }
       args: { i: "1 day", filter_address: $address }

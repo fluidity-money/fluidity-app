@@ -18,6 +18,7 @@ const providerImgNames: { [K in Provider]: string } = {
   Dodo: "DODO.png",
   Fluidity: "logoMetallic.png",
   Jumper: "Jumper.svg",
+  Lifi: "Lifi.svg",
   Jupiter: "Jupiter.svg",
   Kyber: "Kyber.svg",
   Lemniscap: "Lemniscap.png",
@@ -25,7 +26,6 @@ const providerImgNames: { [K in Provider]: string } = {
   Maker: "maker-mkr-logo.png",
   Mercurial: "mercurial.png",
   Mooniswap: "mooniswap.png",
-  Multichain: "multichain.png",
   Multicoin: "Multicoin.png",
   Oneinch: "1inch.svg",
   Orca: "Orca.svg",
@@ -40,5 +40,7 @@ const providerImgNames: { [K in Provider]: string } = {
   "Trader Joe": "trader_joe.svg",
   Uniswap: "Uniswap.svg",
   "XY Finance": "xy.png",
-  "Meteora": "Meteora.svg"
+  "Meteora": "Meteora.svg",
+  "Odos": "Odos.png",
+  "Paraswap": "Paraswap.svg"
 };

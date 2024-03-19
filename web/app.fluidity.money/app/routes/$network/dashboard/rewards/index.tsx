@@ -16,7 +16,6 @@ import { json } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { UserRewards, NoUserRewards } from "./common";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { MintAddress } from "~/types/MintAddress";
 import {
   Text,
@@ -151,12 +150,12 @@ const SAFE_DEFAULT_UNCLAIMED: UnclaimedRewardsLoaderData = {
   loaded: false,
 };
 
+const ADJUSTED_BOTTLE_MULTIPLIER = 12;
+
 export default function Rewards() {
   const { network, page, colors, debug } = useLoaderData<LoaderData>();
 
-  const { showExperiment } = useContext(SplitContext);
-
-  const useDebug = debug && showExperiment("show-debug");
+  const useDebug = debug;
 
   const { data: rewardsData } = useCache<RewardsLoaderData>(
     `/${network}/query/dashboard/rewards`
@@ -461,6 +460,12 @@ export default function Rewards() {
 
     const appProviderName = getProviderDisplayName(application);
 
+    const shouldMultiplyBottles = application != "none";
+
+    let adjustedLootboxCount = lootboxCount;
+    if (shouldMultiplyBottles)
+      adjustedLootboxCount = adjustedLootboxCount * ADJUSTED_BOTTLE_MULTIPLIER;
+
     return {
       RowElement: ({ heading }: { heading: string }) => {
         switch (heading) {
@@ -544,7 +549,7 @@ export default function Rewards() {
           case "BOTTLES EARNED":
             return (
               <td>
-                { (lootboxCount && rewardTier) ? (
+                {lootboxCount && rewardTier ? (
                   <a
                     className="table-address"
                     href={`/${network}/dashboard/airdrop`}
@@ -552,9 +557,9 @@ export default function Rewards() {
                     <LootBottle
                       size="sm"
                       rarity={rewardTier}
-                      quantity={lootboxCount}
+                      quantity={adjustedLootboxCount}
                     />
-                    <Text>{ toDecimalPlaces(lootboxCount, 4) }</Text>
+                    <Text>{toDecimalPlaces(adjustedLootboxCount, 4)}</Text>
                   </a>
                 ) : (
                   <Text>-</Text>
@@ -661,9 +666,6 @@ export default function Rewards() {
                 </a>
                 <a href="https://app.uniswap.org/#/swap?outputCurrency=0x9d1089802eE608BA84C5c98211afE5f37F96B36C">
                   <ProviderIcon provider="Uniswap" />
-                </a>
-                <a href="#">
-                  <ProviderIcon provider="Multichain" />
                 </a>
                 <a href="https://app.dodoex.io/?network=mainnet&from=0x9d1089802eE608BA84C5c98211afE5f37F96B36C&to=ETH">
                   <ProviderIcon provider="Dodo" />

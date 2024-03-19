@@ -38,7 +38,7 @@ const Whitepapers = () => {
       </div>
       <div className={styles.container}>
         <a
-          href="https://whitepapers.fluidity.money/fluidity-economics-wp-v0.8.pdf"
+          href="https://whitepapers.fluidity.money/fluidity-economics-wp-v1.0.pdf"
           rel="noopener noreferrer"
           target="_blank"
         >

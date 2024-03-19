@@ -5,7 +5,7 @@ const QUERY_BY_TX_HASH = gql`
   query getLootboxesByTxHash($filterHashes: [String!] = []) {
     lootbox(where: { transaction_hash: { _in: $filterHashes } }) {
       txHash: transaction_hash
-      lootboxCount: lootbox_count
+      lootboxCount: new_count
       rewardTier: reward_tier
     }
   }
@@ -54,7 +54,9 @@ const useLootboxesByTxHash = (filterHashes: string[]) => {
   );
 };
 
-const translateRewardTierToRarity = (rewardTier: number | undefined): Rarity => {
+const translateRewardTierToRarity = (
+  rewardTier: number | undefined
+): Rarity => {
   switch (rewardTier) {
     case 5:
       return Rarity.Legendary;

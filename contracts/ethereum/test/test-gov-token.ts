@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { commonBindings, signers } from "./setup-common";
 import { expectEq, expectGt } from "./test-utils";
 
-describe("GovToken", async () => {
+describe("TestGovToken", async () => {
   let govOperator: ethers.Contract;
   let govOperatorSigner: ethers.Signer;
   let accountSigner: ethers.Signer;

@@ -27,7 +27,6 @@ import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
 import { ProjectedWinData } from "./query/projectedWinnings";
 import { Chain } from "~/util/chainUtils/chains";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -40,10 +39,6 @@ const CHAIN_NAME_MAP: Record<
   arbitrum: {
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
-  },
-  polygon_zk: {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
   },
   solana: {
     name: "SOL",
@@ -84,8 +79,6 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
-  const { showExperiment } = useContext(SplitContext);
-
   const projectedWinningsData = useFetcher<ProjectedWinData>();
 
   useEffect(() => {
@@ -111,22 +104,13 @@ const NetworkPage = () => {
   const mobileBreakpoint = 500;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .filter(([, chain]) => {
-      const { name } = chain;
-
-      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-        return false;
-
-      return true;
-    })
-    .reduce(
-      (prev, [key, value]) => ({
-        ...prev,
-        [key]: value,
-      }),
-      {} as typeof CHAIN_NAME_MAP
-    );
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP).reduce(
+    (prev, [key, value]) => ({
+      ...prev,
+      [key]: value,
+    }),
+    {} as typeof CHAIN_NAME_MAP
+  );
 
   useEffect(() => {
     // stop modal pop-up if connected

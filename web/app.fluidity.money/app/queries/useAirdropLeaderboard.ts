@@ -1,7 +1,8 @@
 import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 
 const queryByUserAllTime = gql`
-  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!)
+  @cached(ttl: 120) {
     airdrop_leaderboard(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
@@ -18,7 +19,7 @@ const queryByUserAllTime = gql`
 `;
 
 const queryAllTime = gql`
-  query AirdropLeaderboard($epoch: lootbox_epoch!) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!) @cached(ttl: 120) {
     airdrop_leaderboard(
       args: { epoch_: $epoch }
       limit: 16
@@ -37,7 +38,8 @@ const queryAllTime = gql`
 `;
 
 const queryByUser24Hours = gql`
-  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!)
+  @cached(ttl: 60) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
@@ -56,7 +58,7 @@ const queryByUser24Hours = gql`
 `;
 
 const query24Hours = gql`
-  query AirdropLeaderboard($epoch: lootbox_epoch!) {
+  query AirdropLeaderboard($epoch: lootbox_epoch!) @cached(ttl: 120) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours(
       args: { epoch_: $epoch }
       limit: 16
@@ -79,7 +81,7 @@ const query24HoursByUserByApplication = gql`
     $epoch: lootbox_epoch!
     $application: ethereum_application!
     $address: String!
-  ) {
+  ) @cached(ttl: 120) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
       args: { epoch_: $epoch, application_: $application }
       where: { address: { _eq: $address } }
@@ -101,7 +103,7 @@ const query24HoursByApplication = gql`
   query AirdropLeaderboardByApplication(
     $epoch: lootbox_epoch!
     $application: ethereum_application!
-  ) {
+  ) @cached(ttl: 120) {
     airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
       args: { epoch_: $epoch, application_: $application }
       limit: 16

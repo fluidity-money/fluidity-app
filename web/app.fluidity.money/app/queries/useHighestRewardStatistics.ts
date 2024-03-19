@@ -2,7 +2,8 @@ import { gql } from "~/util";
 import { jsonPost } from "~/util/api/rpc";
 
 const queryByNetwork = gql`
-  query HighestRewardsByNetwork($network: network_blockchain!) {
+  query HighestRewardsByNetwork($network: network_blockchain!)
+  @cached(ttl: 300) {
     highest_rewards_monthly(where: { network: { _eq: $network } }) {
       network
       transaction_hash
@@ -21,7 +22,7 @@ const queryByNetwork = gql`
 `;
 
 const queryAll = gql`
-  query HighestRewardsAllNetworks {
+  query HighestRewardsAllNetworks @cached(ttl: 300) {
     highest_rewards_monthly {
       network
       transaction_hash

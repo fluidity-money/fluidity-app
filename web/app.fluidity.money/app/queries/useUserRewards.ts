@@ -60,7 +60,6 @@ const queryWinnersAllSolana = gql`
 
 const queryWinnersAll: { [network in Chain]: string } = {
   arbitrum: queryWinnersAll_,
-  polygon_zk: queryWinnersAll_,
   solana: queryWinnersAllSolana,
 };
 
@@ -118,7 +117,6 @@ const queryWinnersByAddressSolana = gql`
 
 const queryWinnersByAddress: { [network in Chain]: string } = {
   arbitrum: queryWinnersByAddress_,
-  polygon_zk: queryWinnersByAddress_,
   solana: queryWinnersByAddressSolana,
 };
 

@@ -3,7 +3,7 @@ name: DB Migration - Mainnet (Auto)
 on:
   pull_request:
     branches:
-      - production
+      - develop
     types:
       - closed
 
@@ -14,7 +14,7 @@ permissions:
 jobs:
   db-migration:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: powerfulubuntu
     environment: mainnet
     steps:
       - uses: actions/checkout@v3

@@ -12,7 +12,7 @@ import {
   useUserRewardsByAddress,
   useUserTransactionsAll,
   useUserTransactionsByAddress,
-  translateRewardTierToRarity
+  translateRewardTierToRarity,
 } from "~/queries";
 import { captureException } from "@sentry/react";
 import { MintAddress } from "~/types/MintAddress";
@@ -365,7 +365,10 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         } = transaction;
 
         const rewardTier =
-          rewardTier_ ?? translateRewardTierToRarity(Object.values(Rarity).indexOf(rewardTier_));
+          rewardTier_ ??
+          translateRewardTierToRarity(
+            Object.values(Rarity).indexOf(rewardTier_)
+          );
 
         return {
           sender,
@@ -382,7 +385,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           currency,
           application,
           lootboxCount,
-          rewardTier
+          rewardTier,
         };
       }
     );

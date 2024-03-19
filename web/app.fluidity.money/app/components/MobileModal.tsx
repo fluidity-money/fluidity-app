@@ -1,6 +1,5 @@
 import { useNavigate, Link } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { useState, useContext, useEffect } from "react";
 import { networkMapper } from "~/util";
 import { AnimatePresence, motion } from "framer-motion";
@@ -58,10 +57,6 @@ export default function MobileModal({
   const { connected, address, rawAddress, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
-
-  const { showExperiment } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
-  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
 
@@ -151,12 +146,10 @@ export default function MobileModal({
             {/* Navigation Buttons */}
             <div className="mobile-navbar-right">
               {/* Chain Switcher */}
-              {showMobileNetworkButton && (
-                <ChainSelectorButton
-                  chain={chains[network]}
-                  onClick={() => setChainModalVisibility(true)}
-                />
-              )}
+              <ChainSelectorButton
+                chain={chains[network]}
+                onClick={() => setChainModalVisibility(true)}
+              />
               {/* Prize Money */}
               <GeneralButton
                 type={"transparent"}
@@ -205,18 +198,16 @@ export default function MobileModal({
             )}
 
             {/* Chain Switcher */}
-            {!showMobileNetworkButton && (
-              <ChainSelectorButton
-                chain={chains[network]}
-                onClick={() => setChainModalVisibility(true)}
-              />
-            )}
+            <ChainSelectorButton
+              chain={chains[network]}
+              onClick={() => setChainModalVisibility(true)}
+            />
           </section>
 
           {/* Navigation between pages */}
           <ul className="sidebar-nav">
             {navigationMap
-              .filter(({ name }) => name !== "Assets" || showAssets)
+              .filter(({ name }) => name !== "Assets")
               .map((obj, index) => {
                 const key = Object.values(obj)[0];
                 const { name, icon, path } = obj;

@@ -88,7 +88,7 @@ type (
 
 	// app fees for ethereum transactions
 	EthereumAppFees struct {
-		UniswapV3        float64 `json:"uniswap_v3"`
+		UniswapV3        float64 `json:"uniswap_v3",`
 		UniswapV2        float64 `json:"uniswap_v2"`
 		BalancerV2       float64 `json:"balancer_v2"`
 		OneInchV2        float64 `json:"oneinch_v2"`
@@ -97,20 +97,26 @@ type (
 		OneInchFixedRate float64 `json:"oneinch_fixedrate"`
 		DodoV2           float64 `json:"dodo_v2"`
 		Curve            float64 `json:"curve"`
-		Multichain       float64 `json:"multichain"`
-		XyFinance        float64 `json:"xyfinance"`
-		Apeswap          float64 `json:"apeswap"`
-		Saddle           float64 `json:"saddle"`
-		GTradeV6_1       float64 `json:"gtrade_v6_1"`
-		Meson            float64 `json:"meson"`
-		Camelot          float64 `json:"camelot"`
-		CamelotV3        float64 `json:"camelot_v3"`
-		Chronos          float64 `json:"chronos"`
-		Sushiswap        float64 `json:"sushiswap"`
-		KyberClassic     float64 `json:"kyber_classic"`
-		Wombat           float64 `json:"wombat"`
-		SeawaterAmm      float64 `json:"seawater_amm"`
-		TraderJoe        float64 `json:"trader_joe"`
+
+		// Multichain is no longer used, but is kept here to be consistent with the database.
+		Multichain   float64 `json:"multichain"`
+		XyFinance    float64 `json:"xyfinance"`
+		Apeswap      float64 `json:"apeswap"`
+		Saddle       float64 `json:"saddle"`
+		GTradeV6_1   float64 `json:"gtrade_v6_1"`
+		Meson        float64 `json:"meson"`
+		Camelot      float64 `json:"camelot"`
+		CamelotV3    float64 `json:"camelot_v3"`
+		Chronos      float64 `json:"chronos"`
+		Sushiswap    float64 `json:"sushiswap"`
+		KyberClassic float64 `json:"kyber_classic"`
+		Wombat       float64 `json:"wombat"`
+		SeawaterAmm  float64 `json:"seawater_amm"`
+		TraderJoe    float64 `json:"trader_joe"`
+		Lifi         float64 `json:"lifi"`
+		Odos         float64 `json:"odos"`
+		BetSwirl     float64 `json:"betswirl"`
+		Paraswap     float64 `json:"paraswap"`
 	}
 
 	// app fees for sui transactions

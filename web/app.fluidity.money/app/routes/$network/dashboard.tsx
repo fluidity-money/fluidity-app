@@ -24,7 +24,6 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
   AirdropIcon,
@@ -32,6 +31,7 @@ import {
   GeneralButton,
   Trophy,
   AssetsIcon,
+  FlyIcon,
   Text,
   Heading,
   ChainSelectorButton,
@@ -43,7 +43,6 @@ import {
   Modal,
   ProvideLiquidity,
   BurgerMenu,
-  Referral,
   CardModal,
   ArrowUp,
   ArrowDown,
@@ -206,10 +205,6 @@ const CHAIN_NAME_MAP: Record<
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
-  polygon_zk: {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
-  },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
@@ -253,9 +248,6 @@ export default function Dashboard() {
   const { connected, address, rawAddress, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
-
-  const { showExperiment, client } = useContext(SplitContext);
-  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -432,22 +424,13 @@ export default function Dashboard() {
       : false;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .filter(([, chain]) => {
-      const { name } = chain;
-
-      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-        return false;
-
-      return true;
-    })
-    .reduce(
-      (prev, [key, value]) => ({
-        ...prev,
-        [key]: value,
-      }),
-      {} as typeof CHAIN_NAME_MAP
-    );
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP).reduce(
+    (prev, [key, value]) => ({
+      ...prev,
+      [key]: value,
+    }),
+    {} as typeof CHAIN_NAME_MAP
+  );
 
   return (
     <>
@@ -543,6 +526,12 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
+          <li key="ico">
+            <div />
+            <a style={{"cursor": "pointer"}} href="https://launchmoby.com" target="_blank" rel="noreferrer">
+              <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
+            </a>
+          </li>
           {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
@@ -645,74 +634,54 @@ export default function Dashboard() {
           {/* Navigation Buttons */}
           <div id="top-navbar-right">
             {/* Network Button */}
-            {(isTablet || isMobile) && showMobileNetworkButton && (
+            {(isTablet || isMobile) && (
               <ChainSelectorButton
                 chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
             )}
 
-            {/* Send & Receive */}
-            <GeneralButton
-              className="s-r-button"
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                navigate(`/${network}/transfer/send`);
-              }}
-              icon={<ArrowUp />}
-            >
-              {isMobile ? "" : "Send"}
-            </GeneralButton>
-            <GeneralButton
-              className="s-r-button"
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                navigate(`/${network}/transfer/receive`);
-              }}
-              icon={<ArrowDown />}
-            >
-              {isMobile ? "" : "Receive"}
-            </GeneralButton>
-
-            {/* Referrals Button (desktop only) */}
-            {
-              (isTablet || isMobile) || (
+            {/* Send & Receive (only supported if Arbitrum) */}
+            {network == "arbitrum" && (
+              <>
                 <GeneralButton
-                type="transparent"
-                size="small"
-                layout="before"
-                handleClick={() => {
-                  width < airdropMobileBreakpoint
-                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                    : setReferralModalVisibility(true);
-                }}
-                icon={<Referral />}
-              >
-                {isMobile ? "" : "Referral"}
-              </GeneralButton>
-              )
-            }
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
+            )}
 
             {/* Fluidify button (desktop only) */}
-            {
-              (isTablet || isMobile) || (
-                <GeneralButton
-                  className="fluidify-button-dashboard "
-                  type={"secondary"}
-                  size={"small"}
-                  handleClick={() => {
-                    client?.track("user", "click_fluidify");
-                    navigate(`/${network}/fluidify`);
-                  }}
-                >
-                  <b>Fluidify{isMobile ? "" : " Money"}</b>
-                </GeneralButton>
-              )
-            }
+            {isTablet || isMobile || (
+              <GeneralButton
+                className="fluidify-button-dashboard "
+                type={"secondary"}
+                size={"small"}
+                handleClick={() => navigate(`/${network}/fluidify`)}
+              >
+                <b>Fluidify{isMobile ? "" : " Money"}</b>
+              </GeneralButton>
+            )}
 
             {/* Prize Money */}
             <GeneralButton
@@ -784,15 +753,12 @@ export default function Dashboard() {
           )}
 
         {/* Default Fluidify button */}
-        {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
+        {otherModalOpen && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
             type={"secondary"}
             size={"medium"}
-            handleClick={() => {
-              client?.track("user", "click_fluidify");
-              navigate(`/${network}/fluidify`);
-            }}
+            handleClick={() => navigate(`/${network}/fluidify`)}
           >
             <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
