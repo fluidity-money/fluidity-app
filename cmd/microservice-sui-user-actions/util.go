@@ -109,7 +109,9 @@ func getSuiGasFee(suiClient sui.ISuiAPI, suiPythPubkey string, gasUsed models.Ga
 	return gasFee, nil
 }
 
-// TODO
+// TODO obtain the price from pyth rather than hardcoding
+const SuiPrice = 2000000000 // in MIST
 func getPythPrice(client sui.ISuiAPI, pythPubkey string) (*big.Rat, error) {
-
+	gasFee := new(big.Rat).SetInt64(SuiPrice)
+	return gasFee, nil
 }
