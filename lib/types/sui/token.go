@@ -4,6 +4,8 @@
 
 package sui
 
+import token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+
 // TokenDetails is used to contain information on the underlying token and
 // the number of decimal places in another structure.
 
@@ -13,7 +15,8 @@ package sui
 
 const (
 	FluidityModuleName = `fluidity_coin`
-	typeSuffix         = `::fluidity_coin::FLUIDITY_COIN`
+	coinTypeSuffix     = `::coin::COIN`
+	fluidTypeSuffix    = `::fluidity_coin::FLUIDITY_COIN`
 	coinType           = `0x2::coin::Coin`
 )
 
@@ -23,12 +26,21 @@ type SuiToken struct {
 	TokenShortName string `json:"token_short_name"`
 	TokenDecimals  int    `json:"token_decimals"`
 	PackageId      string `json:"package_id"`
+	IsFluid        bool   `json:"is_fluid"`
 }
 
 // can't define these as const as they contain the package id, which differs by token/network
 
 func (s *SuiToken) Type() string {
-	return s.PackageId + typeSuffix
+	if s.IsFluid {
+		return s.PackageId + fluidTypeSuffix
+	}
+	return s.PackageId + coinTypeSuffix
+}
+
+// TokenDetails to convert to the common token details format
+func (s *SuiToken) TokenDetails() token_details.TokenDetails {
+	return token_details.New(s.TokenShortName, s.TokenDecimals)
 }
 
 func (s *SuiToken) Wrap() string {

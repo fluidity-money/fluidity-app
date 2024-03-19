@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	suiApps "github.com/fluidity-money/fluidity-app/common/sui/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -131,6 +132,121 @@ func CreatePendingWinners(winner worker.EthereumWinnerAnnouncement, tokenDetails
 			RewardTier:      rewardTier,
 		})
 	}
+	return pendingWinners
+}
+
+// CreatePendingWinnersSui to create pending winners from the Sui transfer/payout types
+func CreatePendingWinnersSui(transfer worker.TransferWithFee, senderPayouts map[applications.UtilityName]worker.Payout, recipientPayouts map[applications.UtilityName]worker.Payout, tokenDetails map[string]suiApps.UtilityDetails, rewardTier int) []PendingWinner {
+	var pendingWinners []PendingWinner
+
+	for utility, payout := range senderPayouts {
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+
+			fluidTokenDetails   = transfer.UserAction.TokenDetails
+			fluidTokenShortName = fluidTokenDetails.TokenShortName
+			hash                = transfer.UserAction.TransactionHash
+			senderAddress       = transfer.UserAction.SenderAddress
+			checkpoint          = transfer.Checkpoint
+			network             = transfer.UserAction.Network
+			logIndex            = transfer.UserAction.LogIndex
+			application         = transfer.UserAction.Application
+		)
+
+		var details token_details.TokenDetails
+
+		utilityDetails, exists := tokenDetails[string(utility)]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		} else {
+			details = utilityDetails.TokenDetails
+		}
+
+		// create the sender
+		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
+			TokenDetails:    details,
+			TransactionHash: hash,
+			SenderAddress:   senderAddress,
+			NativeWinAmount: nativeWinAmount,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     &checkpoint,
+			Network:         network,
+			RewardType:      "send",
+			LogIndex:        &logIndex,
+			Application:     application,
+			RewardTier:      rewardTier,
+		})
+	}
+
+	for utility, payout := range recipientPayouts {
+		var (
+			nativeWinAmount = payout.Native
+			usdWinAmount    = payout.Usd
+
+			fluidTokenDetails   = transfer.UserAction.TokenDetails
+			fluidTokenShortName = fluidTokenDetails.TokenShortName
+			hash                = transfer.UserAction.TransactionHash
+			recipientAddress    = transfer.UserAction.RecipientAddress
+			checkpoint          = transfer.Checkpoint
+			network             = transfer.UserAction.Network
+			logIndex            = transfer.UserAction.LogIndex
+			application         = transfer.UserAction.Application
+		)
+
+		var details token_details.TokenDetails
+
+		utilityDetails, exists := tokenDetails[string(utility)]
+
+		if !exists {
+			if utility != applications.UtilityFluid {
+				log.Debug(func(k *log.Log) {
+					k.Format(
+						"Couldn't find utility %s in token details list %#v! Defaulting to %+v",
+						utility,
+						tokenDetails,
+						fluidTokenDetails,
+					)
+				})
+			}
+
+			details = fluidTokenDetails
+		} else {
+			details = utilityDetails.TokenDetails
+		}
+
+		// create the recipient
+		pendingWinners = append(pendingWinners, PendingWinner{
+			Category:        fluidTokenShortName,
+			TokenDetails:    details,
+			TransactionHash: hash,
+			SenderAddress:   recipientAddress,
+			NativeWinAmount: nativeWinAmount,
+			UsdWinAmount:    usdWinAmount,
+			Utility:         utility,
+			BlockNumber:     &checkpoint,
+			Network:         network,
+			RewardType:      "send",
+			LogIndex:        &logIndex,
+			Application:     application,
+			RewardTier:      rewardTier,
+		})
+	}
+
 	return pendingWinners
 }
 

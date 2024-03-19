@@ -69,6 +69,13 @@ type (
 		AtxBufferSize   int    `json:"atx_buffer_size"`
 	}
 
+	// WorkerConfigSui that was previously hardcoded for Sui only
+	WorkerConfigSui struct {
+		SuiBlockTime                  uint64  `json:"sui_block_time"`
+		SpoolerInstantRewardThreshold float64 `json:"spooler_instant_reward_threshold"`
+		SpoolerBatchedRewardThreshold float64 `json:"spooler_batched_reward_threshold"`
+	}
+
 	// app fees for solana transactions
 	SolanaAppFees struct {
 		Saber    float64 `json:"saber"`
@@ -103,6 +110,10 @@ type (
 		Wombat           float64 `json:"wombat"`
 		SeawaterAmm      float64 `json:"seawater_amm"`
 		TraderJoe        float64 `json:"trader_joe"`
+	}
+
+	// app fees for sui transactions
+	SuiAppFees struct {
 	}
 
 	FeeSwitch struct {

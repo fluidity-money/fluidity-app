@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/block-vision/sui-go-sdk/sui"
+	"github.com/fluidity-money/fluidity-app/common/sui/applications"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
@@ -23,23 +24,54 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/util"
 )
 
+const RedisLastWinnerCheckpoint = `sui.last-winner-checkpoint`
+
 const (
-	EnvSuiHttpUrl             = `FLU_SUI_HTTP_URL`
-	RedisLastWinnerCheckpoint = `sui.last-winner-checkpoint`
+	// EnvSuiHttpUrl is the HTTP url of a Sui node
+	EnvSuiHttpUrl = `FLU_SUI_HTTP_URL`
+
+	// EnvSuiPythPubkey is the public key of the Pyth price account for SUI
+	EnvSuiPythPubkey = `FLU_SUI_PYTH_PUBKEY`
+
+	// EnvFluidPackageId for the package ID of the fluid token
+	EnvFluidPackageId = `FLU_SUI_PACKAGE_ID`
+
+	// EnvUnderlyingTokenName is the name of the underlying token (e.g. USDC)
+	EnvUnderlyingTokenName = `FLU_SUI_UNDERLYING_TOKEN_NAME`
+
+	// EnvTokenDecimals is the number of decimals the token uses
+	EnvTokenDecimals = `FLU_SUI_TOKEN_DECIMALS`
 )
 
 func main() {
 	var (
-		suiHttpUrl = util.GetEnvOrFatal(EnvSuiHttpUrl)
+		suiHttpUrl          = util.GetEnvOrFatal(EnvSuiHttpUrl)
+		suiPythPubkey       = util.GetEnvOrFatal(EnvSuiPythPubkey)
+		fluidPackageId      = util.GetEnvOrFatal(EnvFluidPackageId)
+		underlyingTokenName = util.GetEnvOrFatal(EnvUnderlyingTokenName)
+		decimalPlaces_      = util.GetEnvOrFatal(EnvTokenDecimals)
+
+		httpClient = sui.NewSuiClient(suiHttpUrl)
 	)
 
+	decimalPlaces, err := strconv.Atoi(decimalPlaces_)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Format(
+				"Failed to convert the decimals from %v! Was %#v!",
+				decimalPlaces_,
+				decimalPlaces,
+			)
+		})
+	}
+
 	var (
-		httpClient = sui.NewSuiClient(suiHttpUrl)
-		// TODO source fluid token from env, including decimals
 		fluidToken = sui_types.SuiToken{
-			PackageId:      "0xeeb05606f5e8033e807c9c86e6f60bf4225f6110d511e45d99d74a562b0a24fe",
-			TokenShortName: "USDC",
-			TokenDecimals:  9,
+			PackageId:      fluidPackageId,
+			TokenShortName: underlyingTokenName,
+			TokenDecimals:  decimalPlaces,
+			IsFluid:        true,
 		}
 	)
 
@@ -88,20 +120,59 @@ func main() {
 		}
 
 		var decoratedTransfers []sui_queue.DecoratedTransfer
+		// userActions without an application
+		var userActions []user_actions.UserAction
+
 		for _, transactionBlock := range blocksResponse {
 			var (
 				objectChanges = transactionBlock.ObjectChanges
 				events        = transactionBlock.Events
 				transactions  = transactionBlock.Transaction.Data.Transaction.Transactions
 				inputs        = transactionBlock.Transaction.Data.Transaction.Inputs
+				gasUsed       = transactionBlock.Effects.GasUsed
 			)
 
 			// process events
 			for eventIndex, event := range events {
 				transactionHash := event.Id.TxDigest
 
+				// check if event is an app type
+				if application := applications.ClassifyApplicationTransfer(event); application != applications.ApplicationNone {
+					checkpointBig, err := misc.BigIntFromString(transactionBlock.Checkpoint)
+					if err != nil {
+						log.Fatal(func(k *log.Log) {
+							k.Format(
+								"Failed to parse checkpoint %v as a number!",
+								transactionBlock.Checkpoint,
+							)
+							k.Payload = err
+						})
+					}
+
+					eventIndexBig := misc.BigIntFromInt64(int64(eventIndex))
+
+					// partially fill a user action to be updated by the server
+					userAction := user_actions.UserAction{
+						Network:         network.NetworkSui,
+						Type:            "send",
+						TransactionHash: transactionHash,
+						LogIndex:        eventIndexBig,
+						TokenDetails:    fluidToken.TokenDetails(),
+						Application:     application.String(),
+					}
+
+					decoratedTransfer := sui_queue.DecoratedTransfer{
+						Event:      &event,
+						Data:       transactionBlock.Transaction.Data,
+						Checkpoint: *checkpointBig,
+						UserAction: userAction,
+					}
+
+					decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
+
+				}
+
 				switch event.Type {
-				// TODO - ethereum doesn't assign a log index to swaps - do we need to on sui?
 				case fluidToken.Wrap():
 					wrapEvent, err := sui_types.ParseWrap(event.ParsedJson)
 					if err != nil {
@@ -121,7 +192,6 @@ func main() {
 					swap := userActionFromWrap(transactionHash, wrapEvent, fluidToken)
 
 					queue.SendMessage(user_actions.TopicUserActionsSui, swap)
-				// TODO - ethereum doesn't seem to assign a log index to swaps - do we need to on sui?
 				case fluidToken.Unwrap():
 					unwrapEvent, err := sui_types.ParseUnwrap(event.ParsedJson)
 					if err != nil {
@@ -326,11 +396,36 @@ func main() {
 				amountInt := misc.NewBigIntFromInt(*amountBig)
 				txIndexInt := misc.BigIntFromInt64(int64(txIndex))
 
-				send := user_actions.NewSendSui(network.NetworkSui, senderAddress, recipientAddress, transactionBlock.Digest, amountInt, txIndexInt, fluidToken.TokenShortName, fluidToken.TokenDecimals)
+				adjustedFee, err := getSuiGasFee(httpClient, suiPythPubkey, gasUsed)
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to get the fee paid for transaction %v!",
+							transactionBlock.Digest,
+						)
+						k.Payload = err
+					})
+				}
+
+				send := user_actions.NewSendSui(network.NetworkSui, senderAddress, recipientAddress, transactionBlock.Digest, amountInt, txIndexInt, adjustedFee, nil, fluidToken.TokenShortName, fluidToken.TokenDecimals)
+
+				userActions = append(userActions, send)
+
+				checkpointBig, err := misc.BigIntFromString(transactionBlock.Checkpoint)
+				if err != nil {
+					log.Fatal(func(k *log.Log) {
+						k.Format(
+							"Failed to parse checkpoint %v as a number!",
+							transactionBlock.Checkpoint,
+						)
+						k.Payload = err
+					})
+				}
 
 				decoratedTransfer := sui_queue.DecoratedTransfer{
 					UserAction: send,
 					Data:       transactionBlock.Transaction.Data,
+					Checkpoint: *checkpointBig,
 				}
 
 				decoratedTransfers = append(decoratedTransfers, decoratedTransfer)
@@ -339,7 +434,13 @@ func main() {
 		}
 
 		// now send to the respective queues
-		// user actions are processed by the application server to add application info
+
+		// worker doesn't re-process transfers without an application, so send immediately
+		queue.SendMessage(
+			user_actions.TopicUserActionsSui,
+			userActions,
+		)
+		// decorated user actions are processed by the application server to add application info
 		queue.SendMessage(sui_queue.TopicDecoratedTransfers, decoratedTransfers)
 
 		// winners are directly processed into timescale

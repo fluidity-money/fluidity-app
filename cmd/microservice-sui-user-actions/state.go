@@ -23,6 +23,7 @@ func getTransactionBlocks(client sui.ISuiAPI, digests []string) (models.SuiMulti
 			ShowInput:         true,
 			ShowEvents:        true,
 			ShowObjectChanges: true,
+			ShowEffects:       true,
 		}
 	)
 

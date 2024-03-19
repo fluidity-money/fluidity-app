@@ -70,6 +70,10 @@ func WinnersSolana(f func(Winner)) {
 	winners(TopicWinnersSolana, f)
 }
 
+func WinnersSui(f func(Winner)) {
+	winners(TopicWinnersSui, f)
+}
+
 func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
 }

@@ -4,22 +4,24 @@
 
 package sui
 
-// sui contains queue code that receives 
+// sui contains queue code that receives
 // from upstream, safely decoding it appropriately. Intended
 // to be used with a fanout exchange, so topic names are randomly chosen.
 
-import "github.com/fluidity-money/fluidity-app/lib/queue"
+import (
+	"github.com/fluidity-money/fluidity-app/lib/queue"
+	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+)
 
 const (
 	// TopicCheckpoints to get a summary of every checkpoint
 	TopicCheckpoints = "sui.checkpoint"
 
-	// TopicEvents to get wrap, unwrap, or yield distribution events
-	TopicEvents = "sui.event"
-
-	// TopicTransfers to get fluid transfers
-	TopicTransfers = "sui.transfer"
+	// TopicDecoratedTransfers to get decorated transfers to process with a worker
+	TopicDecoratedTransfers = "sui.decorated_transfer"
 )
+
+type SuiAppFees = worker.SuiAppFees
 
 func Checkpoints(f func(Checkpoint)) {
 	queue.GetMessages(TopicCheckpoints, func(message queue.Message) {
@@ -31,22 +33,12 @@ func Checkpoints(f func(Checkpoint)) {
 	})
 }
 
-func Events(f func(Event)) {
-	queue.GetMessages(TopicEvents, func(message queue.Message) {
-		var event Event
+func DecoratedTransfers(f func([]DecoratedTransfer)) {
+	queue.GetMessages(TopicDecoratedTransfers, func(message queue.Message) {
+		var decoratedTransfers []DecoratedTransfer
 
-		message.Decode(&event)
+		message.Decode(&decoratedTransfers)
 
-		f(event)
-	})
-}
-
-func Transfers(f func(Transfer)) {
-	queue.GetMessages(TopicTransfers, func(message queue.Message) {
-		var transfer Transfer
-
-		message.Decode(&transfer)
-
-		f(transfer)
+		f(decoratedTransfers)
 	})
 }

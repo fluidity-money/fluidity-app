@@ -53,7 +53,6 @@ type BlockedWinner struct {
 	BatchLastBlock          misc.BigInt                `json:"last_block"`
 }
 
-// TODO update this to be compatible with sui
 // PendingWinner is a winner that has been spooled but not sent
 type PendingWinner struct {
 	// Category is the TokenShortName of the corresponding token (e.g. USDC)
