@@ -390,6 +390,7 @@ solana = ""
 ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
+sui = ""
 
 [contract.registry]
 ethereum = ""
