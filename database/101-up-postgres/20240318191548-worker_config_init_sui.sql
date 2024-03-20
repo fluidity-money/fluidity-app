@@ -2,7 +2,7 @@
 
 CREATE TABLE worker_config_sui (
 	network network_blockchain NOT NULL,
-	sui_block_time INTEGER,
+	sui_block_time INTEGER NOT NULL,
 	spooler_instant_reward_threshold REAL NOT NULL,
 	spooler_batched_reward_threshold REAL NOT NULL
 );
