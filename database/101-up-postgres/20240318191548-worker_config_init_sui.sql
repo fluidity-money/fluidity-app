@@ -1,3 +1,5 @@
+-- migrate:up
+
 CREATE TABLE worker_config_sui (
 	network network_blockchain NOT NULL,
 	sui_block_time INTEGER,
