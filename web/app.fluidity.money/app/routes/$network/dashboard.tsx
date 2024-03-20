@@ -160,20 +160,22 @@ type LoaderData = {
   referralCode: string;
 };
 
-const NAVIGATION_MAP: {
-  [key: string]: {
-    name: string;
-    path: (network: string) => string;
-    icon: JSX.Element;
-  };
-}[] = [
-  {
+const airdropTab = [{
     airdrop: {
       name: "airdrop",
       path: (network: string) => `/${network}/dashboard/airdrop`,
       icon: <AirdropIcon />,
     },
-  },
+  }]
+
+const NAVIGATION_MAP   : {
+  [key: string]: {
+    name: string;
+    path: (network: string) => string;
+    icon: JSX.Element;
+  }
+} = () => [
+  ...airdropTab,
   {
     home: {
       name: "dashboard",

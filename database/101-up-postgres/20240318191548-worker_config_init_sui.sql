@@ -3,7 +3,7 @@
 CREATE TABLE worker_config_sui (
 	network network_blockchain NOT NULL,
 	sui_block_time INTEGER,
-	spooler_instant_reward_threshold REAL NOT NULL
+	spooler_instant_reward_threshold REAL NOT NULL,
 	spooler_batched_reward_threshold REAL NOT NULL
 );
 
@@ -23,4 +23,4 @@ VALUES (
 
 -- migrate:down
 
-DROP TABLE worker_config_ethereum;
+DROP TABLE worker_config_sui;
