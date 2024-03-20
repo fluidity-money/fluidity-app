@@ -96,7 +96,7 @@ const HowItWorks = () => {
             properties.
           </Text>
           <Text as={"p"} prominent={currentImageIndex === 1}>
-            They distribute yield when used on any on-chain use-case. Yield
+            They distribute yield when used in any on-chain use-case. Yield
             is gained through utility.
           </Text>
           <Text as={"p"} prominent={currentImageIndex === 2}>
