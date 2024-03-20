@@ -207,7 +207,7 @@ decimals = 6
 enabled = true
 
 [config.sui]
-explorer = "https://suiexplorer.com"
+explorer = "https://suiscan.xyz"
 fluidAssets = [
     "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69",
 ]

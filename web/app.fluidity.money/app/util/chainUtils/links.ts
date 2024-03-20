@@ -7,7 +7,7 @@ const getAddressExplorerLink = (chain: Chain, address: string): string => {
     case "arbitrum":
       return `https://arbiscan.io/address/${address}`;
     case "sui":
-      return `https://suiexplorer.com/address/${address}`;
+      return `https://suiscan.xyz/mainnet/account/${address}`;
   }
 };
 
@@ -19,7 +19,7 @@ const getBlockExplorerLink = (chain: Chain, block: number): string => {
     case "arbitrum":
       return `https://arbiscan.io/block/${block}`;
     case "sui":
-      return `https://suiexplorer.com/checkpoint/${block}`;
+      return `https://suiscan.xyz/mainnet/checkpoint/${block}`;
   }
 };
 
@@ -30,7 +30,7 @@ const getTxExplorerLink = (chain: Chain, address: string): string => {
     case "arbitrum":
       return `https://arbiscan.io/tx/${address}`;
     case "sui":
-      return `https://suiexplorer.com/txblock/${address}`;
+      return `https://suiscan.xyz/mainnet/tx/${address}`;
   }
 };
 
