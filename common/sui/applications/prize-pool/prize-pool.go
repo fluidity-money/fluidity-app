@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/block-vision/sui-go-sdk/models"
-	"github.com/block-vision/sui-go-sdk/sui"
+	"github.com/fluidity-money/sui-go-sdk/models"
+	"github.com/fluidity-money/sui-go-sdk/sui"
 )
 
 // GetMintSupply fetches the supply of a token via its mint address (unscaled)

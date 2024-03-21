@@ -10,8 +10,8 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/block-vision/sui-go-sdk/signer"
-	suiSdk "github.com/block-vision/sui-go-sdk/sui"
+	"github.com/fluidity-money/sui-go-sdk/signer"
+	suiSdk "github.com/fluidity-money/sui-go-sdk/sui"
 
 	"github.com/fluidity-money/fluidity-app/common/calculation/probability"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/fluidity"
