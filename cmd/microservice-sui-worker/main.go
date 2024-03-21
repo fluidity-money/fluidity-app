@@ -71,7 +71,7 @@ const (
 
 func main() {
 	var (
-		utilities      = suiApps.UtilityListFromEnvOrFatal(EnvUtilityContracts)
+		utilities      = suiApps.UtilityListFromEnv(EnvUtilityContracts)
 		baseTokenName  = util.GetEnvOrFatal(EnvUnderlyingTokenName)
 		decimalPlaces_ = util.GetEnvOrFatal(EnvTokenDecimals)
 		suiHttpUrl     = util.PickEnvOrFatal(EnvSuiHttpUrl)
@@ -173,8 +173,13 @@ func main() {
 			// AppData is not yet used on Sui
 			feeData, _, emission, err := suiApps.GetApplicationFee(transfer, *event, *application)
 
-			utilityDetails, _ := utilities[packageId]
-			utility := utilityDetails.Utility
+			var utility applications.UtilityName
+			utilityDetails, ok := utilities[packageId]
+			if ok {
+				utility = utilityDetails.Utility
+			} else {
+				utility = applications.UtilityFluid
+			}
 
 			var (
 				fee    = feeData.Fee
