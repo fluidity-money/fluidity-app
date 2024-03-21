@@ -443,10 +443,12 @@ func main() {
 		// now send to the respective queues
 
 		// worker doesn't re-process transfers without an application, so send immediately
-		queue.SendMessage(
-			user_actions.TopicUserActionsSui,
-			userActions,
-		)
+		for _, userAction := range userActions {
+			queue.SendMessage(
+				user_actions.TopicUserActionsSui,
+				userAction,
+			)
+		}
 		// decorated user actions are processed by the application server to add application info
 		queue.SendMessage(sui_queue.TopicDecoratedTransfers, decoratedTransfers)
 
