@@ -7,7 +7,7 @@ export const generateMeta = (action: string) => {
       "Fluidity is a protocol that rewards users for using their cryptocurrency.",
 
     "twitter:card": "summary_large_image",
-    "twitter:site": "@fluiditymoney",
+    "twitter:site": "@fluiditylabs",
     "twitter:title": "Why Fluidify? - Fluidity Money",
     "twitter:description":
       "Fluidity is a protocol that rewards users for using their cryptocurrency.",

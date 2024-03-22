@@ -62,6 +62,6 @@ Medium: [https://blog.fluidity.money/](https://blog.fluidity.money/)
 
 Telegram: [https://t.me/fluiditymoney](https://t.me/fluiditymoney)
 
-Twitter: [https://twitter.com/fluiditymoney](https://twitter.com/fluiditymoney)
+Twitter: [https://x.com/fluiditylabs](https://x.com/fluiditylabs)
 
 Discord: [https://discord.gg/CNvpJk4HpC](https://discord.gg/CNvpJk4HpC)

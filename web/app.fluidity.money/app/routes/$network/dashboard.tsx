@@ -817,22 +817,22 @@ export default function Dashboard() {
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <a href={"https://twitter.com/fluiditymoney"}>
+            <a href={"https://twitter.com/fluiditymoney"} rel="noopener noreferrer" target="_blank">
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
             </a>
 
             {/* Discord */}
-            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a href={"https://discord.com/invite/CNvpJk4HpC"} rel="noopener noreferrer" target="_blank">
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
             </a>
 
             {/* Telegram */}
-            <a href={"https://t.me/fluiditymoney"}>
+            <a href={"https://t.me/fluiditymoney"} rel="noopener noreferrer" target="_blank">
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
             </a>
 
             {/* LinkedIn */}
-            <a href={"https://www.linkedin.com/company/fluidity-money"}>
+            <a href={"https://www.linkedin.com/company/fluidity-money"} rel="noopener noreferrer" target="_blank">
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
             </a>
           </section>
