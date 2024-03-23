@@ -160,21 +160,24 @@ type LoaderData = {
   referralCode: string;
 };
 
-const airdropTab = [{
+const airdropTab = [
+  {
     airdrop: {
       name: "airdrop",
       path: (network: string) => `/${network}/dashboard/airdrop`,
       icon: <AirdropIcon />,
     },
-  }]
+  },
+];
 
-const NAVIGATION_MAP   : {
+const NAVIGATION_MAP: {
   [key: string]: {
     name: string;
     path: (network: string) => string;
     icon: JSX.Element;
   }
-} = () => [
+}[]
+= [
   ...airdropTab,
   {
     home: {
@@ -214,7 +217,7 @@ const CHAIN_NAME_MAP: Record<
   sui: {
     name: "SUI",
     icon: <img src="/assets/chains/suiIcon.svg" />,
-  }
+  },
 };
 
 const SAFE_DEFAULT_REFERRAL_COUNT = {
@@ -530,8 +533,15 @@ export default function Dashboard() {
         <ul className="sidebar-nav">
           <li key="ico">
             <div />
-            <a style={{"cursor": "pointer"}} href="https://launchmoby.com" target="_blank" rel="noreferrer">
-              <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
+            <a
+              style={{ cursor: "pointer" }}
+              href="https://launchmoby.com"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Text className="dashboard-navbar-default">
+                <FlyIcon /> ICO
+              </Text>
             </a>
           </li>
           {NAVIGATION_MAP.map((obj, index) => {
@@ -817,22 +827,38 @@ export default function Dashboard() {
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <a href={"https://twitter.com/fluiditymoney"}>
+            <a
+              href={"https://twitter.com/fluiditymoney"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
             </a>
 
             {/* Discord */}
-            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a
+              href={"https://discord.com/invite/CNvpJk4HpC"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
             </a>
 
             {/* Telegram */}
-            <a href={"https://t.me/fluiditymoney"}>
+            <a
+              href={"https://t.me/fluiditymoney"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
             </a>
 
             {/* LinkedIn */}
-            <a href={"https://www.linkedin.com/company/fluidity-money"}>
+            <a
+              href={"https://www.linkedin.com/company/fluidity-money"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
             </a>
           </section>

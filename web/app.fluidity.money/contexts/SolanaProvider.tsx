@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useMemo } from "react";
+import dynamic from "next/dynamic";
 import {
   ConnectionProvider,
   WalletProvider,
-} from '@solana/wallet-adapter-react';
+} from "@solana/wallet-adapter-react";
 import {
   PhantomWalletAdapter,
   SolletWalletAdapter,
@@ -11,8 +11,8 @@ import {
   CloverWalletAdapter,
   Coin98WalletAdapter,
   NightlyWalletAdapter,
-} from '@solana/wallet-adapter-wallets';
-import { Token } from '~/util/chainUtils/tokens';
+} from "@solana/wallet-adapter-wallets";
+import { Token } from "~/util/chainUtils/tokens";
 
 const wallets = [
   new PhantomWalletAdapter(),
@@ -23,7 +23,7 @@ const wallets = [
   new Coin98WalletAdapter(),
 ];
 
-const SolanaFacade = dynamic(() => import('./SolanaFacade'), { ssr: false });
+const SolanaFacade = dynamic(() => import("./SolanaFacade"), { ssr: false });
 
 const SolanaProvider = (rpcUrl: string, tokens: Token[]) => {
   const endpoint = useMemo(() => rpcUrl, [rpcUrl]);

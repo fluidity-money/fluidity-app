@@ -43,7 +43,14 @@ import {
   TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
-import { useContext, useState, useEffect, useRef, useMemo, useCallback } from "react";
+import {
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -68,9 +75,10 @@ import { ethers } from "ethers";
 
 const EPOCH_CURRENT_IDENTIFIER = "epoch_2";
 
-const AIRDROP_BLOG_POST = "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+const AIRDROP_BLOG_POST =
+  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
 
-const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap"
+const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap";
 
 const AIRDROP_MODALS = [
   "recap",
@@ -185,7 +193,7 @@ const Airdrop = () => {
     redeemableTokens: getRedeemableTokens,
     getStakingDeposits,
     redeemTokens,
-    airdropAssociateEthereumAccount
+    airdropAssociateEthereumAccount,
   } = useContext(FluidityFacadeContext);
 
   if (network !== "arbitrum") {
@@ -301,13 +309,16 @@ const Airdrop = () => {
       const [beginAssociation, setBeginAssociation] = useState(false);
 
       // used to prevent double submitting until the request is done
-      const [airdropAssociationInProgress, setAirdropAssociationInProgress] = useState(false);
+      const [airdropAssociationInProgress, setAirdropAssociationInProgress] =
+        useState(false);
 
       // the ethereum address they want to associate
-      const [associationEthereumAddress, setAssociationEthereumAddress] = useState("");
+      const [associationEthereumAddress, setAssociationEthereumAddress] =
+        useState("");
 
       // association worked, make the button green and disable the button
-      const [airdropAssociationSucceeded, setAirdropAssociationSucceeded] = useState(false);
+      const [airdropAssociationSucceeded, setAirdropAssociationSucceeded] =
+        useState(false);
 
       const handleSetAssociationEthereumAddress = (s: string) => {
         setAssociationEthereumAddress(s);
@@ -318,8 +329,7 @@ const Airdrop = () => {
 
       useEffect(() => {
         (async () => {
-          if (!beginAssociation)
-            return;
+          if (!beginAssociation) return;
           try {
             const f = airdropAssociateEthereumAccount;
             if (!f) return;
@@ -335,9 +345,7 @@ const Airdrop = () => {
           }
           setAirdropAssociationInProgress(false);
         })();
-      }, [
-        beginAssociation
-      ]);
+      }, [beginAssociation]);
 
       const handleAirdropAssociation = () => {
         // first, check that the address is okay. then, if it is, begin the
@@ -378,15 +386,21 @@ const Airdrop = () => {
                 type="transparent"
                 size="medium"
                 onClick={handleAirdropAssociation}
-                className={airdropAssociationSucceeded ? "recap-fly-count-delegate-button-success" : ""}
-                disabled={airdropAssociationInProgress || airdropAssociationSucceeded}
+                className={
+                  airdropAssociationSucceeded
+                    ? "recap-fly-count-delegate-button-success"
+                    : ""
+                }
+                disabled={
+                  airdropAssociationInProgress || airdropAssociationSucceeded
+                }
               >
                 {airdropAssociationSucceeded ? "Success!" : "Delegate"}
               </GeneralButton>
             </Form.Group>
             <div className="recap-you-are-eligible-delegate-button-terms-container">
               <Text>
-                By pressing the delegate button, you agree to our airdrop { }
+                By pressing the delegate button, you agree to our airdrop {}
                 <a
                   className="recap-terms-of-condition-delegate"
                   onClick={() => setTermsAndConditionsModalVis(true)}
@@ -402,8 +416,9 @@ const Airdrop = () => {
                 className="recap-you-are-eligible-claim-at-tge-button rainbow"
                 handleClick={() => window?.open(AIRDROP_TGE_CLAIM)}
               >
-                <Text size="sm" >
-                  You will be able to claim your rewards at Fluidity&apos;s TGE in the Arbitrum Portal &rarr;
+                <Text size="sm">
+                  You will be able to claim your rewards at Fluidity&apos;s TGE
+                  in the Arbitrum Portal &rarr;
                 </Text>
               </GeneralButton>
             </div>
@@ -439,11 +454,14 @@ const Airdrop = () => {
       );
     };
 
-    const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] = useState(false);
+    const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
+      useState(false);
 
     const closeWithEsc = useCallback(
       (event: { key: string }) => {
-        event.key === "Escape" && setTermsAndConditionsModalVis && setTermsAndConditionsModalVis(false);
+        event.key === "Escape" &&
+          setTermsAndConditionsModalVis &&
+          setTermsAndConditionsModalVis(false);
       },
       [termsAndConditionsModalVis, setTermsAndConditionsModalVis]
     );
@@ -455,10 +473,7 @@ const Airdrop = () => {
 
     return (
       <div className="pad-main">
-        <Modal
-          id="terms-and-conditions"
-          visible={termsAndConditionsModalVis}
-        >
+        <Modal id="terms-and-conditions" visible={termsAndConditionsModalVis}>
           <div className="airdrop-terms-and-conditions-modal-container">
             <div className="airdrop-terms-and-conditions-modal-child">
               <div className="airdrop-terms-and-conditions-modal-navbar">
@@ -470,56 +485,64 @@ const Airdrop = () => {
                 </GeneralButton>
               </div>
               <p>
-1. Description
-
-We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+                1. Description We may offer you the opportunity to receive some
+                digital assets at no cost (**Airdrop**), subject to the terms
+                described in this section. The Airdrop is delivered by us to
+                you, but may be manufactured, offered and supported by the
+                network creator or developer, if any, and not by us.
               </p>
               <p>
-1. Terms of Airdrop Program
-
-2.1 No Purchase Necessary
-
-There is no purchase necessary to receive the Airdrop. However, you must have
-wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+                1. Terms of Airdrop Program 2.1 No Purchase Necessary There is
+                no purchase necessary to receive the Airdrop. However, you must
+                have wallets recognised and accepted by us. Although we do not
+                charge a fee for participation in the Airdrop Program, we
+                reserve the right to do so in the future and shall provide prior
+                notice to you in such case.
               </p>
               <p>
-2.2 Timing
-
-Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+                2.2 Timing Each Airdrop may be subject to any additional terms
+                and conditions and where applicable such terms and conditions
+                shall be displayed and marked with an asterisk (*) or other
+                similar notation.
               </p>
               <p>
-2.3 Limited Supply
-
-An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
-has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
-suspend any Airdrop requirements at any time without notice, including the amount previously
-advertised as available.
+                2.3 Limited Supply An offer to receive the digital assets in an
+                Airdrop is only available to you while supplies last. Once the
+                amount of digital asset offered by us in an Airdrop is
+                exhausted, any party who has either been placed on a waitlist,
+                or has completed certain additional steps, but not yet received
+                notice of award of the asset in such Airdrop, shall no longer be
+                eligible to receive the said digital assets in that Airdrop. We
+                reserve the right, in our sole discretion, to modify or suspend
+                any Airdrop requirements at any time without notice, including
+                the amount previously advertised as available.
               </p>
               <p>
-2.4 Eligibility
-
-You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
-
-To the best of our understanding, below is a list of countries that does not recognise digital assets;
-
-*Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
-
-Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
-
-**source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
+                2.4 Eligibility You may not be eligible to receive the digital
+                assets or a select class and type of digital assets from an
+                Airdrop in your jurisdiction. To the best of our understanding,
+                below is a list of countries that does not recognise digital
+                assets; *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia,
+                Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia,
+                Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal,
+                Qatar, Sierra Leone, Tunisia ** Kindly be advised that this list
+                is for reference only and you are advised to seek independent
+                legal advise as to your eligibility to receive the assets
+                through Airdrop. **source - Library of Congress, Atlantic
+                Council, Techopedia, Finder, Triple-A, Chainalysis*
               </p>
               <p>
-
-2.5 Notice of Award
-
-In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
-We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+                2.5 Notice of Award In the event you are selected to receive the
+                digital asset in an Airdrop, we shall notify you of the pending
+                delivery of such asset. Eligibility may be limited as to time.
+                We are not liable to you for failure to receive any notice
+                associated with the Airdrop Program.
               </p>
               <p>
-
-3 Risk Disclosures Relating to Airdrop Program
-
-You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+                3 Risk Disclosures Relating to Airdrop Program You are solely
+                responsible for researching and understanding the Fluid Assets
+                token and it’s related utility and/or network subject to the
+                Airdrop.
               </p>
             </div>
           </div>

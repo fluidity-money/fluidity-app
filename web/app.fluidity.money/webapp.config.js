@@ -28,9 +28,9 @@ const options = {
         rpc: {
           http: "",
           ws: "",
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
 };
 

@@ -9,7 +9,6 @@ import { chainType } from "~/util/chainUtils/chains";
 import { useWallets, useConnectWallet } from "@mysten/dapp-kit";
 import { WalletWithRequiredFeatures } from "@mysten/wallet-standard";
 
-
 interface IConnectWalletModal {
   visible: boolean;
   close: () => void;
@@ -73,7 +72,7 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
 
   const SuiWalletsMap = () => {
     const wallets = useWallets();
-    const { mutate: connect } = useConnectWallet()
+    const { mutate: connect } = useConnectWallet();
 
     const selectWallet = useCallback(
       (
@@ -87,9 +86,12 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
 
     return (
       <>
-        {wallets.length === 0 ?
-          <Text className="connect-wallet-modal-sui">No compatible Sui wallets found!</Text>
-          : wallets.map((wallet) => (
+        {wallets.length === 0 ? (
+          <Text className="connect-wallet-modal-sui">
+            No compatible Sui wallets found!
+          </Text>
+        ) : (
+          wallets.map((wallet) => (
             <li
               key={`wallet-${wallet.name}`}
               onClick={(event) => selectWallet(event, wallet)}
@@ -100,10 +102,10 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
                   {wallet.name}
                 </Text>
               </span>
-              <Text size="xs" className="connect-wallet-modal-status">
-              </Text>
+              <Text size="xs" className="connect-wallet-modal-status"></Text>
             </li>
-          ))}
+          ))
+        )}
       </>
     );
   };
@@ -158,13 +160,15 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
     setModal(
       createPortal(
         <div
-          className={`connect-wallet-outer-container ${visible === true ? "show-modal" : "hide-modal"
-            }`}
+          className={`connect-wallet-outer-container ${
+            visible === true ? "show-modal" : "hide-modal"
+          }`}
         >
           <div onClick={close} className="connected-wallet-background"></div>
           <div
-            className={`connect-wallet-modal-container  ${visible === true ? "show-modal" : "hide-modal"
-              }`}
+            className={`connect-wallet-modal-container  ${
+              visible === true ? "show-modal" : "hide-modal"
+            }`}
           >
             <div className="connect-wallet-modal-header">
               <Text prominent size="xxl">

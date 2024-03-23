@@ -47,7 +47,7 @@ const CHAIN_NAME_MAP: Record<
   sui: {
     name: "SUI",
     icon: <img src="/assets/chains/suiIcon.svg" />,
-  }
+  },
 };
 
 export const loader: LoaderFunction = async ({ params }) => {

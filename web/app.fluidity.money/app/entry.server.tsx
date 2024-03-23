@@ -27,6 +27,6 @@ if (process.env.NODE_ENV === "production") {
 
   Sentry.init({
     dsn,
-    tracesSampleRate: 1.0
+    tracesSampleRate: 1.0,
   });
 } else console.log("Running in development, ignoring Sentry initialisation...");

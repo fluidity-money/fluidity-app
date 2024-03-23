@@ -44,7 +44,7 @@ const MobileNavModal = ({ navLinks, setIsOpen }: IMobileNavModalProps) => {
 
       <div className={styles.socials}>
         <a
-          href="https://twitter.com/fluiditymoney"
+          href="https://x.com/fluiditylabs"
           rel="noopener noreferrer"
           target="_blank"
         >

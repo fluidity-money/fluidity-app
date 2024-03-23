@@ -2,8 +2,17 @@ import BN from "bn.js";
 
 import FluidityFacadeContext from "./FluidityFacade";
 import { Token } from "~/util/chainUtils/tokens";
-import { createNetworkConfig, SuiClientProvider, useCurrentAccount, useCurrentWallet, useDisconnectWallet, useSignAndExecuteTransactionBlock, useSuiClient, WalletProvider } from '@mysten/dapp-kit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  createNetworkConfig,
+  SuiClientProvider,
+  useCurrentAccount,
+  useCurrentWallet,
+  useDisconnectWallet,
+  useSignAndExecuteTransactionBlock,
+  useSuiClient,
+  WalletProvider,
+} from "@mysten/dapp-kit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { internalSwap, getBalance } from "~/util/chainUtils/sui/util";
 
 const SuiFacade = ({
@@ -13,16 +22,16 @@ const SuiFacade = ({
   children: React.ReactNode;
   tokens: Token[];
 }) => {
-
-  const { address } = useCurrentAccount() || {}
-  const { isConnecting, isConnected } = useCurrentWallet()
-  const { mutate } = useDisconnectWallet()
-  const { mutate: signAndExecuteTransactionBlock } = useSignAndExecuteTransactionBlock()
-  const suiClient = useSuiClient()
+  const { address } = useCurrentAccount() || {};
+  const { isConnecting, isConnected } = useCurrentWallet();
+  const { mutate } = useDisconnectWallet();
+  const { mutate: signAndExecuteTransactionBlock } =
+    useSignAndExecuteTransactionBlock();
+  const suiClient = useSuiClient();
   // TODO work out auto connect
   // const autoConnect = useAutoConnectWallet()
 
-  const disconnect = async () => mutate()
+  const disconnect = async () => mutate();
 
   const swap = async (amount: string, tokenAddr: string) => {
     const fromToken = tokens.find((t) => t.address === tokenAddr);
@@ -62,7 +71,7 @@ const SuiFacade = ({
         `Could not fetch balance: Could not find matching token ${tokenAddr} in sui`
       );
 
-    return getBalance(suiClient, address, suiTypeName)
+    return getBalance(suiClient, address, suiTypeName);
   };
 
   const getFluidTokens = async (): Promise<string[]> => {
