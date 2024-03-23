@@ -271,7 +271,7 @@ export default function FluidifyToken() {
           // get user token balances
           const userTokenBalance = await Promise.all(
             tokens.map(
-             async ({ address }) => (await balance?.(address)) || new BN(0)
+              async ({ address }) => (await balance?.(address)) || new BN(0)
             )
           );
 

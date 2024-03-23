@@ -15,8 +15,8 @@ import SuiProvider from "contexts/SuiProvider";
 
 type ProviderMap = {
   [key: string]:
-  | ((props: { children: React.ReactNode }) => JSX.Element)
-  | undefined;
+    | ((props: { children: React.ReactNode }) => JSX.Element)
+    | undefined;
 };
 
 export const loader: LoaderFunction = async ({ params }) => {

@@ -6,19 +6,14 @@ import {
   useAnchorWallet,
   useConnection,
 } from "@solana/wallet-adapter-react";
-import {
-  Program,
-  AnchorProvider,
-  setProvider,
-  Idl
-} from "@coral-xyz/anchor";
+import { Program, AnchorProvider, setProvider, Idl } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import {
   getBalance,
   internalSwap,
   limit,
   amountMinted as amountMintedInternal,
-  associateAddressForAirdrop
+  associateAddressForAirdrop,
 } from "~/util/chainUtils/solana/instructions";
 import FluidityFacadeContext from "./FluidityFacade";
 import { Token } from "~/util/chainUtils/tokens";
@@ -38,7 +33,7 @@ const SolanaFacade = ({
   const { connected, publicKey, disconnect, connecting, signMessage } = wallet;
   const { connection } = useConnection();
 
-  const [ airdropAssociationProgram, setAirdropAssociationProgram] =
+  const [airdropAssociationProgram, setAirdropAssociationProgram] =
     useState<Program<Idl> | null>(null);
 
   useEffect(() => {
@@ -49,24 +44,18 @@ const SolanaFacade = ({
 
       if (!publicKey || !signTransaction || !signAllTransactions) return;
 
-      const provider = new AnchorProvider(
-        connection,
-        anchorWallet,
-        {}
-      );
+      const provider = new AnchorProvider(connection, anchorWallet, {});
 
       setProvider(provider);
 
       const airdropAssociation = new Program(
         associateAddressForAirdropIdl as Idl,
-        new PublicKey(associateAddressForAirdropIdl.metadata.address),
+        new PublicKey(associateAddressForAirdropIdl.metadata.address)
       );
 
       setAirdropAssociationProgram(airdropAssociation);
     }
-  },
-    [connection, anchorWallet, wallet]
-  );
+  }, [connection, anchorWallet, wallet]);
 
   const swap = async (amount: string, tokenAddr: string) => {
     if (!publicKey) return;
@@ -140,7 +129,8 @@ const SolanaFacade = ({
   const airdropAssociateEthereumAccount = async (ethereumAddress: string) => {
     if (!publicKey) throw new Error(`Public key not set!`);
 
-    if (!airdropAssociationProgram) throw new Error(`Airdrop Association Program not set!`);
+    if (!airdropAssociationProgram)
+      throw new Error(`Airdrop Association Program not set!`);
 
     const sig = await associateAddressForAirdrop(
       airdropAssociationProgram,
