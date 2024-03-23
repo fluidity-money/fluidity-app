@@ -175,8 +175,9 @@ const NAVIGATION_MAP: {
     name: string;
     path: (network: string) => string;
     icon: JSX.Element;
-  };
-} = () => [
+  }
+}[]
+= [
   ...airdropTab,
   {
     home: {
