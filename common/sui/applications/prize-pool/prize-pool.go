@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/block-vision/sui-go-sdk/models"
-	"github.com/block-vision/sui-go-sdk/sui"
+	"github.com/fluidity-money/sui-go-sdk/models"
+	"github.com/fluidity-money/sui-go-sdk/sui"
 )
 
 // GetMintSupply fetches the supply of a token via its mint address (unscaled)
@@ -45,7 +45,12 @@ func GetMintSupply(client sui.ISuiAPI, coinType string) (uint64, error) {
 // TODO cache with redis
 // GetVaultBalance fetches the balance of a UserVault, ProtocolVault, or CoinReserve
 func GetVaultBalance(client sui.ISuiAPI, vaultObjectId string) (uint64, error) {
-	response, err := client.SuiGetObject(context.Background(), models.SuiGetObjectRequest{ObjectId: vaultObjectId})
+	response, err := client.SuiGetObject(context.Background(), models.SuiGetObjectRequest{
+		ObjectId: vaultObjectId,
+		Options: models.SuiObjectDataOptions{
+			ShowContent: true,
+		},
+	})
 	if err != nil {
 		return 0, fmt.Errorf(
 			"failed to fetch balance of vault with id %v - %v",
