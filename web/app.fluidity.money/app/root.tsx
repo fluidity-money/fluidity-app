@@ -15,7 +15,7 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks } from "./components";
+import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks, FLYClaimSubmitModalLinks } from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
@@ -29,6 +29,7 @@ export const links = () => {
   return [
     ...ToolTipLinks(),
     ...JoeFarmlandsOrCamelotKingdomLinks(),
+    ...FLYClaimSubmitModalLinks(),
     { rel: "icon", href: "/favicon.ico" },
 
     { rel: "apple-touch-icon", sizes: "57x57", href: "/apple-icon-57x57.png" },

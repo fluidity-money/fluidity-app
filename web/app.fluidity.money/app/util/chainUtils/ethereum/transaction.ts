@@ -605,6 +605,69 @@ export const getWethUsdPrice = async (
   }
 };
 
+export const merkleDistributorWithDeadlineEndTime = async (
+  provider: JsonRpcProvider,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      provider
+    );
+
+    if (!merkleDistributorWithDeadlineContract)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+    const endTime =
+      await merkleDistributorWithDeadlineContract.callStatic.endTime();
+
+    return endTime;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+
+    return 0;
+  }
+};
+
+export const merkleDistributorWithDeadlineClaim = async (
+  signer: Signer,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface,
+  index: number,
+  accountAddr: string,
+  amount: BN,
+  merkleProof: string[]
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      signer
+    );
+
+    if (!merkleDistributorWithDeadlineAddr)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+      await merkleDistributorWithDeadlineContract.claim(
+        index,
+        accountAddr,
+        amount.toString(),
+        merkleProof
+      );
+
+      return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
 type ErrorType = {
   data: { message: string };
 } & { message: string };

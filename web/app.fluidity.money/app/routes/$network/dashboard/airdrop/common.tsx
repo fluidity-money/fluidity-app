@@ -56,6 +56,7 @@ import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
+import FLYClaimSubmitModal from "~/components/FLYClaimSubmitModal";
 import { shorthandAmountFormatter } from "~/util";
 
 // Epoch length
@@ -2067,6 +2068,7 @@ const RecapModal = ({
 
   const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] = useState(false);
 
+  // needed for the terms and conditions
   const closeWithEsc = useCallback(
     (event: { key: string }) => {
       event.key === "Escape" && setTermsAndConditionsModalVis && setTermsAndConditionsModalVis(false);
@@ -2090,13 +2092,10 @@ const RecapModal = ({
         </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <div className="recap-fly-count-buttons-spread">
-            <GeneralButton
-              onClick={handleClaimYourFly}
-              disabled
-            >
+            <GeneralButton onClick={handleClaimYourFly}>
               Claim your FLY
             </GeneralButton>
-            <GeneralButton disabled>
+            <GeneralButton>
               Stake your $FLY
             </GeneralButton>
           </div>
@@ -2248,6 +2247,13 @@ You are solely responsible for researching and understanding the Fluid Assets to
           </div>
         </div>
       </Modal>
+
+      <FLYClaimSubmitModal
+        flyAmount={123}
+        visible={true}
+        close={() => {}}
+        onComplete={(amountClaimed) => {console.log("swag")}}
+        onFailure={(onFailure) => {console.log(onFailure)}} />
 
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}

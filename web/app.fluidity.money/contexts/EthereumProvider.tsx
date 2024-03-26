@@ -28,6 +28,9 @@ import {
   testMakeStakingDeposit,
   makeStakingRedemption,
 } from "~/util/chainUtils/ethereum/transaction";
+import {
+  merkleDistributorWithDeadlineClaim as doMerkleDistributorWithDeadlineClaim
+} from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
   getBalanceOfERC20,
@@ -42,6 +45,7 @@ import {
 
 import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
+import MerkleDistributorWithDeadlineAbi from "~/util/chainUtils/ethereum/MerkleDistributorWithDeadline.json";
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
 
@@ -569,6 +573,35 @@ const EthereumFacade = ({
     console.log(result);
   };
 
+  const merkleDistributorWithDeadlineEndTime = () => {
+    throw new Error("TODO");
+  };
+
+  const merkleDistributorWithDeadlineClaim = async (
+    address: string,
+    index: number,
+    amount: BN,
+    merkleProof: string[]
+  ) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const merkleDistributorWithDeadlineAddr = "0x064b19b1CE07A63eB12fB2869Ff666f466008f03";
+    const result = await doMerkleDistributorWithDeadlineClaim(
+      signer,
+      merkleDistributorWithDeadlineAddr,
+      MerkleDistributorWithDeadlineAbi,
+      index,
+      address,
+      amount,
+      merkleProof
+    );
+    console.log(result);
+  };
+
   return (
     <FluidityFacadeContext.Provider
       value={{
@@ -594,6 +627,8 @@ const EthereumFacade = ({
         getStakingRatios,
         signOwnerAddress,
         confirmAccountOwnership,
+        merkleDistributorWithDeadlineEndTime,
+        merkleDistributorWithDeadlineClaim
       }}
     >
       {children}
