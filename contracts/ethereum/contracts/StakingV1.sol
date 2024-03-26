@@ -127,7 +127,8 @@ return a
          * received the bonus.
         */
 
-        uint256 a = _staked.flyVested * ((block.timestamp - _staked.depositTimestamp) / 100);
+        uint256 a = _staked.flyVested * ((block.timestamp - _staked.depositTimestamp) / 1000);
+        if (_staked.receivedBonus) a += (_staked.flyVested / 1000) * 24 days;
         return a;
     }
 
