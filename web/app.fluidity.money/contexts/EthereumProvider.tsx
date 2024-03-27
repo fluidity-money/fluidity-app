@@ -265,9 +265,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-          txHash: ethContractRes.hash,
-        }
+        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+        txHash: ethContractRes.hash,
+      }
       : undefined;
   };
 
@@ -293,7 +293,19 @@ const EthereumFacade = ({
    * Will fail on non-Metamask compliant wallets.
    */
   const addToken = async (symbol: string) => {
-    const token = tokens.find((t) => t.symbol === symbol);
+    const token = symbol === "FLY" ?
+      // FLY is a special case that shouldn't be defined in the normal tokens list
+      {
+        symbol: "FLY",
+        logo: "/assets/tokens/FlyIcon.svg",
+        address: "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
+        decimals: 6,
+        // mock these fields as we don't need them to add the token to wallet
+        colour: "",
+        enabled: true,
+        name: ""
+      } satisfies Token
+      : tokens.find((t) => t.symbol === symbol);
 
     if (!token) return;
 
@@ -333,11 +345,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-        fluidAmount: BN;
-        baseAmount: BN;
-        durationDays: number;
-        depositDate: Date;
-      }>
+      fluidAmount: BN;
+      baseAmount: BN;
+      durationDays: number;
+      depositDate: Date;
+    }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -484,9 +496,9 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-          txHash: stakingDepositRes.hash,
-        }
+        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+        txHash: stakingDepositRes.hash,
+      }
       : undefined;
   };
 
@@ -527,9 +539,9 @@ const EthereumFacade = ({
 
     return stakingRedeemRes
       ? {
-          confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
-          txHash: stakingRedeemRes.hash,
-        }
+        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+        txHash: stakingRedeemRes.hash,
+      }
       : undefined;
   };
 
