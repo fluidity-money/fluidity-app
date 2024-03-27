@@ -1132,6 +1132,10 @@ $holo: linear-gradient(
 
 }
 
+.legal {
+  margin-top: 1em;
+}
+
 .recap-fly-count-thank-you {
   text-align: center;
   max-width: 700px;
@@ -1216,4 +1220,151 @@ $holo: linear-gradient(
 
 .recap-you-are-eligible-claim-at-tge-button-container:hover span {
   color: black;
+}
+
+.fly-submit-claim-modal-background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+}
+
+.fly-submit-claim-modal-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    background-color: #131313;
+    padding: 3em;
+    border: solid white 2px;
+    border-radius: 8px;
+    min-width: 300px;
+    max-width: 546px;
+    margin: auto;
+}
+
+.fly-submit-claim-modal-button-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+    border-width: 2px;
+    border-color: white;
+    gap: 1em;
+    // position: absolute;
+}
+
+.fly-submit-claim-modal-options {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+}
+
+.fly-submit-claim-modal-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4em;
+    padding: 1.5em;
+}
+
+.fly-submit-claim-circle {
+  // padding: 1em;
+}
+
+.fly-submit-claim-outer-modal-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+.claim-button-staked {
+  border: solid lime 2px !important;
+  color: lime !important;
+  background-color: unset !important;
+}
+
+.link {
+  text-decoration: underline;
+  color: white;
+  cursor: pointer;
+}
+
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.rainbow {
+  position: relative;
+  overflow: hidden;
+  font-size: 15px;
+  box-shadow: 0 0 8px 2px #f3b8d8;
+}
+
+.rainbow::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  left: -20%;
+  top: -150%;
+  width: 400px;
+  height: 400px;
+  background-color: #f3b8d8;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  background-image: linear-gradient(
+    45deg,
+    #f3b8d8,
+    #b793e9,
+    #9fd4f3,
+    #ffd2c4,
+    #fbf3f3,
+    #d9abdf,
+    #af9ce3,
+    #aae4e1,
+    #c6ead0,
+    #ffffff,
+    #fdb5e4
+  );
+  animation: rotate 4s linear infinite;
+}
+
+.rainbow::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 3px;
+  top: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: black;
+  border-radius: inherit;
+}
+
+.rainbow:hover > h5 {
+  color: black;
+}
+
+.rainbow:hover:focus > h5 {
+  color: white;
+}
+
+.rainbow:hover:focus::after {
+  background: black;
+}
+
+.rainbow:hover::after {
+  background: transparent;
 }
