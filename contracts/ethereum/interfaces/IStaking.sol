@@ -15,7 +15,7 @@ struct Staked {
 /*
  * IStaking is a simple staking contract with a 7 day unbonding period that requires manual
  * intervention to access after the interaction has begun. The user has their points
- * zeroed when they unstake for sure. In the interim, the UI displays them as "lost".
+ * zeroed when they begin unstaking. In the interim, the UI displays them as "lost".
  * Not intended to be used as a voting contract or anything similar, so it lacks the facilities
  * for this.
  *
@@ -29,11 +29,8 @@ struct Staked {
  * A function is added for an operator to retroactievely provide the signup bonus based on
  * the lag between the claim and the stake (in some cases.)
  *
- * An extra function called "withdraw" is provided for an operator and emergency council to
- * withdraw everyone's claimed assets. A setup ritual is used for this in the initialisation code.
- *
- * Multiple positions are not supported in this iteration of the staking contract. Later,
- * more support will be upgraded to support this functionality.
+ * An extra function called "emergencyWithdraw" is provided for users to pull their staked
+ * amounts out in an emergency mode stake.
 */
 interface IStaking {
     /* ~~~~~~~~~~ SIMPLE GETTER ~~~~~~~~~~ */

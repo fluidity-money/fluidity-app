@@ -20,10 +20,6 @@ string constant STAKING_NAME = "Staked FLY";
 
 string constant STAKING_SYMBOL = "sFLY";
 
-/// @dev FLY_MIN_AMOUNT to allow for staking. 1e6 is assumed to be the
-///      FLY decimals.
-uint256 constant FLY_MIN_AMOUNT = 100 * 1e6;
-
 uint256 constant UNBONDING_PERIOD = 7 days;
 
 struct StakedPrivate {
@@ -33,7 +29,7 @@ struct StakedPrivate {
     // flyVested supplied by users.
     uint256 flyVested;
 
-    // depositTimestamp used to calculate points.
+    // depositTimestamp when the staking was completed.
     uint256 depositTimestamp;
 }
 
@@ -52,7 +48,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
     /* ~~~~~~~~~~ HOUSEKEEPING ~~~~~~~~~~ */
 
     /// @dev if false, emergency mode is active - can be called by either the
-    /// @dev operator, worker account or emergency council
+    ///      operator or emergency council
     bool private noEmergencyMode_;
 
     // for migrations
@@ -121,7 +117,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
          * Calculate the points earned by the user, using the math:
 
 a = x * (seconds_since_start * 0.001)
-if day_1_staked_bonus: a += fly_staked * 0.001* (24*7)
+if day_1_staked_bonus: a += fly_staked * 0.001 * (24*7)
 return a
 
          * Then return the amounts given. Except, we don't need to check that the user has
@@ -129,7 +125,7 @@ return a
         */
 
         uint256 a = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp) / 1000);
-        if (_staked.receivedBonus) a += (_staked.flyVested / 1000) * 24 days;
+        if (_staked.receivedBonus) a += (_staked.flyVested / 1000) * 7 days;
         return a;
     }
 
@@ -144,8 +140,7 @@ return a
         bool _claimAndStakeBonus
     ) internal returns (uint256 _flyStaked) {
         require(noEmergencyMode_, "emergency mode!");
-
-        require(_flyAmount > FLY_MIN_AMOUNT, "too little fly");
+        require(_flyAmount > 0, "zero fly");
 
         stakedStorage_[_recipient].push(StakedPrivate({
             receivedBonus: _claimAndStakeBonus,
@@ -304,9 +299,11 @@ return a
         uint256 flyAmount = 0;
         for (uint i = 0; i < stakedStorage_[msg.sender].length; i++) {
             flyAmount += stakedStorage_[msg.sender][i].flyVested;
+            stakedStorage_[msg.sender][i].flyVested = 0;
         }
         for (uint i = 0; i < unstakingStorage_[msg.sender].length; i++) {
             flyAmount += unstakingStorage_[msg.sender][i].flyAmount;
+            unstakingStorage_[msg.sender][i].flyAmount = 0;
         }
         flyToken_.safeTransfer(msg.sender, flyAmount);
     }
