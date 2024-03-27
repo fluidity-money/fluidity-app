@@ -6,7 +6,7 @@ import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { requestProof, RequestProofRes } from "~/queries/requestProof";
 
-import { Heading, GeneralButton, Text, trimAddress, LinkButton, AttentionButton, Modal } from "@fluidity-money/surfing";
+import { Heading, GeneralButton, Text, trimAddress, LinkButton, AttentionButton, Modal, WarningIcon } from "@fluidity-money/surfing";
 
 import styles from "~/styles/dashboard/airdrop.css";
 import { createPortal } from "react-dom";
@@ -222,25 +222,30 @@ const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showCo
       createPortal(
         <>
           <div
-            className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-modal" : "hide-modal"
+            className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
               }`}
           >
             <div className="fly-submit-claim-modal-background">
               <div
-                className={`fly-submit-claim-modal-container ${visible === true ? "show-modal" : "hide-modal"
+                className={`fly-submit-claim-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
                   }`}
               >
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1em' }}>
                     <Heading as="h3" style={{ fontWeight: 'normal', margin: '0' }}>{currentMode === 'claim' ? "Claiming" : "Staking"} $FLY Tokens</Heading>
                     <span onClick={close}>
                       <img src="/images/icons/x.svg" className="modal-cancel-btn" />
                     </span>
                   </div>
-                  {confirmingClaim ? <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Text size="lg" prominent style={{ color: '#FFB300' }}>Caution. Claiming $FLY will cease your points.</Text>
-                    <Text size="lg" prominent>You have accumulated {points} points. In order to retain your accumulated points, you must initially stake your $FLY. Otherwise, you may claim your $FLY and stake it at a later stage without the accumulated points.</Text>
-                    <Text size="lg" prominent>Do you wish to continue claiming?</Text>
+                  {confirmingClaim ? <div style={{ display: 'flex', flexDirection: 'column', gap: '2em' }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', gap: '1em', alignItems: 'flex-end' }}>
+                      <WarningIcon />
+                      <Text size="lg" prominent style={{ color: '#FFB300' }}>Caution. Claiming $FLY will cease your points.</Text>
+                    </div>
+                    <div style={{ borderLeft: '4px #FFB300 solid', marginLeft: '1em', paddingLeft: '1em' }}>
+                      <Text size="lg" prominent>You have accumulated {points} points. In order to retain your accumulated points, you must initially stake your $FLY. Otherwise, you may claim your $FLY and stake it at a later stage without the accumulated points.</Text>
+                    </div>
+                    <Text size="lg" prominent style={{ alignSelf: 'center', marginBottom: '2em' }}>Do you wish to continue claiming?</Text>
                   </div> :
                     <div className="fly-submit-claim-modal-options">
                       <div className="fly-submit-claim-modal-row">

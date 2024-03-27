@@ -1102,6 +1102,7 @@
   border-radius: 8px;
   min-width: 300px;
   max-width: 546px;
+  min-height: 495px;
   margin: auto;
 }
 
@@ -1143,6 +1144,10 @@
   border: solid lime 2px !important;
   color: lime !important;
   background-color: unset !important;
+}
+
+.show-fly-modal {
+  display: flex;
 }
 
 .link {
