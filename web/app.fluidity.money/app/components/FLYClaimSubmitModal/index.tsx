@@ -6,9 +6,10 @@ import BN from "bn.js";
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { requestProof, RequestProofRes } from "~/queries/requestProof";
 
-import { Heading, GeneralButton, Text } from "@fluidity-money/surfing";
+import { Heading, GeneralButton, Text, trimAddress, LinkButton, AttentionButton, Modal } from "@fluidity-money/surfing";
 
-import styles from "./styles.css";
+import styles from "~/styles/dashboard/airdrop.css";
+import { createPortal } from "react-dom";
 
 export const FLYClaimSubmitModalLinks = () => [{ rel: "stylesheet", href: styles }];
 
@@ -16,6 +17,7 @@ type IFLYClaimSubmitModal = {
   visible: boolean;
   flyAmount: number;
   close: () => void;
+  showConnectWalletModal: () => void;
   onComplete: (amountClaimed: number) => void;
   onFailure: (errorMessage: string) => void
 };
@@ -50,17 +52,50 @@ Kindly be advised that this list is for reference only and you are advised to se
 
 **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*`;
 
-const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount }: IFLYClaimSubmitModal) => {
-  const { address, signBuffer, merkleDistributorWithDeadlineClaim } = useContext(FluidityFacadeContext);
+// TODO add a check for their state if they close and re-open the modal
+// TODO fail state for when they've already claimed/staked
+// TODO remove inline styling
+const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showConnectWalletModal, close }: IFLYClaimSubmitModal) => {
+
+  const { address, signBuffer, addToken, merkleDistributorWithDeadlineClaim } = useContext(FluidityFacadeContext);
+  useEffect(() => {
+    console.log("vis", visible)
+  }, [visible])
+
+  const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
   const [currentStatus, setCurrentStatus] = useState(State.Disconnected);
+  const [showTermsModal, setShowTermsModal] = useState(false)
 
   useEffect(() => {
-    if (address && currentStatus == State.Disconnected)
+    if (address && (currentStatus === State.Disconnected))
       setCurrentStatus(State.IsConnected);
   }, [address]);
 
   const [currentProof, setProofData] = useState<RequestProofRes | null>(null);
+  const [currentAction, setCurrentAction] = useState("Connect")
+
+  useEffect(() => {
+    console.error("current status", currentStatus);
+    switch (currentStatus) {
+      case State.Disconnected:
+        setCurrentAction("Connect")
+        break;
+      case State.IsConnected:
+        setCurrentAction("Sign")
+        break;
+      case State.HasSigned:
+        setCurrentAction("Claim")
+        break;
+      case State.HasClaimed:
+        setCurrentAction("Stake")
+        break;
+      case State.HasStaked:
+        setCurrentAction("Staked!")
+        break;
+    }
+
+  }, [currentStatus])
 
   // needed for the signature effect hook
   const [signature, setSignature] = useState("");
@@ -77,7 +112,7 @@ const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount }: IFLYClaimSubm
     console.log("about to trigger the merkle claim");
     if (!merkleDistributorWithDeadlineClaim) throw new Error("no deadline claim");
     if (!address) throw new Error("no address");
-    console.log("merkle amount",  amount_);
+    console.log("merkle amount", amount_);
     const amount = new BN(amount_.replace(/^0x/, ""), 16);
     console.log("about to trigger the merkle claimrrrr");
     await merkleDistributorWithDeadlineClaim(
@@ -148,66 +183,254 @@ const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount }: IFLYClaimSubm
   const handleClickButton = () => {
     console.error("current status", currentStatus);
     switch (currentStatus) {
-    case State.Disconnected:
-      // do nothing, option should be greyed out here
-      break;
-    case State.IsConnected:
-      // time to sign!
-      handleBeginSigning();
-      break;
-    case State.HasSigned:
-      // time to begin the claim UX by submitting the current merkle
-      // proof data that we have!
-      handleBeginClaiming();
-    case State.HasClaimed:
-      // the user has claimed, time to connect them to the staking UX
-      handleBeginStaking();
-    case State.HasStaked:
-      // do nothing, why is this being shown?
-      break;
-    case State.Broken:
-      // something went wrong. prompt the user to reload the page.
-      break;
+      case State.Disconnected:
+        // prompt wallet connection
+        showConnectWalletModal()
+        break;
+      case State.IsConnected:
+        // time to sign!
+        handleBeginSigning();
+        // setCurrentStatus(State.HasSigned)
+        break;
+      case State.HasSigned:
+        // time to begin the claim UX by submitting the current merkle
+        // proof data that we have!
+        // setCurrentStatus(State.HasClaimed)
+        handleBeginClaiming();
+        break;
+      case State.HasClaimed:
+        // the user has claimed, time to connect them to the staking UX
+        handleBeginStaking();
+        // setCurrentStatus(State.HasStaked)
+      case State.HasStaked:
+        // do nothing, why is this being shown?
+        break;
+      case State.Broken:
+        // something went wrong. prompt the user to reload the page.
+        break;
     }
   };
 
-  return (
-    <div className="fly-submit-claim-modal-background">
-      <div className="fly-submit-claim-modal-container">
-        <div>
-          <Heading as="h3">Claiming $FLY Tokens</Heading>
-          <div className="fly-submit-claim-modal-options">
-            <div className="fly-submit-claim-modal-row">
-              <Heading as="h4">Connect your Arbitrum wallet</Heading>
-            </div>
-            <div className="fly-submit-claim-modal-row">
-              <Heading as="h4">Sign Terms and Conditions</Heading>
-            </div>
-            <div className="fly-submit-claim-modal-row">
-              <Heading as="h4">Claim $FLY {flyAmount}</Heading>
-            </div>
-            <div className="fly-submit-claim-modal-row">
-              <Heading as="h4">Stake $FLY</Heading>
+  useEffect(() => {
+    setModal(
+      createPortal(
+        <>
+          <div
+            className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-modal" : "hide-modal"
+              }`}
+          >
+            <div className="fly-submit-claim-modal-background">
+              <div
+                className={`fly-submit-claim-modal-container ${visible === true ? "show-modal" : "hide-modal"
+                  }`}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Heading as="h3" style={{ fontWeight: 'normal', marginTop: '0' }}>Claiming $FLY Tokens</Heading>
+                    <span onClick={close}>
+                      <img src="/images/icons/x.svg" className="modal-cancel-btn" />
+                    </span>
+                  </div>
+                  <div className="fly-submit-claim-modal-options">
+                    <div className="fly-submit-claim-modal-row">
+                      {currentStatus === State.Disconnected
+                        ? <NextCircle /> : <Checked />}
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Text size="lg" prominent>Connect your Arbitrum wallet</Text>
+                        {State.IsConnected && address && <Text size="md" >Connected {trimAddress(address)}</Text>}
+                      </div>
+                    </div>
+                    <div className="fly-submit-claim-modal-row">
+                      {currentStatus === State.Disconnected ?
+                        <BaseCircle /> :
+                        currentStatus === State.IsConnected ?
+                          <NextCircle /> :
+                          <Checked />
+                      }
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Text size="lg" prominent>Sign Terms and Conditions</Text>
+                        <Text size="md">Read{" "}
+                          <a
+                            className="link"
+                            onClick={() => setShowTermsModal(true)}
+                          >
+                            Terms and Conditions
+                          </a>
+                        </Text>
+                      </div>
+                    </div>
+                    <div className="fly-submit-claim-modal-row">
+                      {currentStatus < State.HasSigned ?
+                        <BaseCircle /> :
+                        currentStatus === State.HasSigned ?
+                          <NextCircle /> :
+                          <Checked />
+                      }
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Text size="lg" prominent>Claim $FLY {flyAmount}</Text>
+                        {currentStatus >= State.HasClaimed &&
+                          <LinkButton
+                            size={"medium"}
+                            type={"external"}
+                            handleClick={() => { addToken?.("FLY") }}
+                          >
+                            Add $FLY to My Wallet
+                          </LinkButton>
+                        }
+                      </div>
+                    </div>
+                    <div className="fly-submit-claim-modal-row">
+                      {currentStatus < State.HasClaimed ?
+                        <BaseCircle /> :
+                        currentStatus === State.HasClaimed ?
+                          <NextCircle /> :
+                          <Checked />
+                      }
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Text size="lg" prominent>Stake $FLY</Text>
+                        <Text size="md">Earn rewards & [REDACTED] on SPN</Text>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="fly-submit-claim-modal-button-container">
+                    <GeneralButton
+                      type="primary"
+                      size="large"
+                      layout="after"
+                      disabled={currentStatus === State.HasStaked}
+                      handleClick={handleClickButton}
+                      style={{ width: 'unset', alignSelf: 'normal' }}
+                      className={`${currentStatus === State.HasClaimed ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""}`}
+
+                    >
+                      <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                        {currentAction}
+                        {currentStatus === State.HasStaked && <Checked size={18} />}
+                      </Text>
+                    </GeneralButton>
+                    <Text size="xs" className="legal">
+                      By signing the following transactions, you agree to Fluidity Money&apos;s{" "}
+                      <a
+                        className="link"
+                        href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+                      >
+                        Terms of Service
+                      </a>{" "}
+                      and acknowledge that you have read and understand the{" "}
+                      <a className="link">Disclaimer</a>
+                    </Text>
+                    <TermsModal visible={showTermsModal} close={() => setShowTermsModal(false)} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="fly-submit-claim-modal-button-container">
-            <GeneralButton
-              type="transparent"
-              layout="after"
-              handleClick={handleClickButton}
-            >
-              <Text size="sm" prominent code style={{ color: "inherit" }}>
-                Sign
-              </Text>
-            </GeneralButton>
-            <Text>
-              By signing the following transactions, you agree to Fluidity Money’s Terms of Service and acknowledge that you have read and understand the Disclaimer.
-            </Text>
-          </div>
+        </>,
+        document.body
+      )
+    );
+  }, [visible, currentStatus, currentAction, showTermsModal]);
+
+  return modal;
+};
+
+const Checked = ({ size = 36 }: { size?: number }) => {
+  return <img className='fly-submit-claim-circle' height={size} width={size} src="/images/icons/checked.svg" alt="copy" />
+}
+
+const BaseCircle = () => {
+  return <div style={{ width: '36px', height: '36px' }}>
+    <svg height="100%" stroke="#696A68" strokeWidth="5px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" />
+    </svg>
+  </div>
+
+}
+const NextCircle = () => {
+  return <div style={{ width: '36px', height: '36px' }}>
+    <svg height="100%" stroke="white" strokeWidth="5px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" />
+    </svg>
+  </div>
+
+}
+
+type TermsModalProps = {
+  visible: boolean
+  close: () => void
+}
+
+const TermsModal = ({ visible, close }: TermsModalProps) => {
+
+  return <Modal
+    id="terms-and-conditions"
+    visible={visible}
+  >
+    <div className="airdrop-terms-and-conditions-modal-container" style={{ zIndex: 10 }}>
+      <div className="airdrop-terms-and-conditions-modal-child">
+        <div className="airdrop-terms-and-conditions-modal-navbar">
+          <GeneralButton
+            size="medium"
+            handleClick={close}
+          >
+            Close
+          </GeneralButton>
         </div>
+        <p>
+          1. Description
+
+          We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+        </p>
+        <p>
+          1. Terms of Airdrop Program
+
+          2.1 No Purchase Necessary
+
+          There is no purchase necessary to receive the Airdrop. However, you must have
+          wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+        </p>
+        <p>
+          2.2 Timing
+
+          Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+        </p>
+        <p>
+          2.3 Limited Supply
+
+          An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
+          has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
+          suspend any Airdrop requirements at any time without notice, including the amount previously
+          advertised as available.
+        </p>
+        <p>
+          2.4 Eligibility
+
+          You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
+
+          To the best of our understanding, below is a list of countries that does not recognise digital assets;
+
+          *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
+
+          Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
+
+          **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
+        </p>
+        <p>
+
+          2.5 Notice of Award
+
+          In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
+          We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+        </p>
+        <p>
+
+          3 Risk Disclosures Relating to Airdrop Program
+
+          You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+        </p>
       </div>
     </div>
-  );
-};
+  </Modal>
+}
 
 export default FLYClaimSubmitModal;

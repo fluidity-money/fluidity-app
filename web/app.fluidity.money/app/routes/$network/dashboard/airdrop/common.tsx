@@ -121,19 +121,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                    position: "absolute",
-                    bottom: "100px",
-                    zIndex: "5",
-                    ...(showBottleNumbers
-                      ? highlightBottle
-                        ? {
-                            fontSize: "2.5em",
-                          }
-                        : {}
-                      : highlightBottle
+                  position: "absolute",
+                  bottom: "100px",
+                  zIndex: "5",
+                  ...(showBottleNumbers
+                    ? highlightBottle
+                      ? {
+                        fontSize: "2.5em",
+                      }
+                      : {}
+                    : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                  }
+                }
                 : { fontSize: "1em" }
             }
           >
@@ -671,8 +671,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-        (396 * totalStakedDays) / 133225 -
-        31 / 365
+      (396 * totalStakedDays) / 133225 -
+      31 / 365
     )
   );
 
@@ -725,12 +725,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-        (baseToken.symbol === "USDC"
-          ? tokenRatios.fusdcUsdcRatio.toNumber() -
-            tokenRatios.fusdcUsdcSpread.toNumber() / 2
-          : tokenRatios.fusdcWethRatio.toNumber() -
-            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-      );
+      (baseToken.symbol === "USDC"
+        ? tokenRatios.fusdcUsdcRatio.toNumber() -
+        tokenRatios.fusdcUsdcSpread.toNumber() / 2
+        : tokenRatios.fusdcWethRatio.toNumber() -
+        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+    );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -793,31 +793,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-    (e) => {
-      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+      (e) => {
+        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-      const [whole, dec] = numericChars.split(".");
+        const [whole, dec] = numericChars.split(".");
 
-      const tokenAmtStr =
-        dec !== undefined
-          ? [whole, dec.slice(0 - token.decimals)].join(".")
-          : whole ?? "0";
+        const tokenAmtStr =
+          dec !== undefined
+            ? [whole, dec.slice(0 - token.decimals)].join(".")
+            : whole ?? "0";
 
-      setInput({
-        ...token,
-        amount: tokenAmtStr,
-      });
+        setInput({
+          ...token,
+          amount: tokenAmtStr,
+        });
 
-      if (!ratio) return;
-      if (!(whole || dec)) return;
+        if (!ratio) return;
+        if (!(whole || dec)) return;
 
-      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-      setOtherInput({
-        ...otherToken,
-        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-      });
-    };
+        setOtherInput({
+          ...otherToken,
+          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+        });
+      };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1041,9 +1041,8 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         {/* Staking Amount */}
         <div className="airdrop-stake-inputs-column">
@@ -1335,7 +1334,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(0, stakingDuration),
+              stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1386,7 +1385,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1638,9 +1637,8 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
-              tutorialContent[currentSlide].image
-            }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+              }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1983,6 +1981,7 @@ const RecapModal = ({
   const videoWidth = isMobile ? 500 : 1500;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
+  const [showFlyClaimModal, setShowFlyClaimModal] = useState(true);
 
   const [flyAmountOwed, setFLYAmountOwed] = useState(0);
 
@@ -2063,6 +2062,7 @@ const RecapModal = ({
   };
 
   const handleClaimYourFly = () => {
+    setShowFlyClaimModal(true)
     // Get the user's address.by
   };
 
@@ -2092,7 +2092,10 @@ const RecapModal = ({
         </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <div className="recap-fly-count-buttons-spread">
-            <GeneralButton onClick={handleClaimYourFly}>
+            <GeneralButton
+              onClick={handleClaimYourFly}
+            // disabled
+            >
               Claim your FLY
             </GeneralButton>
             <GeneralButton>
@@ -2102,7 +2105,7 @@ const RecapModal = ({
         </div>
         <div className="recap-you-are-eligible-delegate-button-terms-container">
           <Text>
-            By pressing the Claim and/or Stake button, you agree to our airdrop { }
+            By pressing the Claim and/or Stake button, you agree to our airdrop {}
             <a
               className="recap-terms-of-condition-claim-or-stake"
               onClick={() => setTermsAndConditionsModalVis(true)}
@@ -2195,66 +2198,70 @@ const RecapModal = ({
               </GeneralButton>
             </div>
             <p>
-1. Description
+              1. Description
 
-We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+              We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
             </p>
             <p>
-1. Terms of Airdrop Program
+              1. Terms of Airdrop Program
 
-2.1 No Purchase Necessary
+              2.1 No Purchase Necessary
 
-There is no purchase necessary to receive the Airdrop. However, you must have
-wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+              There is no purchase necessary to receive the Airdrop. However, you must have
+              wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
             </p>
             <p>
-2.2 Timing
+              2.2 Timing
 
-Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+              Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
             </p>
             <p>
-2.3 Limited Supply
+              2.3 Limited Supply
 
-An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
-has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
-suspend any Airdrop requirements at any time without notice, including the amount previously
-advertised as available.
+              An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
+              has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
+              suspend any Airdrop requirements at any time without notice, including the amount previously
+              advertised as available.
             </p>
             <p>
-2.4 Eligibility
+              2.4 Eligibility
 
-You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
+              You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
 
-To the best of our understanding, below is a list of countries that does not recognise digital assets;
+              To the best of our understanding, below is a list of countries that does not recognise digital assets;
 
-*Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
+              *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
 
-Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
+              Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
 
-**source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
+              **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
             </p>
             <p>
-2.5 Notice of Award
+              2.5 Notice of Award
 
-In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
-We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+              In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
+              We are not liable to you for failure to receive any notice associated with the Airdrop Program.
             </p>
             <p>
-3 Risk Disclosures Relating to Airdrop Program
+              3 Risk Disclosures Relating to Airdrop Program
 
-You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+              You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
             </p>
           </div>
         </div>
       </Modal>
-
-      <FLYClaimSubmitModal
-        flyAmount={123}
-        visible={true}
-        close={() => {}}
-        onComplete={(amountClaimed) => {console.log("swag")}}
-        onFailure={(onFailure) => {console.log(onFailure)}} />
-
+      <Modal id="fly-claim-submit" visible={showFlyClaimModal}>
+        <FLYClaimSubmitModal
+          showConnectWalletModal={() => setWalletModalVisibility(true)}
+          flyAmount={flyAmountOwed}
+          visible={showFlyClaimModal}
+          close={() => setShowFlyClaimModal(false)}
+          onComplete={() => setShowFlyClaimModal(false)}
+          onFailure={error => {
+            console.log("failed to claim fly", error);
+            setShowFlyClaimModal(false)
+          }} />
+      </Modal>
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}
         <div className={"recap-hero"}>
@@ -2331,9 +2338,8 @@ You are solely responsible for researching and understanding the Fluid Assets to
           {/* Animation */}
           {currentVideo === 0 ? (
             <Video
-              src={`/videos/airdrop/${
-                isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
-              }`}
+              src={`/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+                }`}
               type={"cover"}
               loop={false}
               height={videoHeight}
@@ -2347,9 +2353,8 @@ You are solely responsible for researching and understanding the Fluid Assets to
             />
           ) : (
             <Video
-              src={`/videos/airdrop/${
-                isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
-              }`}
+              src={`/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
+                }`}
               type={"cover"}
               loop={true}
               height={videoHeight}
@@ -2515,9 +2520,8 @@ You are solely responsible for researching and understanding the Fluid Assets to
                       />
                       <motion.image
                         xmlnsXlink="http://www.w3.org/1999/xlink"
-                        xlinkHref={`${
-                          bottleRarityColorIcon[tier as Rarity].img
-                        }`}
+                        xlinkHref={`${bottleRarityColorIcon[tier as Rarity].img
+                          }`}
                         mask={`url(#mask-${tier})`}
                         width="100"
                       />

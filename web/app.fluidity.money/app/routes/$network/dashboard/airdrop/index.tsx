@@ -65,6 +65,7 @@ import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
 import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 import { ethers } from "ethers";
+import { redirect } from "react-router-dom";
 
 const EPOCH_CURRENT_IDENTIFIER = "epoch_2";
 
@@ -105,15 +106,24 @@ export const loader: LoaderFunction = async ({ params }) => {
     allowedTokenSymbols.has(symbol)
   );
 
+  const redirectTarget = redirect("/");
+  const ethereumWallets = config.config["ethereum"].wallets;
+
+  if (!network || !Object.keys(config.drivers).includes(network)) {
+    return redirectTarget;
+  }
+
   return json({
     tokens: allowedTokens,
     network,
+    ethereumWallets
   } satisfies LoaderData);
 };
 
 type LoaderData = {
   tokens: Array<Token>;
   network: string;
+  ethereumWallets: typeof config.config["ethereum"]["wallets"],
 };
 
 const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
@@ -386,7 +396,7 @@ const Airdrop = () => {
             </Form.Group>
             <div className="recap-you-are-eligible-delegate-button-terms-container">
               <Text>
-                By pressing the delegate button, you agree to our airdrop { }
+                By pressing the delegate button, you agree to our airdrop {}
                 <a
                   className="recap-terms-of-condition-delegate"
                   onClick={() => setTermsAndConditionsModalVis(true)}
@@ -470,56 +480,56 @@ const Airdrop = () => {
                 </GeneralButton>
               </div>
               <p>
-1. Description
+                1. Description
 
-We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+                We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
               </p>
               <p>
-1. Terms of Airdrop Program
+                1. Terms of Airdrop Program
 
-2.1 No Purchase Necessary
+                2.1 No Purchase Necessary
 
-There is no purchase necessary to receive the Airdrop. However, you must have
-wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+                There is no purchase necessary to receive the Airdrop. However, you must have
+                wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
               </p>
               <p>
-2.2 Timing
+                2.2 Timing
 
-Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+                Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
               </p>
               <p>
-2.3 Limited Supply
+                2.3 Limited Supply
 
-An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
-has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
-suspend any Airdrop requirements at any time without notice, including the amount previously
-advertised as available.
+                An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
+                has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
+                suspend any Airdrop requirements at any time without notice, including the amount previously
+                advertised as available.
               </p>
               <p>
-2.4 Eligibility
+                2.4 Eligibility
 
-You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
+                You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
 
-To the best of our understanding, below is a list of countries that does not recognise digital assets;
+                To the best of our understanding, below is a list of countries that does not recognise digital assets;
 
-*Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
+                *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
 
-Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
+                Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
 
-**source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
-              </p>
-              <p>
-
-2.5 Notice of Award
-
-In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
-We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+                **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
               </p>
               <p>
 
-3 Risk Disclosures Relating to Airdrop Program
+                2.5 Notice of Award
 
-You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+                In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
+                We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+              </p>
+              <p>
+
+                3 Risk Disclosures Relating to Airdrop Program
+
+                You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
               </p>
             </div>
           </div>
@@ -569,10 +579,8 @@ You are solely responsible for researching and understanding the Fluid Assets to
   const currentApplication = "";
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${
-      leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${
-      leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
+    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
+    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
     }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
   );
 
@@ -851,9 +859,8 @@ You are solely responsible for researching and understanding the Fluid Assets to
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${
-          isMobile ? "airdrop-mobile" : ""
-        }`}
+        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
+          }`}
       >
         <TabButton
           size="small"
@@ -929,20 +936,19 @@ You are solely responsible for researching and understanding the Fluid Assets to
       <>
         <Header />
         <motion.div
-          className={`pad-main ${
-            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-          }`}
+          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+            }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-              currentModal === "leaderboard" ||
-              currentModal === "stake"
+                currentModal === "leaderboard" ||
+                currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                ? "1em"
-                : "2em",
+                  ? "1em"
+                  : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -1493,8 +1499,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                  navigate(`/${network}/dashboard/rewards`);
-                }
+                navigate(`/${network}/dashboard/rewards`);
+              }
               : seeBottlesDetails
           }
           style={{
@@ -1668,9 +1674,8 @@ const airdropRankRow = (
   const { user, rank, referralCount, fusdcEarned, arbEarned, bottles } = data;
 
   return {
-    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
-      address === user ? "highlighted-row" : ""
-    }`,
+    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
+      }`,
     RowElement: ({ heading }: { heading: string }) => {
       switch (heading) {
         case "RANK":
@@ -1681,8 +1686,8 @@ const airdropRankRow = (
                 style={
                   address === user
                     ? {
-                        color: "black",
-                      }
+                      color: "black",
+                    }
                     : {}
                 }
               >
@@ -1704,8 +1709,8 @@ const airdropRankRow = (
                   style={
                     address === user
                       ? {
-                          color: "black",
-                        }
+                        color: "black",
+                      }
                       : {}
                   }
                 >
@@ -1722,8 +1727,8 @@ const airdropRankRow = (
                 style={
                   address === user
                     ? {
-                        color: "black",
-                      }
+                      color: "black",
+                    }
                     : {}
                 }
               >
@@ -1739,8 +1744,8 @@ const airdropRankRow = (
                 style={
                   address === user
                     ? {
-                        color: "black",
-                      }
+                      color: "black",
+                    }
                     : {}
                 }
               >
@@ -1756,8 +1761,8 @@ const airdropRankRow = (
                 style={
                   address === user
                     ? {
-                        color: "black",
-                      }
+                      color: "black",
+                    }
                     : {}
                 }
               >
@@ -1773,8 +1778,8 @@ const airdropRankRow = (
                 style={
                   address === user
                     ? {
-                        color: "black",
-                      }
+                      color: "black",
+                    }
                     : {}
                 }
               >
