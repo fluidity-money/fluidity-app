@@ -85,6 +85,15 @@ export interface IFluidityFacade {
     address: string
   ) => Promise<void>;
 
+  merkleDistributorWithDeadlineEndTime?: () => Promise<number | undefined>;
+
+  merkleDistributorWithDeadlineClaim?: (
+    address: string,
+    index: number,
+    amount: BN,
+    merkleProof: string[]
+  ) => Promise<void>;
+
   // Solana only
 
   airdropAssociateEthereumAccount?: (

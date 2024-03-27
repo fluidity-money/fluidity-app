@@ -1165,6 +1165,15 @@ $holo: linear-gradient(
   color: white;
 }
 
+.recap-terms-of-condition-claim-or-stake {
+  all: unset;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  color: white;
+  text-align: center;
+}
+
 .recap-fly-count-delegate-button-success {
   border-color: green;
 }
@@ -1177,6 +1186,7 @@ $holo: linear-gradient(
   justify-content: center;
   flex-direction: row;
   width: 100%;
+  height: 100%;
   padding-top: 40px;
   background-color: rgba(0, 0, 0, 0.75);
 }

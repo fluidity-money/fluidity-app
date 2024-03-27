@@ -1,0 +1,18 @@
+
+.fly-submit-claim-modal-background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.fly-submit-claim-modal-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: black;
+  padding: 10px;
+  border-width: 2px;
+  border-color: white;
+}
