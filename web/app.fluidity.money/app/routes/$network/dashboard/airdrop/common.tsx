@@ -1981,7 +1981,7 @@ const RecapModal = ({
   const videoWidth = isMobile ? 500 : 1500;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
-  const [showFlyClaimModal, setShowFlyClaimModal] = useState(true);
+  const [flyClaimModalState, setFlyClaimModalState] = useState<'none' | 'claim' | 'stake'>('claim');
 
   const [flyAmountOwed, setFLYAmountOwed] = useState(0);
 
@@ -2061,8 +2061,8 @@ const RecapModal = ({
     );
   };
 
-  const handleClaimYourFly = () => {
-    setShowFlyClaimModal(true)
+  const handleClaimYourFly = (type: 'claim' |'stake') => {
+    setFlyClaimModalState(type)
     // Get the user's address.by
   };
 
@@ -2093,12 +2093,15 @@ const RecapModal = ({
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <div className="recap-fly-count-buttons-spread">
             <GeneralButton
-              onClick={handleClaimYourFly}
+              onClick={() => handleClaimYourFly('claim')}
             // disabled
             >
               Claim your FLY
             </GeneralButton>
-            <GeneralButton>
+            <GeneralButton
+            onClick={() => handleClaimYourFly('stake')}
+            // disabled
+            >
               Stake your $FLY
             </GeneralButton>
           </div>
@@ -2250,16 +2253,19 @@ const RecapModal = ({
           </div>
         </div>
       </Modal>
-      <Modal id="fly-claim-submit" visible={showFlyClaimModal}>
+      <Modal id="fly-claim-submit" visible={flyClaimModalState !== 'none'}>
         <FLYClaimSubmitModal
           showConnectWalletModal={() => setWalletModalVisibility(true)}
           flyAmount={flyAmountOwed}
-          visible={showFlyClaimModal}
-          close={() => setShowFlyClaimModal(false)}
-          onComplete={() => setShowFlyClaimModal(false)}
+          visible={flyClaimModalState !== 'none'}
+          mode={flyClaimModalState === 'none' ? 'claim' : flyClaimModalState}
+          // TODO
+          points={"9999"}
+          close={() => setFlyClaimModalState('none')}
+          onComplete={() => setFlyClaimModalState('none')}
           onFailure={error => {
             console.log("failed to claim fly", error);
-            setShowFlyClaimModal(false)
+            setFlyClaimModalState('none')
           }} />
       </Modal>
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>

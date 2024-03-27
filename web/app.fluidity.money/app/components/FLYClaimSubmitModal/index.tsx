@@ -16,6 +16,8 @@ export const FLYClaimSubmitModalLinks = () => [{ rel: "stylesheet", href: styles
 type IFLYClaimSubmitModal = {
   visible: boolean;
   flyAmount: number;
+  points: string;
+  mode: 'stake' | 'claim';
   close: () => void;
   showConnectWalletModal: () => void;
   onComplete: (amountClaimed: number) => void;
@@ -55,17 +57,21 @@ Kindly be advised that this list is for reference only and you are advised to se
 // TODO add a check for their state if they close and re-open the modal
 // TODO fail state for when they've already claimed/staked
 // TODO remove inline styling
-const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showConnectWalletModal, close }: IFLYClaimSubmitModal) => {
+const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showConnectWalletModal, close, points, mode }: IFLYClaimSubmitModal) => {
 
   const { address, signBuffer, addToken, merkleDistributorWithDeadlineClaim } = useContext(FluidityFacadeContext);
+  const [currentMode, setCurrentMode] = useState(mode)
+  const [finalState, setFinalState] = useState(currentMode === 'claim' ? State.HasClaimed : State.HasStaked)
+
   useEffect(() => {
-    console.log("vis", visible)
-  }, [visible])
+    setFinalState(currentMode === 'claim' ? State.HasClaimed : State.HasStaked)
+  }, [finalState])
 
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
   const [currentStatus, setCurrentStatus] = useState(State.Disconnected);
   const [showTermsModal, setShowTermsModal] = useState(false)
+  const [confirmingClaim, setConfirmingClaim] = useState(mode === 'claim')
 
   useEffect(() => {
     if (address && (currentStatus === State.Disconnected))
@@ -88,7 +94,7 @@ const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showCo
         setCurrentAction("Claim")
         break;
       case State.HasClaimed:
-        setCurrentAction("Stake")
+        setCurrentAction(currentMode === "claim" ? "Claimed!" : "Stake")
         break;
       case State.HasStaked:
         setCurrentAction("Staked!")
@@ -225,91 +231,133 @@ const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showCo
                   }`}
               >
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Heading as="h3" style={{ fontWeight: 'normal', marginTop: '0' }}>Claiming $FLY Tokens</Heading>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1em' }}>
+                    <Heading as="h3" style={{ fontWeight: 'normal', margin: '0' }}>{currentMode === 'claim' ? "Claiming" : "Staking"} $FLY Tokens</Heading>
                     <span onClick={close}>
                       <img src="/images/icons/x.svg" className="modal-cancel-btn" />
                     </span>
                   </div>
-                  <div className="fly-submit-claim-modal-options">
-                    <div className="fly-submit-claim-modal-row">
-                      {currentStatus === State.Disconnected
-                        ? <NextCircle /> : <Checked />}
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Text size="lg" prominent>Connect your Arbitrum wallet</Text>
-                        {State.IsConnected && address && <Text size="md" >Connected {trimAddress(address)}</Text>}
+                  {confirmingClaim ? <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Text size="lg" prominent style={{ color: '#FFB300' }}>Caution. Claiming $FLY will cease your points.</Text>
+                    <Text size="lg" prominent>You have accumulated {points} points. In order to retain your accumulated points, you must initially stake your $FLY. Otherwise, you may claim your $FLY and stake it at a later stage without the accumulated points.</Text>
+                    <Text size="lg" prominent>Do you wish to continue claiming?</Text>
+                  </div> :
+                    <div className="fly-submit-claim-modal-options">
+                      <div className="fly-submit-claim-modal-row">
+                        {currentStatus === State.Disconnected
+                          ? <NextCircle /> : <Checked />}
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Text size="lg" prominent>Connect your Arbitrum wallet</Text>
+                          {State.IsConnected && address && <Text size="md" >Connected {trimAddress(address)}</Text>}
+                        </div>
                       </div>
-                    </div>
-                    <div className="fly-submit-claim-modal-row">
-                      {currentStatus === State.Disconnected ?
-                        <BaseCircle /> :
-                        currentStatus === State.IsConnected ?
-                          <NextCircle /> :
-                          <Checked />
-                      }
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Text size="lg" prominent>Sign Terms and Conditions</Text>
-                        <Text size="md">Read{" "}
-                          <a
-                            className="link"
-                            onClick={() => setShowTermsModal(true)}
-                          >
-                            Terms and Conditions
-                          </a>
-                        </Text>
-                      </div>
-                    </div>
-                    <div className="fly-submit-claim-modal-row">
-                      {currentStatus < State.HasSigned ?
-                        <BaseCircle /> :
-                        currentStatus === State.HasSigned ?
-                          <NextCircle /> :
-                          <Checked />
-                      }
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Text size="lg" prominent>Claim $FLY {flyAmount}</Text>
-                        {currentStatus >= State.HasClaimed &&
-                          <LinkButton
-                            size={"medium"}
-                            type={"external"}
-                            handleClick={() => { addToken?.("FLY") }}
-                          >
-                            Add $FLY to My Wallet
-                          </LinkButton>
+                      <div className="fly-submit-claim-modal-row">
+                        {currentStatus === State.Disconnected ?
+                          <BaseCircle /> :
+                          currentStatus === State.IsConnected ?
+                            <NextCircle /> :
+                            <Checked />
                         }
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Text size="lg" prominent>Sign Terms and Conditions</Text>
+                          <Text size="md">Read{" "}
+                            <a
+                              className="link"
+                              onClick={() => setShowTermsModal(true)}
+                            >
+                              Terms and Conditions
+                            </a>
+                          </Text>
+                        </div>
                       </div>
-                    </div>
-                    <div className="fly-submit-claim-modal-row">
-                      {currentStatus < State.HasClaimed ?
-                        <BaseCircle /> :
-                        currentStatus === State.HasClaimed ?
-                          <NextCircle /> :
-                          <Checked />
+                      <div className="fly-submit-claim-modal-row">
+                        {currentStatus < State.HasSigned ?
+                          <BaseCircle /> :
+                          currentStatus === State.HasSigned ?
+                            <NextCircle /> :
+                            <Checked />
+                        }
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Text size="lg" prominent>Claim $FLY {flyAmount}</Text>
+                          {currentStatus >= State.HasClaimed &&
+                            <LinkButton
+                              size={"medium"}
+                              type={"external"}
+                              handleClick={() => { addToken?.("FLY") }}
+                            >
+                              Add $FLY to My Wallet
+                            </LinkButton>
+                          }
+                        </div>
+                      </div>
+                      {currentMode === 'stake' && <div className="fly-submit-claim-modal-row">
+                        {currentStatus < State.HasClaimed ?
+                          <BaseCircle /> :
+                          currentStatus === State.HasClaimed ?
+                            <NextCircle /> :
+                            <Checked />
+                        }
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <Text size="lg" prominent>Stake $FLY</Text>
+                          <Text size="md">Earn rewards & [REDACTED] on SPN</Text>
+                        </div>
+                      </div>
                       }
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Text size="lg" prominent>Stake $FLY</Text>
-                        <Text size="md">Earn rewards & [REDACTED] on SPN</Text>
-                      </div>
                     </div>
-                  </div>
+                  }
                   <div className="fly-submit-claim-modal-button-container">
-                    <GeneralButton
-                      type="primary"
-                      size="large"
-                      layout="after"
-                      disabled={currentStatus === State.HasStaked}
-                      handleClick={handleClickButton}
-                      style={{ width: 'unset', alignSelf: 'normal' }}
-                      className={`${currentStatus === State.HasClaimed ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""}`}
+                    {confirmingClaim ?
+                      <div style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: '1em' }}>
+                        <GeneralButton
+                          type="primary"
+                          size="large"
+                          layout="after"
+                          handleClick={() => setConfirmingClaim(false)}
+                          style={{ width: '100%', alignSelf: 'normal' }}
 
-                    >
-                      <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                        {currentAction}
-                        {currentStatus === State.HasStaked && <Checked size={18} />}
-                      </Text>
-                    </GeneralButton>
+                        >
+                          <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                            Continue Claiming
+                          </Text>
+                        </GeneralButton>
+                        <GeneralButton
+                          type="primary"
+                          size="large"
+                          layout="after"
+                          handleClick={() => {
+
+                            setConfirmingClaim(false);
+                            setCurrentMode('stake')
+                          }}
+                          style={{ width: '100%', alignSelf: 'normal' }}
+
+                        >
+                          <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                            Stake Your $FLY
+                          </Text>
+                        </GeneralButton>
+                      </div>
+                      :
+                      <>
+                        <GeneralButton
+                          type="primary"
+                          size="large"
+                          layout="after"
+                          disabled={currentStatus === finalState}
+                          handleClick={handleClickButton}
+                          style={{ width: 'unset', alignSelf: 'normal' }}
+                          className={`${currentStatus === finalState - 1 ? "rainbow" : ""} ${currentStatus === finalState ? "claim-button-staked" : ""}`}
+
+                        >
+                          <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                            {currentAction}
+                            {currentStatus === finalState && <Checked size={18} />}
+                          </Text>
+                        </GeneralButton>
+                      </>
+                    }
                     <Text size="xs" className="legal">
-                      By signing the following transactions, you agree to Fluidity Money&apos;s{" "}
+                      By signing the following transactions, you agree to Fluidity Money&apos;services{" "}
                       <a
                         className="link"
                         href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
@@ -329,7 +377,7 @@ const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showCo
         document.body
       )
     );
-  }, [visible, currentStatus, currentAction, showTermsModal]);
+  }, [visible, currentStatus, currentAction, showTermsModal, confirmingClaim]);
 
   return modal;
 };
