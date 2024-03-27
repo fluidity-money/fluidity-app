@@ -113,7 +113,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
     /* ~~~~~~~~~~ INTERNAL FUNCTIONS ~~~~~~~~~~ */
 
     function _calcDay1Points(uint256 _flyAmount) internal pure returns (uint256 points) {
-        return _flyAmount * (7 days / 1000);
+        return (_flyAmount * 7 days) / 1000;
     }
 
     function calculatePoints(uint256 curTimestamp, StakedPrivate memory _staked) public pure returns (uint256 points) {
@@ -126,9 +126,8 @@ return a
 
         */
 
-        uint256 a = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp) / 1000);
-        if (_staked.receivedBonus) a += _calcDay1Points(_staked.flyVested);
-        return a;
+        points = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp) / 1000);
+        if (_staked.receivedBonus) points += _calcDay1Points(_staked.flyVested);
     }
 
     function _hasStaked(address _spender) internal view returns (bool hasStaked) {
@@ -160,6 +159,8 @@ return a
         // if the amount of staked positions from the user exceeds 1,
         // then we can replace them with the last item in the array, then
         // pop them.
+        // make sure to always iterate the opposite direction through
+        // this list.
         uint256 len = stakedStorage_[_spender].length;
         if (len > 1) {
             StakedPrivate storage x = stakedStorage_[_spender][len - 1];
@@ -199,7 +200,7 @@ return a
 
     /// @inheritdoc IStaking
     function minFlyAmount() public pure returns (uint256 flyAmount) {
-        return FLY_MIN_AMOUNT;
+        return 0;
     }
 
     /* ~~~~~~~~~~ NORMAL USER PUBLIC ~~~~~~~~~~ */
@@ -231,7 +232,7 @@ return a
         unstakedBy = block.timestamp;
         if (len == 0) return (0, unstakedBy);
         unstakedBy += UNBONDING_PERIOD;
-        for (uint i = 0; i < len; i++) {
+        for (uint i = len - 1; i > 0; i--) {
             if (flyRemaining == 0) return (flyRemaining, unstakedBy);
             StakedPrivate storage s = stakedStorage_[msg.sender][i];
             if (s.flyVested >= flyRemaining) {
@@ -275,7 +276,9 @@ return a
         // timestamp is greater than the block timestamp, then remove their
         // unstaked position, and increase the fly returned. then pop them from
         // the unstaking list.
-        for (uint i = 0; i < unstakingStorage_[msg.sender].length; i++) {
+        uint len = unstakingStorage_[msg.sender].length;
+        if (len == 0) return 0;
+        for (uint i = len - 1; i > 0; i--) {
             UnstakingPrivate storage s = unstakingStorage_[msg.sender][i];
             if (s.unstakedTimestamp > block.timestamp) continue;
             // unstake now.
