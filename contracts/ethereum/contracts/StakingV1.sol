@@ -105,6 +105,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
         require(version_ == 0, "contract is already initialised");
 
         version_ = 1;
+        noEmergencyMode_ = true;
 
         emergencyCouncil_ = _emergencyCouncil;
         operator_ = _operator;
@@ -115,7 +116,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
 
     /* ~~~~~~~~~~ INTERNAL FUNCTIONS ~~~~~~~~~~ */
 
-    function _calculatePoints(StakedPrivate memory _staked) internal view returns (uint256 points) {
+    function calculatePoints(uint256 curTimestamp, StakedPrivate memory _staked) public pure returns (uint256 points) {
         /*
          * Calculate the points earned by the user, using the math:
 
@@ -127,7 +128,7 @@ return a
          * received the bonus.
         */
 
-        uint256 a = _staked.flyVested * ((block.timestamp - _staked.depositTimestamp) / 1000);
+        uint256 a = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp) / 1000);
         if (_staked.receivedBonus) a += (_staked.flyVested / 1000) * 24 days;
         return a;
     }
@@ -144,7 +145,7 @@ return a
     ) internal returns (uint256 _flyStaked) {
         require(noEmergencyMode_, "emergency mode!");
 
-        require(_flyAmount < FLY_MIN_AMOUNT, "too little fly");
+        require(_flyAmount > FLY_MIN_AMOUNT, "too little fly");
 
         stakedStorage_[_recipient].push(StakedPrivate({
             receivedBonus: _claimAndStakeBonus,
@@ -185,11 +186,15 @@ return a
     }
     /* ~~~~~~~~~~ INFORMATIONAL ~~~~~~~~~~ */
 
+    function stakingPositionsLen(address _account) public view returns (uint) {
+        return stakedStorage_[_account].length;
+    }
+
     /// @inheritdoc IStaking
     function stakingDetails(address _account) public view returns (uint256 flyStaked, uint256 points) {
         for (uint i = 0; i < stakedStorage_[_account].length; i++) {
             StakedPrivate storage s = stakedStorage_[_account][i];
-            points += _calculatePoints(s);
+            points += calculatePoints(block.timestamp, s);
             flyStaked += s.flyVested;
         }
     }
@@ -230,8 +235,11 @@ return a
         // the position, then move on.
         flyRemaining = _flyToUnstake;
         uint len = stakedStorage_[msg.sender].length;
-        if (len > 0) unstakedBy = UNBONDING_PERIOD + block.timestamp;
+        unstakedBy = block.timestamp;
+        if (len == 0) return (0, unstakedBy);
+        unstakedBy += UNBONDING_PERIOD;
         for (uint i = 0; i < len; i++) {
+            if (flyRemaining == 0) return (flyRemaining, unstakedBy);
             StakedPrivate storage s = stakedStorage_[msg.sender][i];
             if (s.flyVested >= flyRemaining) {
                 // the FLY staked in this position is more than the amount requested.
