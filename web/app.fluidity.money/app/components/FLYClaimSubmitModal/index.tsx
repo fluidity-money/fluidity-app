@@ -57,7 +57,16 @@ Kindly be advised that this list is for reference only and you are advised to se
 // TODO add a check for their state if they close and re-open the modal
 // TODO fail state for when they've already claimed/staked
 // TODO remove inline styling
-const FLYClaimSubmitModal = ({ onComplete, onFailure, flyAmount, visible, showConnectWalletModal, close, points, mode }: IFLYClaimSubmitModal) => {
+const FLYClaimSubmitModal = ({
+  onComplete,
+  onFailure,
+  flyAmount,
+  visible,
+  showConnectWalletModal,
+  close,
+  points,
+  mode
+}: IFLYClaimSubmitModal) => {
 
   const { address, signBuffer, addToken, merkleDistributorWithDeadlineClaim } = useContext(FluidityFacadeContext);
   const [currentMode, setCurrentMode] = useState(mode)

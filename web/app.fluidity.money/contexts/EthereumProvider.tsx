@@ -46,6 +46,8 @@ import {
 import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
 import MerkleDistributorWithDeadlineAbi from "~/util/chainUtils/ethereum/MerkleDistributorWithDeadline.json";
+import FLYStakingABI from "~/util/chainUtils/ethereum/FLYStaking.json";
+
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
 
@@ -612,6 +614,58 @@ const EthereumFacade = ({
       merkleProof
     );
     console.log(result);
+  };
+
+  const flyStakingStake = async (amount: BN) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const flyStakingAddr = "0x0000000000000000000000000000000000000000";
+    const result = await doFlyStakingStake(
+      signer,
+      flyStakingAddr,
+      FLYStaking,
+      amount,
+    );
+    console.log(result);
+  };
+
+  const flyStakingDetails = async (amount: BN) => {
+    if (!provider) {
+      return undefined;
+    }
+
+    const flyStakingAddr = "0x0000000000000000000000000000000000000000";
+    const result = await doFlyStakingDetails(
+      signer,
+      flyStakingAddr,
+      FLYStaking,
+      address
+    );
+    console.log(result);
+
+    return result;
+  };
+
+  const flyStakingBeginUnstake = async (amount: BN) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const flyStakingAddr = "0x0000000000000000000000000000000000000000";
+    const result = await doFlyStakingBeginUnstake(
+      signer,
+      flyStakingAddr,
+      FLYStaking,
+    );
+    console.log(result);
+
+    return result;
   };
 
   return (

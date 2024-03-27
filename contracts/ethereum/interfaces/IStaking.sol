@@ -73,25 +73,32 @@ interface IStaking {
      * @notice beginUnstake for the address given, unstaking from the leftmost position
      *         until we unstake the amount requested.
      * @param _flyToUnstake the amount to request to unstake for the user.
+     * @return flyRemaining from the unstaking process.
+     * @return unstakedBy the timestamp by which every position is fully unstaked.
      */
     function beginUnstake(
         uint256 _flyToUnstake
-    ) external returns (uint256 flyUnstaked, uint256 unstakedBy);
+    ) external returns (uint256 flyRemaining, uint256 unstakedBy);
 
     /**
      * @notice amountUnstaking that the user has requested in the past, cumulatively.
+     * @param _owner of the amounts that are unstaking to check.
      */
-    function amountUnstaking() external view returns (uint256 flyAmount);
+    function amountUnstaking(address _owner) external view returns (uint256 flyAmount);
 
     /**
-     * @notice secondsUntilUnstaked for the first time based on their oldest deposit.
+     * @notice secondsUntilSoonestUnstake for the soonest amount of seconds until a unstake is possible.
+     * @param _spender of the fully unstaking process.
      */
-    function secondsUntilFullyUnstaked() external view returns (uint256 secs);
+    function secondsUntilSoonestUnstake(address _spender) external view returns (uint256 shortestSecs);
 
     /**
      * @notice finaliseUnstake for a user, if they're past the unbonding period.
      */
     function finaliseUnstake() external returns (uint256 flyReturned);
 
+    /**
+     * @notice emergencyWithdraw the sender's balance, if the contract is in a state of emergency.
+     */
     function emergencyWithdraw() external;
 }

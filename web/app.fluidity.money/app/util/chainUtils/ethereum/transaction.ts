@@ -668,6 +668,148 @@ export const merkleDistributorWithDeadlineClaim = async (
   }
 };
 
+export const merkleDistributorWithDeadlineClaimAndStake = async (
+  signer: Signer,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface,
+  index: number,
+  accountAddr: string,
+  amount: BN,
+  merkleProof: string[]
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      signer
+    );
+
+    if (!merkleDistributorWithDeadlineAddr)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+      await merkleDistributorWithDeadlineContract.claimAndStake(
+        index,
+        accountAddr,
+        amount.toString(),
+        merkleProof
+      );
+
+      return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export const flyStakingStake = async (
+  signer: Signer,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  amount: BN
+) => {
+  try {
+    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, signer);
+
+    if (!flyStakingContract)
+      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+
+    await flyStakingContract.stake(amount.toString());
+
+    return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export type FLYStakingDetailsRes = {
+  flyStaked: BigNumber;
+  day1Points: BigNumber;
+}
+
+export const flyStakingDetails = async (
+  provider: Provider,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  address: string
+):  Promise<FLYStakingDetailsRes | undefined>=> {
+  try {
+    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, provider);
+
+    if (!flyStakingContract)
+      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+
+    return await flyStakingContract.stakingDetails(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
+  }
+};
+
+export const flyStakingBeginUnstake = async (
+  signer: Signer,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  flyToUnstake: BN
+) => {
+  try {
+    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, signer);
+
+    if (!flyStakingContract)
+      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+
+    await flyStakingContract.beginUnstake(flyToUnstake.toString());
+
+    return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export const flyStakingSecondsUntilSoonestUnstake = async (
+  provider: Provider,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  address: string
+):  Promise<BigNumber | undefined>=> {
+  try {
+    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, provider);
+
+    if (!flyStakingContract)
+      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+
+    return await flyStakingContract.secondsUntilSoonestUnstake(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
+  }
+};
+
+export const flyStakingFinaliseUnstake = async (
+  signer: Signer,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface
+): Promise<BigNumber | undefined> => {
+  try {
+    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, signer);
+
+    if (!flyStakingContract)
+      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+
+    const amount = await flyStakingContract.callStatic.finaliseUnstake(flyToUnstake.toString());
+
+    await flyStakingContract.finaliseUnstake(flyToUnstake.toString());
+
+    return amount;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
+  }
+};
+
 type ErrorType = {
   data: { message: string };
 } & { message: string };

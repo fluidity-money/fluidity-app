@@ -3,6 +3,7 @@ import type {
   StakingRatioRes,
   StakingDepositsRes,
   StakingRedeemableRes,
+  FLYStakingDetailsRes
 } from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
@@ -93,6 +94,14 @@ export interface IFluidityFacade {
     amount: BN,
     merkleProof: string[]
   ) => Promise<void>;
+
+  flyStakingStake?: (amount: BN ) => Promise<void>;
+
+  flyStakingDetails?: (address: string) => Promise<FLYStakingDetailsRes | undefined>;
+
+  flyStakingBeginUnstake?: (amount: BN) => Promise<void>;
+
+  flyStakingSecondsUntilSoonestUnstake?: () => Promise<BN | undefined>;
 
   // Solana only
 

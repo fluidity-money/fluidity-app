@@ -22,6 +22,8 @@ string constant STAKING_SYMBOL = "sFLY";
 
 uint256 constant UNBONDING_PERIOD = 7 days;
 
+uint constant MAX_STAKING_POSITIONS = 100;
+
 struct StakedPrivate {
     // receivedBonus for the day 1 staking?
     bool receivedBonus;
@@ -130,6 +132,15 @@ return a
         if (_staked.receivedBonus) points += _calcDay1Points(_staked.flyVested);
     }
 
+    /**
+     * @notice calculatePointsAddSecs external helper function to get an idea of points earned for staking.
+     * @param _seconds to add to the staked struct passed as an argument.
+     * @param _staked to use as the staked structure.
+     */
+    function calculatePointsAddSecs(uint256 _seconds, StakedPrivate memory _staked) external pure returns (uint256 points) {
+        return calculatePoints(_staked.depositTimestamp + _seconds, _staked);
+    }
+
     function _hasStaked(address _spender) internal view returns (bool hasStaked) {
         return stakedStorage_[_spender].length > 0;
     }
@@ -142,6 +153,11 @@ return a
     ) internal returns (uint256 _flyStaked) {
         require(noEmergencyMode_, "emergency mode!");
         require(_flyAmount > 0, "zero fly");
+
+        require(
+            stakedStorage_[_recipient].length < MAX_STAKING_POSITIONS,
+            "too many staked positions"
+        );
 
         stakedStorage_[_recipient].push(StakedPrivate({
             receivedBonus: _claimAndStakeBonus,
@@ -232,22 +248,26 @@ return a
         unstakedBy = block.timestamp;
         if (len == 0) return (0, unstakedBy);
         unstakedBy += UNBONDING_PERIOD;
-        for (uint i = len - 1; i > 0; i--) {
+        // it's important to always break here if we're at 0.
+        for (uint i = len - 1; i >= 0; i--) {
             if (flyRemaining == 0) return (flyRemaining, unstakedBy);
             StakedPrivate storage s = stakedStorage_[msg.sender][i];
-            if (s.flyVested >= flyRemaining) {
-                // the FLY staked in this position is more than the amount requested.
-                // take the full amount for this position, then move on.
+            if (flyRemaining >= s.flyVested) {
+                // the FLY staked in this position is less than the amount requested.
+                // take the full amount for this position, pop the staked amount, reduce
+                // the fly remaining, then move on.
                 flyRemaining -= s.flyVested;
-                _popStakedPosition(msg.sender, i);
                 unstakingStorage_[msg.sender].push(UnstakingPrivate({
                     flyAmount: s.flyVested,
                     unstakedTimestamp: unstakedBy
                 }));
+                _popStakedPosition(msg.sender, i);
+                if (i == 0) break; // FIXME: why is this needed again? needs explanation
             } else {
                 // the FLY staked in this position is more than what's remaining. so we
                 // can update the existing staked amount to reduce the FLY that they
-                // requested, then we can just return here.
+                // requested, then we can just return here. it's safe to not break here
+                // since we're returning.
                 stakedStorage_[msg.sender][i].flyVested -= flyRemaining;
                 flyRemaining = 0;
                 return (flyRemaining, unstakedBy);
@@ -256,17 +276,20 @@ return a
     }
 
     /// @inheritdoc IStaking
-    function amountUnstaking() public view returns (uint256 flyAmount) {
-        for (uint i = 0; i < unstakingStorage_[msg.sender].length; i++) {
-            flyAmount += unstakingStorage_[msg.sender][i].flyAmount;
+    function amountUnstaking(address _owner) public view returns (uint256 flyAmount) {
+        for (uint i = 0; i < unstakingStorage_[_owner].length; i++) {
+            flyAmount += unstakingStorage_[_owner][i].flyAmount;
         }
     }
 
     /// @inheritdoc IStaking
-    function secondsUntilFullyUnstaked() public view returns (uint256 secs) {
-        for (uint i = 0; i < unstakingStorage_[msg.sender].length; i++) {
-            uint256 ts = unstakingStorage_[msg.sender][i].unstakedTimestamp;
-            if (block.timestamp > ts) secs += block.timestamp - ts;
+    function secondsUntilSoonestUnstake(address _spender) public view returns (uint256 shortestSecs) {
+        for (uint i = 0; i < unstakingStorage_[_spender].length; i++) {
+            uint256 ts = unstakingStorage_[_spender][i].unstakedTimestamp;
+            if (block.timestamp > ts) {
+                uint256 remaining =  block.timestamp - ts;
+                if (remaining < shortestSecs) shortestSecs = remaining;
+            }
         }
     }
 
@@ -278,17 +301,22 @@ return a
         // the unstaking list.
         uint len = unstakingStorage_[msg.sender].length;
         if (len == 0) return 0;
-        for (uint i = len - 1; i > 0; i--) {
+        for (uint i = len - 1; i >= 0; i--) {
             UnstakingPrivate storage s = unstakingStorage_[msg.sender][i];
-            if (s.unstakedTimestamp > block.timestamp) continue;
+            // if the timestamp for the time that we need to unstake is less than the
+            // current, break out.
+            if (s.unstakedTimestamp > block.timestamp) {
+              if (i == 0) break;
+              else continue;
+            }
             // unstake now.
             flyReturned += s.flyAmount;
             _popUnstakingPosition(msg.sender, i);
+            if (i == 0) break;
         }
-        // now we can use ERC20 to send the token back, if they're legit.
-        if (flyReturned > 0) {
-            flyToken_.safeTransfer(msg.sender, flyReturned);
-        }
+        // now we can use ERC20 to send the token back, if they got more than 0 back.
+        if (flyReturned == 0) revert("no fly returned");
+        flyToken_.safeTransfer(msg.sender, flyReturned);
     }
 
     /* ~~~~~~~~~~ EMERGENCY FUNCTIONS ~~~~~~~~~~ */
