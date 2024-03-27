@@ -112,6 +112,10 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
 
     /* ~~~~~~~~~~ INTERNAL FUNCTIONS ~~~~~~~~~~ */
 
+    function _calcDay1Points(uint256 _flyAmount) internal pure returns (uint256 points) {
+        return _flyAmount * (7 days / 1000);
+    }
+
     function calculatePoints(uint256 curTimestamp, StakedPrivate memory _staked) public pure returns (uint256 points) {
         /*
          * Calculate the points earned by the user, using the math:
@@ -120,12 +124,10 @@ a = x * (seconds_since_start * 0.001)
 if day_1_staked_bonus: a += fly_staked * 0.001 * (24*7)
 return a
 
-         * Then return the amounts given. Except, we don't need to check that the user has
-         * received the bonus.
         */
 
         uint256 a = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp) / 1000);
-        if (_staked.receivedBonus) a += (_staked.flyVested / 1000) * 7 days;
+        if (_staked.receivedBonus) a += _calcDay1Points(_staked.flyVested);
         return a;
     }
 
@@ -152,10 +154,6 @@ return a
         flyToken_.safeTransferFrom(_spender, address(this), _flyAmount);
 
         return _flyAmount;
-    }
-
-    function _calcDay1Points(uint256 _flyAmount) internal pure returns (uint256 points) {
-        return _flyAmount * (7 days / 100);
     }
 
     function _popStakedPosition(address _spender, uint i) internal {
