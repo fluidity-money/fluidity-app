@@ -1362,7 +1362,7 @@ $holo: linear-gradient(
 
 .fly-submit-claim-action-button-text {
   color: inherit !important;
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 0.5em;
 }

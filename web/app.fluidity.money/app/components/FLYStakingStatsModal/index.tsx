@@ -136,8 +136,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                   <div className="fly-submit-claim-modal-options">
                     {currentStatus === State.Stats ?
                       <>
-                        <div style={{ flexDirection: 'column' }} className="fly-submit-claim-modal-row">
-                          <Text size="xxl" holo>{points}</Text>
+                        <div style={{ flexDirection: 'column', gap: 0 }} className="fly-submit-claim-modal-row">
+                          <Text size="xxl" style={{fontSize: "3.25em"}} holo>{points}</Text>
                           <div className="text-with-info-popup">
                             <Hoverable
                               tooltipStyle={"solid"}
