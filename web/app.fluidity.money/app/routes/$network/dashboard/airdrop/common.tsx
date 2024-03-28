@@ -1981,7 +1981,7 @@ const RecapModal = ({
   const videoWidth = isMobile ? 500 : 1500;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
-  const [flyClaimModalState, setFlyClaimModalState] = useState<'none' | 'claim' | 'stake'>('claim');
+  const [flyClaimModalState, setFlyClaimModalState] = useState<'none' | 'claim' | 'stake'>('none');
 
   const [flyAmountOwed, setFLYAmountOwed] = useState(0);
 
