@@ -234,6 +234,20 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 
 
                         <div className="fly-submit-claim-modal-options">
+                          {currentStatus === State.AmountEntered && <div className="fly-submit-claim-modal-row">
+                            <div className="flex-column" style={{gap: '1em'}}>
+                              <div style={{ display: 'flex' }}>
+                                <Text size="lg" prominent>🏄🏼‍♂️</Text>
+                                <Text size="lg" holo>Staking $FLY will reward you points.</Text>
+                              </div>
+                              <div className="fly-caution-border">
+                                <Text size="lg" prominent>
+                                  You will earn {points} points by staking your $FLY. Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN).
+                                </Text>
+                              </div>
+                            </div>
+                          </div>
+                          }
                           <div className="fly-submit-claim-modal-row">
                             {currentStatus <= State.AmountEntered
                               ? <NextCircle /> : <Checked />}
