@@ -32,6 +32,7 @@ import {
   Trophy,
   AssetsIcon,
   FlyIcon,
+  StakeIcon,
   Text,
   Heading,
   ChainSelectorButton,
@@ -58,6 +59,8 @@ import { getProviderDisplayName } from "~/util/provider";
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import { UIContext } from "contexts/UIProvider";
+import { StakingStatsModal } from "./dashboard/airdrop/common";
+import { FlyStakingStatsModal } from "~/components/FLYStakingStatsModal";
 
 export const links: LinksFunction = () => {
   return [
@@ -555,6 +558,12 @@ export default function Dashboard() {
               </li>
             );
           })}
+          <li key="staking">
+            <div />
+            <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
+              <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+            </a>
+          </li>
         </ul>
 
         {/* Connect Wallet Button */}
@@ -717,6 +726,15 @@ export default function Dashboard() {
         <ConnectWalletModal
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
+        />
+        <FlyStakingStatsModal
+          // TODO - all of these are mocked values
+          staking={true}
+          close={() => { setStakingStatsModalVisibility(false) }}
+          showConnectWalletModal={() => setWalletModalVisibility(true)}
+          points={100}
+          pointsUnstaking={50}
+          visible={stakingStatsModalVisibility}
         />
         <UIContext.Provider
           value={{
