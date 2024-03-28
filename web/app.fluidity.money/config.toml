@@ -206,6 +206,16 @@ isFluidOf = "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
 decimals = 6
 enabled = true
 
+[[config.arbitrum.tokens]]
+symbol = "FLY"
+name = "FLUIDITY"
+logo = "/assets/tokens/fly.svg"
+address = "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+colour = "#12946c"
+isFluidOf = ""
+decimals = 6
+enabled = true
+
 [config.sui]
 explorer = "https://suiscan.xyz"
 fluidAssets = [
