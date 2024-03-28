@@ -22,6 +22,7 @@ import { AirdropIcon } from "./Airdrop";
 import { LinkVerticalIcon } from "./LinkVertical";
 import { Checkmark } from "./Checkmark";
 import { FlyIcon } from "./Fly";
+import { StakeIcon, UnstakeIcon } from "./StakeIcon";
 
 export {
   AirdropIcon,
@@ -36,6 +37,8 @@ export {
   Twitter,
   DashboardIcon,
   WarningIcon,
+  StakeIcon,
+  UnstakeIcon,
   DaoIcon,
   AssetsIcon,
   ProviderIcon,
