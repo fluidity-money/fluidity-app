@@ -56,7 +56,6 @@ Kindly be advised that this list is for reference only and you are advised to se
 
 // TODO add a check for their state if they close and re-open the modal
 // TODO fail state for when they've already claimed/staked
-// TODO remove inline styling
 const FLYClaimSubmitModal = ({
   onComplete,
   onFailure,
@@ -239,28 +238,29 @@ const FLYClaimSubmitModal = ({
                 className={`fly-submit-claim-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
                   }`}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1em' }}>
-                    <Heading as="h3" style={{ fontWeight: 'normal', margin: '0' }}>{currentMode === 'claim' ? "Claiming" : "Staking"} $FLY Tokens</Heading>
+                <div className="fly-submit-claim-flex-container">
+                  <div className="fly-submit-claim-heading-container">
+                    <Heading as="h3" className="fly-submit-claim-heading">{currentMode === 'claim' ? "Claiming" : "Staking"} $FLY Tokens</Heading>
                     <span onClick={close}>
                       <img src="/images/icons/x.svg" className="modal-cancel-btn" />
                     </span>
                   </div>
-                  {confirmingClaim ? <div style={{ display: 'flex', flexDirection: 'column', gap: '2em' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', gap: '1em', alignItems: 'flex-end' }}>
-                      <WarningIcon />
-                      <Text size="lg" prominent style={{ color: '#FFB300' }}>Caution. Claiming $FLY will cease your points.</Text>
-                    </div>
-                    <div style={{ borderLeft: '4px #FFB300 solid', marginLeft: '1em', paddingLeft: '1em' }}>
-                      <Text size="lg" prominent>You have accumulated {points} points. In order to retain your accumulated points, you must initially stake your $FLY. Otherwise, you may claim your $FLY and stake it at a later stage without the accumulated points.</Text>
-                    </div>
-                    <Text size="lg" prominent style={{ alignSelf: 'center', marginBottom: '2em' }}>Do you wish to continue claiming?</Text>
-                  </div> :
+                  {confirmingClaim ?
+                    <div className="fly-confirming-claim-container">
+                      <div className="fly-confirming-claim-header">
+                        <WarningIcon />
+                        <Text size="lg" prominent className="fly-caution-text">Caution. Claiming $FLY will cease your points.</Text>
+                      </div>
+                      <div className="fly-caution-border">
+                        <Text size="lg" prominent>You have accumulated {points} points. In order to retain your accumulated points, you must initially stake your $FLY. Otherwise, you may claim your $FLY and stake it at a later stage without the accumulated points.</Text>
+                      </div>
+                      <Text size="lg" prominent className="fly-caution-centre-text">Do you wish to continue claiming?</Text>
+                    </div> :
                     <div className="fly-submit-claim-modal-options">
                       <div className="fly-submit-claim-modal-row">
                         {currentStatus === State.Disconnected
                           ? <NextCircle /> : <Checked />}
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="flex-column">
                           <Text size="lg" prominent>Connect your Arbitrum wallet</Text>
                           {State.IsConnected && address && <Text size="md" >Connected {trimAddress(address)}</Text>}
                         </div>
@@ -272,7 +272,7 @@ const FLYClaimSubmitModal = ({
                             <NextCircle /> :
                             <Checked />
                         }
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="flex-column">
                           <Text size="lg" prominent>Sign Terms and Conditions</Text>
                           <Text size="md">Read{" "}
                             <a
@@ -291,7 +291,7 @@ const FLYClaimSubmitModal = ({
                             <NextCircle /> :
                             <Checked />
                         }
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="flex-column">
                           <Text size="lg" prominent>Claim $FLY {flyAmount}</Text>
                           {currentStatus >= State.HasClaimed &&
                             <LinkButton
@@ -311,7 +311,7 @@ const FLYClaimSubmitModal = ({
                             <NextCircle /> :
                             <Checked />
                         }
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="flex-column">
                           <Text size="lg" prominent>Stake $FLY</Text>
                           <Text size="md">Earn rewards & [REDACTED] on SPN</Text>
                         </div>
@@ -321,16 +321,16 @@ const FLYClaimSubmitModal = ({
                   }
                   <div className="fly-submit-claim-modal-button-container">
                     {confirmingClaim ?
-                      <div style={{ display: 'flex', flexDirection: 'row', width: '100%', justifyContent: 'space-between', gap: '1em' }}>
+                      <div className="fly-confirming-claim-button-container">
                         <GeneralButton
                           type="primary"
                           size="large"
                           layout="after"
                           handleClick={() => setConfirmingClaim(false)}
-                          style={{ width: '100%', alignSelf: 'normal' }}
+                          className="fly-claim-stake-choice-button"
 
                         >
-                          <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                          <Text size="md" prominent bold className="fly-continue-claiming-text">
                             Continue Claiming
                           </Text>
                         </GeneralButton>
@@ -343,10 +343,10 @@ const FLYClaimSubmitModal = ({
                             setConfirmingClaim(false);
                             setCurrentMode('stake')
                           }}
-                          style={{ width: '100%', alignSelf: 'normal' }}
+                          className="fly-claim-stake-choice-button"
 
                         >
-                          <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                          <Text size="md" bold prominent className="stake-your-fly-text">
                             Stake Your $FLY
                           </Text>
                         </GeneralButton>
@@ -359,11 +359,10 @@ const FLYClaimSubmitModal = ({
                           layout="after"
                           disabled={currentStatus === finalState}
                           handleClick={handleClickButton}
-                          style={{ width: 'unset', alignSelf: 'normal' }}
-                          className={`${currentStatus === finalState - 1 ? "rainbow" : ""} ${currentStatus === finalState ? "claim-button-staked" : ""}`}
+                          className={`fly-submit-claim-action-button ${currentStatus === finalState - 1 ? "rainbow" : ""} ${currentStatus === finalState ? "claim-button-staked" : ""}`}
 
                         >
-                          <Text size="md" prominent bold style={{ color: "inherit", display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                          <Text size="md" bold className="fly-submit-claim-action-button-text">
                             {currentAction}
                             {currentStatus === finalState && <Checked size={18} />}
                           </Text>

@@ -1248,6 +1248,20 @@ $holo: linear-gradient(
     margin: auto;
 }
 
+.fly-submit-claim-flex-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fly-confirming-claim-button-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1em;
+}
+
 .fly-submit-claim-modal-button-container {
     display: flex;
     align-items: center;
@@ -1271,6 +1285,81 @@ $holo: linear-gradient(
     align-items: center;
     gap: 4em;
     padding: 1.5em;
+}
+
+.fly-confirming-claim-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.fly-confirming-claim-header {
+  display: flex;
+  flex-direction: row;
+  // gap: 1em;
+  align-items: flex-end;
+}
+
+.fly-submit-claim-heading-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1em;
+}
+
+.fly-submit-claim-heading {
+  font-weight: normal !important;
+  margin: 0;
+}
+
+.fly-caution-text {
+  color: #FFB300;
+}
+
+.fly-caution-border {
+  border-left: 4px #FFB300 solid;
+  margin-left: 1em;
+  padding-left: 1em;
+}
+
+.fly-caution-centre-text {
+  align-self: center;
+  margin-bottom: 2em;
+}
+
+.fly-submit-claim-action-button {
+  width: unset !important;
+  align-self: normal !important;
+}
+
+.fly-submit-claim-action-button-text {
+  color: inherit !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.fly-continue-claiming-text {
+  color: inherit !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.stake-your-fly-text {
+  color: inherit !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.fly-claim-stake-choice-button {
+  width: 100% !important;
 }
 
 .fly-submit-claim-circle {
