@@ -175,9 +175,8 @@ const NAVIGATION_MAP: {
     name: string;
     path: (network: string) => string;
     icon: JSX.Element;
-  }
-}[]
-= [
+  };
+}[] = [
   ...airdropTab,
   {
     home: {
@@ -537,7 +536,7 @@ export default function Dashboard() {
               style={{ cursor: "pointer" }}
               href="https://launchmoby.com"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               <Text className="dashboard-navbar-default">
                 <FlyIcon /> ICO
