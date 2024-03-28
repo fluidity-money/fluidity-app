@@ -149,7 +149,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
                                 <Text size="md">Your Cumulative Points</Text>
-                                <InfoCircle />
+                                <InfoCircle className="info-circle-grey"/>
                               </div>
                             </Hoverable>
                           </div>
@@ -160,8 +160,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               💸 Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN) 🐱
                             </Text>
                           </Card>
-                        </div>
-                        <div className="fly-submit-claim-modal-row">
                         </div>
                         <div style={{ gap: '0.5em' }} className="fly-submit-claim-modal-row">
                           <Card fill>
@@ -180,7 +178,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 </div>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">$FLY Balance</Text>
-                                  <InfoCircle />
+                                <InfoCircle className="info-circle-grey"/>
                                 </div>
                               </div>
                             </Hoverable>
@@ -198,7 +196,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 <Text size="lg" prominent>{points}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Staked</Text>
-                                  <InfoCircle />
+                                <InfoCircle className="info-circle-grey"/>
                                 </div>
                               </div>
                             </Hoverable>
@@ -216,7 +214,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 <Text size="lg" prominent>{pointsUnstaking}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Unstaking</Text>
-                                  <InfoCircle />
+                                <InfoCircle className="info-circle-grey"/>
                                 </div>
                               </div>
                             </Hoverable>

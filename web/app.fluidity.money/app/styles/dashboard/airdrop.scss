@@ -1445,6 +1445,10 @@ $holo: linear-gradient(
   display: flex;
 }
 
+.info-circle-grey > path {
+  fill: #828381;
+}
+
 @keyframes rotate {
   100% {
     transform: rotate(1turn);
