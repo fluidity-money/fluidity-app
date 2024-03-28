@@ -95,6 +95,13 @@ export interface IFluidityFacade {
     merkleProof: string[]
   ) => Promise<void>;
 
+  merkleDistributorWithDeadlineClaimAndStake?: (
+    address: string,
+    index: number,
+    amount: BN,
+    merkleProof: string[]
+  ) => Promise<void>;
+
   flyStakingStake?: (amount: BN ) => Promise<void>;
 
   flyStakingDetails?: (address: string) => Promise<FLYStakingDetailsRes | undefined>;
