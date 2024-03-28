@@ -327,7 +327,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 
                         >
                           <Text size="md" bold className="fly-submit-claim-action-button-text">
-                            current action: {currentAction}
+                            {currentAction}
                             {currentStatus === State.HasStaked && <Checked size={18} />}
                           </Text>
                         </GeneralButton>
