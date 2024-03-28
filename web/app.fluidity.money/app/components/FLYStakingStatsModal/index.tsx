@@ -136,8 +136,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                   <div className="fly-submit-claim-modal-options">
                     {currentStatus === State.Stats ?
                       <>
-                        <div style={{ flexDirection: 'column', gap: 0 }} className="fly-submit-claim-modal-row">
-                          <Text size="xxl" style={{fontSize: "3.25em"}} holo>{points}</Text>
+                        <div className="flex-column no-gap fly-submit-claim-modal-row">
+                          <Text size="xxxl" holo>{points}</Text>
                           <div className="text-with-info-popup">
                             <Hoverable
                               tooltipStyle={"solid"}
@@ -147,16 +147,16 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 </div>
                               }
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                              <div className="text-with-info-popup">
                                 <Text size="md">Your Cumulative Points</Text>
-                                <InfoCircle className="info-circle-grey"/>
+                                <InfoCircle className="info-circle-grey" />
                               </div>
                             </Hoverable>
                           </div>
                         </div>
                         <div className="fly-submit-claim-modal-row">
                           <Card border="solid" fill>
-                            <Text style={{ textAlign: 'center' }} size="lg" prominent>
+                            <Text className="center-text" size="lg" prominent>
                               💸 Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN) 🐱
                             </Text>
                           </Card>
@@ -172,13 +172,13 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               }
                             >
                               <div className="flex-column">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+                                <div className="text-with-info-popup">
                                   <FlyIcon />
                                   <Text size="lg" prominent>{flyBalance.toString()}</Text>
                                 </div>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">$FLY Balance</Text>
-                                <InfoCircle className="info-circle-grey"/>
+                                  <InfoCircle className="info-circle-grey" />
                                 </div>
                               </div>
                             </Hoverable>
@@ -196,7 +196,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 <Text size="lg" prominent>{points}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Staked</Text>
-                                <InfoCircle className="info-circle-grey"/>
+                                  <InfoCircle className="info-circle-grey" />
                                 </div>
                               </div>
                             </Hoverable>
@@ -214,7 +214,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 <Text size="lg" prominent>{pointsUnstaking}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Unstaking</Text>
-                                <InfoCircle className="info-circle-grey"/>
+                                  <InfoCircle className="info-circle-grey" />
                                 </div>
                               </div>
                             </Hoverable>
@@ -228,10 +228,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                             <div className="fly-submit-claim-modal-row">
                               <StakingWarning
                                 header={
-                                  <Text size="lg" bold prominent style={{ color: 'black' }}>Staking will lock up your funds for <span className="underline">7 Days</span>.</Text>
+                                  <Text size="lg" bold prominent className="black">Staking will lock up your funds for <span className="underline">7 Days</span>.</Text>
                                 }
                                 body={
-                                  <Text size="md" style={{ color: 'black' }}>To have access to your staked funds once again, you must go through the process of unstaking</Text>
+                                  <Text size="md" className="black">To have access to your staked funds once again, you must go through the process of unstaking</Text>
 
                                 } />
                             </div>
@@ -240,27 +240,27 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               <div className="fly-submit-claim-modal-row">
                                 <StakingWarning
                                   header={
-                                    <Text size="lg" bold prominent style={{ color: 'black' }}>Access to the tokens will be <span className="underline">granted in 7 Days</span>.</Text>
+                                    <Text size="lg" bold prominent className="black">Access to the tokens will be <span className="underline">granted in 7 Days</span>.</Text>
                                   }
                                   body={
-                                    <Text size="md" style={{ color: 'black' }}>During this period, you will be unable to receive staking rewards and terminate the un-bonding process.</Text>
+                                    <Text size="md" className="black">During this period, you will be unable to receive staking rewards and terminate the un-bonding process.</Text>
 
                                   } />
                               </div>
                               <div className="fly-submit-claim-modal-row">
                                 <StakingWarning
                                   header={
-                                    <Text size="lg" bold prominent style={{ color: 'black' }}>Unstaking will result in the loss of some points.</Text>
+                                    <Text size="lg" bold prominent className="black">Unstaking will result in the loss of some points.</Text>
                                   }
                                   body={
-                                    <Text size="md" style={{ color: 'black' }}>You wll lose the equivalent percentage of unstaked $FLY from your accumulative points. <Text size="md" style={{ color: 'black' }} bold>(i.e: Unstaking 50% of $FLY will result in 50% Loss of points)</Text></Text>
+                                    <Text size="md" className="black">You wll lose the equivalent percentage of unstaked $FLY from your accumulative points. <Text size="md" className="black" bold>(i.e: Unstaking 50% of $FLY will result in 50% Loss of points)</Text></Text>
 
                                   } />
                               </div>
                             </>
                           }
                           <div className="fly-submit-claim-modal-row">
-                            <div className="flex-column" style={{ width: '100%' }}>
+                            <div className="fly-staking-input-container">
                               <Text prominent size="lg">AMOUNT OF $FLY TO STAKE</Text>
                               <div className="staking-input-underline">
                                 <FlyIcon />
@@ -285,12 +285,12 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               <div className="staking-input-lower">
                                 {0} $FLY remaining (={0})
                                 <div onClick={() => {/*set max*/ }}>
-                                  <Text prominent size="md" className="underline" style={{ cursor: 'pointer', textUnderlineOffset: '2px' }}>Max</Text>
+                                  <Text prominent size="md" className="max-balance-text">Max</Text>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <Text style={{ marginTop: '1em' }}>Once approved, transactions cannot be reverted. By pressing send you agree to our {" "}
+                          <Text className="fly-once-approved">Once approved, transactions cannot be reverted. By pressing send you agree to our {" "}
                             <a
                               className="link"
                               onClick={() => { setShowTermsModal(true) }}
@@ -302,8 +302,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 
                         <div className="fly-submit-claim-modal-options">
                           {currentStatus === State.AmountEntered && <div className="fly-submit-claim-modal-row">
-                            <div className="flex-column" style={{ gap: '1em' }}>
-                              <div style={{ display: 'flex' }}>
+                            <div className="fly-points-info-container">
+                              <div className="flex">
                                 <Text size="lg" prominent>🏄🏼‍♂️</Text>
                                 <Text size="lg" holo>Staking $FLY will reward you points.</Text>
                               </div>
@@ -444,8 +444,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 }
 
 const StakingWarning = ({ header, body }: { header: ReactNode, body: ReactNode }) => {
-  return <Card style={{ backgroundColor: "#FFD362", gap: '1em' }}>
-    <div style={{ display: 'flex', alignItems: 'end', gap: '0.5em' }}>
+  return <Card className="staking-card" >
+    <div className="staking-card-container">
       <WarningIcon />
       {header}
     </div>

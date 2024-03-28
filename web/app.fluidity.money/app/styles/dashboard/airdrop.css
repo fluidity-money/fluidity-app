@@ -1164,9 +1164,30 @@
   gap: 2em;
 }
 
+.flex {
+  display: flex;
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;
+}
+
+.fly-points-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.staking-card {
+  background-color: #FFD362 !important;
+  gap: 1em;
+}
+
+.staking-card-container {
+  display: flex;
+  align-items: end;
+  gap: 0.5em;
 }
 
 .fly-confirming-claim-header {
@@ -1241,6 +1262,10 @@
   width: 100% !important;
 }
 
+.fly-once-approved {
+  margin-top: 1em;
+}
+
 .fly-submit-claim-outer-modal-container {
   width: 100vw;
   height: 100vh;
@@ -1265,6 +1290,22 @@
   text-decoration: underline;
   color: white;
   cursor: pointer;
+}
+
+.max-balance-text {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.no-gap {
+  gap: 0;
+}
+
+.fly-staking-input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
 .text-with-info-popup {
@@ -1297,6 +1338,10 @@
   display: flex;
 }
 
+.center-text {
+  text-align: center;
+}
+
 .info-circle-grey > path {
   fill: #828381;
 }
@@ -1306,6 +1351,10 @@
     transform: rotate(1turn);
   }
 }
+.black {
+  color: black !important;
+}
+
 .rainbow {
   position: relative;
   overflow: hidden;
