@@ -215,7 +215,7 @@ const FLYClaimSubmitModal = ({
       case State.HasClaimed:
         // the user has claimed, time to connect them to the staking UX
         handleBeginStaking();
-        // setCurrentStatus(State.HasStaked)
+      // setCurrentStatus(State.HasStaked)
       case State.HasStaked:
         // do nothing, why is this being shown?
         break;
@@ -339,7 +339,6 @@ const FLYClaimSubmitModal = ({
                           size="large"
                           layout="after"
                           handleClick={() => {
-
                             setConfirmingClaim(false);
                             setCurrentMode('stake')
                           }}
@@ -395,11 +394,11 @@ const FLYClaimSubmitModal = ({
   return modal;
 };
 
-const Checked = ({ size = 36 }: { size?: number }) => {
+export const Checked = ({ size = 36 }: { size?: number }) => {
   return <img className='fly-submit-claim-circle' height={size} width={size} src="/images/icons/checked.svg" alt="copy" />
 }
 
-const BaseCircle = () => {
+export const BaseCircle = () => {
   return <div style={{ width: '36px', height: '36px' }}>
     <svg height="100%" stroke="#696A68" strokeWidth="5px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="45" />
@@ -407,7 +406,7 @@ const BaseCircle = () => {
   </div>
 
 }
-const NextCircle = () => {
+export const NextCircle = () => {
   return <div style={{ width: '36px', height: '36px' }}>
     <svg height="100%" stroke="white" strokeWidth="5px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="45" />
@@ -421,7 +420,7 @@ type TermsModalProps = {
   close: () => void
 }
 
-const TermsModal = ({ visible, close }: TermsModalProps) => {
+export const TermsModal = ({ visible, close }: TermsModalProps) => {
 
   return <Modal
     id="terms-and-conditions"

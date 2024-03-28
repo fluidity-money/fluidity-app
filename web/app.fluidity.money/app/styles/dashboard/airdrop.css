@@ -1244,6 +1244,12 @@
   cursor: pointer;
 }
 
+.text-with-info-popup {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
 @keyframes rotate {
   100% {
     transform: rotate(1turn);
