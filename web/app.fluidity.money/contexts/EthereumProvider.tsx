@@ -61,6 +61,18 @@ type Coin98Wallet = {
 
 type MetamaskError = { code: number; message: string };
 
+// FLY is a special case that shouldn't be defined in the normal tokens list
+export const FlyToken = {
+  symbol: "FLY",
+  logo: "/assets/tokens/FlyIcon.svg",
+  address: "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
+  decimals: 6,
+  // mock these fields as we don't need them to add the token to wallet or fetch its balance
+  colour: "",
+  enabled: true,
+  name: ""
+} satisfies Token
+
 const EthereumFacade = ({
   children,
   tokens,
@@ -296,18 +308,8 @@ const EthereumFacade = ({
    */
   const addToken = async (symbol: string) => {
     const token = symbol === "FLY" ?
-      // FLY is a special case that shouldn't be defined in the normal tokens list
-      {
-        symbol: "FLY",
-        logo: "/assets/tokens/FlyIcon.svg",
-        address: "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
-        decimals: 6,
-        // mock these fields as we don't need them to add the token to wallet
-        colour: "",
-        enabled: true,
-        name: ""
-      } satisfies Token
-      : tokens.find((t) => t.symbol === symbol);
+      FlyToken :
+      tokens.find((t) => t.symbol === symbol);
 
     if (!token) return;
 
