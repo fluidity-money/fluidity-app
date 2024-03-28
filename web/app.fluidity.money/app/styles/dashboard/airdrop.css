@@ -1106,6 +1106,20 @@
   margin: auto;
 }
 
+.fly-staking-stats-modal-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 575px;
+  min-height: 495px;
+  margin: auto;
+}
+
 .fly-submit-claim-flex-container {
   display: flex;
   flex-direction: column;
@@ -1193,6 +1207,15 @@
   align-self: normal !important;
 }
 
+.fly-staking-stats-action-button {
+  width: 100% !important;
+  align-self: normal !important;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
 .fly-submit-claim-action-button-text {
   color: inherit !important;
   display: flex;
@@ -1248,6 +1271,30 @@
   display: flex;
   gap: 0.5em;
   align-items: center;
+}
+
+.staking-input {
+  width: 80%;
+  color: white;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  outline: none;
+}
+
+.staking-input-underline {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  border-bottom: 2px white solid;
+  margin-bottom: 1em;
+  padding-top: 1.5em;
+  padding-bottom: 1em;
+}
+
+.staking-input-lower {
+  justify-content: space-between;
+  display: flex;
 }
 
 @keyframes rotate {

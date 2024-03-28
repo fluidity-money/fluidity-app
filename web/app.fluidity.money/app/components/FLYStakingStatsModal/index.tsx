@@ -1,8 +1,7 @@
-import { Card, FlyIcon, GeneralButton, Heading, Hoverable, InfoCircle, LinkButton, Text, trimAddress, WarningIcon } from "@fluidity-money/surfing";
-import { BN } from "bn.js";
-import { FlyToken } from "contexts/EthereumProvider";
+import { Card, FlyIcon, GeneralButton, Heading, Hoverable, InfoCircle, LinkButton, StakeIcon, Text, trimAddress, UnstakeIcon, WarningIcon } from "@fluidity-money/surfing";
+import { BN } from "bn.js"; import { FlyToken } from "contexts/EthereumProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { useContext, useEffect, useState } from "react";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "~/styles/dashboard/airdrop.css";
 import { BaseCircle, Checked, NextCircle, TermsModal } from "../FLYClaimSubmitModal";
@@ -62,7 +61,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
         setCurrentAction("")
         break;
       case State.StakingDetails:
-        setCurrentAction(isStaking ? "Stake" : "Claim")
+        setCurrentAction(isStaking ? "Stake" : "Unstake")
         break;
       case State.AmountEntered:
         setCurrentAction("Connect")
@@ -117,7 +116,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
           >
             <div className="fly-submit-claim-modal-background">
               <div
-                className={`fly-submit-claim-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
+                className={`fly-staking-stats-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
                   }`}
               >
                 <div className="fly-submit-claim-flex-container">
@@ -141,7 +140,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           <Text size="xxl" holo>{points}</Text>
                           <div className="text-with-info-popup">
                             <Hoverable
-                              tooltipStyle={"frosted"}
+                              tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
                                   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non ligula eu lectus facilisis sollicitudin.
@@ -167,10 +166,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                         <div style={{ gap: '0.5em' }} className="fly-submit-claim-modal-row">
                           <Card fill>
                             <Hoverable
-                              tooltipStyle={"frosted"}
+                              tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non ligula eu lectus facilisis sollicitudin.
+                                  The amount of $FLY Token you have claimed.
                                 </div>
                               }
                             >
@@ -188,10 +187,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           </Card>
                           <Card fill>
                             <Hoverable
-                              tooltipStyle={"frosted"}
+                              tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non ligula eu lectus facilisis sollicitudin.
+                                  The amount of $FLY Token you have staked from your total $FLY Balance.
                                 </div>
                               }
                             >
@@ -206,10 +205,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           </Card>
                           <Card fill>
                             <Hoverable
-                              tooltipStyle={"frosted"}
+                              tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam non ligula eu lectus facilisis sollicitudin.
+                                  The amount of $FLY Tokens you have unstaked from your total Staked $FLY Balance. Includes unbonding amount.
                                 </div>
                               }
                             >
@@ -227,15 +226,85 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                       :
                       currentStatus === State.StakingDetails ?
                         <div className="fly-submit-claim-modal-options">
+                          {isStaking ?
+                            <div className="fly-submit-claim-modal-row">
+                              <StakingWarning
+                                header={
+                                  <Text size="lg" bold prominent style={{ color: 'black' }}>Staking will lock up your funds for <span className="underline">7 Days</span>.</Text>
+                                }
+                                body={
+                                  <Text size="md" style={{ color: 'black' }}>To have access to your staked funds once again, you must go through the process of unstaking</Text>
+
+                                } />
+                            </div>
+                            :
+                            <>
+                              <div className="fly-submit-claim-modal-row">
+                                <StakingWarning
+                                  header={
+                                    <Text size="lg" bold prominent style={{ color: 'black' }}>Access to the tokens will be <span className="underline">granted in 7 Days</span>.</Text>
+                                  }
+                                  body={
+                                    <Text size="md" style={{ color: 'black' }}>During this period, you will be unable to receive staking rewards and terminate the un-bonding process.</Text>
+
+                                  } />
+                              </div>
+                              <div className="fly-submit-claim-modal-row">
+                                <StakingWarning
+                                  header={
+                                    <Text size="lg" bold prominent style={{ color: 'black' }}>Unstaking will result in the loss of some points.</Text>
+                                  }
+                                  body={
+                                    <Text size="md" style={{ color: 'black' }}>You wll lose the equivalent percentage of unstaked $FLY from your accumulative points. <Text size="md" style={{ color: 'black' }} bold>(i.e: Unstaking 50% of $FLY will result in 50% Loss of points)</Text></Text>
+
+                                  } />
+                              </div>
+                            </>
+                          }
                           <div className="fly-submit-claim-modal-row">
-                            {!isStaking ? "un" : ""}staking details
+                            <div className="flex-column" style={{ width: '100%' }}>
+                              <Text prominent size="lg">AMOUNT OF $FLY TO STAKE</Text>
+                              <div className="staking-input-underline">
+                                <FlyIcon />
+                                <input
+                                  className="staking-input"
+                                  min={""}
+                                  // value={swapInput}
+                                  // onBlur={(e) =>
+                                  //   setSwapInput(
+                                  //     addDecimalToBn(
+                                  //       snapToValidValue(e.target.value),
+                                  //       assetToken.decimals
+                                  //     )
+                                  //   )
+                                  // }
+                                  // onChange={handleChangeSwapInput}
+                                  placeholder="0"
+                                  step="any"
+                                />
+                                <Text>${0} USD</Text>
+                              </div>
+                              <div className="staking-input-lower">
+                                {0} $FLY remaining (={0})
+                                <div onClick={() => {/*set max*/ }}>
+                                  <Text prominent size="md" className="underline" style={{ cursor: 'pointer', textUnderlineOffset: '2px' }}>Max</Text>
+                                </div>
+                              </div>
+                            </div>
                           </div>
+                          <Text style={{ marginTop: '1em' }}>Once approved, transactions cannot be reverted. By pressing send you agree to our {" "}
+                            <a
+                              className="link"
+                              onClick={() => { setShowTermsModal(true) }}
+                            >
+                              staking terms and conditions
+                            </a>.</Text>
                         </div> :
 
 
                         <div className="fly-submit-claim-modal-options">
                           {currentStatus === State.AmountEntered && <div className="fly-submit-claim-modal-row">
-                            <div className="flex-column" style={{gap: '1em'}}>
+                            <div className="flex-column" style={{ gap: '1em' }}>
                               <div style={{ display: 'flex' }}>
                                 <Text size="lg" prominent>🏄🏼‍♂️</Text>
                                 <Text size="lg" holo>Staking $FLY will reward you points.</Text>
@@ -311,10 +380,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                             size="large"
                             layout="after"
                             handleClick={() => handleClick(true)}
-                            className={`fly-submit-claim-action-button`}
+                            className={`fly-staking-stats-action-button`}
                           >
                             <Text size="md" bold className="fly-submit-claim-action-button-text">
-                              <WarningIcon />
+                              <StakeIcon />
                               Stake
                             </Text>
                           </GeneralButton>
@@ -323,10 +392,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                             size="large"
                             layout="after"
                             handleClick={() => handleClick(false)}
-                            className={`fly-submit-claim-action-button`}
+                            className={`fly-staking-stats-action-button`}
                           >
                             <Text size="md" bold className="fly-submit-claim-action-button-text">
-                              <WarningIcon />
+                              <UnstakeIcon />
                               Unstake
                             </Text>
                           </GeneralButton>
@@ -337,7 +406,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           layout="after"
                           disabled={currentStatus === State.HasStaked}
                           handleClick={() => handleClick(isStaking)}
-                          className={`fly-submit-claim-action-button ${currentStatus === State.HasStaked - 1 ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""}`}
+                          className={`fly-staking-stats-action-button ${currentStatus === State.HasStaked - 1 ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""}`}
 
                         >
                           <Text size="md" bold className="fly-submit-claim-action-button-text">
@@ -374,6 +443,16 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   }, [visible, currentStatus, isStaking, currentAction, showTermsModal, isStaking])
 
   return modal;
+}
+
+const StakingWarning = ({ header, body }: { header: ReactNode, body: ReactNode }) => {
+  return <Card style={{ backgroundColor: "#FFD362", gap: '1em' }}>
+    <div style={{ display: 'flex', alignItems: 'end', gap: '0.5em' }}>
+      <WarningIcon />
+      {header}
+    </div>
+    {body}
+  </Card>
 }
 
 export {
