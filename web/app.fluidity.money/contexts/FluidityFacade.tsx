@@ -93,22 +93,28 @@ export interface IFluidityFacade {
     index: number,
     amount: BN,
     merkleProof: string[]
-  ) => Promise<void>;
+  ) => Promise<boolean | undefined>;
 
   merkleDistributorWithDeadlineClaimAndStake?: (
     address: string,
     index: number,
     amount: BN,
     merkleProof: string[]
-  ) => Promise<void>;
+  ) => Promise<boolean | undefined>;
 
-  flyStakingStake?: (amount: BN ) => Promise<void>;
+  merkleDistributorWithDeadlineIsClaimed?: (index: number) => Promise<boolean | undefined>;
+
+  flyStakingStake?: (amount: BN) => Promise<BN | undefined>;
 
   flyStakingDetails?: (address: string) => Promise<FLYStakingDetailsRes | undefined>;
 
-  flyStakingBeginUnstake?: (amount: BN) => Promise<void>;
+  flyStakingBeginUnstake?: (amount: BN) => Promise<boolean | undefined>;
 
-  flyStakingSecondsUntilSoonestUnstake?: () => Promise<BN | undefined>;
+  flyStakingSecondsUntilSoonestUnstake?: (address: string) => Promise<BN | undefined>;
+
+  flyStakingFinaliseUnstake?: () => Promise<BN | undefined>;
+
+  flyStakingAmountUnstaking?: (address: string) => Promise<BN | undefined>;
 
   // Solana only
 

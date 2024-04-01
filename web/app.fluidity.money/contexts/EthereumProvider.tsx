@@ -29,7 +29,14 @@ import {
   makeStakingRedemption,
 } from "~/util/chainUtils/ethereum/transaction";
 import {
-  merkleDistributorWithDeadlineClaim as doMerkleDistributorWithDeadlineClaim
+  merkleDistributorWithDeadlineClaim as doMerkleDistributorWithDeadlineClaim,
+  merkleDistributorWithDeadlineClaimAndStake as doMerkleDistributorWithDeadlineClaimAndStake,
+  flyStakingStake as doFlyStakingStake,
+  flyStakingBeginUnstake as doFlyStakingBeginUnstake,
+  flyStakingDetails as doFlyStakingDetails,
+  flyStakingAmountUnstaking as doFlyStakingAmountUnstaking,
+  flyStakingFinaliseUnstake as doFlyStakingFinaliseUnstake,
+  flyStakingSecondsUntilSoonestUnstake as doFlyStakingSecondsUntilSoonestUnstake,
 } from "~/util/chainUtils/ethereum/transaction";
 import makeContractSwap, {
   ContractToken,
@@ -43,13 +50,20 @@ import {
   getNetworkFromChainId,
 } from "~/util/chainUtils/chains";
 
+import TokenAbi from "~/util/chainUtils/ethereum/Token.json";
 import StakingAbi from "~/util/chainUtils/ethereum/Staking.json";
 import LootboxOwnershipAbi from "~/util/chainUtils/ethereum/LootboxConfirmAddressOwnership.json";
 import MerkleDistributorWithDeadlineAbi from "~/util/chainUtils/ethereum/MerkleDistributorWithDeadline.json";
-import FLYStakingABI from "~/util/chainUtils/ethereum/FLYStaking.json";
+import FlyStakingAbi from "~/util/chainUtils/ethereum/FLYStaking.json";
 
 import { useToolTip } from "~/components";
 import { NetworkTooltip } from "~/components/ToolTip";
+
+const FlyTokenAddr = "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386";
+
+const FlyStakingAddr = "0x9E8892E443AD6472e4D9362DF6D0C238000028a3";
+
+const MerkleDistributorWithDeadlineAddr = "0xa86fe32da288f169c2ee449b585dcb0317b631e1";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -64,7 +78,7 @@ type MetamaskError = { code: number; message: string };
 // FLY is a special case that shouldn't be defined in the normal tokens list
 export const FlyToken = {
   symbol: "FLY",
-  logo: "/assets/tokens/FlyIcon.svg",
+  logo: "https://static.fluidity.money/images/fly.svg",
   address: "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
   decimals: 6,
   // mock these fields as we don't need them to add the token to wallet or fetch its balance
@@ -605,13 +619,36 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const merkleDistributorWithDeadlineAddr = "0x064b19b1CE07A63eB12fB2869Ff666f466008f03";
     const result = await doMerkleDistributorWithDeadlineClaim(
       signer,
-      merkleDistributorWithDeadlineAddr,
+      MerkleDistributorWithDeadlineAddr,
       MerkleDistributorWithDeadlineAbi,
       index,
-      address,
+      amount,
+      merkleProof
+    );
+    console.log(result);
+
+    return true;
+  };
+
+  const merkleDistributorWithDeadlineClaimAndStake = async (
+    address: string,
+    index: number,
+    amount: BN,
+    merkleProof: string[]
+  ) => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const result = await doMerkleDistributorWithDeadlineClaimAndStake(
+      signer,
+      MerkleDistributorWithDeadlineAddr,
+      MerkleDistributorWithDeadlineAbi,
+      index,
       amount,
       merkleProof
     );
@@ -625,31 +662,51 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const flyStakingAddr = "0x0000000000000000000000000000000000000000";
+    const address = await signer.getAddress();
+
     const result = await doFlyStakingStake(
       signer,
-      flyStakingAddr,
-      FLYStaking,
+      FlyTokenAddr,
+      TokenAbi,
+      FlyStakingAddr,
+      FlyStakingAbi,
       amount,
     );
     console.log(result);
+
+    return new BN(result.toString());
   };
 
-  const flyStakingDetails = async (amount: BN) => {
-    if (!provider) {
-      return undefined;
-    }
+  const flyStakingDetails = async (address: string) => {
+    if (!provider) return undefined;
 
-    const flyStakingAddr = "0x0000000000000000000000000000000000000000";
     const result = await doFlyStakingDetails(
-      signer,
-      flyStakingAddr,
-      FLYStaking,
+      provider,
+      FlyStakingAddr,
+      FlyStakingAbi,
       address
     );
     console.log(result);
 
     return result;
+  };
+
+  const flyStakingSecondsUntilSoonestUnstake = async (address: string) => {
+    if (!provider) return undefined;
+
+    const result = await doFlyStakingSecondsUntilSoonestUnstake(
+      provider,
+      FlyStakingAddr,
+      FlyStakingAbi,
+      address
+    );
+    console.log(result);
+
+    if (!result) {
+      return undefined;
+    }
+
+    return new BN(result.toString());
   };
 
   const flyStakingBeginUnstake = async (amount: BN) => {
@@ -659,15 +716,56 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const flyStakingAddr = "0x0000000000000000000000000000000000000000";
     const result = await doFlyStakingBeginUnstake(
       signer,
-      flyStakingAddr,
-      FLYStaking,
+      FlyStakingAddr,
+      FlyStakingAbi,
+      amount
     );
     console.log(result);
 
+    if (!result) {
+      return undefined;
+    }
+
     return result;
+  };
+
+  const flyStakingFinaliseUnstake = async () => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    const result = await doFlyStakingFinaliseUnstake(
+      signer,
+      FlyStakingAddr,
+      FlyStakingAbi
+    );
+    console.log(result);
+
+    if (!result) {
+      return undefined;
+    }
+
+    return new BN(result.toString());
+  };
+
+  const flyStakingAmountUnstaking = async (address: string) => {
+    if (!provider) return undefined;
+
+    const result = await doFlyStakingAmountUnstaking(
+      provider,
+      FlyStakingAddr,
+      FlyStakingAbi,
+      address
+    );
+    console.log(result);
+
+    if (!result) return;
+
+    return new BN(result.toString());
   };
 
   return (
@@ -696,7 +794,14 @@ const EthereumFacade = ({
         signOwnerAddress,
         confirmAccountOwnership,
         merkleDistributorWithDeadlineEndTime,
-        merkleDistributorWithDeadlineClaim
+        merkleDistributorWithDeadlineClaim,
+        merkleDistributorWithDeadlineClaimAndStake,
+        flyStakingStake,
+        flyStakingDetails,
+        flyStakingBeginUnstake,
+        flyStakingSecondsUntilSoonestUnstake,
+        flyStakingFinaliseUnstake,
+        flyStakingAmountUnstaking,
       }}
     >
       {children}

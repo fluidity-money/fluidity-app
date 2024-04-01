@@ -374,7 +374,7 @@ const Airdrop = () => {
         <div className="recap-fly-count-block-solana">
           <div className="recap-fly-count-header-solana">
             <Text size="md" code={true}>
-              Congratulations! You are eligible to claim
+              Congratulations! You are eligible to claim 25% of your tokens at TGE
             </Text>
             <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
             <Form.Group hint={ethereumAddressHint}>

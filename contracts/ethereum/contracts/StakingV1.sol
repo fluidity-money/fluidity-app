@@ -4,6 +4,20 @@
 // source code is governed by a GPL-style license that can be found in the
 // LICENSE.md file.
 
+/*
+ * Fluidity Money takes security seriously.
+ *
+ * If you find anything, or there's anything you think we should know, contact us
+ * immediately with https://docs.fluidity.money/docs/security/contactable-team .
+ *
+ * If you find something urgent, and you think funds are immediately at risk, we encourage
+ * you to exploit the vulnerability if there is no other choice and to move the funds into
+ * one of our our dropboxes at https://docs.fluidity.money/docs/security/dropboxes .
+ *
+ * At the time of writing, the Arbtirum dropbox is
+ * 0xfA763219492AE371b35c524655D8972F2D2AF197. Assets moved here will set off alarm bells.
+ */
+
 pragma solidity 0.8.16;
 pragma abicoder v2;
 
@@ -12,7 +26,7 @@ import "./openzeppelin/SafeERC20.sol";
 import "../interfaces/IEmergencyMode.sol";
 import "../interfaces/IStaking.sol";
 import "../interfaces/IOperatorOwned.sol";
-import "../interfaces/IERC20.sol";
+import "../interfaces/IERC20ERC2612.sol";
 
 uint8 constant STAKING_DECIMALS = 1;
 
@@ -45,7 +59,9 @@ struct UnstakingPrivate {
 }
 
 contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
-    using SafeERC20 for IERC20;
+    using SafeERC20 for IERC20ERC2612;
+
+    event NewMerkleDistributor(address old, address _new);
 
     /* ~~~~~~~~~~ HOUSEKEEPING ~~~~~~~~~~ */
 
@@ -66,7 +82,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
 
     /* ~~~~~~~~~~ GLOBAL STORAGE ~~~~~~~~~~ */
 
-    IERC20 private flyToken_;
+    IERC20ERC2612 private flyToken_;
 
     address private merkleDistributor_;
 
@@ -95,7 +111,7 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
      * @param _operator to use as the special privilege for retroactively awarding/admin power.
      */
     function init(
-        IERC20 _flyToken,
+        IERC20ERC2612 _flyToken,
         address _merkleDistributor,
         address _emergencyCouncil,
         address _operator
@@ -110,12 +126,14 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
 
         flyToken_ = _flyToken;
         merkleDistributor_ = _merkleDistributor;
+
+        emit NewMerkleDistributor(address(0), merkleDistributor_);
     }
 
     /* ~~~~~~~~~~ INTERNAL FUNCTIONS ~~~~~~~~~~ */
 
     function _calcDay1Points(uint256 _flyAmount) internal pure returns (uint256 points) {
-        return (_flyAmount * 7 days) / 1e6;
+        return (_flyAmount * 4 * 7 days) / 1e6;
     }
 
     function calculatePoints(uint256 curTimestamp, StakedPrivate memory _staked) public pure returns (uint256 points) {
@@ -139,10 +157,6 @@ return a
      */
     function calculatePointsAddSecs(uint256 _seconds, StakedPrivate memory _staked) external pure returns (uint256 points) {
         return calculatePoints(_staked.depositTimestamp + _seconds, _staked);
-    }
-
-    function _hasStaked(address _spender) internal view returns (bool hasStaked) {
-        return stakedStorage_[_spender].length > 0;
     }
 
     function _stake(
@@ -227,6 +241,18 @@ return a
     }
 
     /// @inheritdoc IStaking
+    function stakePermit(
+        uint256 _flyAmount,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) public returns (uint256 flyStaked) {
+        flyToken_.permit(msg.sender, address(this), _flyAmount, _deadline, _v, _r, _s);
+        return stake(_flyAmount);
+    }
+
+    /// @inheritdoc IStaking
     function stakeFor(address _recipient, uint256 _flyAmount) public returns (
         uint256 flyStaked,
         uint256 day1Points
@@ -246,11 +272,11 @@ return a
         flyRemaining = _flyToUnstake;
         uint len = stakedStorage_[msg.sender].length;
         unstakedBy = block.timestamp;
-        if (len == 0) return (0, unstakedBy);
+        if (len == 0) revert("no fly unstaked");
         unstakedBy += UNBONDING_PERIOD;
         // it's important to always break here if we're at 0.
         for (uint i = len - 1; i >= 0; i--) {
-            if (flyRemaining == 0) return (flyRemaining, unstakedBy);
+            if (flyRemaining == 0) break;
             StakedPrivate storage s = stakedStorage_[msg.sender][i];
             if (flyRemaining >= s.flyVested) {
                 // the FLY staked in this position is less than the amount requested.
@@ -262,17 +288,18 @@ return a
                     unstakedTimestamp: unstakedBy
                 }));
                 _popStakedPosition(msg.sender, i);
-                if (i == 0) break; // FIXME: why is this needed again? needs explanation
+                if (i == 0) break;
             } else {
                 // the FLY staked in this position is more than what's remaining. so we
                 // can update the existing staked amount to reduce the FLY that they
-                // requested, then we can just return here. it's safe to not break here
-                // since we're returning.
+                // requested, then we can just return here.
                 stakedStorage_[msg.sender][i].flyVested -= flyRemaining;
                 flyRemaining = 0;
-                return (flyRemaining, unstakedBy);
+                break;
             }
         }
+        require(_flyToUnstake > flyRemaining, "no fly unstaked");
+        return (flyRemaining, unstakedBy);
     }
 
     /// @inheritdoc IStaking
@@ -283,12 +310,17 @@ return a
     }
 
     /// @inheritdoc IStaking
-    function secondsUntilSoonestUnstake(address _spender) public view returns (uint256 shortestSecs) {
+    function secondsUntilSoonestUnstake(
+        address _spender
+    ) public view returns (uint256 shortestSecs) {
         for (uint i = 0; i < unstakingStorage_[_spender].length; i++) {
             uint256 ts = unstakingStorage_[_spender][i].unstakedTimestamp;
             if (block.timestamp > ts) {
                 uint256 remaining =  block.timestamp - ts;
-                if (remaining < shortestSecs) shortestSecs = remaining;
+                // if we haven't set the shortest number of seconds, we
+                // set it to whatever we can, or we set it to the
+                // smallest value.
+                if (shortestSecs == 0 || remaining < shortestSecs) shortestSecs = remaining;
             }
         }
     }
@@ -319,11 +351,23 @@ return a
         flyToken_.safeTransfer(msg.sender, flyReturned);
     }
 
+    /* ~~~~~~~~~~ OPERATOR ~~~~~~~~~~ */
+
+    function updateMerkleDistributor(address _old, address _new) public {
+        require(msg.sender == operator_, "operator only");
+        require(merkleDistributor_ == _old, "incorrect order");
+        merkleDistributor_ = _new;
+        emit NewMerkleDistributor(_old, _new);
+    }
+
     /* ~~~~~~~~~~ EMERGENCY FUNCTIONS ~~~~~~~~~~ */
 
     /// @inheritdoc IStaking
     function emergencyWithdraw() external {
-        // take out whatever we can for the user, without updating the storage internally.
+	// take out whatever we can for the user, assuming that if we're
+	// at this point, the contract is junk, and is needing a code
+	// upgrade. so we keep the implementation of this as simple as
+	// possible, without using the popping function from earlier.
         require(!noEmergencyMode_, "not emergency");
         uint256 flyAmount = 0;
         for (uint i = 0; i < stakedStorage_[msg.sender].length; i++) {

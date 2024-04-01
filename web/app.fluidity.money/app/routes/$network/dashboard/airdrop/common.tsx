@@ -1891,6 +1891,9 @@ interface IRecapModal {
   navigate?: (path: string) => void;
 }
 
+const calculateDay1Points = (tokenFullAmount: number) =>
+  tokenFullAmount * 0.001 * (24 * 7);
+
 const RecapModal = ({
   totalVolume,
   bottlesLooted,
@@ -1975,7 +1978,7 @@ const RecapModal = ({
     },
   };
 
-  const { address } = useContext(FluidityFacadeContext);
+  const { address, merkleDistributorWithDeadlineIsClaimed } = useContext(FluidityFacadeContext);
 
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
@@ -1986,6 +1989,8 @@ const RecapModal = ({
   const [flyAmountOwed, setFLYAmountOwed] = useState(0);
 
   const [showTGEDetails, setShowTGEDetails] = useState(true);
+
+  const day1Points = calculateDay1Points(flyAmountOwed);
 
   // if the address isn't set, then it's a good proxy for knowing if the
   // user has supplied their address or not
@@ -2081,30 +2086,27 @@ const RecapModal = ({
     return () => document.removeEventListener("keydown", closeWithEsc);
   }, [termsAndConditionsModalVis, closeWithEsc]);
 
+  const ClaimButtonsSpread = () =>
+    <div className="recap-fly-count-buttons-spread">
+      <GeneralButton onClick={() => handleClaimYourFly('claim')}>
+        Claim your FLY
+      </GeneralButton>
+      <GeneralButton onClick={() => handleClaimYourFly('stake')}>
+        Stake your $FLY
+      </GeneralButton>
+    </div>;
+
   const YouAreEligible = () => {
     return (
       <div className="recap-fly-count-block">
         <div className="recap-fly-count-header">
           <Text size="md" code={true}>
-            Congratulations! You are eligible to claim
+            Congratulations! You are eligible to claim 25% of your tokens at TGE!
           </Text>
           <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
         </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
-          <div className="recap-fly-count-buttons-spread">
-            <GeneralButton
-              onClick={() => handleClaimYourFly('claim')}
-            // disabled
-            >
-              Claim your FLY
-            </GeneralButton>
-            <GeneralButton
-            onClick={() => handleClaimYourFly('stake')}
-            // disabled
-            >
-              Stake your $FLY
-            </GeneralButton>
-          </div>
+          <ClaimButtonsSpread />
         </div>
         <div className="recap-you-are-eligible-delegate-button-terms-container">
           <Text>
@@ -2133,7 +2135,7 @@ const RecapModal = ({
             type="external"
             handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
           >
-            Click here to learn more
+            Click here to learn more about $FLY distribution and vesting
           </LinkButton>
         </div>
       </div>
@@ -2259,8 +2261,7 @@ const RecapModal = ({
           flyAmount={flyAmountOwed}
           visible={flyClaimModalState !== 'none'}
           mode={flyClaimModalState === 'none' ? 'claim' : flyClaimModalState}
-          // TODO
-          points={"9999"}
+          accumulatedPoints={day1Points}
           close={() => setFlyClaimModalState('none')}
           onComplete={() => setFlyClaimModalState('none')}
           onFailure={error => {

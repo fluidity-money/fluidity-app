@@ -414,6 +414,8 @@ export default function Dashboard() {
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  const [stakingStatsModalVisibility, setStakingStatsModalVisibility] = useState(false);
+
   const otherModalOpen =
     openMobModal ||
     walletModalVisibility ||
@@ -728,12 +730,9 @@ export default function Dashboard() {
           close={() => setWalletModalVisibility(false)}
         />
         <FlyStakingStatsModal
-          // TODO - all of these are mocked values
           staking={true}
           close={() => { setStakingStatsModalVisibility(false) }}
           showConnectWalletModal={() => setWalletModalVisibility(true)}
-          points={100}
-          pointsUnstaking={50}
           visible={stakingStatsModalVisibility}
         />
         <UIContext.Provider

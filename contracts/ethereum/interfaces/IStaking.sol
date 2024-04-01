@@ -50,6 +50,22 @@ interface IStaking {
     function stake(uint256 _flyAmount) external returns (uint256 flyStaked);
 
     /**
+     * @notice stake the amount given, using the permit router for approvals beforehand.
+     * @param _flyAmount to take from the msg.sender.
+     * @param _deadline as the expiration date for the permit call to the contract.
+     * @param _v recovery ID for the signature.
+     * @param _r point on the elliptic curve
+     * @param _s point on the elliptic curve for address derivation using a signature.
+     */
+    function stakePermit(
+        uint256 _flyAmount,
+        uint256 _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) external returns (uint256 flyStaked);
+
+    /**
      * @notice stakeFor a user using tokens from msg.sender. Currently gated for the
      *         merkle distributor, so as to prevent abuse.
      * @param _spender to stake on behalf of.
@@ -64,7 +80,7 @@ interface IStaking {
      * @notice stakingDetails for a specific user.
      * @param _account to check.
      */
-    function stakingDetails(address _account) external returns (
+    function stakingDetails(address _account) external view returns (
         uint256 flyStaked,
         uint256 points
     );
