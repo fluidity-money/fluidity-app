@@ -1251,6 +1251,17 @@ $holo: linear-gradient(
     max-width: 546px;
     min-height: 495px;
     margin: auto;
+    width: 100%;
+
+    @media (max-width: 527px) {
+      max-height: 100vh;
+      margin: 0;
+      padding: 0.8em;      
+
+      .legal {
+        text-align: center;
+      }
+    }
 }
 
 .fly-staking-stats-modal-container {
@@ -1265,9 +1276,23 @@ $holo: linear-gradient(
     max-width: 575px;
     min-height: 495px;
     margin: auto;
+    width: 100%;
+
+    @media (max-width: 527px) {
+      max-height: 100vh;
+      height: fit-content;
+      overflow-y: auto;
+      margin: 0;
+      padding: 0.8em;      
+
+      .legal {
+        text-align: center;
+      }
+    }
 }
 
 .fly-submit-claim-flex-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1304,6 +1329,19 @@ $holo: linear-gradient(
     align-items: center;
     gap: 4em;
     padding: 1.5em;
+}
+
+.fly-staking-stats-modal-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4em;
+    padding: 1.5em;
+
+    @media (max-width: 527px) {
+      flex-direction: column;
+      padding: 0.5em;
+    }
 }
 
 .fly-confirming-claim-container {
