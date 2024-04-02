@@ -2088,7 +2088,7 @@ const RecapModal = ({
 
   const ClaimButtonsSpread = () =>
     <div className="recap-fly-count-buttons-spread">
-      <GeneralButton onClick={() => handleClaimYourFly('claim')}>
+      <GeneralButton disabled={true} onClick={() => handleClaimYourFly('claim')}>
         Claim your FLY
       </GeneralButton>
       <GeneralButton onClick={() => handleClaimYourFly('stake')}>
