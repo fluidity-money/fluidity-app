@@ -104,10 +104,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
         if (!address) return;
         if (!flyStakingDetails) return;
         const details = await flyStakingDetails(address);
-        console.log("fly staking details", details);
         if (!details) throw new Error("couldnt get fly details"); // hope we get an error instead here
         const { flyStaked, points } = details;
-        console.log("fly staked", flyStaked);
         setPoints(points);
         setFlyStaked(flyStaked);
       } catch (err) {
@@ -118,7 +116,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     })();
   }, [address, flyStakingDetails]);
 
-  const [pointsUnstaking, setPointsUnstaking] = useState(new BN(0));
+  const [flyUnstaking, setFlyUnstaking] = useState(new BN(0));
 
   useEffect(() => {
     (async () => {
@@ -127,7 +125,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
         if (!flyStakingAmountUnstaking) return;
         const unstaking = await flyStakingAmountUnstaking(address);
         if (!unstaking) return;
-        setPointsUnstaking(unstaking);
+        setFlyUnstaking(unstaking);
       } catch (err) {
         console.error("error getting unstaking details", err);
         setErrorMessage(`Failed to get unstaking amount! ${err}`);
@@ -351,7 +349,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               }
                             >
                               <div className="flex-column">
-                                <Text size="lg" prominent>{points.toString()}</Text>
+                                <Text size="lg" prominent>{flyStaked.toString()}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Staked</Text>
                                   <InfoCircle className="info-circle-grey" />
@@ -369,7 +367,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               }
                             >
                               <div className="flex-column">
-                                <Text size="lg" prominent>{pointsUnstaking.toString()}</Text>
+                                <Text size="lg" prominent>{flyUnstaking.toString()}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Unstaking</Text>
                                   <InfoCircle className="info-circle-grey" />
@@ -432,7 +430,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 />
                               </div>
                               <div className="staking-input-lower">
-                                {getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining (={0})
+                                {getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining
                                 <div className="flex" style={{gap: '0.5em'}}>
                                   <Text size="md">Staking {getValueFromFlyAmount(stakeAmount)} $FLY</Text>
                                   <div onClick={setMaxBalance}>
@@ -568,7 +566,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     currentAction,
     showTermsModal,
     points,
-    pointsUnstaking,
+    flyUnstaking,
     swapInput
   ])
 
