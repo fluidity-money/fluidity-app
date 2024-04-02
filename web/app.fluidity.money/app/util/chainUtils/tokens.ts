@@ -127,7 +127,6 @@ const snapToValidValue = (input: string, token: Token, userTokenBalance: BN, use
 
   const maxUserPayable = BN.min(usdBn, userTokenBalance);
 
-  console.log("usdBn",usdBn.toString(),"userTokenBal",userTokenBalance.toString())
   if (!userMintLimit) {
     return maxUserPayable;
   }
@@ -136,7 +135,6 @@ const snapToValidValue = (input: string, token: Token, userTokenBalance: BN, use
   const maxMintable = userMintLimit.sub(
     userMintedAmt || new BN(0)
   );
-  console.log("max mintable",maxMintable.toString())
 
   return BN.min(maxUserPayable, maxMintable);
 };
