@@ -415,7 +415,7 @@ export default function Home() {
                   className="table-activity"
                   href={getTxExplorerLink(network, hash)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   {appProviderName !== "Fluidity" ? (
                     <ProviderIcon provider={appProviderName} />
@@ -510,7 +510,7 @@ export default function Home() {
                   className="table-address"
                   href={getAddressExplorerLink(chain, sender)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   <Text>
                     {sender === MintAddress
@@ -533,7 +533,7 @@ export default function Home() {
                   className="table-activity"
                   href={getTxExplorerLink(network, hash)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   <Text>{hash}</Text>
                 </a>

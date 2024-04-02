@@ -1129,7 +1129,6 @@ $holo: linear-gradient(
 }
 
 .recap-you-are-eligible-ethereum-address-delegate-solana {
-
 }
 
 .legal {
@@ -1214,6 +1213,12 @@ $holo: linear-gradient(
   cursor: pointer;
 }
 
+.recap-you-are-eligible-claim-at-tge-button-container {
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
 .recap-you-are-eligible-claim-at-tge-button-container span {
   color: white;
 }
@@ -1227,7 +1232,7 @@ $holo: linear-gradient(
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 10;
+    z-index: -1;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -1418,7 +1423,7 @@ $holo: linear-gradient(
   width: 100vw;
   height: 100vh;
   background-color: transparent;
-  position: absolute;
+  position: fixed;
   z-index: 1;
   top: 0;
   left: 0;

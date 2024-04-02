@@ -95,6 +95,34 @@ const queryByAddressTimestamp: Queryable = {
       }
     }
   `,
+  sui: gql`
+    query VolumeTxs(
+      $address: String!
+      $filterHashes: [String!] = []
+      $timestamp: timestamp!
+    ) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "sui" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          time: { _gt: $timestamp }
+          _or: [
+            { sender_address: { _eq: $address } }
+            { recipient_address: { _eq: $address } }
+          ]
+        }
+        order_by: { time: desc }
+      ) {
+        sender_address
+        recipient_address
+        token_short_name
+        token_decimals
+        time
+        transaction_hash
+        amount_str
+      }
+    }
+  `,
 };
 
 const queryByTimestamp: Queryable = {
@@ -157,6 +185,26 @@ const queryByTimestamp: Queryable = {
       ) {
         sender_address: solana_sender_owner_address
         recipient_address: solana_recipient_owner_address
+        token_short_name
+        token_decimals
+        time
+        transaction_hash
+        amount_str
+      }
+    }
+  `,
+  sui: gql`
+    query VolumeTxs($filterHashes: [String!] = [], $timestamp: timestamp!) {
+      transfers: user_actions(
+        where: {
+          network: { _eq: "sui" }
+          _not: { transaction_hash: { _in: $filterHashes } }
+          time: { _gt: $timestamp }
+        }
+        order_by: { time: desc }
+      ) {
+        sender_address
+        recipient_address
         token_short_name
         token_decimals
         time

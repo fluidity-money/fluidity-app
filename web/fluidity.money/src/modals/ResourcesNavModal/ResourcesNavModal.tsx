@@ -41,7 +41,7 @@ const ResourcesNavModal = ({ handleModal, navLinks }: IResourcesNavModal) => {
         </h4>
       ))}
       <div className={styles.socials}>
-        <a href="https://twitter.com/fluiditymoney">
+        <a href="https://x.com/fluiditylabs">
           <img src="/assets/images/socials/twitter.svg" alt="twitter" />
         </a>
         <a href="https://discord.gg/CNvpJk4HpC">

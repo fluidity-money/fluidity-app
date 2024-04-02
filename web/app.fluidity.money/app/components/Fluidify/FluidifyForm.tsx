@@ -7,8 +7,8 @@ import { Text, GeneralButton } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
-  getTokenAmountFromUsd,
   getUsdFromTokenAmount,
+  snapToValidValue,
 } from "~/util/chainUtils/tokens";
 
 interface IFluidifyFormProps {
@@ -32,40 +32,7 @@ export const FluidifyForm = ({
 
   const [swapInput, setSwapInput] = useState<string>("");
 
-  const parseSwapInputToTokenAmount = (input: string): BN => {
-    const [whole, dec] = input.split(".");
-
-    const wholeBn = getTokenAmountFromUsd(new BN(whole || 0), assetToken);
-
-    if (dec === undefined) {
-      return wholeBn;
-    }
-
-    const decimalsBn = new BN(dec).mul(
-      new BN(10).pow(new BN(assetToken.decimals - dec.length))
-    );
-
-    return wholeBn.add(decimalsBn);
-  };
-
-  // Snap the smallest of token balance, remaining mint limit, or swap amt
-  const snapToValidValue = (input: string): BN => {
-    const usdBn = parseSwapInputToTokenAmount(input);
-
-    const maxUserPayable = BN.min(usdBn, assetToken.userTokenBalance);
-
-    if (!assetToken.userMintLimit) {
-      return maxUserPayable;
-    }
-
-    const maxMintable = assetToken.userMintLimit.sub(
-      assetToken.userMintedAmt || new BN(0)
-    );
-
-    return BN.min(maxUserPayable, maxMintable);
-  };
-
-  const swapAmount: BN = snapToValidValue(swapInput);
+  const swapAmount: BN = snapToValidValue(swapInput, assetToken, assetToken.userTokenBalance, assetToken.userMintedAmt);
 
   const assertCanSwap =
     connected &&
@@ -101,7 +68,12 @@ export const FluidifyForm = ({
   const inputMaxBalance = () => {
     return setSwapInput(
       addDecimalToBn(
-        snapToValidValue(assetToken.userTokenBalance.toString()),
+        snapToValidValue(
+          assetToken.userTokenBalance.toString(),
+          assetToken,
+          assetToken.userTokenBalance,
+          assetToken.userMintedAmt,
+        ),
         assetToken.decimals
       )
     );
@@ -150,7 +122,12 @@ export const FluidifyForm = ({
           onBlur={(e) =>
             setSwapInput(
               addDecimalToBn(
-                snapToValidValue(e.target.value),
+                snapToValidValue(
+                  e.target.value,
+                  assetToken,
+                  assetToken.userTokenBalance,
+                  assetToken.userMintedAmt,
+                ),
                 assetToken.decimals
               )
             )

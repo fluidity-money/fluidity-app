@@ -50,6 +50,22 @@ const queryByAddressTimestamp: Queryable = {
       }
     }
   `,
+  sui: gql`
+    query getTransactionCount($address: String!, $timestamp: timestamp!) {
+      sui: user_actions_aggregate(
+        where: {
+          network: { _eq: "sui" }
+          sender_address: { _eq: $address }
+          _or: { recipient_address: { _eq: $address } }
+          time: { _gt: $timestamp }
+        }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+  `,
 };
 
 const queryByTimestamp: Queryable = {
@@ -80,6 +96,17 @@ const queryByTimestamp: Queryable = {
     query getTransactionCount($timestamp: timestamp!) {
       arbitrum: user_actions_aggregate(
         where: { network: { _eq: "arbitrum" }, time: { _gt: $timestamp } }
+      ) {
+        aggregate {
+          count
+        }
+      }
+    }
+  `,
+  sui: gql`
+    query getTransactionCount($timestamp: timestamp!) {
+      sui: user_actions_aggregate(
+        where: { network: { _eq: "sui" }, time: { _gt: $timestamp } }
       ) {
         aggregate {
           count

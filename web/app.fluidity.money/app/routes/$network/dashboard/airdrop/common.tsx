@@ -1978,7 +1978,7 @@ const RecapModal = ({
     },
   };
 
-  const { address, merkleDistributorWithDeadlineIsClaimed } = useContext(FluidityFacadeContext);
+  const { address } = useContext(FluidityFacadeContext);
 
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
@@ -2088,7 +2088,7 @@ const RecapModal = ({
 
   const ClaimButtonsSpread = () =>
     <div className="recap-fly-count-buttons-spread">
-      <GeneralButton onClick={() => handleClaimYourFly('claim')}>
+      <GeneralButton disabled={true} onClick={() => handleClaimYourFly('claim')}>
         Claim your FLY
       </GeneralButton>
       <GeneralButton onClick={() => handleClaimYourFly('stake')}>
@@ -2100,7 +2100,7 @@ const RecapModal = ({
     return (
       <div className="recap-fly-count-block">
         <div className="recap-fly-count-header">
-          <Text size="md" code={true}>
+          <Text size="md" style={{color: 'red'}} code={true}>
             Congratulations! You are eligible to claim 25% of your tokens at TGE!
           </Text>
           <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
@@ -2130,7 +2130,8 @@ const RecapModal = ({
         </div>
         <div className="recap-fly-count-buttons-spread-container">
           <LinkButton
-            color="white"
+            style={{color: 'red'}}
+            color="red"
             size="large"
             type="external"
             handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}

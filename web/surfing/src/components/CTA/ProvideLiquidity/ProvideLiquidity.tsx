@@ -90,6 +90,8 @@ const ProvideLiquidity = (props: IProvideLiquidity) => {
       ? provider["ethereum"].providers
       : network === "solana"
         ? provider["solana"].providers
+        : network === "sui"
+          ? provider["sui"].providers
         : provider["arbitrum"].providers;
 
   const LiquidityProviders = () => (

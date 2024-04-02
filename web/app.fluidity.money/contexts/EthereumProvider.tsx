@@ -662,8 +662,6 @@ const EthereumFacade = ({
       return undefined;
     }
 
-    const address = await signer.getAddress();
-
     const result = await doFlyStakingStake(
       signer,
       FlyTokenAddr,

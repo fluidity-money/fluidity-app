@@ -271,14 +271,20 @@ const associateAddressForAirdrop = async (
     program.programId
   );
 
-  const sig =
-    await program.methods.associateEthereumAddress(ethAddress)
+  const sig = await program.methods
+    .associateEthereumAddress(ethAddress)
     .accounts({
-      pda: pdaPubkey
+      pda: pdaPubkey,
     })
     .rpc();
 
   return sig;
 };
 
-export { internalSwap, getBalance, limit, amountMinted, associateAddressForAirdrop };
+export {
+  internalSwap,
+  getBalance,
+  limit,
+  amountMinted,
+  associateAddressForAirdrop,
+};

@@ -33,7 +33,7 @@ const (
 	// EnvContractAddress is the contract to call when a winner's been found
 	EnvContractAddress = `FLU_ETHEREUM_CONTRACT_ADDR`
 
-	// EnvEthereumWsUrl is the url to use to connect to the WS Geth endpoint
+	// EnvEthereumHttpUrl is the url to use to connect to the HTTP Geth endpoint
 	EnvEthereumHttpUrl = `FLU_ETHEREUM_HTTP_URL`
 
 	// EnvPrivateKey is the hex-encoded private key used to sign calls to the reward function

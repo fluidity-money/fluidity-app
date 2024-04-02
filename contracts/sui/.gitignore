@@ -1,0 +1,9 @@
+build/
+node_modules/
+config.json
+packages/CLI
+.DS_Store
+.testing
+patches
+sui.*
+.env

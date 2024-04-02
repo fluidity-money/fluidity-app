@@ -4,7 +4,7 @@
 
 import type { ButtonHTMLAttributes } from "react";
 
-import { ArrowLeft, ArrowRight, ArrowTopRight, InfoCircle } from "components";
+import { ArrowLeft, ArrowRight, ArrowTopRight, ArrowTopRightRed, InfoCircle } from "components";
 import styles from "./LinkButton.module.scss";
 
 interface ILinkButtonProps
@@ -12,7 +12,7 @@ interface ILinkButtonProps
   children: string;
   size: "small" | "medium" | "large";
   type: "internal" | "external" | "info";
-  color?: "white" | "gray";
+  color?: "white" | "gray" | "red";
   left?: boolean;
   handleClick: () => void;
 }
@@ -30,9 +30,8 @@ const LinkButton = ({
   const classProps = className || "";
 
   const buttonColorProps = styles[color];
-  const buttonClassProps = `${
-    styles.button
-  } ${buttonColorProps} ${classProps} ${left && styles.iconLeft}`;
+  const buttonClassProps = `${styles.button
+    } ${buttonColorProps} ${classProps} ${left && styles.iconLeft}`;
 
   const textSizeProps = styles[size];
   const textClassProps = `${styles.text} ${textSizeProps}`;
@@ -46,9 +45,13 @@ const LinkButton = ({
         <ArrowLeft className={`${styles.icon} ${classProps}`} />
       ) : type === "info" ? (
         <InfoCircle className={`${styles.icon} ${classProps}`} />
-      ) : (
-        <ArrowTopRight className={`${styles.icon} ${classProps}`} />
-      )}
+      ) : color === 'red' ?
+        (
+          <ArrowTopRightRed className={`${styles.icon} ${classProps}`} />
+        ) :
+        (
+          <ArrowTopRight className={`${styles.icon} ${classProps}`} />
+        )}
     </button>
   );
 };

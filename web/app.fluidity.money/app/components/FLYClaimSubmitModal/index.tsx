@@ -1,12 +1,12 @@
 
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 
 import BN from "bn.js";
 
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { requestProof, RequestProofRes } from "~/queries/requestProof";
+import { requestProof } from "~/queries/requestProof";
 
-import { Heading, GeneralButton, Text, trimAddress, LinkButton, AttentionButton, Modal, WarningIcon } from "@fluidity-money/surfing";
+import { Heading, GeneralButton, Text, trimAddress, LinkButton, Modal, WarningIcon } from "@fluidity-money/surfing";
 
 import styles from "~/styles/dashboard/airdrop.css";
 import { createPortal } from "react-dom";
@@ -57,8 +57,8 @@ Kindly be advised that this list is for reference only and you are advised to se
 // TODO add a check for their state if they close and re-open the modal
 // TODO fail state for when they've already claimed/staked
 const FLYClaimSubmitModal = ({
-  onComplete,
-  onFailure,
+  // onComplete,
+  // onFailure,
   flyAmount,
   visible,
   showConnectWalletModal,
@@ -72,8 +72,20 @@ const FLYClaimSubmitModal = ({
     signBuffer,
     addToken,
     merkleDistributorWithDeadlineClaim,
-    merkleDistributorWithDeadlineClaimAndStake
+    merkleDistributorWithDeadlineClaimAndStake,
   } = useContext(FluidityFacadeContext);
+
+  const closeWithEsc = useCallback(
+    (event: { key: string }) => {
+      event.key === "Escape" && visible === true && close();
+    },
+    [visible]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeWithEsc);
+    return () => document.removeEventListener("keydown", closeWithEsc);
+  }, [visible]);
 
   const flyAmountFirstTranche = flyAmount / 4;
 
@@ -95,7 +107,6 @@ const FLYClaimSubmitModal = ({
       setCurrentStatus(State.IsConnected);
   }, [address]);
 
-  const [currentProof, setProofData] = useState<RequestProofRes | null>(null);
   const [currentAction, setCurrentAction] = useState("Connect")
 
   useEffect(() => {
@@ -127,34 +138,36 @@ const FLYClaimSubmitModal = ({
   const [beginRequestProof, setBeginRequestProof] = useState(false);
 
   // needed to request the claim onchain, the amount to request
-  const [requestAmount, setRequestAmount] = useState("");
-  const [requestProofs, setRequestProofs] = useState<string[]>([]);
+  // const [requestAmount, setRequestAmount] = useState("");
+  // const [requestProofs, setRequestProofs] = useState<string[]>([]);
 
   const triggerMerkleClaim = async (index: number, amount_: string, proofs: string[]) => {
     if (!address) throw new Error("no address");
     const amount = new BN(amount_.replace(/^0x/, ""), 16);
     try {
       switch (currentMode) {
-      case "stake":
-        if (!merkleDistributorWithDeadlineClaimAndStake)
-          throw new Error("no deadline claim/stake");
+        case "stake":
+          if (!merkleDistributorWithDeadlineClaimAndStake)
+            throw new Error("no deadline claim/stake");
 
-        await merkleDistributorWithDeadlineClaimAndStake(
-          address,
-          index,
-          amount,
-          proofs
-        );
-      case "claim":
-        if (!merkleDistributorWithDeadlineClaim)
-          throw new Error("no deadline claim");
+          await merkleDistributorWithDeadlineClaimAndStake(
+            address,
+            index,
+            amount,
+            proofs
+          );
+          break;
+        case "claim":
+          if (!merkleDistributorWithDeadlineClaim)
+            throw new Error("no deadline claim");
 
-        await merkleDistributorWithDeadlineClaim(
-          address,
-          index,
-          amount,
-          proofs
-        );
+          await merkleDistributorWithDeadlineClaim(
+            address,
+            index,
+            amount,
+            proofs
+          );
+          break;
       }
     } catch (err) {
       console.error("error staking/claiming", err);
@@ -187,8 +200,8 @@ const FLYClaimSubmitModal = ({
         } = await requestProof(address, signature);
 
         if (!index) throw new Error(`amount not returned, err: ${error}`);
-        setRequestAmount(amount);
-        setRequestProofs(proofs);
+        // setRequestAmount(amount);
+        // setRequestProofs(proofs);
         await triggerMerkleClaim(index, amount, proofs);
         setCurrentStatus(State.HasClaimed);
       } catch (err) {
@@ -233,13 +246,14 @@ const FLYClaimSubmitModal = ({
         // time to begin the claim UX by submitting the current merkle
         // proof data that we have!
         switch (currentMode) {
-        case "claim":
-          handleBeginClaiming();
-          break;
-        case "stake":
-          handleBeginStaking();
-          break;
+          case "claim":
+            handleBeginClaiming();
+            break;
+          case "stake":
+            handleBeginStaking();
+            break;
         }
+        break;
       case State.HasClaimed:
         // do nothing!
         break;
@@ -260,7 +274,7 @@ const FLYClaimSubmitModal = ({
             className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
               }`}
           >
-            <div className="fly-submit-claim-modal-background">
+            <div onClick={close} className="fly-submit-claim-modal-background"></div>
               <div
                 className={`fly-submit-claim-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
                   }`}
@@ -410,7 +424,6 @@ const FLYClaimSubmitModal = ({
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </>,
         document.body
@@ -482,7 +495,7 @@ export const TermsModal = ({ visible, close }: TermsModalProps) => {
           Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
         </p>
         <p>
-          2.3 Limited Supply
+          2.3 Limited Supply
 
           An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
           has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
@@ -490,7 +503,7 @@ export const TermsModal = ({ visible, close }: TermsModalProps) => {
           advertised as available.
         </p>
         <p>
-          2.4 Eligibility
+          2.4 Eligibility
 
           You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
 
@@ -504,7 +517,7 @@ export const TermsModal = ({ visible, close }: TermsModalProps) => {
         </p>
         <p>
 
-          2.5 Notice of Award
+          2.5 Notice of Award
 
           In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
           We are not liable to you for failure to receive any notice associated with the Airdrop Program.

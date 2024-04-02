@@ -276,7 +276,20 @@ body {
   right: 0;
   bottom: 0;
   z-index: 1;
-  background: conic-gradient(from 209.59deg at 50% 50%, #f3b8d8 0deg, #b793e9 50.06deg, #9fd4f3 85.94deg, #ffd2c4 134.97deg, #fbf3f3 172.05deg, #d9abdf 200.75deg, #af9ce3 224.67deg, #aae4e1 259.36deg, #c6ead0 298.82deg, #ffffff 328.72deg, #fdb5e4 360deg);
+  background: conic-gradient(
+    from 209.59deg at 50% 50%,
+    #f3b8d8 0deg,
+    #b793e9 50.06deg,
+    #9fd4f3 85.94deg,
+    #ffd2c4 134.97deg,
+    #fbf3f3 172.05deg,
+    #d9abdf 200.75deg,
+    #af9ce3 224.67deg,
+    #aae4e1 259.36deg,
+    #c6ead0 298.82deg,
+    #ffffff 328.72deg,
+    #fdb5e4 360deg
+  );
   filter: blur(10px);
   scale: 1.1;
 }

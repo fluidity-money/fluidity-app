@@ -59,7 +59,6 @@ import { getProviderDisplayName } from "~/util/provider";
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import { UIContext } from "contexts/UIProvider";
-import { StakingStatsModal } from "./dashboard/airdrop/common";
 import { FlyStakingStatsModal } from "~/components/FLYStakingStatsModal";
 
 export const links: LinksFunction = () => {
@@ -163,13 +162,7 @@ type LoaderData = {
   referralCode: string;
 };
 
-const NAVIGATION_MAP: {
-  [key: string]: {
-    name: string;
-    path: (network: string) => string;
-    icon: JSX.Element;
-  };
-}[] = [
+const airdropTab = [
   {
     airdrop: {
       name: "airdrop",
@@ -177,6 +170,16 @@ const NAVIGATION_MAP: {
       icon: <AirdropIcon />,
     },
   },
+];
+
+const NAVIGATION_MAP: {
+  [key: string]: {
+    name: string;
+    path: (network: string) => string;
+    icon: JSX.Element;
+  };
+}[] = [
+  ...airdropTab,
   {
     home: {
       name: "dashboard",
@@ -211,6 +214,10 @@ const CHAIN_NAME_MAP: Record<
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
+  sui: {
+    name: "SUI",
+    icon: <img src="/assets/chains/suiIcon.svg" />,
   },
 };
 
@@ -529,8 +536,15 @@ export default function Dashboard() {
         <ul className="sidebar-nav">
           <li key="ico">
             <div />
-            <a style={{"cursor": "pointer"}} href="https://launchmoby.com" target="_blank" rel="noreferrer">
-              <Text className="dashboard-navbar-default"><FlyIcon /> ICO</Text>
+            <a
+              style={{ cursor: "pointer" }}
+              href="https://launchmoby.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Text className="dashboard-navbar-default">
+                <FlyIcon /> ICO
+              </Text>
             </a>
           </li>
           {NAVIGATION_MAP.map((obj, index) => {
@@ -828,22 +842,38 @@ export default function Dashboard() {
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <a href={"https://twitter.com/fluiditymoney"}>
+            <a
+              href={"https://twitter.com/fluiditymoney"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
             </a>
 
             {/* Discord */}
-            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a
+              href={"https://discord.com/invite/CNvpJk4HpC"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
             </a>
 
             {/* Telegram */}
-            <a href={"https://t.me/fluiditymoney"}>
+            <a
+              href={"https://t.me/fluiditymoney"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
             </a>
 
             {/* LinkedIn */}
-            <a href={"https://www.linkedin.com/company/fluidity-money"}>
+            <a
+              href={"https://www.linkedin.com/company/fluidity-money"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
             </a>
           </section>
@@ -856,6 +886,13 @@ export default function Dashboard() {
               const { name, icon, path } = Object.values(obj)[0];
               return { name, icon, path };
             })}
+            nonNavigationEntries={[
+              <li key="staking">
+                <div />
+                <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
+                  <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+                </a>
+              </li>]}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}

@@ -32,6 +32,7 @@ type Emission struct {
 
 	EthereumBlockNumber misc.BigInt `json:"ethereum_block_number"`
 	SolanaSlotNumber    misc.BigInt `json:"solana_slot_number"`
+	SuiCheckpointNumber misc.BigInt `json:"sui_checkpoint_number"`
 
 	AverageTransfersInBlock float64 `json:"average_transfers_in_block"`
 
@@ -86,6 +87,9 @@ type Emission struct {
 
 	// app fees for eth transactions
 	EthereumAppFees EthereumAppFees `json:"ethereum_fees"`
+
+	// app fees for sui transactions
+	SuiAppFees SuiAppFees `json:"sui_fees"`
 
 	// calculate n function
 	CalculateN struct {

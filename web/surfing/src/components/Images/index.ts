@@ -1,4 +1,4 @@
-import { ArrowTopRight } from "./ArrowTopRight";
+import { ArrowTopRight, ArrowTopRightRed } from "./ArrowTopRight";
 import { ArrowRight } from "./ArrowRight";
 import { ArrowLeft } from "./ArrowLeft";
 import { TriangleDown } from "./TriangleDown";
@@ -31,6 +31,7 @@ export {
   ArrowDown,
   ArrowUp,
   ArrowTopRight,
+  ArrowTopRightRed,
   CopyIcon,
   TriangleDown,
   Trophy,
