@@ -2109,7 +2109,7 @@ const RecapModal = ({
           <ClaimButtonsSpread />
         </div>
         <div className="recap-you-are-eligible-delegate-button-terms-container">
-          <Text>
+          <Text style={{ textAlign: "center" }}>
             By pressing the Claim and/or Stake button, you agree to our airdrop {}
             <a
               className="recap-terms-of-condition-claim-or-stake"

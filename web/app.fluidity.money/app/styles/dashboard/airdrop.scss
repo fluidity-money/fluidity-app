@@ -1097,6 +1097,7 @@ $holo: linear-gradient(
 .recap-you-are-eligible-delegate-button-terms-container {
   padding-top: 20px;
   padding-bottom: 30px;
+  text-align: center;
 }
 
 .recap-fly-count-buttons-spread {
@@ -1436,7 +1437,7 @@ $holo: linear-gradient(
 }
 
 .show-fly-modal {
-  display: flex; 
+  display: flex;
 }
 
 .link {
@@ -1491,7 +1492,7 @@ $holo: linear-gradient(
   display: flex;
 
   @media (max-width: 527px) {
-    text-align: center;    
+    text-align: center;
   }
 }
 
