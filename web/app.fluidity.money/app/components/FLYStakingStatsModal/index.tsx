@@ -64,8 +64,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     (async () => {
       const bal = await balance?.(FlyToken.address);
       if (!bal) return;
-      // setFlyBalance(bal);
-      setFlyBalance(new BN(5010001));
+      setFlyBalance(bal);
     })();
   }, [balance]);
 
