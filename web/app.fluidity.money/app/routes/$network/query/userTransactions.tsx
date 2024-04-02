@@ -148,7 +148,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
           // convert to JS timestamp
           timestamp: new Date(timestamp + "Z").getTime(),
           value,
-          currency: "f" + currency,
+          currency: currency === "FLY" ? currency : "f" + currency,
           application,
           swapType,
           provider: application ?? "Fluidity",
