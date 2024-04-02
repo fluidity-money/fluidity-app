@@ -104,7 +104,7 @@ export interface IFluidityFacade {
 
   merkleDistributorWithDeadlineIsClaimed?: (index: number) => Promise<boolean | undefined>;
 
-  flyStakingStake?: (amount: BN) => Promise<BN | undefined>;
+  flyStakingStake?: (amount: BN) => Promise<boolean | undefined>;
 
   flyStakingDetails?: (address: string) => Promise<FLYStakingDetailsRes | undefined>;
 

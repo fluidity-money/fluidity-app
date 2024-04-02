@@ -746,12 +746,6 @@ export const flyStakingStake = async (
         verifyingContract: flyTokenAddr
       },
       {
-        EIP712Domain: [
-          { name: "name", type: "string" },
-          { name: "version", type: "string" },
-          { name: "chainId", type: "uint256" },
-          { name: "verifyingContract", type: "address" },
-        ],
         Permit: [
           { name: "owner", type: "address" },
           { name: "spender", type: "address" },
@@ -763,7 +757,7 @@ export const flyStakingStake = async (
       {
         owner: signerAddr,
         spender: flyStakingAddr,
-        value: amount.toString(16),
+        value: "0x" + amount.toString(16),
         nonce: nonce,
         deadline: deadline
       }
@@ -775,7 +769,7 @@ export const flyStakingStake = async (
 
     console.log("about to call the stake permit function");
 
-    const flyStaked = await flyStakingContract.stakePermit(
+    await flyStakingContract.stakePermit(
       amount.toString(), // fly amount
       deadline,
       v,
@@ -783,7 +777,7 @@ export const flyStakingStake = async (
       s
     );
 
-    return flyStaked;
+    return true;
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
     return false;

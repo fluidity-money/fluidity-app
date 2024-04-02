@@ -672,7 +672,7 @@ const EthereumFacade = ({
     );
     console.log(result);
 
-    return new BN(result.toString());
+    return result;
   };
 
   const flyStakingDetails = async (address: string) => {

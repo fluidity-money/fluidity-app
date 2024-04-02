@@ -29,7 +29,9 @@ enum State {
   // Awaiting staking
   IsConnected,
   // Finished
-  HasStaked
+  HasStaked,
+  // Error occured
+  InError
 }
 
 const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking = true }: FlyStakingStatsModalProps) => {
@@ -60,12 +62,21 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     return () => document.removeEventListener("keydown", closeWithEsc);
   }, [visible]);
 
+  const [currentStatus, setCurrentStatus] = useState(State.Stats);
+
   useEffect(() => {
     (async () => {
-      const bal = await balance?.(FlyToken.address);
-      if (!bal) return;
-      // setFlyBalance(bal);
-      setFlyBalance(new BN(5010001));
+      try {
+        if (!balance) return;
+        const bal = await balance(FlyToken.address);
+        if (!bal) return;
+        // setFlyBalance(bal);
+        setFlyBalance(new BN(5010001));
+      } catch (err) {
+        console.error("error fly balance", err);
+        setErrorMessage(`Failed to get FLY balance! ${err}`);
+        setCurrentStatus(State.InError);
+      }
     })();
   }, [balance]);
 
@@ -74,12 +85,18 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 
   useEffect(() => {
     (async () => {
-      if (!address) return;
-      const details = await flyStakingDetails?.(address);
-      if (!details) return; // hope we get an error instead here
-      // const { flyStaked, points } = details;
-      setPoints(points);
-      // setFlyStaked(flyStaked);
+      try {
+        if (!address) return;
+        const details = await flyStakingDetails?.(address);
+        if (!details) return; // hope we get an error instead here
+        // const { flyStaked, points } = details;
+        setPoints(points);
+        // setFlyStaked(flyStaked);
+      } catch (err) {
+        console.error("error staking details", err);
+        setErrorMessage(`Failed to get staking details! ${err}`);
+        setCurrentStatus(State.InError);
+      }
     })();
   }, [address, flyStakingDetails]);
 
@@ -87,15 +104,20 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 
   useEffect(() => {
     (async () => {
-      if (!address) return;
-      const unstaking = await flyStakingAmountUnstaking?.(address);
-      if (!unstaking) return;
-      setPointsUnstaking(unstaking);
+      try {
+        if (!address) return;
+        const unstaking = await flyStakingAmountUnstaking?.(address);
+        if (!unstaking) return;
+        setPointsUnstaking(unstaking);
+      } catch (err) {
+        console.error("error getting unstaking details", err);
+        setErrorMessage(`Failed to get unstaking amount! ${err}`);
+        setCurrentStatus(State.InError);
+      }
     })();
   }, [address, flyStakingAmountUnstaking]);
 
   const [isStaking, setIsStaking] = useState(staking)
-  const [currentStatus, setCurrentStatus] = useState(State.Stats);
   const [currentAction, setCurrentAction] = useState("Connect")
   const [showTermsModal, setShowTermsModal] = useState(false)
 
@@ -175,6 +197,9 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   // kicks off the interaction to begin the staking via the contract
   const [beginStaking, setBeginStaking] = useState(false);
 
+  // error message to be displayed above the claim button
+  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     if (!flyStakingStake) return;
     if (!beginStaking) return;
@@ -182,7 +207,9 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
       try {
         await flyStakingStake(stakeAmount);
       } catch (err) {
-        throw new Error(`failed to stake: ${err}`);
+        console.error("error fly staking", err);
+        setErrorMessage(`Failed to begin staking! ${err}`);
+        setCurrentStatus(State.InError);
       }
     })();
   }, [flyStakingStake, beginStaking]);
@@ -247,7 +274,9 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                             <Hoverable
                               tooltipStyle={"solid"}
                               tooltipContent={
-                                <div className="flex-column">Learn more at the Fluidity Staking blog post.</div>
+                                <div className="flex-column">
+                                  <a href="#">More info available here</a>
+                                </div>
                               }
                             >
                               <div className="text-with-info-popup">
@@ -401,11 +430,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 <Text size="lg" prominent>🏄🏼‍♂️</Text>
                                 <Text size="lg" holo>Staking $FLY will reward you points.</Text>
                               </div>
-                              <div className="fly-caution-border">
-                                <Text size="lg" prominent>
-                                  You will earn {potentialPoints} points by staking your $FLY. Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN).
-                                </Text>
-                              </div>
                             </div>
                           </div>
                           }
@@ -439,6 +463,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                         </div>
                     }
                   </div>
+                  <Text className={currentStatus === State.InError ? "claim-error-message" : "claim-error-message-none"}>{ errorMessage }</Text>
                   <div className="fly-submit-claim-modal-button-container">
                     <div className="fly-confirming-claim-button-container">
                       {currentStatus === State.Stats ?
@@ -474,7 +499,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           layout="after"
                           disabled={currentStatus === State.HasStaked || stakeAmount.eq(new BN(0))}
                           handleClick={() => handleClick(isStaking)}
-                          className={`fly-staking-stats-action-button ${currentStatus === State.HasStaked - 1 ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""}`}
+                          className={`fly-staking-stats-action-button ${currentStatus === State.HasStaked - 1 ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""} ${currentStatus === State.InError ? "claim-button-error" : ""}`}
 
                         >
                           <Text size="md" bold className="fly-submit-claim-action-button-text">

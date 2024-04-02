@@ -1435,8 +1435,14 @@ $holo: linear-gradient(
   background-color: unset !important;
 }
 
+.claim-button-error {
+  border: solid red 2px !important;
+  color: white !important;
+  background-color: unset !important;
+}
+
 .show-fly-modal {
-  display: flex; 
+  display: flex;
 }
 
 .link {
@@ -1571,4 +1577,12 @@ $holo: linear-gradient(
 
 .rainbow:hover::after {
   background: transparent;
+}
+
+claim-error-message-none {
+  display: hidden;
+}
+
+.claim-error-message {
+  display: block;
 }
