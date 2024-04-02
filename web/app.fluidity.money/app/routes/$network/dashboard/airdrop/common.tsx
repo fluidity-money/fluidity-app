@@ -2091,7 +2091,7 @@ const RecapModal = ({
       <GeneralButton disabled={true} onClick={() => handleClaimYourFly('claim')}>
         Claim your FLY
       </GeneralButton>
-      <GeneralButton onClick={() => handleClaimYourFly('stake')}>
+      <GeneralButton disabled={true} onClick={() => handleClaimYourFly('stake')}>
         Stake your $FLY
       </GeneralButton>
     </div>;
@@ -2100,7 +2100,7 @@ const RecapModal = ({
     return (
       <div className="recap-fly-count-block">
         <div className="recap-fly-count-header">
-          <Text size="md" style={{color: 'red'}} code={true}>
+          <Text size="md" code={true}>
             Congratulations! You are eligible to claim 25% of your tokens at TGE!
           </Text>
           <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
@@ -2130,7 +2130,6 @@ const RecapModal = ({
         </div>
         <div className="recap-fly-count-buttons-spread-container">
           <LinkButton
-            style={{color: 'red'}}
             color="red"
             size="large"
             type="external"
