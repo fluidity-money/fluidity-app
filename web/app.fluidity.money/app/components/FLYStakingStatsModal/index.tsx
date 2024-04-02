@@ -19,8 +19,6 @@ interface FlyStakingStatsModalProps {
   staking?: boolean
 }
 
-const FLY_DECIMALS = new BN(1e6);
-
 enum State {
   // Base screen
   Stats,
@@ -43,8 +41,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     addToken,
     flyStakingStake,
     flyStakingDetails,
-    flyStakingBeginUnstake,
-    flyStakingSecondsUntilSoonestUnstake,
+    // flyStakingBeginUnstake,
+    // flyStakingSecondsUntilSoonestUnstake,
     flyStakingAmountUnstaking,
   } = useContext(FluidityFacadeContext)
 
@@ -66,21 +64,22 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     (async () => {
       const bal = await balance?.(FlyToken.address);
       if (!bal) return;
-      setFlyBalance(bal);
+      // setFlyBalance(bal);
+      setFlyBalance(new BN(5010001));
     })();
   }, [balance]);
 
   const [points, setPoints] = useState(BigNumber.from(0));
-  const [flyStaked, setFlyStaked] = useState(BigNumber.from(0));
+  // const [flyStaked, setFlyStaked] = useState(BigNumber.from(0));
 
   useEffect(() => {
     (async () => {
       if (!address) return;
       const details = await flyStakingDetails?.(address);
       if (!details) return; // hope we get an error instead here
-      const { flyStaked, points } = details;
+      // const { flyStaked, points } = details;
       setPoints(points);
-      setFlyStaked(flyStaked);
+      // setFlyStaked(flyStaked);
     })();
   }, [address, flyStakingDetails]);
 

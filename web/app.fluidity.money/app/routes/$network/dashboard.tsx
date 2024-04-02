@@ -59,7 +59,6 @@ import { getProviderDisplayName } from "~/util/provider";
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import { UIContext } from "contexts/UIProvider";
-import { StakingStatsModal } from "./dashboard/airdrop/common";
 import { FlyStakingStatsModal } from "~/components/FLYStakingStatsModal";
 
 export const links: LinksFunction = () => {

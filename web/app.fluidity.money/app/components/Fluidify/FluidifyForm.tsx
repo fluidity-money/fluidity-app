@@ -7,7 +7,6 @@ import { Text, GeneralButton } from "@fluidity-money/surfing";
 import AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
-  getTokenAmountFromUsd,
   getUsdFromTokenAmount,
   snapToValidValue,
 } from "~/util/chainUtils/tokens";

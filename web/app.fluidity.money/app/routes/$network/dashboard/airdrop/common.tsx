@@ -1978,7 +1978,7 @@ const RecapModal = ({
     },
   };
 
-  const { address, merkleDistributorWithDeadlineIsClaimed } = useContext(FluidityFacadeContext);
+  const { address } = useContext(FluidityFacadeContext);
 
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
