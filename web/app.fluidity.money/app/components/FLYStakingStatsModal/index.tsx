@@ -58,7 +58,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     flyStakingStake,
     flyStakingDetails,
     flyStakingBeginUnstake,
-    flyStakingSecondsUntilSoonestUnstake,
     flyStakingAmountUnstaking,
   } = useContext(FluidityFacadeContext)
 
@@ -135,8 +134,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   const [isStaking, setIsStaking] = useState(staking)
   const [currentAction, setCurrentAction] = useState("Connect")
   const [showTermsModal, setShowTermsModal] = useState(false)
-
-  const potentialPoints = 123;
 
   useEffect(() => {
     if (address && (currentStatus === State.AmountEntered))
@@ -333,7 +330,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               <div className="flex-column">
                                 <div className="text-with-info-popup">
                                   <FlyIcon />
-                                  <Text size="lg" prominent>{getValueFromFlyAmount(flyBalance).toString()}</Text>
+                                  <Text size="lg" prominent>{getValueFromFlyAmount(flyBalance)?.toString()}</Text>
                                 </div>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">$FLY Balance</Text>
