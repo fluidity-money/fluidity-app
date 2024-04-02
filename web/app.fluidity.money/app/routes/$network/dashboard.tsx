@@ -856,6 +856,13 @@ export default function Dashboard() {
               const { name, icon, path } = Object.values(obj)[0];
               return { name, icon, path };
             })}
+            nonNavigationEntries={[
+              <li key="staking">
+                <div />
+                <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
+                  <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+                </a>
+              </li>]}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}
