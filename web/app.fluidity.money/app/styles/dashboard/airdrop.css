@@ -1343,6 +1343,11 @@
   justify-content: space-between;
   display: flex;
 }
+@media (max-width: 527px) {
+  .staking-input-lower {
+    text-align: center;
+  }
+}
 
 .center-text {
   text-align: center;

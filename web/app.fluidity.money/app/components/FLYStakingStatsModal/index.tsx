@@ -380,8 +380,11 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               </div>
                               <div className="staking-input-lower">
                                 {getUsdFromTokenAmount(flyBalance.sub(stakeAmount), FlyToken.decimals)} $FLY remaining (={0})
-                                <div onClick={setMaxBalance}>
-                                  <Text prominent size="md" className="max-balance-text">Max</Text>
+                                <div className="flex" style={{gap: '0.5em'}}>
+                                  <Text size="md">Staking {getUsdFromTokenAmount(stakeAmount, FlyToken)} $FLY</Text>
+                                  <div onClick={setMaxBalance}>
+                                    <Text prominent size="md" className="max-balance-text">Max</Text>
+                                  </div>
                                 </div>
                               </div>
                             </div>

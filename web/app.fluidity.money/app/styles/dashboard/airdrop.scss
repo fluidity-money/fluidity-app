@@ -1489,6 +1489,10 @@ $holo: linear-gradient(
 .staking-input-lower {
   justify-content: space-between;
   display: flex;
+
+  @media (max-width: 527px) {
+    text-align: center;    
+  }
 }
 
 .center-text {
