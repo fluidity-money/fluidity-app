@@ -144,6 +144,19 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     }
   }
 
+  const setMaxBalance = () => {
+    return setSwapInput(
+      addDecimalToBn(
+        snapToValidValue(
+          flyBalance.toString(),
+          FlyToken,
+          flyBalance,
+        ),
+        FlyToken.decimals
+      )
+    );
+  };
+
   const [swapInput, setSwapInput] = useState("");
 
   const stakeAmount: BN = snapToValidValue(swapInput, FlyToken, flyBalance);
@@ -356,7 +369,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               </div>
                               <div className="staking-input-lower">
                                 {getUsdFromTokenAmount(flyBalance.sub(stakeAmount), FlyToken.decimals)} $FLY remaining (={0})
-                                <div onClick={() => {/*set max*/ }}>
+                                <div onClick={setMaxBalance}>
                                   <Text prominent size="md" className="max-balance-text">Max</Text>
                                 </div>
                               </div>
