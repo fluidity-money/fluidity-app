@@ -7,7 +7,7 @@ import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "~/styles/dashboard/airdrop.css";
 import { BaseCircle, Checked, NextCircle, TermsModal } from "../FLYClaimSubmitModal";
-import { addDecimalToBn, getUsdFromTokenAmount, snapToValidValue } from "~/util/chainUtils/tokens";
+import { addDecimalToBn, snapToValidValue } from "~/util/chainUtils/tokens";
 
 export const FlyStakingStatsModalLinks = () => [{ rel: "stylesheet", href: styles }];
 
@@ -34,6 +34,22 @@ enum State {
   InError
 }
 
+const getValueFromFlyAmount = (amount: BN) => {
+  const x = amount.toString();
+  switch (true) {
+  case (x.length > 6):
+    return (() => {
+      const leftSide = x.slice(0, x.length - 6);
+      const rightSide = x.slice(x.length - 6).slice(0, 3);
+      return `${leftSide}.${rightSide}`;
+    })();
+  case (x.length == 6):
+    return `0.${x}`;
+  default:
+    return x
+  }
+};
+
 const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking = true }: FlyStakingStatsModalProps) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
@@ -43,8 +59,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     addToken,
     flyStakingStake,
     flyStakingDetails,
-    // flyStakingBeginUnstake,
-    // flyStakingSecondsUntilSoonestUnstake,
+    flyStakingBeginUnstake,
+    flyStakingSecondsUntilSoonestUnstake,
     flyStakingAmountUnstaking,
   } = useContext(FluidityFacadeContext)
 
@@ -80,17 +96,20 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   }, [balance]);
 
   const [points, setPoints] = useState(BigNumber.from(0));
-  // const [flyStaked, setFlyStaked] = useState(BigNumber.from(0));
+  const [flyStaked, setFlyStaked] = useState(BigNumber.from(0));
 
   useEffect(() => {
     (async () => {
       try {
         if (!address) return;
-        const details = await flyStakingDetails?.(address);
-        if (!details) return; // hope we get an error instead here
-        // const { flyStaked, points } = details;
+        if (!flyStakingDetails) return;
+        const details = await flyStakingDetails(address);
+        console.log("fly staking details", details);
+        if (!details) throw new Error("couldnt get fly details"); // hope we get an error instead here
+        const { flyStaked, points } = details;
+        console.log("fly staked", flyStaked);
         setPoints(points);
-        // setFlyStaked(flyStaked);
+        setFlyStaked(flyStaked);
       } catch (err) {
         console.error("error staking details", err);
         setErrorMessage(`Failed to get staking details! ${err}`);
@@ -105,7 +124,8 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     (async () => {
       try {
         if (!address) return;
-        const unstaking = await flyStakingAmountUnstaking?.(address);
+        if (!flyStakingAmountUnstaking) return;
+        const unstaking = await flyStakingAmountUnstaking(address);
         if (!unstaking) return;
         setPointsUnstaking(unstaking);
       } catch (err) {
@@ -205,6 +225,9 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     (async () => {
       try {
         await flyStakingStake(stakeAmount);
+        setCurrentStatus(State.HasStaked);
+        setFlyStaked(flyStaked.add(stakeAmount.toString()));
+        setFlyBalance(flyBalance.sub(stakeAmount));
       } catch (err) {
         console.error("error fly staking", err);
         setErrorMessage(`Failed to begin staking! ${err}`);
@@ -214,7 +237,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   }, [flyStakingStake, beginStaking]);
 
   const beginStakeInteraction = () => {
-    // setCurrentStatus(State.HasStaked);
     setBeginStaking(true);
   };
 
@@ -274,7 +296,12 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  <a href="#">More info available here</a>
+                                  <a
+                                    href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
+                                    rel="noopener noreferrer"
+                                  >
+                                    More info available here
+                                  </a>
                                 </div>
                               }
                             >
@@ -305,7 +332,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               <div className="flex-column">
                                 <div className="text-with-info-popup">
                                   <FlyIcon />
-                                  <Text size="lg" prominent>{getUsdFromTokenAmount(flyBalance, FlyToken.decimals)}</Text>
+                                  <Text size="lg" prominent>{getValueFromFlyAmount(flyBalance).toString()}</Text>
                                 </div>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">$FLY Balance</Text>
@@ -405,9 +432,9 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 />
                               </div>
                               <div className="staking-input-lower">
-                                {getUsdFromTokenAmount(flyBalance.sub(stakeAmount), FlyToken.decimals)} $FLY remaining (={0})
+                                {getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining (={0})
                                 <div className="flex" style={{gap: '0.5em'}}>
-                                  <Text size="md">Staking {getUsdFromTokenAmount(stakeAmount, FlyToken)} $FLY</Text>
+                                  <Text size="md">Staking {getValueFromFlyAmount(stakeAmount)} $FLY</Text>
                                   <div onClick={setMaxBalance}>
                                     <Text prominent size="md" className="max-balance-text">Max</Text>
                                   </div>
@@ -446,7 +473,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           <div className="fly-staking-stats-modal-row">
                             {currentStatus < State.HasStaked ? <BaseCircle /> : <Checked />}
                             <div className="flex-column">
-                              <Text size="lg" prominent>{isStaking ? "Stake" : "Unstake"} $FLY {getUsdFromTokenAmount(stakeAmount, FlyToken)}</Text>
+                              <Text size="lg" prominent>{isStaking ? "Stake" : "Unstake"} $FLY {getValueFromFlyAmount(stakeAmount)}</Text>
                               {
                                 currentStatus >= State.HasStaked && (
                                   isStaking ?
