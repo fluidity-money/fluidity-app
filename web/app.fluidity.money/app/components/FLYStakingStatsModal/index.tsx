@@ -338,7 +338,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                     <Text size="lg" bold prominent className="black">Unstaking will result in the loss of some points.</Text>
                                   }
                                   body={
-                                    <Text size="md" className="black">You wll lose the equivalent percentage of unstaked $FLY from your accumulative points. <Text size="md" className="black" bold>(i.e: Unstaking 50% of $FLY will result in 50% Loss of points)</Text></Text>
+                                    <Text size="md" className="black">You will lose the equivalent percentage of unstaked $FLY from your accumulative points. <Text size="md" className="black" bold>(i.e: Unstaking 50% of $FLY will result in 50% Loss of points)</Text></Text>
 
                                   } />
                               </div>
