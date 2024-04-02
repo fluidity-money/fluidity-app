@@ -100,5 +100,7 @@ clean:
 	@rm -rf \
 		"${TIMESCALE_BUILD_OUT}" \
 		"${POSTGRES_BUILD_OUT}" \
+		"${TIMESCALE_BUILD_DIR}" \
+		"${POSTGRES_BUILD_DIR}" \
 		docker-timescale \
 		docker-postgres

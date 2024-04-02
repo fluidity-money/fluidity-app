@@ -24,6 +24,26 @@ const query: Queryable = {
       }
     }
   `,
+  sui: gql`
+    query getPendingRewards($address: String!) {
+      ethereum_pending_winners(
+        where: {
+          reward_sent: { _eq: false }
+          address: { _eq: $address }
+          network: { _eq: "sui" }
+        }
+        order_by: { block_number: desc }
+      ) {
+        address
+        reward_sent
+        token_decimals
+        token_short_name
+        transaction_hash
+        win_amount
+        block_number
+      }
+    }
+  `,
 };
 
 type UnclaimedRewardsReq = {

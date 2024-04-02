@@ -1,5 +1,5 @@
-export type Chain = "solana" | "arbitrum";
-export type ChainType = "evm" | "solana";
+export type Chain = "solana" | "arbitrum" | "sui";
+export type ChainType = "evm" | "solana" | "sui";
 
 const chainType = (network: string): ChainType | undefined => {
   switch (network) {
@@ -7,6 +7,8 @@ const chainType = (network: string): ChainType | undefined => {
       return "evm";
     case "solana":
       return "solana";
+    case "sui":
+      return "sui";
     default:
       return undefined;
   }
@@ -17,6 +19,8 @@ const getChainId = (network: Chain): number => {
     case "arbitrum":
       return 42161;
     case "solana":
+      return 1;
+    case "sui":
       return 1;
   }
 };
@@ -39,6 +43,8 @@ const getChainNativeToken = (network: string): string => {
       return "ETH";
     case "solana":
       return "SOL";
+    case "sui":
+      return "SUI";
     default:
       return "";
   }
