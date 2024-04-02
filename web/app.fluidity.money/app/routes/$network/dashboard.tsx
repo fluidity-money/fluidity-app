@@ -538,7 +538,7 @@ export default function Dashboard() {
             <div />
             <a
               style={{ cursor: "pointer" }}
-              href=""
+              href="https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum"
               target="_blank"
               rel="noopener noreferrer"
             >
