@@ -538,12 +538,12 @@ export default function Dashboard() {
             <div />
             <a
               style={{ cursor: "pointer" }}
-              href="https://launchmoby.com"
+              href=""
               target="_blank"
               rel="noopener noreferrer"
             >
               <Text className="dashboard-navbar-default">
-                <FlyIcon /> ICO
+                <FlyIcon /> GET FLY
               </Text>
             </a>
           </li>

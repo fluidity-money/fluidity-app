@@ -222,9 +222,14 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
     if (!beginStaking) return;
     (async () => {
       try {
-        await flyStakingStake(stakeAmount);
+        isStaking ?
+          await flyStakingStake(stakeAmount) :
+          await flyStakingBeginUnstake?.(stakeAmount);
         setCurrentStatus(State.HasStaked);
-        setFlyStaked(flyStaked.add(stakeAmount.toString()));
+        // if the user is staking, add to their staked amount, if not, take
+        isStaking ?
+          setFlyStaked(flyStaked.add(stakeAmount.toString())) :
+          setFlyStaked(flyStaked.sub(stakeAmount.toString()));
         setFlyBalance(flyBalance.sub(stakeAmount));
       } catch (err) {
         console.error("error fly staking", err);
@@ -417,7 +422,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                           }
                           <div className="fly-staking-stats-modal-row">
                             <div className="fly-staking-input-container">
-                              <Text prominent size="lg">AMOUNT OF $FLY TO STAKE</Text>
+                              <Text prominent size="lg">AMOUNT OF $FLY TO {isStaking ? "STAKE" : "UNSTAKE"}</Text>
                               <div className="staking-input-underline">
                                 <FlyIcon />
                                 <input
@@ -430,7 +435,9 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                                 />
                               </div>
                               <div className="staking-input-lower">
-                                {getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining
+                                {isStaking ?
+                                  `${getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining` :
+                                  `${getValueFromFlyAmount(new BN(flyStaked.toString()).sub(stakeAmount))} $FLY remaining`}
                                 <div className="flex" style={{gap: '0.5em'}}>
                                   <Text size="md">Staking {getValueFromFlyAmount(stakeAmount)} $FLY</Text>
                                   <div onClick={setMaxBalance}>
