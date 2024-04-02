@@ -1,5 +1,5 @@
 
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 
 import BN from "bn.js";
 
@@ -72,8 +72,20 @@ const FLYClaimSubmitModal = ({
     signBuffer,
     addToken,
     merkleDistributorWithDeadlineClaim,
-    merkleDistributorWithDeadlineClaimAndStake
+    merkleDistributorWithDeadlineClaimAndStake,
   } = useContext(FluidityFacadeContext);
+
+  const closeWithEsc = useCallback(
+    (event: { key: string }) => {
+      event.key === "Escape" && visible === true && close();
+    },
+    [visible]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeWithEsc);
+    return () => document.removeEventListener("keydown", closeWithEsc);
+  }, [visible]);
 
   const flyAmountFirstTranche = flyAmount / 4;
 
@@ -260,7 +272,7 @@ const FLYClaimSubmitModal = ({
             className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
               }`}
           >
-            <div className="fly-submit-claim-modal-background">
+            <div onClick={close} className="fly-submit-claim-modal-background"></div>
               <div
                 className={`fly-submit-claim-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
                   }`}
@@ -410,7 +422,6 @@ const FLYClaimSubmitModal = ({
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </>,
         document.body

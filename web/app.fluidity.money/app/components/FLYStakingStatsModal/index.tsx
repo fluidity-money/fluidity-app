@@ -3,7 +3,7 @@ import { BigNumber } from "ethers";
 import BN from "bn.js";
 import { FlyToken } from "contexts/EthereumProvider";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { ReactNode, useContext, useEffect, useState } from "react";
+import { ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "~/styles/dashboard/airdrop.css";
 import { BaseCircle, Checked, NextCircle, TermsModal } from "../FLYClaimSubmitModal";
@@ -49,6 +49,18 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   } = useContext(FluidityFacadeContext)
 
   const [flyBalance, setFlyBalance] = useState(new BN(0));
+
+  const closeWithEsc = useCallback(
+    (event: { key: string }) => {
+      event.key === "Escape" && visible === true && close();
+    },
+    [visible]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeWithEsc);
+    return () => document.removeEventListener("keydown", closeWithEsc);
+  }, [visible]);
 
   useEffect(() => {
     (async () => {
@@ -208,7 +220,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
             className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
               }`}
           >
-            <div className="fly-submit-claim-modal-background">
+            <div onClick={close} className="fly-submit-claim-modal-background"></div>
               <div
                 className={`fly-staking-stats-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
                   }`}
@@ -492,7 +504,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                   <TermsModal visible={showTermsModal} close={() => setShowTermsModal(false)} />
                 </div>
               </div>
-            </div>
           </div>
         </>,
         document.body
