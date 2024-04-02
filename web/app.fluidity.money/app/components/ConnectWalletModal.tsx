@@ -102,7 +102,9 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
                   {wallet.name}
                 </Text>
               </span>
-              <Text size="xs" className="connect-wallet-modal-status"></Text>
+              <Text size="xs" className="connect-wallet-modal-status">
+                <i></i>
+              </Text>
             </li>
           ))
         )}
