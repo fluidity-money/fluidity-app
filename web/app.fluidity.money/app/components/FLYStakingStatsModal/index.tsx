@@ -386,7 +386,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
 
 
                         <div className="fly-submit-claim-modal-options">
-                          {currentStatus === State.AmountEntered && <div className="fly-submit-claim-modal-row">
+                          {currentStatus <= State.IsConnected && <div className="fly-submit-claim-modal-row">
                             <div className="fly-points-info-container">
                               <div className="flex">
                                 <Text size="lg" prominent>🏄🏼‍♂️</Text>
