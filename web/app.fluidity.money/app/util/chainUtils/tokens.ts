@@ -105,11 +105,48 @@ const addDecimalToBn = (amount: BN, decimals: number) => {
   return !dec ? whole : `${whole}.${dec}`;
 };
 
+const parseSwapInputToTokenAmount = (input: string, token: Token): BN => {
+  const [whole, dec] = input.split(".");
+
+  const wholeBn = getTokenAmountFromUsd(new BN(whole || 0), token);
+
+  if (dec === undefined) {
+    return wholeBn;
+  }
+
+  const decimalsBn = new BN(dec).mul(
+    new BN(10).pow(new BN(token.decimals - dec.length))
+  );
+
+  return wholeBn.add(decimalsBn);
+};
+
+// Snap the smallest of token balance, remaining mint limit, or swap amt
+const snapToValidValue = (input: string, token: Token, userTokenBalance: BN, userMintLimit?: BN, userMintedAmt?: BN): BN => {
+  const usdBn = parseSwapInputToTokenAmount(input, token);
+
+  const maxUserPayable = BN.min(usdBn, userTokenBalance);
+
+  console.log("usdBn",usdBn.toString(),"userTokenBal",userTokenBalance.toString())
+  if (!userMintLimit) {
+    return maxUserPayable;
+  }
+
+
+  const maxMintable = userMintLimit.sub(
+    userMintedAmt || new BN(0)
+  );
+  console.log("max mintable",maxMintable.toString())
+
+  return BN.min(maxUserPayable, maxMintable);
+};
+
 export {
   getTokenForNetwork,
   getTokenFromAddress,
   getTokenFromSymbol,
   getUsdFromTokenAmount,
+  snapToValidValue,
   getTokenAmountFromUsd,
   addDecimalToBn,
   fluidAssetOf,
