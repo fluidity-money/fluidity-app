@@ -294,12 +294,14 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                               tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  <a
-                                    href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
-                                    rel="noopener noreferrer"
-                                  >
-                                    More info available here
-                                  </a>
+                                  <Text className="staking-stats-info-text">
+                                    <a
+                                      href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
+                                      rel="noopener noreferrer"
+                                    >
+                                      More info available here
+                                    </a>
+                                  </Text>
                                 </div>
                               }
                             >
