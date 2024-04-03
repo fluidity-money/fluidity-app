@@ -1257,7 +1257,7 @@ $holo: linear-gradient(
     @media (max-width: 527px) {
       max-height: 100vh;
       margin: 0;
-      padding: 0.8em;      
+      padding: 0.8em;
 
       .legal {
         text-align: center;
@@ -1284,7 +1284,7 @@ $holo: linear-gradient(
       height: fit-content;
       overflow-y: auto;
       margin: 0;
-      padding: 0.8em;      
+      padding: 0.8em;
 
       .legal {
         text-align: center;
@@ -1628,4 +1628,9 @@ claim-error-message-none {
 
 .claim-error-message {
   display: block;
+}
+
+.staking-stats-info-text {
+  min-width: 100px;
+  max-width: 140px;
 }
