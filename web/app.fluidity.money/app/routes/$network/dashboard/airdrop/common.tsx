@@ -2127,7 +2127,7 @@ const RecapModal = ({
   const [completedClaimStakeModal, setCompletedClaimStakeModal] = useState(false);
 
   // called when someone completes the staking modal with a claim complete state.
-  const handleClaimStakingModalComplete = (_: BN) => {
+  const handleClaimStakingModalComplete = () => {
     setCompletedClaimStakeModal(true);
   };
 
