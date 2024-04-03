@@ -2092,12 +2092,33 @@ const RecapModal = ({
     return () => document.removeEventListener("keydown", closeWithEsc);
   }, [termsAndConditionsModalVis, closeWithEsc]);
 
+  const [isItTimeForClaim, setIsItTimeForClaim] = useState(false);
+
+  // set up a timer that activates when it's time to show the button
+
+  useEffect(() => {
+    const currentTimestampMs = new Date().getTime();
+    const futureTimestampMs = 1712152800 * 1000; // 3rd of april 2pm utc
+
+    if (currentTimestampMs > futureTimestampMs) {
+      setIsItTimeForClaim(true);
+      return;
+    }
+
+    const delay = futureTimestampMs - currentTimestampMs;
+    const timerId = setTimeout(() => {
+      setIsItTimeForClaim(true);
+    }, delay);
+
+    return () => clearTimeout(timerId);
+  }, []);
+
   const ClaimButtonsSpread = () =>
     <div className="recap-fly-count-buttons-spread">
-      <GeneralButton onClick={() => handleClaimYourFly('claim')}>
+      <GeneralButton disabled={!isItTimeForClaim} onClick={() => handleClaimYourFly('claim')}>
         Claim your FLY
       </GeneralButton>
-      <GeneralButton onClick={() => handleClaimYourFly('stake')}>
+      <GeneralButton disabled={!isItTimeForClaim} onClick={() => handleClaimYourFly('stake')}>
         Stake your $FLY airdrop
       </GeneralButton>
     </div>;
