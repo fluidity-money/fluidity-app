@@ -707,6 +707,31 @@ export const merkleDistributorWithDeadlineClaimAndStake = async (
   }
 };
 
+export const merkleDistributorWithDeadlineIsClaimed = async (
+  provider: Provider,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface,
+  index: number
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      provider
+    );
+
+    if (!merkleDistributorWithDeadlineAddr)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+    return await merkleDistributorWithDeadlineContract.isClaimed(index);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return false;
+  }
+};
+
 export const flyStakingStake = async (
   signer: JsonRpcSigner,
   flyTokenAddr: string,

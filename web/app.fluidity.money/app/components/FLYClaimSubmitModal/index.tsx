@@ -4,6 +4,7 @@ import { useContext, useState, useEffect, useCallback } from "react";
 import BN from "bn.js";
 
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { requestProof } from "~/queries/requestProof";
 
 import { Heading, GeneralButton, Text, trimAddress, LinkButton, Modal, WarningIcon } from "@fluidity-money/surfing";
@@ -20,8 +21,8 @@ type IFLYClaimSubmitModal = {
   mode: 'stake' | 'claim';
   close: () => void;
   showConnectWalletModal: () => void;
-  onComplete: (amountClaimed: number) => void;
-  onFailure: (errorMessage: string) => void
+  onStakingComplete: (amountStaked: BN) => void;
+  onClaimComplete: (amountClaimed: BN) => void
 };
 
 enum State {
@@ -30,7 +31,7 @@ enum State {
   HasSigned,
   HasClaimed,
   HasStaked,
-  Broken
+  InError
 }
 
 const BlobData = `By completing the transaction of this Airdrop you acknowledge that
@@ -54,11 +55,9 @@ Kindly be advised that this list is for reference only and you are advised to se
 
 **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*`;
 
-// TODO add a check for their state if they close and re-open the modal
-// TODO fail state for when they've already claimed/staked
 const FLYClaimSubmitModal = ({
-  // onComplete,
-  // onFailure,
+  onStakingComplete,
+  onClaimComplete,
   flyAmount,
   visible,
   showConnectWalletModal,
@@ -73,7 +72,10 @@ const FLYClaimSubmitModal = ({
     addToken,
     merkleDistributorWithDeadlineClaim,
     merkleDistributorWithDeadlineClaimAndStake,
+    merkleDistributorWithDeadlineIsClaimed,
   } = useContext(FluidityFacadeContext);
+
+  const { shouldUpdateBalance } = useContext(FlyStakingContext);
 
   const closeWithEsc = useCallback(
     (event: { key: string }) => {
@@ -127,7 +129,6 @@ const FLYClaimSubmitModal = ({
         setCurrentAction("Staked!")
         break;
     }
-
   }, [currentStatus])
 
   // needed for the signature effect hook
@@ -138,39 +139,34 @@ const FLYClaimSubmitModal = ({
   const [beginRequestProof, setBeginRequestProof] = useState(false);
 
   // needed to request the claim onchain, the amount to request
-  // const [requestAmount, setRequestAmount] = useState("");
-  // const [requestProofs, setRequestProofs] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const triggerMerkleClaim = async (index: number, amount_: string, proofs: string[]) => {
     if (!address) throw new Error("no address");
     const amount = new BN(amount_.replace(/^0x/, ""), 16);
-    try {
-      switch (currentMode) {
-        case "stake":
-          if (!merkleDistributorWithDeadlineClaimAndStake)
-            throw new Error("no deadline claim/stake");
+    switch (currentMode) {
+      case "stake":
+        if (!merkleDistributorWithDeadlineClaimAndStake)
+          throw new Error("no deadline claim/stake");
 
-          await merkleDistributorWithDeadlineClaimAndStake(
-            address,
-            index,
-            amount,
-            proofs
-          );
-          break;
-        case "claim":
-          if (!merkleDistributorWithDeadlineClaim)
-            throw new Error("no deadline claim");
+        await merkleDistributorWithDeadlineClaimAndStake(
+          address,
+          index,
+          amount,
+          proofs
+        );
+        break;
+      case "claim":
+        if (!merkleDistributorWithDeadlineClaim)
+          throw new Error("no deadline claim");
 
-          await merkleDistributorWithDeadlineClaim(
-            address,
-            index,
-            amount,
-            proofs
-          );
-          break;
-      }
-    } catch (err) {
-      console.error("error staking/claiming", err);
+        await merkleDistributorWithDeadlineClaim(
+          address,
+          index,
+          amount,
+          proofs
+        );
+        break;
     }
   };
 
@@ -190,6 +186,7 @@ const FLYClaimSubmitModal = ({
   useEffect(() => {
     if (!address) return;
     if (!beginRequestProof) return;
+    if (!merkleDistributorWithDeadlineIsClaimed) return;
     (async () => {
       try {
         const {
@@ -199,17 +196,35 @@ const FLYClaimSubmitModal = ({
           error
         } = await requestProof(address, signature);
 
+        // get the amount into a big number, but slice off the 0x at the start
+        const amountBn = new BN(amount.slice(2), 16);
+
+        const alreadyClaimed = await merkleDistributorWithDeadlineIsClaimed(index);
+
+        if (alreadyClaimed) {
+          setCurrentStatus(currentMode === "stake" ? State.HasStaked : State.HasClaimed);
+          onClaimComplete(amountBn);
+          shouldUpdateBalance?.();
+          return;
+        }
+
         if (!index) throw new Error(`amount not returned, err: ${error}`);
-        // setRequestAmount(amount);
-        // setRequestProofs(proofs);
         await triggerMerkleClaim(index, amount, proofs);
-        setCurrentStatus(State.HasClaimed);
+        if (currentMode === "stake") {
+          setCurrentStatus(State.HasStaked);
+          onStakingComplete(amountBn);
+        } else {
+          setCurrentStatus(State.HasClaimed);
+          onClaimComplete(amountBn);
+        }
+        shouldUpdateBalance?.();
       } catch (err) {
-        console.error("the big fuck", err);
-        throw new Error(`failed to request proof: ${err}`);
+        setCurrentStatus(State.InError);
+        setErrorMessage(`error staking/claiming: ${err}`);
+        console.error("error staking/claiming", err);
       }
     })();
-  }, [address, beginRequestProof]);
+  }, [address, beginRequestProof, merkleDistributorWithDeadlineIsClaimed]);
 
   const handleBeginSigning = () => {
     // prompt the user to sign the blob that we're using for verifying
@@ -260,7 +275,7 @@ const FLYClaimSubmitModal = ({
       case State.HasStaked:
         // do nothing, why is this being shown?
         break;
-      case State.Broken:
+      case State.InError:
         // something went wrong. prompt the user to reload the page.
         break;
     }
@@ -326,15 +341,15 @@ const FLYClaimSubmitModal = ({
                         </div>
                       </div>
                       {currentMode === "claim" && <div className="fly-submit-claim-modal-row">
-                        {currentStatus < State.HasSigned ?
+                        {currentStatus < State.HasStaked ?
                           <BaseCircle /> :
-                          currentStatus === State.HasSigned ?
-                            <NextCircle /> :
-                            <Checked />
+                          currentStatus === State.HasStaked ?
+                            <Checked /> :
+                            <NextCircle />
                         }
                         <div className="flex-column">
                           <Text size="lg" prominent>Claim $FLY {flyAmountFirstTranche}</Text>
-                          {currentStatus >= State.HasClaimed &&
+                          {currentStatus == State.HasClaimed &&
                             <LinkButton
                               size={"medium"}
                               type={"external"}
@@ -360,6 +375,9 @@ const FLYClaimSubmitModal = ({
                       }
                     </div>
                   }
+                  <Text className={currentStatus === State.InError ? "claim-error-message" : "claim-error-message-none"}>
+                    { errorMessage }
+                  </Text>
                   <div className="fly-submit-claim-modal-button-container">
                     {confirmingClaim ?
                       <div className="fly-confirming-claim-button-container">
@@ -397,8 +415,8 @@ const FLYClaimSubmitModal = ({
                           type="primary"
                           size="large"
                           layout="after"
-                          disabled={currentStatus === finalState}
                           handleClick={handleClickButton}
+                          disabled={currentStatus === State.HasStaked || currentStatus === State.InError}
                           className={`fly-submit-claim-action-button ${currentStatus === finalState - 1 ? "rainbow" : ""} ${currentStatus === finalState ? "claim-button-staked" : ""}`}
 
                         >

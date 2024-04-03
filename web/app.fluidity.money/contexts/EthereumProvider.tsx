@@ -31,6 +31,7 @@ import {
 import {
   merkleDistributorWithDeadlineClaim as doMerkleDistributorWithDeadlineClaim,
   merkleDistributorWithDeadlineClaimAndStake as doMerkleDistributorWithDeadlineClaimAndStake,
+  merkleDistributorWithDeadlineIsClaimed as doMerkleDistributorWithDeadlineIsClaimed,
   flyStakingStake as doFlyStakingStake,
   flyStakingBeginUnstake as doFlyStakingBeginUnstake,
   flyStakingDetails as doFlyStakingDetails,
@@ -655,6 +656,22 @@ const EthereumFacade = ({
     console.log(result);
   };
 
+  const merkleDistributorWithDeadlineIsClaimed = async (index: number) => {
+    if (!provider) return undefined;
+
+    const result = await doMerkleDistributorWithDeadlineIsClaimed(
+      provider,
+      MerkleDistributorWithDeadlineAddr,
+      MerkleDistributorWithDeadlineAbi,
+      index
+    );
+    console.log(result);
+
+    if (!result) return undefined;
+
+    return result;
+  };
+
   const flyStakingStake = async (amount: BN) => {
     const signer = provider?.getSigner();
 
@@ -794,6 +811,7 @@ const EthereumFacade = ({
         merkleDistributorWithDeadlineEndTime,
         merkleDistributorWithDeadlineClaim,
         merkleDistributorWithDeadlineClaimAndStake,
+        merkleDistributorWithDeadlineIsClaimed,
         flyStakingStake,
         flyStakingDetails,
         flyStakingBeginUnstake,

@@ -59,6 +59,7 @@ import { getProviderDisplayName } from "~/util/provider";
 import dashboardStyles from "~/styles/dashboard.css";
 import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import { UIContext } from "contexts/UIProvider";
+import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { FlyStakingStatsModal } from "~/components/FLYStakingStatsModal";
 
 export const links: LinksFunction = () => {
@@ -423,6 +424,9 @@ export default function Dashboard() {
 
   const [stakingStatsModalVisibility, setStakingStatsModalVisibility] = useState(false);
 
+  // every change to this number asks flystakingmodal to look up the new balance
+  const [shouldUpdateFlyBalance, setShouldUpdateFlyBalance] = useState(0);
+
   const otherModalOpen =
     openMobModal ||
     walletModalVisibility ||
@@ -743,19 +747,28 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
+        {/* FLY Staking Stats Modal */}
         <FlyStakingStatsModal
           staking={true}
           close={() => { setStakingStatsModalVisibility(false) }}
           showConnectWalletModal={() => setWalletModalVisibility(true)}
           visible={stakingStatsModalVisibility}
+          shouldUpdateFlyBalance={shouldUpdateFlyBalance}
         />
-        <UIContext.Provider
+        <FlyStakingContext.Provider
           value={{
-            toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+            toggleVisibility: setStakingStatsModalVisibility,
+            shouldUpdateBalance: () => setShouldUpdateFlyBalance((v) => v + 1)
           }}
         >
-          <Outlet />
-        </UIContext.Provider>
+          <UIContext.Provider
+            value={{
+              toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+            }}
+          >
+            <Outlet />
+          </UIContext.Provider>
+        </FlyStakingContext.Provider>
         {/* Provide Liquidity*/}
         <div
           className="pad-main"

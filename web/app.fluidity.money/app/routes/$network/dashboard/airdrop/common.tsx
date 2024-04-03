@@ -54,6 +54,7 @@ import {
 } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import FLYClaimSubmitModal from "~/components/FLYClaimSubmitModal";
@@ -1659,6 +1660,7 @@ const TestnetRewardsModal = () => {
     signOwnerAddress,
     address: signerAddress,
   } = useContext(FluidityFacadeContext);
+
   const [address, setAddress] = useState("");
   const [ropstenAddress, setRopstenAddress] = useState("");
   const [signature, setSignature] = useState("");
@@ -1980,6 +1982,10 @@ const RecapModal = ({
 
   const { address } = useContext(FluidityFacadeContext);
 
+  const {
+    toggleVisibility: flyStakingModalToggleVisibility
+  } = useContext(FlyStakingContext);
+
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
 
@@ -2088,13 +2094,31 @@ const RecapModal = ({
 
   const ClaimButtonsSpread = () =>
     <div className="recap-fly-count-buttons-spread">
-      <GeneralButton disabled={true} onClick={() => handleClaimYourFly('claim')}>
+      <GeneralButton onClick={() => handleClaimYourFly('claim')}>
         Claim your FLY
       </GeneralButton>
-      <GeneralButton disabled={true} onClick={() => handleClaimYourFly('stake')}>
-        Stake your $FLY
+      <GeneralButton onClick={() => handleClaimYourFly('stake')}>
+        Stake your $FLY airdrop
       </GeneralButton>
     </div>;
+
+  // whether the popup staking modal was completed in a staking state
+  const [completedClaimStakeModal, setCompletedClaimStakeModal] = useState(false);
+
+  // called when someone completes the staking modal with a claim complete state.
+  const handleClaimStakingModalComplete = (amount: BN) => {
+    setCompletedClaimStakeModal(true);
+  };
+
+  const StakingStatsButton = () =>
+    <div className="recap-fly-count-buttons-spread">
+      <GeneralButton onClick={ () => flyStakingModalToggleVisibility?.(true) }>
+        Staking stats
+      </GeneralButton>
+    </div>;
+
+  const ButtonsSpread = () =>
+    completedClaimStakeModal ? <StakingStatsButton /> : <ClaimButtonsSpread />;
 
   const YouAreEligible = () => {
     return (
@@ -2106,7 +2130,7 @@ const RecapModal = ({
           <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
         </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
-          <ClaimButtonsSpread />
+          <ButtonsSpread />
         </div>
         <div className="recap-you-are-eligible-delegate-button-terms-container">
           <Text style={{ textAlign: "center" }}>
@@ -2263,11 +2287,9 @@ const RecapModal = ({
           mode={flyClaimModalState === 'none' ? 'claim' : flyClaimModalState}
           accumulatedPoints={day1Points}
           close={() => setFlyClaimModalState('none')}
-          onComplete={() => setFlyClaimModalState('none')}
-          onFailure={error => {
-            console.log("failed to claim fly", error);
-            setFlyClaimModalState('none')
-          }} />
+          onStakingComplete={handleClaimStakingModalComplete}
+          onClaimComplete={handleClaimStakingModalComplete}
+        />
       </Modal>
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}

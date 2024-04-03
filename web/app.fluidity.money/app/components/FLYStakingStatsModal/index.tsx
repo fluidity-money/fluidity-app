@@ -16,7 +16,8 @@ interface FlyStakingStatsModalProps {
   showConnectWalletModal: () => void;
   close: () => void;
   // true for staking, false for unstaking
-  staking?: boolean
+  staking?: boolean;
+  shouldUpdateFlyBalance: number;
 }
 
 enum State {
@@ -48,7 +49,7 @@ const getValueFromFlyAmount = (amount: BN) => {
   }
 };
 
-const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking = true }: FlyStakingStatsModalProps) => {
+const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUpdateFlyBalance, staking = true }: FlyStakingStatsModalProps) => {
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
   const {
@@ -90,7 +91,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
         setCurrentStatus(State.InError);
       }
     })();
-  }, [balance]);
+  }, [balance, shouldUpdateFlyBalance]);
 
   const [points, setPoints] = useState(BigNumber.from(0));
   const [flyStaked, setFlyStaked] = useState(BigNumber.from(0));
