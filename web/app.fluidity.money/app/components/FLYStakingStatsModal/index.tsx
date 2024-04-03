@@ -49,9 +49,14 @@ const getValueFromFlyAmount = (amount: BN) => {
   }
 };
 
+const getValueFromFlyAmountEthers = (amount: BigNumber) => {
+  console.log("amount staked string", amount.toString());
+  const a = new BN(amount.toString());
+  console.log("fly staked", a);
+  return getValueFromFlyAmount(a);
+}
+
 const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUpdateFlyBalance, staking = true }: FlyStakingStatsModalProps) => {
-const getValueFromFlyAmountEthers = (amount: BigNumber) =>
-  getValueFromFlyAmount(new BN(amount.toString()));
 
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
@@ -112,6 +117,7 @@ const getValueFromFlyAmountEthers = (amount: BigNumber) =>
         const { flyStaked, points } = details;
         setPoints(points);
         setFlyStaked(flyStaked);
+        console.log("fly staked 123", flyStaked);
       } catch (err) {
         console.error("error staking details", err);
         setErrorMessage(`Failed to get staking details! ${err}`);
@@ -377,7 +383,7 @@ const getValueFromFlyAmountEthers = (amount: BigNumber) =>
                               }
                             >
                               <div className="flex-column">
-                                <Text size="lg" prominent>{getValueFromFlyAmountEthers(flyStaked)?.toString()}</Text>
+                                <Text size="lg" prominent>{flyStaked.toString()}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Staked</Text>
                                   <InfoCircle className="info-circle-grey" />

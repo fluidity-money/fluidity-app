@@ -2098,7 +2098,8 @@ const RecapModal = ({
 
   useEffect(() => {
     const currentTimestampMs = new Date().getTime();
-    const futureTimestampMs = 1712152800 * 1000; // 3rd of april 2pm utc
+    //const futureTimestampMs = 1712152800 * 1000; // 3rd of april 2pm utc
+    const futureTimestampMs = 0 * 1000; // 3rd of april 2pm utc
 
     if (currentTimestampMs > futureTimestampMs) {
       setIsItTimeForClaim(true);
