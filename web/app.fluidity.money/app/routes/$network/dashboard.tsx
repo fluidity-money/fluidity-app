@@ -194,13 +194,6 @@ const NAVIGATION_MAP: {
       icon: <Trophy />,
     },
   },
-  {
-    assets: {
-      name: "assets",
-      path: (network: string) => `/${network}/dashboard/assets`,
-      icon: <AssetsIcon />,
-    },
-  },
 ];
 
 const CHAIN_NAME_MAP: Record<
@@ -916,9 +909,6 @@ const routeMapper = (route: string) => {
       return "REWARDS";
     case "/unclaimed":
       return "CLAIM";
-    case "/assets":
-    case "/assets/regular":
-      return "ASSETS";
     case "/dao":
       return "DAO";
     case "/airdrop":
