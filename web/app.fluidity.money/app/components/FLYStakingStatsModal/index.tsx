@@ -316,12 +316,14 @@ const getValueFromFlyAmountEthers = (amount: BigNumber) =>
                               tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  <a
-                                    href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
-                                    rel="noopener noreferrer"
-                                  >
-                                    More info available here
-                                  </a>
+                                  <Text className="staking-stats-info-text">
+                                    <a
+                                      href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
+                                      rel="noopener noreferrer"
+                                    >
+                                      More info available here
+                                    </a>
+                                  </Text>
                                 </div>
                               }
                             >
@@ -345,7 +347,9 @@ const getValueFromFlyAmountEthers = (amount: BigNumber) =>
                               tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  The amount of $FLY Token you have claimed.
+                                  <Text className="staking-stats-info-text">
+                                    The amount of $FLY Token you have claimed.
+                                  </Text>
                                 </div>
                               }
                             >
@@ -366,7 +370,9 @@ const getValueFromFlyAmountEthers = (amount: BigNumber) =>
                               tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  The amount of $FLY Token you have staked from your total $FLY Balance.
+                                  <Text className="staking-stats-info-text">
+                                    The amount of $FLY Token you have staked from your total $FLY Balance.
+                                  </Text>
                                 </div>
                               }
                             >
@@ -384,7 +390,9 @@ const getValueFromFlyAmountEthers = (amount: BigNumber) =>
                               tooltipStyle={"solid"}
                               tooltipContent={
                                 <div className="flex-column">
-                                  The amount of $FLY Tokens you have unstaked from your total Staked $FLY Balance. Includes unbonding amount.
+                                  <Text className="staking-stats-info-text">
+                                    The amount of $FLY Tokens you have unstaked from your total Staked $FLY Balance. Includes unbonding amount.
+                                  </Text>
                                 </div>
                               }
                             >

@@ -1471,4 +1471,9 @@ claim-error-message-none {
   display: block;
 }
 
+.staking-stats-info-text {
+  min-width: 100px;
+  max-width: 140px;
+}
+
 /*# sourceMappingURL=airdrop.css.map */
