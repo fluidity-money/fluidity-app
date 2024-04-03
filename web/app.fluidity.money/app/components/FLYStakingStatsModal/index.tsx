@@ -376,7 +376,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
                               }
                             >
                               <div className="flex-column">
-                                <Text size="lg" prominent>{flyStaked.toString()}</Text>
+                                <Text size="lg" prominent>{getValueFromFlyAmount(new BN(flyStaked.toString()))?.toString()}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Staked</Text>
                                   <InfoCircle className="info-circle-grey" />
