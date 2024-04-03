@@ -193,23 +193,35 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
   }
 
   const setMaxBalance = () => {
-    return setSwapInput(
-      addDecimalToBn(
-        snapToValidValue(
-          flyBalance.toString(),
-          FlyToken,
-          flyBalance,
-        ),
-        FlyToken.decimals
-      )
-    );
+    if (isStaking) {
+      setSwapInput(
+        addDecimalToBn(
+          snapToValidValue(
+            flyBalance.toString(),
+            FlyToken,
+            flyBalance,
+          ),
+          FlyToken.decimals
+        )
+      );
+    } else {
+      setSwapInput(
+        addDecimalToBn(
+          snapToValidValue(
+            flyStaked.toString(),
+            FlyToken,
+            new BN(flyStaked.toString())
+          ),
+          FlyToken.decimals
+        )
+      );
+    }
   };
 
   const [swapInput, setSwapInput] = useState("");
 
   const stakeAmount: BN = snapToValidValue(swapInput, FlyToken, flyBalance);
 
-  // FIXME
   const unstakeAmount: BN = snapToValidValue(swapInput, FlyToken, new BN(flyStaked.toString()));
 
   // kicks off the interaction to begin the staking via the contract
