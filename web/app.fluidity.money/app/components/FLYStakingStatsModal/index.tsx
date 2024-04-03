@@ -102,7 +102,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
         if (!address) return;
         if (!flyStakingDetails) return;
         const details = await flyStakingDetails(address);
-        if (!details) throw new Error("couldnt get fly details"); // hope we get an error instead here
+        if (!details) {
+          console.error("couldnt get fly staking details");
+          return;
+        };
         const { flyStaked, points } = details;
         setPoints(points);
         setFlyStaked(flyStaked);
@@ -112,7 +115,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
         setCurrentStatus(State.InError);
       }
     })();
-  }, [address, flyStakingDetails]);
+  }, [address, flyStakingDetails, shouldUpdateFlyBalance]);
 
   const [flyUnstaking, setFlyUnstaking] = useState(new BN(0));
 

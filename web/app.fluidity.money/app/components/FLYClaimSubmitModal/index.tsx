@@ -120,7 +120,7 @@ const FLYClaimSubmitModal = ({
         setCurrentAction("Sign")
         break;
       case State.HasSigned:
-        setCurrentAction("Claim")
+        setCurrentAction(currentMode === "claim" ? "Claim" : "Stake")
         break;
       case State.HasClaimed:
         setCurrentAction(currentMode === "claim" ? "Claimed!" : "Stake")
