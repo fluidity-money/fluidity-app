@@ -334,6 +334,18 @@ const FLYClaimSubmitModal = ({
                         }
                         <div className="flex-column">
                           <Text size="lg" prominent>Claim $FLY {flyAmountFirstTranche}</Text>
+                          {currentStatus === State.HasSigned &&
+                          <Text size="md">Your remaining {flyAmount - flyAmountFirstTranche} $FLY will be vested and{" "}
+                            <a
+                              className="link"
+                              href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
+                              rel="noopener noreferrer"
+                              target="_blank"
+                            >
+                              Airdropped to your wallet accordingly
+                            </a>
+                          </Text>
+                          }
                           {currentStatus >= State.HasClaimed &&
                             <LinkButton
                               size={"medium"}
@@ -414,6 +426,8 @@ const FLYClaimSubmitModal = ({
                       <a
                         className="link"
                         href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+                        rel="noopener noreferrer"
+                        target="_blank"
                       >
                         Terms of Service
                       </a>{" "}

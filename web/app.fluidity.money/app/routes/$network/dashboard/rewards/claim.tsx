@@ -105,19 +105,6 @@ const ClaimedRewards = () => {
           <hr />
         </section>
 
-        {/* Navigation Buttons*/}
-        {/* Assets Button - SCOPED OUT */}
-        {/*
-      <GeneralButton
-        version={"primary"}
-        buttontype={"text"}
-        size={"large"}
-        handleClick={() => navigate("assets")}
-      >
-        Go to Assets
-      </GeneralButton>
-      */}
-
         {/* Fluidify Button */}
         <GeneralButton
           className="spread"
