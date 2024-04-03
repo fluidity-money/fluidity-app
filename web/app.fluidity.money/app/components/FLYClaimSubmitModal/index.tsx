@@ -334,11 +334,11 @@ const FLYClaimSubmitModal = ({
                         }
                         <div className="flex-column">
                           <Text size="lg" prominent>Claim $FLY {flyAmountFirstTranche}</Text>
-                          {currentStatus === State.HasSigned && 
+                          {currentStatus === State.HasSigned &&
                           <Text size="md">Your remaining {flyAmount - flyAmountFirstTranche} $FLY will be vested and{" "}
                             <a
                               className="link"
-                              href=""
+                              href="https://blog.fluidity.money/introducing-the-fluidity-governance-token-fly-0992cfbf921e"
                               rel="noopener noreferrer"
                               target="_blank"
                             >
