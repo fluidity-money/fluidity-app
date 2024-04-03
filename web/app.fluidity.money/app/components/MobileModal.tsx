@@ -210,7 +210,6 @@ export default function MobileModal({
           <ul className="sidebar-nav">
             <>
             {navigationMap
-              .filter(({ name }) => name !== "Assets")
               .map((obj, index) => {
                 const key = Object.values(obj)[0];
                 const { name, icon, path } = obj;

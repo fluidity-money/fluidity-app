@@ -30,7 +30,6 @@ import {
   DashboardIcon,
   GeneralButton,
   Trophy,
-  AssetsIcon,
   FlyIcon,
   StakeIcon,
   Text,
@@ -193,13 +192,6 @@ const NAVIGATION_MAP: {
       name: "rewards",
       path: (network: string) => `/${network}/dashboard/rewards`,
       icon: <Trophy />,
-    },
-  },
-  {
-    assets: {
-      name: "assets",
-      path: (network: string) => `/${network}/dashboard/assets`,
-      icon: <AssetsIcon />,
     },
   },
 ];
@@ -929,9 +921,6 @@ const routeMapper = (route: string) => {
       return "REWARDS";
     case "/unclaimed":
       return "CLAIM";
-    case "/assets":
-    case "/assets/regular":
-      return "ASSETS";
     case "/dao":
       return "DAO";
     case "/airdrop":

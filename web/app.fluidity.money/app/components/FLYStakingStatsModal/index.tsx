@@ -50,6 +50,9 @@ const getValueFromFlyAmount = (amount: BN) => {
 };
 
 const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUpdateFlyBalance, staking = true }: FlyStakingStatsModalProps) => {
+const getValueFromFlyAmountEthers = (amount: BigNumber) =>
+  getValueFromFlyAmount(new BN(amount.toString()));
+
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
   const {
@@ -66,7 +69,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
 
   const closeWithEsc = useCallback(
     (event: { key: string }) => {
-      event.key === "Escape" && visible === true && close();
+      event.key === "Escape" && visible === true && handleClose();
     },
     [visible]
   );
@@ -194,21 +197,36 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
   }
 
   const setMaxBalance = () => {
-    return setSwapInput(
-      addDecimalToBn(
-        snapToValidValue(
-          flyBalance.toString(),
-          FlyToken,
-          flyBalance,
-        ),
-        FlyToken.decimals
-      )
-    );
+    if (isStaking) {
+      setSwapInput(
+        addDecimalToBn(
+          snapToValidValue(
+            flyBalance.toString(),
+            FlyToken,
+            flyBalance,
+          ),
+          FlyToken.decimals
+        )
+      );
+    } else {
+      setSwapInput(
+        addDecimalToBn(
+          snapToValidValue(
+            flyStaked.toString(),
+            FlyToken,
+            new BN(flyStaked.toString())
+          ),
+          FlyToken.decimals
+        )
+      );
+    }
   };
 
   const [swapInput, setSwapInput] = useState("");
 
   const stakeAmount: BN = snapToValidValue(swapInput, FlyToken, flyBalance);
+
+  const unstakeAmount: BN = snapToValidValue(swapInput, FlyToken, new BN(flyStaked.toString()));
 
   // kicks off the interaction to begin the staking via the contract
   const [beginStaking, setBeginStaking] = useState(false);
@@ -353,7 +371,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
                               }
                             >
                               <div className="flex-column">
-                                <Text size="lg" prominent>{flyStaked.toString()}</Text>
+                                <Text size="lg" prominent>{getValueFromFlyAmountEthers(flyStaked)?.toString()}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Staked</Text>
                                   <InfoCircle className="info-circle-grey" />
@@ -371,7 +389,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
                               }
                             >
                               <div className="flex-column">
-                                <Text size="lg" prominent>{flyUnstaking.toString()}</Text>
+                                <Text size="lg" prominent>{getValueFromFlyAmount(flyUnstaking)?.toString()}</Text>
                                 <div className="text-with-info-popup">
                                   <Text size="lg">Unstaking</Text>
                                   <InfoCircle className="info-circle-grey" />
@@ -436,7 +454,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
                               <div className="staking-input-lower">
                                 {isStaking ?
                                   `${getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining` :
-                                  `${getValueFromFlyAmount(new BN(flyStaked.toString()).sub(stakeAmount))} $FLY remaining`}
+                                  `${getValueFromFlyAmount(new BN(flyStaked.toString()).sub(unstakeAmount))} $FLY staked remaining`}
                                 <div className="flex" style={{gap: '0.5em'}}>
                                   <Text size="md">Staking {getValueFromFlyAmount(stakeAmount)} $FLY</Text>
                                   <div onClick={setMaxBalance}>
@@ -530,7 +548,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
                           type="primary"
                           size="large"
                           layout="after"
-                          disabled={currentStatus === State.HasStaked || stakeAmount.eq(new BN(0))}
+                          disabled={currentStatus === State.HasStaked || (isStaking ? stakeAmount.eq(new BN(0)) : unstakeAmount.eq(new BN(0)))}
                           handleClick={() => handleClick(isStaking)}
                           className={`fly-staking-stats-action-button ${currentStatus === State.HasStaked - 1 ? "rainbow" : ""} ${currentStatus === State.HasStaked ? "claim-button-staked" : ""} ${currentStatus === State.InError ? "claim-button-error" : ""}`}
 
