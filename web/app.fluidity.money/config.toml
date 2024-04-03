@@ -212,7 +212,7 @@ name = "FLUIDITY"
 logo = "/assets/tokens/fly.svg"
 address = "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
 colour = "#12946c"
-isFluidOf = ""
+isFluidOf = "0x0000000000000000000000000000000000000000"
 decimals = 6
 enabled = true
 
