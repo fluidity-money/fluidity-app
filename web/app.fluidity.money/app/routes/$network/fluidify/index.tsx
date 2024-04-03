@@ -335,6 +335,7 @@ export default function FluidifyToken() {
 
   useEffect(() => {
     const typeFilteredTokens = tokens
+      .filter((n) => n.symbol != "FLY")
       .filter(searchFilters[activeFilterIndex].filter)
       .sort(
         (first, second) =>
