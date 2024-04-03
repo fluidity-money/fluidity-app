@@ -49,13 +49,6 @@ const getValueFromFlyAmount = (amount: BN) => {
   }
 };
 
-const getValueFromFlyAmountEthers = (amount: BigNumber) => {
-  console.log("amount staked string", amount.toString());
-  const a = new BN(amount.toString());
-  console.log("fly staked", a);
-  return getValueFromFlyAmount(a);
-}
-
 const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUpdateFlyBalance, staking = true }: FlyStakingStatsModalProps) => {
 
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
@@ -113,7 +106,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
         if (!details) {
           console.error("couldnt get fly staking details");
           return;
-        };
+        }
         const { flyStaked, points } = details;
         setPoints(points);
         setFlyStaked(flyStaked);
