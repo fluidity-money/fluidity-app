@@ -658,8 +658,8 @@ export default function Dashboard() {
               />
             )}
 
-            {/* Send & Receive (only supported if Arbitrum) */}
-            {network == "arbitrum" && (
+            {/* Send & Receive (only supported if Arbitrum and non mobile and tablet) */}
+            {network == "arbitrum" && !isMobile && !isTablet && (
               <>
                 <GeneralButton
                   className="s-r-button"
