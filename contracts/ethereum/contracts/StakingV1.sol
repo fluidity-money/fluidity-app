@@ -271,7 +271,10 @@ return a
         uint256 flyStaked,
         uint256 day1Points
     ) {
-        require(msg.sender == merkleDistributor_, "not merkle distributor");
+        require(
+            msg.sender == merkleDistributor_ || msg.sender == operator_,
+            "not merkle distributor"
+        );
         flyStaked = _stake(msg.sender, _recipient, _flyAmount, true);
         return (flyStaked, _calcDay1Points(_flyAmount));
     }
