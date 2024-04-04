@@ -123,7 +123,7 @@ export const parseSwapInputToTokenAmount = (input: string, token: Token): BN => 
 };
 
 // Snap the smallest of token balance, remaining mint limit, or swap amt
-const snapToValidValue = (input: string, token: Token, userTokenBalance: BN, userMintLimit?: BN, userMintedAmt?: BN): BN => {
+const snapToValidValue = (input: string, token: Token, userTokenBalance: BN): BN => {
   const usdBn = parseSwapInputToTokenAmount(input, token);
   const maxUserPayable = BN.min(usdBn, userTokenBalance);
   return maxUserPayable;
