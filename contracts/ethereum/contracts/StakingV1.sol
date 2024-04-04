@@ -214,7 +214,7 @@ return a
     }
     /* ~~~~~~~~~~ INFORMATIONAL ~~~~~~~~~~ */
 
-    function stakingPositionsLen(address _account) public view returns (uint) {
+    function stakedPositionsLen(address _account) public view returns (uint) {
         return stakedStorage_[_account].length;
     }
 
