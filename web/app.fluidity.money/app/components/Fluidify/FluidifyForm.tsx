@@ -9,6 +9,7 @@ import {
   addDecimalToBn,
   getUsdFromTokenAmount,
   snapToValidValue,
+  parseSwapInputToTokenAmount,
 } from "~/util/chainUtils/tokens";
 
 interface IFluidifyFormProps {
@@ -66,6 +67,7 @@ export const FluidifyForm = ({
   };
 
   const inputMaxBalance = () => {
+    console.log("user token balance", assetToken.userTokenBalance.toString());
     return setSwapInput(
       addDecimalToBn(
         snapToValidValue(
@@ -122,12 +124,7 @@ export const FluidifyForm = ({
           onBlur={(e) =>
             setSwapInput(
               addDecimalToBn(
-                snapToValidValue(
-                  e.target.value,
-                  assetToken,
-                  assetToken.userTokenBalance,
-                  assetToken.userMintedAmt,
-                ),
+                parseSwapInputToTokenAmount(e.target.value, assetToken),
                 assetToken.decimals
               )
             )
