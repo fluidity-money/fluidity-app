@@ -2148,7 +2148,7 @@ const RecapModal = ({
           <Text size="md" code={true}>
             Congratulations! You are eligible to claim 25% of your tokens at TGE!
           </Text>
-          <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
+          <Heading>$FLY {flyAmountOwed == 996699 ? "" : numberToCommaSeparated(flyAmountOwed)}</Heading>
         </div>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <ButtonsSpread />
