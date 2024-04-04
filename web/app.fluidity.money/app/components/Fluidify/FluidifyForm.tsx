@@ -67,7 +67,6 @@ export const FluidifyForm = ({
   };
 
   const inputMaxBalance = () => {
-    console.log("user token balance", assetToken.userTokenBalance.toString());
     return setSwapInput(
       addDecimalToBn(
         snapToValidValue(
