@@ -178,20 +178,19 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
-    ...airdropTab,
-    {
-      home: {
-        name: "dashboard",
-        path: (network: string) => `/${network}/dashboard/home`,
-        icon: <DashboardIcon />,
-      },
+  ...airdropTab,
+  {
+    home: {
+      name: "dashboard",
+      path: (network: string) => `/${network}/dashboard/home`,
+      icon: <DashboardIcon />,
     },
-    {
-      rewards: {
-        name: "rewards",
-        path: (network: string) => `/${network}/dashboard/rewards`,
-        icon: <Trophy />,
-      },
+  },
+  {
+    rewards: {
+      name: "rewards",
+      path: (network: string) => `/${network}/dashboard/rewards`,
+      icon: <Trophy />,
     },
   },
 ];
