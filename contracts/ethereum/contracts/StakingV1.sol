@@ -146,7 +146,7 @@ return a
 
         */
 
-        points = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp) / 1e12);
+        points = _staked.flyVested * ((curTimestamp - _staked.depositTimestamp)) / 1e12;
         if (_staked.receivedBonus) points += _calcDay1Points(_staked.flyVested);
     }
 

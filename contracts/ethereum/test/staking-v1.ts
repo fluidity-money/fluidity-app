@@ -1022,14 +1022,11 @@ const stakingTests = [
 
 const TestTokenName = "Test Token";
 
-const expectWithin5PctErr = (line: number, x_: BigNumberish, y_: number) => {
-  const x = BigNumber.from(x_);
-  const y = BigNumber.from(Math.floor(y_));
-  const b = (x.gt(y) ? x : y).mul(1e6).div(BigNumber.from(5).mul(1e6).div(100));
-  assert.ok(
-    x.sub(y).abs().lte(b),
-    `line: ${line}, ${x_} - ${y_} > 0.05 difference!`
-   );
+const within5PctErr = (line: number, x_: number, y_: number) => {
+  const x = x_;
+  const y = Math.floor(y_);
+  const b = Math.max(x, y) * 0.05;
+  return Math.abs(x - y) <= b;
 };
 
 const withSnapshot = async (k: () => Promise<void>) => {
@@ -1363,7 +1360,7 @@ describe("StakingV1", async () => {
         flyVested: fly,
         depositTimestamp: 0 // we can set this to 0 for this function.
       });
-      expectWithin5PctErr(i, points, expectedPoints);
+      assert(within5PctErr(i, points, expectedPoints), `line ${i}, points are ${points}, expected ${expectedPoints}, seconds passed are ${seconds}`);
     }
   });
 });
