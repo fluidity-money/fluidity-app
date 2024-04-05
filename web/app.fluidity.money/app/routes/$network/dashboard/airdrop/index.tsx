@@ -1189,7 +1189,7 @@ const Airdrop = () => {
       ) : (
         <>
           <div className="pad-main">
-            <div style={{ paddingTop: "10px", paddingBottom: "20px" }}>
+            <div className="airdrop-image-banner">
               <img
                 style={{
                   maxWidth: "1110px",
@@ -1199,7 +1199,7 @@ const Airdrop = () => {
                   borderColor: "white",
                 }}
                 width="100%"
-                src="/images/epoch2AirdropBanner.png"
+                src="/images/epoch3AirdropBanner.png"
               />
             </div>
             <div
@@ -1219,13 +1219,15 @@ const Airdrop = () => {
                 }}
               >
                 <div>
-                  <Heading
-                    as="h2"
-                    className={"no-margin"}
-                    style={{ marginBottom: "0.5em" }}
-                  >
-                    Airdrop V3: FLY Me to The Moon.
-                  </Heading>
+                  <div>
+                    <Heading
+                      as="h2"
+                      className={"no-margin"}
+                      style={{ marginBottom: "0.5em" }}
+                    >
+                      Airdrop V3: FLY Me to The Moon.
+                    </Heading>
+                  </div>
                   <Text style={{ fontSize: 14 }}>
                     Fluidify your assets, transact them, and boost your rewards
                     by using your Fluid Assets on partnered protocols and
@@ -1461,7 +1463,7 @@ const MultiplierTasks = () => {
           Multiplier Tasks
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Transact fUSDC on listed platforms to earn more!
+          Transact FLY on listed platforms to earn more!
         </Text>
       </div>
       <div
@@ -1578,10 +1580,12 @@ const MyMultiplier = ({
       <div>
         <div className="airdrop-arb-multipliers-container">
           <Text holo={true}>
-            Provide $fUSDC Liquidity to earn $ARB and Multipliers! Add liquidity
-            to the following Trader Joe and Camelot pools to earn $ARB liquidity
-            mining rewards! You will also retroactively earn bottles depending
-            on your contribution at the end of the Airdrop!
+            Provide $FLY and $ƒUSDC Liquidity to earn $ARB and Rewards!
+          </Text>
+          <Text holo={true}>
+            Add liquidity to Uniswap or the following Trader Joe and Camelot pools to earn Liquidity
+            Mining rewards! You will also retroactively earn bottles depending on your contribution at
+            the end of the Airdrop!
           </Text>
         </div>
         <JoeFarmlandsOrCamelotKingdom />

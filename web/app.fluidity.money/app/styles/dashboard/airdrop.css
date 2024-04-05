@@ -1476,4 +1476,9 @@ claim-error-message-none {
   max-width: 140px;
 }
 
+.airdrop-image-banner {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
 /*# sourceMappingURL=airdrop.css.map */

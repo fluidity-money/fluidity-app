@@ -2485,7 +2485,7 @@ const RecapModal = ({
               <Display style={{ margin: "0" }}>
                 {shorthandAmountFormatter(totalVolume.toString(), 1)}+
               </Display>
-              <Text>The amount of Total Volume in this Wave! </Text>
+              <Text>The amount of Total Volume in Wave Two! </Text>
             </motion.div>
 
             {/* Bottle Distribution */}

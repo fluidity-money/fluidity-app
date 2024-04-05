@@ -115,6 +115,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               highestRewardTier: 0,
               fusdcEarned: 0,
               flyEarned: 0,
+              flyStaked: 0
             } satisfies AirdropLeaderboardEntry,
           ]
     ).concat(leaderboard);
