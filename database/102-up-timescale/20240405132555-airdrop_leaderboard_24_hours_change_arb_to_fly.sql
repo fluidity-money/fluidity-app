@@ -6,9 +6,9 @@
 DROP FUNCTION airdrop_leaderboard_24_hours;
 
 ALTER TABLE airdrop_leaderboard_return
-	DROP COLUMN arb_earned,
-	ADD COLUMN fly_earned NUMERIC NOT NULL,
-        ADD COLUMN fly_staked NUMERIC NOT NULL;
+    DROP COLUMN arb_earned,
+    ADD COLUMN fly_earned NUMERIC NOT NULL,
+    ADD COLUMN fly_staked NUMERIC NOT NULL;
 
 CREATE OR REPLACE FUNCTION airdrop_leaderboard_24_hours(epoch_ lootbox_epoch)
  RETURNS SETOF airdrop_leaderboard_return
@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION airdrop_leaderboard_24_hours(epoch_ lootbox_epoch)
  STABLE
 AS $function$
 SELECT
-    address,
+    fly_staked.address,
     -- placeholder
     ROW_NUMBER() OVER () AS rank,
     COUNT(DISTINCT referee) AS referral_count,
@@ -24,7 +24,8 @@ SELECT
     lb.highest_reward_tier,
     COALESCE(liquidity.result, 1) AS liquidity_multiplier,
     COALESCE(lootbox_amounts_rewarded_fusdc.amount_earned, 0),
-    COALESCE(lootbox_amounts_rewarded_fly.amount_earned, 0)
+    COALESCE(lootbox_amounts_rewarded_fly.amount_earned, 0),
+    SUM(fly_staked.amount) AS fly_staked
 FROM (
     -- subquery to avoid re-summing lootbox_count for every referee
     SELECT address, SUM(lootbox_count) as total_box_count, MAX(reward_tier) as highest_reward_tier
@@ -43,10 +44,12 @@ FROM (
         WHERE token_short_name = 'FLY' AND epoch = epoch_
     ) AS lootbox_amounts_rewarded_fly ON lb.address = lootbox_amounts_rewarded_fly.winner
     LEFT JOIN lootbox_referrals
-        ON lb.address = lootbox_referrals.referrer,
-    LATERAL calculate_a_y(address, now()::TIMESTAMP) AS liquidity
+        ON lb.address = lootbox_referrals.referrer
+    LEFT JOIN fly_staked
+        ON lb.address = fly_staked.address,
+    LATERAL calculate_a_y(lb.address, now()::TIMESTAMP) AS liquidity
 GROUP BY
-    address,
+    fly_staked.address,
     liquidity_multiplier,
     total_box_count,
     highest_reward_tier,
