@@ -179,7 +179,7 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
 
               <img
                 onClick={close}
-                src="/images/icons/x.svg"
+                src="https://frontend-old.fluidity.money/images/icons/x.svg"
                 className="modal-cancel-btn"
               />
             </div>

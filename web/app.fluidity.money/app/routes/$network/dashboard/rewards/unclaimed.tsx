@@ -157,7 +157,7 @@ const UnclaimedWinnings = () => {
                   <img
                     src={
                       tokenDetailsMap[token_short_name].logo ??
-                      "/assets/tokens/usdt.svg"
+                      "https://frontend-old.fluidity.money/assets/tokens/usdt.svg"
                     }
                   />
                   <Text>{token_short_name}</Text>
@@ -219,7 +219,7 @@ const UnclaimedWinnings = () => {
                 >
                   <img
                     src={
-                      tokenDetailsMap[symbol].logo ?? "/assets/tokens/usdt.svg"
+                      tokenDetailsMap[symbol].logo ?? "https://frontend-old.fluidity.money/assets/tokens/usdt.svg"
                     }
                   />
                   <Text>{symbol}</Text>

@@ -55,7 +55,7 @@ const SwapCircle = ({
           >
             <Video
               className="swapping-video"
-              src={"/videos/LoadingOther.webm"}
+              src={"https://frontend-old.fluidity.money/videos/LoadingOther.webm"}
               loop={false}
               type="none"
               onEnded={() => {

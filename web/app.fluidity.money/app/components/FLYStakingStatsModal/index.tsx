@@ -299,7 +299,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, staking 
                       }
                     </Heading>
                     <span onClick={handleClose}>
-                      <img src="/images/icons/x.svg" className="modal-cancel-btn" />
+                      <img src="https://frontend-old.fluidity.money/images/icons/x.svg" className="modal-cancel-btn" />
                     </span>
                   </div>
                   <div className="fly-submit-claim-modal-options">

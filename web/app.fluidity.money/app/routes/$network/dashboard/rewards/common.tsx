@@ -43,7 +43,7 @@ const UserRewards = ({
           {/* Icon */}
           <img
             id="card-logo"
-            src="/images/fluidTokensMetallicCropped.svg"
+            src="https://frontend-old.fluidity.money/images/fluidTokensMetallicCropped.svg"
             alt="tokens"
             style={{ width: 200 }}
           />

@@ -283,7 +283,7 @@ const FLYClaimSubmitModal = ({
                   <div className="fly-submit-claim-heading-container">
                     <Heading as="h3" className="fly-submit-claim-heading">{currentMode === 'claim' ? "Claiming" : "Staking"} $FLY Tokens</Heading>
                     <span onClick={close}>
-                      <img src="/images/icons/x.svg" className="modal-cancel-btn" />
+                      <img src="https://frontend-old.fluidity.money/images/icons/x.svg" className="modal-cancel-btn" />
                     </span>
                   </div>
                   {confirmingClaim ?
@@ -435,7 +435,7 @@ const FLYClaimSubmitModal = ({
 };
 
 export const Checked = ({ size = 36 }: { size?: number }) => {
-  return <img className='fly-submit-claim-circle' height={size} width={size} src="/images/icons/checked.svg" alt="copy" />
+  return <img className='fly-submit-claim-circle' height={size} width={size} src="https://frontend-old.fluidity.money/images/icons/checked.svg" alt="copy" />
 }
 
 export const BaseCircle = () => {
