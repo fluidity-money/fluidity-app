@@ -1451,17 +1451,7 @@ const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "12x">("12x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Jumper", link: "https://jumper.exchange/" },
-    { provider: "Uniswap", link: "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500" },
-    {
-      provider: "Trader Joe",
-      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
-    },
-    { provider: "Camelot", link: "https://app.camelot.exchange/" },
-    {
-      provider: "Ramses",
-      link: "https://app.ramses.exchange/liquidity/v2/0xf73c87736008ad3af9973b357c97ab8c60d8ca63",
-    },
+    { provider: "Uniswap", link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum" },
   ];
 
   return (
