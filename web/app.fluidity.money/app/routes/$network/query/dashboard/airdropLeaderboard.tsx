@@ -114,7 +114,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
               bottles: 0,
               highestRewardTier: 0,
               fusdcEarned: 0,
-              arbEarned: 0,
+              flyEarned: 0,
             } satisfies AirdropLeaderboardEntry,
           ]
     ).concat(leaderboard);

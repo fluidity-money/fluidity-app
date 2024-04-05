@@ -1605,7 +1605,7 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, fusdcEarned, arbEarned, bottles } = data;
+  const { user, rank, referralCount, fusdcEarned, flyEarned, flyStaked, bottles } = data;
 
   return {
     className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
@@ -1687,7 +1687,7 @@ const airdropRankRow = (
               </Text>
             </td>
           );
-        case "$ARB EARNED":
+        case "$FLY EARNED":
           return (
             <td>
               <Text
@@ -1700,7 +1700,24 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toDecimalPlaces(arbEarned, 4)}
+                {toDecimalPlaces(flyEarned, 4)}
+              </Text>
+            </td>
+          );
+        case "$FLY STAKED":
+          return (
+            <td>
+              <Text
+                prominent
+                style={
+                  address === user
+                    ? {
+                      color: "black",
+                    }
+                    : {}
+                }
+              >
+                {toDecimalPlaces(flyStaked, 4)}
               </Text>
             </td>
           );
@@ -1759,7 +1776,8 @@ const Leaderboard = ({
       bottles: 0,
       highestRewardTier: 0,
       fusdcEarned: 0,
-      arbEarned: 0,
+      flyEarned: 0,
+      flyStaked: 0,
     };
 
     data.push(userEntry);
@@ -1801,7 +1819,8 @@ const Leaderboard = ({
           { name: "USER" },
           { name: "BOTTLES" },
           { name: "$fUSDC EARNED" },
-          { name: "$ARB EARNED" },
+          { name: "$FLY EARNED" },
+          { name: "$FLY STAKED" },
           { name: "REFERRALS" },
         ]}
         pagination={{

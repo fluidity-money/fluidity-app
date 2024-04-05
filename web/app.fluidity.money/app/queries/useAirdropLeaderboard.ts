@@ -32,7 +32,8 @@ const queryAllTime = gql`
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
       fusdcEarned: fusdc_earned
-      arbEarned: arb_earned
+      flyEarned: fly_earned
+      flyStaked: fly_staked
     }
   }
 `;
@@ -52,7 +53,8 @@ const queryByUser24Hours = gql`
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
       fusdcEarned: fusdc_earned
-      arbEarned: arb_earned
+      flyEarned: fly_earned
+      flyStaked: fly_staked
     }
   }
 `;
@@ -71,7 +73,8 @@ const query24Hours = gql`
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
       fusdcEarned: fusdc_earned
-      arbEarned: arb_earned
+      flyEarned: fly_earned
+      flyStaked: fly_staked
     }
   }
 `;
@@ -94,7 +97,8 @@ const query24HoursByUserByApplication = gql`
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
       fusdcEarned: fusdc_earned
-      arbEarned: arb_earned
+      flyEarned: fly_earned
+      flyStaked: fly_staked
     }
   }
 `;
@@ -116,7 +120,8 @@ const query24HoursByApplication = gql`
       highestRewardTier: highest_reward_tier
       liquidityMultiplier: liquidity_multiplier
       fusdcEarned: fusdc_earned
-      arbEarned: arb_earned
+      flyEarned: fly_earned
+      flyStaked: fly_staked
     }
   }
 `;
@@ -152,7 +157,8 @@ export type AirdropLeaderboardEntry = {
   highestRewardTier: number;
   liquidityMultiplier: number;
   fusdcEarned: number;
-  arbEarned: number;
+  flyEarned: number;
+  flyStaked: number;
 };
 
 type AirdropLeaderboardResponse = {
