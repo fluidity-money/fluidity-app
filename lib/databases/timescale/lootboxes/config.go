@@ -16,6 +16,7 @@ import (
 const (
 	Epoch1       = "epoch_1"
 	Epoch2       = "epoch_2"
+	Epoch3       = "epoch_3"
 	EpochTesting = "epoch_testing"
 )
 

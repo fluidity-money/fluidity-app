@@ -73,7 +73,7 @@ import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 import { redirect } from "react-router-dom";
 
-const EPOCH_CURRENT_IDENTIFIER = "epoch_2";
+const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
 
 const AIRDROP_BLOG_POST =
   "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
@@ -891,7 +891,7 @@ const Airdrop = () => {
                   style={{ marginBottom: "0.5em" }}
                   className={"no-margin"}
                 >
-                  Airdrop V2: Arbitrum&apos;s Space Expedition.
+                  Airdrop V3: FLY Me to The Moon.
                 </Heading>
                 <Text>
                   Fluidify your assets, transact them, and boost your rewards by
@@ -909,7 +909,8 @@ const Airdrop = () => {
                     }}
                     handleClick={() => {
                       window.open(
-                        "https://blog.fluidity.money/introducing-the-final-fluidity-airdrop-season-v2-now-live-acf6a7838ce2",
+                        // TODO
+                        "https://blog.fluidity.money",
                         "_blank"
                       );
                     }}
@@ -1223,7 +1224,7 @@ const Airdrop = () => {
                     className={"no-margin"}
                     style={{ marginBottom: "0.5em" }}
                   >
-                    Airdrop V2: Arbitrum&apos;s Space Expedition.
+                    Airdrop V3: FLY Me to The Moon.
                   </Heading>
                   <Text style={{ fontSize: 14 }}>
                     Fluidify your assets, transact them, and boost your rewards
@@ -1241,7 +1242,8 @@ const Airdrop = () => {
                       }}
                       handleClick={() => {
                         window.open(
-                          "https://blog.fluidity.money/introducing-the-final-fluidity-airdrop-season-v2-now-live-acf6a7838ce2",
+                          // TODO
+                          "https://blog.fluidity.money/",
                           "_blank"
                         );
                       }}
