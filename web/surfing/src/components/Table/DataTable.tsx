@@ -11,7 +11,7 @@ import {
 import { useMemo } from "react";
 
 import styles from "./DataTable.module.scss";
-import { ReactComponent as ArrowIcon } from "/src/assets/images/buttonIcons/arrowRightWhite.svg";
+import { ReactComponent as ArrowIcon } from "/srchttps://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/arrowRightWhite.svg";
 
 const SelectColumnFilter = ({
   filterValue,

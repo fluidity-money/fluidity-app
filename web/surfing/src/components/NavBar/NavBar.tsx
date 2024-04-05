@@ -59,7 +59,7 @@ const NavBar = ({ logo, text, button, navLinks }: INavBarProps) => {
       {link.modal && (
         <button onClick={() => {}}>
           <img
-            src="./src/assets/images/triangleDown.svg"
+            src="./srchttps://app-cdn.fluidity.money/surfing/assets/images/triangleDown.svg"
             alt="open resource options"
           />
         </button>

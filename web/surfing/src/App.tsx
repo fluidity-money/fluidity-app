@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import reactLogo from ".https://app-cdn.fluidity.money/surfing/assets/react.svg";
 import "./App.css";
 
 function App() {

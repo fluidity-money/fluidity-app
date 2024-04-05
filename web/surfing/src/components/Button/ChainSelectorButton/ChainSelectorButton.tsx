@@ -5,7 +5,7 @@
 import type { ButtonHTMLAttributes, ReactComponentElement } from "react";
 
 import { Text } from "~/components";
-import { ReactComponent as ArrowDiag } from "~/assets/images/buttonIcons/arrowDiagWhite.svg";
+import { ReactComponent as ArrowDiag } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/arrowDiagWhite.svg";
 import styles from "./ChainSelectorButton.module.scss";
 import { SupportedChains, SupportedChainsList } from "~/types";
 

@@ -1,3 +1,3 @@
-import { ReactComponent as AirdropIcon } from "~/assets/images/buttonIcons/Airdrop.svg";
+import { ReactComponent as AirdropIcon } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/Airdrop.svg";
 
 export { AirdropIcon };

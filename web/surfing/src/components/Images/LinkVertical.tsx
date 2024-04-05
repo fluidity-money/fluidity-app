@@ -1,3 +1,3 @@
-import { ReactComponent as LinkVerticalIcon } from "~/assets/images/buttonIcons/LinkVertical.svg";
+import { ReactComponent as LinkVerticalIcon } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/LinkVertical.svg";
 
 export { LinkVerticalIcon };

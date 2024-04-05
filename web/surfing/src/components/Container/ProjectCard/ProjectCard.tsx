@@ -3,7 +3,7 @@
 // LICENSE.md file.
 
 import { useState } from "react";
-import { ReactComponent as InfoSvg } from "~/assets/images/buttonIcons/infoCircle.svg";
+import { ReactComponent as InfoSvg } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/infoCircle.svg";
 import { Card, Heading, Row, Text } from "~/components";
 import { numberToMonetaryString, numberToCommaSeparated } from "~/util";
 import styles from "./ProjectCard.module.scss";

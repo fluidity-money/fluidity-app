@@ -50,16 +50,16 @@ const NavBarModal = ({ handleModal, navLinks }: INavBarModal) => {
       ))}
       <div className={styles.socials}>
         <a href="https://x.com/fluiditylabs">
-          <img src="/assets/images/socials/twitter.svg" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/twitter.svg" />
         </a>
         <a href="https://discord.gg/CNvpJk4HpC">
-          <img src="/assets/images/socials/discord.svg" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/discord.svg" />
         </a>
         <a href="https://t.me/fluiditymoney">
-          <img src="/assets/images/socials/telegram.svg" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/telegram.svg" />
         </a>
         <a href="https://www.linkedin.com/company/74689228/">
-          <img src="/assets/images/socials/linkedin.svg" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/linkedin.svg" />
         </a>
       </div>
     </motion.div>

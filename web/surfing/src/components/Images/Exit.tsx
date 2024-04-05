@@ -1,3 +1,3 @@
-import { ReactComponent as Exit } from "~/assets/images/buttonIcons/exit.svg";
+import { ReactComponent as Exit } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/exit.svg";
 
 export { Exit };

@@ -1,3 +1,3 @@
-import { ReactComponent as CaretLeft } from "~/assets/images/buttonIcons/caretLeft.svg";
+import { ReactComponent as CaretLeft } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/caretLeft.svg";
 
 export { CaretLeft };

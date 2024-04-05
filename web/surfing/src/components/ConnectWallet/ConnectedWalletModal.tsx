@@ -122,7 +122,7 @@ export const ConnectedWalletModal = ({
                   By connecting a wallet, you agree to Fluidity Money&apos;s{" "}
                   <a
                     className="link-text"
-                    href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+                    href="https://static.fluidity.moneyhttps://app-cdn.fluidity.money/surfing/assets/fluidity-website-tc.pdf"
                   >
                     Terms of Service
                   </a>{" "}

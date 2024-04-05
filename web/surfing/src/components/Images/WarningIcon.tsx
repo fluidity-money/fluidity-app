@@ -1,3 +1,3 @@
-import { ReactComponent as WarningIcon } from "~/assets/images/warning.svg"
+import { ReactComponent as WarningIcon } from "https://app-cdn.fluidity.money/surfing/assets/images/warning.svg"
 
 export { WarningIcon };

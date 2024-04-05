@@ -1,3 +1,3 @@
-import { ReactComponent as InfoCircle } from "~/assets/images/buttonIcons/infoCircle.svg";
+import { ReactComponent as InfoCircle } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/infoCircle.svg";
 
 export { InfoCircle };

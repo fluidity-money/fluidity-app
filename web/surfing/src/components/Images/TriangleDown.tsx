@@ -1,3 +1,3 @@
-import { ReactComponent as TriangleDown } from "~/assets/images/triangleDown.svg";
+import { ReactComponent as TriangleDown } from "https://app-cdn.fluidity.money/surfing/assets/images/triangleDown.svg";
 
 export { TriangleDown };

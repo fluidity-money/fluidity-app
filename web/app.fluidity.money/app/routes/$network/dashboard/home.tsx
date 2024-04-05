@@ -167,7 +167,8 @@ export default function Home() {
 
   const userHomeData = useFetcher();
   const userTransactionsData = useFetcher();
-  const prizePoolData = useCache<{ totalPrizePool: number }>(
+
+  const prizePoolData = json<{ totalPrizePool: number}>(
     `/${network}/query/dashboard/prizePool`
   );
 

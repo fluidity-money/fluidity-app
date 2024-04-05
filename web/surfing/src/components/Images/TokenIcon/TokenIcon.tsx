@@ -1,6 +1,6 @@
 import type { Token } from "~/types";
 
-const baseImgPath = "https://static.fluidity.money/assets/tokens";
+const baseImgPath = "https://static.fluidity.moneyhttps://app-cdn.fluidity.money/surfing/assets/tokens";
 
 const tokenImgMap: {[K in Token]: string} = {
   USDC: "usdc.svg",

@@ -1,3 +1,3 @@
-import { ReactComponent as DaoIcon } from "~/assets/images/buttonIcons/Dao.svg";
+import { ReactComponent as DaoIcon } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/Dao.svg";
 
 export { DaoIcon };

@@ -7,7 +7,7 @@ import { SupportedChainsList, SupportedChains } from "~/types";
 
 import { useRef } from "react";
 import { useClickOutside } from "~/util/hooks/useClickOutside";
-import { ReactComponent as Checkmark } from "~/assets/images/buttonIcons/Checkmark.svg";
+import { ReactComponent as Checkmark } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/Checkmark.svg";
 import { Card, Heading, Text } from "~/components";
 import styles from "./BlockchainModal.module.scss";
 

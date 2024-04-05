@@ -16,7 +16,7 @@ const Socials = () => {
         target="_blank"
       >
         <div className={styles.imageContainer}>
-          <img src="/assets/images/socials/twitter.svg" alt="twitter" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/twitter.svg" alt="twitter" />
         </div>
         <Text as="p" prominent={true} className={styles.socialText}>
           @FLUIDITYMONEY
@@ -29,7 +29,7 @@ const Socials = () => {
         target="_blank"
       >
         <div className={styles.imageContainer}>
-          <img src="/assets/images/socials/discord.svg" alt="discord" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/discord.svg" alt="discord" />
         </div>
         <Text as="p" prominent={true} className={styles.socialText}>
           DISCORD
@@ -43,7 +43,7 @@ const Socials = () => {
         target="_blank"
       >
         <div className={styles.imageContainer}>
-          <img src="/assets/images/socials/telegram.svg" alt="telegram" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/telegram.svg" alt="telegram" />
         </div>
         <Text as="p" prominent={true} className={styles.socialText}>
           TELEGRAM
@@ -56,7 +56,7 @@ const Socials = () => {
         target="_blank"
       >
         <div className={styles.imageContainer}>
-          <img src="/assets/images/socials/linkedin.svg" alt="linkedin" />
+          <img src="https://app-cdn.fluidity.money/surfing/assets/images/socials/linkedin.svg" alt="linkedin" />
         </div>
         <Text as="p" prominent={true} className={styles.socialText}>
           LINKEDIN

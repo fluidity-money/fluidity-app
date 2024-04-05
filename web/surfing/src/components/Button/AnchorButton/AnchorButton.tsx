@@ -4,7 +4,7 @@
 
 import type { ButtonHTMLAttributes } from "react";
 
-import { ReactComponent as ArrowDown } from "~/assets/images/buttonIcons/arrowDownWhite.svg";
+import { ReactComponent as ArrowDown } from "https://app-cdn.fluidity.money/surfing/assets/images/buttonIcons/arrowDownWhite.svg";
 import styles from "./AnchorButton.module.scss";
 
 interface IAnchorButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
