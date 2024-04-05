@@ -106,7 +106,7 @@ const SwapCompleteModal = ({
                 />
                 <Video
                   className="swapping-video"
-                  src={"https://frontend-old.fluidity.money/videos/LoadingOther.webm"}
+                  src={"https://app-cdn.fluidity.money/videos/LoadingOther.webm"}
                   loop={false}
                   type="fill"
                   height={"auto"}

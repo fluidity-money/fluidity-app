@@ -298,8 +298,8 @@ const Table = <T,>(props: ITable<T>) => {
                 style={{ width: 16 }}
                 src={
                   page === 1
-                    ? "https://frontend-old.fluidity.money/images/icons/arrowLeftDark.svg"
-                    : "https://frontend-old.fluidity.money/images/icons/arrowLeftWhite.svg"
+                    ? "https://app-cdn.fluidity.money/images/icons/arrowLeftDark.svg"
+                    : "https://app-cdn.fluidity.money/images/icons/arrowLeftWhite.svg"
                 }
                 className={
                   page === 1 ? "pagination-arrow-off" : "pagination-arrow"
@@ -312,8 +312,8 @@ const Table = <T,>(props: ITable<T>) => {
                 style={{ width: 16 }}
                 src={
                   page === pageCount
-                    ? "https://frontend-old.fluidity.money/images/icons/arrowRightDark.svg"
-                    : "https://frontend-old.fluidity.money/images/icons/arrowRightWhite.svg"
+                    ? "https://app-cdn.fluidity.money/images/icons/arrowRightDark.svg"
+                    : "https://app-cdn.fluidity.money/images/icons/arrowRightWhite.svg"
                 }
                 className={
                   page === pageCount

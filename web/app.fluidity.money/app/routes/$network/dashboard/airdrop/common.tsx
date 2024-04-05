@@ -1670,7 +1670,7 @@ const TestnetRewardsModal = () => {
 
   return (
     <div className="claim-ropsten">
-      <img src="https://frontend-old.fluidity.money/images/testnetBanner.png" />
+      <img src="https://app-cdn.fluidity.money/images/testnetBanner.png" />
       <div className="ropsten-header">
         <Heading as="h3">Claim Testnet Rewards</Heading>
         <Text prominent size="sm">
@@ -1919,23 +1919,23 @@ const RecapModal = ({
 
   const bottleRarityColorIcon = {
     [Rarity.Common]: {
-      img: "https://frontend-old.fluidity.money/images/airdrop/COMMON.png",
+      img: "https://app-cdn.fluidity.money/images/airdrop/COMMON.png",
       color: "#FFFFFF",
     },
     [Rarity.Uncommon]: {
-      img: "https://frontend-old.fluidity.money/images/airdrop/UNCOMMON.png",
+      img: "https://app-cdn.fluidity.money/images/airdrop/UNCOMMON.png",
       color: "#80E4EF",
     },
     [Rarity.Rare]: {
-      img: "https://frontend-old.fluidity.money/images/airdrop/RARE.png",
+      img: "https://app-cdn.fluidity.money/images/airdrop/RARE.png",
       color: "#B7EBD4",
     },
     [Rarity.UltraRare]: {
-      img: "https://frontend-old.fluidity.money/images/airdrop/ULTRA RARE.png",
+      img: "https://app-cdn.fluidity.money/images/airdrop/ULTRA RARE.png",
       color: "#EDC6E1",
     },
     [Rarity.Legendary]: {
-      img: "https://frontend-old.fluidity.money/images/airdrop/LEGENDARY.png",
+      img: "https://app-cdn.fluidity.money/images/airdrop/LEGENDARY.png",
       color: "#F8D192",
     },
   };
