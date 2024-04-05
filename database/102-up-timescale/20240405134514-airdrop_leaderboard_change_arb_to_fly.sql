@@ -1,4 +1,3 @@
--- TODO - join fly_staked when table exists
 -- migrate:up
 
 DROP FUNCTION airdrop_leaderboard;

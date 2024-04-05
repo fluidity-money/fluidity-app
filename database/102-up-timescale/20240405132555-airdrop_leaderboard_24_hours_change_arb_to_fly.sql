@@ -1,4 +1,3 @@
--- TODO - join fly_staked when table exists
 -- migrate:up
 
 -- doesn't take the underlying network into account!
