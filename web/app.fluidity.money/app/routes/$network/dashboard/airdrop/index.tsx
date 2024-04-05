@@ -1450,6 +1450,7 @@ const MultiplierTasks = () => {
 
   const providerLinks: { provider: Provider; link: string }[] = [
     { provider: "Jumper", link: "https://jumper.exchange/" },
+    { provider: "Uniswap", link: "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500" },
     {
       provider: "Trader Joe",
       link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4cfa50b7ce747e2d61724fcac57f24b748ff2b2a",
