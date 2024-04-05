@@ -1,19 +1,21 @@
 import { gql, jsonPost } from "~/util";
 
 const queryByAddress = gql`
-  query getReferralCodeByAddress($address: String!) {
-    lootbox_referral_codes(where: { address: { _eq: $address } }) {
+  query getReferralCodeByAddress($address: String!, $epoch: String!) {
+    lootbox_referral_codes(where: { address: { _eq: $address }, epoch: { _eq: $epoch } }) {
       address
       referral_code
+      epoch
     }
   }
 `;
 
 const queryByCode = gql`
-  query getReferralCodeByCode($code: String!) {
-    lootbox_referral_codes(where: { referral_code: { _eq: $code } }) {
+  query getReferralCodeByCode($code: String!, $epoch: String!) {
+    lootbox_referral_codes(where: { referral_code: { _eq: $code }, epoch: { _eq: $epoch } }) {
       address
       referral_code
+      epoch
     }
   }
 `;
@@ -22,6 +24,7 @@ type ReferralCodeByAddressBody = {
   query: string;
   variables: {
     address: string;
+    epoch: string;
   };
 };
 
@@ -29,12 +32,14 @@ type ReferralCodeByCodeBody = {
   query: string;
   variables: {
     code: string;
+    epoch: string;
   };
 };
 
 export type ReferralCode = {
   address: string;
   referral_code: string;
+  epoch: string;
 };
 
 type ReferralCodeRes = {
@@ -44,9 +49,10 @@ type ReferralCodeRes = {
   errors?: unknown;
 };
 
-const useReferralCodeByAddress = (address: string) => {
+const useReferralCodeByAddress = (address: string, epoch: string) => {
   const variables = {
     address,
+    epoch,
   };
 
   const body = {
@@ -67,9 +73,10 @@ const useReferralCodeByAddress = (address: string) => {
   );
 };
 
-const useReferralCodeByCode = (code: string) => {
+const useReferralCodeByCode = (code: string, epoch: string) => {
   const variables = {
     code,
+    epoch,
   };
 
   const body = {

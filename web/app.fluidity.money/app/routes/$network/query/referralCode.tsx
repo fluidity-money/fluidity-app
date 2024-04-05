@@ -8,6 +8,7 @@ import {
   useReferralCodeByCode,
 } from "~/queries";
 import { validAddress } from "~/util";
+import { EPOCH_CURRENT_IDENTIFIER } from "../dashboard/airdrop";
 
 export type ReferralCodeLoaderData = {
   referralAddress: string;
@@ -32,7 +33,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!code) throw new Error("Unauthorised");
 
   const { data: referralCodeData, errors: referralCodeErr } =
-    await useReferralCodeByCode(code);
+    await useReferralCodeByCode(code, EPOCH_CURRENT_IDENTIFIER);
 
   const referralAddress = referralCodeData?.lootbox_referral_codes[0]?.address;
 
@@ -41,7 +42,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const { data: referralData, errors: referralErr } =
-    await useReferralByAddress(referralAddress, address);
+    await useReferralByAddress(referralAddress, address, EPOCH_CURRENT_IDENTIFIER);
 
   const referralExists = !!referralData?.lootbox_referrals.length;
 
@@ -96,7 +97,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     const {
       data: referralCodeByAddressData,
       errors: referralCodeByAddressErr,
-    } = await useReferralCodeByAddress(address);
+    } = await useReferralCodeByAddress(address, EPOCH_CURRENT_IDENTIFIER);
 
     if (
       referralCodeByAddressErr ||
@@ -114,7 +115,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         const referralCode = randomCode(8);
 
         const { data: referralCodeByCodeData, errors: referralCodeByCodeErr } =
-          await useReferralCodeByAddress(address);
+          await useReferralCodeByAddress(address, EPOCH_CURRENT_IDENTIFIER);
 
         if (
           referralCodeByCodeErr ||
@@ -134,7 +135,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       throw new Error("Could not generate unique ID");
     }
 
-    const { data, errors } = await addReferralCode(address, genReferralCode);
+    const { data, errors } = await addReferralCode(address, genReferralCode, EPOCH_CURRENT_IDENTIFIER);
 
     if (errors || !data) {
       throw new Error("Could not insert referral code");

@@ -20,7 +20,7 @@ const (
 type Referral = types.Referral
 
 // GetLatestUnclaimedReferrals by referee, sorted by date, limited by number
-func GetEarliestUnclaimedReferrals(address ethereum.Address, limit int) []Referral {
+func GetEarliestUnclaimedReferrals(address ethereum.Address, epoch string, limit int) []Referral {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -33,9 +33,10 @@ func GetEarliestUnclaimedReferrals(address ethereum.Address, limit int) []Referr
 
 		FROM %v
 		WHERE referee = $1
+		AND epoch = $2
 		AND active = FALSE
 		ORDER BY created_time ASC 
-		LIMIT $2`,
+		LIMIT $3`,
 
 		TableReferrals,
 	)
@@ -43,6 +44,7 @@ func GetEarliestUnclaimedReferrals(address ethereum.Address, limit int) []Referr
 	rows, err := timescaleClient.Query(
 		statementText,
 		address,
+		epoch,
 		limit,
 	)
 
@@ -91,7 +93,7 @@ func GetEarliestUnclaimedReferrals(address ethereum.Address, limit int) []Referr
 }
 
 // GetClaimedReferrals of referee to distribute rewards to referrer
-func GetClaimedReferrals(address ethereum.Address) []Referral {
+func GetClaimedReferrals(address ethereum.Address, epoch string) []Referral {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -104,6 +106,7 @@ func GetClaimedReferrals(address ethereum.Address) []Referral {
 
 		FROM %v
 		WHERE referee = $1
+		AND epoch = $2
 		AND active = TRUE`,
 
 		TableReferrals,
@@ -112,6 +115,7 @@ func GetClaimedReferrals(address ethereum.Address) []Referral {
 	rows, err := timescaleClient.Query(
 		statementText,
 		address,
+		epoch,
 	)
 
 	if err != nil {
@@ -157,7 +161,7 @@ func GetClaimedReferrals(address ethereum.Address) []Referral {
 	return referrals
 }
 
-func UpdateReferral(referral Referral) {
+func UpdateReferral(referral Referral, epoch string) {
 	timescaleClient := timescale.Client()
 
 	statementText := fmt.Sprintf(
@@ -165,7 +169,8 @@ func UpdateReferral(referral Referral) {
 			progress = $1,
 			active = $2
 		WHERE referrer = $3
-		AND referee = $4`,
+		AND referee = $4
+		AND epoch = $5`,
 
 		TableReferrals,
 	)
@@ -176,6 +181,7 @@ func UpdateReferral(referral Referral) {
 		referral.Active,
 		referral.Referrer,
 		referral.Referee,
+		epoch,
 	)
 
 	if err != nil {

@@ -64,6 +64,7 @@ func main() {
 
 		activeReferrals := referrals.GetClaimedReferrals(
 			ethereum.AddressFromString(address),
+			epoch,
 		)
 
 		for _, referral := range activeReferrals {

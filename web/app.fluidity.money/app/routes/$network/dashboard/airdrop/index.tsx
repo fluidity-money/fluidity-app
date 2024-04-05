@@ -73,7 +73,7 @@ import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 import { redirect } from "react-router-dom";
 
-const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
+export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
 
 const AIRDROP_BLOG_POST =
   "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";

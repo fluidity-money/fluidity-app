@@ -74,6 +74,7 @@ func main() {
 
 		unclaimedReferrals := referrals.GetEarliestUnclaimedReferrals(
 			ethereum.AddressFromString(address),
+			epoch,
 			int(maxUnclaimedReferrals),
 		)
 
@@ -111,7 +112,7 @@ func main() {
 				queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)
 			}
 
-			referrals.UpdateReferral(referral)
+			referrals.UpdateReferral(referral, epoch)
 		}
 	})
 }

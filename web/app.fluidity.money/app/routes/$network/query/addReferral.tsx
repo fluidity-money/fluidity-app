@@ -9,6 +9,7 @@ import { hashMessage } from "@ethersproject/hash";
 import nacl from "tweetnacl";
 import { validAddress } from "~/util";
 import { useReferralCodeByCode } from "~/queries";
+import { EPOCH_CURRENT_IDENTIFIER } from "../dashboard/airdrop";
 
 export type AddReferralBody = {
   address: string;
@@ -72,7 +73,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
     // Check ReferralCode exists
     const { data: referralCodeByCodeData, errors } =
-      await useReferralCodeByCode(referrerCode);
+      await useReferralCodeByCode(referrerCode, EPOCH_CURRENT_IDENTIFIER);
 
     const matchingReferralCode =
       referralCodeByCodeData?.lootbox_referral_codes[0];
@@ -88,7 +89,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       throw new Error("Invalid Address");
     }
 
-    const res = await addReferral(referrer, referee);
+    const res = await addReferral(referrer, referee, EPOCH_CURRENT_IDENTIFIER);
 
     if (res.errors || !res.data) {
       throw new Error("Could not insert referral");

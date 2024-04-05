@@ -11,6 +11,7 @@ import {
 } from "~/queries";
 import { jsonPost } from "~/util";
 import { AddReferralCodeBody, AddReferralCodeData } from "./referralCode";
+import { EPOCH_CURRENT_IDENTIFIER } from "../dashboard/airdrop";
 
 export type ReferralCountLoaderData = {
   numActiveReferrerReferrals: number;
@@ -50,11 +51,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     { data: inactiveReferralData, errors: inactiveReferralErr },
     { data: referralCodeData, errors: referralCodeErr },
   ] = await Promise.all([
-    useActiveReferralCountByReferrerAddress(address),
-    useActiveReferralCountByRefereeAddress(address),
-    useInactiveReferralCountByRefereeAddress(address),
-    useInactiveReferralByAddress(address),
-    useReferralCodeByAddress(address),
+    useActiveReferralCountByReferrerAddress(address, EPOCH_CURRENT_IDENTIFIER),
+    useActiveReferralCountByRefereeAddress(address, EPOCH_CURRENT_IDENTIFIER),
+    useInactiveReferralCountByRefereeAddress(address, EPOCH_CURRENT_IDENTIFIER),
+    useInactiveReferralByAddress(address, EPOCH_CURRENT_IDENTIFIER),
+    useReferralCodeByAddress(address, EPOCH_CURRENT_IDENTIFIER),
   ]);
 
   if (activeReferrerReferralCountErr || !activeReferrerReferralCountData) {

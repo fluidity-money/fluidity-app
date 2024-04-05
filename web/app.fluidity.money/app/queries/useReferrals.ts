@@ -6,18 +6,20 @@ export type Referral = {
   progress: number;
   referee: string;
   referrer: string;
+  epoch: string;
 };
 
 const QUERY_BY_ADDRESS = gql`
-  query getReferralByAddress($referrer: String!, $referee: String!) {
+  query getReferralByAddress($referrer: String!, $referee: String!, $epoch: String!) {
     lootbox_referrals(
-      where: { referrer: { _eq: $referrer }, referee: { _eq: $referee } }
+      where: { referrer: { _eq: $referrer }, referee: { _eq: $referee }, epoch: { _eq: $epoch } }
     ) {
       active
       createdTime: created_time
       progress
       referee
       referrer
+      epoch
     }
   }
 `;
@@ -25,7 +27,7 @@ const QUERY_BY_ADDRESS = gql`
 const QUERY_INACTIVE_BY_ADDRESS = gql`
   query getInactiveReferralByAddress($address: String!) {
     lootbox_referrals(
-      where: { referee: { _eq: $address }, active: { _eq: false } }
+      where: { referee: { _eq: $address }, active: { _eq: false }, epoch: { _eq: $epoch } }
       order_by: { created_time: asc }
       limit: 1
     ) {
@@ -34,6 +36,7 @@ const QUERY_INACTIVE_BY_ADDRESS = gql`
       progress
       referee
       referrer
+      epoch
     }
   }
 `;
@@ -43,6 +46,7 @@ type ReferralsByAddressBody = {
   variables: {
     referrer: string;
     referee: string;
+    epoch: string;
   };
 };
 
@@ -50,6 +54,7 @@ type InactiveReferralsByAddressBody = {
   query: string;
   variables: {
     address: string;
+    epoch: string;
   };
 };
 
@@ -60,10 +65,11 @@ type ReferralsRes = {
   errors?: unknown;
 };
 
-const useReferralByAddress = (referrer: string, referee: string) => {
+const useReferralByAddress = (referrer: string, referee: string, epoch: string) => {
   const variables = {
     referrer,
     referee,
+    epoch,
   };
 
   const body = {
@@ -84,9 +90,10 @@ const useReferralByAddress = (referrer: string, referee: string) => {
   );
 };
 
-const useInactiveReferralByAddress = (address: string) => {
+const useInactiveReferralByAddress = (address: string, epoch: string) => {
   const variables = {
     address,
+    epoch,
   };
 
   const body = {
