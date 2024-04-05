@@ -13,7 +13,7 @@ const useCache: UseCache = (key: string, suspense?: boolean, config = {}) => {
   return useSWR(key, fetcher, {
     ...config,
     errorRetryCount: 0,
-    refreshInterval: 10000, // 10 seconds
+    refreshInterval: 100000, // 100 seconds
     suspense,
   });
 };
