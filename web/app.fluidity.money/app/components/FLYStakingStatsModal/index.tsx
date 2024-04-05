@@ -158,7 +158,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
         setCurrentAction("Connect")
         break;
       case State.IsConnected:
-        setCurrentAction(isStaking ? "Stake" : "Claim")
+        setCurrentAction(isStaking ? "Stake" : "Unstake")
         break;
       case State.HasStaked:
         setCurrentAction(isStaking ? "Staked!" : "Unstaked")
@@ -238,9 +238,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
     if (!beginStaking) return;
     (async () => {
       try {
+        console.log("begin unstaking", unstakeAmount.toString());
         isStaking ?
           await flyStakingStake(stakeAmount) :
-          await flyStakingBeginUnstake?.(stakeAmount);
+          await flyStakingBeginUnstake?.(unstakeAmount);
         setCurrentStatus(State.HasStaked);
         // if the user is staking, add to their staked amount, if not, take
         isStaking ?
