@@ -1,4 +1,3 @@
--- TODO - join fly_staked when table exists
 -- migrate:up
 
 DROP FUNCTION airdrop_leaderboard_24_hours_by_application;
@@ -10,7 +9,7 @@ STABLE
 AS
 $$
 SELECT
-    address,
+    fly_staked.address,
     -- placeholder
     ROW_NUMBER() OVER () AS rank,
     COUNT(DISTINCT referee) AS referral_count,
@@ -18,7 +17,8 @@ SELECT
     lb_24_application.highest_reward_tier,
     COALESCE(liquidity.result, 1) AS liquidity_multiplier,
     COALESCE(lootbox_amounts_rewarded_fusdc.amount_earned, 0),
-    COALESCE(lootbox_amounts_rewarded_fly.amount_earned, 0)
+    COALESCE(lootbox_amounts_rewarded_fly.amount_earned, 0),
+    SUM(fly_staked.amount) AS fly_staked
 FROM (
     -- subquery to avoid re-summing lootbox_count for every referee
     SELECT address, SUM(lootbox_count) as total_box_count, MAX(reward_tier) as highest_reward_tier
@@ -38,10 +38,12 @@ FROM (
         WHERE token_short_name = 'FLY'
     ) AS lootbox_amounts_rewarded_fly ON lb_24_application.address = lootbox_amounts_rewarded_fly.winner
     LEFT JOIN lootbox_referrals
-        ON lb_24_application.address = lootbox_referrals.referrer,
-    LATERAL calculate_a_y(address, now()::TIMESTAMP) AS liquidity
+        ON lb_24_application.address = lootbox_referrals.referrer
+    LEFT JOIN fly_staked
+        ON lb_24_application.address = fly_staked.address,
+    LATERAL calculate_a_y(lb_24_application.address, now()::TIMESTAMP) AS liquidity
 GROUP BY
-    address,
+    fly_staked.address,
     liquidity_multiplier,
     total_box_count,
     highest_reward_tier,

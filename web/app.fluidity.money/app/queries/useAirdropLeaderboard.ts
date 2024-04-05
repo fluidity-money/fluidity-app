@@ -3,7 +3,7 @@ import { jsonPost, gql, fetchInternalEndpoint } from "~/util";
 const queryByUserAllTime = gql`
   query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!)
   @cached(ttl: 120) {
-    airdrop_leaderboard(
+    airdrop_leaderboard_static(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
       limit: 1
@@ -20,7 +20,7 @@ const queryByUserAllTime = gql`
 
 const queryAllTime = gql`
   query AirdropLeaderboard($epoch: lootbox_epoch!) @cached(ttl: 120) {
-    airdrop_leaderboard(
+    airdrop_leaderboard_static(
       args: { epoch_: $epoch }
       limit: 16
       order_by: { total_lootboxes: desc }
@@ -41,7 +41,7 @@ const queryAllTime = gql`
 const queryByUser24Hours = gql`
   query AirdropLeaderboard($epoch: lootbox_epoch!, $address: String!)
   @cached(ttl: 60) {
-    airdrop_leaderboard: airdrop_leaderboard_24_hours(
+    airdrop_leaderboard: airdrop_leaderboard_static_24_hours(
       args: { epoch_: $epoch }
       where: { address: { _eq: $address } }
       limit: 1
@@ -61,7 +61,7 @@ const queryByUser24Hours = gql`
 
 const query24Hours = gql`
   query AirdropLeaderboard($epoch: lootbox_epoch!) @cached(ttl: 120) {
-    airdrop_leaderboard: airdrop_leaderboard_24_hours(
+    airdrop_leaderboard: airdrop_leaderboard_static_24_hours(
       args: { epoch_: $epoch }
       limit: 16
       order_by: { total_lootboxes: desc }
@@ -85,7 +85,7 @@ const query24HoursByUserByApplication = gql`
     $application: ethereum_application!
     $address: String!
   ) @cached(ttl: 120) {
-    airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
+    airdrop_leaderboard: airdrop_leaderboard_static_24_hours_by_application(
       args: { epoch_: $epoch, application_: $application }
       where: { address: { _eq: $address } }
       limit: 1
@@ -108,7 +108,7 @@ const query24HoursByApplication = gql`
     $epoch: lootbox_epoch!
     $application: ethereum_application!
   ) @cached(ttl: 120) {
-    airdrop_leaderboard: airdrop_leaderboard_24_hours_by_application(
+    airdrop_leaderboard: airdrop_leaderboard_static_24_hours_by_application(
       args: { epoch_: $epoch, application_: $application }
       limit: 16
       order_by: { total_lootboxes: desc }
