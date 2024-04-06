@@ -20,6 +20,9 @@ type TokenDetailsBase struct {
 	TokenAddress  string
 	TokenDecimals *big.Rat
 	TokenName     string
+
+	// Extras is anything off to the right, in it's string format.
+	Extras []string
 }
 
 func trimWhitespace(s string) string {
@@ -28,7 +31,7 @@ func trimWhitespace(s string) string {
 
 // NewTokenDetailsBase with the name and number to turn into an
 // exponential number (ie if given 10, will go 1e10)
-func NewTokenDetailsBase(address, name string, decimals int) TokenDetailsBase {
+func NewTokenDetailsBase(address, name string, decimals int, extras ...string) TokenDetailsBase {
 	decimalsAdjusted := math.Pow10(decimals)
 
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
@@ -37,6 +40,7 @@ func NewTokenDetailsBase(address, name string, decimals int) TokenDetailsBase {
 		TokenAddress:  address,
 		TokenName:     name,
 		TokenDecimals: decimalsRat,
+		Extras:         extras,
 	}
 }
 
@@ -64,6 +68,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 			tokenAddress = trimWhitespace(tokenDetails_[0])
 			tokenName    = trimWhitespace(tokenDetails_[1])
 			decimals_    = trimWhitespace(tokenDetails_[2])
+			extras        = tokenDetails_[3:]
 		)
 
 		decimals, err := strconv.Atoi(decimals_)
@@ -79,7 +84,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 			})
 		}
 
-		tokenDetails[i] = NewTokenDetailsBase(tokenAddress, tokenName, decimals)
+		tokenDetails[i] = NewTokenDetailsBase(tokenAddress, tokenName, decimals, extras...)
 	}
 
 	return tokenDetails
