@@ -235,13 +235,13 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
   >
     <div className="spread-center">
       <div className="single-line">
-        <img style={{ width: "1.25em" }} src={"/images/icons/circle1.svg"} />
+        <img style={{ width: "1.25em" }} src={"https://app-cdn.fluidity.money/images/icons/circle1.svg"} />
         <Text prominent size="sm">
           Copy Your Link.
         </Text>
       </div>
       <div className="single-line">
-        <img style={{ width: "1.25em" }} src={"/images/icons/circle2.svg"} />
+        <img style={{ width: "1.25em" }} src={"https://app-cdn.fluidity.money/images/icons/circle2.svg"} />
         <Text prominent size="sm">
           Share it with your friends.
         </Text>
@@ -296,7 +296,7 @@ const HowItWorksContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div className="how-it-works-warning-container">
       <img
         style={{ width: isMobile ? "auto" : "50px" }}
-        src="/images/icons/circleInfo.svg"
+        src="https://app-cdn.fluidity.money/images/icons/circleInfo.svg"
       />
       <Text prominent size="sm" className="how-it-works-warning-text">
         They will have to earn 5 Loot Bottles for each referral in order to

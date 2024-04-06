@@ -10,7 +10,7 @@ export type Referral = {
 };
 
 const QUERY_BY_ADDRESS = gql`
-  query getReferralByAddress($referrer: String!, $referee: String!, $epoch: String!) {
+  query getReferralByAddress($referrer: String!, $referee: String!, $epoch: lootbox_epoch!) {
     lootbox_referrals(
       where: { referrer: { _eq: $referrer }, referee: { _eq: $referee }, epoch: { _eq: $epoch } }
     ) {
@@ -25,7 +25,7 @@ const QUERY_BY_ADDRESS = gql`
 `;
 
 const QUERY_INACTIVE_BY_ADDRESS = gql`
-  query getInactiveReferralByAddress($address: String!) {
+  query getInactiveReferralByAddress($address: String!, $epoch: lootbox_epoch!) {
     lootbox_referrals(
       where: { referee: { _eq: $address }, active: { _eq: false }, epoch: { _eq: $epoch } }
       order_by: { created_time: asc }
@@ -77,7 +77,7 @@ const useReferralByAddress = (referrer: string, referee: string, epoch: string) 
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<ReferralsByAddressBody, ReferralsRes>(
     url,
@@ -101,7 +101,7 @@ const useInactiveReferralByAddress = (address: string, epoch: string) => {
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<InactiveReferralsByAddressBody, ReferralsRes>(
     url,

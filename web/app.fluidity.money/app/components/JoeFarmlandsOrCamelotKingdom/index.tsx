@@ -14,7 +14,7 @@ const JoeFarmlandsOrCamelotKingdom = () => {
       >
         <img
           className="joe_farmlands_or_camelot_img_joe"
-          src="/images/joe-farmlands.png"
+          src="https://app-cdn.fluidity.money/images/joe-farmlands.png"
         />
       </a>
       <a
@@ -24,7 +24,7 @@ const JoeFarmlandsOrCamelotKingdom = () => {
       >
         <img
           className="joe_farmlands_or_camelot_img_camelot"
-          src="/images/kingdom-of-camelot.png"
+          src="https://app-cdn.fluidity.money/images/kingdom-of-camelot.png"
         />
       </a>
     </div>

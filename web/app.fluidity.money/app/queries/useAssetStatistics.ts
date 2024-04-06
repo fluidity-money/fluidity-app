@@ -86,7 +86,7 @@ const useAssetStatistics = (
     },
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<AssetStatisticsRequest, AssetStatisticsResponse>(
     url,

@@ -167,7 +167,7 @@ function ErrorBoundary(err: Error) {
           alignItems: "center",
         }}
       >
-        <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+        <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
         <h1>Something went wrong!</h1>
         <br />
         <h2>Our team has been notified, and are working on fixing it!</h2>

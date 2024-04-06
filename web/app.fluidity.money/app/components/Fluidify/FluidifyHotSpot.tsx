@@ -34,7 +34,7 @@ const FluidityHotSpot = ({
         <div ref={drop} className="fluidify-hot-spot">
           <img
             className="fluidify-circle"
-            src="/images/fluidify/fluidify-hotspot.png"
+            src="https://app-cdn.fluidity.money/images/fluidify/fluidify-hotspot.png"
           />
           <span className={"dashed-circle"}>
             {!activeToken && (

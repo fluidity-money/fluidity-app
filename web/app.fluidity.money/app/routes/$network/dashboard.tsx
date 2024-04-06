@@ -109,7 +109,7 @@ function ErrorBoundary() {
         alignItems: "center",
       }}
     >
-      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not load Dashboard!</h1>
       <br />
       <h2>Our team has been notified, and are working on fixing it!</h2>
@@ -202,15 +202,15 @@ const CHAIN_NAME_MAP: Record<
 > = {
   arbitrum: {
     name: "ARB",
-    icon: <img src="/assets/chains/arbIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/arbIcon.svg" />,
   },
   solana: {
     name: "SOL",
-    icon: <img src="/assets/chains/solanaIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/solanaIcon.svg" />,
   },
   sui: {
     name: "SUI",
-    icon: <img src="/assets/chains/suiIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/suiIcon.svg" />,
   },
 };
 
@@ -517,7 +517,7 @@ export default function Dashboard() {
           <Link to={"./home"}>
             <img
               style={{ width: "5.5em", height: "2.5em" }}
-              src="/images/outlinedLogo.svg"
+              src="https://app-cdn.fluidity.money/images/outlinedLogo.svg"
               alt="Fluidity"
             />
           </Link>
@@ -636,7 +636,7 @@ export default function Dashboard() {
               <a onClick={() => navigate("./home")}>
                 <img
                   style={{ width: "5.5em", height: "2.5em" }}
-                  src="/images/outlinedLogo.svg"
+                  src="https://app-cdn.fluidity.money/images/outlinedLogo.svg"
                   alt="Fluidity"
                 />
               </a>
@@ -852,7 +852,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
+              <img src={"https://app-cdn.fluidity.money/images/socials/twitter.svg"} alt={"Twitter"} />
             </a>
 
             {/* Discord */}
@@ -861,7 +861,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"/images/socials/discord.svg"} alt={"Discord"} />
+              <img src={"https://app-cdn.fluidity.money/images/socials/discord.svg"} alt={"Discord"} />
             </a>
 
             {/* Telegram */}
@@ -870,7 +870,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
+              <img src={"https://app-cdn.fluidity.money/images/socials/telegram.svg"} alt={"Telegram"} />
             </a>
 
             {/* LinkedIn */}
@@ -879,7 +879,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
+              <img src={"https://app-cdn.fluidity.money/images/socials/linkedin.svg"} alt={"LinkedIn"} />
             </a>
           </section>
         </footer>

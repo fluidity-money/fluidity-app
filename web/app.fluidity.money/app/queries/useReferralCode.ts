@@ -1,7 +1,7 @@
 import { gql, jsonPost } from "~/util";
 
 const queryByAddress = gql`
-  query getReferralCodeByAddress($address: String!, $epoch: String!) {
+  query getReferralCodeByAddress($address: String!, $epoch: lootbox_epoch!) {
     lootbox_referral_codes(where: { address: { _eq: $address }, epoch: { _eq: $epoch } }) {
       address
       referral_code
@@ -11,7 +11,7 @@ const queryByAddress = gql`
 `;
 
 const queryByCode = gql`
-  query getReferralCodeByCode($code: String!, $epoch: String!) {
+  query getReferralCodeByCode($code: String!, $epoch: lootbox_epoch!) {
     lootbox_referral_codes(where: { referral_code: { _eq: $code }, epoch: { _eq: $epoch } }) {
       address
       referral_code
@@ -60,7 +60,7 @@ const useReferralCodeByAddress = (address: string, epoch: string) => {
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<ReferralCodeByAddressBody, ReferralCodeRes>(
     url,
@@ -84,7 +84,7 @@ const useReferralCodeByCode = (code: string, epoch: string) => {
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<ReferralCodeByCodeBody, ReferralCodeRes>(
     url,

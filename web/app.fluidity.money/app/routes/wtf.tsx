@@ -42,15 +42,15 @@ export const links: LinksFunction = () => {
 const enabledChains = [
   {
     name: "ETH",
-    icon: <img src="/assets/chains/ethIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/ethIcon.svg" />,
   },
   {
     name: "ARB",
-    icon: <img src="/assets/chains/arbIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/arbIcon.svg" />,
   },
   {
     name: "SOL",
-    icon: <img src="/assets/chains/solanaIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/solanaIcon.svg" />,
   },
 ];
 
@@ -149,7 +149,7 @@ function ErrorBoundary() {
         alignItems: "center",
       }}
     >
-      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not load Highest Rewards</h1>
       <br />
       <h2>Our team has been notified, and are working on fixing it!</h2>
@@ -173,7 +173,7 @@ export default function IndexPage() {
     <>
       <Video
         className="video"
-        src={"/videos/FluidityOpportunityB.mp4"}
+        src={"https://app-cdn.fluidity.money/videos/FluidityOpportunityB.mp4"}
         type={"none"}
         loop={true}
       />

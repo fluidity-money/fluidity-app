@@ -73,7 +73,7 @@ import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 import { redirect } from "react-router-dom";
 
-export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
+export const EPOCH_CURRENT_IDENTIFIER = "epoch_testing";
 
 const AIRDROP_BLOG_POST =
   "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
@@ -891,7 +891,7 @@ const Airdrop = () => {
                   style={{ marginBottom: "0.5em" }}
                   className={"no-margin"}
                 >
-                  Airdrop V3: FLY Me to The Moon.
+                  Airdrop V3: FLY Me To The Moon.
                 </Heading>
                 <Text>
                   Fluidify your assets, transact them, and boost your rewards by
@@ -1199,7 +1199,7 @@ const Airdrop = () => {
                   borderColor: "white",
                 }}
                 width="100%"
-                src="/images/epoch3AirdropBanner.png"
+                src="https://app-cdn.fluidity.money/images/epoch3AirdropBanner.png"
               />
             </div>
             <div
@@ -1225,7 +1225,7 @@ const Airdrop = () => {
                       className={"no-margin"}
                       style={{ marginBottom: "0.5em" }}
                     >
-                      Airdrop V3: FLY Me to The Moon.
+                      Airdrop V3: FLY Me To The Moon.
                     </Heading>
                   </div>
                   <Text style={{ fontSize: 14 }}>
@@ -1599,10 +1599,10 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, fusdcEarned, flyEarned, flyStaked, bottles } = data;
+  const { user, rank, referralCount, fusdcEarned, arbEarned, flyStaked, bottles } = data;
 
   return {
-    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address === user ? "highlighted-row" : ""
+    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address && address === user ? "highlighted-row" : ""
       }`,
     RowElement: ({ heading }: { heading: string }) => {
       switch (heading) {
@@ -1612,7 +1612,7 @@ const airdropRankRow = (
               <Text
                 prominent
                 style={
-                  address === user
+                  address && address === user
                     ? {
                       color: "black",
                     }
@@ -1635,14 +1635,14 @@ const airdropRankRow = (
                 <Text
                   prominent
                   style={
-                    address === user
+                    address && address === user
                       ? {
                         color: "black",
                       }
                       : {}
                   }
                 >
-                  {address === user ? "ME" : trimAddress(user)}
+                  {address && address === user ? "ME" : trimAddress(user)}
                 </Text>
               </a>
             </td>
@@ -1653,7 +1653,7 @@ const airdropRankRow = (
               <Text
                 prominent
                 style={
-                  address === user
+                  address && address === user
                     ? {
                       color: "black",
                     }
@@ -1670,7 +1670,7 @@ const airdropRankRow = (
               <Text
                 prominent
                 style={
-                  address === user
+                  address && address === user
                     ? {
                       color: "black",
                     }
@@ -1681,20 +1681,20 @@ const airdropRankRow = (
               </Text>
             </td>
           );
-        case "$FLY EARNED":
+        case "$ARB EARNED":
           return (
             <td>
               <Text
                 prominent
                 style={
-                  address === user
+                  address && address === user
                     ? {
                       color: "black",
                     }
                     : {}
                 }
               >
-                {toDecimalPlaces(flyEarned, 4)}
+                {toDecimalPlaces(arbEarned, 4)}
               </Text>
             </td>
           );
@@ -1704,7 +1704,7 @@ const airdropRankRow = (
               <Text
                 prominent
                 style={
-                  address === user
+                  address && address === user
                     ? {
                       color: "black",
                     }
@@ -1721,7 +1721,7 @@ const airdropRankRow = (
               <Text
                 prominent
                 style={
-                  address === user
+                  address && address === user
                     ? {
                       color: "black",
                     }
@@ -1770,7 +1770,7 @@ const Leaderboard = ({
       bottles: 0,
       highestRewardTier: 0,
       fusdcEarned: 0,
-      flyEarned: 0,
+      arbEarned: 0,
       flyStaked: 0,
     };
 
@@ -1813,7 +1813,7 @@ const Leaderboard = ({
           { name: "USER" },
           { name: "BOTTLES" },
           { name: "$fUSDC EARNED" },
-          { name: "$FLY EARNED" },
+          { name: "$ARB EARNED" },
           { name: "$FLY STAKED" },
           { name: "REFERRALS" },
         ]}
@@ -1870,19 +1870,19 @@ const BottleProgress = ({
         style={isMobile ? { flexDirection: "column-reverse", gap: "2em" } : {}}
       >
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/hero/common.png" />
+          <img src="https://app-cdn.fluidity.money/images/hero/common.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/hero/uncommon.png" />
+          <img src="https://app-cdn.fluidity.money/images/hero/uncommon.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/hero/rare.png" />
+          <img src="https://app-cdn.fluidity.money/images/hero/rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/hero/ultra_rare.png" />
+          <img src="https://app-cdn.fluidity.money/images/hero/ultra_rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="/images/hero/legendary.png" />
+          <img src="https://app-cdn.fluidity.money/images/hero/legendary.png" />
         </Card>
       </HeroCarousel>
       <BottleDistribution

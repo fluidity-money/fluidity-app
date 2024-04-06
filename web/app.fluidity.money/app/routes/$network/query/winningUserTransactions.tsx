@@ -254,7 +254,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       {} as Record<string, string>
     );
 
-    const defaultLogo = "/assets/tokens/usdt.svg";
+    const defaultLogo = "https://app-cdn.fluidity.money/assets/tokens/usdt.svg";
 
     const transactionMap = userTransactions.reduce(
       (map, tx) => ({

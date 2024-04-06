@@ -110,7 +110,6 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
         const { flyStaked, points } = details;
         setPoints(points);
         setFlyStaked(flyStaked);
-        console.log("fly staked 123", flyStaked);
       } catch (err) {
         console.error("error staking details", err);
         setErrorMessage(`Failed to get staking details! ${err}`);
@@ -158,7 +157,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
         setCurrentAction("Connect")
         break;
       case State.IsConnected:
-        setCurrentAction(isStaking ? "Stake" : "Claim")
+        setCurrentAction(isStaking ? "Stake" : "Unstake")
         break;
       case State.HasStaked:
         setCurrentAction(isStaking ? "Staked!" : "Unstaked")
@@ -238,9 +237,10 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
     if (!beginStaking) return;
     (async () => {
       try {
+        console.log("begin unstaking", unstakeAmount.toString());
         isStaking ?
           await flyStakingStake(stakeAmount) :
-          await flyStakingBeginUnstake?.(stakeAmount);
+          await flyStakingBeginUnstake?.(unstakeAmount);
         setCurrentStatus(State.HasStaked);
         // if the user is staking, add to their staked amount, if not, take
         isStaking ?
@@ -302,7 +302,7 @@ const FlyStakingStatsModal = ({ visible, close, showConnectWalletModal, shouldUp
                       }
                     </Heading>
                     <span onClick={handleClose}>
-                      <img src="/images/icons/x.svg" className="modal-cancel-btn" />
+                      <img src="https://app-cdn.fluidity.money/images/icons/x.svg" className="modal-cancel-btn" />
                     </span>
                   </div>
                   <div className="fly-submit-claim-modal-options">

@@ -1,7 +1,7 @@
 import { gql, jsonPost } from "~/util";
 
 const mutation = gql`
-  mutation addReferral($referrer: String!, $referee: String!, $epoch: String!) {
+  mutation addReferral($referrer: String!, $referee: String!, $epoch: lootbox_epoch!) {
     insert_lootbox_referrals_one(
       object: { referrer: $referrer, referee: $referee, epoch: $epoch }
     ) {
@@ -44,7 +44,7 @@ const addReferral = (referrer: string, referee: string, epoch: string) => {
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<AddReferralBody, AddReferralRes>(
     url,

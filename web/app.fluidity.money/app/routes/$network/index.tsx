@@ -38,15 +38,15 @@ const CHAIN_NAME_MAP: Record<
 > = {
   arbitrum: {
     name: "ARB",
-    icon: <img src="/assets/chains/arbIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/arbIcon.svg" />,
   },
   solana: {
     name: "SOL",
-    icon: <img src="/assets/chains/solanaIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/solanaIcon.svg" />,
   },
   sui: {
     name: "SUI",
-    icon: <img src="/assets/chains/suiIcon.svg" />,
+    icon: <img src="https://app-cdn.fluidity.money/assets/chains/suiIcon.svg" />,
   },
 };
 
@@ -126,7 +126,7 @@ const NetworkPage = () => {
       {connected && connected && loaded && (
         <Video
           className="video"
-          src={"/videos/FluidityOpportunityA.mp4"}
+          src={"https://app-cdn.fluidity.money/videos/FluidityOpportunityA.mp4"}
           type={"none"}
           loop={false}
         />

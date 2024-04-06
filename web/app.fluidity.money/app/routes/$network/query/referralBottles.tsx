@@ -25,7 +25,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     await useReferralLootboxesByAddress(epoch, address);
 
   if (referralBottleCountErr || !referralBottleCountData) {
-    throw new Error("Could not fetch Referral Bottles");
+    throw new Error(`Could not fetch Referral Bottles ${JSON.stringify(referralBottleCountErr)}`);
   }
 
   const {

@@ -70,7 +70,7 @@ function ErrorBoundary(error: Error) {
         alignItems: "center",
       }}
     >
-      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not fetch transactions!</h1>
     </div>
   );

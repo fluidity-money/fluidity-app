@@ -59,7 +59,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   ]);
 
   if (activeReferrerReferralCountErr || !activeReferrerReferralCountData) {
-    throw new Error("Could not fetch Referrals");
+    throw new Error(`Could not fetch Referrals referrer count ${JSON.stringify(activeReferrerReferralCountErr)}`);
   }
 
   const {
@@ -69,7 +69,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   } = activeReferrerReferralCountData;
 
   if (activeRefereeReferralCountErr || !activeRefereeReferralCountData) {
-    throw new Error("Could not fetch Referrals");
+    throw new Error(`Could not fetch Referrals referee active count ${JSON.stringify(activeRefereeReferralCountErr)}`);
   }
 
   const {
@@ -89,7 +89,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   } = inactiveRefereeReferralCountData;
 
   if (inactiveReferralErr || !inactiveReferralData) {
-    throw new Error("Could not fetch Referrals");
+    throw new Error(`Could not fetch Referrals inactive count ${JSON.stringify(inactiveReferralErr)}`);
   }
 
   const { lootbox_referrals: inactiveReferrals } = inactiveReferralData;

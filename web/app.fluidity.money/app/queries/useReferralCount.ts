@@ -1,7 +1,8 @@
 import { gql, jsonPost } from "~/util";
 
 const queryActiveByReferrerAddress = gql`
-  query getClaimedReferrerReferralCount($address: String!, $epoch: String!) {
+  query getClaimedReferrerReferralCount($address: String!, $epoch: lootbox_epoch!) {
+    lootbox_referrals_aggregate (
       where: { referrer: { _eq: $address }, active: { _eq: true }, epoch: { _eq: $epoch } }
     ) {
       aggregate {
@@ -12,7 +13,7 @@ const queryActiveByReferrerAddress = gql`
 `;
 
 const queryActiveByRefereeAddress = gql`
-  query getClaimedReferreeReferralCount($address: String!, $epoch: String!) {
+  query getClaimedReferreeReferralCount($address: String!, $epoch: lootbox_epoch!) {
     lootbox_referrals_aggregate(
       where: { referee: { _eq: $address }, active: { _eq: true }, epoch: { _eq: $epoch } }
     ) {
@@ -24,7 +25,7 @@ const queryActiveByRefereeAddress = gql`
 `;
 
 const queryInactiveByRefereeAddress = gql`
-  query getClaimedReferrerReferralCount($address: String!, $epoch: String!) {
+  query getClaimedReferrerReferralCount($address: String!, $epoch: lootbox_epoch!) {
     lootbox_referrals_aggregate(
       where: { referee: { _eq: $address }, active: { _eq: false }, epoch: { _eq: $epoch } }
     ) {
@@ -65,7 +66,7 @@ const useActiveReferralCountByReferrerAddress = (address: string, epoch: string)
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
@@ -89,7 +90,7 @@ const useActiveReferralCountByRefereeAddress = (address: string, epoch: string) 
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
@@ -113,7 +114,7 @@ const useInactiveReferralCountByRefereeAddress = (address: string, epoch: string
     variables,
   };
 
-  const url = "https://fluidity.hasura.app/v1/graphql";
+  const url = "http://localhost:8080/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,

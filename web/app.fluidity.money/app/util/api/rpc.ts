@@ -30,6 +30,8 @@ const jsonGet = async <
   params_?: Req,
   headers?: Record<string, string>
 ): Promise<Res> => {
+  let text = "";
+
   try {
     const params = params_ || ({} as Req);
 
@@ -46,11 +48,11 @@ const jsonGet = async <
       },
     });
 
-    const json = await res.json();
+    text = await res.text();
 
-    return json;
+    return JSON.parse(text);
   } catch (e) {
-    throw new Error(`Could not parse JSON: ${e}`);
+    throw new Error(`Could not parse JSON body "${text}": ${e}`);
   }
 };
 

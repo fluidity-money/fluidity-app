@@ -176,7 +176,7 @@ func main() {
 
 		if _, found := tokensMap[tokenShortName]; !found {
 			log.Debugf(
-				"For transaction hash %v, had a winner with token short name %v that wasn't in the tokens list. Ignoring",
+				"For transaction hash %v, had a user action with token short name %v that wasn't in the tokens list. Ignoring",
 				transactionHash,
 				tokenShortName,
 			)
@@ -243,6 +243,10 @@ func main() {
 			amountUsd, _ = new(big.Rat).SetString("0.04636")
 		}
 
+		// multiply the usd price with the normalisedAmount to get the USD amount that was sent
+
+		amountUsd.Mul(amountUsd, normalisedAmount)
+
 		awardedTime := time.Now()
 
 		customMultiplier := customMultipliers[tokenShortName]
@@ -254,7 +258,7 @@ func main() {
 			amountUsd,
 		)
 
-		// Calculate lootboxes earned from transaction
+		// calculate lootboxes earned from transaction
 
 		lootboxCount := new(big.Rat).Quo(amountUsd, new(big.Rat).SetInt64(3))
 
@@ -315,7 +319,7 @@ func main() {
 
 func protocolAllowed(application applications.Application) bool {
 	switch application {
-	case applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelotV3:
+	case applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelotV3, applications.ApplicationJumper:
 		return true
 	default:
 		return false
