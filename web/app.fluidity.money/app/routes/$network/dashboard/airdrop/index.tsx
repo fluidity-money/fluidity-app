@@ -1574,9 +1574,9 @@ const MyMultiplier = ({
       </GeneralButton>
       <div>
         <div className="airdrop-arb-multipliers-container">
-          <Text holo={true}>
+          <Heading as="h5">
             Provide $FLY and $ƒUSDC Liquidity to earn $ARB and Rewards!
-          </Text>
+          </Heading>
           <Text holo={true}>
             Add liquidity to Uniswap or the following Trader Joe and Camelot pools to earn Liquidity
             Mining rewards! You will also retroactively earn bottles depending on your contribution at

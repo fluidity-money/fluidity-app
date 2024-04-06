@@ -36,15 +36,15 @@ const (
 func pickRandomNumber() int {
 	n := rand.Int31n(PayoutChances)
 	switch {
-	case n => PayoutNoBottle && n <= PayoutTier5:
+	case n >= PayoutNoBottle && n <= PayoutTier5:
 		return 5
-	case n => PayoutTier4 && n <= PayoutNoBottle:
+	case n >= PayoutTier4 && n <= PayoutNoBottle:
 		return 0
-	case n => PayoutTier3 && n <= PayoutTier4:
+	case n >= PayoutTier3 && n <= PayoutTier4:
 		return 4
-	case n => PayoutTier2 && n <= PayoutTier3:
+	case n >= PayoutTier2 && n <= PayoutTier3:
 		return 3
-	case n => PayoutTier1 &&n  <= PayoutTier2:
+	case n >= PayoutTier1 &&n  <= PayoutTier2:
 		return 2
 	case n <= PayoutTier1:
 		return 1

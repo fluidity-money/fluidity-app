@@ -2389,7 +2389,7 @@ const RecapModal = ({
           {/* Animation */}
           {currentVideo === 0 ? (
             <Video
-              src={`https://app-cdn.fluidity.money/videos/airdrop${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+              src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
                 }`}
               type={"cover"}
               loop={false}
