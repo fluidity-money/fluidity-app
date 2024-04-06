@@ -41,6 +41,7 @@ export const getProviderDisplayName = (name?: string): Provider => {
     case "solend":
       return "Solend";
     case "uniswap":
+    case "uniswap_v3":
     case "uniswap_v2":
       return "Uniswap";
     case "sushiswap":
