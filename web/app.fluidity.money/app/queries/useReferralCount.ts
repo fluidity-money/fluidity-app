@@ -66,7 +66,7 @@ const useActiveReferralCountByReferrerAddress = (address: string, epoch: string)
     variables,
   };
 
-  const url = "http://localhost:8080/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
@@ -90,7 +90,7 @@ const useActiveReferralCountByRefereeAddress = (address: string, epoch: string) 
     variables,
   };
 
-  const url = "http://localhost:8080/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,
@@ -114,7 +114,7 @@ const useInactiveReferralCountByRefereeAddress = (address: string, epoch: string
     variables,
   };
 
-  const url = "http://localhost:8080/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralCountByAddressBody, ReferralCountRes>(
     url,

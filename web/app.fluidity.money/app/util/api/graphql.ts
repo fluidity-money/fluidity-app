@@ -11,7 +11,7 @@ type GqlEndpoint = {
 
 type GqlBackend = "hasura";
 
-const HasuraUrl = "http://localhost:8080/v1/graphql";
+const HasuraUrl = "https://fluidity.hasura.app/v1/graphql";
 
 export const networkGqlBackend = (network: string): GqlBackend | null => {
   switch (network) {

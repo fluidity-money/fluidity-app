@@ -387,6 +387,7 @@ const useUserTransactionsByAddress = async (
   filterHashes: string[],
   limit = 12
 ) => {
+  console.log("WHAT THE FUCK", tokens);
   const variables = {
     address: address,
     offset: (page - 1) * 12,

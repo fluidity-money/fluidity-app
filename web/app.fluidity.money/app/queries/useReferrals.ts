@@ -77,7 +77,7 @@ const useReferralByAddress = (referrer: string, referee: string, epoch: string) 
     variables,
   };
 
-  const url = "http://localhost:8080/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<ReferralsByAddressBody, ReferralsRes>(
     url,
@@ -101,7 +101,7 @@ const useInactiveReferralByAddress = (address: string, epoch: string) => {
     variables,
   };
 
-  const url = "http://localhost:8080/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
 
   return jsonPost<InactiveReferralsByAddressBody, ReferralsRes>(
     url,

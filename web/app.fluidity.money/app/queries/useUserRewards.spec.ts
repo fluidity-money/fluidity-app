@@ -4,7 +4,7 @@ describe("useUserRewards successfully runs", () => {
   it("should return a valid response", async () => {
     const response = await useUserRewardsByAddress(
       "arbitrum",
-      "0xeb6b882a295d316ac62c8cfcc81c3e37c084b7c5"
+      "0xdb9df35a80f84971d561b57750a5b2237acca83c"
     );
     expect(response).toBeDefined();
     expect(response.data).toBeDefined();

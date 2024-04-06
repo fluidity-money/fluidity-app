@@ -19,7 +19,7 @@ const query = gql`
 
 const useGlobalRewardStatistics = async (network: string) => {
   const variables = { network };
-  const url = "http://localhost:8080/v1/graphql";
+  const url = "https://fluidity.hasura.app/v1/graphql";
   const body = {
     variables,
     query: query,
