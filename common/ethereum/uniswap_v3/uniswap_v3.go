@@ -23,21 +23,19 @@ const Context = "UNISWAP_V3"
 //go:embed uniswap-v3-abi.json
 var uniswapV3AbiBytes []byte
 
-//0x66e433B898e299cD16dD724e99E11EECb3cBd55c
-
 var uniswapV3PoolAbi ethAbi.ABI
 
-func calculatePrice(seconds int, firstTick, secondTick *big.Int) *big.Rat {
-	tickDifference := new(big.Rat).Sub(new(big.Rat).SetInt(secondTick), new(big.Rat).SetInt(firstTick))
+func calculatePrice(seconds int, firstTick, secondTick *big.Int) (price *big.Rat) {
+	tickDifference := new(big.Int).Sub(new(big.Int).Set(secondTick), new(big.Int).Set(firstTick))
 
-	averageTick := new(big.Rat).Quo(tickDifference, new(big.Rat).SetInt64(int64(seconds)))
+	averageTick := new(big.Int).Quo(tickDifference, new(big.Int).SetInt64(int64(seconds)))
+	log.Debugf("average tick before %v", averageTick.String())
 
-	price := new(big.Rat).Mul(averageTick, averageTick)
+	averageTick.Exp(averageTick, new(big.Int).SetInt64(10001), nil)
 
-	two192 := new(big.Int).SetInt64(2)
-	two192.Exp(two192, new(big.Int).SetInt64(192), nil)
+	log.Debugf("average tick %v", averageTick.String())
 
-	return price.Quo(price, new(big.Rat).SetInt(two192))
+	return
 }
 
 // GetTwrpPrice from given seconds in the past til now. Using the Uniswap
@@ -55,10 +53,7 @@ func GetTwrpPrice(client *ethclient.Client, poolAddress ethCommon.Address, secon
 		)
 	})
 
-	secondsAgo := []*big.Int{
-		new(big.Int).SetInt64(int64(seconds)), // from
-		new(big.Int).SetInt64(0),              // to
-	}
+	secondsAgo := []uint32{uint32(seconds),0}
 
 	resp, err := ethereum.StaticCall(client, poolAddress, uniswapV3PoolAbi, "observe", secondsAgo)
 

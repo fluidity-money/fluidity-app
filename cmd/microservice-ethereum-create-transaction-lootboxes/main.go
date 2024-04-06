@@ -18,7 +18,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/util"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap_v3"
+	//"github.com/fluidity-money/fluidity-app/common/ethereum/uniswap_v3"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
@@ -233,13 +233,14 @@ func main() {
 
 		amountUsd := new(big.Rat).SetInt64(1)
 
-		uniswapV3PoolAddr, ok := oraclesMap[tokenShortName]
+		_, ok := oraclesMap[tokenShortName]
 
 		// if we can find a pool using the oracle map, then let's look up the price instead of using the default
 
 		if ok {
 			// this will die using Fatal if the lookup fails
-			amountUsd = uniswap_v3.GetTwrpPrice1Second(ethClient, uniswapV3PoolAddr)
+			//amountUsd = uniswap_v3.GetTwrpPrice1Second(ethClient, uniswapV3PoolAddr)
+			amountUsd, _ = new(big.Rat).SetString("0.04636")
 		}
 
 		awardedTime := time.Now()
