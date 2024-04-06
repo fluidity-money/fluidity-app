@@ -66,6 +66,7 @@ import { useFLYOwedForAddress } from "~/queries";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
+import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { useCache } from "~/hooks/useCache";
 import Table, { IRow } from "~/components/Table";
 import { ReferralBottlesCountLoaderData } from "../../query/referralBottles";
@@ -73,7 +74,7 @@ import { HowItWorksContent } from "~/components/ReferralModal";
 import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKingdom";
 import { redirect } from "react-router-dom";
 
-export const EPOCH_CURRENT_IDENTIFIER = "epoch_testing";
+export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
 
 const AIRDROP_BLOG_POST =
   "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
@@ -203,6 +204,8 @@ const Airdrop = () => {
     getStakingDeposits,
     redeemTokens,
   } = useContext(FluidityFacadeContext);
+
+  const { toggleVisibility: toggleStakingVisibility } = useContext(FlyStakingContext);
 
   if (network !== "arbitrum") {
     // assuming this is solana
@@ -894,11 +897,11 @@ const Airdrop = () => {
                   Airdrop V3: FLY Me To The Moon.
                 </Heading>
                 <Text>
-                  Fluidify your assets, transact them, and boost your rewards by
-                  using your Fluid Assets on partnered protocols and staking
-                  liquidity right here on Fluidity! Keep an eye on the
-                  leaderboard as you compete with fellow Fluiders for the top
-                  spot. Future Fluid Governance Tokens await!
+                  Stake and trade your $FLY, fluidify your assets, transact them, and boost your rewards by
+                  using trading on partnered protocols and staking liquidity right here on Fluidity! Keep an
+                  eye on the leaderboard as you compete with fellow Surfers for the top spot! A new Layer of
+                  rewards and utility is coming!
+
                   <LinkButton
                     size="medium"
                     type="external"
@@ -953,14 +956,7 @@ const Airdrop = () => {
               />
               <MultiplierTasks />
               <MyMultiplier
-                seeMyStakingStats={() => {
-                  setCurrentModal("stake");
-                  // would just useRef here but the ref doesn't exist at this point
-                  // timeout is needed to counterract the scroll to top
-                  setTimeout(() => {
-                    window.scrollTo(0, 1000);
-                  }, 500);
-                }}
+                seeMyStakingStats={() => toggleStakingVisibility?.(true)}
                 seeStakeNow={() => setCurrentModal("stake")}
                 liquidityMultiplier={liquidityMultiplier}
                 stakes={stakes}
@@ -1229,11 +1225,10 @@ const Airdrop = () => {
                     </Heading>
                   </div>
                   <Text style={{ fontSize: 14 }}>
-                    Fluidify your assets, transact them, and boost your rewards
-                    by using your Fluid Assets on partnered protocols and
-                    staking liquidity right here on Fluidity! Keep an eye on the
-                    leaderboard as you compete with fellow Fluiders for the top
-                    spot. Future Fluid Governance Tokens await!
+                    Stake and trade your $FLY, fluidify your assets, transact them, and boost your rewards by
+                    using trading on partnered protocols and staking liquidity right here on Fluidity! Keep an
+                    eye on the leaderboard as you compete with fellow Surfers for the top spot! A new Layer of
+                    rewards and utility is coming!
                     <LinkButton
                       size="medium"
                       type="external"
@@ -1267,7 +1262,7 @@ const Airdrop = () => {
                 />
                 <MultiplierTasks />
                 <MyMultiplier
-                  seeMyStakingStats={() => setCurrentModal("staking-stats")}
+                  seeMyStakingStats={() => toggleStakingVisibility?.(true)}
                   seeStakeNow={() => setCurrentModal("stake")}
                   liquidityMultiplier={liquidityMultiplier}
                   stakes={stakes}
@@ -1575,7 +1570,7 @@ const MyMultiplier = ({
         handleClick={seeMyStakingStats}
         id="mx-see-my-staking-stats"
       >
-        MY EPOCH 1 STAKING STATS
+        STAKE $FLY AND EARN
       </GeneralButton>
       <div>
         <div className="airdrop-arb-multipliers-container">

@@ -1458,12 +1458,12 @@ const tutorialContent: {
 } = {
   "0": {
     title: "WHAT ARE LOOT BOTTLES?",
-    desc: "Welcome to the Fluidity Airdrop V3! Use Fluid Assets and earn Loot Bottles and $FLY rewards. Loot Bottles contain $FLUID tokens. They have different rarities, from common to legendary. The higher the rarity, the more $FLUID tokens it contains. ",
+    desc: "Welcome to Fluidity Airdrop V3! Use $FLY and Fluid Assets to earn Loot Bottles, Superposition points, and $ARB rewards. Loot Bottles contain $FLY tokens and SPN points. They have different rarities, from common to legendary. The higher the rarity, the higher the rewards.",
     image: "WHAT_ARE_LOOT_BOTTLES",
   },
   "1": {
     title: "HOW TO EARN LOOT BOTTLES?",
-    desc: "To participate in the airdrop, all you need to do is Fluidify your tokens and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles. ",
+    desc: "To participate in the airdrop, all you need to do is Trade $FLY on participating DEXs, or Fluidify your tokens (turn $USDC in $ƒUSDC) and start transacting with them. The more Fluid Transactions you perform, the more Loot Bottles you get and the higher your chances of receiving rarer Loot Bottles.",
     image: "HOW_TO_EARN",
   },
   "2": {
@@ -1471,8 +1471,7 @@ const tutorialContent: {
     desc: (
       <>
         <Text size="md">
-          You can increase your chances of receiving Loot Bottles by doing the
-          following:
+          You can increase your chances of receiving Loot Bottles by doing the following: Staking $FLY on the Fluidity Webapp • LPing on the incentivised Trader Joe & Camelot LPs • Contributing volume (specially through $FLY) • Use our supported DEXs to receive a 12x multiplier for transacting
         </Text>
         <div
           style={{
@@ -1525,7 +1524,7 @@ const tutorialContent: {
   },
   "3": {
     title: "REFERRALS",
-    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire Wave. Your friend will receive 5 Loot Bottles after performing certain actions. ",
+    desc: "You can generate your own referral link and invite your friends to try out Fluidity! In exchange you will receive 10% of their airdrop earnings throughout the entire epoch. Your friend will receive 10 Loot Bottles after performing certain actions.",
     image: "REFERRALS",
   },
   "4": {
@@ -1639,7 +1638,7 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+            src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
               }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
@@ -2390,7 +2389,7 @@ const RecapModal = ({
           {/* Animation */}
           {currentVideo === 0 ? (
             <Video
-              src={`/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+              src={`https://app-cdn.fluidity.money/videos/airdrop${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
                 }`}
               type={"cover"}
               loop={false}
@@ -2405,7 +2404,7 @@ const RecapModal = ({
             />
           ) : (
             <Video
-              src={`/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
+              src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
                 }`}
               type={"cover"}
               loop={true}
