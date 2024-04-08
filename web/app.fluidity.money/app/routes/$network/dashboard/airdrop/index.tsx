@@ -1701,7 +1701,7 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toDecimalPlaces(arbEarned, 4)}
+                0
               </Text>
             </td>
           );
