@@ -514,7 +514,7 @@ const Airdrop = () => {
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
+    }${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
     }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
   );
 
