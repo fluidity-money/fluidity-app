@@ -494,7 +494,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
   const { width } = useViewport();
 
@@ -1801,6 +1801,14 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
+          <GeneralButton
+            type={filterIndex === 0 ? "primary" : "transparent"}
+            handleClick={() => setFilterIndex(0)}
+          >
+            <Text code size="sm" style={{ color: "inherit" }}>
+              24 HOURS
+            </Text>
+          </GeneralButton>
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
