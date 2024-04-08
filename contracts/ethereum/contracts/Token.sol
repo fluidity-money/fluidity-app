@@ -171,6 +171,12 @@ contract Token is
     ///         moving and unwrapping/wrapping funds.
     mapping(address => bool) private blacklist_;
 
+    /// @notice blacklistFrozenWhen_ is a way to prevent blacklist and move transactions from
+    ///         taking place in the same block. Best case scenario, the DAO if it's executing this
+    ///         transaction will catch any calls to this path and interfere if it's a bad proposal. Though
+    ///         obviously a contract upgrade would frustrate this step.
+    mapping(address => uint256) private blacklistFrozenWhen_;
+
     /* ~~~~~~~~~~ EVENTS ~~~~~~~~~~ */
 
     /// @dev BlacklistEnabled activated for a specific address
@@ -898,7 +904,9 @@ contract Token is
     }
 
     /**
-     * @dev blacklistAddress, only callable by the operator.
+     * @dev blacklistAddress, only callable by the operator. Will prevent funds from being
+     *      unwrapped/moved. Will record the block number that this took place, to prevent
+     *      freezing and moving immediately.
      * @param _spender to ban using the blacklisting feature
      * @param _status of whether or not it's enabled
      */
@@ -910,6 +918,24 @@ contract Token is
         require(_spender != address(0), "no zero address");
         emit BlacklistEnabled(_spender, _status);
         blacklist_[_spender] = _status;
+        blacklistFrozenWhen_[_spender] = block.number;
+    }
+
+    /**
+     * @dev blacklistMoveFunds for a blacklisted address. Make sure it wasn't done
+     *      in the same block to prevent abuse.
+     * @param _old address to take the money from.
+     * @param _new address to move the money to.
+     */
+    function blacklistMoveFunds(address _old, address _new) public {
+       require(msg.sender == operator_, "only operator");
+       require(_old != address(0), "no zero address");
+       require(blacklist_[_old], "address not blacklisted");
+
+       // why bother with a newer block? avoid messy block reorgs
+       require(blacklistFrozenWhen_[_new] < block.number, "same block number");
+       balances_[_new] = balances_[_old];
+       balances_[_old] = 0;
     }
 
     /**
