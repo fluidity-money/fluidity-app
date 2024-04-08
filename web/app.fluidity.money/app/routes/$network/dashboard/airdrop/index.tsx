@@ -1606,7 +1606,7 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, fusdcEarned, arbEarned, flyStaked, bottles } = data;
+  const { user, rank, referralCount, fusdcEarned, flyStaked, bottles } = data;
 
   return {
     className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address && address === user ? "highlighted-row" : ""
