@@ -77,7 +77,7 @@ import { redirect } from "react-router-dom";
 export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
 
 const AIRDROP_BLOG_POST =
-  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+  "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12";
 
 const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap";
 
@@ -854,7 +854,7 @@ const Airdrop = () => {
         </TabButton>
         <TabButton size="small" groupId="airdrop">
           <a
-            href="https://dune.com/neogeo/fluidity-airdrop-v2"
+            href="https://dune.com/fluidity_labs/fluidity-fly-staking-metrics"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -912,8 +912,7 @@ const Airdrop = () => {
                     }}
                     handleClick={() => {
                       window.open(
-                        // TODO
-                        "https://blog.fluidity.money",
+                        "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12",
                         "_blank"
                       );
                     }}
@@ -1239,8 +1238,7 @@ const Airdrop = () => {
                       }}
                       handleClick={() => {
                         window.open(
-                          // TODO
-                          "https://blog.fluidity.money/",
+                          "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12",
                           "_blank"
                         );
                       }}
