@@ -18,10 +18,15 @@ import {
   winnersTransactionObservable,
   pendingWinnersTransactionObservables,
 } from "./drivers";
+import { writeReadableStreamToWritable } from "@remix-run/node";
 
 //
 
 const MODE = process.env.NODE_ENV;
+const CDN = process.env.FLU_CDN
+
+if (!CDN)
+  throw new Error("FLU_CDN not set!")
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,6 +54,20 @@ app.use(
   "/build",
   express.static("public/build", { immutable: true, maxAge: "1y" })
 );
+
+// Fetch assets from CDN rather than local path.
+// Remix's publicPath sets the path for everything, so we instead specify paths to route through the CDN.
+app.use(["/assets", "/images", "/videos"], (req, res, next) => {
+  fetch(`${CDN}${req.originalUrl}`).then(cdnRes => {
+    if (!cdnRes.body)
+      return next()
+    writeReadableStreamToWritable(cdnRes.body, res)
+
+    cdnRes.headers.forEach((v, n) =>
+      res.setHeader(n, v));
+  }).catch(e => { console.error("Failed to fetch from CDN", e) })
+})
+
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
 app.use(express.static("public", { maxAge: "1h" }));
@@ -159,13 +178,13 @@ app.all(
   MODE === "production"
     ? createSentryRequestHandler({ build: require(BUILD_DIR) })
     : (...args) => {
-        purgeRequireCache();
-        const requestHandler = createRequestHandler({
-          build: require(BUILD_DIR),
-          mode: MODE,
-        });
-        return requestHandler(...args);
-      }
+      purgeRequireCache();
+      const requestHandler = createRequestHandler({
+        build: require(BUILD_DIR),
+        mode: MODE,
+      });
+      return requestHandler(...args);
+    }
 );
 const port = process.env.PORT || 3000;
 const server = httpServer.listen(port, () => {

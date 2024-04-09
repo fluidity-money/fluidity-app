@@ -16,6 +16,7 @@
 | `FLU_HASURA_SECRET`    | Hasura admin secret used in client headers for RPC calls  |
 | `FLU_SENTRY_DSN`       | Sentry reporting URI                                      |
 | `FLU_WALLETCONNECT_ID` | WalletConnect Client-Side Project ID                      |
+| `FLU_CDN`              | CDN URL to use for static content, without a trailing `/` |
 
 ## Building
 
