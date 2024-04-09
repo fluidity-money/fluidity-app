@@ -43,6 +43,7 @@ import {
   Modal,
   ProvideLiquidity,
   BurgerMenu,
+  Referral,
   CardModal,
   ArrowUp,
   ArrowDown,
@@ -421,9 +422,9 @@ export default function Dashboard() {
 
   const otherModalOpen =
     openMobModal ||
-    walletModalVisibility ||
-    connectedWalletModalVisibility ||
-    chainModalVisibility
+      walletModalVisibility ||
+      connectedWalletModalVisibility ||
+      chainModalVisibility
       ? true
       : false;
 
@@ -499,9 +500,8 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${
-            otherModalOpen ? "z-0" : "z-1"
-          }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
+            }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -686,6 +686,23 @@ export default function Dashboard() {
                   {isMobile ? "" : "Receive"}
                 </GeneralButton>
               </>
+            )}
+
+            {/* Referrals Button (desktop only) */}
+            {isTablet || isMobile || (
+              <GeneralButton
+                type="transparent"
+                size="small"
+                layout="before"
+                handleClick={() => {
+                  width < airdropMobileBreakpoint
+                    ? navigate(`/${network}/dashboard/airdrop#referrals`)
+                    : setReferralModalVisibility(true);
+                }}
+                icon={<Referral />}
+              >
+                {isMobile ? "" : "Referral"}
+              </GeneralButton>
             )}
 
             {/* Fluidify button (desktop only) */}
@@ -897,7 +914,21 @@ export default function Dashboard() {
                 <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
                   <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
                 </a>
-              </li>]}
+              </li>,
+              <li key="ico">
+                <div />
+                <a
+                  style={{ cursor: "pointer" }}
+                  href="https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Text className="dashboard-navbar-default">
+                    <FlyIcon /> GET FLY
+                  </Text>
+                </a>
+              </li>
+            ]}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}

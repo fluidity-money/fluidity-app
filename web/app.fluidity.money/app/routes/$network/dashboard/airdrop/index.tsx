@@ -77,7 +77,7 @@ import { redirect } from "react-router-dom";
 export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
 
 const AIRDROP_BLOG_POST =
-  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+  "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12";
 
 const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap";
 
@@ -494,7 +494,7 @@ const Airdrop = () => {
     defaultTokens.map((tok) => ({ ...tok, userTokenBalance: new BN(0) }))
   );
 
-  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(1);
+  const [leaderboardFilterIndex, setLeaderboardFilterIndex] = useState(0);
 
   const { width } = useViewport();
 
@@ -514,7 +514,7 @@ const Airdrop = () => {
 
   const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
     `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
+    }${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
     }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
   );
 
@@ -854,7 +854,7 @@ const Airdrop = () => {
         </TabButton>
         <TabButton size="small" groupId="airdrop">
           <a
-            href="https://dune.com/neogeo/fluidity-airdrop-v2"
+            href="https://dune.com/fluidity_labs/fluidity-fly-staking-metrics"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -912,8 +912,7 @@ const Airdrop = () => {
                     }}
                     handleClick={() => {
                       window.open(
-                        // TODO
-                        "https://blog.fluidity.money",
+                        "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12",
                         "_blank"
                       );
                     }}
@@ -1239,8 +1238,7 @@ const Airdrop = () => {
                       }}
                       handleClick={() => {
                         window.open(
-                          // TODO
-                          "https://blog.fluidity.money/",
+                          "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12",
                           "_blank"
                         );
                       }}
@@ -1351,8 +1349,10 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
-  const epochDaysLeft = 89;
-  const epochPercentage = 0;
+  const dayDiff = epochMax - epochDays
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
+  const percentage = Math.floor((epochDays / epochMax) * 100)
+  const epochPercentage = percentage < 100 ? percentage : 100
 
   return (
     <div
@@ -1604,7 +1604,7 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, fusdcEarned, arbEarned, flyStaked, bottles } = data;
+  const { user, rank, referralCount, fusdcEarned, flyStaked, bottles } = data;
 
   return {
     className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address && address === user ? "highlighted-row" : ""
@@ -1699,7 +1699,7 @@ const airdropRankRow = (
                     : {}
                 }
               >
-                {toDecimalPlaces(arbEarned, 4)}
+                0
               </Text>
             </td>
           );
@@ -1801,6 +1801,14 @@ const Leaderboard = ({
           </Text>
         </div>
         <div className="leaderboard-header-filters">
+          <GeneralButton
+            type={filterIndex === 0 ? "primary" : "transparent"}
+            handleClick={() => setFilterIndex(0)}
+          >
+            <Text code size="sm" style={{ color: "inherit" }}>
+              24 HOURS
+            </Text>
+          </GeneralButton>
           <GeneralButton
             type={filterIndex === 1 ? "primary" : "transparent"}
             handleClick={() => setFilterIndex(1)}
