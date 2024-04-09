@@ -52,35 +52,3 @@ func pickRandomNumber() int {
 		panic(fmt.Sprintf("bad pickRandomNumber impl: %v", n))
 	}
 }
-
-// getExpectedTierPcts. Returns the expected percentage chance of being drawn for all tiers
-func getExpectedTierPcts() map[int]float64 {
-	expectedMap := make(map[int]float64)
-	expectedMap[0] = float64((PayoutChances - PayoutTier5)) / float64(PayoutChances) * 100
-	expectedMap[1] = float64(Tier1Prob) / float64(PayoutChances) * 100
-	expectedMap[2] = float64(Tier2Prob) / float64(PayoutChances) * 100
-	expectedMap[3] = float64(Tier3Prob) / float64(PayoutChances) * 100
-	expectedMap[4] = float64(Tier4Prob) / float64(PayoutChances) * 100
-	expectedMap[5] = float64(Tier5Prob) / float64(PayoutChances) * 100
-	return expectedMap
-}
-
-// simulate a large number of draws and compare to the expected probabilities.
-func simulateDraws() {
-	simIterations := 100000
-	expectedResults := getExpectedTierPcts()
-	simResults := make(map[int]int)
-	for i := 0; i < 6; i++ {
-		simResults[i] = 0
-	}
-
-	for i := 0; i < simIterations; i++ {
-		lootboxRewardTier := pickRandomNumber()
-		simResults[lootboxRewardTier] += 1
-	}
-
-	fmt.Printf("\nIterations:  %v", simIterations)
-	for i := 0; i < 6; i++ {
-		fmt.Printf("\nTier %v Got:  %v = %v%%  Expected:%v%%", i, simResults[i], (float64(simResults[i])/float64(simIterations))*100, expectedResults[i])
-	}
-}
