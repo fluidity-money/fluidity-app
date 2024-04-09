@@ -505,9 +505,7 @@ const Airdrop = () => {
   const isMobile = width < mobileBreakpoint;
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
-    address
-      ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
-      : ""
+      `/${network}/query/dashboard/airdrop?epoch=${EPOCH_CURRENT_IDENTIFIER}&address=${address}`
   );
 
   const currentApplication = "";

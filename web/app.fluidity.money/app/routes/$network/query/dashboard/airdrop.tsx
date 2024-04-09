@@ -51,12 +51,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const { network } = params;
 
   const url = new URL(request.url);
-  const address_ = url.searchParams.get("address");
+  const address_ = url.searchParams.get("address") ?? "";
   const epochIdentifier = url.searchParams.get("epoch") ?? "";
 
   const address = address_?.toLowerCase();
 
-  if (!address || !network || !epochIdentifier)
+  if (!network || !epochIdentifier)
     throw new Error("Invalid Request");
 
   const { data, errors } = await useLootboxConfig({
