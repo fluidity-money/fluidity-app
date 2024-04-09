@@ -79,7 +79,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     {} as Record<string, string>
   );
 
-  const defaultLogo = "https://app-cdn.fluidity.money/assets/tokens/fUSDC.svg";
+  const defaultLogo = "/assets/tokens/fUSDC.svg";
 
   // use updated SQL aggregation
   if (networkGqlBackend(network) === "hasura") {

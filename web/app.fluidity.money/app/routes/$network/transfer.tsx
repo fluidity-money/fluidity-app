@@ -22,7 +22,7 @@ const Transfer = () => {
             <Link to={"../dashboard/home"}>
               <img
                 style={{ width: "5.5em", height: "2.5em" }}
-                src="https://app-cdn.fluidity.money/images/outlinedLogo.svg"
+                src="/images/outlinedLogo.svg"
                 alt="Fluidity"
               />
             </Link>

@@ -1192,7 +1192,7 @@ const Airdrop = () => {
                   borderColor: "white",
                 }}
                 width="100%"
-                src="https://app-cdn.fluidity.money/images/epoch3AirdropBanner.png"
+                src="/images/epoch3AirdropBanner.png"
               />
             </div>
             <div
@@ -1881,19 +1881,19 @@ const BottleProgress = ({
         style={isMobile ? { flexDirection: "column-reverse", gap: "2em" } : {}}
       >
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/common.png" />
+          <img src="/images/hero/common.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/uncommon.png" />
+          <img src="/images/hero/uncommon.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/rare.png" />
+          <img src="/images/hero/rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/ultra_rare.png" />
+          <img src="/images/hero/ultra_rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/legendary.png" />
+          <img src="/images/hero/legendary.png" />
         </Card>
       </HeroCarousel>
       <BottleDistribution

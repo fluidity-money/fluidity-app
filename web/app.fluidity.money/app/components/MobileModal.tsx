@@ -139,7 +139,7 @@ export default function MobileModal({
               >
                 <img
                   style={{ width: "5.5em", height: "2.5em" }}
-                  src="https://app-cdn.fluidity.money/images/outlinedLogo.svg"
+                  src="/images/outlinedLogo.svg"
                   alt="Fluidity"
                 />
               </a>
@@ -260,7 +260,7 @@ export default function MobileModal({
                   ? navigate(`/${network}/dashboard/rewards/unclaimed`)
                   : navigate(`/${network}/dashboard/rewards`);
               }}
-              icon={<img src="https://app-cdn.fluidity.money/images/icons/arrowRightWhite.svg" />}
+              icon={<img src="/images/icons/arrowRightWhite.svg" />}
               className="unclaimed-button"
             >
               <Text size="lg" prominent={true}>

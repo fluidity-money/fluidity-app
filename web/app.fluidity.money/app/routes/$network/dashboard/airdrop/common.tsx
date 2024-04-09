@@ -1638,7 +1638,7 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
               }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
@@ -1672,7 +1672,7 @@ const TestnetRewardsModal = () => {
 
   return (
     <div className="claim-ropsten">
-      <img src="https://app-cdn.fluidity.money/images/testnetBanner.png" />
+      <img src="/images/testnetBanner.png" />
       <div className="ropsten-header">
         <Heading as="h3">Claim Testnet Rewards</Heading>
         <Text prominent size="sm">
@@ -1922,23 +1922,23 @@ const RecapModal = ({
 
   const bottleRarityColorIcon = {
     [Rarity.Common]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/COMMON.png",
+      img: "/images/airdrop/COMMON.png",
       color: "#FFFFFF",
     },
     [Rarity.Uncommon]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/UNCOMMON.png",
+      img: "/images/airdrop/UNCOMMON.png",
       color: "#80E4EF",
     },
     [Rarity.Rare]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/RARE.png",
+      img: "/images/airdrop/RARE.png",
       color: "#B7EBD4",
     },
     [Rarity.UltraRare]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/ULTRA RARE.png",
+      img: "/images/airdrop/ULTRA RARE.png",
       color: "#EDC6E1",
     },
     [Rarity.Legendary]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/LEGENDARY.png",
+      img: "/images/airdrop/LEGENDARY.png",
       color: "#F8D192",
     },
   };
@@ -2389,7 +2389,7 @@ const RecapModal = ({
           {/* Animation */}
           {currentVideo === 0 ? (
             <Video
-              src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+              src={`/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
                 }`}
               type={"cover"}
               loop={false}
@@ -2404,7 +2404,7 @@ const RecapModal = ({
             />
           ) : (
             <Video
-              src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
+              src={`/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
                 }`}
               type={"cover"}
               loop={true}

@@ -302,7 +302,7 @@ const Send = () => {
     <div className={`transfer-container send ${isMobile ? "mobile" : ""}`}>
       <Video
         className="send-video"
-        src={"https://app-cdn.fluidity.money/videos/FluidityOpportunityB.mp4"}
+        src={"/videos/FluidityOpportunityB.mp4"}
         type={"none"}
         loop={true}
       />
