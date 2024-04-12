@@ -63,6 +63,8 @@ contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
 
     event NewMerkleDistributor(address old, address _new);
 
+    event Day1BonusApplied(address user, uint stakedPosition);
+
     /* ~~~~~~~~~~ HOUSEKEEPING ~~~~~~~~~~ */
 
     /// @dev if false, emergency mode is active - can be called by either the
@@ -182,6 +184,8 @@ return a
         // take the ERC20 from the spender.
         flyToken_.safeTransferFrom(_spender, address(this), _flyAmount);
 
+        emit NewStake(_recipient, _flyAmount);
+
         return _flyAmount;
     }
 
@@ -210,7 +214,7 @@ return a
     }
     /* ~~~~~~~~~~ INFORMATIONAL ~~~~~~~~~~ */
 
-    function stakingPositionsLen(address _account) public view returns (uint) {
+    function stakedPositionsLen(address _account) public view returns (uint) {
         return stakedStorage_[_account].length;
     }
 
@@ -231,6 +235,16 @@ return a
     /// @inheritdoc IStaking
     function minFlyAmount() public pure returns (uint256 flyAmount) {
         return 0;
+    }
+
+    function stakedStorage(address _a, uint _p) public view returns (
+        bool receivedBonus,
+        uint256 flyVested,
+        uint256 depositTimestamp
+    ) {
+        receivedBonus = stakedStorage_[_a][_p].receivedBonus;
+        flyVested = stakedStorage_[_a][_p].flyVested;
+        depositTimestamp = stakedStorage_[_a][_p].depositTimestamp;
     }
 
     /* ~~~~~~~~~~ NORMAL USER PUBLIC ~~~~~~~~~~ */
@@ -257,7 +271,10 @@ return a
         uint256 flyStaked,
         uint256 day1Points
     ) {
-        require(msg.sender == merkleDistributor_, "not merkle distributor");
+        require(
+            msg.sender == merkleDistributor_ || msg.sender == operator_,
+            "not merkle distributor"
+        );
         flyStaked = _stake(msg.sender, _recipient, _flyAmount, true);
         return (flyStaked, _calcDay1Points(_flyAmount));
     }
@@ -283,6 +300,7 @@ return a
                 // take the full amount for this position, pop the staked amount, reduce
                 // the fly remaining, then move on.
                 flyRemaining -= s.flyVested;
+                emit UnstakeBeginning(msg.sender, s.flyVested, unstakedBy);
                 unstakingStorage_[msg.sender].push(UnstakingPrivate({
                     flyAmount: s.flyVested,
                     unstakedTimestamp: unstakedBy
@@ -348,6 +366,7 @@ return a
         }
         // now we can use ERC20 to send the token back, if they got more than 0 back.
         if (flyReturned == 0) revert("no fly returned");
+        emit UnstakeFinalised(msg.sender, flyReturned);
         flyToken_.safeTransfer(msg.sender, flyReturned);
     }
 
@@ -358,6 +377,12 @@ return a
         require(merkleDistributor_ == _old, "incorrect order");
         merkleDistributor_ = _new;
         emit NewMerkleDistributor(_old, _new);
+    }
+
+    function applyDay1Bonus(address _user, uint _pos) public {
+        require(msg.sender == operator_, "operator only");
+        require(stakedStorage_[_user][_pos].flyVested > 0, "empty staking storage");
+        stakedStorage_[_user][_pos].receivedBonus = true;
     }
 
     /* ~~~~~~~~~~ EMERGENCY FUNCTIONS ~~~~~~~~~~ */

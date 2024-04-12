@@ -33,6 +33,12 @@ struct Staked {
  * amounts out in an emergency mode stake.
 */
 interface IStaking {
+    event NewStake(address staker, uint256 amount);
+
+    event UnstakeBeginning(address unstaker, uint256 amount, uint256 unlockTimestamp);
+
+    event UnstakeFinalised(address unstaker, uint256 amount);
+
     /* ~~~~~~~~~~ SIMPLE GETTER ~~~~~~~~~~ */
 
     /// @notice merkleDistributor that's in use for the stakeFor function.
