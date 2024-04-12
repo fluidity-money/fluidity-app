@@ -11,9 +11,6 @@ import (
 func TestPickRandomTier(t *testing.T) {
 	simIterations := 10_000_000
 
-	//This is "how close" the simulated probabilities must be to the expected probs to pass the test
-	testTolerancePct := float64(0.5) //Percentage, so 0.5 = 0.5%  or  1 = 1%
-
 	expectedResults := getExpectedTierPcts()
 
 	//Prepare result data structure
@@ -28,27 +25,30 @@ func TestPickRandomTier(t *testing.T) {
 		simResults[lootboxRewardTier] += 1
 	}
 
-	//Informational: Output Actual vs Expected probabilities
+	//Calculate the Simulated Result Outcome Percentages for each Tier
 	simResultPcts := make(map[int]float64)
-	fmt.Printf("\nIterations:  %v", simIterations)
 	for i := 0; i < 6; i++ {
 		simResultPcts[i] = (float64(simResults[i]) / float64(simIterations)) * 100
-		fmt.Printf("\nTier %v Got:  %v = %f%%  Expected:%f%%", i, simResults[i], simResultPcts[i], expectedResults[i])
 	}
 
-	fmt.Printf("\n")
+	//This is "how close" the simulated outcome percentages must be to the expected probabilities to pass the test
+	testTolerancePct := float64(0.5) //Percentage, so 0.5 = 0.5%  or  1 = 1%
 
-	//Actual testing & asserts
+	//Actual testing & asserts.
+	//Compare the Simulated Result Outcome Pcts to an "acceptable" value range around the Expected Result
 	for i := 0; i < 6; i++ {
+
+		//Define an acceptable range of [Expected Result Pct] + or - TestTolerancePct
 		acceptableHigh := expectedResults[i] + testTolerancePct //expectedResults[i] is a pct. so we just +/- the tolerance
 		acceptableLow := expectedResults[i] - testTolerancePct
 		if acceptableLow < 0 {
 			acceptableLow = 0
 		}
 
-		thisResult := simResultPcts[i]
-		fmt.Printf("\nTier %v Acceptable Range %v - %f   Actual:%f", i, acceptableLow, acceptableHigh, thisResult)
-		assert.True(t, thisResult >= float64(acceptableLow) && thisResult <= float64(acceptableHigh), fmt.Sprintf("Tier %v value is not within expected range", i))
+		thisSimResultPct := simResultPcts[i] // The simulated outcome pct
+
+		//Assert: Simulated Output Pct must be within the range of acceptable expected values.
+		assert.True(t, thisSimResultPct >= float64(acceptableLow) && thisSimResultPct <= float64(acceptableHigh), fmt.Sprintf("Tier %v value is not within expected range", i))
 	}
 }
 
