@@ -24,7 +24,9 @@ type IMobileModal = {
     path: (network: string) => string;
     icon: JSX.Element;
   }>;
-  nonNavigationEntries?: Array<React.DetailedHTMLProps<React.LiHTMLAttributes<HTMLElement>, HTMLElement>>;
+  nonNavigationEntries?: Array<
+    React.DetailedHTMLProps<React.LiHTMLAttributes<HTMLElement>, HTMLElement>
+  >;
   activeIndex: number;
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
@@ -209,8 +211,7 @@ export default function MobileModal({
           {/* Navigation between pages */}
           <ul className="sidebar-nav">
             <>
-            {navigationMap
-              .map((obj, index) => {
+              {navigationMap.map((obj, index) => {
                 const key = Object.values(obj)[0];
                 const { name, icon, path } = obj;
                 const active = index === activeIndex;
@@ -241,8 +242,8 @@ export default function MobileModal({
                   </li>
                 );
               })}
-              {...(nonNavigationEntries || [])}
-              </>
+              {...nonNavigationEntries || []}
+            </>
           </ul>
 
           {/* Navigation at bottom of modal */}

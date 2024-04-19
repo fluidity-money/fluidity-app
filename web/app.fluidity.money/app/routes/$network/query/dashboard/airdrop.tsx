@@ -56,8 +56,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const address = address_?.toLowerCase();
 
-  if (!network || !epochIdentifier)
-    throw new Error("Invalid Request");
+  if (!network || !epochIdentifier) throw new Error("Invalid Request");
 
   const { data, errors } = await useLootboxConfig({
     identifier: epochIdentifier,

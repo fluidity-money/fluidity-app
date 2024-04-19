@@ -1229,67 +1229,67 @@ $holo: linear-gradient(
 }
 
 .fly-submit-claim-modal-background {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
 }
 
 .fly-submit-claim-modal-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    background-color: #131313;
-    padding: 3em;
-    border: solid white 2px;
-    border-radius: 8px;
-    min-width: 300px;
-    max-width: 546px;
-    min-height: 495px;
-    margin: auto;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 546px;
+  min-height: 495px;
+  margin: auto;
+  width: 100%;
 
-    @media (max-width: 527px) {
-      max-height: 100vh;
-      margin: 0;
-      padding: 0.8em;
+  @media (max-width: 527px) {
+    max-height: 100vh;
+    margin: 0;
+    padding: 0.8em;
 
-      .legal {
-        text-align: center;
-      }
+    .legal {
+      text-align: center;
     }
+  }
 }
 
 .fly-staking-stats-modal-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    background-color: #131313;
-    padding: 3em;
-    border: solid white 2px;
-    border-radius: 8px;
-    min-width: 300px;
-    max-width: 575px;
-    min-height: 495px;
-    margin: auto;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 575px;
+  min-height: 495px;
+  margin: auto;
+  width: 100%;
 
-    @media (max-width: 527px) {
-      max-height: 100vh;
-      height: fit-content;
-      overflow-y: auto;
-      margin: 0;
-      padding: 0.8em;
+  @media (max-width: 527px) {
+    max-height: 100vh;
+    height: fit-content;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.8em;
 
-      .legal {
-        text-align: center;
-      }
+    .legal {
+      text-align: center;
     }
+  }
 }
 
 .fly-submit-claim-flex-container {
@@ -1308,41 +1308,41 @@ $holo: linear-gradient(
 }
 
 .fly-submit-claim-modal-button-container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    padding: 10px;
-    border-width: 2px;
-    border-color: white;
-    gap: 1em;
-    // position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  border-width: 2px;
+  border-color: white;
+  gap: 1em;
+  // position: absolute;
 }
 
 .fly-submit-claim-modal-options {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1em;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
 }
 
 .fly-submit-claim-modal-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4em;
-    padding: 1.5em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4em;
+  padding: 1.5em;
 }
 
 .fly-staking-stats-modal-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4em;
-    padding: 1.5em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4em;
+  padding: 1.5em;
 
-    @media (max-width: 527px) {
-      flex-direction: column;
-      padding: 0.5em;
-    }
+  @media (max-width: 527px) {
+    flex-direction: column;
+    padding: 0.5em;
+  }
 }
 
 .fly-confirming-claim-container {
@@ -1367,7 +1367,7 @@ $holo: linear-gradient(
 }
 
 .staking-card {
-  background-color: #FFD362 !important;
+  background-color: #ffd362 !important;
   gap: 1em;
 }
 
@@ -1397,11 +1397,11 @@ $holo: linear-gradient(
 }
 
 .fly-caution-text {
-  color: #FFB300;
+  color: #ffb300;
 }
 
 .fly-caution-border {
-  border-left: 4px #FFB300 solid;
+  border-left: 4px #ffb300 solid;
   margin-left: 1em;
   padding-left: 1em;
 }
@@ -1455,7 +1455,7 @@ $holo: linear-gradient(
 .centre {
   align-self: center;
 }
-  
+
 .underline {
   text-decoration: underline;
 }

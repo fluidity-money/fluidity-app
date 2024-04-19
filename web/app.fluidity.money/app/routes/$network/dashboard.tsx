@@ -415,16 +415,17 @@ export default function Dashboard() {
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const [stakingStatsModalVisibility, setStakingStatsModalVisibility] = useState(false);
+  const [stakingStatsModalVisibility, setStakingStatsModalVisibility] =
+    useState(false);
 
   // every change to this number asks flystakingmodal to look up the new balance
   const [shouldUpdateFlyBalance, setShouldUpdateFlyBalance] = useState(0);
 
   const otherModalOpen =
     openMobModal ||
-      walletModalVisibility ||
-      connectedWalletModalVisibility ||
-      chainModalVisibility
+    walletModalVisibility ||
+    connectedWalletModalVisibility ||
+    chainModalVisibility
       ? true
       : false;
 
@@ -500,8 +501,9 @@ export default function Dashboard() {
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
         <GeneralButton
-          className={`fluidify-button-dashboard-mobile rainbow ${otherModalOpen ? "z-0" : "z-1"
-            }`}
+          className={`fluidify-button-dashboard-mobile rainbow ${
+            otherModalOpen ? "z-0" : "z-1"
+          }`}
           type={"secondary"}
           size={"medium"}
           handleClick={() => navigate("../fluidify")}
@@ -572,8 +574,13 @@ export default function Dashboard() {
           })}
           <li key="staking">
             <div />
-            <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
-              <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+            <a
+              style={{ cursor: "pointer" }}
+              onClick={() => setStakingStatsModalVisibility(true)}
+            >
+              <Text className="dashboard-navbar-default">
+                <StakeIcon classname="staking-icon" /> STAKING
+              </Text>
             </a>
           </li>
         </ul>
@@ -759,7 +766,9 @@ export default function Dashboard() {
         {/* FLY Staking Stats Modal */}
         <FlyStakingStatsModal
           staking={true}
-          close={() => { setStakingStatsModalVisibility(false) }}
+          close={() => {
+            setStakingStatsModalVisibility(false);
+          }}
           showConnectWalletModal={() => setWalletModalVisibility(true)}
           visible={stakingStatsModalVisibility}
           shouldUpdateFlyBalance={shouldUpdateFlyBalance}
@@ -767,12 +776,13 @@ export default function Dashboard() {
         <FlyStakingContext.Provider
           value={{
             toggleVisibility: setStakingStatsModalVisibility,
-            shouldUpdateBalance: () => setShouldUpdateFlyBalance((v) => v + 1)
+            shouldUpdateBalance: () => setShouldUpdateFlyBalance((v) => v + 1),
           }}
         >
           <UIContext.Provider
             value={{
-              toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+              toggleConnectWalletModal: () =>
+                setWalletModalVisibility((v) => !v),
             }}
           >
             <Outlet />
@@ -911,8 +921,13 @@ export default function Dashboard() {
             nonNavigationEntries={[
               <li key="staking">
                 <div />
-                <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
-                  <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+                <a
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setStakingStatsModalVisibility(true)}
+                >
+                  <Text className="dashboard-navbar-default">
+                    <StakeIcon classname="staking-icon" /> STAKING
+                  </Text>
                 </a>
               </li>,
               <li key="ico">
@@ -927,7 +942,7 @@ export default function Dashboard() {
                     <FlyIcon /> GET FLY
                   </Text>
                 </a>
-              </li>
+              </li>,
             ]}
             activeIndex={activeIndex}
             chains={chainNameMap}
