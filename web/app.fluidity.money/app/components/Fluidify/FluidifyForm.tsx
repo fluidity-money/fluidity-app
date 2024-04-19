@@ -33,7 +33,11 @@ export const FluidifyForm = ({
 
   const [swapInput, setSwapInput] = useState<string>("");
 
-  const swapAmount: BN = snapToValidValue(swapInput, assetToken, assetToken.userTokenBalance);
+  const swapAmount: BN = snapToValidValue(
+    swapInput,
+    assetToken,
+    assetToken.userTokenBalance
+  );
 
   const assertCanSwap =
     connected &&
@@ -72,7 +76,7 @@ export const FluidifyForm = ({
         snapToValidValue(
           assetToken.userTokenBalance.toString(),
           assetToken,
-          assetToken.userTokenBalance,
+          assetToken.userTokenBalance
         ),
         assetToken.decimals
       )

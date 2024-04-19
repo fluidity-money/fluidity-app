@@ -29,7 +29,6 @@ import {
   toSignificantDecimals,
   numberToCommaSeparated,
   useViewport,
-  numberToMonetaryString,
   toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import {
@@ -124,14 +123,14 @@ export const loader: LoaderFunction = async ({ params }) => {
   return json({
     tokens: allowedTokens,
     network,
-    ethereumWallets
+    ethereumWallets,
   } satisfies LoaderData);
 };
 
 type LoaderData = {
   tokens: Array<Token>;
   network: string;
-  ethereumWallets: typeof config.config["ethereum"]["wallets"],
+  ethereumWallets: (typeof config.config)["ethereum"]["wallets"];
 };
 
 const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
@@ -205,7 +204,8 @@ const Airdrop = () => {
     redeemTokens,
   } = useContext(FluidityFacadeContext);
 
-  const { toggleVisibility: toggleStakingVisibility } = useContext(FlyStakingContext);
+  const { toggleVisibility: toggleStakingVisibility } =
+    useContext(FlyStakingContext);
 
   if (network !== "arbitrum") {
     // assuming this is solana
@@ -319,7 +319,8 @@ const Airdrop = () => {
         <div className="recap-fly-count-block-solana">
           <div className="recap-fly-count-header-solana">
             <Text size="md" code={true}>
-              Congratulations! You are eligible to claim 25% of your tokens at TGE
+              Congratulations! You are eligible to claim 25% of your tokens at
+              TGE
             </Text>
             <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
             <Text>
@@ -505,25 +506,31 @@ const Airdrop = () => {
   const isMobile = width < mobileBreakpoint;
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
-      `/${network}/query/dashboard/airdrop?epoch=${EPOCH_CURRENT_IDENTIFIER}&address=${address}`
+    `/${network}/query/dashboard/airdrop?epoch=${EPOCH_CURRENT_IDENTIFIER}&address=${address}`
   );
 
   const currentApplication = "";
 
-  const { data: airdropLeaderboardData_ } = useCache<AirdropLeaderboardLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
-    }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
-  );
+  const { data: airdropLeaderboardData_ } =
+    useCache<AirdropLeaderboardLoaderData>(
+      `/${network}/query/dashboard/airdropLeaderboard?period=${
+        leaderboardFilterIndex === 0 ? "24" : "all"
+      }&address=${address ?? ""}${
+        leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
+      }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+    );
 
   // airdrop leaderboard data contains more than the displayed entries, so postprocessing is required
-  const airdropLeaderboardData = useMemo(() => ({
-    loaded: airdropLeaderboardData_?.loaded,
-    leaderboard: getLeaderboardWithUser(
-      airdropLeaderboardData_?.leaderboard || [], 
-      address ?? ""
-    )
-  }), [airdropLeaderboardData_])
+  const airdropLeaderboardData = useMemo(
+    () => ({
+      loaded: airdropLeaderboardData_?.loaded,
+      leaderboard: getLeaderboardWithUser(
+        airdropLeaderboardData_?.leaderboard || [],
+        address ?? ""
+      ),
+    }),
+    [airdropLeaderboardData_]
+  );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
     address
@@ -800,8 +807,9 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         <TabButton
           size="small"
@@ -877,19 +885,20 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-                currentModal === "leaderboard" ||
-                currentModal === "stake"
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                  ? "1em"
-                  : "2em",
+                ? "1em"
+                : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -904,11 +913,12 @@ const Airdrop = () => {
                   Airdrop V3: FLY Me To The Moon.
                 </Heading>
                 <Text>
-                  Stake and trade your $FLY, fluidify your assets, transact them, and boost your rewards by
-                  using trading on partnered protocols and staking liquidity right here on Fluidity! Keep an
-                  eye on the leaderboard as you compete with fellow Surfers for the top spot! A new Layer of
-                  rewards and utility is coming!
-
+                  Stake and trade your $FLY, fluidify your assets, transact
+                  them, and boost your rewards by using trading on partnered
+                  protocols and staking liquidity right here on Fluidity! Keep
+                  an eye on the leaderboard as you compete with fellow Surfers
+                  for the top spot! A new Layer of rewards and utility is
+                  coming!
                   <LinkButton
                     size="medium"
                     type="external"
@@ -1231,10 +1241,12 @@ const Airdrop = () => {
                     </Heading>
                   </div>
                   <Text style={{ fontSize: 14 }}>
-                    Stake and trade your $FLY, fluidify your assets, transact them, and boost your rewards by
-                    using trading on partnered protocols and staking liquidity right here on Fluidity! Keep an
-                    eye on the leaderboard as you compete with fellow Surfers for the top spot! A new Layer of
-                    rewards and utility is coming!
+                    Stake and trade your $FLY, fluidify your assets, transact
+                    them, and boost your rewards by using trading on partnered
+                    protocols and staking liquidity right here on Fluidity! Keep
+                    an eye on the leaderboard as you compete with fellow Surfers
+                    for the top spot! A new Layer of rewards and utility is
+                    coming!
                     <LinkButton
                       size="medium"
                       type="external"
@@ -1356,10 +1368,10 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
-  const dayDiff = epochMax - epochDays
-  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
-  const percentage = Math.floor((epochDays / epochMax) * 100)
-  const epochPercentage = percentage < 100 ? percentage : 100
+  const dayDiff = epochMax - epochDays;
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0;
+  const percentage = Math.floor((epochDays / epochMax) * 100);
+  const epochPercentage = percentage < 100 ? percentage : 100;
 
   return (
     <div
@@ -1436,8 +1448,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                navigate(`/${network}/dashboard/rewards`);
-              }
+                  navigate(`/${network}/dashboard/rewards`);
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1455,15 +1467,18 @@ const MultiplierTasks = () => {
   const [tasks, setTasks] = useState<"1x" | "12x">("12x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Uniswap", link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum" },
+    {
+      provider: "Uniswap",
+      link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum",
+    },
     {
       provider: "Trader Joe",
-      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
     },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
     {
       provider: "Ramses",
-      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
     },
     { provider: "Jumper", link: "https://jumper.exchange/" },
   ];
@@ -1595,9 +1610,10 @@ const MyMultiplier = ({
             Provide $FLY and $ƒUSDC Liquidity to earn $ARB and Rewards!
           </Heading>
           <Text holo={true}>
-            Add liquidity to Uniswap or the following Trader Joe and Camelot pools to earn Liquidity
-            Mining rewards! You will also retroactively earn bottles depending on your contribution at
-            the end of the Airdrop!
+            Add liquidity to Uniswap or the following Trader Joe and Camelot
+            pools to earn Liquidity Mining rewards! You will also retroactively
+            earn bottles depending on your contribution at the end of the
+            Airdrop!
           </Text>
         </div>
         <JoeFarmlandsOrCamelotKingdom />
@@ -1611,11 +1627,12 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, fusdcEarned, flyStaked, bottles } = data;
+  const { user, rank, referralCount, flyStaked, bottles } = data;
 
   return {
-    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address && address === user ? "highlighted-row" : ""
-      }`,
+    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+      address && address === user ? "highlighted-row" : ""
+    }`,
     RowElement: ({ heading }: { heading: string }) => {
       switch (heading) {
         case "RANK":
@@ -1626,8 +1643,8 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
@@ -1649,8 +1666,8 @@ const airdropRankRow = (
                   style={
                     address && address === user
                       ? {
-                        color: "black",
-                      }
+                          color: "black",
+                        }
                       : {}
                   }
                 >
@@ -1667,46 +1684,12 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
                 {toSignificantDecimals(bottles, 0)}
-              </Text>
-            </td>
-          );
-        case "$fUSDC EARNED":
-          return (
-            <td>
-              <Text
-                prominent
-                style={
-                  address && address === user
-                    ? {
-                      color: "black",
-                    }
-                    : {}
-                }
-              >
-                {numberToMonetaryString(fusdcEarned)}
-              </Text>
-            </td>
-          );
-        case "$ARB EARNED":
-          return (
-            <td>
-              <Text
-                prominent
-                style={
-                  address && address === user
-                    ? {
-                      color: "black",
-                    }
-                    : {}
-                }
-              >
-                0
               </Text>
             </td>
           );
@@ -1718,8 +1701,8 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
@@ -1735,8 +1718,8 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
@@ -1832,8 +1815,6 @@ const Leaderboard = ({
           { name: "RANK" },
           { name: "USER" },
           { name: "BOTTLES" },
-          { name: "$fUSDC EARNED" },
-          { name: "$ARB EARNED" },
           { name: "$FLY STAKED" },
           { name: "REFERRALS" },
         ]}
@@ -1943,36 +1924,38 @@ const isAirdropModal = (modal: string): modal is AirdropModalName =>
   AIRDROP_MODALS.includes(modal as AirdropModalName);
 
 // filter airdrop leaderboard data to the top 16 and the current user if the're found
-const getLeaderboardWithUser = (data: Array<AirdropLeaderboardEntry>, address: string) => {
-  const top16 = data.slice(0, 16)
+const getLeaderboardWithUser = (
+  data: Array<AirdropLeaderboardEntry>,
+  address: string
+) => {
+  const top16 = data.slice(0, 16);
 
   // user not logged in
-  if (!address)
-    return top16
+  if (!address) return top16;
 
-  const userDataIndex = data.findIndex(({user}) => user === address)
+  const userDataIndex = data.findIndex(({ user }) => user === address);
 
   // user not found in data, use a blank entry
   if (userDataIndex === -1)
     return [
-        {
-          user: address,
-          rank: -1,
-          liquidityMultiplier: 0,
-          referralCount: 0,
-          bottles: 0,
-          highestRewardTier: 0,
-          fusdcEarned: 0,
-          arbEarned: 0,
-          flyStaked: 0
-        } satisfies AirdropLeaderboardEntry,
-      ].concat(top16)
+      {
+        user: address,
+        rank: -1,
+        liquidityMultiplier: 0,
+        referralCount: 0,
+        bottles: 0,
+        highestRewardTier: 0,
+        fusdcEarned: 0,
+        arbEarned: 0,
+        flyStaked: 0,
+      } satisfies AirdropLeaderboardEntry,
+    ].concat(top16);
   // found outside the top 16
   if (userDataIndex >= 16) {
-    return [data[userDataIndex]].concat(top16)
+    return [data[userDataIndex]].concat(top16);
   }
   // found in the top 16
-  return top16
-}
+  return top16;
+};
 
 export default Airdrop;

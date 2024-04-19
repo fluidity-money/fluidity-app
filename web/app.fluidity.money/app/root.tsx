@@ -15,7 +15,11 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks, FLYClaimSubmitModalLinks } from "./components";
+import {
+  JoeFarmlandsOrCamelotKingdomLinks,
+  ToolTipLinks,
+  FLYClaimSubmitModalLinks,
+} from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";

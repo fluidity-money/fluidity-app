@@ -106,7 +106,10 @@ const addDecimalToBn = (amount: BN, decimals: number) => {
   return !dec ? whole : `${whole}.${dec}`;
 };
 
-export const parseSwapInputToTokenAmount = (input: string, token: Token): BN => {
+export const parseSwapInputToTokenAmount = (
+  input: string,
+  token: Token
+): BN => {
   const [whole, dec] = input.split(".");
 
   const wholeBn = getTokenAmountFromUsd(new BN(whole || 0), token);
@@ -123,7 +126,11 @@ export const parseSwapInputToTokenAmount = (input: string, token: Token): BN => 
 };
 
 // Snap the smallest of token balance, remaining mint limit, or swap amt
-const snapToValidValue = (input: string, token: Token, userTokenBalance: BN): BN => {
+const snapToValidValue = (
+  input: string,
+  token: Token,
+  userTokenBalance: BN
+): BN => {
   const usdBn = parseSwapInputToTokenAmount(input, token);
   const maxUserPayable = BN.min(usdBn, userTokenBalance);
   return maxUserPayable;
