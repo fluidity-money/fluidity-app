@@ -1,4 +1,3 @@
-
 import { useContext, useState, useEffect, useCallback } from "react";
 
 import BN from "bn.js";
@@ -7,22 +6,32 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { requestProof } from "~/queries/requestProof";
 
-import { Heading, GeneralButton, Text, trimAddress, LinkButton, Modal, WarningIcon } from "@fluidity-money/surfing";
+import {
+  Heading,
+  GeneralButton,
+  Text,
+  trimAddress,
+  LinkButton,
+  Modal,
+  WarningIcon,
+} from "@fluidity-money/surfing";
 
 import styles from "~/styles/dashboard/airdrop.css";
 import { createPortal } from "react-dom";
 
-export const FLYClaimSubmitModalLinks = () => [{ rel: "stylesheet", href: styles }];
+export const FLYClaimSubmitModalLinks = () => [
+  { rel: "stylesheet", href: styles },
+];
 
 type IFLYClaimSubmitModal = {
   visible: boolean;
   flyAmount: number;
   accumulatedPoints: number;
-  mode: 'stake' | 'claim';
+  mode: "stake" | "claim";
   close: () => void;
   showConnectWalletModal: () => void;
   onStakingComplete: (amountStaked: BN) => void;
-  onClaimComplete: (amountClaimed: BN) => void
+  onClaimComplete: (amountClaimed: BN) => void;
 };
 
 enum State {
@@ -31,7 +40,7 @@ enum State {
   HasSigned,
   HasClaimed,
   HasStaked,
-  InError
+  InError,
 }
 
 const BlobData = `By completing the transaction of this Airdrop you acknowledge that
@@ -63,9 +72,8 @@ const FLYClaimSubmitModal = ({
   showConnectWalletModal,
   close,
   accumulatedPoints,
-  mode
+  mode,
 }: IFLYClaimSubmitModal) => {
-
   const {
     address,
     signBuffer,
@@ -91,45 +99,47 @@ const FLYClaimSubmitModal = ({
 
   const flyAmountFirstTranche = flyAmount / 4;
 
-  const [currentMode, setCurrentMode] = useState(mode)
-  const [finalState, setFinalState] = useState(currentMode === 'claim' ? State.HasClaimed : State.HasStaked)
+  const [currentMode, setCurrentMode] = useState(mode);
+  const [finalState, setFinalState] = useState(
+    currentMode === "claim" ? State.HasClaimed : State.HasStaked
+  );
 
   useEffect(() => {
-    setFinalState(currentMode === 'claim' ? State.HasClaimed : State.HasStaked)
-  }, [finalState])
+    setFinalState(currentMode === "claim" ? State.HasClaimed : State.HasStaked);
+  }, [finalState]);
 
   const [modal, setModal] = useState<React.ReactPortal | null>(null);
 
   const [currentStatus, setCurrentStatus] = useState(State.Disconnected);
-  const [showTermsModal, setShowTermsModal] = useState(false)
-  const [confirmingClaim, setConfirmingClaim] = useState(mode === 'claim')
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [confirmingClaim, setConfirmingClaim] = useState(mode === "claim");
 
   useEffect(() => {
-    if (address && (currentStatus === State.Disconnected))
+    if (address && currentStatus === State.Disconnected)
       setCurrentStatus(State.IsConnected);
   }, [address]);
 
-  const [currentAction, setCurrentAction] = useState("Connect")
+  const [currentAction, setCurrentAction] = useState("Connect");
 
   useEffect(() => {
     switch (currentStatus) {
       case State.Disconnected:
-        setCurrentAction("Connect")
+        setCurrentAction("Connect");
         break;
       case State.IsConnected:
-        setCurrentAction("Sign")
+        setCurrentAction("Sign");
         break;
       case State.HasSigned:
-        setCurrentAction(currentMode === "claim" ? "Claim" : "Stake")
+        setCurrentAction(currentMode === "claim" ? "Claim" : "Stake");
         break;
       case State.HasClaimed:
-        setCurrentAction(currentMode === "claim" ? "Claimed!" : "Stake")
+        setCurrentAction(currentMode === "claim" ? "Claimed!" : "Stake");
         break;
       case State.HasStaked:
-        setCurrentAction("Staked!")
+        setCurrentAction("Staked!");
         break;
     }
-  }, [currentStatus])
+  }, [currentStatus]);
 
   // needed for the signature effect hook
   const [signature, setSignature] = useState("");
@@ -141,7 +151,11 @@ const FLYClaimSubmitModal = ({
   // needed to request the claim onchain, the amount to request
   const [errorMessage, setErrorMessage] = useState("");
 
-  const triggerMerkleClaim = async (index: number, amount_: string, proofs: string[]) => {
+  const triggerMerkleClaim = async (
+    index: number,
+    amount_: string,
+    proofs: string[]
+  ) => {
     if (!address) throw new Error("no address");
     const amount = new BN(amount_.replace(/^0x/, ""), 16);
     switch (currentMode) {
@@ -171,10 +185,8 @@ const FLYClaimSubmitModal = ({
   };
 
   useEffect(() => {
-    if (!signBuffer)
-      throw new Error("couldn't sign");
-    if (!requestSignature)
-      return;
+    if (!signBuffer) throw new Error("couldn't sign");
+    if (!requestSignature) return;
     (async () => {
       const sig = await signBuffer(BlobData);
       if (!sig) throw new Error("couldn't bubble up sig");
@@ -189,20 +201,22 @@ const FLYClaimSubmitModal = ({
     if (!merkleDistributorWithDeadlineIsClaimed) return;
     (async () => {
       try {
-        const {
-          index,
-          amount,
-          proofs,
-          error
-        } = await requestProof(address, signature);
+        const { index, amount, proofs, error } = await requestProof(
+          address,
+          signature
+        );
 
         // get the amount into a big number, but slice off the 0x at the start
         const amountBn = new BN(amount.slice(2), 16);
 
-        const alreadyClaimed = await merkleDistributorWithDeadlineIsClaimed(index);
+        const alreadyClaimed = await merkleDistributorWithDeadlineIsClaimed(
+          index
+        );
 
         if (alreadyClaimed) {
-          setCurrentStatus(currentMode === "stake" ? State.HasStaked : State.HasClaimed);
+          setCurrentStatus(
+            currentMode === "stake" ? State.HasStaked : State.HasClaimed
+          );
           onClaimComplete(amountBn);
           shouldUpdateBalance?.();
           return;
@@ -251,7 +265,7 @@ const FLYClaimSubmitModal = ({
     switch (currentStatus) {
       case State.Disconnected:
         // prompt wallet connection
-        showConnectWalletModal()
+        showConnectWalletModal();
         break;
       case State.IsConnected:
         // time to sign!
@@ -286,162 +300,246 @@ const FLYClaimSubmitModal = ({
       createPortal(
         <>
           <div
-            className={`fly-submit-claim-outer-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
-              }`}
+            className={`fly-submit-claim-outer-modal-container ${
+              visible === true ? "show-fly-modal" : "hide-modal"
+            }`}
           >
-            <div onClick={close} className="fly-submit-claim-modal-background"></div>
-              <div
-                className={`fly-submit-claim-modal-container ${visible === true ? "show-fly-modal" : "hide-modal"
-                  }`}
-              >
-                <div className="fly-submit-claim-flex-container">
-                  <div className="fly-submit-claim-heading-container">
-                    <Heading as="h3" className="fly-submit-claim-heading">{currentMode === 'claim' ? "Claiming" : "Staking"} $FLY Tokens</Heading>
-                    <span onClick={close}>
-                      <img src="/images/icons/x.svg" className="modal-cancel-btn" />
-                    </span>
+            <div
+              onClick={close}
+              className="fly-submit-claim-modal-background"
+            ></div>
+            <div
+              className={`fly-submit-claim-modal-container ${
+                visible === true ? "show-fly-modal" : "hide-modal"
+              }`}
+            >
+              <div className="fly-submit-claim-flex-container">
+                <div className="fly-submit-claim-heading-container">
+                  <Heading as="h3" className="fly-submit-claim-heading">
+                    {currentMode === "claim" ? "Claiming" : "Staking"} $FLY
+                    Tokens
+                  </Heading>
+                  <span onClick={close}>
+                    <img
+                      src="/images/icons/x.svg"
+                      className="modal-cancel-btn"
+                    />
+                  </span>
+                </div>
+                {confirmingClaim ? (
+                  <div className="fly-confirming-claim-container">
+                    <div className="fly-confirming-claim-header">
+                      <WarningIcon />
+                      <Text size="lg" prominent className="fly-caution-text">
+                        Caution. Claiming $FLY will cease your points.
+                      </Text>
+                    </div>
+                    <div className="fly-caution-border">
+                      <Text size="lg" prominent>
+                        You have accumulated {accumulatedPoints} points. In
+                        order to retain your accumulated points, you must
+                        initially stake your $FLY. Otherwise, you may claim your
+                        $FLY and stake it at a later stage without the
+                        accumulated points.
+                      </Text>
+                    </div>
+                    <Text
+                      size="lg"
+                      prominent
+                      className="fly-caution-centre-text"
+                    >
+                      Do you wish to continue claiming?
+                    </Text>
                   </div>
-                  {confirmingClaim ?
-                    <div className="fly-confirming-claim-container">
-                      <div className="fly-confirming-claim-header">
-                        <WarningIcon />
-                        <Text size="lg" prominent className="fly-caution-text">Caution. Claiming $FLY will cease your points.</Text>
-                      </div>
-                      <div className="fly-caution-border">
-                        <Text size="lg" prominent>You have accumulated {accumulatedPoints} points. In order to retain your accumulated points, you must initially stake your $FLY. Otherwise, you may claim your $FLY and stake it at a later stage without the accumulated points.</Text>
-                      </div>
-                      <Text size="lg" prominent className="fly-caution-centre-text">Do you wish to continue claiming?</Text>
-                    </div> :
-                    <div className="fly-submit-claim-modal-options">
-                      <div className="fly-submit-claim-modal-row">
-                        {currentStatus === State.Disconnected
-                          ? <NextCircle /> : <Checked />}
-                        <div className="flex-column">
-                          <Text size="lg" prominent>Connect your Arbitrum wallet</Text>
-                          {State.IsConnected && address && <Text size="md" >Connected {trimAddress(address)}</Text>}
-                        </div>
-                      </div>
-                      <div className="fly-submit-claim-modal-row">
-                        {currentStatus === State.Disconnected ?
-                          <BaseCircle /> :
-                          currentStatus === State.IsConnected ?
-                            <NextCircle /> :
-                            <Checked />
-                        }
-                        <div className="flex-column">
-                          <Text size="lg" prominent>Sign Terms and Conditions</Text>
-                          <Text size="md">Read{" "}
-                            <a
-                              className="link"
-                              onClick={() => setShowTermsModal(true)}
-                            >
-                              Terms and Conditions
-                            </a>
+                ) : (
+                  <div className="fly-submit-claim-modal-options">
+                    <div className="fly-submit-claim-modal-row">
+                      {currentStatus === State.Disconnected ? (
+                        <NextCircle />
+                      ) : (
+                        <Checked />
+                      )}
+                      <div className="flex-column">
+                        <Text size="lg" prominent>
+                          Connect your Arbitrum wallet
+                        </Text>
+                        {State.IsConnected && address && (
+                          <Text size="md">
+                            Connected {trimAddress(address)}
                           </Text>
-                        </div>
+                        )}
                       </div>
-                      {currentMode === "claim" && <div className="fly-submit-claim-modal-row">
-                        {currentStatus < State.HasStaked ?
-                          <BaseCircle /> :
-                          currentStatus === State.HasStaked ?
-                            <Checked /> :
-                            <NextCircle />
-                        }
+                    </div>
+                    <div className="fly-submit-claim-modal-row">
+                      {currentStatus === State.Disconnected ? (
+                        <BaseCircle />
+                      ) : currentStatus === State.IsConnected ? (
+                        <NextCircle />
+                      ) : (
+                        <Checked />
+                      )}
+                      <div className="flex-column">
+                        <Text size="lg" prominent>
+                          Sign Terms and Conditions
+                        </Text>
+                        <Text size="md">
+                          Read{" "}
+                          <a
+                            className="link"
+                            onClick={() => setShowTermsModal(true)}
+                          >
+                            Terms and Conditions
+                          </a>
+                        </Text>
+                      </div>
+                    </div>
+                    {currentMode === "claim" && (
+                      <div className="fly-submit-claim-modal-row">
+                        {currentStatus < State.HasStaked ? (
+                          <BaseCircle />
+                        ) : currentStatus === State.HasStaked ? (
+                          <Checked />
+                        ) : (
+                          <NextCircle />
+                        )}
                         <div className="flex-column">
-                          <Text size="lg" prominent>Claim $FLY {flyAmountFirstTranche}</Text>
-                          {currentStatus >= State.HasClaimed &&
+                          <Text size="lg" prominent>
+                            Claim $FLY {flyAmountFirstTranche}
+                          </Text>
+                          {currentStatus >= State.HasClaimed && (
                             <LinkButton
                               size={"medium"}
                               type={"external"}
-                              handleClick={() => { addToken?.("FLY") }}
+                              handleClick={() => {
+                                addToken?.("FLY");
+                              }}
                             >
                               Add $FLY to My Wallet
                             </LinkButton>
-                          }
+                          )}
                         </div>
-                      </div>}
-                      {currentMode === 'stake' && <div className="fly-submit-claim-modal-row">
-                        {currentStatus < State.HasClaimed ?
-                          <BaseCircle /> :
-                          currentStatus === State.HasClaimed ?
-                            <NextCircle /> :
-                            <Checked />
-                        }
+                      </div>
+                    )}
+                    {currentMode === "stake" && (
+                      <div className="fly-submit-claim-modal-row">
+                        {currentStatus < State.HasClaimed ? (
+                          <BaseCircle />
+                        ) : currentStatus === State.HasClaimed ? (
+                          <NextCircle />
+                        ) : (
+                          <Checked />
+                        )}
                         <div className="flex-column">
-                          <Text size="lg" prominent>Stake $FLY</Text>
-                          <Text size="md">Earn rewards & [REDACTED] on SPN</Text>
+                          <Text size="lg" prominent>
+                            Stake $FLY
+                          </Text>
+                          <Text size="md">
+                            Earn rewards & [REDACTED] on SPN
+                          </Text>
                         </div>
                       </div>
-                      }
-                    </div>
-                  }
-                  <Text className={currentStatus === State.InError ? "claim-error-message" : "claim-error-message-none"}>
-                    { errorMessage }
-                  </Text>
-                  <div className="fly-submit-claim-modal-button-container">
-                    {confirmingClaim ?
-                      <div className="fly-confirming-claim-button-container">
-                        <GeneralButton
-                          type="primary"
-                          size="large"
-                          layout="after"
-                          handleClick={() => setConfirmingClaim(false)}
-                          className="fly-claim-stake-choice-button"
-
-                        >
-                          <Text size="md" prominent bold className="fly-continue-claiming-text">
-                            Continue Claiming
-                          </Text>
-                        </GeneralButton>
-                        <GeneralButton
-                          type="primary"
-                          size="large"
-                          layout="after"
-                          handleClick={() => {
-                            setConfirmingClaim(false);
-                            setCurrentMode('stake')
-                          }}
-                          className="fly-claim-stake-choice-button"
-
-                        >
-                          <Text size="md" bold prominent className="stake-your-fly-text">
-                            Stake Your $FLY
-                          </Text>
-                        </GeneralButton>
-                      </div>
-                      :
-                      <>
-                        <GeneralButton
-                          type="primary"
-                          size="large"
-                          layout="after"
-                          handleClick={handleClickButton}
-                          disabled={currentStatus === State.HasStaked || currentStatus === State.InError}
-                          className={`fly-submit-claim-action-button ${currentStatus === finalState - 1 ? "rainbow" : ""} ${currentStatus === finalState ? "claim-button-staked" : ""}`}
-
-                        >
-                          <Text size="md" bold className="fly-submit-claim-action-button-text">
-                            {currentAction}
-                            {currentStatus === finalState && <Checked size={18} />}
-                          </Text>
-                        </GeneralButton>
-                      </>
-                    }
-                    <Text size="xs" className="legal">
-                      By signing the following transactions, you agree to Fluidity Money&apos;services{" "}
-                      <a
-                        className="link"
-                        href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
-                      >
-                        Terms of Service
-                      </a>{" "}
-                      and acknowledge that you have read and understand the{" "}
-                      <a className="link">Disclaimer</a>
-                    </Text>
-                    <TermsModal visible={showTermsModal} close={() => setShowTermsModal(false)} />
+                    )}
                   </div>
+                )}
+                <Text
+                  className={
+                    currentStatus === State.InError
+                      ? "claim-error-message"
+                      : "claim-error-message-none"
+                  }
+                >
+                  {errorMessage}
+                </Text>
+                <div className="fly-submit-claim-modal-button-container">
+                  {confirmingClaim ? (
+                    <div className="fly-confirming-claim-button-container">
+                      <GeneralButton
+                        type="primary"
+                        size="large"
+                        layout="after"
+                        handleClick={() => setConfirmingClaim(false)}
+                        className="fly-claim-stake-choice-button"
+                      >
+                        <Text
+                          size="md"
+                          prominent
+                          bold
+                          className="fly-continue-claiming-text"
+                        >
+                          Continue Claiming
+                        </Text>
+                      </GeneralButton>
+                      <GeneralButton
+                        type="primary"
+                        size="large"
+                        layout="after"
+                        handleClick={() => {
+                          setConfirmingClaim(false);
+                          setCurrentMode("stake");
+                        }}
+                        className="fly-claim-stake-choice-button"
+                      >
+                        <Text
+                          size="md"
+                          bold
+                          prominent
+                          className="stake-your-fly-text"
+                        >
+                          Stake Your $FLY
+                        </Text>
+                      </GeneralButton>
+                    </div>
+                  ) : (
+                    <>
+                      <GeneralButton
+                        type="primary"
+                        size="large"
+                        layout="after"
+                        handleClick={handleClickButton}
+                        disabled={
+                          currentStatus === State.HasStaked ||
+                          currentStatus === State.InError
+                        }
+                        className={`fly-submit-claim-action-button ${
+                          currentStatus === finalState - 1 ? "rainbow" : ""
+                        } ${
+                          currentStatus === finalState
+                            ? "claim-button-staked"
+                            : ""
+                        }`}
+                      >
+                        <Text
+                          size="md"
+                          bold
+                          className="fly-submit-claim-action-button-text"
+                        >
+                          {currentAction}
+                          {currentStatus === finalState && (
+                            <Checked size={18} />
+                          )}
+                        </Text>
+                      </GeneralButton>
+                    </>
+                  )}
+                  <Text size="xs" className="legal">
+                    By signing the following transactions, you agree to Fluidity
+                    Money&apos;services{" "}
+                    <a
+                      className="link"
+                      href="https://static.fluidity.money/assets/fluidity-website-tc.pdf"
+                    >
+                      Terms of Service
+                    </a>{" "}
+                    and acknowledge that you have read and understand the{" "}
+                    <a className="link">Disclaimer</a>
+                  </Text>
+                  <TermsModal
+                    visible={showTermsModal}
+                    close={() => setShowTermsModal(false)}
+                  />
                 </div>
               </div>
+            </div>
           </div>
         </>,
         document.body
@@ -453,102 +551,128 @@ const FLYClaimSubmitModal = ({
 };
 
 export const Checked = ({ size = 36 }: { size?: number }) => {
-  return <img className='fly-submit-claim-circle' height={size} width={size} src="/images/icons/checked.svg" alt="copy" />
-}
+  return (
+    <img
+      className="fly-submit-claim-circle"
+      height={size}
+      width={size}
+      src="/images/icons/checked.svg"
+      alt="copy"
+    />
+  );
+};
 
 export const BaseCircle = () => {
-  return <div style={{ width: '36px', height: '36px' }}>
-    <svg height="100%" stroke="#696A68" strokeWidth="5px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="45" />
-    </svg>
-  </div>
-
-}
+  return (
+    <div style={{ width: "36px", height: "36px" }}>
+      <svg
+        height="100%"
+        stroke="#696A68"
+        strokeWidth="5px"
+        viewBox="0 0 200 100"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="50" cy="50" r="45" />
+      </svg>
+    </div>
+  );
+};
 export const NextCircle = () => {
-  return <div style={{ width: '36px', height: '36px' }}>
-    <svg height="100%" stroke="white" strokeWidth="5px" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="50" cy="50" r="45" />
-    </svg>
-  </div>
-
-}
+  return (
+    <div style={{ width: "36px", height: "36px" }}>
+      <svg
+        height="100%"
+        stroke="white"
+        strokeWidth="5px"
+        viewBox="0 0 200 100"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="50" cy="50" r="45" />
+      </svg>
+    </div>
+  );
+};
 
 type TermsModalProps = {
-  visible: boolean
-  close: () => void
-}
+  visible: boolean;
+  close: () => void;
+};
 
 export const TermsModal = ({ visible, close }: TermsModalProps) => {
-
-  return <Modal
-    id="terms-and-conditions"
-    visible={visible}
-  >
-    <div className="airdrop-terms-and-conditions-modal-container" style={{ zIndex: 10 }}>
-      <div className="airdrop-terms-and-conditions-modal-child">
-        <div className="airdrop-terms-and-conditions-modal-navbar">
-          <GeneralButton
-            size="medium"
-            handleClick={close}
-          >
-            Close
-          </GeneralButton>
+  return (
+    <Modal id="terms-and-conditions" visible={visible}>
+      <div
+        className="airdrop-terms-and-conditions-modal-container"
+        style={{ zIndex: 10 }}
+      >
+        <div className="airdrop-terms-and-conditions-modal-child">
+          <div className="airdrop-terms-and-conditions-modal-navbar">
+            <GeneralButton size="medium" handleClick={close}>
+              Close
+            </GeneralButton>
+          </div>
+          <p>
+            1. Description We may offer you the opportunity to receive some
+            digital assets at no cost (**Airdrop**), subject to the terms
+            described in this section. The Airdrop is delivered by us to you,
+            but may be manufactured, offered and supported by the network
+            creator or developer, if any, and not by us.
+          </p>
+          <p>
+            1. Terms of Airdrop Program 2.1 No Purchase Necessary There is no
+            purchase necessary to receive the Airdrop. However, you must have
+            wallets recognised and accepted by us. Although we do not charge a
+            fee for participation in the Airdrop Program, we reserve the right
+            to do so in the future and shall provide prior notice to you in such
+            case.
+          </p>
+          <p>
+            2.2 Timing Each Airdrop may be subject to any additional terms and
+            conditions and where applicable such terms and conditions shall be
+            displayed and marked with an asterisk (*) or other similar notation.
+          </p>
+          <p>
+            2.3 Limited Supply An offer to receive the digital assets in an
+            Airdrop is only available to you while supplies last. Once the
+            amount of digital asset offered by us in an Airdrop is exhausted,
+            any party who has either been placed on a waitlist, or has completed
+            certain additional steps, but not yet received notice of award of
+            the asset in such Airdrop, shall no longer be eligible to receive
+            the said digital assets in that Airdrop. We reserve the right, in
+            our sole discretion, to modify or suspend any Airdrop requirements
+            at any time without notice, including the amount previously
+            advertised as available.
+          </p>
+          <p>
+            2.4 Eligibility You may not be eligible to receive the digital
+            assets or a select class and type of digital assets from an Airdrop
+            in your jurisdiction. To the best of our understanding, below is a
+            list of countries that does not recognise digital assets;
+            *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi,
+            Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq,
+            Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra
+            Leone, Tunisia ** Kindly be advised that this list is for reference
+            only and you are advised to seek independent legal advise as to your
+            eligibility to receive the assets through Airdrop. **source -
+            Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A,
+            Chainalysis*
+          </p>
+          <p>
+            2.5 Notice of Award In the event you are selected to receive the
+            digital asset in an Airdrop, we shall notify you of the pending
+            delivery of such asset. Eligibility may be limited as to time. We
+            are not liable to you for failure to receive any notice associated
+            with the Airdrop Program.
+          </p>
+          <p>
+            3 Risk Disclosures Relating to Airdrop Program You are solely
+            responsible for researching and understanding the Fluid Assets token
+            and it’s related utility and/or network subject to the Airdrop.
+          </p>
         </div>
-        <p>
-          1. Description
-
-          We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
-        </p>
-        <p>
-          1. Terms of Airdrop Program
-
-          2.1 No Purchase Necessary
-
-          There is no purchase necessary to receive the Airdrop. However, you must have
-          wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
-        </p>
-        <p>
-          2.2 Timing
-
-          Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
-        </p>
-        <p>
-          2.3 Limited Supply
-
-          An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
-          has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
-          suspend any Airdrop requirements at any time without notice, including the amount previously
-          advertised as available.
-        </p>
-        <p>
-          2.4 Eligibility
-
-          You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
-
-          To the best of our understanding, below is a list of countries that does not recognise digital assets;
-
-          *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
-
-          Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
-
-          **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
-        </p>
-        <p>
-
-          2.5 Notice of Award
-
-          In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
-          We are not liable to you for failure to receive any notice associated with the Airdrop Program.
-        </p>
-        <p>
-
-          3 Risk Disclosures Relating to Airdrop Program
-
-          You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
-        </p>
       </div>
-    </div>
-  </Modal>
-}
+    </Modal>
+  );
+};
 
 export default FLYClaimSubmitModal;

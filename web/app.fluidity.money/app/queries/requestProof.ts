@@ -15,9 +15,10 @@ export type RequestProofRes = {
 };
 
 export const requestProof = (address: string, signature: string) => {
-  const body = {address, signature};
+  const body = { address, signature };
 
-  const url = "https://lyqieipytnj32qqga7mpgdpn7q0pxmlw.lambda-url.ap-southeast-2.on.aws/";
+  const url =
+    "https://lyqieipytnj32qqga7mpgdpn7q0pxmlw.lambda-url.ap-southeast-2.on.aws/";
 
   return jsonPost<RequestProofBody, RequestProofRes>(url, body, {});
 };
