@@ -42,7 +42,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const { data: referralData, errors: referralErr } =
-    await useReferralByAddress(referralAddress, address, EPOCH_CURRENT_IDENTIFIER);
+    await useReferralByAddress(
+      referralAddress,
+      address,
+      EPOCH_CURRENT_IDENTIFIER
+    );
 
   const referralExists = !!referralData?.lootbox_referrals.length;
 
@@ -135,7 +139,11 @@ export const action: ActionFunction = async ({ request, params }) => {
       throw new Error("Could not generate unique ID");
     }
 
-    const { data, errors } = await addReferralCode(address, genReferralCode, EPOCH_CURRENT_IDENTIFIER);
+    const { data, errors } = await addReferralCode(
+      address,
+      genReferralCode,
+      EPOCH_CURRENT_IDENTIFIER
+    );
 
     if (errors || !data) {
       throw new Error("Could not insert referral code");

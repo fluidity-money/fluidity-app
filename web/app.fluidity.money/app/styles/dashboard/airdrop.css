@@ -274,7 +274,19 @@
 }
 .transaction-table > thead > tr.highlighted-row,
 .transaction-table > tbody > tr.airdrop-row.highlighted-row {
-  background: linear-gradient(90deg, #f3b8d8 0%, #b793e9 15.1%, #9fd4f3 26.04%, #ffd2c4 36.46%, #fbf3f3 46.88%, #d9abdf 57.29%, #af9ce3 72.4%, #aae4e1 85.42%, #c6ead0 93.23%, #fdb5e4 100%);
+  background: linear-gradient(
+    90deg,
+    #f3b8d8 0%,
+    #b793e9 15.1%,
+    #9fd4f3 26.04%,
+    #ffd2c4 36.46%,
+    #fbf3f3 46.88%,
+    #d9abdf 57.29%,
+    #af9ce3 72.4%,
+    #aae4e1 85.42%,
+    #c6ead0 93.23%,
+    #fdb5e4 100%
+  );
 }
 .transaction-table > thead > tr.highlighted-row td,
 .transaction-table > tbody > tr.airdrop-row.highlighted-row td {
@@ -303,14 +315,30 @@
 }
 .airdrop-leaderboard-mobile .transaction-table > thead > tr td:first-child,
 .airdrop-leaderboard-mobile .transaction-table > thead > tr th:first-child,
-.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row td:first-child,
-.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row th:first-child {
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  td:first-child,
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  th:first-child {
   padding-left: 1em;
 }
 .airdrop-leaderboard-mobile .transaction-table > thead > tr td:last-child,
 .airdrop-leaderboard-mobile .transaction-table > thead > tr th:last-child,
-.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row td:last-child,
-.airdrop-leaderboard-mobile .transaction-table > tbody > tr.airdrop-row th:last-child {
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  td:last-child,
+.airdrop-leaderboard-mobile
+  .transaction-table
+  > tbody
+  > tr.airdrop-row
+  th:last-child {
   padding-right: 1em;
 }
 .airdrop-leaderboard-mobile .transaction-table > thead > tr td,
@@ -681,7 +709,10 @@
   align-items: flex-start;
   gap: 0.5em;
 }
-.staking-stats-container .staking-stats-stakes-container .stake .stake-multiplier {
+.staking-stats-container
+  .staking-stats-stakes-container
+  .stake
+  .stake-multiplier {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -754,18 +785,31 @@
   width: 150px;
   height: 150px;
 }
-.recap-container .recap-hero .recap-hero-text .recap-circle-scroll .recap-circle-scroll-arrow {
+.recap-container
+  .recap-hero
+  .recap-hero-text
+  .recap-circle-scroll
+  .recap-circle-scroll-arrow {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
 }
-.recap-container .recap-hero .recap-hero-text .recap-circle-scroll .recap-circle-scroll-arrow svg {
+.recap-container
+  .recap-hero
+  .recap-hero-text
+  .recap-circle-scroll
+  .recap-circle-scroll-arrow
+  svg {
   fill: none;
   stroke: white;
   transform: scale(3);
 }
-.recap-container .recap-hero .recap-hero-text .recap-circle-scroll .recap-circle-scroll-text {
+.recap-container
+  .recap-hero
+  .recap-hero-text
+  .recap-circle-scroll
+  .recap-circle-scroll-text {
   font-size: 10px;
   fill: grey;
   letter-spacing: 0.4em;
@@ -857,19 +901,28 @@
   /* Track */
   /* Handle */
 }
-.recap-container .recap-stats .recap-bottle-distribution-container::-webkit-scrollbar {
+.recap-container
+  .recap-stats
+  .recap-bottle-distribution-container::-webkit-scrollbar {
   height: 10px;
 }
-.recap-container .recap-stats .recap-bottle-distribution-container::-webkit-scrollbar-track {
+.recap-container
+  .recap-stats
+  .recap-bottle-distribution-container::-webkit-scrollbar-track {
   background: transparent;
   border: 1px solid white;
   border-radius: 5px;
 }
-.recap-container .recap-stats .recap-bottle-distribution-container::-webkit-scrollbar-thumb {
+.recap-container
+  .recap-stats
+  .recap-bottle-distribution-container::-webkit-scrollbar-thumb {
   background: white;
   border-radius: 5px;
 }
-.recap-container .recap-stats .recap-bottle-distribution-container .bottle-container {
+.recap-container
+  .recap-stats
+  .recap-bottle-distribution-container
+  .bottle-container {
   gap: 1em;
   display: flex;
   flex-direction: column;
@@ -1226,7 +1279,7 @@
 }
 
 .staking-card {
-  background-color: #FFD362 !important;
+  background-color: #ffd362 !important;
   gap: 1em;
 }
 
@@ -1255,11 +1308,11 @@
 }
 
 .fly-caution-text {
-  color: #FFB300;
+  color: #ffb300;
 }
 
 .fly-caution-border {
-  border-left: 4px #FFB300 solid;
+  border-left: 4px #ffb300 solid;
   margin-left: 1em;
   padding-left: 1em;
 }
@@ -1472,7 +1525,20 @@
   background-repeat: no-repeat;
   background-size: 100%;
   background-position: 0 0, 100% 0, 100% 100%, 0 100%;
-  background-image: linear-gradient(45deg, #f3b8d8, #b793e9, #9fd4f3, #ffd2c4, #fbf3f3, #d9abdf, #af9ce3, #aae4e1, #c6ead0, #ffffff, #fdb5e4);
+  background-image: linear-gradient(
+    45deg,
+    #f3b8d8,
+    #b793e9,
+    #9fd4f3,
+    #ffd2c4,
+    #fbf3f3,
+    #d9abdf,
+    #af9ce3,
+    #aae4e1,
+    #c6ead0,
+    #ffffff,
+    #fdb5e4
+  );
   animation: rotate 4s linear infinite;
 }
 

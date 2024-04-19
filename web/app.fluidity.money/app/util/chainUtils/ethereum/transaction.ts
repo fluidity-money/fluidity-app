@@ -1,4 +1,8 @@
-import { JsonRpcProvider, JsonRpcSigner, Provider } from "@ethersproject/providers";
+import {
+  JsonRpcProvider,
+  JsonRpcSigner,
+  Provider,
+} from "@ethersproject/providers";
 import { ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
@@ -655,13 +659,13 @@ export const merkleDistributorWithDeadlineClaim = async (
         `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
       );
 
-      await merkleDistributorWithDeadlineContract.claim(
-        index,
-        amount.toString(),
-        merkleProof
-      );
+    await merkleDistributorWithDeadlineContract.claim(
+      index,
+      amount.toString(),
+      merkleProof
+    );
 
-      return true;
+    return true;
   } catch (error) {
     await handleContractErrors(error as ErrorType, signer.provider);
     return false;
@@ -745,10 +749,16 @@ export const flyStakingStake = async (
 
     const signerAddr = await signer.getAddress();
 
-    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, signer);
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      signer
+    );
 
     if (!flyStakingContract)
-      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
 
     const flyTokenContract = new Contract(flyTokenAddr, flyTokenAbi, provider);
 
@@ -761,14 +771,14 @@ export const flyStakingStake = async (
 
     console.log("got nonce", nonce);
 
-    const deadline = Date.now() + (60 * 120); // 2 hours in the future
+    const deadline = Date.now() + 60 * 120; // 2 hours in the future
 
     const sig = await signer._signTypedData(
       {
         name: "Fluidity", // FLY name
         version: "1",
         chainId: ArbitrumChainId, // arbitrum chain id
-        verifyingContract: flyTokenAddr
+        verifyingContract: flyTokenAddr,
       },
       {
         Permit: [
@@ -777,14 +787,14 @@ export const flyStakingStake = async (
           { name: "value", type: "uint256" },
           { name: "nonce", type: "uint256" },
           { name: "deadline", type: "uint256" },
-        ]
+        ],
       },
       {
         owner: signerAddr,
         spender: flyStakingAddr,
         value: "0x" + amount.toString(16),
         nonce: nonce,
-        deadline: deadline
+        deadline: deadline,
       }
     );
 
@@ -812,19 +822,25 @@ export const flyStakingStake = async (
 export type FLYStakingDetailsRes = {
   flyStaked: BigNumber;
   points: BigNumber;
-}
+};
 
 export const flyStakingDetails = async (
   provider: Provider,
   flyStakingAddr: string,
   flyStakingAbi: ContractInterface,
   address: string
-):  Promise<FLYStakingDetailsRes | undefined>=> {
+): Promise<FLYStakingDetailsRes | undefined> => {
   try {
-    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, provider);
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      provider
+    );
 
     if (!flyStakingContract)
-      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
 
     return await flyStakingContract.stakingDetails(address);
   } catch (error) {
@@ -840,10 +856,16 @@ export const flyStakingBeginUnstake = async (
   flyToUnstake: BN
 ) => {
   try {
-    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, signer);
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      signer
+    );
 
     if (!flyStakingContract)
-      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
 
     await flyStakingContract.beginUnstake(flyToUnstake.toString());
 
@@ -859,12 +881,18 @@ export const flyStakingSecondsUntilSoonestUnstake = async (
   flyStakingAddr: string,
   flyStakingAbi: ContractInterface,
   address: string
-):  Promise<BigNumber | undefined> => {
+): Promise<BigNumber | undefined> => {
   try {
-    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, provider);
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      provider
+    );
 
     if (!flyStakingContract)
-      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
 
     return await flyStakingContract.secondsUntilSoonestUnstake(address);
   } catch (error) {
@@ -879,10 +907,16 @@ export const flyStakingFinaliseUnstake = async (
   flyStakingAbi: ContractInterface
 ): Promise<BigNumber | undefined> => {
   try {
-    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, signer);
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      signer
+    );
 
     if (!flyStakingContract)
-      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
 
     const amount = await flyStakingContract.callStatic.finaliseUnstake();
 
@@ -900,12 +934,18 @@ export const flyStakingAmountUnstaking = async (
   flyStakingAddr: string,
   flyStakingAbi: ContractInterface,
   address: string
-):  Promise<BigNumber | undefined>=> {
+): Promise<BigNumber | undefined> => {
   try {
-    const flyStakingContract = new Contract(flyStakingAddr, flyStakingAbi, provider);
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      provider
+    );
 
     if (!flyStakingContract)
-      throw new Error(`Could not instantiate FLYStakingV1 at ${flyStakingAddr}`);
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
 
     return await flyStakingContract.amountUnstaking(address);
   } catch (error) {

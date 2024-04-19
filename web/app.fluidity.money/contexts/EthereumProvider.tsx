@@ -64,7 +64,8 @@ const FlyTokenAddr = "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386";
 
 const FlyStakingAddr = "0x9E8892E443AD6472e4D9362DF6D0C238000028a3";
 
-const MerkleDistributorWithDeadlineAddr = "0xa86fe32da288f169c2ee449b585dcb0317b631e1";
+const MerkleDistributorWithDeadlineAddr =
+  "0xa86fe32da288f169c2ee449b585dcb0317b631e1";
 
 type OKXWallet = {
   isOkxWallet: boolean;
@@ -85,8 +86,8 @@ export const FlyToken = {
   // mock these fields as we don't need them to add the token to wallet or fetch its balance
   colour: "",
   enabled: true,
-  name: ""
-} satisfies Token
+  name: "",
+} satisfies Token;
 
 const EthereumFacade = ({
   children,
@@ -294,9 +295,9 @@ const EthereumFacade = ({
 
     return ethContractRes
       ? {
-        confirmTx: async () => (await ethContractRes.wait())?.status === 1,
-        txHash: ethContractRes.hash,
-      }
+          confirmTx: async () => (await ethContractRes.wait())?.status === 1,
+          txHash: ethContractRes.hash,
+        }
       : undefined;
   };
 
@@ -322,9 +323,8 @@ const EthereumFacade = ({
    * Will fail on non-Metamask compliant wallets.
    */
   const addToken = async (symbol: string) => {
-    const token = symbol === "FLY" ?
-      FlyToken :
-      tokens.find((t) => t.symbol === symbol);
+    const token =
+      symbol === "FLY" ? FlyToken : tokens.find((t) => t.symbol === symbol);
 
     if (!token) return;
 
@@ -364,11 +364,11 @@ const EthereumFacade = ({
     address: string
   ): Promise<
     | Array<{
-      fluidAmount: BN;
-      baseAmount: BN;
-      durationDays: number;
-      depositDate: Date;
-    }>
+        fluidAmount: BN;
+        baseAmount: BN;
+        durationDays: number;
+        depositDate: Date;
+      }>
     | undefined
   > => {
     const signer = provider?.getSigner();
@@ -515,9 +515,9 @@ const EthereumFacade = ({
 
     return stakingDepositRes
       ? {
-        confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
-        txHash: stakingDepositRes.hash,
-      }
+          confirmTx: async () => (await stakingDepositRes.wait())?.status === 1,
+          txHash: stakingDepositRes.hash,
+        }
       : undefined;
   };
 
@@ -558,9 +558,9 @@ const EthereumFacade = ({
 
     return stakingRedeemRes
       ? {
-        confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
-        txHash: stakingRedeemRes.hash,
-      }
+          confirmTx: async () => (await stakingRedeemRes.wait())?.status === 1,
+          txHash: stakingRedeemRes.hash,
+        }
       : undefined;
   };
 
@@ -685,7 +685,7 @@ const EthereumFacade = ({
       TokenAbi,
       FlyStakingAddr,
       FlyStakingAbi,
-      amount,
+      amount
     );
     console.log(result);
 

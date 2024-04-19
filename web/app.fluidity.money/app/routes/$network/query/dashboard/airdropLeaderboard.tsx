@@ -39,9 +39,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     const [useAllQuery] = (() => {
       switch (true) {
         case useAll: {
-          return [
-            () => useAirdropLeaderboardAllTime(epoch),
-          ];
+          return [() => useAirdropLeaderboardAllTime(epoch)];
         }
         case use24Hours && !!provider: {
           return [
@@ -50,9 +48,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
         }
         case use24Hours && !provider:
         default: {
-          return [
-            () => useAirdropLeaderboard24Hours(epoch),
-          ];
+          return [() => useAirdropLeaderboard24Hours(epoch)];
         }
       }
     })();
