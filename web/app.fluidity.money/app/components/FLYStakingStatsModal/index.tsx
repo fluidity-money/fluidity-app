@@ -58,14 +58,14 @@ enum State {
 const getValueFromFlyAmount = (amount: BN) => {
   const x = amount.toString();
   switch (true) {
-    case x.length > 6:
-      return (() => {
-        const leftSide = x.slice(0, x.length - 6);
-        const rightSide = x.slice(x.length - 6).slice(0, 3);
-        return `${leftSide}.${rightSide}`;
-      })();
-    case x.length < 6:
-      return `0.${x}`;
+  case (x.length > 6):
+    return (() => {
+      const leftSide = x.slice(0, x.length - 6);
+      const rightSide = x.slice(x.length - 6).slice(0, 3);
+      return `${leftSide}.${rightSide}`;
+    })();
+  case (x.length <= 6):
+    return `0.${x}`;
   }
 };
 
@@ -521,29 +521,17 @@ const FlyStakingStatsModal = ({
                                   <InfoCircle className="info-circle-grey" />
                                 </div>
                               </div>
-                            </Hoverable>
-                          </Card>
-                          <Card fill>
-                            <Hoverable
-                              tooltipStyle={"solid"}
-                              tooltipContent={
-                                <div className="flex-column">
-                                  <Text className="staking-stats-info-text">
-                                    The amount of $FLY Tokens you have unstaked
-                                    from your total Staked $FLY Balance.
-                                    Includes unbonding amount.
-                                  </Text>
-                                </div>
-                              }
-                            >
-                              <div className="flex-column">
-                                <Text size="lg" prominent>
-                                  {getValueFromFlyAmount(flyUnstaking) ??
-                                    flyUnstaking.toString()}
-                                </Text>
-                                <div className="text-with-info-popup">
-                                  <Text size="lg">Unstaking</Text>
-                                  <InfoCircle className="info-circle-grey" />
+                              <div className="staking-input-lower">
+                                {isStaking ?
+                                  `${getValueFromFlyAmount(flyBalance.sub(stakeAmount))} $FLY remaining` :
+                                  `${getValueFromFlyAmount(new BN(flyStaked.toString()).sub(unstakeAmount))} $FLY staked remaining`}
+                                <div className="flex" style={{gap: '0.5em'}}>
+                                  {isStaking ? 
+                                  <Text size="md">Staking {getValueFromFlyAmount(stakeAmount)} $FLY</Text> :
+                                  <Text size="md">Unstaking {getValueFromFlyAmount(unstakeAmount)} $FLY</Text>}
+                                  <div onClick={setMaxBalance}>
+                                    <Text prominent size="md" className="max-balance-text">Max</Text>
+                                  </div>
                                 </div>
                               </div>
                             </Hoverable>
@@ -635,27 +623,21 @@ const FlyStakingStatsModal = ({
                             />
                           </div>
                           <div className="fly-staking-stats-modal-row">
-                            <StakingWarning
-                              header={
-                                <Text
-                                  size="lg"
-                                  bold
-                                  prominent
-                                  className="black"
-                                >
-                                  Unstaking will result in the loss of some
-                                  points.
-                                </Text>
-                              }
-                              body={
-                                <Text size="md" className="black">
-                                  You will lose the equivalent percentage of
-                                  unstaked $FLY from your accumulative points.{" "}
-                                  <Text size="md" className="black" bold>
-                                    (i.e: Unstaking 50% of $FLY will result in
-                                    50% Loss of points)
-                                  </Text>
-                                </Text>
+                            {currentStatus < State.HasStaked ? <BaseCircle /> : <Checked />}
+                            <div className="flex-column">
+                              <Text size="lg" prominent>{isStaking ? `Stake $FLY ${getValueFromFlyAmount(stakeAmount)}`: `Unstake $FLY ${getValueFromFlyAmount(unstakeAmount)}`}</Text>
+                              {
+                                currentStatus >= State.HasStaked && (
+                                  isStaking ?
+                                    <Text size="md">Earn rewards & [REDACTED] on SPN</Text> :
+                                    <LinkButton
+                                      size={"medium"}
+                                      type={"external"}
+                                      handleClick={() => { addToken?.("FLY") }}
+                                    >
+                                      Add $FLY to My Wallet
+                                    </LinkButton >
+                                )
                               }
                             />
                           </div>

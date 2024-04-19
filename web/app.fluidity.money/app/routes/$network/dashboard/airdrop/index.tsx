@@ -39,7 +39,6 @@ import {
   StakingStatsModal,
   TutorialModal,
   RecapModal,
-  TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
 import {
@@ -1084,11 +1083,6 @@ const Airdrop = () => {
               <HowItWorksContent isMobile />
             </>
           )}
-          {currentModal === "testnet-rewards" && (
-            <>
-              <TestnetRewardsModal />
-            </>
-          )}
         </motion.div>
       </>
     );
@@ -1169,13 +1163,6 @@ const Airdrop = () => {
         closeModal={closeModal}
       >
         <TutorialModal closeModal={closeModal} />
-      </CardModal>
-      <CardModal
-        id="testnet-rewards"
-        visible={currentModal === "testnet-rewards"}
-        closeModal={closeModal}
-      >
-        <TestnetRewardsModal />
       </CardModal>
 
       {/* Page Content */}
@@ -1464,7 +1451,7 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [tasks, setTasks] = useState<"1x" | "12x">("12x");
+  const [tasks, setTasks] = useState<"8x" | "12x">("12x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
     {
@@ -1487,16 +1474,16 @@ const MultiplierTasks = () => {
     <Card fill color="holo" rounded className="multiplier-tasks">
       <div className="multiplier-tasks-header">
         <Text style={{ color: "black" }} bold size="md">
-          Multiplier Tasks
+          Utility Multiplier
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Transact FLY on listed platforms to earn more!
+          Transact <b>$FLY</b> and $ƒUSDC on listed platforms to earn more!
         </Text>
       </div>
       <div
         className="multiplier-tasks-multiplier"
         onClick={() => {
-          setTasks((prev) => (prev === "1x" ? "12x" : "1x"));
+          setTasks((prev) => (prev === "8x" ? "12x" : "8x"));
         }}
         style={{ transform: "scale(0.6)" }}
       >
@@ -1505,7 +1492,7 @@ const MultiplierTasks = () => {
           direction="vertical"
           checked={tasks === "12x"}
         />
-        <TextButton style={{ textDecorationThickness: "3px" }}>
+        <TextButton style={{ textDecorationThickness: "3px", width: "97%" }}>
           <motion.div
             key={tasks}
             initial={{ opacity: 0, y: 10 }}
@@ -1518,7 +1505,7 @@ const MultiplierTasks = () => {
           </motion.div>
         </TextButton>
       </div>
-      {tasks === "1x" && (
+      {tasks === "8x" && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
@@ -1526,9 +1513,8 @@ const MultiplierTasks = () => {
           className="multiplier-tasks-tasks"
         >
           <Text size="xs" style={{ color: "black" }}>
-            Perform any type of fAsset transactions{" "}
-            <b>in any on-chain protocol</b>, including sending{" "}
-            <b>with any wallet</b>.
+            Get extra multipliers for transacting<br/>
+            <b>$FLY on any protocol, with any wallet.</b>
           </Text>
         </motion.div>
       )}

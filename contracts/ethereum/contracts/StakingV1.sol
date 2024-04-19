@@ -212,10 +212,28 @@ return a
         }
         unstakingStorage_[_spender].pop();
     }
+
     /* ~~~~~~~~~~ INFORMATIONAL ~~~~~~~~~~ */
 
     function stakedPositionsLen(address _account) public view returns (uint) {
         return stakedStorage_[_account].length;
+    }
+
+    function stakedPositionInfo(address _account, uint _i) public view returns (bool receivedBonus, uint256 flyVested, uint256 depositTimestamp) {
+        StakedPrivate storage s = stakedStorage_[_account][_i];
+        receivedBonus = s.receivedBonus;
+        flyVested = s.flyVested;
+        depositTimestamp = s.depositTimestamp;
+    }
+
+    function unstakingPositionsLen(address _account) public view returns (uint) {
+        return unstakingStorage_[_account].length;
+    }
+
+    function unstakingPositionInfo(address _account, uint _i) public view returns (uint256 flyAmount, uint256 unstakedTimestamp) {
+        UnstakingPrivate storage s = unstakingStorage_[_account][_i];
+        flyAmount = s.flyAmount;
+        unstakedTimestamp = s.unstakedTimestamp;
     }
 
     /// @inheritdoc IStaking
@@ -312,6 +330,10 @@ return a
                 // can update the existing staked amount to reduce the FLY that they
                 // requested, then we can just return here.
                 stakedStorage_[msg.sender][i].flyVested -= flyRemaining;
+                unstakingStorage_[msg.sender].push(UnstakingPrivate({
+                    flyAmount: flyRemaining,
+                    unstakedTimestamp: unstakedBy
+                }));
                 flyRemaining = 0;
                 break;
             }
@@ -333,8 +355,8 @@ return a
     ) public view returns (uint256 shortestSecs) {
         for (uint i = 0; i < unstakingStorage_[_spender].length; i++) {
             uint256 ts = unstakingStorage_[_spender][i].unstakedTimestamp;
-            if (block.timestamp > ts) {
-                uint256 remaining =  block.timestamp - ts;
+            if (ts > block.timestamp) {
+                uint256 remaining =  ts - block.timestamp;
                 // if we haven't set the shortest number of seconds, we
                 // set it to whatever we can, or we set it to the
                 // smallest value.
@@ -353,7 +375,7 @@ return a
         if (len == 0) return 0;
         for (uint i = len - 1; i >= 0; i--) {
             UnstakingPrivate storage s = unstakingStorage_[msg.sender][i];
-            // if the timestamp for the time that we need to unstake is less than the
+            // if the timestamp for the time that we need to unstake is more than the
             // current, break out.
             if (s.unstakedTimestamp > block.timestamp) {
               if (i == 0) break;
