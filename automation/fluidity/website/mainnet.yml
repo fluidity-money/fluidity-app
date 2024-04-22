@@ -8,7 +8,7 @@ SERVICES:
       SECRET_FLU_ARB_RPC_HTTP: /fluidity/arbitrum/http_url
       SECRET_FLU_POLYZK_RPC_HTTP: /fluidity/polygon_zk/http_url
       DEPLOYMENT_TYPE: CODEDEPLOY
-      CODEDEPLOY_WAIT_TIME: 0 #minutes
+      CODEDEPLOY_WAIT_TIME: 15 #minutes
       LOAD_BALANCER: flu-mainnet-fluidity-alb
       TARGET_GROUP_01: flu-mainnet-fluidity-fe-tg
       TARGET_GROUP_02: flu-mainnet-fluidity-fe-tg-1
