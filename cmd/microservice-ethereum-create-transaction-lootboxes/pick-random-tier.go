@@ -19,7 +19,7 @@ const (
 	Tier2Prob = 100_000_000 // this is 100_000_000 / 1_000_000_000
 	Tier3Prob = 50_000_000  //etc...
 	Tier4Prob = 10_000_000
-	Tier5Prob = 100
+	Tier5Prob = 1000
 	//The probability of NoBottle is: (PayoutChances - (The Sum of all TierXProb values above)) / PayoutChances
 
 	// Thresholds that the random number must fall below to win a tier
