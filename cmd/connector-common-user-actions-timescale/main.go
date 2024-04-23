@@ -2,7 +2,6 @@ package main
 
 import (
 	database "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
-	"github.com/fluidity-money/fluidity-app/lib/log"
 	queue "github.com/fluidity-money/fluidity-app/lib/queues/user-actions"
 )
 
