@@ -750,7 +750,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap" || currentModal === "claim"}
         >
-          Airdrop retrospect
+          Airdrop recap
         </TabButton>
         <TabButton
           size="small"

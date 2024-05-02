@@ -2106,17 +2106,6 @@ const RecapModal = ({
                   the crate!
                 </Text>
               </motion.div>
-              <motion.div variants={heroItemVariants}>
-                <GeneralButton
-                  type="transparent"
-                  layout="after"
-                  handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-                >
-                  <Text size="sm" prominent code style={{ color: "inherit" }}>
-                    Convert your bottles to $FLY
-                  </Text>
-                </GeneralButton>
-              </motion.div>
 
               <motion.div
                 className="recap-circle-scroll"
