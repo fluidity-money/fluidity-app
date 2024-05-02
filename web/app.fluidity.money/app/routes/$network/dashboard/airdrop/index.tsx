@@ -313,68 +313,6 @@ const Airdrop = () => {
       );
     };
 
-    const YouAreEligible = () => {
-      return (
-        <div className="recap-fly-count-block-solana">
-          <div className="recap-fly-count-header-solana">
-            <Text size="md" code={true}>
-              Congratulations! You are eligible to claim 25% of your tokens at
-              TGE
-            </Text>
-            <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
-            <Text>
-              The association window for Solana users is now over. Please create
-              a support ticket before the 2nd of April in the Discord (
-              <a href="https://discord.gg/fluidity" rel="noopener noreferrer">
-                https://discord.gg/fluidity
-              </a>
-              ) to receive your Solana airdrop.
-            </Text>
-            <div className="recap-you-are-eligible-claim-at-tge-button-container">
-              <GeneralButton
-                size="medium"
-                type="secondary"
-                className="recap-you-are-eligible-claim-at-tge-button rainbow"
-                handleClick={() => window?.open(AIRDROP_TGE_CLAIM)}
-              >
-                <Text size="sm">
-                  You will be able to claim your rewards at Fluidity&apos;s TGE
-                  in the Arbitrum Portal &rarr;
-                </Text>
-              </GeneralButton>
-            </div>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container-solana">
-            <LinkButton
-              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              color="white"
-              size="medium"
-              type="external"
-            >
-              Click here to learn more
-            </LinkButton>
-          </div>
-        </div>
-      );
-    };
-
-    const TGEDisplay = () => {
-      return (
-        <div className="recap-fly-count-child-solana">
-          {(() => {
-            switch (true) {
-              case showTGEDetails:
-                return <ShowSolanaPrompt />;
-              case flyAmountOwed > 0:
-                return <YouAreEligible />;
-              default:
-                return <YoureNotEligible />;
-            }
-          })()}
-        </div>
-      );
-    };
-
     const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
       useState(false);
 
@@ -471,7 +409,6 @@ const Airdrop = () => {
         <Heading as="h1" className="no-margin">
           Airdrop
         </Heading>
-        <TGEDisplay />
       </div>
     );
   }
@@ -813,7 +750,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap" || currentModal === "claim"}
         >
-          TGE Claim
+          Airdrop retrospect
         </TabButton>
         <TabButton
           size="small"

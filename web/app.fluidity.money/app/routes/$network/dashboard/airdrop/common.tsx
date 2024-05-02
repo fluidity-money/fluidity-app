@@ -1793,23 +1793,6 @@ const RecapModal = ({
     setCheckYourEligibilityButtonEnabled,
   ] = useState(false);
 
-  const TGEDisplay = () => {
-    return (
-      <div className="recap-fly-count-child">
-        {(() => {
-          switch (true) {
-            case showTGEDetails:
-              return <ShowEpochDetails />;
-            case flyAmountOwed > 0:
-              return <YouAreEligible />;
-            default:
-              return <YoureNotEligible />;
-          }
-        })()}
-      </div>
-    );
-  };
-
   useEffect(() => {
     (async () => {
       if (address) {
@@ -2002,41 +1985,6 @@ const RecapModal = ({
     // check if the request to get information on the airdrop is
     // done, if it is, then show the tge details
     setShowTGEDetails(false);
-  };
-
-  const ShowEpochDetails = () => {
-    return (
-      <div id="airdrop-claim-block" className="recap-fly-count-block">
-        <div className="recap-fly-count-header">
-          <Text size="md" code={true} as="p">
-            FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
-          </Text>
-          <Heading>The Fluidity $FLY-Wheel Begins</Heading>
-        </div>
-        <div className="recap-fly-count-thank-you">
-          <Text>
-            Thank you for riding with us this Wave. It has come to an end, check
-            your eligibility for rewards from your bottles, and how you surfed.
-          </Text>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container">
-          <div className="recap-fly-count-buttons-spread">
-            <GeneralButton
-              handleClick={handleCheckEligibility}
-              disabled={!checkYourEligibilityButtonEnabled}
-            >
-              Check your eligibility
-            </GeneralButton>
-            <GeneralButton
-              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              icon={<ArrowTopRight />}
-            >
-              See criteria
-            </GeneralButton>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -2414,20 +2362,6 @@ const RecapModal = ({
             </motion.div>
           </div>
         )}
-
-        {/*TGE details display*/}
-        <motion.div
-          className={"recap-fly-count-container"}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1, delay: 0.1 }}
-          viewport={{
-            amount: "all",
-            once: true,
-          }}
-        >
-          <div id="claim">{showPageContent && <TGEDisplay />}</div>
-        </motion.div>
 
         <Modal id="connect-wallet" visible={walletModalVisibility}>
           <div className="cover">
