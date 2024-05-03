@@ -41,6 +41,7 @@ import {
   getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
+import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import {
   AnimatePresence,
