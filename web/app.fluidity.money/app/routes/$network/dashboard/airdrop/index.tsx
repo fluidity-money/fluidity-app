@@ -12,12 +12,10 @@ import {
   LabelledValue,
   LinkButton,
   Text,
-  Modal,
   HeroCarousel,
   ProgressBar,
   GeneralButton,
   ArrowRight,
-  ArrowTopRight,
   Display,
   ProviderIcon,
   Provider,
@@ -27,7 +25,6 @@ import {
   TabButton,
   BloomEffect,
   toSignificantDecimals,
-  numberToCommaSeparated,
   useViewport,
   toDecimalPlaces,
 } from "@fluidity-money/surfing";
@@ -41,14 +38,7 @@ import {
   RecapModal,
 } from "./common";
 import { motion } from "framer-motion";
-import {
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
+import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -60,7 +50,6 @@ import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
 import { ReferralCountLoaderData } from "../../query/referrals";
 import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
-import { useFLYOwedForAddress } from "~/queries";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -73,11 +62,6 @@ import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKing
 import { redirect } from "react-router-dom";
 
 export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
-
-const AIRDROP_BLOG_POST =
-  "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12";
-
-const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap";
 
 const AIRDROP_MODALS = [
   "recap",
@@ -206,276 +190,6 @@ const Airdrop = () => {
   const { toggleVisibility: toggleStakingVisibility } =
     useContext(FlyStakingContext);
 
-  if (network !== "arbitrum") {
-    // assuming this is solana
-
-    const [flyAmountOwed, setFLYAmountOwed] = useState(0);
-
-    const [showTGEDetails, setShowTGEDetails] = useState(true);
-
-    const [
-      checkYourEligibilityButtonEnabled,
-      setCheckYourEligibilityButtonEnabled,
-    ] = useState(false);
-
-    useEffect(() => {
-      (async () => {
-        if (address) {
-          const resp = await useFLYOwedForAddress(address);
-          if (!resp) {
-            console.warn(`Invalid response for airdrop request: ${resp}`);
-            return;
-          }
-          const { amount, error } = resp;
-          if (error) throw new Error(`Airdrop request error: ${error}`);
-          setFLYAmountOwed(amount);
-          setCheckYourEligibilityButtonEnabled(true);
-        }
-      })();
-    }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
-
-    const handleCheckEligibility = () => {
-      // grey out the button here
-      setCheckYourEligibilityButtonEnabled(false);
-
-      // check if the request to get information on the airdrop is
-      // done, if it is, then show the tge details
-      setShowTGEDetails(false);
-    };
-
-    const ShowSolanaPrompt = () => {
-      return (
-        <div className="recap-fly-count-block">
-          <div className="recap-fly-count-header">
-            <Text size="md" code={true} as="p">
-              FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
-            </Text>
-            <Heading>The Fluidity $FLY-Wheel Begins</Heading>
-          </div>
-          <div className="recap-fly-count-thank-you-solana">
-            <Text>
-              Thank you for riding with us this Wave. It has come to an end,
-              check your eligibility for rewards from your bottles, and how you
-              surfed.
-            </Text>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container">
-            <div className="recap-fly-count-buttons-spread">
-              <GeneralButton
-                handleClick={handleCheckEligibility}
-                disabled={!checkYourEligibilityButtonEnabled}
-              >
-                Check your eligibility
-              </GeneralButton>
-              <GeneralButton
-                handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-                icon={<ArrowTopRight />}
-              >
-                See criteria
-              </GeneralButton>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const YoureNotEligible = () => {
-      return (
-        <div className="recap-fly-count-block">
-          <div className="recap-fly-count-header">
-            <Text size="md" code={true} as="p">
-              FLUIDITY AIRDROP WAVE 1 & 2
-            </Text>
-            <Heading>You are not eligible</Heading>
-          </div>
-          <div className="recap-fly-count-thank-you-solana">
-            <Text>
-              Keep transferring with Fluid Assets and participating in our
-              upcoming Airdrops, to earn more rewards and multipliers! The next
-              one will be even bigger!
-            </Text>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container">
-            <div className="recap-fly-count-buttons-spread">
-              <GeneralButton
-                type="primary"
-                icon={<ArrowTopRight />}
-                layout="after"
-                handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              >
-                <Text size="sm" prominent code style={{ color: "inherit" }}>
-                  Learn more
-                </Text>
-              </GeneralButton>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const YouAreEligible = () => {
-      return (
-        <div className="recap-fly-count-block-solana">
-          <div className="recap-fly-count-header-solana">
-            <Text size="md" code={true}>
-              Congratulations! You are eligible to claim 25% of your tokens at
-              TGE
-            </Text>
-            <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
-            <Text>
-              The association window for Solana users is now over. Please create
-              a support ticket before the 2nd of April in the Discord (
-              <a href="https://discord.gg/fluidity" rel="noopener noreferrer">
-                https://discord.gg/fluidity
-              </a>
-              ) to receive your Solana airdrop.
-            </Text>
-            <div className="recap-you-are-eligible-claim-at-tge-button-container">
-              <GeneralButton
-                size="medium"
-                type="secondary"
-                className="recap-you-are-eligible-claim-at-tge-button rainbow"
-                handleClick={() => window?.open(AIRDROP_TGE_CLAIM)}
-              >
-                <Text size="sm">
-                  You will be able to claim your rewards at Fluidity&apos;s TGE
-                  in the Arbitrum Portal &rarr;
-                </Text>
-              </GeneralButton>
-            </div>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container-solana">
-            <LinkButton
-              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              color="white"
-              size="medium"
-              type="external"
-            >
-              Click here to learn more
-            </LinkButton>
-          </div>
-        </div>
-      );
-    };
-
-    const TGEDisplay = () => {
-      return (
-        <div className="recap-fly-count-child-solana">
-          {(() => {
-            switch (true) {
-              case showTGEDetails:
-                return <ShowSolanaPrompt />;
-              case flyAmountOwed > 0:
-                return <YouAreEligible />;
-              default:
-                return <YoureNotEligible />;
-            }
-          })()}
-        </div>
-      );
-    };
-
-    const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
-      useState(false);
-
-    const closeWithEsc = useCallback(
-      (event: { key: string }) => {
-        event.key === "Escape" &&
-          setTermsAndConditionsModalVis &&
-          setTermsAndConditionsModalVis(false);
-      },
-      [termsAndConditionsModalVis, setTermsAndConditionsModalVis]
-    );
-
-    useEffect(() => {
-      document.addEventListener("keydown", closeWithEsc);
-      return () => document.removeEventListener("keydown", closeWithEsc);
-    }, [termsAndConditionsModalVis, closeWithEsc]);
-
-    return (
-      <div className="pad-main">
-        <Modal id="terms-and-conditions" visible={termsAndConditionsModalVis}>
-          <div className="airdrop-terms-and-conditions-modal-container">
-            <div className="airdrop-terms-and-conditions-modal-child">
-              <div className="airdrop-terms-and-conditions-modal-navbar">
-                <GeneralButton
-                  size="medium"
-                  handleClick={() => setTermsAndConditionsModalVis(false)}
-                >
-                  Close
-                </GeneralButton>
-              </div>
-              <p>
-                1. Description We may offer you the opportunity to receive some
-                digital assets at no cost (**Airdrop**), subject to the terms
-                described in this section. The Airdrop is delivered by us to
-                you, but may be manufactured, offered and supported by the
-                network creator or developer, if any, and not by us.
-              </p>
-              <p>
-                1. Terms of Airdrop Program 2.1 No Purchase Necessary There is
-                no purchase necessary to receive the Airdrop. However, you must
-                have wallets recognised and accepted by us. Although we do not
-                charge a fee for participation in the Airdrop Program, we
-                reserve the right to do so in the future and shall provide prior
-                notice to you in such case.
-              </p>
-              <p>
-                2.2 Timing Each Airdrop may be subject to any additional terms
-                and conditions and where applicable such terms and conditions
-                shall be displayed and marked with an asterisk (*) or other
-                similar notation.
-              </p>
-              <p>
-                2.3 Limited Supply An offer to receive the digital assets in an
-                Airdrop is only available to you while supplies last. Once the
-                amount of digital asset offered by us in an Airdrop is
-                exhausted, any party who has either been placed on a waitlist,
-                or has completed certain additional steps, but not yet received
-                notice of award of the asset in such Airdrop, shall no longer be
-                eligible to receive the said digital assets in that Airdrop. We
-                reserve the right, in our sole discretion, to modify or suspend
-                any Airdrop requirements at any time without notice, including
-                the amount previously advertised as available.
-              </p>
-              <p>
-                2.4 Eligibility You may not be eligible to receive the digital
-                assets or a select class and type of digital assets from an
-                Airdrop in your jurisdiction. To the best of our understanding,
-                below is a list of countries that does not recognise digital
-                assets; *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia,
-                Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia,
-                Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal,
-                Qatar, Sierra Leone, Tunisia ** Kindly be advised that this list
-                is for reference only and you are advised to seek independent
-                legal advise as to your eligibility to receive the assets
-                through Airdrop. **source - Library of Congress, Atlantic
-                Council, Techopedia, Finder, Triple-A, Chainalysis*
-              </p>
-              <p>
-                2.5 Notice of Award In the event you are selected to receive the
-                digital asset in an Airdrop, we shall notify you of the pending
-                delivery of such asset. Eligibility may be limited as to time.
-                We are not liable to you for failure to receive any notice
-                associated with the Airdrop Program.
-              </p>
-              <p>
-                3 Risk Disclosures Relating to Airdrop Program You are solely
-                responsible for researching and understanding the Fluid Assets
-                token and it’s related utility and/or network subject to the
-                Airdrop.
-              </p>
-            </div>
-          </div>
-        </Modal>
-        <Heading as="h1" className="no-margin">
-          Airdrop
-        </Heading>
-        <TGEDisplay />
-      </div>
-    );
-  }
-
   const [redeemableTokens, setRedeemableTokens] = useState<RedeemableToken[]>(
     []
   );
@@ -520,13 +234,16 @@ const Airdrop = () => {
     );
 
   // airdrop leaderboard data contains more than the displayed entries, so postprocessing is required
-  const airdropLeaderboardData = useMemo(() => ({
-    loaded: airdropLeaderboardData_?.loaded,
-    leaderboard: getLeaderboardWithUser(
-      airdropLeaderboardData_?.leaderboard || [],
-      address ?? ""
-    )
-  }), [airdropLeaderboardData_])
+  const airdropLeaderboardData = useMemo(
+    () => ({
+      loaded: airdropLeaderboardData_?.loaded,
+      leaderboard: getLeaderboardWithUser(
+        airdropLeaderboardData_?.leaderboard || [],
+        address ?? ""
+      ),
+    }),
+    [airdropLeaderboardData_]
+  );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
     address
@@ -813,7 +530,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap" || currentModal === "claim"}
         >
-          TGE Claim
+          Airdrop Recap
         </TabButton>
         <TabButton
           size="small"
