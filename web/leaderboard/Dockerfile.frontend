@@ -25,6 +25,8 @@ RUN make frontend
 
 FROM fluidity/runtime-web-container:latest
 
+RUN npm uninstall next && npm install next@latest
+
 WORKDIR /usr/local/src/fluidity/web
 
 COPY --from=build /usr/local/src/fluidity/web .
