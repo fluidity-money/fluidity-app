@@ -25,7 +25,9 @@ RUN make frontend
 
 FROM fluidity/runtime-web-container:latest
 
-RUN npm uninstall next && npm install next@latest
+# https://github.com/vercel/next.js/discussions/57066
+RUN npm cache clean --force
+RUN npm install next@latest
 
 WORKDIR /usr/local/src/fluidity/web
 
