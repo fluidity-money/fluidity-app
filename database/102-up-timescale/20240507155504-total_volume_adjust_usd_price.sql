@@ -3,8 +3,8 @@
 -- token_prices to contain the current price in US dollars of a token, so that its volume can be correctly scaled
 -- if a token is found in user_actions but not token_prices, its price is assumed to be 1 USD.
 CREATE TABLE token_prices (
-	token_short_name VARCHAR,
-	usd_price DOUBLE PRECISION
+	token_short_name VARCHAR NOT NULL,
+	usd_price DOUBLE PRECISION NOT NULL
 );
 
 INSERT INTO token_prices (token_short_name, usd_price) VALUES (
