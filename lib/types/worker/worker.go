@@ -58,6 +58,7 @@ type (
 		DefaultTransfersInBlock       int                       `json:"default_transfers_in_block"`
 		AtxBufferSize                 int                       `json:"atx_buffer_size"`
 		EpochBlocks                   int                       `json:"epoch_blocks"`
+		YieldToStakers                bool                      `json:"yield_to_stakers"`
 		SpoolerInstantRewardThreshold float64                   `json:"spooler_instant_reward_threshold"`
 		SpoolerBatchedRewardThreshold float64                   `json:"spooler_batched_reward_threshold"`
 	}
