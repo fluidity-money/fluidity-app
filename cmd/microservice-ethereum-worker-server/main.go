@@ -504,6 +504,22 @@ func main() {
 
 				// if the amount transferred was exactly 0, then we skip to the next transfer
 
+				log.Debugf(
+					"Transaction hash %v log index %v has a decorator that's nil? %v",
+					transfer.TransactionHash,
+					logIndex,
+					transfer.Decorator == nil,
+				)
+
+				if d := transfer.Decorator; d != nil {
+					log.Debugf(
+						"Transaction hash %v log index %v has a decorator volume %v",
+						transfer.TransactionHash,
+						logIndex,
+						transfer.Decorator.Volume,
+					)
+				}
+
 				if isDecoratedTransferZeroVolume(transfer) {
 					log.App(func(k *log.Log) {
 						k.Format(
@@ -716,7 +732,12 @@ func main() {
 				// check if we've processed this before as a final failsafe before we submit
 				// the balls via a message and store an emission
 
-				failsafe.CommitTransactionHashIndex(transactionHash, *logIndex)
+				failsafeOk := failsafe.CommitTransactionHashIndex(transactionHash, *logIndex)
+
+				if !failsafeOk {
+					// the function should log itself
+					continue
+				}
 
 				for _, payoutDetails := range payouts {
 

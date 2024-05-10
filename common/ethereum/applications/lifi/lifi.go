@@ -203,6 +203,14 @@ func genericSwapCompleted(transfer worker.EthereumApplicationTransfer, fluidToke
 
 	fluidTransferAmount := new(big.Rat)
 
+	log.Debugf(
+		"LiFiGenericSwapCompleted for transaction hash %v transfer from asset ID: %v, to asset id: %v, fluid token contract %v",
+		transfer.TransactionHash,
+		fromAssetId,
+		toAssetId,
+		fluidTokenContract,
+	)
+
 	switch fluidTokenContract {
 	case fromAssetId:
 		fluidTransferAmount.Set(fromAmount)
@@ -226,7 +234,7 @@ func genericSwapCompleted(transfer worker.EthereumApplicationTransfer, fluidToke
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
-	feeData.Fee = new(big.Rat).SetInt64(0)
+	feeData.Fee = big.NewRat(0, 1)
 
 	return feeData, nil
 }
@@ -296,6 +304,13 @@ func swappedGeneric(transfer worker.EthereumApplicationTransfer, fluidTokenContr
 
 	fluidTransferAmount := new(big.Rat)
 
+	log.Debugf(
+		"LiFiSwappedGeneric transfer for transaction hash %v from asset ID: %v, to asset id: %v",
+		transfer.TransactionHash,
+		fromAssetId,
+		toAssetId,
+	)
+
 	switch fluidTokenContract {
 	case fromAssetId:
 		fluidTransferAmount.Set(fromAmount)
@@ -319,7 +334,7 @@ func swappedGeneric(transfer worker.EthereumApplicationTransfer, fluidTokenContr
 	decimalsRat := new(big.Rat).SetFloat64(decimalsAdjusted)
 
 	feeData.Volume = new(big.Rat).Quo(fluidTransferAmount, decimalsRat)
-	feeData.Fee = new(big.Rat).SetInt64(0)
+	feeData.Fee = big.NewRat(0, 1)
 
 	return feeData, nil
 }
