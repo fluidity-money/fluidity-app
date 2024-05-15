@@ -1194,7 +1194,7 @@ const MultiplierTasks = () => {
           Utility Multiplier
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Transact $ƒUSDC on listed platforms to earn more!
+          Use $ƒUSDC on listed platforms to earn!
         </Text>
       </div>
       <div
