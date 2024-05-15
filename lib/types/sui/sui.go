@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/block-vision/sui-go-sdk/models"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
+	"github.com/fluidity-money/sui-go-sdk/models"
 )
 
 type WrapEvent struct {

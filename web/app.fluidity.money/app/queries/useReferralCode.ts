@@ -2,7 +2,9 @@ import { gql, jsonPost } from "~/util";
 
 const queryByAddress = gql`
   query getReferralCodeByAddress($address: String!, $epoch: lootbox_epoch!) {
-    lootbox_referral_codes(where: { address: { _eq: $address }, epoch: { _eq: $epoch } }) {
+    lootbox_referral_codes(
+      where: { address: { _eq: $address }, epoch: { _eq: $epoch } }
+    ) {
       address
       referral_code
       epoch
@@ -12,7 +14,9 @@ const queryByAddress = gql`
 
 const queryByCode = gql`
   query getReferralCodeByCode($code: String!, $epoch: lootbox_epoch!) {
-    lootbox_referral_codes(where: { referral_code: { _eq: $code }, epoch: { _eq: $epoch } }) {
+    lootbox_referral_codes(
+      where: { referral_code: { _eq: $code }, epoch: { _eq: $epoch } }
+    ) {
       address
       referral_code
       epoch

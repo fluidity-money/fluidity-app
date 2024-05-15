@@ -1,6 +1,6 @@
 import React from "react";
 import { useEnsName, Address } from "wagmi";
-
+//
 import { trimAddress } from "@fluidity-money/surfing";
 
 const defaultChain = 1; // taken from wagmi documentation

@@ -1125,7 +1125,7 @@ describe("StakingV1", async () => {
       expect(await stakingContract.callStatic.stake(amountStaked)).to.be.equal(amountStaked);
       // then send on-chain to continue the life of the testing
       await stakingContract.stake(amountStaked);
-      expect(await stakingContract.stakingPositionsLen(signerAddr)).to.be.equal(1);
+      expect(await stakingContract.stakedPositionsLen(signerAddr)).to.be.equal(1);
       let { flyStaked } = await stakingContract.stakingDetails(signerAddr);
       expect(flyStaked).to.be.equal(amountStaked);
       const { flyRemaining } = await stakingContract.callStatic.beginUnstake(0);
@@ -1144,7 +1144,7 @@ describe("StakingV1", async () => {
         .to.be.equal(amountStaked);
 
       await stakingContract.stake(amountStaked);
-      expect(await stakingContract.stakingPositionsLen(signerAddr))
+      expect(await stakingContract.stakedPositionsLen(signerAddr))
         .to.be.equal(1);
 
       // now wait a seeminly random amount of time, get the points
@@ -1256,7 +1256,7 @@ describe("StakingV1", async () => {
 
       // the amount of positions remaining should be equal to 2 since we
       // closed the newest position.
-      expect(await stakingContract.stakingPositionsLen(signerAddr)).to.be.equal(2);
+      expect(await stakingContract.stakedPositionsLen(signerAddr)).to.be.equal(2);
 
       ({ flyStaked } = await stakingContract.stakingDetails(signerAddr));
       expect(flyStaked).to.be.equal(s1.add(s2.sub(flyUnstake1)).add(s3));
@@ -1273,7 +1273,7 @@ describe("StakingV1", async () => {
 
       ({ flyStaked } = await stakingContract.stakingDetails(signerAddr));
       expect(flyStaked).to.be.equal(s3);
-      expect(await stakingContract.stakingPositionsLen(signerAddr)).to.be.equal(1);
+      expect(await stakingContract.stakedPositionsLen(signerAddr)).to.be.equal(1);
 
       /*
        * unstake just 1 this time.
@@ -1287,7 +1287,7 @@ describe("StakingV1", async () => {
 
       ({ flyStaked } = await stakingContract.stakingDetails(signerAddr));
       expect(flyStaked).to.be.equal(s3.sub(1));
-      expect(await stakingContract.stakingPositionsLen(signerAddr)).to.be.equal(1);
+      expect(await stakingContract.stakedPositionsLen(signerAddr)).to.be.equal(1);
     });
   });
 

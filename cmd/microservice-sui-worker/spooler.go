@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/block-vision/sui-go-sdk/signer"
-	suiSdk "github.com/block-vision/sui-go-sdk/sui"
 	commonSpooler "github.com/fluidity-money/fluidity-app/common/ethereum/spooler"
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
 	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/spooler"
@@ -12,6 +10,8 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	"github.com/fluidity-money/fluidity-app/lib/types/sui"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
+	"github.com/fluidity-money/sui-go-sdk/signer"
+	suiSdk "github.com/fluidity-money/sui-go-sdk/sui"
 )
 
 func payoutSpooledWinnings(client suiSdk.ISuiAPI, signer signer.Signer, fluidToken, baseToken sui.SuiToken, workerAddress string, payoutArgs payoutArgs, pendingWinners []spooler.PendingWinner) {

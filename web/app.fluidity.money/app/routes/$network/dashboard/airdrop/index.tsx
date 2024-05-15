@@ -12,12 +12,10 @@ import {
   LabelledValue,
   LinkButton,
   Text,
-  Modal,
   HeroCarousel,
   ProgressBar,
   GeneralButton,
   ArrowRight,
-  ArrowTopRight,
   Display,
   ProviderIcon,
   Provider,
@@ -27,9 +25,7 @@ import {
   TabButton,
   BloomEffect,
   toSignificantDecimals,
-  numberToCommaSeparated,
   useViewport,
-  numberToMonetaryString,
   toDecimalPlaces,
 } from "@fluidity-money/surfing";
 import {
@@ -40,17 +36,9 @@ import {
   StakingStatsModal,
   TutorialModal,
   RecapModal,
-  TestnetRewardsModal,
 } from "./common";
 import { motion } from "framer-motion";
-import {
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
+import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import {
   getAddressExplorerLink,
   getUsdFromTokenAmount,
@@ -62,7 +50,6 @@ import { AirdropLoaderData, BottleTiers } from "../../query/dashboard/airdrop";
 import { AirdropLeaderboardLoaderData } from "../../query/dashboard/airdropLeaderboard";
 import { ReferralCountLoaderData } from "../../query/referrals";
 import { AirdropLeaderboardEntry } from "~/queries/useAirdropLeaderboard";
-import { useFLYOwedForAddress } from "~/queries";
 import config from "~/webapp.config.server";
 import AugmentedToken from "~/types/AugmentedToken";
 import FluidityFacadeContext from "contexts/FluidityFacade";
@@ -75,11 +62,6 @@ import JoeFarmlandsOrCamelotKingdom from "~/components/JoeFarmlandsOrCamelotKing
 import { redirect } from "react-router-dom";
 
 export const EPOCH_CURRENT_IDENTIFIER = "epoch_3";
-
-const AIRDROP_BLOG_POST =
-  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
-
-const AIRDROP_TGE_CLAIM = "/arbitrum/dashboard/airdrop#recap";
 
 const AIRDROP_MODALS = [
   "recap",
@@ -124,14 +106,14 @@ export const loader: LoaderFunction = async ({ params }) => {
   return json({
     tokens: allowedTokens,
     network,
-    ethereumWallets
+    ethereumWallets,
   } satisfies LoaderData);
 };
 
 type LoaderData = {
   tokens: Array<Token>;
   network: string;
-  ethereumWallets: typeof config.config["ethereum"]["wallets"],
+  ethereumWallets: (typeof config.config)["ethereum"]["wallets"];
 };
 
 const SAFE_DEFAULT_AIRDROP: AirdropLoaderData = {
@@ -205,276 +187,8 @@ const Airdrop = () => {
     redeemTokens,
   } = useContext(FluidityFacadeContext);
 
-  const { toggleVisibility: toggleStakingVisibility } = useContext(FlyStakingContext);
-
-  if (network !== "arbitrum") {
-    // assuming this is solana
-
-    const [flyAmountOwed, setFLYAmountOwed] = useState(0);
-
-    const [showTGEDetails, setShowTGEDetails] = useState(true);
-
-    const [
-      checkYourEligibilityButtonEnabled,
-      setCheckYourEligibilityButtonEnabled,
-    ] = useState(false);
-
-    useEffect(() => {
-      (async () => {
-        if (address) {
-          const resp = await useFLYOwedForAddress(address);
-          if (!resp) {
-            console.warn(`Invalid response for airdrop request: ${resp}`);
-            return;
-          }
-          const { amount, error } = resp;
-          if (error) throw new Error(`Airdrop request error: ${error}`);
-          setFLYAmountOwed(amount);
-          setCheckYourEligibilityButtonEnabled(true);
-        }
-      })();
-    }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
-
-    const handleCheckEligibility = () => {
-      // grey out the button here
-      setCheckYourEligibilityButtonEnabled(false);
-
-      // check if the request to get information on the airdrop is
-      // done, if it is, then show the tge details
-      setShowTGEDetails(false);
-    };
-
-    const ShowSolanaPrompt = () => {
-      return (
-        <div className="recap-fly-count-block">
-          <div className="recap-fly-count-header">
-            <Text size="md" code={true} as="p">
-              FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
-            </Text>
-            <Heading>The Fluidity $FLY-Wheel Begins</Heading>
-          </div>
-          <div className="recap-fly-count-thank-you-solana">
-            <Text>
-              Thank you for riding with us this Wave. It has come to an end,
-              check your eligibility for rewards from your bottles, and how you
-              surfed.
-            </Text>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container">
-            <div className="recap-fly-count-buttons-spread">
-              <GeneralButton
-                handleClick={handleCheckEligibility}
-                disabled={!checkYourEligibilityButtonEnabled}
-              >
-                Check your eligibility
-              </GeneralButton>
-              <GeneralButton
-                handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-                icon={<ArrowTopRight />}
-              >
-                See criteria
-              </GeneralButton>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const YoureNotEligible = () => {
-      return (
-        <div className="recap-fly-count-block">
-          <div className="recap-fly-count-header">
-            <Text size="md" code={true} as="p">
-              FLUIDITY AIRDROP WAVE 1 & 2
-            </Text>
-            <Heading>You are not eligible</Heading>
-          </div>
-          <div className="recap-fly-count-thank-you-solana">
-            <Text>
-              Keep transferring with Fluid Assets and participating in our
-              upcoming Airdrops, to earn more rewards and multipliers! The next
-              one will be even bigger!
-            </Text>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container">
-            <div className="recap-fly-count-buttons-spread">
-              <GeneralButton
-                type="primary"
-                icon={<ArrowTopRight />}
-                layout="after"
-                handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              >
-                <Text size="sm" prominent code style={{ color: "inherit" }}>
-                  Learn more
-                </Text>
-              </GeneralButton>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    const YouAreEligible = () => {
-      return (
-        <div className="recap-fly-count-block-solana">
-          <div className="recap-fly-count-header-solana">
-            <Text size="md" code={true}>
-              Congratulations! You are eligible to claim 25% of your tokens at TGE
-            </Text>
-            <Heading>$FLY {numberToCommaSeparated(flyAmountOwed)}</Heading>
-            <Text>
-              The association window for Solana users is now over. Please create
-              a support ticket before the 2nd of April in the Discord (
-              <a href="https://discord.gg/fluidity" rel="noopener noreferrer">
-                https://discord.gg/fluidity
-              </a>
-              ) to receive your Solana airdrop.
-            </Text>
-            <div className="recap-you-are-eligible-claim-at-tge-button-container">
-              <GeneralButton
-                size="medium"
-                type="secondary"
-                className="recap-you-are-eligible-claim-at-tge-button rainbow"
-                handleClick={() => window?.open(AIRDROP_TGE_CLAIM)}
-              >
-                <Text size="sm">
-                  You will be able to claim your rewards at Fluidity&apos;s TGE
-                  in the Arbitrum Portal &rarr;
-                </Text>
-              </GeneralButton>
-            </div>
-          </div>
-          <div className="recap-fly-count-buttons-spread-container-solana">
-            <LinkButton
-              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              color="white"
-              size="medium"
-              type="external"
-            >
-              Click here to learn more
-            </LinkButton>
-          </div>
-        </div>
-      );
-    };
-
-    const TGEDisplay = () => {
-      return (
-        <div className="recap-fly-count-child-solana">
-          {(() => {
-            switch (true) {
-              case showTGEDetails:
-                return <ShowSolanaPrompt />;
-              case flyAmountOwed > 0:
-                return <YouAreEligible />;
-              default:
-                return <YoureNotEligible />;
-            }
-          })()}
-        </div>
-      );
-    };
-
-    const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
-      useState(false);
-
-    const closeWithEsc = useCallback(
-      (event: { key: string }) => {
-        event.key === "Escape" &&
-          setTermsAndConditionsModalVis &&
-          setTermsAndConditionsModalVis(false);
-      },
-      [termsAndConditionsModalVis, setTermsAndConditionsModalVis]
-    );
-
-    useEffect(() => {
-      document.addEventListener("keydown", closeWithEsc);
-      return () => document.removeEventListener("keydown", closeWithEsc);
-    }, [termsAndConditionsModalVis, closeWithEsc]);
-
-    return (
-      <div className="pad-main">
-        <Modal id="terms-and-conditions" visible={termsAndConditionsModalVis}>
-          <div className="airdrop-terms-and-conditions-modal-container">
-            <div className="airdrop-terms-and-conditions-modal-child">
-              <div className="airdrop-terms-and-conditions-modal-navbar">
-                <GeneralButton
-                  size="medium"
-                  handleClick={() => setTermsAndConditionsModalVis(false)}
-                >
-                  Close
-                </GeneralButton>
-              </div>
-              <p>
-                1. Description We may offer you the opportunity to receive some
-                digital assets at no cost (**Airdrop**), subject to the terms
-                described in this section. The Airdrop is delivered by us to
-                you, but may be manufactured, offered and supported by the
-                network creator or developer, if any, and not by us.
-              </p>
-              <p>
-                1. Terms of Airdrop Program 2.1 No Purchase Necessary There is
-                no purchase necessary to receive the Airdrop. However, you must
-                have wallets recognised and accepted by us. Although we do not
-                charge a fee for participation in the Airdrop Program, we
-                reserve the right to do so in the future and shall provide prior
-                notice to you in such case.
-              </p>
-              <p>
-                2.2 Timing Each Airdrop may be subject to any additional terms
-                and conditions and where applicable such terms and conditions
-                shall be displayed and marked with an asterisk (*) or other
-                similar notation.
-              </p>
-              <p>
-                2.3 Limited Supply An offer to receive the digital assets in an
-                Airdrop is only available to you while supplies last. Once the
-                amount of digital asset offered by us in an Airdrop is
-                exhausted, any party who has either been placed on a waitlist,
-                or has completed certain additional steps, but not yet received
-                notice of award of the asset in such Airdrop, shall no longer be
-                eligible to receive the said digital assets in that Airdrop. We
-                reserve the right, in our sole discretion, to modify or suspend
-                any Airdrop requirements at any time without notice, including
-                the amount previously advertised as available.
-              </p>
-              <p>
-                2.4 Eligibility You may not be eligible to receive the digital
-                assets or a select class and type of digital assets from an
-                Airdrop in your jurisdiction. To the best of our understanding,
-                below is a list of countries that does not recognise digital
-                assets; *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia,
-                Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia,
-                Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal,
-                Qatar, Sierra Leone, Tunisia ** Kindly be advised that this list
-                is for reference only and you are advised to seek independent
-                legal advise as to your eligibility to receive the assets
-                through Airdrop. **source - Library of Congress, Atlantic
-                Council, Techopedia, Finder, Triple-A, Chainalysis*
-              </p>
-              <p>
-                2.5 Notice of Award In the event you are selected to receive the
-                digital asset in an Airdrop, we shall notify you of the pending
-                delivery of such asset. Eligibility may be limited as to time.
-                We are not liable to you for failure to receive any notice
-                associated with the Airdrop Program.
-              </p>
-              <p>
-                3 Risk Disclosures Relating to Airdrop Program You are solely
-                responsible for researching and understanding the Fluid Assets
-                token and it’s related utility and/or network subject to the
-                Airdrop.
-              </p>
-            </div>
-          </div>
-        </Modal>
-        <Heading as="h1" className="no-margin">
-          Airdrop
-        </Heading>
-        <TGEDisplay />
-      </div>
-    );
-  }
+  const { toggleVisibility: toggleStakingVisibility } =
+    useContext(FlyStakingContext);
 
   const [redeemableTokens, setRedeemableTokens] = useState<RedeemableToken[]>(
     []
@@ -505,17 +219,30 @@ const Airdrop = () => {
   const isMobile = width < mobileBreakpoint;
 
   const { data: airdropData } = useCache<AirdropLoaderData>(
-    address
-      ? `/${network}/query/dashboard/airdrop?address=${address}&epoch=${EPOCH_CURRENT_IDENTIFIER}`
-      : ""
+    `/${network}/query/dashboard/airdrop?epoch=${EPOCH_CURRENT_IDENTIFIER}&address=${address}`
   );
 
   const currentApplication = "";
 
-  const { data: airdropLeaderboardData } = useCache<AirdropLoaderData>(
-    `/${network}/query/dashboard/airdropLeaderboard?period=${leaderboardFilterIndex === 0 ? "24" : "all"
-    }&address=${address ?? ""}${leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
-    }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+  const { data: airdropLeaderboardData_ } =
+    useCache<AirdropLeaderboardLoaderData>(
+      `/${network}/query/dashboard/airdropLeaderboard?period=${
+        leaderboardFilterIndex === 0 ? "24" : "all"
+      }&address=${address ?? ""}${
+        leaderboardFilterIndex === 0 ? `&provider=${currentApplication}` : ""
+      }&epoch=${EPOCH_CURRENT_IDENTIFIER}`
+    );
+
+  // airdrop leaderboard data contains more than the displayed entries, so postprocessing is required
+  const airdropLeaderboardData = useMemo(
+    () => ({
+      loaded: airdropLeaderboardData_?.loaded,
+      leaderboard: getLeaderboardWithUser(
+        airdropLeaderboardData_?.leaderboard || [],
+        address ?? ""
+      ),
+    }),
+    [airdropLeaderboardData_]
   );
 
   const { data: referralData } = useCache<AirdropLoaderData>(
@@ -793,8 +520,9 @@ const Airdrop = () => {
   const Header = () => {
     return (
       <div
-        className={`pad-main airdrop-header ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`pad-main airdrop-header ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         <TabButton
           size="small"
@@ -802,7 +530,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap" || currentModal === "claim"}
         >
-          TGE Claim
+          Airdrop Recap
         </TabButton>
         <TabButton
           size="small"
@@ -854,7 +582,7 @@ const Airdrop = () => {
         </TabButton>
         <TabButton size="small" groupId="airdrop">
           <a
-            href="https://dune.com/neogeo/fluidity-airdrop-v2"
+            href="https://dune.com/fluidity_labs/fluidity-fly-staking-metrics"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -870,19 +598,20 @@ const Airdrop = () => {
       <>
         <Header />
         <motion.div
-          className={`pad-main ${currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
-            }`}
+          className={`pad-main ${
+            currentModal === "leaderboard" ? "airdrop-leaderboard-mobile" : ""
+          }`}
           style={{
             display: "flex",
             flexDirection: "column",
             gap:
               currentModal === "tutorial" ||
-                currentModal === "leaderboard" ||
-                currentModal === "stake"
+              currentModal === "leaderboard" ||
+              currentModal === "stake"
                 ? "0.5em"
                 : currentModal === "referrals"
-                  ? "1em"
-                  : "2em",
+                ? "1em"
+                : "2em",
           }}
           key={`airdrop-mobile-${currentModal}`}
         >
@@ -897,11 +626,12 @@ const Airdrop = () => {
                   Airdrop V3: FLY Me To The Moon.
                 </Heading>
                 <Text>
-                  Stake and trade your $FLY, fluidify your assets, transact them, and boost your rewards by
-                  using trading on partnered protocols and staking liquidity right here on Fluidity! Keep an
-                  eye on the leaderboard as you compete with fellow Surfers for the top spot! A new Layer of
-                  rewards and utility is coming!
-
+                  Stake and trade your $FLY, fluidify your assets, transact
+                  them, and boost your rewards by using trading on partnered
+                  protocols and staking liquidity right here on Fluidity! Keep
+                  an eye on the leaderboard as you compete with fellow Surfers
+                  for the top spot! A new Layer of rewards and utility is
+                  coming!
                   <LinkButton
                     size="medium"
                     type="external"
@@ -912,8 +642,7 @@ const Airdrop = () => {
                     }}
                     handleClick={() => {
                       window.open(
-                        // TODO
-                        "https://blog.fluidity.money",
+                        "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12",
                         "_blank"
                       );
                     }}
@@ -996,7 +725,7 @@ const Airdrop = () => {
           {currentModal === "leaderboard" && (
             <>
               <Leaderboard
-                loaded={leaderboardLoaded}
+                loaded={leaderboardLoaded ?? false}
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
@@ -1066,11 +795,6 @@ const Airdrop = () => {
               />
               <Display size="xxxs">How It Works</Display>
               <HowItWorksContent isMobile />
-            </>
-          )}
-          {currentModal === "testnet-rewards" && (
-            <>
-              <TestnetRewardsModal />
             </>
           )}
         </motion.div>
@@ -1154,13 +878,6 @@ const Airdrop = () => {
       >
         <TutorialModal closeModal={closeModal} />
       </CardModal>
-      <CardModal
-        id="testnet-rewards"
-        visible={currentModal === "testnet-rewards"}
-        closeModal={closeModal}
-      >
-        <TestnetRewardsModal />
-      </CardModal>
 
       {/* Page Content */}
       <Header />
@@ -1195,7 +912,7 @@ const Airdrop = () => {
                   borderColor: "white",
                 }}
                 width="100%"
-                src="https://app-cdn.fluidity.money/images/epoch3AirdropBanner.png"
+                src="/images/epoch3AirdropBanner.png"
               />
             </div>
             <div
@@ -1225,10 +942,12 @@ const Airdrop = () => {
                     </Heading>
                   </div>
                   <Text style={{ fontSize: 14 }}>
-                    Stake and trade your $FLY, fluidify your assets, transact them, and boost your rewards by
-                    using trading on partnered protocols and staking liquidity right here on Fluidity! Keep an
-                    eye on the leaderboard as you compete with fellow Surfers for the top spot! A new Layer of
-                    rewards and utility is coming!
+                    Stake and trade your $FLY, fluidify your assets, transact
+                    them, and boost your rewards by using trading on partnered
+                    protocols and staking liquidity right here on Fluidity! Keep
+                    an eye on the leaderboard as you compete with fellow Surfers
+                    for the top spot! A new Layer of rewards and utility is
+                    coming!
                     <LinkButton
                       size="medium"
                       type="external"
@@ -1239,8 +958,7 @@ const Airdrop = () => {
                       }}
                       handleClick={() => {
                         window.open(
-                          // TODO
-                          "https://blog.fluidity.money/",
+                          "https://blog.fluidity.money/introducing-fluidity-airdrop-season-3-fly-me-to-the-moon-9f519fffbb12",
                           "_blank"
                         );
                       }}
@@ -1312,7 +1030,7 @@ const Airdrop = () => {
               color="white"
             >
               <Leaderboard
-                loaded={leaderboardLoaded}
+                loaded={leaderboardLoaded ?? false}
                 data={leaderboardRows}
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
@@ -1351,10 +1069,10 @@ const AirdropStats = ({
   navigate,
   isMobile,
 }: IAirdropStats) => {
-  const dayDiff = epochMax - epochDays
-  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0
-  const percentage = Math.floor((epochDays / epochMax) * 100)
-  const epochPercentage = percentage < 100 ? percentage : 100
+  const dayDiff = epochMax - epochDays;
+  const epochDaysLeft = dayDiff > 0 ? dayDiff : 0;
+  const percentage = Math.floor((epochDays / epochMax) * 100);
+  const epochPercentage = percentage < 100 ? percentage : 100;
 
   return (
     <div
@@ -1431,8 +1149,8 @@ const AirdropStats = ({
           handleClick={
             isMobile
               ? () => {
-                navigate(`/${network}/dashboard/rewards`);
-              }
+                  navigate(`/${network}/dashboard/rewards`);
+                }
               : seeBottlesDetails
           }
           style={{
@@ -1447,18 +1165,21 @@ const AirdropStats = ({
 };
 
 const MultiplierTasks = () => {
-  const [tasks, setTasks] = useState<"1x" | "12x">("12x");
+  const [tasks, setTasks] = useState<"8x" | "12x">("12x");
 
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Uniswap", link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum" },
+    {
+      provider: "Uniswap",
+      link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum",
+    },
     {
       provider: "Trader Joe",
-      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
     },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
     {
       provider: "Ramses",
-      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
     },
     { provider: "Jumper", link: "https://jumper.exchange/" },
   ];
@@ -1467,16 +1188,16 @@ const MultiplierTasks = () => {
     <Card fill color="holo" rounded className="multiplier-tasks">
       <div className="multiplier-tasks-header">
         <Text style={{ color: "black" }} bold size="md">
-          Multiplier Tasks
+          Utility Multiplier
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Transact FLY on listed platforms to earn more!
+          Transact <b>$FLY</b> and $ƒUSDC on listed platforms to earn more!
         </Text>
       </div>
       <div
         className="multiplier-tasks-multiplier"
         onClick={() => {
-          setTasks((prev) => (prev === "1x" ? "12x" : "1x"));
+          setTasks((prev) => (prev === "8x" ? "12x" : "8x"));
         }}
         style={{ transform: "scale(0.6)" }}
       >
@@ -1485,7 +1206,7 @@ const MultiplierTasks = () => {
           direction="vertical"
           checked={tasks === "12x"}
         />
-        <TextButton style={{ textDecorationThickness: "3px" }}>
+        <TextButton style={{ textDecorationThickness: "3px", width: "97%" }}>
           <motion.div
             key={tasks}
             initial={{ opacity: 0, y: 10 }}
@@ -1498,7 +1219,7 @@ const MultiplierTasks = () => {
           </motion.div>
         </TextButton>
       </div>
-      {tasks === "1x" && (
+      {tasks === "8x" && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.2 } }}
@@ -1506,9 +1227,9 @@ const MultiplierTasks = () => {
           className="multiplier-tasks-tasks"
         >
           <Text size="xs" style={{ color: "black" }}>
-            Perform any type of fAsset transactions{" "}
-            <b>in any on-chain protocol</b>, including sending{" "}
-            <b>with any wallet</b>.
+            Get extra multipliers for transacting
+            <br />
+            <b>$FLY on any protocol, with any wallet.</b>
           </Text>
         </motion.div>
       )}
@@ -1590,9 +1311,10 @@ const MyMultiplier = ({
             Provide $FLY and $ƒUSDC Liquidity to earn $ARB and Rewards!
           </Heading>
           <Text holo={true}>
-            Add liquidity to Uniswap or the following Trader Joe and Camelot pools to earn Liquidity
-            Mining rewards! You will also retroactively earn bottles depending on your contribution at
-            the end of the Airdrop!
+            Add liquidity to Uniswap or the following Trader Joe and Camelot
+            pools to earn Liquidity Mining rewards! You will also retroactively
+            earn bottles depending on your contribution at the end of the
+            Airdrop!
           </Text>
         </div>
         <JoeFarmlandsOrCamelotKingdom />
@@ -1606,11 +1328,12 @@ const airdropRankRow = (
   isMobile = false
 ): IRow => {
   const { address } = useContext(FluidityFacadeContext);
-  const { user, rank, referralCount, fusdcEarned, arbEarned, flyStaked, bottles } = data;
+  const { user, rank, referralCount, flyStaked, bottles } = data;
 
   return {
-    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${address && address === user ? "highlighted-row" : ""
-      }`,
+    className: `airdrop-row ${isMobile ? "airdrop-mobile" : ""} ${
+      address && address === user ? "highlighted-row" : ""
+    }`,
     RowElement: ({ heading }: { heading: string }) => {
       switch (heading) {
         case "RANK":
@@ -1621,8 +1344,8 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
@@ -1644,8 +1367,8 @@ const airdropRankRow = (
                   style={
                     address && address === user
                       ? {
-                        color: "black",
-                      }
+                          color: "black",
+                        }
                       : {}
                   }
                 >
@@ -1662,46 +1385,12 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
                 {toSignificantDecimals(bottles, 0)}
-              </Text>
-            </td>
-          );
-        case "$fUSDC EARNED":
-          return (
-            <td>
-              <Text
-                prominent
-                style={
-                  address && address === user
-                    ? {
-                      color: "black",
-                    }
-                    : {}
-                }
-              >
-                {numberToMonetaryString(fusdcEarned)}
-              </Text>
-            </td>
-          );
-        case "$ARB EARNED":
-          return (
-            <td>
-              <Text
-                prominent
-                style={
-                  address && address === user
-                    ? {
-                      color: "black",
-                    }
-                    : {}
-                }
-              >
-                {toDecimalPlaces(arbEarned, 4)}
               </Text>
             </td>
           );
@@ -1713,8 +1402,8 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
@@ -1730,8 +1419,8 @@ const airdropRankRow = (
                 style={
                   address && address === user
                     ? {
-                      color: "black",
-                    }
+                        color: "black",
+                      }
                     : {}
                 }
               >
@@ -1827,8 +1516,6 @@ const Leaderboard = ({
           { name: "RANK" },
           { name: "USER" },
           { name: "BOTTLES" },
-          { name: "$fUSDC EARNED" },
-          { name: "$ARB EARNED" },
           { name: "$FLY STAKED" },
           { name: "REFERRALS" },
         ]}
@@ -1885,19 +1572,19 @@ const BottleProgress = ({
         style={isMobile ? { flexDirection: "column-reverse", gap: "2em" } : {}}
       >
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/common.png" />
+          <img src="/images/hero/common.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/uncommon.png" />
+          <img src="/images/hero/uncommon.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/rare.png" />
+          <img src="/images/hero/rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/ultra_rare.png" />
+          <img src="/images/hero/ultra_rare.png" />
         </Card>
         <Card type="frosted" fill shimmer rounded>
-          <img src="https://app-cdn.fluidity.money/images/hero/legendary.png" />
+          <img src="/images/hero/legendary.png" />
         </Card>
       </HeroCarousel>
       <BottleDistribution
@@ -1936,5 +1623,40 @@ export const dayDifference = (date1: Date, date2: Date) =>
 
 const isAirdropModal = (modal: string): modal is AirdropModalName =>
   AIRDROP_MODALS.includes(modal as AirdropModalName);
+
+// filter airdrop leaderboard data to the top 16 and the current user if the're found
+const getLeaderboardWithUser = (
+  data: Array<AirdropLeaderboardEntry>,
+  address: string
+) => {
+  const top16 = data.slice(0, 16);
+
+  // user not logged in
+  if (!address) return top16;
+
+  const userDataIndex = data.findIndex(({ user }) => user === address);
+
+  // user not found in data, use a blank entry
+  if (userDataIndex === -1)
+    return [
+      {
+        user: address,
+        rank: -1,
+        liquidityMultiplier: 0,
+        referralCount: 0,
+        bottles: 0,
+        highestRewardTier: 0,
+        fusdcEarned: 0,
+        arbEarned: 0,
+        flyStaked: 0,
+      } satisfies AirdropLeaderboardEntry,
+    ].concat(top16);
+  // found outside the top 16
+  if (userDataIndex >= 16) {
+    return [data[userDataIndex]].concat(top16);
+  }
+  // found in the top 16
+  return top16;
+};
 
 export default Airdrop;

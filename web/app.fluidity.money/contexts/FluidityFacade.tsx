@@ -3,7 +3,7 @@ import type {
   StakingRatioRes,
   StakingDepositsRes,
   StakingRedeemableRes,
-  FLYStakingDetailsRes
+  FLYStakingDetailsRes,
 } from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
@@ -102,15 +102,21 @@ export interface IFluidityFacade {
     merkleProof: string[]
   ) => Promise<boolean | undefined>;
 
-  merkleDistributorWithDeadlineIsClaimed?: (index: number) => Promise<boolean | undefined>;
+  merkleDistributorWithDeadlineIsClaimed?: (
+    index: number
+  ) => Promise<boolean | undefined>;
 
   flyStakingStake?: (amount: BN) => Promise<boolean | undefined>;
 
-  flyStakingDetails?: (address: string) => Promise<FLYStakingDetailsRes | undefined>;
+  flyStakingDetails?: (
+    address: string
+  ) => Promise<FLYStakingDetailsRes | undefined>;
 
   flyStakingBeginUnstake?: (amount: BN) => Promise<boolean | undefined>;
 
-  flyStakingSecondsUntilSoonestUnstake?: (address: string) => Promise<BN | undefined>;
+  flyStakingSecondsUntilSoonestUnstake?: (
+    address: string
+  ) => Promise<BN | undefined>;
 
   flyStakingFinaliseUnstake?: () => Promise<BN | undefined>;
 

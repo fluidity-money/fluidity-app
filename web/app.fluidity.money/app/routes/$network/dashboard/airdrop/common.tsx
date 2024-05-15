@@ -6,7 +6,7 @@ import type {
 } from "~/util/chainUtils/ethereum/transaction";
 import type AugmentedToken from "~/types/AugmentedToken";
 
-import { useState, useEffect, useContext, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -30,11 +30,8 @@ import {
   Form,
   numberToMonetaryString,
   SliderButton,
-  Checkmark,
-  CopyIcon,
   numberToCommaSeparated,
   ArrowDown,
-  ArrowTopRight,
   Provider,
   Modal,
 } from "@fluidity-money/surfing";
@@ -44,7 +41,7 @@ import {
   getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
-import { useFLYOwedForAddress, Referral } from "~/queries";
+import { Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import {
   AnimatePresence,
@@ -53,11 +50,8 @@ import {
   useTransform,
 } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
-import FluidityFacadeContext from "contexts/FluidityFacade";
-import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import FLYClaimSubmitModal from "~/components/FLYClaimSubmitModal";
 import { shorthandAmountFormatter } from "~/util";
 
 // Epoch length
@@ -69,9 +63,6 @@ const MAX_STAKING_DAYS = 365;
 
 // Minimum amount of Fluid USDC deposit
 const MINIMUM_FLUID_LIQUIDITY_USD = 10;
-
-const AIRDROP_BLOG_POST =
-  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -122,19 +113,19 @@ const BottleDistribution = ({
             style={
               numberPosition === "absolute"
                 ? {
-                  position: "absolute",
-                  bottom: "100px",
-                  zIndex: "5",
-                  ...(showBottleNumbers
-                    ? highlightBottle
-                      ? {
-                        fontSize: "2.5em",
-                      }
-                      : {}
-                    : highlightBottle
+                    position: "absolute",
+                    bottom: "100px",
+                    zIndex: "5",
+                    ...(showBottleNumbers
+                      ? highlightBottle
+                        ? {
+                            fontSize: "2.5em",
+                          }
+                        : {}
+                      : highlightBottle
                       ? { fontSize: "2.5em" }
                       : { display: "none" }),
-                }
+                  }
                 : { fontSize: "1em" }
             }
           >
@@ -672,8 +663,8 @@ export const stakingLiquidityMultiplierEq = (
     Math.min(
       1,
       (396 / 11315 - (396 * totalStakedDays) / 4129975) * stakedDays +
-      (396 * totalStakedDays) / 133225 -
-      31 / 365
+        (396 * totalStakedDays) / 133225 -
+        31 / 365
     )
   );
 
@@ -726,12 +717,12 @@ const StakeNowModal = ({
   const ratio = !tokenRatios
     ? 0
     : calculateRatioFromProportion(
-      (baseToken.symbol === "USDC"
-        ? tokenRatios.fusdcUsdcRatio.toNumber() -
-        tokenRatios.fusdcUsdcSpread.toNumber() / 2
-        : tokenRatios.fusdcWethRatio.toNumber() -
-        tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
-    );
+        (baseToken.symbol === "USDC"
+          ? tokenRatios.fusdcUsdcRatio.toNumber() -
+            tokenRatios.fusdcUsdcSpread.toNumber() / 2
+          : tokenRatios.fusdcWethRatio.toNumber() -
+            tokenRatios.fusdcWethSpread.toNumber() / 2) / 1e12
+      );
 
   // usdMultiplier x tokenAmount = USD
   const fluidUsdMultiplier = usdcPrice;
@@ -794,31 +785,31 @@ const StakeNowModal = ({
       setOtherInput: (token: StakingAugmentedToken) => void,
       conversionRatio: number
     ): React.ChangeEventHandler<HTMLInputElement> =>
-      (e) => {
-        const numericChars = e.target.value.replace(/[^0-9.]+/, "");
+    (e) => {
+      const numericChars = e.target.value.replace(/[^0-9.]+/, "");
 
-        const [whole, dec] = numericChars.split(".");
+      const [whole, dec] = numericChars.split(".");
 
-        const tokenAmtStr =
-          dec !== undefined
-            ? [whole, dec.slice(0 - token.decimals)].join(".")
-            : whole ?? "0";
+      const tokenAmtStr =
+        dec !== undefined
+          ? [whole, dec.slice(0 - token.decimals)].join(".")
+          : whole ?? "0";
 
-        setInput({
-          ...token,
-          amount: tokenAmtStr,
-        });
+      setInput({
+        ...token,
+        amount: tokenAmtStr,
+      });
 
-        if (!ratio) return;
-        if (!(whole || dec)) return;
+      if (!ratio) return;
+      if (!(whole || dec)) return;
 
-        const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
+      const otherTokenAmt = parseFloat(tokenAmtStr) * conversionRatio;
 
-        setOtherInput({
-          ...otherToken,
-          amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
-        });
-      };
+      setOtherInput({
+        ...otherToken,
+        amount: otherTokenAmt.toFixed(otherToken.decimals).replace(/\.0+$/, ""),
+      });
+    };
 
   const fluidTokenAmount = useMemo(
     () => parseSwapInputToTokenAmount(fluidToken.amount, fluidToken),
@@ -1042,8 +1033,9 @@ const StakeNowModal = ({
         </Card>
       )}
       <div
-        className={`airdrop-stake-container ${isMobile ? "airdrop-mobile" : ""
-          }`}
+        className={`airdrop-stake-container ${
+          isMobile ? "airdrop-mobile" : ""
+        }`}
       >
         {/* Staking Amount */}
         <div className="airdrop-stake-inputs-column">
@@ -1335,7 +1327,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(0, stakingDuration),
+                stakingLiquidityMultiplierEq(0, stakingDuration),
               1
             )}
           </Text>
@@ -1386,7 +1378,7 @@ const StakeNowModal = ({
                   baseToken.decimals,
                   baseUsdMultiplier
                 ) || 0)) *
-              stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
+                stakingLiquidityMultiplierEq(MAX_EPOCH_DAYS, stakingDuration),
               1
             )}
           </Text>
@@ -1471,7 +1463,11 @@ const tutorialContent: {
     desc: (
       <>
         <Text size="md">
-          You can increase your chances of receiving Loot Bottles by doing the following: Staking $FLY on the Fluidity Webapp • LPing on the incentivised Trader Joe & Camelot LPs • Contributing volume (specially through $FLY) • Use our supported DEXs to receive a 12x multiplier for transacting
+          You can increase your chances of receiving Loot Bottles by doing the
+          following: Staking $FLY on the Fluidity Webapp • LPing on the
+          incentivised Trader Joe & Camelot LPs • Contributing volume (specially
+          through $FLY) • Use our supported DEXs to receive a 12x multiplier for
+          transacting
         </Text>
         <div
           style={{
@@ -1638,8 +1634,9 @@ const TutorialModal = ({
             width={isMobile ? 550 : 635}
             height={isMobile ? 550 : 230}
             loop
-            src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${tutorialContent[currentSlide].image
-              }.mp4`}
+            src={`/videos/airdrop/${isMobile ? `MOBILE` : `DESKTOP`}_-_${
+              tutorialContent[currentSlide].image
+            }.mp4`}
             className="tutorial-image"
             style={{ maxWidth: "100%" }}
           />
@@ -1651,227 +1648,6 @@ const TutorialModal = ({
       </AnimatePresence>
       {!isMobile && <Navigation />}
     </>
-  );
-};
-
-const TestnetRewardsModal = () => {
-  const {
-    confirmAccountOwnership,
-    signOwnerAddress,
-    address: signerAddress,
-  } = useContext(FluidityFacadeContext);
-
-  const [address, setAddress] = useState("");
-  const [ropstenAddress, setRopstenAddress] = useState("");
-  const [signature, setSignature] = useState("");
-  const [finalised, setFinalised] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [error, setError] = useState("");
-
-  if (!confirmAccountOwnership || !signOwnerAddress) return <></>;
-
-  return (
-    <div className="claim-ropsten">
-      <img src="https://app-cdn.fluidity.money/images/testnetBanner.png" />
-      <div className="ropsten-header">
-        <Heading as="h3">Claim Testnet Rewards</Heading>
-        <Text prominent size="sm">
-          If you participated in Fluidity&#39;s Ropsten testnet, you are
-          eligible for free bottles!
-        </Text>
-      </div>
-      {!signerAddress ? (
-        <>
-          <Text prominent size="sm">
-            Please connect your wallet to begin.
-          </Text>
-        </>
-      ) : finalised ? (
-        <Text prominent size="sm">
-          Congratulations! You have successfully confirmed your ownership of the
-          testnet address:
-          <GeneralButton
-            type="transparent"
-            size="small"
-            className="ropsten-address-btn"
-            disabled
-            onClick={() => {
-              return;
-            }}
-          >
-            <Text prominent size="sm" code style={{ color: "inherit " }}>
-              {ropstenAddress}
-            </Text>
-          </GeneralButton>
-          <br />
-          <br />
-          If this address participated in the Fluidity Ropsten testnet, you will
-          receive free loot bottles during the Fluidity Airdrop!
-        </Text>
-      ) : signature ? (
-        signerAddress.toLowerCase() === address.toLowerCase() ? (
-          <>
-            <Text prominent size="sm">
-              You are verifying ownership of the following testnet address:{" "}
-              <GeneralButton
-                type="transparent"
-                size="small"
-                className="ropsten-address-btn"
-                disabled
-                onClick={() => {
-                  return;
-                }}
-              >
-                <Text prominent size="sm" code style={{ color: "inherit " }}>
-                  {ropstenAddress}
-                </Text>
-              </GeneralButton>
-            </Text>
-            <GeneralButton
-              layout="after"
-              handleClick={() => {
-                confirmAccountOwnership(signature, address)
-                  // .then((tx) => tx.confirmTx())
-                  .then(() => {
-                    setFinalised(true);
-                  })
-                  .catch((e) => {
-                    const errMsgMatchReason = /message":"[a-z0-9 :_()]+/gi;
-                    const stakingError = (e as { message: string }).message
-                      .match(errMsgMatchReason)?.[1]
-                      .slice(10);
-
-                    setError(stakingError ?? "");
-                    setFinalised(false);
-                  })
-                  .finally(() => setSignature(""));
-              }}
-              type="transparent"
-            >
-              Confirm Account Ownership
-            </GeneralButton>
-          </>
-        ) : (
-          <>
-            <Text prominent size="sm">
-              Change your wallet account to{" "}
-              <GeneralButton
-                type="transparent"
-                size="small"
-                className="ropsten-address-btn"
-                disabled
-                onClick={() => {
-                  return;
-                }}
-              >
-                <Text prominent size="sm" code style={{ color: "inherit " }}>
-                  {address}
-                </Text>
-              </GeneralButton>{" "}
-              to finalise confirmation. Currently signed in as{" "}
-              <GeneralButton
-                type="transparent"
-                size="small"
-                className="ropsten-address-btn"
-                disabled
-                onClick={() => {
-                  return;
-                }}
-              >
-                <Text prominent size="sm" code style={{ color: "inherit " }}>
-                  {signerAddress}
-                </Text>
-              </GeneralButton>
-            </Text>
-          </>
-        )
-      ) : (
-        <>
-          <Text prominent size="sm" style={{ margin: "1em 0" }}>
-            <ol>
-              <li>
-                Copy your Arbitrum One address.
-                <div style={{ display: "inline-block", width: "1em" }} />
-                <GeneralButton
-                  className="ropsten-address-btn"
-                  size="small"
-                  icon={
-                    copied ? (
-                      <span className="ropsten-check">
-                        <Checkmark />
-                      </span>
-                    ) : (
-                      <CopyIcon />
-                    )
-                  }
-                  type="transparent"
-                  layout="after"
-                  handleClick={() => {
-                    navigator.clipboard.writeText(signerAddress);
-                    setCopied(true);
-                  }}
-                >
-                  <Text code size="sm" style={{ color: "inherit" }}>
-                    {signerAddress}
-                  </Text>
-                </GeneralButton>
-              </li>
-              <li>
-                Switch your wallet to the address that you used on Ropsten.{" "}
-                <br />
-                (If you are using the same address as you used on Ropsten
-                continue to Step 3)
-              </li>
-              <li>Enter your Arbitrum One address in the box below.</li>
-              <li>
-                Click the confirmation button to prompt a signature from your
-                wallet.
-              </li>
-              <Card className="ropsten-warning" border="solid">
-                <Text size="sm">
-                  <InfoCircle />
-                  Ensure you don&#39;t change the active network away from
-                  Arbitrum One!
-                </Text>
-              </Card>
-            </ol>
-          </Text>
-          <div className="claim-ropsten-form">
-            <div className="claim-ropsten-input">
-              <Text size="xs" className="helper-label">
-                ARBITRUM ONE ADDRESS
-              </Text>
-              <input
-                value={address}
-                onChange={(v) => setAddress(v.target.value)}
-              ></input>
-              <GeneralButton
-                layout="after"
-                handleClick={() => {
-                  setRopstenAddress(signerAddress ?? "");
-                  signOwnerAddress(address).then((sig) =>
-                    setSignature(sig ?? "")
-                  );
-                }}
-                type="transparent"
-              >
-                <Text style={{ color: "inherit" }} code>
-                  Confirm Owner Address
-                </Text>
-              </GeneralButton>
-            </div>
-          </div>
-          {error && (
-            <Card className="ropsten-warning danger">
-              <Text prominent size="xs" style={{ color: "inherit" }}>
-                <InfoCircle />
-                {error}
-              </Text>
-            </Card>
-          )}
-        </>
-      )}
-    </div>
   );
 };
 
@@ -1893,9 +1669,6 @@ interface IRecapModal {
   navigate?: (path: string) => void;
 }
 
-const calculateDay1Points = (tokenFullAmount: number) =>
-  tokenFullAmount * 0.001 * (24 * 7);
-
 const RecapModal = ({
   totalVolume,
   bottlesLooted,
@@ -1907,38 +1680,41 @@ const RecapModal = ({
   },
 }: IRecapModal) => {
   const providerLinks: { provider: Provider; link: string }[] = [
-    { provider: "Uniswap", link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum" },
+    {
+      provider: "Uniswap",
+      link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum",
+    },
     {
       provider: "Trader Joe",
-      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
     },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
     {
       provider: "Ramses",
-      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
     },
     { provider: "Jumper", link: "https://jumper.exchange/" },
   ];
 
   const bottleRarityColorIcon = {
     [Rarity.Common]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/COMMON.png",
+      img: "/images/airdrop/COMMON.png",
       color: "#FFFFFF",
     },
     [Rarity.Uncommon]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/UNCOMMON.png",
+      img: "/images/airdrop/UNCOMMON.png",
       color: "#80E4EF",
     },
     [Rarity.Rare]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/RARE.png",
+      img: "/images/airdrop/RARE.png",
       color: "#B7EBD4",
     },
     [Rarity.UltraRare]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/ULTRA RARE.png",
+      img: "/images/airdrop/ULTRA RARE.png",
       color: "#EDC6E1",
     },
     [Rarity.Legendary]: {
-      img: "https://app-cdn.fluidity.money/images/airdrop/LEGENDARY.png",
+      img: "/images/airdrop/LEGENDARY.png",
       color: "#F8D192",
     },
   };
@@ -1981,109 +1757,20 @@ const RecapModal = ({
     },
   };
 
-  const { address } = useContext(FluidityFacadeContext);
-
-  const {
-    toggleVisibility: flyStakingModalToggleVisibility
-  } = useContext(FlyStakingContext);
-
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
-  const [flyClaimModalState, setFlyClaimModalState] = useState<'none' | 'claim' | 'stake'>('none');
 
-  const [flyAmountOwed, setFLYAmountOwed] = useState(0);
-
-  const [showTGEDetails, setShowTGEDetails] = useState(true);
-
-  const day1Points = calculateDay1Points(flyAmountOwed);
-
-  // if the address isn't set, then it's a good proxy for knowing if the
-  // user has supplied their address or not
-  const [
-    checkYourEligibilityButtonEnabled,
-    setCheckYourEligibilityButtonEnabled,
-  ] = useState(false);
-
-  const TGEDisplay = () => {
-    return (
-      <div className="recap-fly-count-child">
-        {(() => {
-          switch (true) {
-            case showTGEDetails:
-              return <ShowEpochDetails />;
-            case flyAmountOwed > 0:
-              return <YouAreEligible />;
-            default:
-              return <YoureNotEligible />;
-          }
-        })()}
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    (async () => {
-      if (address) {
-        const resp = await useFLYOwedForAddress(address);
-        if (!resp) {
-          console.warn(`Invalid response for airdrop request: ${resp}`);
-          return;
-        }
-        const { amount, error } = resp;
-        if (error) throw new Error(`Airdrop request error: ${error}`);
-        setFLYAmountOwed(amount);
-        setCheckYourEligibilityButtonEnabled(true);
-      }
-    })();
-  }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
-
-  const YoureNotEligible = () => {
-    return (
-      <div className="recap-fly-count-block">
-        <div className="recap-fly-count-header">
-          <Text size="md" code={true} as="p">
-            FLUIDITY AIRDROP WAVE 1 & 2
-          </Text>
-          <Heading>You are not eligible</Heading>
-        </div>
-        <div className="recap-fly-count-thank-you">
-          <Text>
-            Keep transferring with Fluid Assets and participating in our
-            upcoming Airdrops, to earn more rewards and multipliers! The next
-            one will be even bigger!
-          </Text>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container">
-          <div className="recap-fly-count-buttons-spread">
-            <GeneralButton
-              type="primary"
-              icon={<ArrowTopRight />}
-              layout="after"
-              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-            >
-              <Text size="sm" prominent code style={{ color: "inherit" }}>
-                Learn more
-              </Text>
-            </GeneralButton>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const handleClaimYourFly = (type: 'claim' |'stake') => {
-    setFlyClaimModalState(type)
-    // Get the user's address.by
-  };
-
-  const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] = useState(false);
+  const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
+    useState(false);
 
   // needed for the terms and conditions
   const closeWithEsc = useCallback(
     (event: { key: string }) => {
-      event.key === "Escape" && setTermsAndConditionsModalVis && setTermsAndConditionsModalVis(false);
+      event.key === "Escape" &&
+        setTermsAndConditionsModalVis &&
+        setTermsAndConditionsModalVis(false);
     },
     [termsAndConditionsModalVis, setTermsAndConditionsModalVis]
   );
@@ -2093,151 +1780,9 @@ const RecapModal = ({
     return () => document.removeEventListener("keydown", closeWithEsc);
   }, [termsAndConditionsModalVis, closeWithEsc]);
 
-  const [isItTimeForClaim, setIsItTimeForClaim] = useState(false);
-
-  // set up a timer that activates when it's time to show the button
-
-  useEffect(() => {
-    const currentTimestampMs = new Date().getTime();
-    const futureTimestampMs = 1712152800 * 1000; // 3rd of april 2pm utc
-
-    if (currentTimestampMs > futureTimestampMs) {
-      setIsItTimeForClaim(true);
-      return;
-    }
-
-    const delay = futureTimestampMs - currentTimestampMs;
-    const timerId = setTimeout(() => {
-      setIsItTimeForClaim(true);
-    }, delay);
-
-    return () => clearTimeout(timerId);
-  }, []);
-
-  const ClaimButtonsSpread = () =>
-    <div className="recap-fly-count-buttons-spread">
-      <GeneralButton disabled={!isItTimeForClaim} onClick={() => handleClaimYourFly('claim')}>
-        Claim your FLY
-      </GeneralButton>
-      <GeneralButton disabled={!isItTimeForClaim} onClick={() => handleClaimYourFly('stake')}>
-        Stake your $FLY airdrop
-      </GeneralButton>
-    </div>;
-
-  // whether the popup staking modal was completed in a staking state
-  const [completedClaimStakeModal, setCompletedClaimStakeModal] = useState(false);
-
-  // called when someone completes the staking modal with a claim complete state.
-  const handleClaimStakingModalComplete = () => {
-    setCompletedClaimStakeModal(true);
-  };
-
-  const StakingStatsButton = () =>
-    <div className="recap-fly-count-buttons-spread">
-      <GeneralButton onClick={ () => flyStakingModalToggleVisibility?.(true) }>
-        Staking stats
-      </GeneralButton>
-    </div>;
-
-  const ButtonsSpread = () =>
-    completedClaimStakeModal ? <StakingStatsButton /> : <ClaimButtonsSpread />;
-
-  const YouAreEligible = () => {
-    return (
-      <div className="recap-fly-count-block">
-        <div className="recap-fly-count-header">
-          <Text size="md" code={true}>
-            Congratulations! You are eligible to claim 25% of your tokens at TGE!
-          </Text>
-          <Heading>$FLY {flyAmountOwed == 996699 ? "" : numberToCommaSeparated(flyAmountOwed)}</Heading>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
-          <ButtonsSpread />
-        </div>
-        <div className="recap-you-are-eligible-delegate-button-terms-container">
-          <Text style={{ textAlign: "center" }}>
-            By pressing the Claim and/or Stake button, you agree to our airdrop {}
-            <a
-              className="recap-terms-of-condition-claim-or-stake"
-              onClick={() => setTermsAndConditionsModalVis(true)}
-            >
-              terms of service
-            </a>
-          </Text>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
-          <GeneralButton
-            size="medium"
-            type="secondary"
-            className="recap-you-are-eligible-claim-at-tge-button rainbow"
-          >
-            💸 Stake your $FLY to earn Airdrop Rewards and [REDACTED] in Superposition (SPN) 🐱
-          </GeneralButton>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container">
-          <LinkButton
-            color="red"
-            size="large"
-            type="external"
-            handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-          >
-            Click here to learn more about $FLY distribution and vesting
-          </LinkButton>
-        </div>
-      </div>
-    );
-  };
-
-  const handleCheckEligibility = () => {
-    // grey out the button here
-    setCheckYourEligibilityButtonEnabled(false);
-
-    // check if the request to get information on the airdrop is
-    // done, if it is, then show the tge details
-    setShowTGEDetails(false);
-  };
-
-  const ShowEpochDetails = () => {
-    return (
-      <div id="airdrop-claim-block" className="recap-fly-count-block">
-        <div className="recap-fly-count-header">
-          <Text size="md" code={true} as="p">
-            FLUIDITY AIRDROP WAVE 1 & 2: ELIGIBILITY CHECK
-          </Text>
-          <Heading>The Fluidity $FLY-Wheel Begins</Heading>
-        </div>
-        <div className="recap-fly-count-thank-you">
-          <Text>
-            Thank you for riding with us this Wave. It has come to an end, check
-            your eligibility for rewards from your bottles, and how you surfed.
-          </Text>
-        </div>
-        <div className="recap-fly-count-buttons-spread-container">
-          <div className="recap-fly-count-buttons-spread">
-            <GeneralButton
-              handleClick={handleCheckEligibility}
-              disabled={!checkYourEligibilityButtonEnabled}
-            >
-              Check your eligibility
-            </GeneralButton>
-            <GeneralButton
-              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-              icon={<ArrowTopRight />}
-            >
-              See criteria
-            </GeneralButton>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <Modal
-        id="terms-and-conditions"
-        visible={termsAndConditionsModalVis}
-      >
+      <Modal id="terms-and-conditions" visible={termsAndConditionsModalVis}>
         <div className="airdrop-terms-and-conditions-modal-container">
           <div className="airdrop-terms-and-conditions-modal-child">
             <div className="airdrop-terms-and-conditions-modal-navbar">
@@ -2249,69 +1794,67 @@ const RecapModal = ({
               </GeneralButton>
             </div>
             <p>
-              1. Description
-
-              We may offer you the opportunity to receive some digital assets at no cost (**Airdrop**), subject to the terms described in this section. The Airdrop is delivered by us to you, but may be manufactured, offered and supported by the network creator or developer, if any, and not by us.
+              1. Description We may offer you the opportunity to receive some
+              digital assets at no cost (**Airdrop**), subject to the terms
+              described in this section. The Airdrop is delivered by us to you,
+              but may be manufactured, offered and supported by the network
+              creator or developer, if any, and not by us.
             </p>
             <p>
-              1. Terms of Airdrop Program
-
-              2.1 No Purchase Necessary
-
-              There is no purchase necessary to receive the Airdrop. However, you must have
-              wallets recognised and accepted by us. Although we do not charge a fee for participation in the Airdrop Program, we reserve the right to do so in the future and shall provide prior notice to you in such case.
+              1. Terms of Airdrop Program 2.1 No Purchase Necessary There is no
+              purchase necessary to receive the Airdrop. However, you must have
+              wallets recognised and accepted by us. Although we do not charge a
+              fee for participation in the Airdrop Program, we reserve the right
+              to do so in the future and shall provide prior notice to you in
+              such case.
             </p>
             <p>
-              2.2 Timing
-
-              Each Airdrop may be subject to any additional terms and conditions and where applicable such terms and conditions shall be displayed and marked with an asterisk (*) or other similar notation.
+              2.2 Timing Each Airdrop may be subject to any additional terms and
+              conditions and where applicable such terms and conditions shall be
+              displayed and marked with an asterisk (*) or other similar
+              notation.
             </p>
             <p>
-              2.3 Limited Supply
-
-              An offer to receive the digital assets in an Airdrop is only available to you while supplies last. Once the amount of digital asset offered by us in an Airdrop is exhausted, any party who
-              has either been placed on a waitlist, or has completed certain additional steps, but not yet received notice of award of the asset in such Airdrop, shall no longer be eligible to receive the said digital assets in that Airdrop. We reserve the right, in our sole discretion, to modify or
-              suspend any Airdrop requirements at any time without notice, including the amount previously
-              advertised as available.
+              2.3 Limited Supply An offer to receive the digital assets in an
+              Airdrop is only available to you while supplies last. Once the
+              amount of digital asset offered by us in an Airdrop is exhausted,
+              any party who has either been placed on a waitlist, or has
+              completed certain additional steps, but not yet received notice of
+              award of the asset in such Airdrop, shall no longer be eligible to
+              receive the said digital assets in that Airdrop. We reserve the
+              right, in our sole discretion, to modify or suspend any Airdrop
+              requirements at any time without notice, including the amount
+              previously advertised as available.
             </p>
             <p>
-              2.4 Eligibility
-
-              You may not be eligible to receive the digital assets or a select class and type of digital assets from an Airdrop in your jurisdiction.
-
-              To the best of our understanding, below is a list of countries that does not recognise digital assets;
-
-              *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia, Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia, Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal, Qatar, Sierra Leone, Tunisia **
-
-              Kindly be advised that this list is for reference only and you are advised to seek independent legal advise as to your eligibility to receive the assets through Airdrop.
-
-              **source - Library of Congress, Atlantic Council, Techopedia, Finder, Triple-A, Chainalysis*
+              2.4 Eligibility You may not be eligible to receive the digital
+              assets or a select class and type of digital assets from an
+              Airdrop in your jurisdiction. To the best of our understanding,
+              below is a list of countries that does not recognise digital
+              assets; *Afghanistan, Algeria, Egypt, Bangladesh, Bolivia,
+              Burundi, Cameroon, Chad, China, Republic of Congo, Ethiopia,
+              Gabon, Iraq, Lesotho, Libya, Macedonia, Morocco, Myanmar, Nepal,
+              Qatar, Sierra Leone, Tunisia ** Kindly be advised that this list
+              is for reference only and you are advised to seek independent
+              legal advise as to your eligibility to receive the assets through
+              Airdrop. **source - Library of Congress, Atlantic Council,
+              Techopedia, Finder, Triple-A, Chainalysis*
             </p>
             <p>
-              2.5 Notice of Award
-
-              In the event you are selected to receive the digital asset in an Airdrop, we shall notify you of the pending delivery of such asset. Eligibility may be limited as to time.
-              We are not liable to you for failure to receive any notice associated with the Airdrop Program.
+              2.5 Notice of Award In the event you are selected to receive the
+              digital asset in an Airdrop, we shall notify you of the pending
+              delivery of such asset. Eligibility may be limited as to time. We
+              are not liable to you for failure to receive any notice associated
+              with the Airdrop Program.
             </p>
             <p>
-              3 Risk Disclosures Relating to Airdrop Program
-
-              You are solely responsible for researching and understanding the Fluid Assets token and it’s related utility and/or network  subject to the Airdrop.
+              3 Risk Disclosures Relating to Airdrop Program You are solely
+              responsible for researching and understanding the Fluid Assets
+              token and it’s related utility and/or network subject to the
+              Airdrop.
             </p>
           </div>
         </div>
-      </Modal>
-      <Modal id="fly-claim-submit" visible={flyClaimModalState !== 'none'}>
-        <FLYClaimSubmitModal
-          showConnectWalletModal={() => setWalletModalVisibility(true)}
-          flyAmount={flyAmountOwed}
-          visible={flyClaimModalState !== 'none'}
-          mode={flyClaimModalState === 'none' ? 'claim' : flyClaimModalState}
-          accumulatedPoints={day1Points}
-          close={() => setFlyClaimModalState('none')}
-          onStakingComplete={handleClaimStakingModalComplete}
-          onClaimComplete={handleClaimStakingModalComplete}
-        />
       </Modal>
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}
@@ -2343,17 +1886,6 @@ const RecapModal = ({
                   TGE. You will get notified for when it is time to crack open
                   the crate!
                 </Text>
-              </motion.div>
-              <motion.div variants={heroItemVariants}>
-                <GeneralButton
-                  type="transparent"
-                  layout="after"
-                  handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-                >
-                  <Text size="sm" prominent code style={{ color: "inherit" }}>
-                    Convert your bottles to $FLY
-                  </Text>
-                </GeneralButton>
               </motion.div>
 
               <motion.div
@@ -2389,8 +1921,9 @@ const RecapModal = ({
           {/* Animation */}
           {currentVideo === 0 ? (
             <Video
-              src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
-                }`}
+              src={`/videos/airdrop/${
+                isMobile ? "FULL_ANIMATION_MOBILE.mp4" : "FULL_ANIMATION.mp4"
+              }`}
               type={"cover"}
               loop={false}
               height={videoHeight}
@@ -2404,8 +1937,9 @@ const RecapModal = ({
             />
           ) : (
             <Video
-              src={`https://app-cdn.fluidity.money/videos/airdrop/${isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
-                }`}
+              src={`/videos/airdrop/${
+                isMobile ? "LOOP_MOBILE.mp4" : "FLOAT_LOOP.mp4"
+              }`}
               type={"cover"}
               loop={true}
               height={videoHeight}
@@ -2571,8 +2105,9 @@ const RecapModal = ({
                       />
                       <motion.image
                         xmlnsXlink="http://www.w3.org/1999/xlink"
-                        xlinkHref={`${bottleRarityColorIcon[tier as Rarity].img
-                          }`}
+                        xlinkHref={`${
+                          bottleRarityColorIcon[tier as Rarity].img
+                        }`}
                         mask={`url(#mask-${tier})`}
                         width="100"
                       />
@@ -2598,20 +2133,6 @@ const RecapModal = ({
           </div>
         )}
 
-        {/*TGE details display*/}
-        <motion.div
-          className={"recap-fly-count-container"}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1, delay: 0.1 }}
-          viewport={{
-            amount: "all",
-            once: true,
-          }}
-        >
-          <div id="claim">{showPageContent && <TGEDisplay />}</div>
-        </motion.div>
-
         <Modal id="connect-wallet" visible={walletModalVisibility}>
           <div className="cover">
             <ConnectWalletModal
@@ -2633,6 +2154,5 @@ export {
   StakingStatsModal,
   BottlesDetailsModal,
   ReferralDetailsModal,
-  TestnetRewardsModal,
   RecapModal,
 };

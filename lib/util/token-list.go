@@ -40,7 +40,7 @@ func NewTokenDetailsBase(address, name string, decimals int, extras ...string) T
 		TokenAddress:  address,
 		TokenName:     name,
 		TokenDecimals: decimalsRat,
-		Extras:         extras,
+		Extras:        extras,
 	}
 }
 
@@ -68,7 +68,7 @@ func GetTokensListBase(tokensList_ string) []TokenDetailsBase {
 			tokenAddress = trimWhitespace(tokenDetails_[0])
 			tokenName    = trimWhitespace(tokenDetails_[1])
 			decimals_    = trimWhitespace(tokenDetails_[2])
-			extras        = tokenDetails_[3:]
+			extras       = tokenDetails_[3:]
 		)
 
 		decimals, err := strconv.Atoi(decimals_)

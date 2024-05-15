@@ -110,7 +110,7 @@ function ErrorBoundary() {
         alignItems: "center",
       }}
     >
-      <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not load Dashboard!</h1>
       <br />
       <h2>Our team has been notified, and are working on fixing it!</h2>
@@ -203,15 +203,15 @@ const CHAIN_NAME_MAP: Record<
 > = {
   arbitrum: {
     name: "ARB",
-    icon: <img src="https://app-cdn.fluidity.money/assets/chains/arbIcon.svg" />,
+    icon: <img src="/assets/chains/arbIcon.svg" />,
   },
   solana: {
     name: "SOL",
-    icon: <img src="https://app-cdn.fluidity.money/assets/chains/solanaIcon.svg" />,
+    icon: <img src="/assets/chains/solanaIcon.svg" />,
   },
   sui: {
     name: "SUI",
-    icon: <img src="https://app-cdn.fluidity.money/assets/chains/suiIcon.svg" />,
+    icon: <img src="/assets/chains/suiIcon.svg" />,
   },
 };
 
@@ -415,7 +415,8 @@ export default function Dashboard() {
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const [stakingStatsModalVisibility, setStakingStatsModalVisibility] = useState(false);
+  const [stakingStatsModalVisibility, setStakingStatsModalVisibility] =
+    useState(false);
 
   // every change to this number asks flystakingmodal to look up the new balance
   const [shouldUpdateFlyBalance, setShouldUpdateFlyBalance] = useState(0);
@@ -518,7 +519,7 @@ export default function Dashboard() {
           <Link to={"./home"}>
             <img
               style={{ width: "5.5em", height: "2.5em" }}
-              src="https://app-cdn.fluidity.money/images/outlinedLogo.svg"
+              src="/images/outlinedLogo.svg"
               alt="Fluidity"
             />
           </Link>
@@ -573,8 +574,13 @@ export default function Dashboard() {
           })}
           <li key="staking">
             <div />
-            <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
-              <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+            <a
+              style={{ cursor: "pointer" }}
+              onClick={() => setStakingStatsModalVisibility(true)}
+            >
+              <Text className="dashboard-navbar-default">
+                <StakeIcon classname="staking-icon" /> STAKING
+              </Text>
             </a>
           </li>
         </ul>
@@ -637,7 +643,7 @@ export default function Dashboard() {
               <a onClick={() => navigate("./home")}>
                 <img
                   style={{ width: "5.5em", height: "2.5em" }}
-                  src="https://app-cdn.fluidity.money/images/outlinedLogo.svg"
+                  src="/images/outlinedLogo.svg"
                   alt="Fluidity"
                 />
               </a>
@@ -760,7 +766,9 @@ export default function Dashboard() {
         {/* FLY Staking Stats Modal */}
         <FlyStakingStatsModal
           staking={true}
-          close={() => { setStakingStatsModalVisibility(false) }}
+          close={() => {
+            setStakingStatsModalVisibility(false);
+          }}
           showConnectWalletModal={() => setWalletModalVisibility(true)}
           visible={stakingStatsModalVisibility}
           shouldUpdateFlyBalance={shouldUpdateFlyBalance}
@@ -768,12 +776,13 @@ export default function Dashboard() {
         <FlyStakingContext.Provider
           value={{
             toggleVisibility: setStakingStatsModalVisibility,
-            shouldUpdateBalance: () => setShouldUpdateFlyBalance((v) => v + 1)
+            shouldUpdateBalance: () => setShouldUpdateFlyBalance((v) => v + 1),
           }}
         >
           <UIContext.Provider
             value={{
-              toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+              toggleConnectWalletModal: () =>
+                setWalletModalVisibility((v) => !v),
             }}
           >
             <Outlet />
@@ -870,7 +879,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"https://app-cdn.fluidity.money/images/socials/twitter.svg"} alt={"Twitter"} />
+              <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
             </a>
 
             {/* Discord */}
@@ -879,7 +888,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"https://app-cdn.fluidity.money/images/socials/discord.svg"} alt={"Discord"} />
+              <img src={"/images/socials/discord.svg"} alt={"Discord"} />
             </a>
 
             {/* Telegram */}
@@ -888,7 +897,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"https://app-cdn.fluidity.money/images/socials/telegram.svg"} alt={"Telegram"} />
+              <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
             </a>
 
             {/* LinkedIn */}
@@ -897,7 +906,7 @@ export default function Dashboard() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              <img src={"https://app-cdn.fluidity.money/images/socials/linkedin.svg"} alt={"LinkedIn"} />
+              <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
             </a>
           </section>
         </footer>
@@ -912,10 +921,29 @@ export default function Dashboard() {
             nonNavigationEntries={[
               <li key="staking">
                 <div />
-                <a style={{ "cursor": "pointer" }} onClick={() => setStakingStatsModalVisibility(true)}>
-                  <Text className="dashboard-navbar-default"><StakeIcon classname="staking-icon" /> STAKING</Text>
+                <a
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setStakingStatsModalVisibility(true)}
+                >
+                  <Text className="dashboard-navbar-default">
+                    <StakeIcon classname="staking-icon" /> STAKING
+                  </Text>
                 </a>
-              </li>]}
+              </li>,
+              <li key="ico">
+                <div />
+                <a
+                  style={{ cursor: "pointer" }}
+                  href="https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Text className="dashboard-navbar-default">
+                    <FlyIcon /> GET FLY
+                  </Text>
+                </a>
+              </li>,
+            ]}
             activeIndex={activeIndex}
             chains={chainNameMap}
             unclaimedFluid={userUnclaimedRewards}

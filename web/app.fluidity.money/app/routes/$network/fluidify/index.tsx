@@ -87,7 +87,7 @@ function ErrorBoundary(error: unknown) {
         alignItems: "center",
       }}
     >
-      <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1 style={{ textAlign: "center" }}>Could not find Token to Fluidify!</h1>
     </div>
   );

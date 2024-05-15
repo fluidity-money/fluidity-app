@@ -15,7 +15,11 @@ import { withSentry } from "@sentry/remix";
 
 import globalStylesheetUrl from "./global-styles.css";
 import surfingStylesheetUrl from "@fluidity-money/surfing/dist/style.css";
-import { JoeFarmlandsOrCamelotKingdomLinks, ToolTipLinks, FLYClaimSubmitModalLinks } from "./components";
+import {
+  JoeFarmlandsOrCamelotKingdomLinks,
+  ToolTipLinks,
+  FLYClaimSubmitModalLinks,
+} from "./components";
 import { ToolProvider } from "./components/ToolTip";
 import CacheProvider from "contexts/CacheProvider";
 import { useEffect, useState } from "react";
@@ -167,7 +171,7 @@ function ErrorBoundary(err: Error) {
           alignItems: "center",
         }}
       >
-        <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+        <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
         <h1>Something went wrong!</h1>
         <br />
         <h2>Our team has been notified, and are working on fixing it!</h2>

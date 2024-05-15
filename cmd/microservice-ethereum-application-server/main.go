@@ -186,6 +186,15 @@ func main() {
 					volume = feeData.Volume
 				)
 
+				log.Debugf(
+					"Got the application data %v for the transaction hash %v, and the fee %v, and the volume %v",
+					appData,
+					transfer.TransactionHash,
+					fee,
+					volume,
+				)
+
+
 				if err != nil {
 					log.Fatal(func(k *log.Log) {
 						k.Message = "Failed to get the application fee for an application transfer!"
@@ -198,10 +207,10 @@ func main() {
 				utility, _ := utilities[normalisedAddress]
 
 				// we set the decorator if there's an app fee
-				if fee == nil {
+				if volume == nil {
 					log.App(func(k *log.Log) {
 						k.Format(
-							"Skipping an application transfer for transaction %#v and application %#v!",
+							"Skipping an application transfer for transaction %#v, and application %#v! .Volume was nil!",
 							transactionHash.String(),
 							transfer.Application,
 						)

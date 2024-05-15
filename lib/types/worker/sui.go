@@ -3,10 +3,10 @@ package worker
 import (
 	"math/big"
 
-	"github.com/block-vision/sui-go-sdk/models"
 	user_actions "github.com/fluidity-money/fluidity-app/lib/databases/timescale/user-actions"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+	"github.com/fluidity-money/sui-go-sdk/models"
 )
 
 func NewSuiEmission() *Emission {

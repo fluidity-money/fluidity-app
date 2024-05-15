@@ -64,14 +64,14 @@ const ClaimedRewards = () => {
       {/* Bg Video*/}
       <video
         id="cover-vid"
-        src={"https://app-cdn.fluidity.money/images/FluidityOpportunityB.mp4"}
+        src={"/images/FluidityOpportunityB.mp4"}
         autoPlay={true}
         loop={true}
       />
 
       {/* Navigation Bar */}
       <header id="claim-header">
-        <img src="https://app-cdn.fluidity.money/images/logoOutline.svg" alt="FluidLogo" />
+        <img src="/images/logoOutline.svg" alt="FluidLogo" />
         <LinkButton
           size={"small"}
           type={"internal"}

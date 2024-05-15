@@ -10,20 +10,19 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/block-vision/sui-go-sdk/models"
+	"github.com/fluidity-money/sui-go-sdk/models"
 
-	"github.com/block-vision/sui-go-sdk/sui"
-	"github.com/fluidity-money/fluidity-app/cmd/connector-solana-amqp/lib/redis"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	sui_queue "github.com/fluidity-money/fluidity-app/lib/queues/sui"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	sui_types "github.com/fluidity-money/fluidity-app/lib/types/sui"
 	"github.com/fluidity-money/fluidity-app/lib/util"
+	"github.com/fluidity-money/sui-go-sdk/sui"
 )
 
 const (
-	RedisLastCheckpoint  = `sui.last-checkpoint`
+	RedisLastCheckpoint = `sui.last-checkpoint`
 
 	// RedisBufferSize is the length of the buffer for previously seen blocks
 	RedisBufferSize = 100
@@ -62,7 +61,7 @@ func main() {
 
 	// if unset, try use the last checkpoint
 	if firstCheckpoint == 0 {
-		firstCheckpoint = redis.GetLastBlock(RedisLastCheckpoint)
+		firstCheckpoint = GetLastBlock(RedisLastCheckpoint)
 	}
 
 	// if env unset and nothing in Redis, start from the very first block
@@ -87,7 +86,7 @@ func main() {
 
 // paginateCheckpoints to infinitely search for new checkpoints and send them down a queue
 func paginateCheckpoints(client sui.ISuiAPI, firstCheckpoint uint64, waitDuration time.Duration) {
-	var lastCheckpoint uint64 = redis.GetLastBlock(RedisLastCheckpoint)
+	var lastCheckpoint uint64 = GetLastBlock(RedisLastCheckpoint)
 
 	// user-set checkpoint takes precedence
 	if lastCheckpoint < firstCheckpoint {
@@ -187,7 +186,7 @@ func paginateCheckpoints(client sui.ISuiAPI, firstCheckpoint uint64, waitDuratio
 
 			timestamp := time.Unix(timestamp_/1000, 0).UTC()
 
-			redis.WriteLastBlock(RedisLastCheckpoint, sequenceNumber)
+			WriteLastBlock(RedisLastCheckpoint, sequenceNumber)
 
 			sequenceNumberInt, ok := new(big.Int).SetString(sequenceNumberString, 10)
 

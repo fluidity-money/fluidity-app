@@ -39,7 +39,7 @@ const UnclaimedRewardsHoverModal = ({
       >
         <img
           id="card-logo"
-          src="https://app-cdn.fluidity.money/images/fluidTokensMetallicCropped.svg"
+          src="/images/fluidTokensMetallicCropped.svg"
           alt="tokens"
           style={{ width: 100 }}
         />

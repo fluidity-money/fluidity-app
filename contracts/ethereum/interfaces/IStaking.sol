@@ -33,6 +33,12 @@ struct Staked {
  * amounts out in an emergency mode stake.
 */
 interface IStaking {
+    event NewStake(address staker, uint256 amount);
+
+    event UnstakeBeginning(address unstaker, uint256 amount, uint256 unlockTimestamp);
+
+    event UnstakeFinalised(address unstaker, uint256 amount);
+
     /* ~~~~~~~~~~ SIMPLE GETTER ~~~~~~~~~~ */
 
     /// @notice merkleDistributor that's in use for the stakeFor function.
@@ -70,8 +76,9 @@ interface IStaking {
      *         merkle distributor, so as to prevent abuse.
      * @param _spender to stake on behalf of.
      * @param _amount to take from the msg.sender, to stake on behalf of the user.
+     * @param _bonus should be applied?
      */
-    function stakeFor(address _spender, uint256 _amount) external returns (
+    function stakeFor(address _spender, uint256 _amount, bool _bonus) external returns (
         uint256 flyStaked,
         uint256 day1Points
     );

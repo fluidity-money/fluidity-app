@@ -1,0 +1,24 @@
+SERVICES:
+  - LEADERBOARD:
+      SERVICE_NAME: leaderboard
+      DOCKER_IMAGE: leaderboard-frontend
+      DOCKERFILE_PATH: ./web/leaderboard
+      SECRET_FLU_HASURA_KEY: /leaderboard/hasura/key
+      SECRET_FLU_ETH_RPC_HTTP: /leaderboard/ethereum/http_url
+      SECRET_FLU_ARB_RPC_HTTP: /leaderboard/arbitrum/http_url
+      SECRET_FLU_POLYZK_RPC_HTTP: /leaderboard/polygon_zk/http_url
+      DEPLOYMENT_TYPE: CODEDEPLOY
+      CODEDEPLOY_WAIT_TIME: 15 #minutes
+      LOAD_BALANCER: flu-mainnet-leaderboard-alb
+      TARGET_GROUP_01: flu-mainnet-leaderboard-fe-tg
+      TARGET_GROUP_02: flu-mainnet-leaderboard-fe-tg-1
+      CPU_LIMIT: 512
+      MEM_LIMIT: 1024
+      SECRET_FLU_SENTRY_DSN: /leaderboard/frontend/sentryURL
+      NEXT_PUBLIC_FLU_GTAG_ID: G-EF68MNJRJ7
+      NEXT_PUBLIC_FLU_GTM_ID: GTM-W7QJGR2
+      NEXT_PUBLIC_FLU_HASURA_URL: https://leaderboard.hasura.app/v1/graphql
+
+      DOCKER_ARGS:
+        SECRET_FLU_SENTRY_DSN: /leaderboard/frontend/sentryURL
+        SECRET_GITHUB_TOKEN: /leaderboard/npm/github_token

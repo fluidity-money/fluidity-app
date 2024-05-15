@@ -37,6 +37,7 @@ func TestString(t *testing.T) {
 	"sender_address":"",
 	"ethereum_block_number":"0",
 	"solana_slot_number":"0",
+	"sui_checkpoint_number":"0",
 	"average_transfers_in_block":0,
 	"atx_buffer_size":0,
 	"transfers_in_block":0,
@@ -109,6 +110,7 @@ func TestString(t *testing.T) {
 		"betswirl": 0,
 		"paraswap": 0
 	},
+	"sui_fees":{},
 	"calculate_n":{
 		"probability_m":0,
 		"factorial":0,

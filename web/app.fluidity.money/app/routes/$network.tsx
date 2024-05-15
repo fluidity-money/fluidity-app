@@ -104,7 +104,7 @@ function ErrorBoundary({ error }: { error: string }) {
   console.error(error);
   return (
     <div>
-      <img src="https://app-cdn.fluidity.money/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
+      <img src="/images/logoMetallic.png" alt="" style={{ height: "40px" }} />
       <h1>Could not connect to Provider!</h1>
       <br />
       <h2>Our team has been notified, and are working on fixing it!</h2>

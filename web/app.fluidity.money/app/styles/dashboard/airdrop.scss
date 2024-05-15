@@ -190,11 +190,12 @@ $holo: linear-gradient(
 .multiplier-tasks {
   z-index: 0;
   color: black;
-  display: grid;
+  display: grid !important;
   box-sizing: border-box;
   grid-template-columns: 180px 64px 250px;
   gap: 0.5em;
   max-width: 100%;
+  flex-direction: row !important;
 
   .multiplier-tasks-header {
     display: flex;
@@ -219,9 +220,9 @@ $holo: linear-gradient(
     grid-column: 3/4;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     width: 100%;
-    gap: 6px;
+    gap: 8px;
 
     a {
       text-align: center;
@@ -931,7 +932,7 @@ $holo: linear-gradient(
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      background-image: url("https://app-cdn.fluidity.money/images/airdrop/volume_border.svg");
+      background-image: url("/images/airdrop/volume_border.svg");
       background-repeat: no-repeat;
       background-size: contain;
       background-position: center;
@@ -1228,67 +1229,67 @@ $holo: linear-gradient(
 }
 
 .fly-submit-claim-modal-background {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
 }
 
 .fly-submit-claim-modal-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    background-color: #131313;
-    padding: 3em;
-    border: solid white 2px;
-    border-radius: 8px;
-    min-width: 300px;
-    max-width: 546px;
-    min-height: 495px;
-    margin: auto;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 546px;
+  min-height: 495px;
+  margin: auto;
+  width: 100%;
 
-    @media (max-width: 527px) {
-      max-height: 100vh;
-      margin: 0;
-      padding: 0.8em;
+  @media (max-width: 527px) {
+    max-height: 100vh;
+    margin: 0;
+    padding: 0.8em;
 
-      .legal {
-        text-align: center;
-      }
+    .legal {
+      text-align: center;
     }
+  }
 }
 
 .fly-staking-stats-modal-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    background-color: #131313;
-    padding: 3em;
-    border: solid white 2px;
-    border-radius: 8px;
-    min-width: 300px;
-    max-width: 575px;
-    min-height: 495px;
-    margin: auto;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 575px;
+  min-height: 495px;
+  margin: auto;
+  width: 100%;
 
-    @media (max-width: 527px) {
-      max-height: 100vh;
-      height: fit-content;
-      overflow-y: auto;
-      margin: 0;
-      padding: 0.8em;
+  @media (max-width: 527px) {
+    max-height: 100vh;
+    height: fit-content;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.8em;
 
-      .legal {
-        text-align: center;
-      }
+    .legal {
+      text-align: center;
     }
+  }
 }
 
 .fly-submit-claim-flex-container {
@@ -1307,41 +1308,41 @@ $holo: linear-gradient(
 }
 
 .fly-submit-claim-modal-button-container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    padding: 10px;
-    border-width: 2px;
-    border-color: white;
-    gap: 1em;
-    // position: absolute;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  border-width: 2px;
+  border-color: white;
+  gap: 1em;
+  // position: absolute;
 }
 
 .fly-submit-claim-modal-options {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1em;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
 }
 
 .fly-submit-claim-modal-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4em;
-    padding: 1.5em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4em;
+  padding: 1.5em;
 }
 
 .fly-staking-stats-modal-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4em;
-    padding: 1.5em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4em;
+  padding: 1.5em;
 
-    @media (max-width: 527px) {
-      flex-direction: column;
-      padding: 0.5em;
-    }
+  @media (max-width: 527px) {
+    flex-direction: column;
+    padding: 0.5em;
+  }
 }
 
 .fly-confirming-claim-container {
@@ -1366,7 +1367,7 @@ $holo: linear-gradient(
 }
 
 .staking-card {
-  background-color: #FFD362 !important;
+  background-color: #ffd362 !important;
   gap: 1em;
 }
 
@@ -1396,11 +1397,11 @@ $holo: linear-gradient(
 }
 
 .fly-caution-text {
-  color: #FFB300;
+  color: #ffb300;
 }
 
 .fly-caution-border {
-  border-left: 4px #FFB300 solid;
+  border-left: 4px #ffb300 solid;
   margin-left: 1em;
   padding-left: 1em;
 }
@@ -1418,6 +1419,41 @@ $holo: linear-gradient(
 .fly-staking-stats-action-button {
   width: 100% !important;
   align-self: normal !important;
+}
+
+.fly-unstaking-claim-action-button {
+  width: 30% !important;
+  align-self: center;
+}
+
+.fly-staking-grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+}
+
+.fly-staking-grid-item-long {
+  grid-column: 1 / -1;
+}
+
+.fly-staking-popup-icon-text {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.fly-staking-popup-container-outer {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+}
+
+.fly-staking-popup-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.centre {
+  align-self: center;
 }
 
 .underline {
@@ -1503,6 +1539,12 @@ $holo: linear-gradient(
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+.fly-staking-claimable {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .text-with-info-popup {
@@ -1632,6 +1674,10 @@ claim-error-message-none {
 .staking-stats-info-text {
   min-width: 100px;
   max-width: 140px;
+
+  .nowrap {
+    white-space: nowrap;
+  }
 }
 
 .airdrop-image-banner {

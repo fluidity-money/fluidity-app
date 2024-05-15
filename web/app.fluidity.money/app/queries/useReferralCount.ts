@@ -1,9 +1,16 @@
 import { gql, jsonPost } from "~/util";
 
 const queryActiveByReferrerAddress = gql`
-  query getClaimedReferrerReferralCount($address: String!, $epoch: lootbox_epoch!) {
-    lootbox_referrals_aggregate (
-      where: { referrer: { _eq: $address }, active: { _eq: true }, epoch: { _eq: $epoch } }
+  query getClaimedReferrerReferralCount(
+    $address: String!
+    $epoch: lootbox_epoch!
+  ) {
+    lootbox_referrals_aggregate(
+      where: {
+        referrer: { _eq: $address }
+        active: { _eq: true }
+        epoch: { _eq: $epoch }
+      }
     ) {
       aggregate {
         count
@@ -13,9 +20,16 @@ const queryActiveByReferrerAddress = gql`
 `;
 
 const queryActiveByRefereeAddress = gql`
-  query getClaimedReferreeReferralCount($address: String!, $epoch: lootbox_epoch!) {
+  query getClaimedReferreeReferralCount(
+    $address: String!
+    $epoch: lootbox_epoch!
+  ) {
     lootbox_referrals_aggregate(
-      where: { referee: { _eq: $address }, active: { _eq: true }, epoch: { _eq: $epoch } }
+      where: {
+        referee: { _eq: $address }
+        active: { _eq: true }
+        epoch: { _eq: $epoch }
+      }
     ) {
       aggregate {
         count
@@ -25,9 +39,16 @@ const queryActiveByRefereeAddress = gql`
 `;
 
 const queryInactiveByRefereeAddress = gql`
-  query getClaimedReferrerReferralCount($address: String!, $epoch: lootbox_epoch!) {
+  query getClaimedReferrerReferralCount(
+    $address: String!
+    $epoch: lootbox_epoch!
+  ) {
     lootbox_referrals_aggregate(
-      where: { referee: { _eq: $address }, active: { _eq: false }, epoch: { _eq: $epoch } }
+      where: {
+        referee: { _eq: $address }
+        active: { _eq: false }
+        epoch: { _eq: $epoch }
+      }
     ) {
       aggregate {
         count
@@ -55,10 +76,13 @@ type ReferralCountRes = {
   errors?: unknown;
 };
 
-const useActiveReferralCountByReferrerAddress = (address: string, epoch: string) => {
+const useActiveReferralCountByReferrerAddress = (
+  address: string,
+  epoch: string
+) => {
   const variables = {
     address,
-    epoch
+    epoch,
   };
 
   const body = {
@@ -79,7 +103,10 @@ const useActiveReferralCountByReferrerAddress = (address: string, epoch: string)
   );
 };
 
-const useActiveReferralCountByRefereeAddress = (address: string, epoch: string) => {
+const useActiveReferralCountByRefereeAddress = (
+  address: string,
+  epoch: string
+) => {
   const variables = {
     address,
     epoch,
@@ -103,7 +130,10 @@ const useActiveReferralCountByRefereeAddress = (address: string, epoch: string) 
   );
 };
 
-const useInactiveReferralCountByRefereeAddress = (address: string, epoch: string) => {
+const useInactiveReferralCountByRefereeAddress = (
+  address: string,
+  epoch: string
+) => {
   const variables = {
     address,
     epoch,

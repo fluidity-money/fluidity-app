@@ -486,21 +486,21 @@ func GetPendingSenders(network_ network.BlockchainNetwork, maxBlockNumber misc.B
 			category,
 			token_short_name,
 			token_decimals,
-			transction_hash,
-			sender_address,
-			native_win_amount,
+			transaction_hash,
+			address,
+			win_amount,
 			usd_win_amount,
-			utility,
+			utility_name,
 			block_number,
 			network,
 			reward_type,
 			log_index,
 			application,
-			reward_tier,
+			reward_tier
 		FROM %v
-		WHERE 
+		WHERE
 			network = $1 AND
-			block_number > $2
+			block_number > $2 AND
 			reward_type = 'send'
 		ORDER BY block_number DESC
 		`,
@@ -569,11 +569,11 @@ func GetPendingRecipientBySend(network_ network.BlockchainNetwork, sendTransacti
 			category,
 			token_short_name,
 			token_decimals,
-			transction_hash,
-			sender_address,
-			native_win_amount,
+			transaction_hash,
+			address,
+			win_amount,
 			usd_win_amount,
-			utility,
+			utility_name,
 			block_number,
 			network,
 			reward_type,
@@ -581,7 +581,7 @@ func GetPendingRecipientBySend(network_ network.BlockchainNetwork, sendTransacti
 			application,
 			reward_tier,
 		FROM %v
-		WHERE 
+		WHERE
 			network = $1 AND
 			transaction_hash = $2 AND
 			log_index = $3

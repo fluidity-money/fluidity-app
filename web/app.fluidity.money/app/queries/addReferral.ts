@@ -1,7 +1,11 @@
 import { gql, jsonPost } from "~/util";
 
 const mutation = gql`
-  mutation addReferral($referrer: String!, $referee: String!, $epoch: lootbox_epoch!) {
+  mutation addReferral(
+    $referrer: String!
+    $referee: String!
+    $epoch: lootbox_epoch!
+  ) {
     insert_lootbox_referrals_one(
       object: { referrer: $referrer, referee: $referee, epoch: $epoch }
     ) {

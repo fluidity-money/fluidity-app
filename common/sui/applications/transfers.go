@@ -3,9 +3,9 @@ package applications
 import (
 	"fmt"
 
-	"github.com/block-vision/sui-go-sdk/models"
 	"github.com/fluidity-money/fluidity-app/lib/queues/sui"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
+	"github.com/fluidity-money/sui-go-sdk/models"
 )
 
 // ClassifyApplicationTransfer to determine the application used in a transfer based on the event type

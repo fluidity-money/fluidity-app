@@ -10,9 +10,17 @@ export type Referral = {
 };
 
 const QUERY_BY_ADDRESS = gql`
-  query getReferralByAddress($referrer: String!, $referee: String!, $epoch: lootbox_epoch!) {
+  query getReferralByAddress(
+    $referrer: String!
+    $referee: String!
+    $epoch: lootbox_epoch!
+  ) {
     lootbox_referrals(
-      where: { referrer: { _eq: $referrer }, referee: { _eq: $referee }, epoch: { _eq: $epoch } }
+      where: {
+        referrer: { _eq: $referrer }
+        referee: { _eq: $referee }
+        epoch: { _eq: $epoch }
+      }
     ) {
       active
       createdTime: created_time
@@ -25,9 +33,16 @@ const QUERY_BY_ADDRESS = gql`
 `;
 
 const QUERY_INACTIVE_BY_ADDRESS = gql`
-  query getInactiveReferralByAddress($address: String!, $epoch: lootbox_epoch!) {
+  query getInactiveReferralByAddress(
+    $address: String!
+    $epoch: lootbox_epoch!
+  ) {
     lootbox_referrals(
-      where: { referee: { _eq: $address }, active: { _eq: false }, epoch: { _eq: $epoch } }
+      where: {
+        referee: { _eq: $address }
+        active: { _eq: false }
+        epoch: { _eq: $epoch }
+      }
       order_by: { created_time: asc }
       limit: 1
     ) {
@@ -65,7 +80,11 @@ type ReferralsRes = {
   errors?: unknown;
 };
 
-const useReferralByAddress = (referrer: string, referee: string, epoch: string) => {
+const useReferralByAddress = (
+  referrer: string,
+  referee: string,
+  epoch: string
+) => {
   const variables = {
     referrer,
     referee,

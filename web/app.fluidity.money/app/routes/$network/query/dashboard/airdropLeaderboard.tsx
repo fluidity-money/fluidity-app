@@ -4,11 +4,8 @@ import { LoaderFunction, json } from "@remix-run/node";
 import { captureException } from "@sentry/react";
 import {
   useAirdropLeaderboardAllTime,
-  useAirdropLeaderboardByUserAllTime,
   useAirdropLeaderboard24Hours,
-  useAirdropLeaderboardByUser24Hours,
   useAirdropLeaderboardByApplication24Hours,
-  useAirdropLeaderboardByUserByApplication24Hours,
 } from "~/queries/useAirdropLeaderboard";
 
 export type AirdropLeaderboardLoaderData = {
@@ -39,33 +36,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   if (!use24Hours && !useAll) throw new Error("Invalid Request");
 
   try {
-    const [useAllQuery, useUserQuery] = (() => {
+    const [useAllQuery] = (() => {
       switch (true) {
         case useAll: {
-          return [
-            () => useAirdropLeaderboardAllTime(epoch),
-            (address: string) =>
-              useAirdropLeaderboardByUserAllTime(epoch, address),
-          ];
+          return [() => useAirdropLeaderboardAllTime(epoch)];
         }
         case use24Hours && !!provider: {
           return [
             () => useAirdropLeaderboardByApplication24Hours(epoch, provider),
-            (address: string) =>
-              useAirdropLeaderboardByUserByApplication24Hours(
-                epoch,
-                address,
-                provider
-              ),
           ];
         }
         case use24Hours && !provider:
         default: {
-          return [
-            () => useAirdropLeaderboard24Hours(epoch),
-            (address: string) =>
-              useAirdropLeaderboardByUser24Hours(epoch, address),
-          ];
+          return [() => useAirdropLeaderboard24Hours(epoch)];
         }
       }
     })();
@@ -93,35 +76,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       } satisfies AirdropLeaderboardLoaderData);
     }
 
-    const { data: userLeaderboardData, errors: userLeaderboardErrors } =
-      await useUserQuery(address);
-
-    if (!userLeaderboardData || userLeaderboardErrors)
-      throw userLeaderboardErrors;
-
-    const jointLeaderboardData = (
-      userLeaderboardData.airdrop_leaderboard.length
-        ? userLeaderboardData.airdrop_leaderboard.map((e) => ({
-            ...e,
-            rank: -1,
-          }))
-        : [
-            {
-              user: address,
-              rank: -1,
-              liquidityMultiplier: 0,
-              referralCount: 0,
-              bottles: 0,
-              highestRewardTier: 0,
-              fusdcEarned: 0,
-              arbEarned: 0,
-              flyStaked: 0
-            } satisfies AirdropLeaderboardEntry,
-          ]
-    ).concat(leaderboard);
-
     return json({
-      leaderboard: jointLeaderboardData,
+      leaderboard,
       loaded: true,
     } satisfies AirdropLeaderboardLoaderData);
   } catch (err) {

@@ -3,6 +3,8 @@ ORG_ROOT: fluidity
 ENABLE: true
 CODEDEPLOY_CACHE_PURGE_LAMBDA: ecs-cloudfront-purge-cache-mainnet-purge-cache
 
+ENV_FLU_CDN: https://app-cdn.fluidity.money
+
 SECRET_FLU_SENTRY_URL: /fluidity/sentryUrl
 SECRET_FLU_FRONTEND_SENTRY_URL: /fluidity/frontend/sentryURL
 SECRET_FLU_NPM_GITHUB_TOKEN: /fluidity/npm/github_token
