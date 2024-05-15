@@ -58,6 +58,12 @@ struct UnstakingPrivate {
     uint256 unstakedTimestamp;
 }
 
+struct StakeFor {
+    address recipient;
+    uint256 flyAmount;
+    bool bonus;
+}
+
 contract StakingV1 is IStaking, IERC20, IEmergencyMode, IOperatorOwned {
     using SafeERC20 for IERC20ERC2612;
 
@@ -285,7 +291,7 @@ return a
     }
 
     /// @inheritdoc IStaking
-    function stakeFor(address _recipient, uint256 _flyAmount) public returns (
+    function stakeFor(address _recipient, uint256 _flyAmount, bool _bonus) public returns (
         uint256 flyStaked,
         uint256 day1Points
     ) {
@@ -293,8 +299,20 @@ return a
             msg.sender == merkleDistributor_ || msg.sender == operator_,
             "not merkle distributor"
         );
-        flyStaked = _stake(msg.sender, _recipient, _flyAmount, true);
+        flyStaked = _stake(msg.sender, _recipient, _flyAmount, _bonus);
         return (flyStaked, _calcDay1Points(_flyAmount));
+    }
+
+    function stakeForList(StakeFor[] memory _stakeFor) public {
+        require(msg.sender == operator_, "not merkle distributor");
+        for (uint i = 0; i < _stakeFor.length; i++) {
+            _stake(
+                msg.sender,
+                _stakeFor[i].recipient,
+                _stakeFor[i].flyAmount,
+                _stakeFor[i].bonus
+            );
+        }
     }
 
     /// @inheritdoc IStaking

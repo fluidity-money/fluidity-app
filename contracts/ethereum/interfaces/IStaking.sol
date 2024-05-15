@@ -76,8 +76,9 @@ interface IStaking {
      *         merkle distributor, so as to prevent abuse.
      * @param _spender to stake on behalf of.
      * @param _amount to take from the msg.sender, to stake on behalf of the user.
+     * @param _bonus should be applied?
      */
-    function stakeFor(address _spender, uint256 _amount) external returns (
+    function stakeFor(address _spender, uint256 _amount, bool _bonus) external returns (
         uint256 flyStaked,
         uint256 day1Points
     );

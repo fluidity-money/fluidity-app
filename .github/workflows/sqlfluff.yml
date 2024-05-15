@@ -1,0 +1,25 @@
+name: sqlfluff
+
+on:
+  pull_request:
+    branches:
+      - development
+
+jobs:
+  sqlfluff:
+    name: sqlfluff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: yu-iskw/action-sqlfluff@v3.7.0
+        id: lint-sql
+        with:
+          github_token: ${{ secrets.github_token }}
+          sqlfluff_version: "3.0.6"
+          paths: '${{ github.workspace }}/database/migrations'
+          level: 'info'
+      - name: 'Show outputs (Optional)'
+        shell: bash
+        run: |
+          echo '${{ steps.lint-sql.outputs.sqlfluff-results }}' | jq -r '.'
+          echo '${{ steps.lint-sql.outputs.sqlfluff-results-rdjson }}' | jq -r '.'

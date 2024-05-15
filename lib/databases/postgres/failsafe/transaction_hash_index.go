@@ -18,7 +18,7 @@ import (
 // logIndex, and the worker ID, forming a composite primary key
 // that guarantees uniqueness. Will Fatal if the insertion fails, with a
 // reason. Useful for identifying duplication-related issues.
-func CommitTransactionHashIndex(transactionHash ethereum.Hash, logIndex misc.BigInt) {
+func CommitTransactionHashIndex(transactionHash ethereum.Hash, logIndex misc.BigInt) (success bool) {
 	postgresClient := postgres.Client()
 
 	statementText := fmt.Sprintf(`
@@ -41,7 +41,7 @@ func CommitTransactionHashIndex(transactionHash ethereum.Hash, logIndex misc.Big
 	_, err := postgresClient.Exec(statementText, transactionHash, logIndex, workerId)
 
 	if err != nil {
-		log.Fatal(func(k *log.Log) {
+		log.App(func(k *log.Log) {
 			k.Context = Context
 
 			k.Format(
@@ -53,5 +53,9 @@ func CommitTransactionHashIndex(transactionHash ethereum.Hash, logIndex misc.Big
 
 			k.Payload = err
 		})
+
+		return false
 	}
+
+	return true
 }
