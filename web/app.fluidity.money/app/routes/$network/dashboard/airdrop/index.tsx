@@ -589,6 +589,9 @@ const Airdrop = () => {
             Dune
           </a>
         </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("staking-stats")}>
+          Epoch 1 staking
+        </TabButton>
       </div>
     );
   };
@@ -1191,7 +1194,7 @@ const MultiplierTasks = () => {
           Utility Multiplier
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Transact <b>$FLY</b> and $ƒUSDC on listed platforms to earn more!
+          Use $ƒUSDC on listed platforms to earn!
         </Text>
       </div>
       <div
@@ -1308,7 +1311,7 @@ const MyMultiplier = ({
       <div>
         <div className="airdrop-arb-multipliers-container">
           <Heading as="h5">
-            Provide $FLY and $ƒUSDC Liquidity to earn $ARB and Rewards!
+            Provide $ƒUSDC Liquidity to earn $ARB and Rewards!
           </Heading>
           <Text holo={true}>
             Add liquidity to Uniswap or the following Trader Joe and Camelot
