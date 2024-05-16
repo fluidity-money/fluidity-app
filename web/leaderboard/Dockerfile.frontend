@@ -17,6 +17,11 @@ COPY . ./
 
 RUN yarn
 
+# https://github.com/vercel/next.js/discussions/57066
+RUN npm run build
+RUN npm cache clean --force
+RUN npm install next@latest
+
 ARG FLU_SENTRY_DSN
 
 WORKDIR /usr/local/src/fluidity/web/leaderboard
@@ -24,10 +29,6 @@ WORKDIR /usr/local/src/fluidity/web/leaderboard
 RUN make frontend
 
 FROM fluidity/runtime-web-container:latest
-
-# https://github.com/vercel/next.js/discussions/57066
-RUN npm cache clean --force
-RUN npm install next@latest
 
 WORKDIR /usr/local/src/fluidity/web
 
