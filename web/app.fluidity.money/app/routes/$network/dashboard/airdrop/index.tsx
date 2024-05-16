@@ -629,7 +629,7 @@ const Airdrop = () => {
                   Airdrop V3: FLY Me To The Moon.
                 </Heading>
                 <Text>
-                  Stake and trade your $FLY, fluidify your assets, transact
+                  Trade your $fUSDC, fluidify your assets, transact
                   them, and boost your rewards by using trading on partnered
                   protocols and staking liquidity right here on Fluidity! Keep
                   an eye on the leaderboard as you compete with fellow Surfers
@@ -945,7 +945,7 @@ const Airdrop = () => {
                     </Heading>
                   </div>
                   <Text style={{ fontSize: 14 }}>
-                    Stake and trade your $FLY, fluidify your assets, transact
+                    Trade your $fUSDC, fluidify your assets, transact
                     them, and boost your rewards by using trading on partnered
                     protocols and staking liquidity right here on Fluidity! Keep
                     an eye on the leaderboard as you compete with fellow Surfers
