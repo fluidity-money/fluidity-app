@@ -33,6 +33,6 @@ WORKDIR /usr/local/src/fluidity/web/leaderboard
 
 EXPOSE 3000
 
-RUN mkdir .next && touch .next/BUILD_ID && echo "999" > .next/BUILD_ID
+RUN yarn build
 
 CMD ["yarn", "start"]

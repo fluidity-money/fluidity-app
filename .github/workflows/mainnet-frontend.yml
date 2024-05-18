@@ -4,8 +4,9 @@ on:
   pull_request:
     branches:
       - develop
-    types:
-      - closed
+#    types:
+#      - closed
+#      - open
 
 permissions:
   id-token: write
@@ -16,14 +17,14 @@ env:
 
 jobs:
   codecov:
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     runs-on: powerfulubuntu
     steps:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
 
   get-diff:
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     runs-on: powerfulubuntu
     environment: mainnet
     outputs:
@@ -57,7 +58,7 @@ jobs:
           fi
 
   deploy-web:
-    if: needs.get-diff.outputs.file_exists == 'true'
+#    if: needs.get-diff.outputs.file_exists == 'true'
     runs-on: powerfulubuntu
     environment: mainnet
     needs: [get-diff]
