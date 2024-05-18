@@ -15,10 +15,6 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY . ./
 
-RUN npm install next@latest -g
-
-RUN npm run build
-
 RUN yarn
 
 ARG FLU_SENTRY_DSN
@@ -36,5 +32,7 @@ COPY --from=build /usr/local/src/fluidity/web .
 WORKDIR /usr/local/src/fluidity/web/leaderboard
 
 EXPOSE 3000
+
+RUN mkdir .next && touch .next/BUILD_ID && echo "999" > .next/BUILD_ID
 
 CMD ["yarn", "start"]
