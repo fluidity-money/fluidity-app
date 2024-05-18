@@ -17,6 +17,8 @@ COPY . ./
 
 RUN npm install next@latest -g
 
+RUN npm run build
+
 RUN yarn
 
 ARG FLU_SENTRY_DSN
