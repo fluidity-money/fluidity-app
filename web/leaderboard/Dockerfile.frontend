@@ -15,12 +15,9 @@ ENV PATH /app/node_modules.bin:$PATH
 
 COPY . ./
 
-RUN yarn
+RUN npm install next@latest -g
 
-# https://github.com/vercel/next.js/discussions/57066
-RUN npm run build
-RUN npm cache clean --force
-RUN npm install next@latest
+RUN yarn
 
 ARG FLU_SENTRY_DSN
 
