@@ -3,8 +3,8 @@
 [ -z "$HARDHAT" ] && HARDHAT=hardhat
 [ -z "$FORGE" ] && FORGE=forge
 
-if [ -z "$FLU_ETHEREUM_FORKNET_URL_GOERLI" ] || [ -z "FLU_ETHEREUM_FORKNET_URL_MAINNET" ] || [ -z "$FLU_ETHEREUM_FORKNET_URL_ARBITRUM" ]; then
-	>&2 echo "FLU_ETHEREUM_FORKNET_URL_GOERLI, FLU_ETHEREUM_FORKNET_URL_MAINNET or FLU_ETHEREUM_FORKNET_URL_ARBITRUM not set!"
+if [ -z "$FLU_ETHEREUM_FORKNET_URL_SEPOLIA" ] || [ -z "FLU_ETHEREUM_FORKNET_URL_MAINNET" ] || [ -z "$FLU_ETHEREUM_FORKNET_URL_ARBITRUM" ]; then
+	>&2 echo "FLU_ETHEREUM_FORKNET_URL_SEPOLIA, FLU_ETHEREUM_FORKNET_URL_MAINNET or FLU_ETHEREUM_FORKNET_URL_ARBITRUM not set!"
 	exit 1
 fi
 
@@ -27,9 +27,9 @@ run_test $FORGE test
 
 FLU_FORKNET_NETWORK=mainnet run_test $HARDHAT test
 
->&2 echo "testing goerli..."
+>&2 echo "testing sepolia..."
 
-FLU_FORKNET_NETWORK=goerli run_test $HARDHAT test
+FLU_FORKNET_NETWORK=sepolia run_test $HARDHAT test
 
 if [ "$failedcode" -ne 0 ]; then
 	>&2 echo "some tests failed!"

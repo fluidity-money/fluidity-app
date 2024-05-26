@@ -1,7 +1,7 @@
 import * as hre from "hardhat";
 import * as ethers from "ethers";
 import { expectEq, expectGt } from "./test-utils";
-import { bindings } from "./setup-goerli";
+import { bindings } from "./setup-sepolia";
 import { signers } from "./setup-common";
 
 describe("token aave v3 integration", async function () {
@@ -10,7 +10,7 @@ describe("token aave v3 integration", async function () {
   let accountAddr: string;
 
   before(async function () {
-    if (process.env.FLU_FORKNET_NETWORK !== "goerli") {
+    if (process.env.FLU_FORKNET_NETWORK !== "sepolia") {
       return this.skip();
     }
 

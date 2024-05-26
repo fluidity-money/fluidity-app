@@ -32,7 +32,7 @@ export let commonBindings: FluidityBindings;
 before(async function () {
   if (!process.env.FLU_FORKNET_NETWORK) {
     throw new Error(
-      `no forknet network set! set FLU_FORKNET_NETWORK=goerli or mainnet if we're on a fork!`
+      `no forknet network set! set FLU_FORKNET_NETWORK=sepolia or mainnet if we're on a fork!`
     );
   }
 

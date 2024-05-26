@@ -7,8 +7,8 @@ import { forknetTakeFunds } from "../script-utils";
 import { deployTokens } from "../deployment";
 
 import {
-  AAVE_V3_GOERLI_POOL_PROVIDER_ADDR,
-  TokenList } from "./goerli-constants";
+  AAVE_V3_SEPOLIA_POOL_PROVIDER_ADDR,
+  TokenList } from "./sepolia-constants";
 
 import {
     commonBeaconAddresses,
@@ -34,8 +34,8 @@ export let bindings: typeof commonBindings & {
 };
 
 before(async function() {
-  if (process.env.FLU_FORKNET_NETWORK !== "goerli") {
-    console.log("not on a goerli fork! skipping aave v3 tests!");
+  if (process.env.FLU_FORKNET_NETWORK !== "sepolia") {
+    console.log("not on a sepolia fork! skipping aave v3 tests!");
     return;
   }
 
@@ -73,7 +73,7 @@ before(async function() {
     hre,
     toDeploy,
     "no v2 tokens here",
-    AAVE_V3_GOERLI_POOL_PROVIDER_ADDR,
+    AAVE_V3_SEPOLIA_POOL_PROVIDER_ADDR,
     emergencyCouncilAddress,
     operatorAddress,
     commonBindings.operator.externalOperator,
