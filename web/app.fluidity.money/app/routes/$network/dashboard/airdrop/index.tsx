@@ -589,6 +589,9 @@ const Airdrop = () => {
             Dune
           </a>
         </TabButton>
+        <TabButton size="small" onClick={() => setCurrentModal("staking-stats")}>
+          Epoch 1 staking
+        </TabButton>
       </div>
     );
   };
@@ -626,7 +629,7 @@ const Airdrop = () => {
                   Airdrop V3: FLY Me To The Moon.
                 </Heading>
                 <Text>
-                  Stake and trade your $FLY, fluidify your assets, transact
+                  Trade your $fUSDC, fluidify your assets, transact
                   them, and boost your rewards by using trading on partnered
                   protocols and staking liquidity right here on Fluidity! Keep
                   an eye on the leaderboard as you compete with fellow Surfers
@@ -942,7 +945,7 @@ const Airdrop = () => {
                     </Heading>
                   </div>
                   <Text style={{ fontSize: 14 }}>
-                    Stake and trade your $FLY, fluidify your assets, transact
+                    Trade your $fUSDC, fluidify your assets, transact
                     them, and boost your rewards by using trading on partnered
                     protocols and staking liquidity right here on Fluidity! Keep
                     an eye on the leaderboard as you compete with fellow Surfers
@@ -1170,16 +1173,16 @@ const MultiplierTasks = () => {
   const providerLinks: { provider: Provider; link: string }[] = [
     {
       provider: "Uniswap",
-      link: "https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum",
+      link: "https://app.uniswap.org/swap?outputCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A&chain=arbitrum",
     },
     {
       provider: "Trader Joe",
-      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
+      link: "https://traderjoexyz.com/arbitrum/trade?outputCurrency=0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
     },
     { provider: "Camelot", link: "https://app.camelot.exchange/" },
     {
       provider: "Ramses",
-      link: "https://app.ramses.exchange/liquidity/v2/0x000F1720A263f96532D1ac2bb9CDC12b72C6f386",
+      link: "https://app.ramses.exchange/liquidity/v2/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
     },
     { provider: "Jumper", link: "https://jumper.exchange/" },
   ];
@@ -1191,7 +1194,7 @@ const MultiplierTasks = () => {
           Utility Multiplier
         </Text>
         <Text size="xs" style={{ color: "black" }}>
-          Transact <b>$FLY</b> and $ƒUSDC on listed platforms to earn more!
+          Use $ƒUSDC on listed platforms to earn!
         </Text>
       </div>
       <div
@@ -1308,7 +1311,7 @@ const MyMultiplier = ({
       <div>
         <div className="airdrop-arb-multipliers-container">
           <Heading as="h5">
-            Provide $FLY and $ƒUSDC Liquidity to earn $ARB and Rewards!
+            Provide $ƒUSDC Liquidity to earn $ARB and Rewards!
           </Heading>
           <Text holo={true}>
             Add liquidity to Uniswap or the following Trader Joe and Camelot
