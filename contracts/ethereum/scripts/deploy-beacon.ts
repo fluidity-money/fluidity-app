@@ -5,7 +5,8 @@ const tasks: {[k: string]: {contract: string, name: string}} = {
     token: {contract: "Token", name: "token"},
     aaveV2: {contract: "AaveV2LiquidityProvider", name: "aave v2 liquidity pool"},
     aaveV3: {contract: "AaveV3LiquidityProvider", name: "aave v3 liquidity pool"},
-    stupid: {contract: "StupidLiquidityProvider",name:  "stupid liquidity pool"},
+    stupid: {contract: "StupidLiquidityProvider",name: "stupid liquidity pool"},
+    increase: {contract: "AutoIncreaseLiquidityProvider", name: "auto increase liquidity provider"},
     compound: {contract: "CompoundLiquidityProvider", name: "compound liquidity pool"},
 };
 
