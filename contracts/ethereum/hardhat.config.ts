@@ -213,6 +213,12 @@ if (process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_URL,
   };
 
+if (process.env.FLU_ETHEREUM_DEPLOY_SUPERPOSITION_KEY)
+  networks['superposition'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_SUPERPOSITION_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_SUPERPOSITION_URL,
+  };
+
 if (process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY)
   networks['zksync'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY],
