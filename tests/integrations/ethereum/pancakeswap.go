@@ -4,6 +4,8 @@
 
 package main
 
+// integrationTestPancakeswap is tested with us in a broader lifi
+// transaction, and a transaction that doesn't include us.
 const integrationTestPancakeswap = `[
   {
     "transfer": {
