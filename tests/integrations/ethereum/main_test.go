@@ -141,6 +141,9 @@ func init() {
 
  	paraswap := unmarshalJsonTestOrFatal(integrationTestParaswap)
  	tests = append(tests, paraswap...)
+
+ 	pancakeswap := unmarshalJsonTestOrFatal(integrationTestPancakeswap)
+ 	tests = append(tests, pancakeswap...)
  }
 
 func TestIntegrations(t *testing.T) {

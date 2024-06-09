@@ -167,6 +167,7 @@ func InsertEmissions(emission Emission) {
 			trader_joe_fee,
 			lifi_fee,
 			paraswap_fee,
+			pancakeswap_fee,
 
 			saber_fee,
 			orca_fee,
@@ -307,47 +308,48 @@ func InsertEmissions(emission Emission) {
 			$79,
 			$80,
 			$81,
-
 			$82,
+
 			$83,
 			$84,
 			$85,
 			$86,
 			$87,
-
 			$88,
+
 			$89,
 			$90,
 			$91,
 			$92,
-
 			$93,
+
 			$94,
 			$95,
 			$96,
-
 			$97,
+
 			$98,
 			$99,
 			$100,
 			$101,
-
 			$102,
-			$103,
 
+			$103,
 			$104,
 
 			$105,
+
 			$106,
 			$107,
-
 			$108,
+
 			$109,
 			$110,
-
 			$111,
+
 			$112,
-			$113
+			$113,
+			$114
 		);`,
 
 		TableEmissions,
@@ -452,6 +454,7 @@ func InsertEmissions(emission Emission) {
 		ethAppFees.TraderJoe,
 		ethAppFees.Lifi,
 		ethAppFees.Paraswap,
+		ethAppFees.Pancakeswap,
 
 		solAppFees.Saber,
 		solAppFees.Orca,

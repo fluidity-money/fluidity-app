@@ -118,6 +118,7 @@ type (
 		Odos         float64 `json:"odos"`
 		BetSwirl     float64 `json:"betswirl"`
 		Paraswap     float64 `json:"paraswap"`
+		Pancakeswap float64 `json:"pancakeswap"`
 	}
 
 	// app fees for sui transactions

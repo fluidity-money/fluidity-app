@@ -37,6 +37,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/pancakeswap"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -80,6 +81,7 @@ const (
 	ApplicationOdos
 	ApplicationBetSwirl
 	ApplicationParaswap
+	ApplicationPancakeswap
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -324,6 +326,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 			tokenDecimals,
 		)
 		emission.Paraswap += util.MaybeRatToFloat(feeData.Fee)
+
+	case ApplicationPancakeswap:
+		feeData, err = pancakeswap.GetPancackeswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.Pancakeswap += util.MaybeRatToFloat(feeData.Fee)
 
 	default:
 		err = fmt.Errorf(
