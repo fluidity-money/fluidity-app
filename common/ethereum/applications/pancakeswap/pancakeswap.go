@@ -186,7 +186,7 @@ func GetPancackeswapFees(transfer worker.EthereumApplicationTransfer, client *et
 
 	swapContainsFluid := fluidTokenContract == token0addr || fluidTokenContract == token1addr
 
-	amount0, ok := unpacked[1].(*big.Int)
+	amount0, ok := unpacked[0].(*big.Int)
 
 	if !ok {
 		return feeData, fmt.Errorf(
@@ -195,7 +195,7 @@ func GetPancackeswapFees(transfer worker.EthereumApplicationTransfer, client *et
 		)
 	}
 
-	amount1, ok := unpacked[2].(*big.Int)
+	amount1, ok := unpacked[1].(*big.Int)
 
 	if !ok {
 		return feeData, fmt.Errorf(
