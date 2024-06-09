@@ -108,7 +108,8 @@ func TestString(t *testing.T) {
 		"lifi": 0,
 		"odos": 0,
 		"betswirl": 0,
-		"paraswap": 0
+		"paraswap": 0,
+		"pancakeswap": 0
 	},
 	"sui_fees":{},
 	"calculate_n":{
