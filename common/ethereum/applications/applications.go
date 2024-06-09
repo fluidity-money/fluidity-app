@@ -37,6 +37,7 @@ import (
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/uniswap"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/wombat"
 	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/xy-finance"
+	"github.com/fluidity-money/fluidity-app/common/ethereum/applications/pancakeswap"
 
 	ethCommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -80,6 +81,7 @@ const (
 	ApplicationOdos
 	ApplicationBetSwirl
 	ApplicationParaswap
+	ApplicationPancakeswap
 )
 
 // ParseApplicationName shadows the lib types definition
@@ -325,6 +327,15 @@ func GetApplicationFee(transfer worker.EthereumApplicationTransfer, client *ethc
 		)
 		emission.Paraswap += util.MaybeRatToFloat(feeData.Fee)
 
+	case ApplicationPancakeswap:
+		feeData, err = pancakeswap.GetPancackeswapFees(
+			transfer,
+			client,
+			fluidTokenContract,
+			tokenDecimals,
+		)
+		emission.Pancakeswap += util.MaybeRatToFloat(feeData.Fee)
+
 	default:
 		err = fmt.Errorf(
 			"Transfer #%v did not contain an application",
@@ -441,6 +452,11 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// initiator. This might not hold up in practice - the
 		// contracts are not fully open source, and the only
 		// function signature we've seen is simpleSwap.
+
+		return transaction.From, contractAddress, nil
+	case ApplicationPancakeswap:
+		// Give the majority payout to the initiator of the transaction, and the
+		// rest to the pool.
 
 		return transaction.From, contractAddress, nil
 	default:

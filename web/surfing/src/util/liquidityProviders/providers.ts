@@ -42,5 +42,6 @@ const providerImgNames: { [K in Provider]: string } = {
   "XY Finance": "xy.png",
   "Meteora": "Meteora.svg",
   "Odos": "Odos.png",
-  "Paraswap": "Paraswap.svg"
+  "Paraswap": "Paraswap.svg",
+  "Pancakeswap": "Pancakeswap.svg"
 };

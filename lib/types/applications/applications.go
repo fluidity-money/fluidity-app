@@ -51,6 +51,7 @@ var applicationNames = []string{
 	"odos",
 	"betswirl",
 	"paraswap",
+	"pancakeswap",
 }
 
 // Supported utilities, should map to an entry in the onchain Registry
