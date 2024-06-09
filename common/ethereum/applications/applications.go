@@ -454,6 +454,11 @@ func GetApplicationTransferParties(transaction ethereum.Transaction, transfer wo
 		// function signature we've seen is simpleSwap.
 
 		return transaction.From, contractAddress, nil
+	case ApplicationPancakeswap:
+		// Give the majority payout to the initiator of the transaction, and the
+		// rest to the pool.
+
+		return transaction.From, contractAddress, nil
 	default:
 		return nilAddress, nilAddress, fmt.Errorf(
 			"Transfer #%v did not contain an application",

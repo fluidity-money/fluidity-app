@@ -209,12 +209,12 @@ func GetPancackeswapFees(transfer worker.EthereumApplicationTransfer, client *et
 	switch {
 	//amount0 < 0
 	case amount0.Cmp(zero) < 0:
-		amountsIn = amount0
+		amountsIn = new(big.Int).Abs(amount0)
 		amountsOut = amount1
 
 	//amount1 < 0
 	case amount1.Cmp(zero) < 0:
-		amountsIn = amount1
+		amountsIn = new(big.Int).Abs(amount1)
 		amountsOut = amount0
 
 	// no value was exchanged!
