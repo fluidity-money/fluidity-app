@@ -81,6 +81,8 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Lifi";
     case "odos":
       return "Odos";
+    case "pancakeswap":
+      return "Pancakeswap";
     case "fluidity":
     case "spl":
     case "none":
