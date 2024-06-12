@@ -319,7 +319,7 @@ func main() {
 
 func protocolAllowed(application applications.Application) bool {
 	switch application {
-	case applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelotV3, applications.ApplicationJumper, applications.ApplicationLifi:
+	case applications.ApplicationUniswapV3, applications.ApplicationTraderJoe, applications.ApplicationCamelotV3, applications.ApplicationJumper, applications.ApplicationLifi, applications.ApplicationPancakeswap:
 		return true
 	default:
 		return false
