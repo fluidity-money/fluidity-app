@@ -45,7 +45,7 @@
     "@sentry/tracing": "^7.106.1",
     "@solana/wallet-adapter-base": "^0.9.18",
     "@solana/wallet-adapter-react": "^0.15.23",
-    "@solana/wallet-adapter-wallets": "^0.19.5",
+    "@solana/wallet-adapter-wallets": "^0.19.24",
     "@solana/web3.js": "^1.63.1",
     "@types/node": "^18.11.2",
     "@types/ws": "^8.5.3",
