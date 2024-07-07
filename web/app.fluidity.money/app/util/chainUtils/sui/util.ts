@@ -157,7 +157,6 @@ const internalSwap = async (
         onError: () => {
           resolve("");
         },
-        // @ts-ignore
         onSuccess: (result) => {
           resolve(result.digest);
         },
