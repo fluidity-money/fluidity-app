@@ -95,13 +95,15 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const programBegin = new Date(programBegin_);
   const programEnd = new Date(programEnd_);
+  const now = new Date();
 
   const epochDaysTotal = Math.round(
     (programEnd.valueOf() - programBegin.valueOf()) / (1000 * 60 * 60 * 24)
   );
 
-  const epochDaysElapsed =
-    dayDifference(new Date(), programBegin) % epochDaysTotal;
+  // if we're past the program end, all days have elapsed
+  const epochDaysElapsed = now > programEnd ? epochDaysTotal :
+    dayDifference(now, programBegin) % epochDaysTotal;
 
   const infuraRpc = config.drivers[network][MAINNET_ID].rpc.http;
   const provider = new JsonRpcProvider(infuraRpc);
