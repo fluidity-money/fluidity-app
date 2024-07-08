@@ -383,6 +383,12 @@ const Airdrop = () => {
     navigate(`#${currentModal}`, { replace: true });
   }, [currentModal]);
 
+  // force all time if the epoch has ended
+  useEffect(() => {
+    if (epochDaysElapsed >= epochDaysTotal)
+      setLeaderboardFilterIndex(1)
+  }, [epochDaysTotal, epochDaysElapsed])
+
   const closeModal = () => {
     setCurrentModal(null);
   };
@@ -734,6 +740,7 @@ const Airdrop = () => {
                 setFilterIndex={setLeaderboardFilterIndex}
                 userAddress={address || ""}
                 isMobile
+                disable24Hr={epochDaysTotal >= epochDaysElapsed}
               />
             </>
           )}
@@ -1038,6 +1045,7 @@ const Airdrop = () => {
                 filterIndex={leaderboardFilterIndex}
                 setFilterIndex={setLeaderboardFilterIndex}
                 userAddress={address || ""}
+                disable24Hr={epochDaysElapsed >= epochDaysTotal}
               />
             </Card>
           </div>
@@ -1445,6 +1453,7 @@ interface IAirdropLeaderboard {
   setFilterIndex: (index: number) => void;
   userAddress: string;
   isMobile?: boolean;
+  disable24Hr: boolean;
 }
 
 const Leaderboard = ({
@@ -1454,6 +1463,7 @@ const Leaderboard = ({
   setFilterIndex,
   userAddress,
   isMobile = false,
+  disable24Hr,
 }: IAirdropLeaderboard) => {
   // This adds a dummy user entry to the leaderboard if the user's address isn't found
   if (
@@ -1497,6 +1507,7 @@ const Leaderboard = ({
         <div className="leaderboard-header-filters">
           <GeneralButton
             type={filterIndex === 0 ? "primary" : "transparent"}
+            disabled={disable24Hr}
             handleClick={() => setFilterIndex(0)}
           >
             <Text code size="sm" style={{ color: "inherit" }}>
