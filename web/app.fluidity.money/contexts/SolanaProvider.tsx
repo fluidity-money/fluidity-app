@@ -13,6 +13,7 @@ import {
   NightlyWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { Token } from "~/util/chainUtils/tokens";
+import SolanaFacade from "./SolanaFacade";
 
 const wallets = [
   new PhantomWalletAdapter(),
@@ -22,8 +23,6 @@ const wallets = [
   new CloverWalletAdapter(),
   new Coin98WalletAdapter(),
 ];
-
-const SolanaFacade = dynamic(() => import("./SolanaFacade"), { ssr: false });
 
 const SolanaProvider = (rpcUrl: string, tokens: Token[]) => {
   const endpoint = useMemo(() => rpcUrl, [rpcUrl]);
