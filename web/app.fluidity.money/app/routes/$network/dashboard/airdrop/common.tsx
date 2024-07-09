@@ -1962,7 +1962,7 @@ const RecapModal = ({
               }}
             >
               <Text size="xl">
-                Fluidity&apos;s second Airdrop Wave has come to an end. Here are
+                Fluidity&apos;s third Airdrop Wave has come to an end. Here are
                 some <strong style={{ color: "white" }}>Global Stats</strong>{" "}
                 for the Wave.
               </Text>

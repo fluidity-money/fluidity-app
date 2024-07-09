@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import dynamic from "next/dynamic";
 import {
   ConnectionProvider,
   WalletProvider,
