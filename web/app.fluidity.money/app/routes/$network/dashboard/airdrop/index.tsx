@@ -166,11 +166,11 @@ const SAFE_DEFAULT_REFERRAL_LOOTBOTTLES: ReferralBottlesCountLoaderData = {
 };
 
 const GLOBAL_AIRDROP_BOTTLE_TIERS = {
-  [Rarity.Common]: 39000000,
-  [Rarity.Uncommon]: 7200000,
-  [Rarity.Rare]: 500000,
-  [Rarity.UltraRare]: 6400,
-  [Rarity.Legendary]: 0,
+  [Rarity.Common]: 62000000,
+  [Rarity.Uncommon]: 6600000,
+  [Rarity.Rare]: 3300000,
+  [Rarity.UltraRare]: 658000,
+  [Rarity.Legendary]: 58,
 };
 
 const Airdrop = () => {
@@ -536,7 +536,7 @@ const Airdrop = () => {
           groupId="airdrop"
           isSelected={currentModal === "recap" || currentModal === "claim"}
         >
-          Airdrop Recap
+          Epoch 3 Recap
         </TabButton>
         <TabButton
           size="small"
@@ -706,8 +706,8 @@ const Airdrop = () => {
           )}
           {(currentModal === "recap" || currentModal === "claim") && (
             <RecapModal
-              totalVolume={2000000000}
-              bottlesLooted={47000000}
+              totalVolume={2200000000}
+              bottlesLooted={72000000}
               bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
               userRecap={{
                 bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
@@ -893,8 +893,8 @@ const Airdrop = () => {
       <Header />
       {currentModal === "recap" || currentModal === "claim" ? (
         <RecapModal
-          totalVolume={2000000000}
-          bottlesLooted={47000000}
+          totalVolume={2200000000}
+          bottlesLooted={72000000}
           bottles={GLOBAL_AIRDROP_BOTTLE_TIERS}
           userRecap={{
             bottles: SAFE_DEFAULT_AIRDROP.bottleTiers,
