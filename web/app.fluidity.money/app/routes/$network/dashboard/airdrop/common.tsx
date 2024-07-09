@@ -1877,7 +1877,7 @@ const RecapModal = ({
               <motion.div variants={heroItemVariants}>
                 <Text size="sm">
                   <strong style={{ color: "white" }}>
-                    Congratulations for completing Fluidity&apos;s Second
+                    Congratulations for completing Fluidity&apos;s Third
                     Airdrop Wave!
                   </strong>{" "}
                   All of these loot bottles you have earned are safely secured
