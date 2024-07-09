@@ -553,6 +553,7 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("tutorial")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "tutorial"}
+          disabled
         >
           Airdrop Tutorial
         </TabButton>
@@ -583,6 +584,7 @@ const Airdrop = () => {
           onClick={() => setCurrentModal("referrals")}
           groupId="airdrop"
           isSelected={isMobile && currentModal === "referrals"}
+          disabled
         >
           Referrals
         </TabButton>
