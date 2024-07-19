@@ -42,11 +42,12 @@ contract TestUtilityClient is BaseUtilityClient {
 
 contract TestBaseUtilityClient is Test {
     // duplicate of IFluidClient.Reward, since for some reason events aren't importable
-    event Reward(
+    event RewardV2(
         address indexed winner,
         uint amount,
         uint startBlock,
-        uint endBlock
+        uint endBlock,
+        bytes32 extraData
     );
 
     IERC20 private token;
@@ -129,7 +130,7 @@ contract TestBaseUtilityClient is Test {
         });
 
         vm.expectEmit(true, true, true, true);
-        emit Reward(winner1, 7, 1, 2);
+        emit RewardV2(winner1, 7, 1, 2, 0x00);
 
         c.batchReward(winners, 1, 2);
 

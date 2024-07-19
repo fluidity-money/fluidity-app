@@ -29,14 +29,16 @@ struct UtilityVars {
 string constant DEFAULT_CALCULATION_TYPE = "";
 
 interface IFluidClient {
-
-    /// @notice MUST be emitted when any reward is paid out
-    event Reward(
+    /// @notice RewardV2 contains information on the payout, including
+    ///         some extra bytes that may or may not be relevant to a downstream
+    ///         consumer.
+    event RewardV2(
         address indexed winner,
         uint amount,
         uint startBlock,
-        uint endBlock
-    );
+        uint endBlock,
+        bytes32 data
+    )
 
     /**
      * @notice pays out several rewards

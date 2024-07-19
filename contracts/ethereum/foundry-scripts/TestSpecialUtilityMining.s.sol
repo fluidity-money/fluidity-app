@@ -19,7 +19,7 @@ contract FakeFluidToken is IFluidClient {
     /// @inheritdoc IFluidClient
     function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) external {
         for (uint i = 0; i < rewards.length; i++) {
-            emit Reward(rewards[i].winner, rewards[i].amount, firstBlock, lastBlock);
+            emit RewardV2(rewards[i].winner, rewards[i].amount, firstBlock, lastBlock, 0x00);
         }
     }
 
