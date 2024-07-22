@@ -6,7 +6,7 @@ import type {
 } from "~/util/chainUtils/ethereum/transaction";
 import type AugmentedToken from "~/types/AugmentedToken";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import BN from "bn.js";
 import {
   Card,
@@ -32,6 +32,7 @@ import {
   SliderButton,
   numberToCommaSeparated,
   ArrowDown,
+  ArrowTopRight,
   Provider,
   Modal,
 } from "@fluidity-money/surfing";
@@ -41,7 +42,7 @@ import {
   getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
-import { Referral } from "~/queries";
+import { useFLYOwedForAddress, Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import {
   AnimatePresence,
@@ -50,8 +51,11 @@ import {
   useTransform,
 } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
+import FluidityFacadeContext from "contexts/FluidityFacade";
+import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
+import FLYClaimSubmitModal from "~/components/FLYClaimSubmitModal";
 import { shorthandAmountFormatter } from "~/util";
 
 // Epoch length
@@ -63,6 +67,9 @@ const MAX_STAKING_DAYS = 365;
 
 // Minimum amount of Fluid USDC deposit
 const MINIMUM_FLUID_LIQUIDITY_USD = 10;
+
+const AIRDROP_BLOG_POST =
+  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -1669,6 +1676,9 @@ interface IRecapModal {
   navigate?: (path: string) => void;
 }
 
+const calculateDay1Points = (tokenFullAmount: number) =>
+  tokenFullAmount * 0.001 * (24 * 7);
+
 const RecapModal = ({
   totalVolume,
   bottlesLooted,
@@ -1757,10 +1767,101 @@ const RecapModal = ({
     },
   };
 
+  const { address } = useContext(FluidityFacadeContext);
+
+  const { toggleVisibility: flyStakingModalToggleVisibility } =
+    useContext(FlyStakingContext);
+
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
+  const [flyClaimModalState, setFlyClaimModalState] = useState<
+    "none" | "claim" | "stake"
+  >("none");
+
+  const [flyAmountOwed, setFLYAmountOwed] = useState(0);
+
+  const [showTGEDetails, setShowTGEDetails] = useState(true);
+
+  const day1Points = calculateDay1Points(flyAmountOwed);
+
+  // if the address isn't set, then it's a good proxy for knowing if the
+  // user has supplied their address or not
+  const [
+    checkYourEligibilityButtonEnabled,
+    setCheckYourEligibilityButtonEnabled,
+  ] = useState(false);
+
+  const TGEDisplay = () => {
+    return (
+      <div className="recap-fly-count-child">
+        {(() => {
+          switch (true) {
+            case showTGEDetails:
+              return <ShowEpochDetails />;
+            case flyAmountOwed > 0:
+              return <YouAreEligible />;
+            default:
+              return <YoureNotEligible />;
+          }
+        })()}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (address) {
+        const resp = await useFLYOwedForAddress(address);
+        if (!resp) {
+          console.warn(`Invalid response for airdrop request: ${resp}`);
+          return;
+        }
+        const { amount, error } = resp;
+        if (error) throw new Error(`Airdrop request error: ${error}`);
+        setFLYAmountOwed(amount);
+        setCheckYourEligibilityButtonEnabled(true);
+      }
+    })();
+  }, [address, useFLYOwedForAddress, setFLYAmountOwed]);
+
+  const YoureNotEligible = () => {
+    return (
+      <div className="recap-fly-count-block">
+        <div className="recap-fly-count-header">
+          <Text size="md" code={true} as="p">
+            FLUIDITY AIRDROP WAVE 3
+          </Text>
+          <Heading>You are not eligible</Heading>
+        </div>
+        <div className="recap-fly-count-thank-you">
+          <Text>
+            Keep transferring with Fluid Assets and participating! Utility Gauges are coming soon.
+          </Text>
+        </div>
+        <div className="recap-fly-count-buttons-spread-container">
+          <div className="recap-fly-count-buttons-spread">
+            <GeneralButton
+              type="primary"
+              icon={<ArrowTopRight />}
+              layout="after"
+              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
+            >
+              <Text size="sm" prominent code style={{ color: "inherit" }}>
+                Learn more
+              </Text>
+            </GeneralButton>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const handleClaimYourFly = (type: "claim" | "stake") => {
+    setFlyClaimModalState(type);
+    // Get the user's address.by
+  };
 
   const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
     useState(false);
@@ -1779,6 +1880,140 @@ const RecapModal = ({
     document.addEventListener("keydown", closeWithEsc);
     return () => document.removeEventListener("keydown", closeWithEsc);
   }, [termsAndConditionsModalVis, closeWithEsc]);
+
+  const ClaimButtonsSpread = () => (
+    <div className="recap-fly-count-buttons-spread">
+      <GeneralButton
+        disabled={true}
+        onClick={() => handleClaimYourFly("claim")}
+      >
+        Claim your FLY
+      </GeneralButton>
+      <GeneralButton
+        disabled={true}
+        onClick={() => handleClaimYourFly("stake")}
+      >
+        Stake your $FLY airdrop
+      </GeneralButton>
+    </div>
+  );
+
+  // whether the popup staking modal was completed in a staking state
+  const [completedClaimStakeModal, setCompletedClaimStakeModal] =
+    useState(false);
+
+  // called when someone completes the staking modal with a claim complete state.
+  const handleClaimStakingModalComplete = () => {
+    setCompletedClaimStakeModal(true);
+  };
+
+  const StakingStatsButton = () => (
+    <div className="recap-fly-count-buttons-spread">
+      <GeneralButton onClick={() => flyStakingModalToggleVisibility?.(true)}>
+        Staking stats
+      </GeneralButton>
+    </div>
+  );
+
+  const ButtonsSpread = () =>
+    completedClaimStakeModal ? <StakingStatsButton /> : <ClaimButtonsSpread />;
+
+  const YouAreEligible = () => {
+    return (
+      <div className="recap-fly-count-block">
+        <div className="recap-fly-count-header">
+          <Text size="md" code={true}>
+            Congratulations! You are entitled to
+          </Text>
+          <Heading>
+            $FLY{" "}
+            {numberToCommaSeparated(flyAmountOwed)}
+          </Heading>
+        </div>
+        <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
+          <ButtonsSpread />
+        </div>
+        <div className="recap-you-are-eligible-delegate-button-terms-container">
+          <Text style={{ textAlign: "center" }}>
+            By pressing the Claim and/or Stake button, you agree to our airdrop{" "}
+            {}
+            <a
+              className="recap-terms-of-condition-claim-or-stake"
+              onClick={() => setTermsAndConditionsModalVis(true)}
+            >
+              terms of service
+            </a>
+          </Text>
+        </div>
+        <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
+          <GeneralButton
+            size="medium"
+            type="secondary"
+            className="recap-you-are-eligible-claim-at-tge-button rainbow"
+          >
+            💸 Stake your $FLY to earn Airdrop Rewards and [REDACTED] in
+            Superposition (SPN) 🐱
+          </GeneralButton>
+        </div>
+        <div className="recap-fly-count-buttons-spread-container">
+          <LinkButton
+            color="red"
+            size="large"
+            type="external"
+            handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
+            disabled
+          >
+            Click here to learn more about $FLY distribution
+          </LinkButton>
+        </div>
+      </div>
+    );
+  };
+
+  const handleCheckEligibility = () => {
+    // grey out the button here
+    setCheckYourEligibilityButtonEnabled(false);
+
+    // check if the request to get information on the airdrop is
+    // done, if it is, then show the tge details
+    setShowTGEDetails(false);
+  };
+
+  const ShowEpochDetails = () => {
+    return (
+      <div id="airdrop-claim-block" className="recap-fly-count-block">
+        <div className="recap-fly-count-header">
+          <Text size="md" code={true} as="p">
+            FLUIDITY AIRDROP WAVE 3
+          </Text>
+          <Heading>The Fluidity $FLY-Wheel Continues</Heading>
+        </div>
+        <div className="recap-fly-count-thank-you">
+          <Text>
+            Thank you for riding with us this Wave. It has come to an end, check
+            your eligibility for rewards from your bottles, and how you surfed.
+          </Text>
+        </div>
+        <div className="recap-fly-count-buttons-spread-container">
+          <div className="recap-fly-count-buttons-spread">
+            <GeneralButton
+              handleClick={handleCheckEligibility}
+              disabled={!checkYourEligibilityButtonEnabled}
+            >
+              Check your eligibility
+            </GeneralButton>
+            <GeneralButton
+              handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
+              icon={<ArrowTopRight />}
+              disabled
+            >
+              See criteria
+            </GeneralButton>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -1856,6 +2091,18 @@ const RecapModal = ({
           </div>
         </div>
       </Modal>
+      <Modal id="fly-claim-submit" visible={flyClaimModalState !== "none"}>
+        <FLYClaimSubmitModal
+          showConnectWalletModal={() => setWalletModalVisibility(true)}
+          flyAmount={flyAmountOwed}
+          visible={flyClaimModalState !== "none"}
+          mode={flyClaimModalState === "none" ? "claim" : flyClaimModalState}
+          accumulatedPoints={day1Points}
+          close={() => setFlyClaimModalState("none")}
+          onStakingComplete={handleClaimStakingModalComplete}
+          onClaimComplete={handleClaimStakingModalComplete}
+        />
+      </Modal>
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}
         <div className={"recap-hero"}>
@@ -1882,10 +2129,21 @@ const RecapModal = ({
                   </strong>{" "}
                   All of these loot bottles you have earned are safely secured
                   in your personal airdrop crate, and is now{" "}
-                  <strong style={{ color: "white" }}>En Route</strong> to you to
-                  TGE. You will get notified for when it is time to crack open
+                  <strong style={{ color: "white" }}>En Route</strong> to you.
+                  You will get notified for when it is time to crack open
                   the crate!
                 </Text>
+              </motion.div>
+              <motion.div variants={heroItemVariants}>
+                <GeneralButton
+                  type="transparent"
+                  layout="after"
+                  handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
+                >
+                  <Text size="sm" prominent code style={{ color: "inherit" }}>
+                    Convert your bottles to $FLY
+                  </Text>
+                </GeneralButton>
               </motion.div>
 
               <motion.div
@@ -2132,6 +2390,20 @@ const RecapModal = ({
             </motion.div>
           </div>
         )}
+
+        {/*TGE details display*/}
+        <motion.div
+          className={"recap-fly-count-container"}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.1, delay: 0.1 }}
+          viewport={{
+            amount: "all",
+            once: true,
+          }}
+        >
+          <div id="claim">{showPageContent && <TGEDisplay />}</div>
+        </motion.div>
 
         <Modal id="connect-wallet" visible={walletModalVisibility}>
           <div className="cover">
