@@ -34,14 +34,6 @@ jobs:
       - name: make test-go
         run: |
           make test-go
-      - name: Discord
-        uses: ./scripts/actions
-        if: always()
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        with:
-          command: |
-            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   test-npm:
     runs-on: powerfulubuntu
@@ -57,11 +49,3 @@ jobs:
         run: |
           yarn
           npm test
-      - name: Discord
-        uses: ./scripts/actions
-        if: always()
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        with:
-          command: |
-            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
