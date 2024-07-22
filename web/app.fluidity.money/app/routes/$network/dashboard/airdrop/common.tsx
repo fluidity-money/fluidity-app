@@ -1892,7 +1892,6 @@ const RecapModal = ({
       <GeneralButton
         disabled={true}
         onClick={() => handleClaimYourFly("stake")}
-        disabled
       >
         Stake your $FLY airdrop
       </GeneralButton>
