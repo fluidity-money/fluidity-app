@@ -1,7 +1,7 @@
 import { jsonPost } from "~/util";
 
 const BaseUrl =
-  "https://tweixhrmbbft7t4yadd3dwklqq0etpxl.lambda-url.ap-southeast-2.on.aws";
+  "https://z9zrt4j6ri.execute-api.ap-southeast-2.amazonaws.com/default/flu-airdrop-amounts-owed-and-validate-signature-2";
 
 type RequestFLYOwedForAddressBody = {
   address: string;
