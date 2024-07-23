@@ -69,7 +69,7 @@ const MAX_STAKING_DAYS = 365;
 const MINIMUM_FLUID_LIQUIDITY_USD = 10;
 
 const AIRDROP_BLOG_POST =
-  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-and-ico-4c72172acb64";
+  "https://blog.fluidity.money/announcing-the-fluidity-airdrop-season-3-fb5890a10e54";
 
 interface IBottleDistribution extends React.HTMLAttributes<HTMLDivElement> {
   bottles: BottleTiers;
@@ -1895,6 +1895,12 @@ const RecapModal = ({
       >
         Stake your $FLY airdrop
       </GeneralButton>
+      <GeneralButton
+        disabled={true}
+        onClick={() => handleClaimYourFly("stake")}
+      >
+        Convert to $SPN points
+      </GeneralButton>
     </div>
   );
 
@@ -1961,7 +1967,6 @@ const RecapModal = ({
             size="large"
             type="external"
             handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
-            disabled
           >
             Click here to learn more about $FLY distribution
           </LinkButton>
@@ -2005,7 +2010,6 @@ const RecapModal = ({
             <GeneralButton
               handleClick={() => window?.open(AIRDROP_BLOG_POST, "_blank")}
               icon={<ArrowTopRight />}
-              disabled
             >
               See criteria
             </GeneralButton>

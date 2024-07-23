@@ -972,12 +972,9 @@
   padding-bottom: 20px;
 }
 
-.recap-fly-count-buttons-spread > button:nth-child(1) {
-  margin-right: 10px;
-}
-
 .recap-fly-count-buttons-spread > button:nth-child(2) {
   margin-left: 10px;
+  margin-right: 10px;
 }
 
 .recap-fly-count-buttons-spread-container {
