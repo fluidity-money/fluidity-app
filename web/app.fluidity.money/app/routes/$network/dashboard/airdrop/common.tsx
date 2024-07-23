@@ -1895,6 +1895,12 @@ const RecapModal = ({
       >
         Stake your $FLY airdrop
       </GeneralButton>
+      <GeneralButton
+        disabled={true}
+        onClick={() => handleClaimYourFly("stake")}
+      >
+        Convert to SPN points
+      </GeneralButton>
     </div>
   );
 
