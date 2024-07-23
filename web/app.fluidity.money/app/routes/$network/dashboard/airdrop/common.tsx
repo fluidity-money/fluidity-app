@@ -1899,7 +1899,7 @@ const RecapModal = ({
         disabled={true}
         onClick={() => handleClaimYourFly("stake")}
       >
-        Convert to SPN points
+        Convert to $SPN points
       </GeneralButton>
     </div>
   );
