@@ -52,7 +52,6 @@ import {
 } from "framer-motion";
 import { TransactionResponse } from "~/util/chainUtils/instructions";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import { shorthandAmountFormatter } from "~/util";
