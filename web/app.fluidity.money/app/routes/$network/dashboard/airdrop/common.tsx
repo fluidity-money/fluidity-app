@@ -1675,9 +1675,6 @@ interface IRecapModal {
   navigate?: (path: string) => void;
 }
 
-const calculateDay1Points = (tokenFullAmount: number) =>
-  tokenFullAmount * 0.001 * (24 * 7);
-
 const RecapModal = ({
   totalVolume,
   bottlesLooted,
@@ -1775,9 +1772,7 @@ const RecapModal = ({
   const videoWidth = isMobile ? 500 : 1500;
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
-  const [flyClaimModalState, setFlyClaimModalState] = useState<
-    "none" | "claim" | "stake" | "convert"
-  >("none");
+
   const [isMidSigningAirdropElection, setIsMidSigningAirdropElection] = useState(false);
   const [electMessage, setElectMessage] = useState("");
 
@@ -1785,8 +1780,6 @@ const RecapModal = ({
   const [isFLYAllocated, setIsFLYAllocated] = useState(false);
 
   const [showTGEDetails, setShowTGEDetails] = useState(true);
-
-  const day1Points = calculateDay1Points(flyAmountOwed);
 
   // if the address isn't set, then it's a good proxy for knowing if the
   // user has supplied their address or not
@@ -1864,10 +1857,9 @@ const RecapModal = ({
 
   const handleClaimYourFly = async (type: "claim" | "stake" | "convert") => {
     if (!address) return;
-    setFlyClaimModalState(type);
     if (!signAirdropElection || isMidSigningAirdropElection) return;
     setIsMidSigningAirdropElection(true);
-    var option: number;
+    let option: number;
     switch (type) {
     case "claim":
       option = AirdropElection.Claim;
@@ -1939,11 +1931,6 @@ const RecapModal = ({
   // whether the popup staking modal was completed in a staking state
   const [completedClaimStakeModal, setCompletedClaimStakeModal] =
     useState(false);
-
-  // called when someone completes the staking modal with a claim complete state.
-  const handleClaimStakingModalComplete = () => {
-    setCompletedClaimStakeModal(true);
-  };
 
   const StakingStatsButton = () => (
     <div className="recap-fly-count-buttons-spread">
