@@ -1765,9 +1765,6 @@ const RecapModal = ({
 
   const { address, signAirdropElection } = useContext(FluidityFacadeContext);
 
-  const { toggleVisibility: flyStakingModalToggleVisibility } =
-    useContext(FlyStakingContext);
-
   const videoHeight = isMobile ? 500 : 700;
   const videoWidth = isMobile ? 500 : 1500;
 
@@ -1924,14 +1921,6 @@ const RecapModal = ({
         onClick={() => handleClaimYourFly("convert")}
       >
         Convert to $SPN points
-      </GeneralButton>
-    </div>
-  );
-
-  const StakingStatsButton = () => (
-    <div className="recap-fly-count-buttons-spread">
-      <GeneralButton onClick={() => flyStakingModalToggleVisibility?.(true)}>
-        Staking stats
       </GeneralButton>
     </div>
   );
