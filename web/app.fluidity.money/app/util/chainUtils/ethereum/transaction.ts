@@ -1002,14 +1002,13 @@ export enum AirdropElection {
   Claim = 0,
   Stake,
   ConvertToSpn
-};
+}
 
 export const signAirdropElection_ = async (
   signer: Signer,
   option: AirdropElection
 ): Promise<string> => {
-  const address = await signer.getAddress();
-  var optionStr = "";
+  let optionStr = "";
   switch (option) {
   case AirdropElection.Claim:
     optionStr = "claim";
