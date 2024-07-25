@@ -1,11 +1,5 @@
 /* eslint-disable no-irregular-whitespace */
 
-import type {
-  StakingRatioRes,
-  StakingDepositsRes,
-} from "~/util/chainUtils/ethereum/transaction";
-import type AugmentedToken from "~/types/AugmentedToken";
-
 import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import BN from "bn.js";
 import {
@@ -36,13 +30,19 @@ import {
   Provider,
   Modal,
 } from "@fluidity-money/surfing";
+import type {
+  StakingRatioRes,
+  StakingDepositsRes,
+} from "~/util/chainUtils/ethereum/transaction";
+import { AirdropElection } from "~/util/chainUtils/ethereum/transaction";
+import type AugmentedToken from "~/types/AugmentedToken";
 import {
   addDecimalToBn,
   getTokenAmountFromUsd,
   getUsdFromTokenAmount,
 } from "~/util/chainUtils/tokens";
 import { dayDifference } from ".";
-import { useFLYOwedForAddress, Referral } from "~/queries";
+import { useFLYOwedForAddress, addAirdropElection, Referral } from "~/queries";
 import { BottleTiers } from "../../query/dashboard/airdrop";
 import {
   AnimatePresence,
@@ -55,7 +55,6 @@ import FluidityFacadeContext from "contexts/FluidityFacade";
 import { FlyStakingContext } from "contexts/FlyStakingProvider";
 import { CopyGroup } from "~/components/ReferralModal";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import FLYClaimSubmitModal from "~/components/FLYClaimSubmitModal";
 import { shorthandAmountFormatter } from "~/util";
 
 // Epoch length
@@ -1767,7 +1766,7 @@ const RecapModal = ({
     },
   };
 
-  const { address } = useContext(FluidityFacadeContext);
+  const { address, signAirdropElection } = useContext(FluidityFacadeContext);
 
   const { toggleVisibility: flyStakingModalToggleVisibility } =
     useContext(FlyStakingContext);
@@ -1777,10 +1776,13 @@ const RecapModal = ({
 
   const [walletModalVisibility, setWalletModalVisibility] = useState(false);
   const [flyClaimModalState, setFlyClaimModalState] = useState<
-    "none" | "claim" | "stake"
+    "none" | "claim" | "stake" | "convert"
   >("none");
+  const [isMidSigningAirdropElection, setIsMidSigningAirdropElection] = useState(false);
+  const [electMessage, setElectMessage] = useState("");
 
   const [flyAmountOwed, setFLYAmountOwed] = useState(0);
+  const [isFLYAllocated, setIsFLYAllocated] = useState(false);
 
   const [showTGEDetails, setShowTGEDetails] = useState(true);
 
@@ -1818,9 +1820,11 @@ const RecapModal = ({
           console.warn(`Invalid response for airdrop request: ${resp}`);
           return;
         }
-        const { amount, error } = resp;
+        const { amount, allocated, error } = resp;
         if (error) throw new Error(`Airdrop request error: ${error}`);
         setFLYAmountOwed(amount);
+        setIsFLYAllocated(allocated);
+        if (allocated) setElectMessage("You have already elected to claim, stake, or convert!");
         setCheckYourEligibilityButtonEnabled(true);
       }
     })();
@@ -1858,9 +1862,37 @@ const RecapModal = ({
     );
   };
 
-  const handleClaimYourFly = (type: "claim" | "stake") => {
+  const handleClaimYourFly = async (type: "claim" | "stake" | "convert") => {
+    if (!address) return;
     setFlyClaimModalState(type);
-    // Get the user's address.by
+    if (!signAirdropElection || isMidSigningAirdropElection) return;
+    setIsMidSigningAirdropElection(true);
+    var option: number;
+    switch (type) {
+    case "claim":
+      option = AirdropElection.Claim;
+      break;
+    case "stake":
+      option = AirdropElection.Stake;
+      break;
+    case "convert":
+      option = AirdropElection.ConvertToSpn;
+      break;
+    }
+    const signature = await signAirdropElection(option);
+    console.log("signature for election", signature);
+    if (!signature) {
+      setIsMidSigningAirdropElection(true);
+      setElectMessage("Bad signature!");
+      return;
+    }
+    const { error } = await addAirdropElection(address, option, signature);
+    if (error) {
+      console.error("error setting airdrop election", error);
+      setElectMessage("Error setting option for distribution. Try again, and create a Discord ticket if another issue occurs.");
+      return;
+    }
+    setElectMessage("Success setting!");
   };
 
   const [termsAndConditionsModalVis, setTermsAndConditionsModalVis] =
@@ -1884,20 +1916,20 @@ const RecapModal = ({
   const ClaimButtonsSpread = () => (
     <div className="recap-fly-count-buttons-spread">
       <GeneralButton
-        disabled={true}
+        disabled={isFLYAllocated || isMidSigningAirdropElection}
         onClick={() => handleClaimYourFly("claim")}
       >
         Claim your FLY
       </GeneralButton>
       <GeneralButton
-        disabled={true}
+        disabled={isFLYAllocated || isMidSigningAirdropElection}
         onClick={() => handleClaimYourFly("stake")}
       >
         Stake your $FLY airdrop
       </GeneralButton>
       <GeneralButton
-        disabled={true}
-        onClick={() => handleClaimYourFly("stake")}
+        disabled={isFLYAllocated || isMidSigningAirdropElection}
+        onClick={() => handleClaimYourFly("convert")}
       >
         Convert to $SPN points
       </GeneralButton>
@@ -1936,6 +1968,7 @@ const RecapModal = ({
             {numberToCommaSeparated(flyAmountOwed)}
           </Heading>
         </div>
+        <Heading as="h5" style={{ textAlign: "center" }}>{electMessage}</Heading>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
           <ButtonsSpread />
         </div>
@@ -2094,18 +2127,6 @@ const RecapModal = ({
             </p>
           </div>
         </div>
-      </Modal>
-      <Modal id="fly-claim-submit" visible={flyClaimModalState !== "none"}>
-        <FLYClaimSubmitModal
-          showConnectWalletModal={() => setWalletModalVisibility(true)}
-          flyAmount={flyAmountOwed}
-          visible={flyClaimModalState !== "none"}
-          mode={flyClaimModalState === "none" ? "claim" : flyClaimModalState}
-          accumulatedPoints={day1Points}
-          close={() => setFlyClaimModalState("none")}
-          onStakingComplete={handleClaimStakingModalComplete}
-          onClaimComplete={handleClaimStakingModalComplete}
-        />
       </Modal>
       <div className={`recap-container ${isMobile ? "recap-mobile" : ""}`}>
         {/* Recap Heading */}

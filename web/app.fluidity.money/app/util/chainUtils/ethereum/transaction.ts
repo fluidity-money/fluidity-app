@@ -119,7 +119,7 @@ export const getUsdAmountMinted = async (
   return Number(utils.formatUnits(amount, decimals));
 };
 
-const makeContractSwap = async (
+export const makeContractSwap = async (
   signer: Signer,
   from: ContractToken,
   to: ContractToken,
@@ -998,4 +998,29 @@ export const handleContractErrors = async (
   }
 };
 
-export default makeContractSwap;
+export enum AirdropElection {
+  Claim = 0,
+  Stake,
+  ConvertToSpn
+};
+
+export const signAirdropElection_ = async (
+  signer: Signer,
+  option: AirdropElection
+): Promise<string> => {
+  const address = await signer.getAddress();
+  var optionStr = "";
+  switch (option) {
+  case AirdropElection.Claim:
+    optionStr = "claim";
+    break;
+  case AirdropElection.Stake:
+    optionStr = "stake";
+    break;
+  case AirdropElection.ConvertToSpn:
+    optionStr = "convert";
+    break;
+  }
+  const message = `I elect to ${optionStr} my FLY token.`;
+  return await signer.signMessage(utils.arrayify(utils.toUtf8Bytes(message)));
+};

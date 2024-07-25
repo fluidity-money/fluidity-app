@@ -4,6 +4,7 @@ import type {
   StakingDepositsRes,
   StakingRedeemableRes,
   FLYStakingDetailsRes,
+  AirdropElection,
 } from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
@@ -85,6 +86,8 @@ export interface IFluidityFacade {
     signature: string,
     address: string
   ) => Promise<void>;
+
+  signAirdropElection?: (option: AirdropElection) => Promise<string | undefined>;
 
   merkleDistributorWithDeadlineEndTime?: () => Promise<number | undefined>;
 

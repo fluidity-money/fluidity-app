@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import {
   confirmAccountOwnership_,
+  AirdropElection,
+  signAirdropElection_,
   signOwnerAddress_,
   StakingDepositsRes,
 } from "~/util/chainUtils/ethereum/transaction";
@@ -39,7 +41,8 @@ import {
   flyStakingFinaliseUnstake as doFlyStakingFinaliseUnstake,
   flyStakingSecondsUntilSoonestUnstake as doFlyStakingSecondsUntilSoonestUnstake,
 } from "~/util/chainUtils/ethereum/transaction";
-import makeContractSwap, {
+import {
+  makeContractSwap,
   ContractToken,
   getBalanceOfERC20,
 } from "~/util/chainUtils/ethereum/transaction";
@@ -604,6 +607,16 @@ const EthereumFacade = ({
     console.log(result);
   };
 
+  const signAirdropElection = async (option: AirdropElection): Promise<string | undefined> => {
+    const signer = provider?.getSigner();
+
+    if (!signer) {
+      return undefined;
+    }
+
+    return signAirdropElection_(signer, option);
+  };
+
   const merkleDistributorWithDeadlineEndTime = () => {
     throw new Error("TODO");
   };
@@ -808,6 +821,7 @@ const EthereumFacade = ({
         getStakingRatios,
         signOwnerAddress,
         confirmAccountOwnership,
+        signAirdropElection,
         merkleDistributorWithDeadlineEndTime,
         merkleDistributorWithDeadlineClaim,
         merkleDistributorWithDeadlineClaimAndStake,
