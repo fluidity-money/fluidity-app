@@ -962,6 +962,11 @@
   text-align: center;
 }
 
+.recap-fly-election-message {
+  font-size: 14px;
+  text-align: center;
+}
+
 .recap-fly-count-buttons-spread {
   display: flex;
   flex-direction: row;

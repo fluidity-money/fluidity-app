@@ -17,6 +17,7 @@ type ResponseFLYOwedForAddress = {
   amount: number;
   updated: string;
   bottles: ResponseFLYOwedForAddressBottle[];
+  allocated: boolean;
   error: string;
 };
 

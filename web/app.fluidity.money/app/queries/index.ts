@@ -12,3 +12,4 @@ export * from "./addReferralCode";
 export * from "./useLootboxConfig";
 export * from "./useLootBottles";
 export * from "./useFLYOwed";
+export * from "./addAirdropElection";
