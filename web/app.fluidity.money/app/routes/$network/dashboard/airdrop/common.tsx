@@ -1928,10 +1928,6 @@ const RecapModal = ({
     </div>
   );
 
-  // whether the popup staking modal was completed in a staking state
-  const [completedClaimStakeModal, setCompletedClaimStakeModal] =
-    useState(false);
-
   const StakingStatsButton = () => (
     <div className="recap-fly-count-buttons-spread">
       <GeneralButton onClick={() => flyStakingModalToggleVisibility?.(true)}>
@@ -1939,9 +1935,6 @@ const RecapModal = ({
       </GeneralButton>
     </div>
   );
-
-  const ButtonsSpread = () =>
-    completedClaimStakeModal ? <StakingStatsButton /> : <ClaimButtonsSpread />;
 
   const YouAreEligible = () => {
     return (
@@ -1957,7 +1950,7 @@ const RecapModal = ({
         </div>
         <Heading as="h5" style={{ textAlign: "center" }}>{electMessage}</Heading>
         <div className="recap-fly-count-buttons-spread-container recap-fly-count-eligible-buttons">
-          <ButtonsSpread />
+          <ClaimButtonsSpread />
         </div>
         <div className="recap-you-are-eligible-delegate-button-terms-container">
           <Text style={{ textAlign: "center" }}>
