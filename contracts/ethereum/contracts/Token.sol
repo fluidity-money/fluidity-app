@@ -371,31 +371,33 @@ contract Token is
      * @dev rewards two users from the reward pool
      * @dev mints tokens and emits the reward event
      *
-     * @param firstBlock the first block in the range being rewarded for
-     * @param lastBlock the last block in the range being rewarded for
-     * @param winner the address being rewarded
-     * @param amount the amount being rewarded
+     * @param _firstBlock the first block in the range being rewarded for
+     * @param _lastBlock the last block in the range being rewarded for
+     * @param _winner the address being rewarded
+     * @param _amount the amount being rewarded
+     * @param _extraData to be sent alongside the event
      */
     function _rewardFromPool(
-        uint256 firstBlock,
-        uint256 lastBlock,
-        address winner,
-        uint256 amount
+        uint256 _firstBlock,
+        uint256 _lastBlock,
+        address _winner,
+        uint256 _amount,
+        bytes32 _extraData
     ) internal {
         require(noEmergencyMode_, "emergency mode!");
 
-        if (amount > maxUncheckedReward_) {
+        if (_amount > maxUncheckedReward_) {
             // quarantine the reward
-            emit BlockedReward(winner, amount, firstBlock, lastBlock);
+            emit BlockedReward(_winner, _amount, _firstBlock, _lastBlock);
 
-            blockedRewards_[winner] += amount;
+            blockedRewards_[_winner] += _amount;
 
             return;
         }
 
-        _mint(winner, amount);
+        _mint(_winner, _amount);
 
-        emit Reward(winner, amount, firstBlock, lastBlock);
+        emit RewardV2(_winner, _amount, _firstBlock, _lastBlock, _extraData);
     }
 
 
@@ -708,27 +710,29 @@ contract Token is
 
     /// @inheritdoc IFluidClient
     function batchReward(
-        Winner[] memory rewards,
-        uint firstBlock,
-        uint lastBlock
+        Winner[] memory _rewards,
+        uint _firstBlock,
+        uint _lastBlock,
+        bytes32 _extraData
     ) public {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
         uint poolAmount = rewardPoolAmount();
 
-        for (uint i = 0; i < rewards.length; i++) {
-            Winner memory winner = rewards[i];
+        for (uint i = 0; i < _rewards.length; i++) {
+            Winner memory winner = _rewards[i];
 
             require(poolAmount >= winner.amount, "empty reward pool");
 
             poolAmount = poolAmount - winner.amount;
 
             _rewardFromPool(
-                firstBlock,
-                lastBlock,
+                _firstBlock,
+                _lastBlock,
                 winner.winner,
-                winner.amount
+                winner.amount,
+                _extraData
             );
         }
     }

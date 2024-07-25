@@ -60,7 +60,7 @@ abstract contract BaseUtilityClient is IFluidClient, IEmergencyMode {
     // implements IFluidClient
 
     /// @inheritdoc IFluidClient
-    function batchReward(Winner[] memory _rewards, uint _firstBlock, uint _lastBlock) external {
+    function batchReward(Winner[] memory _rewards, uint _firstBlock, uint _lastBlock, bytes32 _extraData) external {
         require(noEmergencyMode_, "emergency mode!");
         require(msg.sender == oracle_, "only oracle");
 
@@ -74,11 +74,12 @@ abstract contract BaseUtilityClient is IFluidClient, IEmergencyMode {
             poolAmount = poolAmount - winner.amount;
 
             token_.safeTransfer(winner.winner, winner.amount);
-            emit Reward(
+            emit RewardV2(
                 winner.winner,
                 winner.amount,
                 _firstBlock,
-                _lastBlock
+                _lastBlock,
+                _extraData
             );
         }
     }

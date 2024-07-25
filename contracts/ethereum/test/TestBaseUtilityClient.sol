@@ -42,11 +42,12 @@ contract TestUtilityClient is BaseUtilityClient {
 
 contract TestBaseUtilityClient is Test {
     // duplicate of IFluidClient.Reward, since for some reason events aren't importable
-    event Reward(
+    event RewardV2(
         address indexed winner,
         uint amount,
         uint startBlock,
-        uint endBlock
+        uint endBlock,
+        bytes32 extraData
     );
 
     IERC20 private token;

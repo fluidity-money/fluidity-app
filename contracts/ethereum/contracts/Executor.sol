@@ -201,7 +201,8 @@ contract Executor is IEmergencyMode, IOperatorOwned {
         address _token,
         FluidityReward[] calldata _rewards,
         uint _firstBlock,
-        uint _lastBlock
+        uint _lastBlock,
+        bytes32 _extraData
     )
         public
     {
@@ -218,7 +219,7 @@ contract Executor is IEmergencyMode, IOperatorOwned {
             );
 
             // this will revert if client == address(0)
-            client.batchReward(fluidReward.rewards, _firstBlock, _lastBlock);
+            client.batchReward(fluidReward.rewards, _firstBlock, _lastBlock, _extraData);
         }
     }
 

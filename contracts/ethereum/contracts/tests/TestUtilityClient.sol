@@ -28,12 +28,23 @@ contract TestClient is IFluidClient {
         token.transferFrom(msg.sender, address(this), amount);
     }
 
-    function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) external {
+    function batchReward(
+        Winner[] memory _rewards,
+        uint _firstBlock,
+        uint _lastBlock,
+        bytes32 _extraData
+    ) external {
         require(msg.sender == oracle_, "only the operator can use this");
 
-        for (uint i = 0; i < rewards.length; i++) {
-            govToken_.transfer(rewards[i].winner, rewards[i].amount);
-            emit Reward(rewards[i].winner, rewards[i].amount, firstBlock, lastBlock);
+        for (uint i = 0; i < _rewards.length; i++) {
+            govToken_.transfer(_rewards[i].winner, _rewards[i].amount);
+            emit RewardV2(
+                _rewards[i].winner,
+                _rewards[i].amount,
+                _firstBlock,
+                _lastBlock,
+                _extraData
+            );
         }
     }
 

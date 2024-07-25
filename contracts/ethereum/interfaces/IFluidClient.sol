@@ -31,11 +31,12 @@ string constant DEFAULT_CALCULATION_TYPE = "";
 interface IFluidClient {
 
     /// @notice MUST be emitted when any reward is paid out
-    event Reward(
+    event RewardV2(
         address indexed winner,
         uint amount,
         uint startBlock,
-        uint endBlock
+        uint endBlock,
+        bytes32 extraData
     );
 
     /**
@@ -44,7 +45,12 @@ interface IFluidClient {
      *
      * @param rewards the array of rewards to pay out
      */
-    function batchReward(Winner[] memory rewards, uint firstBlock, uint lastBlock) external;
+    function batchReward(
+        Winner[] memory rewards,
+        uint firstBlock,
+        uint lastBlock,
+        bytes32 extraData
+    ) external;
 
     /**
      * @notice gets stats on the token being distributed
