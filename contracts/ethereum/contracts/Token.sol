@@ -934,8 +934,13 @@ contract Token is
 
        // why bother with a newer block? avoid messy block reorgs
        require(blacklistFrozenWhen_[_new] < block.number, "same block number");
-       balances_[_new] = balances_[_old];
+
+       uint256 amount = balances_[_old];
+
+       balances_[_new] = amount;
        balances_[_old] = 0;
+
+        emit Transfer(_old, _new, amount);
     }
 
     /**
