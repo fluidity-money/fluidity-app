@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"math/big"
 
-	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
-	"github.com/ethereum/go-ethereum/common"
 	ethCommon "github.com/fluidity-money/fluidity-app/common/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	ethTypes "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
+
+	ethAbi "github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 const ammAbiString = `[
@@ -17,7 +18,8 @@ const ammAbiString = `[
       "anonymous": false,
       "inputs": [
         { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-        { "indexed": false, "internalType": "int128", "name": "delta", "type": "int128" }
+        { "indexed": false, "internalType": "int256", "name": "token0", "type": "int256" },
+        { "indexed": false, "internalType": "int256", "name": "token1", "type": "int256" }
       ],
       "name": "UpdatePositionLiquidity",
       "type": "event"
@@ -82,13 +84,14 @@ var AmmAbi ethAbi.ABI
 type (
 	AmmEventPositionMint struct {
 		Id    misc.BigInt      `json:"id"`
+		Pool  ethereum.Address `json:"pool"`
 		Lower int32            `json:"lower_tick"`
 		Upper int32            `json:"upper_tick"`
-		Pool  ethereum.Address `json:"pool"`
 	}
 	AmmEventPositionUpdate struct {
-		Id    misc.BigInt `json:"id"`
-		Delta misc.BigInt `json:"liquidity_delta"`
+		Id     misc.BigInt `json:"id"`
+		Token0 misc.BigInt `json:"token0"`
+		Token1 misc.BigInt `json:"token1"`
 	}
 	AmmEventCollectFees struct {
 		Id      misc.BigInt
@@ -187,15 +190,26 @@ func DecodeUpdatePosition(log ethTypes.Log) (update AmmEventPositionUpdate, err 
 		return
 	}
 
-	delta, err := ethCommon.CoerceBoundContractResultsToInt(data)
+	token0, ok := data[0].(*big.Int)
 
-	if err != nil {
+	if !ok {
+		err = fmt.Errorf("Failed to decode token0! %T", data[0])
+
+		return
+	}
+
+	token1, ok := data[1].(*big.Int)
+
+	if !ok {
+		err = fmt.Errorf("Failed to decode token1! %T", data[1])
+
 		return
 	}
 
 	update = AmmEventPositionUpdate{
-		Id:    misc.NewBigIntFromInt(*id),
-		Delta: misc.NewBigIntFromInt(*delta),
+		Id:     misc.NewBigIntFromInt(*id),
+		Token0: misc.NewBigIntFromInt(*token0),
+		Token1: misc.NewBigIntFromInt(*token1),
 	}
 
 	return update, nil
