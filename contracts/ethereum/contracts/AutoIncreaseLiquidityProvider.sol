@@ -33,6 +33,8 @@ contract AutoIncreaseLiquidityProvider is ILiquidityProvider {
     /// @dev amountTaken_ from the pool so far
     uint256 public amountTaken_;
 
+    uint256 public amountAdded_;
+
     /**
      * @notice initialiser function
      *
@@ -57,7 +59,8 @@ contract AutoIncreaseLiquidityProvider is ILiquidityProvider {
     }
 
     /// @inheritdoc ILiquidityProvider
-    function addToPool(uint /* _amount */) external view {
+    function addToPool(uint _amount) external {
+        amountAdded_ += _amount;
     }
 
     /// @inheritdoc ILiquidityProvider
@@ -71,7 +74,7 @@ contract AutoIncreaseLiquidityProvider is ILiquidityProvider {
     function totalPoolAmount() external view returns (uint) {
         uint secsSince = block.timestamp - deploymentTs_;
         uint256 fluidBalance = (secsSince * increaseAmount_) - amountTaken_;
-        return fluidBalance;
+        return fluidBalance + amountAdded_;
     }
 
     function owner_() public view returns (address) {
