@@ -92,6 +92,10 @@ type (
 		Id     misc.BigInt `json:"id"`
 		Token0 misc.BigInt `json:"token0"`
 		Token1 misc.BigInt `json:"token1"`
+
+		// Delta is needed by the AMM positions microservice so we can calculate who
+		// receives rewards. So this is added by the microservice that unpacks this data.
+		Delta misc.BigInt `json:"delta"`
 	}
 	AmmEventCollectFees struct {
 		Id      misc.BigInt
