@@ -61,7 +61,6 @@ jobs:
     if: needs.get-diff.outputs.file_exists == 'true'
     runs-on: powerfulubuntu
     environment: mainnet
-    needs: [get-diff]
     steps:
       - uses: actions/checkout@v3
         with:
