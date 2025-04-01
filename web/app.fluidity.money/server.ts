@@ -18,10 +18,14 @@ import {
   winnersTransactionObservable,
   pendingWinnersTransactionObservables,
 } from "./drivers";
+import { writeReadableStreamToWritable } from "@remix-run/node";
 
 //
 
 const MODE = process.env.NODE_ENV;
+const CDN = process.env.FLU_CDN;
+
+if (!CDN) throw new Error("FLU_CDN not set!");
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,6 +53,22 @@ app.use(
   "/build",
   express.static("public/build", { immutable: true, maxAge: "1y" })
 );
+
+// Fetch assets from CDN rather than local path.
+// Remix's publicPath sets the path for everything, so we instead specify paths to route through the CDN.
+app.use(["/assets", "/images", "/videos"], (req, res, next) => {
+  fetch(`${CDN}${req.originalUrl}`)
+    .then((cdnRes) => {
+      if (!cdnRes.body) return next();
+      writeReadableStreamToWritable(cdnRes.body, res);
+
+      cdnRes.headers.forEach((v, n) => res.setHeader(n, v));
+    })
+    .catch((e) => {
+      console.error("Failed to fetch from CDN", e);
+    });
+});
+
 // Everything else (like favicon.ico) is cached for an hour. You may want to be
 // more aggressive with this caching.
 app.use(express.static("public", { maxAge: "1h" }));
@@ -57,14 +77,6 @@ app.use(morgan("tiny"));
 const BUILD_DIR = path.join(process.cwd(), "build");
 
 const ethereumTokens = config.config["ethereum"].tokens
-  .filter((entry) => entry.isFluidOf !== undefined)
-  .map((entry) => ({
-    token: entry.symbol,
-    address: entry.address,
-    decimals: entry.decimals,
-  }));
-
-const solanaTokens = config.config["solana"].tokens
   .filter((entry) => entry.isFluidOf !== undefined)
   .map((entry) => ({
     token: entry.symbol,
@@ -87,8 +99,6 @@ io.on("connection", (socket) => {
     let Tokens: TokenList = [];
     if (protocol === `ethereum`) {
       Tokens = ethereumTokens;
-    } else if (protocol === `solana`) {
-      Tokens = solanaTokens;
     }
 
     const OnChainTransactionsObservable: Observable<PipedTransaction> =

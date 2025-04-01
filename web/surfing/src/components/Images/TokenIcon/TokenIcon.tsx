@@ -14,6 +14,7 @@ const tokenImgMap: {[K in Token]: string} = {
   DAI: "dai.svg",
   fDAI: "fDAI.svg",
   wETH: "Weth.svg",
+  FLY: "fly.svg",
 } as const;
 
 type ITokenIcon = React.ImgHTMLAttributes<HTMLImageElement> & {

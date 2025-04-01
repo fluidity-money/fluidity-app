@@ -12,6 +12,7 @@ import (
 	"time"
 
 	solApps "github.com/fluidity-money/fluidity-app/common/solana/applications"
+	suiApps "github.com/fluidity-money/fluidity-app/common/sui/applications"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
@@ -103,6 +104,26 @@ func InsertWinner(winner Winner) {
 			)`,
 			TableWinners,
 		)
+
+	case network.NetworkSui:
+		statementText = fmt.Sprintf(
+			`INSERT INTO %s (
+				network,
+				transaction_hash,
+				send_transaction_hash,
+				winning_address,
+				solana_winning_owner_address,
+				winning_amount,
+				awarded_time,
+				send_transaction_log_index,
+				token_short_name,
+				token_decimals,
+				reward_type,
+				sui_application,
+				utility_name
+			)`,
+			TableWinners,
+		)
 	}
 
 	statementText +=
@@ -165,7 +186,8 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 			solana_winning_owner_address,
 			reward_type,
 			ethereum_application,
-			solana_application
+			solana_application,
+			sui_application
 
 		FROM %v
 		WHERE network = $1
@@ -204,6 +226,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 			solanaWinnerOwnerAddress sql.NullString
 			applicationSolana        string
 			applicationEthereum      string
+			applicationSui           string
 		)
 
 		err := rows.Scan(
@@ -219,6 +242,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 			&winner.RewardType,
 			&applicationSolana,
 			&applicationEthereum,
+			&applicationSui,
 		)
 
 		if err != nil {
@@ -234,7 +258,7 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 		var application Application
 
 		switch winner.Network {
-		case network.NetworkEthereum:
+		case network.NetworkEthereum, network.NetworkArbitrum:
 			application, err = ethApps.ParseApplicationName(applicationEthereum)
 
 			if err != nil {
@@ -256,6 +280,16 @@ func GetLatestWinners(blockchainNetwork network.BlockchainNetwork, limit int) []
 				})
 			}
 
+		case network.NetworkSui:
+			application, err = suiApps.ParseApplicationName(applicationSui)
+
+			if err != nil {
+				log.Fatal(func(k *log.Log) {
+					k.Context = Context
+					k.Message = "Failed to convert application name into application!"
+					k.Payload = err
+				})
+			}
 		}
 
 		winner.Application = application.String()

@@ -1,7 +1,6 @@
 # microservice-ethereum-create-transaction-lootboxes
 
-Creates lootboxes from attributes of winning transactions,
-and publishes to lootbox queue
+Creates lootboxes from user actions tracked by the application server, ignoring non-applications.
 
 ## Environment variables
 

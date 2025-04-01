@@ -8,14 +8,13 @@ SERVICES:
       SECRET_FLU_ARB_RPC_HTTP: /fluidity/arbitrum/http_url
       SECRET_FLU_POLYZK_RPC_HTTP: /fluidity/polygon_zk/http_url
       DEPLOYMENT_TYPE: CODEDEPLOY
-      CODEDEPLOY_WAIT_TIME: 60 #minutes
+      CODEDEPLOY_WAIT_TIME: 15 #minutes
       LOAD_BALANCER: flu-mainnet-fluidity-alb
       TARGET_GROUP_01: flu-mainnet-fluidity-fe-tg
       TARGET_GROUP_02: flu-mainnet-fluidity-fe-tg-1
       CPU_LIMIT: 512
       MEM_LIMIT: 1024
       SECRET_FLU_SENTRY_DSN: /fluidity/frontend/sentryURL
-      NEXT_PUBLIC_FLU_SPLIT_BROWSER_KEY: s7ovhvrpv77htn8aqlf2irirnll9ofvr07be
       NEXT_PUBLIC_FLU_GTAG_ID: G-EF68MNJRJ7
       NEXT_PUBLIC_FLU_GTM_ID: GTM-W7QJGR2
       NEXT_PUBLIC_FLU_HASURA_URL: https://fluidity.hasura.app/v1/graphql

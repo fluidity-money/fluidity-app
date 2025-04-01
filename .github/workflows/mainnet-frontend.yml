@@ -17,14 +17,14 @@ env:
 jobs:
   codecov:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: powerfulubuntu
     steps:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
 
   get-diff:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: powerfulubuntu
     environment: mainnet
     outputs:
       file_exists: ${{ steps.deployment_list.outputs.exist }}
@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 2
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -58,7 +58,7 @@ jobs:
 
   deploy-web:
     if: needs.get-diff.outputs.file_exists == 'true'
-    runs-on: ubuntu-latest
+    runs-on: powerfulubuntu
     environment: mainnet
     needs: [get-diff]
     steps:
@@ -67,7 +67,7 @@ jobs:
           fetch-depth: 2
           lfs: true
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -87,12 +87,3 @@ jobs:
         with:
           command: |
             flu deploy-diff --network fluidity --environment $ENVIRONMENT --tag $GITHUB_SHA
-      - name: Discord
-        uses: ./scripts/actions
-        if: always()
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        with:
-          command: |
-            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
-

@@ -54,7 +54,7 @@ permissions:
 jobs:
   rollback-app:
     if: ${{ github.event.inputs.skip_app_rollback == 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: powerfulubuntu
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
@@ -63,7 +63,7 @@ jobs:
           lfs: true
           ref: ${{ github.event.inputs.rollbackTo }}
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -98,23 +98,15 @@ jobs:
               --environment ${{ github.event.inputs.environment }} \
               --debug false \
               --tag ${{ github.event.inputs.rollbackTo }}
-      - name: Discord
-        uses: ./scripts/actions
-        if: always()
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        with:
-          command: |
-            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}
 
   rollback-db:
     if: ${{ github.event.inputs.rollback_timescale == 'true' || github.event.inputs.rollback_postgres == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: powerfulubuntu
     environment: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-southeast-2
           role-to-assume: ${{ secrets.FLU_AWS_GITHUB_OIDC_ROLE }}
@@ -130,11 +122,3 @@ jobs:
               --rollback-timescaledb ${{ github.event.inputs.rollback_timescale }} \
               --rollback-postgresdb ${{ github.event.inputs.rollback_postgres }} \
               --tag $GITHUB_SHA
-      - name: Discord
-        uses: ./scripts/actions
-        if: always()
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        with:
-          command: |
-            flu send-discord --webhook-url ${{ secrets.FLU_CI_DISCORD_WEBHOOK_URL }} --status ${{ job.status }}

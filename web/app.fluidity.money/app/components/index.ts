@@ -7,3 +7,4 @@ export {
 } from "./ToolTip";
 export { UtilityToken } from "./UtilityToken";
 export { JoeFarmlandsOrCamelotKingdomLinks } from "./JoeFarmlandsOrCamelotKingdom";
+export { FLYClaimSubmitModalLinks } from "./FLYClaimSubmitModal";

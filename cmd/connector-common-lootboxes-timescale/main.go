@@ -8,11 +8,13 @@ import (
 
 func main() {
 	queue.LootboxesAll(func(lootbox lootboxes.Lootbox) {
-		user_actions.UpdateAggregatedUserTransactionByHashWithLootbottles(
-			lootbox.LootboxCount,
-			lootbox.RewardTier,
-			lootbox.TransactionHash,
-		)
+		if lootbox.TransactionHash != "" {
+			user_actions.UpdateAggregatedUserTransactionByHashWithLootbottles(
+				lootbox.LootboxCount,
+				lootbox.RewardTier,
+				lootbox.TransactionHash,
+			)
+		}
 
 		lootboxes.InsertLootbox(lootbox)
 	})

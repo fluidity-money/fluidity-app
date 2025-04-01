@@ -30,26 +30,32 @@ func TestTokenList(t *testing.T) {
 		{
 			TokenName:     `USDT`,
 			TokenDecimals: big.NewRat(1000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `USDC`,
 			TokenDecimals: big.NewRat(1000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `DAI`,
 			TokenDecimals: big.NewRat(1000000000000000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `TUSD`,
 			TokenDecimals: big.NewRat(1000000000000000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `FEI`,
 			TokenDecimals: big.NewRat(1000000000000000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `FRAX`,
 			TokenDecimals: big.NewRat(1000000000000000000, 1),
+			Extras:        []string{},
 		},
 	}
 
@@ -57,14 +63,17 @@ func TestTokenList(t *testing.T) {
 		{
 			TokenName:     `USDC`,
 			TokenDecimals: big.NewRat(1000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `USDT`,
 			TokenDecimals: big.NewRat(1000000, 1),
+			Extras:        []string{},
 		},
 		{
 			TokenName:     `UXD`,
 			TokenDecimals: big.NewRat(1000000, 1),
+			Extras:        []string{},
 		},
 	}
 

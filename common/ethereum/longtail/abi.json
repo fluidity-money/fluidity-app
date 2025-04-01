@@ -1,0 +1,26 @@
+[
+	{
+		"type": "function",
+		"name": "positionLiquidity8D11C045",
+		"inputs": [
+			{
+				"name": "pool",
+				"type": "address",
+				"internalType": "address"
+			},
+			{
+				"name": "id",
+				"type": "uint256",
+				"internalType": "uint256"
+			}
+		],
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint128",
+				"internalType": "uint128"
+			}
+		],
+		"stateMutability": "nonpayable"
+	}
+]

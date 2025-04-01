@@ -13,6 +13,7 @@ NPM_INSTALL := npm install
 
 DOCKER_BUILD := docker build
 DOCKER_COMPOSE := docker-compose
+DOCKER_RUN := docker run
 
 SEMGREP_ALL := semgrep --config p/ci --config p/secrets
 

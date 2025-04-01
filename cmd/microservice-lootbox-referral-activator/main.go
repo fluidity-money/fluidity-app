@@ -50,9 +50,13 @@ func main() {
 		if source != lootboxes.Transaction {
 			log.Debug(func(k *log.Log) {
 				k.Format(
-					"Lootbox was not derived from transaction - SKIPPING!",
-				)
-			})
+					"Lootbox transaction hash %v, source %v, lootbox count %v was not derived from transaction - SKIPPING!",
+					transactionHash,
+					source,
+					lootboxCount,
+ 				)
+ 			})
+
 			return
 		}
 
@@ -70,6 +74,7 @@ func main() {
 
 		unclaimedReferrals := referrals.GetEarliestUnclaimedReferrals(
 			ethereum.AddressFromString(address),
+			epoch,
 			int(maxUnclaimedReferrals),
 		)
 
@@ -107,7 +112,7 @@ func main() {
 				queue.SendMessage(lootboxes_queue.TopicLootboxes, referralLootbox)
 			}
 
-			referrals.UpdateReferral(referral)
+			referrals.UpdateReferral(referral, epoch)
 		}
 	})
 }

@@ -21,9 +21,11 @@ import (
 
 	"github.com/fluidity-money/fluidity-app/lib/databases/postgres/failsafe"
 	worker_config "github.com/fluidity-money/fluidity-app/lib/databases/postgres/worker"
+	"github.com/fluidity-money/fluidity-app/lib/databases/timescale/fly-staked"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/queue"
 	"github.com/fluidity-money/fluidity-app/lib/queues/worker"
+	libEth "github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	appTypes "github.com/fluidity-money/fluidity-app/lib/types/applications"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
@@ -235,6 +237,7 @@ func main() {
 			defaultTransfersInBlock      = workerConfig.DefaultTransfersInBlock
 			atxBufferSize                = workerConfig.AtxBufferSize
 			epochBlocks                  = workerConfig.EpochBlocks
+			yieldToStakers               = workerConfig.YieldToStakers
 		)
 
 		var (
@@ -501,6 +504,22 @@ func main() {
 
 				// if the amount transferred was exactly 0, then we skip to the next transfer
 
+				log.Debugf(
+					"Transaction hash %v log index %v has a decorator that's nil? %v",
+					transfer.TransactionHash,
+					logIndex,
+					transfer.Decorator == nil,
+				)
+
+				if d := transfer.Decorator; d != nil {
+					log.Debugf(
+						"Transaction hash %v log index %v has a decorator volume %v",
+						transfer.TransactionHash,
+						logIndex,
+						transfer.Decorator.Volume,
+					)
+				}
+
 				if isDecoratedTransferZeroVolume(transfer) {
 					log.App(func(k *log.Log) {
 						k.Format(
@@ -513,15 +532,31 @@ func main() {
 					continue
 				}
 
-				senderAddress, senderAddressChanged := worker_config.LookupFeeSwitch(
-					senderAddress_,
-					dbNetwork,
+				var (
+					senderAddress    libEth.Address
+					recipientAddress libEth.Address
+
+					senderAddressChanged    bool
+					recipientAddressChanged bool
 				)
 
-				recipientAddress, recipientAddressChanged := worker_config.LookupFeeSwitch(
-					recipientAddress_,
-					dbNetwork,
-				)
+				shouldSendYieldToStakers := yieldToStakers && dbNetwork == network.NetworkArbitrum
+
+				if shouldSendYieldToStakers {
+					senderAddress, recipientAddress = fly_staked.PickSenderAndReceiver()
+					senderAddressChanged = true
+					recipientAddressChanged = true
+				} else {
+					senderAddress, senderAddressChanged = worker_config.LookupFeeSwitch(
+						senderAddress_,
+						dbNetwork,
+					)
+
+					recipientAddress, recipientAddressChanged = worker_config.LookupFeeSwitch(
+						recipientAddress_,
+						dbNetwork,
+					)
+				}
 
 				if senderAddress == recipientAddress {
 					log.App(func(k *log.Log) {
@@ -697,7 +732,12 @@ func main() {
 				// check if we've processed this before as a final failsafe before we submit
 				// the balls via a message and store an emission
 
-				failsafe.CommitTransactionHashIndex(transactionHash, *logIndex)
+				failsafeOk := failsafe.CommitTransactionHashIndex(transactionHash, *logIndex)
+
+				if !failsafeOk {
+					// the function should log itself
+					continue
+				}
 
 				for _, payoutDetails := range payouts {
 

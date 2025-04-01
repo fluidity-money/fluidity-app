@@ -18,6 +18,8 @@ const UtilityToken = ({ utility, ...imgProps }: IUtilityToken) => {
       return <img {...imgProps} src="/images/providers/Jumper.svg" />;
     case "arb":
       return <img {...imgProps} src="/assets/chains/arbIcon.svg" />;
+    case "lifi":
+      return <img {...imgProps} src="/images/providers/Lifi.svg" />;
     default:
       return <img {...imgProps} src="/assets/tokens/fUSDC.svg" />;
   }

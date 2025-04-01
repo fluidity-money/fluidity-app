@@ -5,15 +5,17 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/fluidity-money/fluidity-app/common/ethereum/amm"
 	"github.com/fluidity-money/fluidity-app/lib/log"
 	"github.com/fluidity-money/fluidity-app/lib/timescale"
 	"github.com/fluidity-money/fluidity-app/lib/types/applications"
-	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
 	"github.com/fluidity-money/fluidity-app/lib/types/misc"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	token_details "github.com/fluidity-money/fluidity-app/lib/types/token-details"
 	"github.com/fluidity-money/fluidity-app/lib/types/worker"
+	"github.com/fluidity-money/fluidity-app/lib/types/ethereum"
+
+
+	"github.com/fluidity-money/fluidity-app/common/ethereum/amm"
 )
 
 const (
@@ -76,6 +78,29 @@ func InsertAmmPosition(mint amm.AmmEventPositionMint) {
 			k.Payload = err
 		})
 	}
+}
+
+func GetPositionPool(id misc.BigInt) (pool ethereum.Address) {
+	timescaleClient := timescale.Client()
+
+	statementText := fmt.Sprintf(
+		`SELECT pool_address FROM %v WHERE position_id = $1`,
+		TableAmmPositions,
+	)
+
+	row := timescaleClient.QueryRow(statementText, id)
+
+	err := row.Scan(&pool)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to update a position's liquidity!"
+			k.Payload = err
+		})
+	}
+
+	return pool
 }
 
 func UpdateAmmPosition(update amm.AmmEventPositionUpdate) {

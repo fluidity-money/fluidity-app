@@ -3,4 +3,8 @@ FROM fluidity/build-container:latest
 
 RUN go mod download
 
+COPY .semgrep .semgrep
+
+COPY tests tests
+
 ENTRYPOINT make test

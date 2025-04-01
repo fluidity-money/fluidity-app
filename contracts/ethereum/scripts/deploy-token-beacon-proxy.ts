@@ -21,6 +21,8 @@ const ENV_AAVE_V3_ADDRESS_PROVIDER = `FLU_ETHEREUM_AAVE_V3_PROVIDER_ADDRESS`;
 const ENV_COMPOUND_CTOKEN = `FLU_ETHEREUM_COMPOUND_CTOKEN_ADDRESS`;
 
 const ENV_STUPID_UNDERLYING = `FLU_ETHEREUM_STUPID_UNDERLYING`;
+const ENV_AUTO_INCREASE_UNDERLYING =  `FLU_AUTO_INCREASE_UNDERLYING`;
+const ENV_AUTO_INCREASE_INCREASE_AMOUNT = `FLU_AUTO_INCREASE_AMOUNT`;
 
 const ENV_DECIMALS = `FLU_ETHEREUM_DECIMALS`;
 const ENV_SYMBOL = `FLU_ETHEREUM_TOKEN_SYMBOL`;
@@ -45,6 +47,7 @@ const main = async () => {
   const aaveV2Factory = await hre.ethers.getContractFactory("AaveV2LiquidityProvider");
   const aaveV3Factory = await hre.ethers.getContractFactory("AaveV3LiquidityProvider");
   const stupidFactory = await hre.ethers.getContractFactory("StupidLiquidityProvider");
+  const autoIncreasingFactory = await hre.ethers.getContractFactory("AutoIncreaseLiquidityProvider");
 
   console.log(`deploying token with beacon address ${tokenAddress}`);
 
@@ -109,9 +112,21 @@ const main = async () => {
     );
     break;
 
+  case "increase":
+    const underlying = mustEnv(ENV_AUTO_INCREASE_UNDERLYING);
+    const increaseAmount = Number(mustEnv(ENV_AUTO_INCREASE_INCREASE_AMOUNT));
+    console.log(`deploying auto increase pool with beacon ${poolAddress}, underlying ${underlying}`);
+    pool = await hre.upgrades.deployBeaconProxy(
+      poolAddress,
+      autoIncreasingFactory,
+      [underlying, token.address, increaseAmount],
+      {initializer: "init(address,address,uint256)"},
+    );
+    break;
+
   default:
     throw new Error(
-      `Invalid token backend: ${backend} - should be 'compound' or 'aaveV2' or 'aaveV3'`
+      `Invalid token backend: ${backend} - should be 'compound', 'aaveV2', 'aaveV3', 'stupid', or 'increase'`
     );
   }
 

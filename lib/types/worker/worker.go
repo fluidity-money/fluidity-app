@@ -58,6 +58,7 @@ type (
 		DefaultTransfersInBlock       int                       `json:"default_transfers_in_block"`
 		AtxBufferSize                 int                       `json:"atx_buffer_size"`
 		EpochBlocks                   int                       `json:"epoch_blocks"`
+		YieldToStakers                bool                      `json:"yield_to_stakers"`
 		SpoolerInstantRewardThreshold float64                   `json:"spooler_instant_reward_threshold"`
 		SpoolerBatchedRewardThreshold float64                   `json:"spooler_batched_reward_threshold"`
 	}
@@ -67,6 +68,13 @@ type (
 		SolanaBlockTime uint64 `json:"solana_block_time"`
 		TransferCompute int    `json:"transfer_compute"`
 		AtxBufferSize   int    `json:"atx_buffer_size"`
+	}
+
+	// WorkerConfigSui that was previously hardcoded for Sui only
+	WorkerConfigSui struct {
+		SuiBlockTime                  uint64  `json:"sui_block_time"`
+		SpoolerInstantRewardThreshold float64 `json:"spooler_instant_reward_threshold"`
+		SpoolerBatchedRewardThreshold float64 `json:"spooler_batched_reward_threshold"`
 	}
 
 	// app fees for solana transactions
@@ -81,7 +89,7 @@ type (
 
 	// app fees for ethereum transactions
 	EthereumAppFees struct {
-		UniswapV3        float64 `json:"uniswap_v3"`
+		UniswapV3        float64 `json:"uniswap_v3",`
 		UniswapV2        float64 `json:"uniswap_v2"`
 		BalancerV2       float64 `json:"balancer_v2"`
 		OneInchV2        float64 `json:"oneinch_v2"`
@@ -90,19 +98,31 @@ type (
 		OneInchFixedRate float64 `json:"oneinch_fixedrate"`
 		DodoV2           float64 `json:"dodo_v2"`
 		Curve            float64 `json:"curve"`
-		Multichain       float64 `json:"multichain"`
-		XyFinance        float64 `json:"xyfinance"`
-		Apeswap          float64 `json:"apeswap"`
-		Saddle           float64 `json:"saddle"`
-		GTradeV6_1       float64 `json:"gtrade_v6_1"`
-		Meson            float64 `json:"meson"`
-		Camelot          float64 `json:"camelot"`
-		Chronos          float64 `json:"chronos"`
-		Sushiswap        float64 `json:"sushiswap"`
-		KyberClassic     float64 `json:"kyber_classic"`
-		Wombat           float64 `json:"wombat"`
-		SeawaterAmm      float64 `json:"seawater_amm"`
-		TraderJoe        float64 `json:"trader_joe"`
+
+		// Multichain is no longer used, but is kept here to be consistent with the database.
+		Multichain   float64 `json:"multichain"`
+		XyFinance    float64 `json:"xyfinance"`
+		Apeswap      float64 `json:"apeswap"`
+		Saddle       float64 `json:"saddle"`
+		GTradeV6_1   float64 `json:"gtrade_v6_1"`
+		Meson        float64 `json:"meson"`
+		Camelot      float64 `json:"camelot"`
+		CamelotV3    float64 `json:"camelot_v3"`
+		Chronos      float64 `json:"chronos"`
+		Sushiswap    float64 `json:"sushiswap"`
+		KyberClassic float64 `json:"kyber_classic"`
+		Wombat       float64 `json:"wombat"`
+		SeawaterAmm  float64 `json:"seawater_amm"`
+		TraderJoe    float64 `json:"trader_joe"`
+		Lifi         float64 `json:"lifi"`
+		Odos         float64 `json:"odos"`
+		BetSwirl     float64 `json:"betswirl"`
+		Paraswap     float64 `json:"paraswap"`
+		Pancakeswap float64 `json:"pancakeswap"`
+	}
+
+	// app fees for sui transactions
+	SuiAppFees struct {
 	}
 
 	FeeSwitch struct {

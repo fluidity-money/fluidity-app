@@ -120,7 +120,7 @@ function flipIf<T>(t : boolean, arr : T[]) : T[] {
   return t ? arr : [arr[1], arr[0]];
 }
 
-describe("VEGovToken", async () => {
+describe("VETestGovToken", async () => {
   let signer : ethers.Signer;
   let signerAddress : string;
 
@@ -128,7 +128,7 @@ describe("VEGovToken", async () => {
   let wethToken : ethers.Contract;
 
   let balancerVault : ethers.Contract;
-  let veGovToken : ethers.Contract;
+  let veTestGovToken : ethers.Contract;
   let weightedPool : ethers.Contract;
 
   let poolId : ethers.BytesLike;
@@ -141,7 +141,7 @@ describe("VEGovToken", async () => {
     signerAddress = await signer.getAddress();
 
     const {
-      veGovToken: veGovTokenFactory,
+      veTestGovToken: veTestGovTokenFactory,
       govToken: govTokenFactory } = commonFactories;
 
     // set up the balancer pool so we can get some voting power units
@@ -256,14 +256,14 @@ describe("VEGovToken", async () => {
 
     expect(await weightedPool.balanceOf(signerAddress)).to.be.gt(0);
 
-    veGovToken = await veGovTokenFactory.deploy(
+    veTestGovToken = await veTestGovTokenFactory.deploy(
       weightedPool.address,
       "VE Gov Token",
       "VET",
       "0"
     );
 
-    await weightedPool.approve(veGovToken.address, MaxUint256);
+    await weightedPool.approve(veTestGovToken.address, MaxUint256);
   });
 
   it("should display the balance correctly", async () => {
@@ -286,20 +286,20 @@ describe("VEGovToken", async () => {
       });
 
       expect(
-        await veGovToken.getVotes(signerAddress),
+        await veTestGovToken.getVotes(signerAddress),
         "initial ve gov token"
       ).to.equal(0);
 
       const veFluid = BigNumber.from(veFluid_);
 
-      await veGovToken.create_lock(bptLocked, timestampAddLockTime);
+      await veTestGovToken.create_lock(bptLocked, timestampAddLockTime);
 
       // check that the difference is below 5 days, and more than 4 days
 
       // 864000 = 10 days
       // 31536000 = 365 days
 
-      const votes = await veGovToken.getVotes(signerAddress);
+      const votes = await veTestGovToken.getVotes(signerAddress);
 
       // we have to assert that if the difference is greater than 0, but
       // if it's less than 4 it should be greater

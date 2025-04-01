@@ -190,11 +190,12 @@ $holo: linear-gradient(
 .multiplier-tasks {
   z-index: 0;
   color: black;
-  display: grid;
+  display: grid !important;
   box-sizing: border-box;
   grid-template-columns: 180px 64px 250px;
   gap: 0.5em;
   max-width: 100%;
+  flex-direction: row !important;
 
   .multiplier-tasks-header {
     display: flex;
@@ -206,7 +207,7 @@ $holo: linear-gradient(
   }
 
   .multiplier-tasks-multiplier {
-    display: flex;
+    display: none;
     flex-direction: row;
     gap: 1em;
     align-items: center;
@@ -219,9 +220,9 @@ $holo: linear-gradient(
     grid-column: 3/4;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     width: 100%;
-    gap: 6px;
+    gap: 8px;
 
     a {
       text-align: center;
@@ -819,7 +820,7 @@ $holo: linear-gradient(
     text-align: center;
 
     .recap-hero-text {
-      z-index: 1;
+      z-index: -1;
       box-sizing: border-box;
       position: absolute;
       top: 0;
@@ -1069,11 +1070,616 @@ $holo: linear-gradient(
 }
 
 .airdrop-arb-multipliers-container {
-  display: flex;
   padding-top: 20px;
 }
 
 .airdrop-arb-multipliers-container > * {
   margin-left: auto;
   margin-right: auto;
+}
+
+.recap-fly-count-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.recap-fly-count-child {
+  display: block;
+}
+
+.recap-fly-count-child-solana {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.recap-you-are-eligible-delegate-button-terms-container {
+  padding-top: 20px;
+  padding-bottom: 30px;
+  text-align: center;
+}
+
+.recap-fly-election-message {
+  font-size: 14px;
+  text-align: center;
+}
+
+.recap-fly-count-buttons-spread {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.recap-fly-count-eligible-buttons {
+  padding-bottom: 20px;
+}
+
+.recap-fly-count-buttons-spread > button:nth-child(2) {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.recap-fly-count-buttons-spread-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.recap-you-are-eligible-input-delegate-solana {
+  display: flex;
+  flex-direction: row;
+}
+
+.legal {
+  margin-top: 1em;
+}
+
+.recap-fly-count-thank-you {
+  text-align: center;
+  max-width: 700px;
+  padding-bottom: 40px;
+}
+
+.recap-fly-count-thank-you-solana {
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+.recap-fly-count-header {
+  text-align: center;
+}
+
+.recap-fly-count-header-solana {
+  text-align: center;
+  max-width: 700px;
+}
+
+.recap-fly-count-buttons-spread-container-solana {
+  padding-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.recap-terms-of-condition-delegate {
+  all: unset;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  color: white;
+}
+
+.recap-terms-of-condition-claim-or-stake {
+  all: unset;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  color: white;
+  text-align: center;
+}
+
+.recap-fly-count-delegate-button-success {
+  border-color: green;
+}
+
+.airdrop-terms-and-conditions-modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  padding-top: 40px;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.airdrop-terms-and-conditions-modal-child {
+  max-width: 800px;
+  background-color: black;
+  padding: 20px;
+  border-radius: 10px;
+  max-height: 1000px;
+  overflow: scroll;
+}
+
+.airdrop-terms-and-conditions-modal-navbar {
+  display: flex;
+  justify-content: right;
+}
+
+.recap-you-are-eligible-claim-rewards-button {
+  cursor: pointer;
+}
+
+.recap-you-are-eligible-claim-at-tge-button-container {
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.recap-you-are-eligible-claim-at-tge-button-container span {
+  color: white;
+}
+
+.recap-you-are-eligible-claim-at-tge-button-container:hover span {
+  color: black;
+}
+
+.fly-submit-claim-modal-background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+}
+
+.fly-submit-claim-modal-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 546px;
+  min-height: 495px;
+  margin: auto;
+  width: 100%;
+
+  @media (max-width: 527px) {
+    max-height: 100vh;
+    margin: 0;
+    padding: 0.8em;
+
+    .legal {
+      text-align: center;
+    }
+  }
+}
+
+.fly-staking-stats-modal-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: #131313;
+  padding: 3em;
+  border: solid white 2px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 575px;
+  min-height: 495px;
+  margin: auto;
+  width: 100%;
+
+  @media (max-width: 527px) {
+    max-height: 100vh;
+    height: fit-content;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.8em;
+
+    .legal {
+      text-align: center;
+    }
+  }
+}
+
+.fly-submit-claim-flex-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fly-confirming-claim-button-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.fly-submit-claim-modal-button-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  border-width: 2px;
+  border-color: white;
+  gap: 1em;
+  // position: absolute;
+}
+
+.fly-submit-claim-modal-options {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+}
+
+.fly-submit-claim-modal-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4em;
+  padding: 1.5em;
+}
+
+.fly-staking-stats-modal-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4em;
+  padding: 1.5em;
+
+  @media (max-width: 527px) {
+    flex-direction: column;
+    padding: 0.5em;
+  }
+}
+
+.fly-confirming-claim-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.fly-points-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.staking-card {
+  background-color: #ffd362 !important;
+  gap: 1em;
+}
+
+.staking-card-container {
+  display: flex;
+  align-items: end;
+  gap: 0.5em;
+}
+
+.fly-confirming-claim-header {
+  display: flex;
+  flex-direction: row;
+  // gap: 1em;
+  align-items: flex-end;
+}
+
+.fly-submit-claim-heading-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1em;
+}
+
+.fly-submit-claim-heading {
+  font-weight: normal !important;
+  margin: 0;
+}
+
+.fly-caution-text {
+  color: #ffb300;
+}
+
+.fly-caution-border {
+  border-left: 4px #ffb300 solid;
+  margin-left: 1em;
+  padding-left: 1em;
+}
+
+.fly-caution-centre-text {
+  align-self: center;
+  margin-bottom: 2em;
+}
+
+.fly-submit-claim-action-button {
+  width: unset !important;
+  align-self: normal !important;
+}
+
+.fly-staking-stats-action-button {
+  width: 100% !important;
+  align-self: normal !important;
+}
+
+.fly-unstaking-claim-action-button {
+  width: 30% !important;
+  align-self: center;
+}
+
+.fly-staking-grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+}
+
+.fly-staking-grid-item-long {
+  grid-column: 1 / -1;
+}
+
+.fly-staking-popup-icon-text {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.fly-staking-popup-container-outer {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+}
+
+.fly-staking-popup-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.centre {
+  align-self: center;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.fly-submit-claim-action-button-text {
+  color: inherit !important;
+  display: flex !important;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.fly-continue-claiming-text {
+  color: inherit !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.stake-your-fly-text {
+  color: inherit !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.fly-claim-stake-choice-button {
+  width: 100% !important;
+}
+
+.fly-once-approved {
+  margin-top: 1em;
+}
+
+.fly-submit-claim-circle {
+  // padding: 1em;
+}
+
+.fly-submit-claim-outer-modal-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
+.claim-button-staked {
+  border: solid lime 2px !important;
+  color: lime !important;
+  background-color: unset !important;
+}
+
+.claim-button-error {
+  border: solid red 2px !important;
+  color: white !important;
+  background-color: unset !important;
+}
+
+.show-fly-modal {
+  display: flex;
+}
+
+.link {
+  text-decoration: underline;
+  color: white;
+  cursor: pointer;
+}
+
+.max-balance-text {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.no-gap {
+  gap: 0;
+}
+
+.fly-staking-input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.fly-staking-claimable {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.text-with-info-popup {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.staking-input {
+  width: 80%;
+  color: white;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  outline: none;
+}
+
+.staking-input-underline {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  border-bottom: 2px white solid;
+  margin-bottom: 1em;
+  padding-top: 1.5em;
+  padding-bottom: 1em;
+}
+
+.staking-input-lower {
+  justify-content: space-between;
+  display: flex;
+
+  @media (max-width: 527px) {
+    text-align: center;
+  }
+}
+
+.center-text {
+  text-align: center;
+}
+
+.info-circle-grey > path {
+  fill: #828381;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.black {
+  color: black !important;
+}
+
+.rainbow {
+  position: relative;
+  overflow: hidden;
+  font-size: 15px;
+  box-shadow: 0 0 8px 2px #f3b8d8;
+}
+
+.rainbow::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  left: -20%;
+  top: -150%;
+  width: 400px;
+  height: 400px;
+  background-color: #f3b8d8;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  background-image: linear-gradient(
+    45deg,
+    #f3b8d8,
+    #b793e9,
+    #9fd4f3,
+    #ffd2c4,
+    #fbf3f3,
+    #d9abdf,
+    #af9ce3,
+    #aae4e1,
+    #c6ead0,
+    #ffffff,
+    #fdb5e4
+  );
+  animation: rotate 4s linear infinite;
+}
+
+.rainbow::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 3px;
+  top: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: black;
+  border-radius: inherit;
+}
+
+.rainbow:hover > h5 {
+  color: black;
+}
+
+.rainbow:hover:focus > h5 {
+  color: white;
+}
+
+.rainbow:hover:focus::after {
+  background: black;
+}
+
+.rainbow:hover::after {
+  background: transparent;
+}
+
+claim-error-message-none {
+  display: hidden;
+}
+
+.claim-error-message {
+  display: block;
+}
+
+.staking-stats-info-text {
+  min-width: 100px;
+  max-width: 140px;
+
+  .nowrap {
+    white-space: nowrap;
+  }
+}
+
+.airdrop-image-banner {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }

@@ -67,12 +67,6 @@ func TestGetApplicationFee(t *testing.T) {
 	assert.Nil(t, feeData.Fee)
 	assert.Zero(t, emission)
 	assert.Error(t, err)
-
-	transfer.Application = ApplicationMultichain
-	feeData, _, emission, err = GetApplicationFee(transfer, client, fluidTokenContract, tokenDecimals, receipt, inputData)
-	assert.Nil(t, feeData.Fee)
-	assert.Zero(t, emission)
-	assert.Error(t, err)
 }
 
 func TestGetApplicationTransferParties(t *testing.T) {
@@ -110,12 +104,6 @@ func TestGetApplicationTransferParties(t *testing.T) {
 	assert.Equal(t, logAddress, receiver)
 
 	transfer.Application = ApplicationCurve
-	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
-	assert.NoError(t, err)
-	assert.Equal(t, transactionSender, sender)
-	assert.Equal(t, logAddress, receiver)
-
-	transfer.Application = ApplicationMultichain
 	sender, receiver, err = GetApplicationTransferParties(transaction, transfer)
 	assert.NoError(t, err)
 	assert.Equal(t, transactionSender, sender)

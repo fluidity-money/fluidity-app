@@ -1,4 +1,4 @@
-import { ArrowTopRight } from "./ArrowTopRight";
+import { ArrowTopRight, ArrowTopRightRed } from "./ArrowTopRight";
 import { ArrowRight } from "./ArrowRight";
 import { ArrowLeft } from "./ArrowLeft";
 import { TriangleDown } from "./TriangleDown";
@@ -21,6 +21,8 @@ import { Referral } from "./Referral";
 import { AirdropIcon } from "./Airdrop";
 import { LinkVerticalIcon } from "./LinkVertical";
 import { Checkmark } from "./Checkmark";
+import { FlyIcon } from "./Fly";
+import { StakeIcon, UnstakeIcon } from "./StakeIcon";
 
 export {
   AirdropIcon,
@@ -29,12 +31,15 @@ export {
   ArrowDown,
   ArrowUp,
   ArrowTopRight,
+  ArrowTopRightRed,
   CopyIcon,
   TriangleDown,
   Trophy,
   Twitter,
   DashboardIcon,
   WarningIcon,
+  StakeIcon,
+  UnstakeIcon,
   DaoIcon,
   AssetsIcon,
   ProviderIcon,
@@ -45,5 +50,6 @@ export {
   CaretRight,
   Referral,
   LinkVerticalIcon,
-  Checkmark
+  Checkmark,
+  FlyIcon,
 };

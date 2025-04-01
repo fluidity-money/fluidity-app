@@ -18,7 +18,8 @@ func init() {
 	var (
 		workerId = util.GetWorkerId()
 
-		deadLetterEnabled = os.Getenv(EnvDeadLetterEnabled) != "false"
+		deadLetterEnabled     = os.Getenv(EnvDeadLetterEnabled) != "false"
+		messageLoggingEnabled = os.Getenv(EnvMessageLoggingEnabled) != ""
 
 		messageRetries_ = util.GetEnvOrDefault(EnvMessageRetries, "5")
 
@@ -138,12 +139,13 @@ func init() {
 	go func() {
 		for {
 			chanAmqpDetails <- amqpDetails{
-				channel:           channel,
-				exchangeName:      ExchangeName,
-				workerId:          workerId,
-				deadLetterEnabled: deadLetterEnabled,
-				messageRetries:    messageRetries,
-				goroutines:        goroutines,
+				channel:               channel,
+				exchangeName:          ExchangeName,
+				workerId:              workerId,
+				deadLetterEnabled:     deadLetterEnabled,
+				messageRetries:        messageRetries,
+				goroutines:            goroutines,
+				messageLoggingEnabled: messageLoggingEnabled,
 			}
 		}
 	}()

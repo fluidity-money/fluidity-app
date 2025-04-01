@@ -9,6 +9,7 @@ export const getProviderDisplayName = (name?: string): Provider => {
     case "aldrinv2":
       return "Aldrin";
     case "camelot":
+    case "camelot_v3":
       return "Camelot";
     case "chronos":
       return "Chronos";
@@ -40,6 +41,7 @@ export const getProviderDisplayName = (name?: string): Provider => {
     case "solend":
       return "Solend";
     case "uniswap":
+    case "uniswap_v3":
     case "uniswap_v2":
       return "Uniswap";
     case "sushiswap":
@@ -57,8 +59,6 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Mooniswap";
     case "curve":
       return "Curve";
-    case "multichain":
-      return "Multichain";
     case "xy finance":
     case "xy":
     case "xy_finance":
@@ -77,6 +77,12 @@ export const getProviderDisplayName = (name?: string): Provider => {
       return "Jumper";
     case "meteora":
       return "Meteora";
+    case "lifi":
+      return "Lifi";
+    case "odos":
+      return "Odos";
+    case "pancakeswap":
+      return "Pancakeswap";
     case "fluidity":
     case "spl":
     case "none":

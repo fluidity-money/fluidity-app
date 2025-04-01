@@ -1,7 +1,3 @@
-import type { ReferralCountLoaderData } from "./query/referrals";
-import type { ReferralCodeLoaderData } from "./query/referralCode";
-import type { UnclaimedRewardsLoaderData } from "./query/dashboard/unclaimedRewards";
-
 import {
   json,
   LinksFunction,
@@ -24,13 +20,14 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { networkMapper } from "~/util";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import config from "~/webapp.config.server";
 import {
+  AirdropIcon,
   DashboardIcon,
   GeneralButton,
   Trophy,
-  AssetsIcon,
+  FlyIcon,
+  StakeIcon,
   Text,
   Heading,
   ChainSelectorButton,
@@ -49,20 +46,16 @@ import {
 } from "@fluidity-money/surfing";
 import { chainType } from "~/util/chainUtils/chains";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
-import MobileModal from "~/components/MobileModal";
-import UnclaimedRewardsHoverModal from "~/components/UnclaimedRewardsHoverModal";
-import ReferralModal from "~/components/ReferralModal";
-import AcceptReferralModal from "~/components/AcceptReferralModal";
 import { getProviderDisplayName } from "~/util/provider";
 
 import dashboardStyles from "~/styles/dashboard.css";
-import referralModalStyles from "~/components/ReferralModal/referralModal.css";
 import { UIContext } from "contexts/UIProvider";
+import { FlyStakingContext } from "contexts/FlyStakingProvider";
+import { FlyStakingStatsModal } from "~/components/FLYStakingStatsModal";
 
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: dashboardStyles },
-    { rel: "stylesheet", href: referralModalStyles },
   ];
 };
 
@@ -160,6 +153,16 @@ type LoaderData = {
   referralCode: string;
 };
 
+const airdropTab = [
+  {
+    airdrop: {
+      name: "airdrop",
+      path: (network: string) => `/${network}/dashboard/airdrop`,
+      icon: <AirdropIcon />,
+    },
+  },
+];
+
 const NAVIGATION_MAP: {
   [key: string]: {
     name: string;
@@ -167,25 +170,12 @@ const NAVIGATION_MAP: {
     icon: JSX.Element;
   };
 }[] = [
+  ...airdropTab,
   {
     home: {
       name: "dashboard",
       path: (network: string) => `/${network}/dashboard/home`,
       icon: <DashboardIcon />,
-    },
-  },
-  {
-    rewards: {
-      name: "rewards",
-      path: (network: string) => `/${network}/dashboard/rewards`,
-      icon: <Trophy />,
-    },
-  },
-  {
-    assets: {
-      name: "assets",
-      path: (network: string) => `/${network}/dashboard/assets`,
-      icon: <AssetsIcon />,
     },
   },
 ];
@@ -198,13 +188,13 @@ const CHAIN_NAME_MAP: Record<
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
-  polygon_zk: {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
-  },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
+  sui: {
+    name: "SUI",
+    icon: <img src="/assets/chains/suiIcon.svg" />,
   },
 };
 
@@ -241,9 +231,6 @@ export default function Dashboard() {
   const { connected, address, rawAddress, disconnect, connecting } = useContext(
     FluidityFacadeContext
   );
-
-  const { showExperiment, client } = useContext(SplitContext);
-  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const url = useLocation();
   const urlPaths = url.pathname.split("dashboard");
@@ -320,51 +307,6 @@ export default function Dashboard() {
     navigate(`/${networkMapper(network)}/${pathComponents.join("/")}`);
   };
 
-  const { data: referralsCountData } = useCache<ReferralCountLoaderData>(
-    address ? `/${network}/query/referrals?address=${address}` : ""
-  );
-
-  const { data: referralCodeData } = useCache<ReferralCodeLoaderData>(
-    clickedReferralCode && address
-      ? `/${network}/query/referralCode?code=${clickedReferralCode}&address=${address}`
-      : ""
-  );
-
-  // Rewards User has yet to claim - Ethereum feature
-  const { data: userUnclaimedData } = useCache<UnclaimedRewardsLoaderData>(
-    address && chainType(network) === "evm"
-      ? `/${network}/query/dashboard/unclaimedRewards?address=${address}`
-      : ""
-  );
-
-  const data = {
-    referralCount: {
-      ...SAFE_DEFAULT_REFERRAL_COUNT,
-      ...referralsCountData,
-    },
-    referralCode: {
-      ...SAFE_DEFAULT_REFERRAL_CODE,
-      ...referralCodeData,
-    },
-    unclaimedRewards: {
-      ...SAFE_DEFAULT_UNCLAIMED_REWARDS,
-      ...userUnclaimedData,
-    },
-  };
-
-  const {
-    referralCount: {
-      numActiveReferrerReferrals,
-      numActiveReferreeReferrals,
-      numInactiveReferreeReferrals,
-      inactiveReferrals,
-      referralCode,
-      loaded: referralCountLoaded,
-    },
-    referralCode: { referralAddress, loaded: referralCodeLoaded },
-    unclaimedRewards: { userUnclaimedRewards },
-  } = data;
-
   const handleScroll = () => {
     if (!openMobModal) {
       // Unsets Background Scrolling to use when Modal is closed
@@ -391,13 +333,6 @@ export default function Dashboard() {
   }, [openMobModal]);
 
   useEffect(() => {
-    // Only show acceptReferralModal if referral code is valid
-    if (referralCodeLoaded && referralAddress) {
-      setAcceptReferralModalVisibility(true);
-    }
-  }, [referralCodeLoaded]);
-
-  useEffect(() => {
     // Resets background when navigating away
     document.body.style.overflow = "unset";
     document.body.style.position = "static";
@@ -411,6 +346,12 @@ export default function Dashboard() {
   const [hoverModal, setHoverModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  const [stakingStatsModalVisibility, setStakingStatsModalVisibility] =
+    useState(false);
+
+  // every change to this number asks flystakingmodal to look up the new balance
+  const [shouldUpdateFlyBalance, setShouldUpdateFlyBalance] = useState(0);
+
   const otherModalOpen =
     openMobModal ||
     walletModalVisibility ||
@@ -420,22 +361,13 @@ export default function Dashboard() {
       : false;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .filter(([, chain]) => {
-      const { name } = chain;
-
-      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-        return false;
-
-      return true;
-    })
-    .reduce(
-      (prev, [key, value]) => ({
-        ...prev,
-        [key]: value,
-      }),
-      {} as typeof CHAIN_NAME_MAP
-    );
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP).reduce(
+    (prev, [key, value]) => ({
+      ...prev,
+      [key]: value,
+    }),
+    {} as typeof CHAIN_NAME_MAP
+  );
 
   return (
     <>
@@ -451,51 +383,6 @@ export default function Dashboard() {
           />
         </div>
       </Modal>
-
-      {/* Referral Modal */}
-      <CardModal
-        id="referral-modal"
-        visible={referralModalVisibility}
-        closeModal={() => setReferralModalVisibility(false)}
-        cardPositionStyle={{
-          position: "absolute",
-          top: "1em",
-          right: isTablet ? "20px" : "60px",
-          width: 500,
-        }}
-        color="holo"
-        style={{ padding: 0, width: "100%" }}
-      >
-        <ReferralModal
-          connected={!!connected}
-          network={network}
-          connectWallet={() => {
-            setReferralModalVisibility(false);
-            setWalletModalVisibility(true);
-          }}
-          referrerClaimed={numActiveReferrerReferrals}
-          refereeClaimed={numActiveReferreeReferrals}
-          refereeUnclaimed={numInactiveReferreeReferrals}
-          progress={inactiveReferrals[0]?.progress || 0}
-          progressReq={10}
-          referralCode={referralCode}
-          loaded={referralCountLoaded}
-          closeModal={() => setReferralModalVisibility(false)}
-        />
-      </CardModal>
-
-      {/* Accept Referral Modal */}
-      <CardModal
-        id="accept-referral-modal"
-        visible={acceptReferralModalVisibility}
-        closeModal={() => setAcceptReferralModalVisibility(false)}
-      >
-        <AcceptReferralModal
-          network={network}
-          referralCode={clickedReferralCode}
-          referrer={referralAddress}
-        />
-      </CardModal>
 
       {/* Fluidify Money button, in a portal with z-index above tooltip if another modal isn't open */}
       <Modal id="fluidify" visible={!otherModalOpen}>
@@ -531,6 +418,19 @@ export default function Dashboard() {
 
         {/* Nav Bar */}
         <ul className="sidebar-nav">
+          <li key="ico">
+            <div />
+            <a
+              style={{ cursor: "pointer" }}
+              href="https://app.uniswap.org/swap?outputCurrency=0x000F1720A263f96532D1ac2bb9CDC12b72C6f386&chain=arbitrum"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Text className="dashboard-navbar-default">
+                <FlyIcon /> GET FLY
+              </Text>
+            </a>
+          </li>
           {NAVIGATION_MAP.map((obj, index) => {
             const key = Object.keys(obj)[0];
             const { name, icon } = Object.values(obj)[0];
@@ -558,6 +458,17 @@ export default function Dashboard() {
               </li>
             );
           })}
+          <li key="staking">
+            <div />
+            <a
+              style={{ cursor: "pointer" }}
+              onClick={() => setStakingStatsModalVisibility(true)}
+            >
+              <Text className="dashboard-navbar-default">
+                <StakeIcon classname="staking-icon" /> STAKING
+              </Text>
+            </a>
+          </li>
         </ul>
 
         {/* Connect Wallet Button */}
@@ -633,84 +544,54 @@ export default function Dashboard() {
           {/* Navigation Buttons */}
           <div id="top-navbar-right">
             {/* Network Button */}
-            {(isTablet || isMobile) && showMobileNetworkButton && (
+            {(isTablet || isMobile) && (
               <ChainSelectorButton
                 chain={chainNameMap[network]}
                 onClick={() => setChainModalVisibility(true)}
               />
             )}
 
-            {/* Send & Receive */}
-            <GeneralButton
-              className="s-r-button"
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                navigate(`/${network}/transfer/send`);
-              }}
-              icon={<ArrowUp />}
-            >
-              {isMobile ? "" : "Send"}
-            </GeneralButton>
-            <GeneralButton
-              className="s-r-button"
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                navigate(`/${network}/transfer/receive`);
-              }}
-              icon={<ArrowDown />}
-            >
-              {isMobile ? "" : "Receive"}
-            </GeneralButton>
+            {/* Send & Receive (only supported if Arbitrum and non mobile and tablet) */}
+            {network == "arbitrum" && !isMobile && !isTablet && (
+              <>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/send`);
+                  }}
+                  icon={<ArrowUp />}
+                >
+                  {isMobile ? "" : "Send"}
+                </GeneralButton>
+                <GeneralButton
+                  className="s-r-button"
+                  type="transparent"
+                  size="small"
+                  layout="before"
+                  handleClick={() => {
+                    navigate(`/${network}/transfer/receive`);
+                  }}
+                  icon={<ArrowDown />}
+                >
+                  {isMobile ? "" : "Receive"}
+                </GeneralButton>
+              </>
+            )}
 
-            {/* Referrals Button */}
-            <GeneralButton
-              type="transparent"
-              size="small"
-              layout="before"
-              handleClick={() => {
-                width < airdropMobileBreakpoint
-                  ? navigate(`/${network}/dashboard/airdrop#referrals`)
-                  : setReferralModalVisibility(true);
-              }}
-              icon={<Referral />}
-            >
-              {isMobile ? "" : "Referral"}
-            </GeneralButton>
-
-            {/* Fluidify button */}
-            <GeneralButton
-              className="fluidify-button-dashboard "
-              type={"secondary"}
-              size={"small"}
-              handleClick={() => {
-                client?.track("user", "click_fluidify");
-                navigate(`/${network}/fluidify`);
-              }}
-            >
-              <b>Fluidify{isMobile ? "" : " Money"}</b>
-            </GeneralButton>
-
-            {/* Prize Money */}
-            <GeneralButton
-              onMouseEnter={() => setHoverModal(true)}
-              onMouseLeave={() => setTimeout(() => setHoverModal(false), 500)}
-              type={"transparent"}
-              layout="after"
-              size={"small"}
-              handleClick={() =>
-                userUnclaimedRewards < 0.000005
-                  ? navigate(`/${network}/dashboard/rewards`)
-                  : navigate(`/${network}/dashboard/rewards/unclaimed`)
-              }
-              icon={<Trophy />}
-              style={{ fontSize: "1em" }}
-            >
-              {numberToMonetaryString(userUnclaimedRewards)}
-            </GeneralButton>
+            {/* Fluidify button (desktop only) */}
+            {isTablet || isMobile || (
+              <GeneralButton
+                className="fluidify-button-dashboard "
+                type={"secondary"}
+                size={"small"}
+                handleClick={() => navigate(`/${network}/fluidify`)}
+              >
+                <b>Fluidify{isMobile ? "" : " Money"}</b>
+              </GeneralButton>
+            )}
 
             {(isTablet || isMobile) && (
               <BurgerMenu isOpen={openMobModal} setIsOpen={setOpenMobModal} />
@@ -733,13 +614,31 @@ export default function Dashboard() {
           visible={walletModalVisibility}
           close={() => setWalletModalVisibility(false)}
         />
-        <UIContext.Provider
+        {/* FLY Staking Stats Modal */}
+        <FlyStakingStatsModal
+          staking={true}
+          close={() => {
+            setStakingStatsModalVisibility(false);
+          }}
+          showConnectWalletModal={() => setWalletModalVisibility(true)}
+          visible={stakingStatsModalVisibility}
+          shouldUpdateFlyBalance={shouldUpdateFlyBalance}
+        />
+        <FlyStakingContext.Provider
           value={{
-            toggleConnectWalletModal: () => setWalletModalVisibility((v) => !v),
+            toggleVisibility: setStakingStatsModalVisibility,
+            shouldUpdateBalance: () => setShouldUpdateFlyBalance((v) => v + 1),
           }}
         >
-          <Outlet />
-        </UIContext.Provider>
+          <UIContext.Provider
+            value={{
+              toggleConnectWalletModal: () =>
+                setWalletModalVisibility((v) => !v),
+            }}
+          >
+            <Outlet />
+          </UIContext.Provider>
+        </FlyStakingContext.Provider>
         {/* Provide Liquidity*/}
         <div
           className="pad-main"
@@ -753,26 +652,14 @@ export default function Dashboard() {
             />
           )}
         </div>
-        {/* Modal on hover */}
-        {userUnclaimedRewards >= 0.000005 &&
-          (hoverModal || showModal) &&
-          !isMobile && (
-            <UnclaimedRewardsHoverModal
-              unclaimedRewards={userUnclaimedRewards}
-              setShowModal={setShowModal}
-            />
-          )}
 
         {/* Default Fluidify button */}
-        {otherModalOpen && !showExperiment("Fluidify-Button-Placement") && (
+        {otherModalOpen && (
           <GeneralButton
             className="fluidify-button-dashboard-mobile rainbow "
             type={"secondary"}
             size={"medium"}
-            handleClick={() => {
-              client?.track("user", "click_fluidify");
-              navigate(`/${network}/fluidify`);
-            }}
+            handleClick={() => navigate(`/${network}/fluidify`)}
           >
             <Heading as="h5" color="inherit" style={{ margin: 0 }}>
               <b>Fluidify Money</b>
@@ -816,53 +703,55 @@ export default function Dashboard() {
             </a>
 
             {/* Source code */}
-            {showExperiment("enable-source-code") && (
-              <a href={"https://github.com/fluidity-money/fluidity-app"}>
-                <Text>Source Code</Text>
-              </a>
-            )}
+            <a href={"https://github.com/fluidity-money/fluidity-app"}>
+              <Text>Source Code</Text>
+            </a>
+
+            {/* Dune */}
+            <a href={"https://dune.com/neogeo/fluidity-arbitrum"}>
+              <Text>Dune</Text>
+            </a>
           </section>
 
           {/* Socials */}
           <section>
             {/* Twitter */}
-            <a href={"https://twitter.com/fluiditymoney"}>
+            <a
+              href={"https://twitter.com/fluiditymoney"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/twitter.svg"} alt={"Twitter"} />
             </a>
 
             {/* Discord */}
-            <a href={"https://discord.com/invite/CNvpJk4HpC"}>
+            <a
+              href={"https://discord.com/invite/CNvpJk4HpC"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/discord.svg"} alt={"Discord"} />
             </a>
 
             {/* Telegram */}
-            <a href={"https://t.me/fluiditymoney"}>
+            <a
+              href={"https://t.me/fluiditymoney"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/telegram.svg"} alt={"Telegram"} />
             </a>
 
             {/* LinkedIn */}
-            <a href={"https://www.linkedin.com/company/fluidity-money"}>
+            <a
+              href={"https://www.linkedin.com/company/fluidity-money"}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               <img src={"/images/socials/linkedin.svg"} alt={"LinkedIn"} />
             </a>
           </section>
         </footer>
-
-        {/* Mobile Menu Modal */}
-        {openMobModal && (
-          <MobileModal
-            navigationMap={NAVIGATION_MAP.map((obj) => {
-              const { name, icon, path } = Object.values(obj)[0];
-              return { name, icon, path };
-            })}
-            activeIndex={activeIndex}
-            chains={chainNameMap}
-            unclaimedFluid={userUnclaimedRewards}
-            network={network}
-            isOpen={openMobModal}
-            setIsOpen={setOpenMobModal}
-            unclaimedRewards={userUnclaimedRewards}
-          />
-        )}
       </main>
     </>
   );
@@ -873,15 +762,6 @@ const routeMapper = (route: string) => {
     case "/":
     case "/home":
       return "DASHBOARD";
-    case "/rewards":
-      return "REWARDS";
-    case "/unclaimed":
-      return "CLAIM";
-    case "/assets":
-    case "/assets/regular":
-      return "ASSETS";
-    case "/dao":
-      return "DAO";
     case "/airdrop":
       return "AIRDROP";
     default:

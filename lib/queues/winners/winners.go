@@ -31,18 +31,23 @@ const (
 	// a single blocked winner and their amount won
 	TopicBlockedWinnersSolana = `blocked_winners.` + string(network.NetworkSolana)
 
-	// subWinnersAll to subscribe to winner messages from either network
+	// TopicWinnersSui to broadcast winner messages containing a single
+	// winner and their amount won
+	TopicWinnersSui = `winners.` + string(network.NetworkSui)
+
+	// subWinnersAll to subscribe to winner messages from all networks
 	subWinnersAll = `winners.*`
 
-	// subBlockedWinnersAll to subscribe to blocked winner messages from either network
+	// subBlockedWinnersAll to subscribe to blocked winner messages from all networks
 	subBlockedWinnersAll = `blocked_winners.*`
 
-	// TopicPendingWinners to broadcast pending winner messages
+	// TopicPendingWinners to broadcast pending winner messages on ethereum or sui
 	TopicPendingWinners = `pending_winners`
 )
 
 type (
 	Winner        = types.Winner
+	PendingWinner = types.PendingWinner
 	BlockedWinner = types.BlockedWinner
 	RewardData    = fluidity.RewardData
 )
@@ -65,6 +70,10 @@ func WinnersSolana(f func(Winner)) {
 	winners(TopicWinnersSolana, f)
 }
 
+func WinnersSui(f func(Winner)) {
+	winners(TopicWinnersSui, f)
+}
+
 func WinnersAll(f func(Winner)) {
 	winners(subWinnersAll, f)
 }
@@ -79,9 +88,9 @@ func BlockedWinnersAll(f func(BlockedWinner)) {
 	})
 }
 
-func PendingWinners(f func([]types.PendingWinner)) {
+func PendingWinners(f func([]PendingWinner)) {
 	queue.GetMessages(TopicPendingWinners, func(message queue.Message) {
-		var pendingWinners []types.PendingWinner
+		var pendingWinners []PendingWinner
 
 		message.Decode(&pendingWinners)
 

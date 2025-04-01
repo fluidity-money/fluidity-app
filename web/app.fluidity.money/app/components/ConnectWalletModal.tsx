@@ -140,7 +140,7 @@ const ConnectWalletModal = ({ visible, close }: IConnectWalletModal) => {
               />
             </div>
 
-            <ul className="connect-wallet-modal-list">
+            <ul className={`connect-wallet-modal-list ${network}`}>
               {chainType(network) === "evm" && <EthWalletsMap />}
               {chainType(network) === "solana" && <SolWalletsMap />}
             </ul>

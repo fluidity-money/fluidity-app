@@ -3,6 +3,8 @@ import type {
   StakingRatioRes,
   StakingDepositsRes,
   StakingRedeemableRes,
+  FLYStakingDetailsRes,
+  AirdropElection,
 } from "~/util/chainUtils/ethereum/transaction";
 
 import type BN from "bn.js";
@@ -84,6 +86,50 @@ export interface IFluidityFacade {
     signature: string,
     address: string
   ) => Promise<void>;
+
+  signAirdropElection?: (option: AirdropElection) => Promise<string | undefined>;
+
+  merkleDistributorWithDeadlineEndTime?: () => Promise<number | undefined>;
+
+  merkleDistributorWithDeadlineClaim?: (
+    address: string,
+    index: number,
+    amount: BN,
+    merkleProof: string[]
+  ) => Promise<boolean | undefined>;
+
+  merkleDistributorWithDeadlineClaimAndStake?: (
+    address: string,
+    index: number,
+    amount: BN,
+    merkleProof: string[]
+  ) => Promise<boolean | undefined>;
+
+  merkleDistributorWithDeadlineIsClaimed?: (
+    index: number
+  ) => Promise<boolean | undefined>;
+
+  flyStakingStake?: (amount: BN) => Promise<boolean | undefined>;
+
+  flyStakingDetails?: (
+    address: string
+  ) => Promise<FLYStakingDetailsRes | undefined>;
+
+  flyStakingBeginUnstake?: (amount: BN) => Promise<boolean | undefined>;
+
+  flyStakingSecondsUntilSoonestUnstake?: (
+    address: string
+  ) => Promise<BN | undefined>;
+
+  flyStakingFinaliseUnstake?: () => Promise<BN | undefined>;
+
+  flyStakingAmountUnstaking?: (address: string) => Promise<BN | undefined>;
+
+  // Solana only
+
+  airdropAssociateEthereumAccount?: (
+    etherumAddress: string
+  ) => Promise<string | undefined>;
 }
 
 const FluidityFacadeContext = createContext<Partial<IFluidityFacade>>({

@@ -15,7 +15,6 @@ import (
 	"github.com/fluidity-money/fluidity-app/lib/queues/winners"
 	"github.com/fluidity-money/fluidity-app/lib/types/network"
 	userActionsType "github.com/fluidity-money/fluidity-app/lib/types/user-actions"
-	winnerTypes "github.com/fluidity-money/fluidity-app/lib/types/winners"
 )
 
 func handleUserAction(userAction user_actions.UserAction) {
@@ -53,6 +52,7 @@ func handleUserAction(userAction user_actions.UserAction) {
 
 func main() {
 	go queue.UserActionsEthereum(handleUserAction)
+	go queue.UserActionsSui(handleUserAction)
 
 	// Solana user actions are sent over the buffered queue
 	go queue.BufferedUserActionsSolana(func(buffered queue.BufferedUserAction) {
@@ -142,14 +142,14 @@ func main() {
 		user_actions.UpdateAggregatedUserTransactionByHash(*existingUserTransaction, sendTransactionHash)
 	})
 
-	winners.PendingWinners(func(pendingWinners []winnerTypes.PendingWinner) {
+	winners.PendingWinners(func(pendingWinners []winners.PendingWinner) {
 		for _, pendingWinner := range pendingWinners {
 			var (
 				network         = pendingWinner.Network
-				transactionHash = pendingWinner.TransactionHash.String()
-				application     = pendingWinner.Application.String()
+				transactionHash = pendingWinner.TransactionHash
+				application     = pendingWinner.Application
 				usdWinAmount    = pendingWinner.UsdWinAmount
-				senderAddress   = pendingWinner.SenderAddress.String()
+				senderAddress   = pendingWinner.SenderAddress
 				utility         = pendingWinner.Utility
 			)
 

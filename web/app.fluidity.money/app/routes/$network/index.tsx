@@ -25,9 +25,7 @@ import {
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
-import { ProjectedWinData } from "./query/projectedWinnings";
 import { Chain } from "~/util/chainUtils/chains";
-import { SplitContext } from "contexts/SplitProvider";
 
 export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: opportunityStyles }];
@@ -41,13 +39,13 @@ const CHAIN_NAME_MAP: Record<
     name: "ARB",
     icon: <img src="/assets/chains/arbIcon.svg" />,
   },
-  polygon_zk: {
-    name: "POLY_ZK",
-    icon: <img src="/assets/chains/polygonIcon.svg" />,
-  },
   solana: {
     name: "SOL",
     icon: <img src="/assets/chains/solanaIcon.svg" />,
+  },
+  sui: {
+    name: "SUI",
+    icon: <img src="/assets/chains/suiIcon.svg" />,
   },
 };
 
@@ -80,22 +78,6 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
-  const { showExperiment } = useContext(SplitContext);
-
-  const projectedWinningsData = useFetcher<ProjectedWinData>();
-
-  useEffect(() => {
-    if (!address) return;
-
-    projectedWinningsData.load(
-      `/${network}/query/projectedWinnings?address=${address}`
-    );
-  }, [connected]);
-
-  const projectedWin = projectedWinningsData.data?.projectedWin || 0;
-
-  const loaded = !!projectedWinningsData?.data;
-
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
   );
@@ -107,22 +89,13 @@ const NetworkPage = () => {
   const mobileBreakpoint = 500;
 
   // filter CHAIN_NAME_MAP by enabled chains
-  const chainNameMap = Object.entries(CHAIN_NAME_MAP)
-    .filter(([, chain]) => {
-      const { name } = chain;
-
-      if (name === "POLY_ZK" && !showExperiment("enable-polygonzk"))
-        return false;
-
-      return true;
-    })
-    .reduce(
-      (prev, [key, value]) => ({
-        ...prev,
-        [key]: value,
-      }),
-      {} as typeof CHAIN_NAME_MAP
-    );
+  const chainNameMap = Object.entries(CHAIN_NAME_MAP).reduce(
+    (prev, [key, value]) => ({
+      ...prev,
+      [key]: value,
+    }),
+    {} as typeof CHAIN_NAME_MAP
+  );
 
   useEffect(() => {
     // stop modal pop-up if connected
@@ -135,7 +108,7 @@ const NetworkPage = () => {
 
   return (
     <>
-      {connected && connected && loaded && (
+      {connected && connected && (
         <Video
           className="video"
           src={"/videos/FluidityOpportunityA.mp4"}
@@ -241,36 +214,6 @@ const NetworkPage = () => {
               </Modal>
             </div>
 
-            {/* Expected Earnings */}
-            {projectedWinningsData.state === "loading" && connected && (
-              <>
-                <div className="loader-dots">
-                  <LoadingDots />
-                </div>
-                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Loading your transactions from last week...
-                </Text>
-                <br />
-              </>
-            )}
-
-            {/* Expected Earnings */}
-            {!!projectedWinningsData.data && connected && (
-              <>
-                <Display
-                  className="winnings-figure"
-                  size={width < mobileBreakpoint ? "xs" : "md"}
-                >
-                  {numberToMonetaryString(projectedWin)}
-                </Display>
-                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on your transactions last
-                  week.
-                </Text>
-                <br />
-              </>
-            )}
-
             <Text size={width < mobileBreakpoint ? "md" : "xl"}>
               Fluidify your assets to start earning.
             </Text>
@@ -284,27 +227,6 @@ const NetworkPage = () => {
               >
                 FLUIDIFY MONEY
               </GeneralButton>
-
-              {!!projectedWinningsData.data && (
-                <a
-                  href={generateRewardTweet(projectedWin)}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <GeneralButton
-                    className="share-button"
-                    size="large"
-                    type="transparent"
-                    layout="before"
-                    icon={<Twitter />}
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    SHARE
-                  </GeneralButton>
-                </a>
-              )}
             </div>
           </div>
         </div>

@@ -9,4 +9,5 @@ export type Token =
   | "fFRAX"
   | "DAI"
   | "fDAI"
+  | "FLY"
   | "wETH";

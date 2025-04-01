@@ -85,12 +85,10 @@ const OptionsSchema = z.object({
     prize_pool: z.object({
       arbitrum: z.string(),
       solana: z.string(),
-      polygon_zk: z.string(),
     }),
     eac_aggregator_proxy: z.object({
       arbitrum: z.string(),
       solana: z.string(),
-      polygon_zk: z.string(),
     }),
   }),
 });

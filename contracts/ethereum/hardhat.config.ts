@@ -213,6 +213,12 @@ if (process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_KEY)
     url: process.env.FLU_ETHEREUM_DEPLOY_ARBITRUM_URL,
   };
 
+if (process.env.FLU_ETHEREUM_DEPLOY_SUPERPOSITION_KEY)
+  networks['superposition'] = {
+    accounts: [process.env.FLU_ETHEREUM_DEPLOY_SUPERPOSITION_KEY],
+    url: process.env.FLU_ETHEREUM_DEPLOY_SUPERPOSITION_URL,
+  };
+
 if (process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY)
   networks['zksync'] = {
     accounts: [process.env.FLU_ETHEREUM_DEPLOY_ZKSYNC_KEY],
@@ -238,9 +244,9 @@ const enableMainnet =
   process.env.FLU_FORKNET_NETWORK == "mainnet" &&
   "FLU_ETHEREUM_FORKNET_URL_MAINNET" in process.env;
 
-const enableGoerli =
-  process.env.FLU_FORKNET_NETWORK == "goerli" &&
-  "FLU_ETHEREUM_FORKNET_URL_GOERLI" in process.env;
+const enableSepolia =
+  process.env.FLU_FORKNET_NETWORK == "sepolia" &&
+  "FLU_ETHEREUM_FORKNET_URL_SEPOLIA" in process.env;
 
 const enableArbitrum =
   process.env.FLU_FORKNET_NETWORK == "arbitrum" &&
@@ -256,10 +262,10 @@ if (enableMainnet)
     },
   };
 
-if (enableGoerli)
+if (enableSepolia)
   forkOptions = {
     forking: {
-      url: process.env.FLU_ETHEREUM_FORKNET_URL_GOERLI,
+      url: process.env.FLU_ETHEREUM_FORKNET_URL_SEPOLIA,
       blockNumber: 7906700,
     },
   };

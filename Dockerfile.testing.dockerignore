@@ -1,0 +1,25 @@
+.git
+cmd
+web
+contracts
+automation
+!automation/nginx-default.conf
+docs
+
+**/*.o
+**/*.out
+*.out
+*.o
+
+lib/build-lib
+common/build-common
+
+database/build/**
+database/build
+database/db
+
+deployment_list.json
+
+# Vendor specific
+.vscode
+.DS_Store

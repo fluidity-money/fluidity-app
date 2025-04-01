@@ -198,5 +198,48 @@ const integrationTestCamelot = `
 	  "camelot": 1.1673497091273821
     }
   }
-]
-`
+]`
+
+// adapted from the UniswapV3 test - expects a 0 fee as the camelot v3 integration does not currently calculate fees
+const integrationTestCamelotV3 = `[
+    {
+    "transfer": {
+      "transaction": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6",
+      "log": {
+        "data": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGA5EselnlwAAD////////////////////////////////////+WNlDJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQxvh7mCN4sTZSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPgi1gZVSHXISPj///////////////////////////////////////vImw==",
+        "address": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
+        "topics": [
+          "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+          "0x000000000000000000000000ef1c6e67703c7bd7107eed8303fbe6ec2554bf6b",
+          "0x00000000000000000000000035f09f57fd5c6106da70f4ed8e14312614747efc"
+        ]
+      },
+      "application": 25
+    },
+    "transaction": {
+      "to": "0xEf1c6E67703c7BD7107eed8303Fbe6EC2554BF6B",
+      "from": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
+      "hash": "0xdaaeff3d62cbbfb33eefe48190498ccc280cbee3ce5af85e9e3e2fc92d04d5e6"
+    },
+    "expected_sender": "0x35f09F57fd5C6106Da70f4Ed8e14312614747Efc",
+    "expected_recipient": "0x5777d92f208679DB4b9778590Fa3CAB3aC9e2168",
+    "expected_fees": "0",
+    "expected_volume": "1774825271/250000",
+    "expected_emission": {
+      "camelot_v3": 0
+    },
+    "rpc_methods": {
+      "eth_getCode": "0x0"
+    },
+    "call_methods": {
+      "token0()": {
+		    "": "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f"
+	    },
+		  "token1()": {
+		    "": "0x000000000000000000000000A0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+	    }
+    },
+    "token_decimals": 6,
+    "contract_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    }
+]`

@@ -24,6 +24,7 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 			default_transfers_in_block,
 			atx_buffer_size,
 			epoch_blocks_size,
+			yield_to_stakers,
 			spooler_instant_reward_threshold,
 			spooler_batched_reward_threshold
 		FROM %s
@@ -51,6 +52,7 @@ func GetWorkerConfigEthereum(network_ network.BlockchainNetwork) (config WorkerC
 		&config.DefaultTransfersInBlock,
 		&config.AtxBufferSize,
 		&config.EpochBlocks,
+		&config.YieldToStakers,
 		&config.SpoolerInstantRewardThreshold,
 		&config.SpoolerBatchedRewardThreshold,
 	)
@@ -100,6 +102,46 @@ func GetWorkerConfigSolana() (config WorkerConfigSolana) {
 		log.Fatal(func(k *log.Log) {
 			k.Context = Context
 			k.Message = "Failed to decode Solana worker config!"
+			k.Payload = err
+		})
+	}
+
+	return config
+}
+
+func GetWorkerConfigSui() (config WorkerConfigSui) {
+	postgresClient := postgres.Client()
+
+	statementText := fmt.Sprintf(`
+		SELECT
+			sui_block_time,
+			spooler_instant_reward_threshold,
+			spooler_batched_reward_threshold
+		FROM %s`,
+
+		TableWorkerConfigSui,
+	)
+
+	row := postgresClient.QueryRow(statementText)
+
+	if err := row.Err(); err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to get the Sui worker config!"
+			k.Payload = err
+		})
+	}
+
+	err := row.Scan(
+		&config.SuiBlockTime,
+		&config.SpoolerInstantRewardThreshold,
+		&config.SpoolerBatchedRewardThreshold,
+	)
+
+	if err != nil {
+		log.Fatal(func(k *log.Log) {
+			k.Context = Context
+			k.Message = "Failed to decode Sui worker config!"
 			k.Payload = err
 		})
 	}

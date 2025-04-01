@@ -99,7 +99,9 @@ const decimalTrim = (amount: string, limit: number) => {
  * @param address string
  * @returns abbrevates long addresses e.g 0x1234567890 converted to 0x123...890
  */
-const trimAddress = (address: string): string => {
+const trimAddress = (address: string | undefined): string => {
+  if (!address) return "";
+
   const leftSide = address.slice(0, 4);
 
   const rightSide = address.slice(-4);

@@ -1,6 +1,5 @@
 import { useNavigate, Link } from "@remix-run/react";
 import FluidityFacadeContext from "contexts/FluidityFacade";
-import { SplitContext } from "contexts/SplitProvider";
 import { useState, useContext, useEffect } from "react";
 import { networkMapper } from "~/util";
 import { AnimatePresence, motion } from "framer-motion";
@@ -25,6 +24,9 @@ type IMobileModal = {
     path: (network: string) => string;
     icon: JSX.Element;
   }>;
+  nonNavigationEntries?: Array<
+    React.DetailedHTMLProps<React.LiHTMLAttributes<HTMLElement>, HTMLElement>
+  >;
   activeIndex: number;
   chains: Record<string, { name: string; icon: JSX.Element }>;
   unclaimedFluid: number;
@@ -36,6 +38,7 @@ type IMobileModal = {
 
 export default function MobileModal({
   navigationMap,
+  nonNavigationEntries,
   activeIndex,
   chains,
   network,
@@ -58,10 +61,6 @@ export default function MobileModal({
   const { connected, address, rawAddress, connecting, disconnect } = useContext(
     FluidityFacadeContext
   );
-
-  const { showExperiment } = useContext(SplitContext);
-  const showAssets = showExperiment("enable-assets-page");
-  const showMobileNetworkButton = showExperiment("feature-network-visible");
 
   const [animation, setAnimation] = useState(true);
 
@@ -151,12 +150,10 @@ export default function MobileModal({
             {/* Navigation Buttons */}
             <div className="mobile-navbar-right">
               {/* Chain Switcher */}
-              {showMobileNetworkButton && (
-                <ChainSelectorButton
-                  chain={chains[network]}
-                  onClick={() => setChainModalVisibility(true)}
-                />
-              )}
+              <ChainSelectorButton
+                chain={chains[network]}
+                onClick={() => setChainModalVisibility(true)}
+              />
               {/* Prize Money */}
               <GeneralButton
                 type={"transparent"}
@@ -205,19 +202,16 @@ export default function MobileModal({
             )}
 
             {/* Chain Switcher */}
-            {!showMobileNetworkButton && (
-              <ChainSelectorButton
-                chain={chains[network]}
-                onClick={() => setChainModalVisibility(true)}
-              />
-            )}
+            <ChainSelectorButton
+              chain={chains[network]}
+              onClick={() => setChainModalVisibility(true)}
+            />
           </section>
 
           {/* Navigation between pages */}
           <ul className="sidebar-nav">
-            {navigationMap
-              .filter(({ name }) => name !== "Assets" || showAssets)
-              .map((obj, index) => {
+            <>
+              {navigationMap.map((obj, index) => {
                 const key = Object.values(obj)[0];
                 const { name, icon, path } = obj;
                 const active = index === activeIndex;
@@ -248,6 +242,8 @@ export default function MobileModal({
                   </li>
                 );
               })}
+              {...nonNavigationEntries || []}
+            </>
           </ul>
 
           {/* Navigation at bottom of modal */}

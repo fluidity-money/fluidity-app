@@ -20,7 +20,7 @@ const getFutureTimestamp = async (hre: HardhatRuntimeEnvironment): Promise<numbe
 const main = async () => {
   const rootSignerAddress = await (await hre.ethers.getSigners())[0].getAddress();
 
-  const tokenFactory = await hre.ethers.getContractFactory("GovToken");
+  const tokenFactory = await hre.ethers.getContractFactory("TestGovToken");
 
   const token0 = await tokenFactory.deploy(
     "Staking test token",

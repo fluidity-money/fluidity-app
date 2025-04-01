@@ -1,11 +1,17 @@
-import { JsonRpcProvider, Provider } from "@ethersproject/providers";
+import {
+  JsonRpcProvider,
+  JsonRpcSigner,
+  Provider,
+} from "@ethersproject/providers";
 import { ContractTransaction } from "@ethersproject/contracts";
 import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
-import { B64ToUint8Array, jsonPost } from "~/util";
+import { B64ToUint8Array, getChainId } from "~/util";
 import { TransactionResponse } from "../instructions";
+
+const ArbitrumChainId = getChainId("arbitrum");
 
 export type ContractToken = {
   address: string;
@@ -113,7 +119,7 @@ export const getUsdAmountMinted = async (
   return Number(utils.formatUnits(amount, decimals));
 };
 
-const makeContractSwap = async (
+export const makeContractSwap = async (
   signer: Signer,
   from: ContractToken,
   to: ContractToken,
@@ -203,79 +209,6 @@ type ManualRewardRes = {
     };
     signature: string;
   };
-};
-
-export const manualRewardToken = async (
-  token: ContractToken,
-  baseTokenSymbol: string,
-  address: string,
-  signer: Signer
-): Promise<
-  { amount: number; gasFee: number; networkFee: number } | undefined
-> => {
-  const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
-
-  const manualRewardBody = {
-    address,
-    token_short_name: baseTokenSymbol,
-  };
-
-  const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
-    manualRewardUrl,
-    manualRewardBody
-  );
-
-  if (error || !payload) return;
-
-  // Call eth contract
-
-  const { winner, win_amount, first_block, last_block, token_details } =
-    payload.reward;
-
-  const { token_decimals } = token_details;
-  const decimals = BigNumber.from(10).pow(token_decimals);
-
-  const winningAmount = BigNumber.from(`${win_amount}`);
-
-  const { signature: b64Signature } = payload;
-
-  // convert B64 -> byte[] -> hex string
-  const uint8Signature = B64ToUint8Array(b64Signature);
-  const hexSignature = bytesToHex(Array.from(uint8Signature));
-
-  const mainnetId = 1;
-
-  try {
-    const tokenContract = getContract(token.ABI, token.address, signer);
-
-    const contractTx: ContractTransaction = await tokenContract.manualReward(
-      // contractAddress
-      token.address,
-      // chainid
-      mainnetId,
-      // winnerAddress
-      winner,
-      // winAmount
-      winningAmount,
-      // firstBlock
-      first_block,
-      // lastBlock
-      last_block,
-      // sig
-      hexSignature
-    );
-
-    const res = await contractTx.wait();
-
-    return {
-      networkFee: res.gasUsed.toNumber(),
-      gasFee: res.gasUsed.toNumber(),
-      amount: parseFloat(winningAmount.div(decimals).toString()),
-    };
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, signer.provider);
-    return { amount: 0, gasFee: 0, networkFee: 0 };
-  }
 };
 
 type PrizePool = {
@@ -605,6 +538,349 @@ export const getWethUsdPrice = async (
   }
 };
 
+export const merkleDistributorWithDeadlineEndTime = async (
+  provider: JsonRpcProvider,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      provider
+    );
+
+    if (!merkleDistributorWithDeadlineContract)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+    const endTime =
+      await merkleDistributorWithDeadlineContract.callStatic.endTime();
+
+    return endTime;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+
+    return 0;
+  }
+};
+
+export const merkleDistributorWithDeadlineClaim = async (
+  signer: Signer,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface,
+  index: number,
+  amount: BN,
+  merkleProof: string[]
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      signer
+    );
+
+    if (!merkleDistributorWithDeadlineAddr)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+    await merkleDistributorWithDeadlineContract.claim(
+      index,
+      amount.toString(),
+      merkleProof
+    );
+
+    return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export const merkleDistributorWithDeadlineClaimAndStake = async (
+  signer: Signer,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface,
+  index: number,
+  amount: BN,
+  merkleProof: string[]
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      signer
+    );
+
+    if (!merkleDistributorWithDeadlineAddr)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+    await merkleDistributorWithDeadlineContract.callStatic.claimAndStake(
+      index,
+      amount.toString(),
+      merkleProof
+    );
+
+    await merkleDistributorWithDeadlineContract.claimAndStake(
+      index,
+      amount.toString(),
+      merkleProof
+    );
+
+    return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export const merkleDistributorWithDeadlineIsClaimed = async (
+  provider: Provider,
+  merkleDistributorWithDeadlineAddr: string,
+  merkleDistributorWithDeadlineAbi: ContractInterface,
+  index: number
+) => {
+  try {
+    const merkleDistributorWithDeadlineContract = new Contract(
+      merkleDistributorWithDeadlineAddr,
+      merkleDistributorWithDeadlineAbi,
+      provider
+    );
+
+    if (!merkleDistributorWithDeadlineAddr)
+      throw new Error(
+        `Could not instantiate MerkleDistributorWithDeadline at ${merkleDistributorWithDeadlineAddr}`
+      );
+
+    return await merkleDistributorWithDeadlineContract.isClaimed(index);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return false;
+  }
+};
+
+export const flyStakingStake = async (
+  signer: JsonRpcSigner,
+  flyTokenAddr: string,
+  flyTokenAbi: ContractInterface,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  amount: BN
+) => {
+  try {
+    const { provider } = signer;
+
+    const signerAddr = await signer.getAddress();
+
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      signer
+    );
+
+    if (!flyStakingContract)
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
+
+    const flyTokenContract = new Contract(flyTokenAddr, flyTokenAbi, provider);
+
+    if (!flyTokenContract)
+      throw new Error(`Could not instantiate FlyToken at ${flyTokenAddr}`);
+
+    console.log("about to get nonces");
+
+    const nonce = await flyTokenContract.nonces(signerAddr);
+
+    console.log("got nonce", nonce);
+
+    const deadline = Date.now() + 60 * 120; // 2 hours in the future
+
+    const sig = await signer._signTypedData(
+      {
+        name: "Fluidity", // FLY name
+        version: "1",
+        chainId: ArbitrumChainId, // arbitrum chain id
+        verifyingContract: flyTokenAddr,
+      },
+      {
+        Permit: [
+          { name: "owner", type: "address" },
+          { name: "spender", type: "address" },
+          { name: "value", type: "uint256" },
+          { name: "nonce", type: "uint256" },
+          { name: "deadline", type: "uint256" },
+        ],
+      },
+      {
+        owner: signerAddr,
+        spender: flyStakingAddr,
+        value: "0x" + amount.toString(16),
+        nonce: nonce,
+        deadline: deadline,
+      }
+    );
+
+    console.log("got sig", sig);
+
+    const { r, s, v } = utils.splitSignature(sig);
+
+    console.log("about to call the stake permit function");
+
+    await flyStakingContract.stakePermit(
+      amount.toString(), // fly amount
+      deadline,
+      v,
+      r,
+      s
+    );
+
+    return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export type FLYStakingDetailsRes = {
+  flyStaked: BigNumber;
+  points: BigNumber;
+};
+
+export const flyStakingDetails = async (
+  provider: Provider,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  address: string
+): Promise<FLYStakingDetailsRes | undefined> => {
+  try {
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      provider
+    );
+
+    if (!flyStakingContract)
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
+
+    return await flyStakingContract.stakingDetails(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return undefined;
+  }
+};
+
+export const flyStakingBeginUnstake = async (
+  signer: Signer,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  flyToUnstake: BN
+) => {
+  try {
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      signer
+    );
+
+    if (!flyStakingContract)
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
+
+    await flyStakingContract.beginUnstake(flyToUnstake.toString());
+
+    return true;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return false;
+  }
+};
+
+export const flyStakingSecondsUntilSoonestUnstake = async (
+  provider: Provider,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  address: string
+): Promise<BigNumber | undefined> => {
+  try {
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      provider
+    );
+
+    if (!flyStakingContract)
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
+
+    return await flyStakingContract.secondsUntilSoonestUnstake(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return undefined;
+  }
+};
+
+export const flyStakingFinaliseUnstake = async (
+  signer: Signer,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface
+): Promise<BigNumber | undefined> => {
+  try {
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      signer
+    );
+
+    if (!flyStakingContract)
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
+
+    const amount = await flyStakingContract.callStatic.finaliseUnstake();
+
+    await flyStakingContract.finaliseUnstake();
+
+    return amount;
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, signer.provider);
+    return undefined;
+  }
+};
+
+export const flyStakingAmountUnstaking = async (
+  provider: Provider,
+  flyStakingAddr: string,
+  flyStakingAbi: ContractInterface,
+  address: string
+): Promise<BigNumber | undefined> => {
+  try {
+    const flyStakingContract = new Contract(
+      flyStakingAddr,
+      flyStakingAbi,
+      provider
+    );
+
+    if (!flyStakingContract)
+      throw new Error(
+        `Could not instantiate FLYStakingV1 at ${flyStakingAddr}`
+      );
+
+    return await flyStakingContract.amountUnstaking(address);
+  } catch (error) {
+    await handleContractErrors(error as ErrorType, provider);
+    return undefined;
+  }
+};
+
 type ErrorType = {
   data: { message: string };
 } & { message: string };
@@ -649,4 +925,28 @@ export const handleContractErrors = async (
   }
 };
 
-export default makeContractSwap;
+export enum AirdropElection {
+  Claim = 0,
+  Stake,
+  ConvertToSpn
+}
+
+export const signAirdropElection_ = async (
+  signer: Signer,
+  option: AirdropElection
+): Promise<string> => {
+  let optionStr = "";
+  switch (option) {
+  case AirdropElection.Claim:
+    optionStr = "claim";
+    break;
+  case AirdropElection.Stake:
+    optionStr = "stake";
+    break;
+  case AirdropElection.ConvertToSpn:
+    optionStr = "convert";
+    break;
+  }
+  const message = `I elect to ${optionStr} my FLY token.`;
+  return await signer.signMessage(utils.arrayify(utils.toUtf8Bytes(message)));
+};

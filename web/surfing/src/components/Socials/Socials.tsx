@@ -10,7 +10,7 @@ const Socials = () => {
   const repeatingSocials = (
     <>
       <a
-        href="https://twitter.com/fluiditymoney"
+        href="https://x.com/fluiditylabs"
         className={styles.social}
         rel="noopener noreferrer"
         target="_blank"

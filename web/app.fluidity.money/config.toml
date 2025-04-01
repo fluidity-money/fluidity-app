@@ -5,21 +5,10 @@ testnet = false
 rpc = { http = "FLU_ETH_RPC_HTTP", ws = "FLU_ETH_RPC_WS" }
 server = "https://api.ethereum.fluidity.money"
 
-[[drivers.solana]]
-label = "Solana"
-testnet = false
-rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
-server = "https://api.solana.fluidity.money"
-
 [[drivers.arbitrum]]
 label = "Arbitrum"
 testnet = false
 rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
-
-[[drivers.polygon_zk]]
-label = "Polygon ZK"
-testnet = false
-rpc = { http = "FLU_POLYZK_RPC_HTTP", ws = "FLU_POLYZK_RPC_WS" }
 
 [[drivers.hasura]]
 label= "Hasura"
@@ -133,39 +122,12 @@ isFluidOf = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 decimals = 18
 enabled = true
 
-[config.solana]
-explorer = "https://explorer.solana.com"
-fluidAssets = [
-    "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv",
-]
-
-[[config.solana.tokens]]
-symbol = "USDC"
-name = "USDC Native"
-logo = "/assets/tokens/usdc.svg"
-address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-colour = "#2775ca"
-decimals = 6
-enabled = true
-
-[[config.solana.tokens]]
-symbol = "fUSDC"
-name = "Fluid USDC Native"
-logo = "/assets/tokens/fUSDC.svg"
-address = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
-colour = "#2775ca"
-isFluidOf = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-obligationAccount = "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A"
-dataAccount = "Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce"
-decimals = 6
-enabled = true
-
 [config.arbitrum]
-explorer = "https://etherscan.io"
+explorer = "https://arbiscan.io"
 fluidAssets = [
     "0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A",
     "0xC9FA90D24B7103Ad2215DE52afec5e1E4C7a6e62",
-    "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b",
+    "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
 ]
 
 [[config.arbitrum.tokens]]
@@ -207,58 +169,14 @@ decimals = 6
 enabled = true
 
 [[config.arbitrum.tokens]]
-symbol = "DAI"
-name = "Dai Stablecoin"
-logo = "/assets/tokens/dai.svg"
-address = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
-colour = "#825902"
-decimals = 18
-enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "fDAI"
-name = "Fluid DAI"
-logo = "/assets/tokens/fDAI.svg"
-address = "0x1b40e7812E75D02Eef97E4399c33865D2Ff5952b"
-colour = "#825902"
-isFluidOf = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1"
-decimals = 18
-enabled = true
-
-[[config.arbitrum.tokens]]
-symbol = "wETH"
-name = "Wrapped Ether"
-logo = "/assets/tokens/weth.svg"
-address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
-colour = "#eb2077"
-decimals = 18
-enabled = false
-
-[config.polygon_zk]
-explorer = "https://zkevm.polygonscan.com"
-fluidAssets = [
-    "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C",
-]
-
-[[config.polygon_zk.tokens]]
-symbol = "USDC"
-name = "USDC Native"
-logo = "/assets/tokens/usdc.svg"
-address = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
-colour = "#2775ca"
+symbol = "FLY"
+name = "FLUIDITY"
+logo = "/assets/tokens/fly.svg"
+address = "0x000F1720A263f96532D1ac2bb9CDC12b72C6f386"
+colour = "#12946c"
+isFluidOf = "0x0000000000000000000000000000000000000000"
 decimals = 6
 enabled = true
-
-[[config.polygon_zk.tokens]]
-symbol = "fUSDC"
-name = "Fluid USDC Native"
-logo = "/assets/tokens/fUSDC.svg"
-address = "0x74ad340fE9C506700B6ca039BDfA36cFD5dcc18C"
-colour = "#2775ca"
-isFluidOf = "0xA8CE8aee21bC2A48a5EF670afCc9274C7bbbC035"
-decimals = 6
-enabled = true
-
 
 # liquidity_providers Configurations
 # eth providers
@@ -314,30 +232,6 @@ fTUSD = "https://app.1inch.io/#/1/earn/pools"
 fFRAX = "https://app.1inch.io/#/1/earn/pools"
 fDAI = "https://app.1inch.io/#/1/earn/pools"
 
-# sol providers
-[liquidity_providers.solana]
-
-[[liquidity_providers.solana.providers]]
-name= "orca"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://v1.orca.so/liquidity/browse?tokenMint=Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
-fUSDT = "https://www.orca.so/"
-
-[[liquidity_providers.solana.providers]]
-name= "jupiter"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://www.jup.ag/"
-fUSDT = "https://www.jup.ag/"
-
-[[liquidity_providers.solana.providers]]
-name= "Meteora"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://app.meteora.ag/pools/67rm8swU7MZAekKwnPWGufWwfasqUAJkjaAYZK55SNmK"
-fUSDT = "https://app.meteora.ag"
-
 [liquidity_providers.arbitrum]
 
 [[liquidity_providers.arbitrum.providers]]
@@ -356,7 +250,7 @@ fUSDC = "https://app.camelot.exchange/liquidity/?token1=0xaf88d065e77c8cC2239327
 name= "Ramses"
 
 [liquidity_providers.arbitrum.providers.link]
-fUSDC = "https://app.ramses.exchange/liquidity/v2/0xf73c87736008ad3af9973b357c97ab8c60d8ca63"
+fUSDC = "https://app.ramses.exchange/liquidity/v2/0x2c9a8c5814bbd8eb4f3531efb836f3d1fa185f38"
 
 [[liquidity_providers.arbitrum.providers]]
 name= "uniswap"
@@ -388,30 +282,20 @@ id = "coin98"
 description = "Store multi-chain Cryptoassets with Coin98 Wallet."
 logo = "/assets/wallets/coin98.svg"
 
-[[contract.solana]]
-name = "Mainnet"
-address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
-
 [contract.prize_pool]
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
-polygon_zk = "0xDB6d7F5aF3caDFEBBB86DD627C68fdC58cdEB91B"
 
 [contract.staking]
 ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
-solana = ""
-polygon_zk = ""
 
 [contract.eac_aggregator_proxy]
 ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
-polygon_zk = ""
 
 [contract.registry]
 ethereum = ""
 arbitrum = "0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d"
-solana = ""
-polygon_zk = ""
