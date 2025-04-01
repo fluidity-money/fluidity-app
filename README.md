@@ -4,6 +4,13 @@ cover: https://fluidity.money/gitbook-content/background-2.png
 coverY: 0
 ---
 
+> On the 1st of April, Fluidity Labs sunsetted development on Fluidity. It's been a great
+> run! The team are focusing development on https://superposition.so, and integrating
+> the technology and lessons learned here there. Everything will remain functioning, but
+> the graph will be shut down.
+
+---
+
 # 🌊💸 Welcome to Fluidity Money
 
 **Fluidity is a yield generating protocol that rewards people for using their cryptocurrencies.**

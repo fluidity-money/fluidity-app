@@ -25,7 +25,6 @@ import {
 } from "@fluidity-money/surfing";
 import ConnectWalletModal from "~/components/ConnectWalletModal";
 import opportunityStyles from "~/styles/opportunity.css";
-import { ProjectedWinData } from "./query/projectedWinnings";
 import { Chain } from "~/util/chainUtils/chains";
 
 export const links: LinksFunction = () => {
@@ -79,20 +78,6 @@ const NetworkPage = () => {
   );
   const navigate = useNavigate();
 
-  const projectedWinningsData = useFetcher<ProjectedWinData>();
-
-  useEffect(() => {
-    if (!address) return;
-
-    projectedWinningsData.load(
-      `/${network}/query/projectedWinnings?address=${address}`
-    );
-  }, [connected]);
-
-  const projectedWin = projectedWinningsData.data?.projectedWin || 0;
-
-  const loaded = !!projectedWinningsData?.data;
-
   const [walletModalVisibility, setWalletModalVisibility] = useState(
     !connected
   );
@@ -123,7 +108,7 @@ const NetworkPage = () => {
 
   return (
     <>
-      {connected && connected && loaded && (
+      {connected && connected && (
         <Video
           className="video"
           src={"/videos/FluidityOpportunityA.mp4"}
@@ -229,36 +214,6 @@ const NetworkPage = () => {
               </Modal>
             </div>
 
-            {/* Expected Earnings */}
-            {projectedWinningsData.state === "loading" && connected && (
-              <>
-                <div className="loader-dots">
-                  <LoadingDots />
-                </div>
-                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Loading your transactions from last week...
-                </Text>
-                <br />
-              </>
-            )}
-
-            {/* Expected Earnings */}
-            {!!projectedWinningsData.data && connected && (
-              <>
-                <Display
-                  className="winnings-figure"
-                  size={width < mobileBreakpoint ? "xs" : "md"}
-                >
-                  {numberToMonetaryString(projectedWin)}
-                </Display>
-                <Text size={width < mobileBreakpoint ? "md" : "xl"}>
-                  Would have been your winnings, based on your transactions last
-                  week.
-                </Text>
-                <br />
-              </>
-            )}
-
             <Text size={width < mobileBreakpoint ? "md" : "xl"}>
               Fluidify your assets to start earning.
             </Text>
@@ -272,27 +227,6 @@ const NetworkPage = () => {
               >
                 FLUIDIFY MONEY
               </GeneralButton>
-
-              {!!projectedWinningsData.data && (
-                <a
-                  href={generateRewardTweet(projectedWin)}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <GeneralButton
-                    className="share-button"
-                    size="large"
-                    type="transparent"
-                    layout="before"
-                    icon={<Twitter />}
-                    handleClick={() => {
-                      return;
-                    }}
-                  >
-                    SHARE
-                  </GeneralButton>
-                </a>
-              )}
             </div>
           </div>
         </div>

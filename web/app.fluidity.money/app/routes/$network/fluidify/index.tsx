@@ -352,29 +352,6 @@ export default function FluidifyToken() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {/* Swapping Modal */}
-      {swapping && assetToken && toToken && (
-        <SwapCompleteModal
-          visible={swapping}
-          confirmed={confirmed}
-          close={() => {
-            setSwapping(false);
-            setSwapData({
-              amount: "",
-              txHash: "",
-            });
-            setSwapError(false);
-          }}
-          colorMap={colors}
-          assetToken={assetToken}
-          tokenPair={toToken}
-          amount={amount}
-          network={network}
-          txHash={txHash}
-          error={swapError}
-        />
-      )}
-
       {/* Mobile Swap Modal */}
       {isTablet && openMobModal && !swapping && (
         <div className="mob-swap-modal">

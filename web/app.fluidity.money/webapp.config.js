@@ -21,16 +21,6 @@ const options = {
         },
       },
     ],
-    sui: [
-      {
-        label: "Sui",
-        testnet: false,
-        rpc: {
-          http: "",
-          ws: "",
-        },
-      },
-    ],
   },
 };
 

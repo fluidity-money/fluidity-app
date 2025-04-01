@@ -6,12 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import config from "../../webapp.config.js";
 
 import EthereumProvider from "contexts/EthereumProvider";
-import SolanaProvider from "contexts/SolanaProvider";
 
 import { Fragment } from "react";
 import { Token } from "~/util/chainUtils/tokens.js";
 import { NotificationSubscription } from "~/components/NotificationSubscription";
-import SuiProvider from "contexts/SuiProvider";
 
 type ProviderMap = {
   [key: string]:
@@ -65,9 +63,7 @@ const Provider = ({
   children: React.ReactNode;
 }) => {
   const providers: ProviderMap = {
-    solana: SolanaProvider(solRpc, tokens),
     arbitrum: EthereumProvider(walletconnectId, tokens, network),
-    sui: SuiProvider(suiRpc, tokens),
   };
 
   const [validNetwork, setValidNetwork] = useState(network ?? "arbitrum");

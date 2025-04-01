@@ -84,14 +84,6 @@ const ethereumTokens = config.config["ethereum"].tokens
     decimals: entry.decimals,
   }));
 
-const solanaTokens = config.config["solana"].tokens
-  .filter((entry) => entry.isFluidOf !== undefined)
-  .map((entry) => ({
-    token: entry.symbol,
-    address: entry.address,
-    decimals: entry.decimals,
-  }));
-
 const registry = new Map<string, Subscription>();
 
 type TokenList = {
@@ -107,8 +99,6 @@ io.on("connection", (socket) => {
     let Tokens: TokenList = [];
     if (protocol === `ethereum`) {
       Tokens = ethereumTokens;
-    } else if (protocol === `solana`) {
-      Tokens = solanaTokens;
     }
 
     const OnChainTransactionsObservable: Observable<PipedTransaction> =

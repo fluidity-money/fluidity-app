@@ -34,8 +34,6 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
     "@fluidity-money/surfing": "*",
-    "@mysten/dapp-kit": "^0.12.2",
-    "@mysten/sui.js": "^0.50.1",
     "@openzeppelin/contracts": "^4.8.0",
     "@remix-run/react": "^1.7.1",
     "@remix-run/serve": "^1.7.1",

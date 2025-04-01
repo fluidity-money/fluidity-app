@@ -8,7 +8,7 @@ import { utils, BigNumber, constants } from "ethers";
 import { Signer, Contract, ContractInterface } from "ethers";
 import BN from "bn.js";
 import { bytesToHex } from "web3-utils";
-import { B64ToUint8Array, jsonPost, getChainId } from "~/util";
+import { B64ToUint8Array, getChainId } from "~/util";
 import { TransactionResponse } from "../instructions";
 
 const ArbitrumChainId = getChainId("arbitrum");
@@ -209,79 +209,6 @@ type ManualRewardRes = {
     };
     signature: string;
   };
-};
-
-export const manualRewardToken = async (
-  token: ContractToken,
-  baseTokenSymbol: string,
-  address: string,
-  signer: Signer
-): Promise<
-  { amount: number; gasFee: number; networkFee: number } | undefined
-> => {
-  const manualRewardUrl = "https://api.ethereum.fluidity.money/manual-reward";
-
-  const manualRewardBody = {
-    address,
-    token_short_name: baseTokenSymbol,
-  };
-
-  const { error, payload } = await jsonPost<ManualRewardBody, ManualRewardRes>(
-    manualRewardUrl,
-    manualRewardBody
-  );
-
-  if (error || !payload) return;
-
-  // Call eth contract
-
-  const { winner, win_amount, first_block, last_block, token_details } =
-    payload.reward;
-
-  const { token_decimals } = token_details;
-  const decimals = BigNumber.from(10).pow(token_decimals);
-
-  const winningAmount = BigNumber.from(`${win_amount}`);
-
-  const { signature: b64Signature } = payload;
-
-  // convert B64 -> byte[] -> hex string
-  const uint8Signature = B64ToUint8Array(b64Signature);
-  const hexSignature = bytesToHex(Array.from(uint8Signature));
-
-  const mainnetId = 1;
-
-  try {
-    const tokenContract = getContract(token.ABI, token.address, signer);
-
-    const contractTx: ContractTransaction = await tokenContract.manualReward(
-      // contractAddress
-      token.address,
-      // chainid
-      mainnetId,
-      // winnerAddress
-      winner,
-      // winAmount
-      winningAmount,
-      // firstBlock
-      first_block,
-      // lastBlock
-      last_block,
-      // sig
-      hexSignature
-    );
-
-    const res = await contractTx.wait();
-
-    return {
-      networkFee: res.gasUsed.toNumber(),
-      gasFee: res.gasUsed.toNumber(),
-      amount: parseFloat(winningAmount.div(decimals).toString()),
-    };
-  } catch (error) {
-    await handleContractErrors(error as ErrorType, signer.provider);
-    return { amount: 0, gasFee: 0, networkFee: 0 };
-  }
 };
 
 type PrizePool = {

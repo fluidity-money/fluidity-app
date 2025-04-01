@@ -5,21 +5,10 @@ testnet = false
 rpc = { http = "FLU_ETH_RPC_HTTP", ws = "FLU_ETH_RPC_WS" }
 server = "https://api.ethereum.fluidity.money"
 
-[[drivers.solana]]
-label = "Solana"
-testnet = false
-rpc = { http = 'FLU_SOL_RPC_HTTP', ws = 'FLU_SOL_RPC_WS' }
-server = "https://api.solana.fluidity.money"
-
 [[drivers.arbitrum]]
 label = "Arbitrum"
 testnet = false
 rpc = { http = "FLU_ARB_RPC_HTTP", ws = "FLU_ARB_RPC_WS" }
-
-[[drivers.sui]]
-label = "Sui"
-testnet = false
-rpc = { http = "FLU_SUI_RPC_HTTP", ws = "FLU_SUI_RPC_WS" }
 
 [[drivers.hasura]]
 label= "Hasura"
@@ -133,33 +122,6 @@ isFluidOf = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 decimals = 18
 enabled = true
 
-[config.solana]
-explorer = "https://explorer.solana.com"
-fluidAssets = [
-    "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv",
-]
-
-[[config.solana.tokens]]
-symbol = "USDC"
-name = "USDC Native"
-logo = "/assets/tokens/usdc.svg"
-address = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-colour = "#2775ca"
-decimals = 6
-enabled = true
-
-[[config.solana.tokens]]
-symbol = "fUSDC"
-name = "Fluid USDC Native"
-logo = "/assets/tokens/fUSDC.svg"
-address = "Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
-colour = "#2775ca"
-isFluidOf = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-obligationAccount = "J6ZHkcCiAKSKTmoUZzozZ2L1Wwm34WF2VQamyu2Sno6A"
-dataAccount = "Gy6weHjgTxqFqosH1sGdECC2jG4j9h8t347KrumsQzce"
-decimals = 6
-enabled = true
-
 [config.arbitrum]
 explorer = "https://arbiscan.io"
 fluidAssets = [
@@ -216,34 +178,6 @@ isFluidOf = "0x0000000000000000000000000000000000000000"
 decimals = 6
 enabled = true
 
-[config.sui]
-explorer = "https://suiscan.xyz"
-fluidAssets = [
-    "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69",
-]
-
-[[config.sui.tokens]]
-symbol = "USDC"
-name = "USDC Wormhole"
-logo = "/assets/tokens/usdc.svg"
-address = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
-suiTypeName = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN"
-colour = "#2775ca"
-decimals = 6
-enabled = true
-
-[[config.sui.tokens]]
-symbol = "fUSDC"
-name = "Fluid USDC Wormhole"
-logo = "/assets/tokens/fUSDC.svg"
-address = "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69"
-suiTypeName = "0x11d8b87037c386df1e32487dbde48b1d7659679a6c370630fb834114140e1c69::fluidity_coin::FLUIDITY_COIN"
-colour = "#2775ca"
-isFluidOf = "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf"
-decimals = 6
-enabled = true
-
-
 # liquidity_providers Configurations
 # eth providers
 [liquidity_providers.ethereum]
@@ -298,30 +232,6 @@ fTUSD = "https://app.1inch.io/#/1/earn/pools"
 fFRAX = "https://app.1inch.io/#/1/earn/pools"
 fDAI = "https://app.1inch.io/#/1/earn/pools"
 
-# sol providers
-[liquidity_providers.solana]
-
-[[liquidity_providers.solana.providers]]
-name= "orca"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://v1.orca.so/liquidity/browse?tokenMint=Ez2zVjw85tZan1ycnJ5PywNNxR6Gm4jbXQtZKyQNu3Lv"
-fUSDT = "https://www.orca.so/"
-
-[[liquidity_providers.solana.providers]]
-name= "jupiter"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://www.jup.ag/"
-fUSDT = "https://www.jup.ag/"
-
-[[liquidity_providers.solana.providers]]
-name= "Meteora"
-
-[liquidity_providers.solana.providers.link]
-fUSDC = "https://app.meteora.ag/pools/67rm8swU7MZAekKwnPWGufWwfasqUAJkjaAYZK55SNmK"
-fUSDT = "https://app.meteora.ag"
-
 [liquidity_providers.arbitrum]
 
 [[liquidity_providers.arbitrum.providers]]
@@ -348,16 +258,6 @@ name= "uniswap"
 [liquidity_providers.arbitrum.providers.link]
 fUSDC = "https://app.uniswap.org/#/add/0xaf88d065e77c8cC2239327C5EDb3A432268e5831/0x4CFA50B7Ce747e2D61724fcAc57f24B748FF2b2A/500"
 
-# TODO fill in real providers
-# sui providers
-[liquidity_providers.sui]
-
-[[liquidity_providers.sui.providers]]
-name= "uniswap"
-
-[liquidity_providers.sui.providers.link]
-fUSDC = ""
-
 [[config.ethereum.wallets]]
 name = "Browser"
 id = "metamask"
@@ -382,29 +282,20 @@ id = "coin98"
 description = "Store multi-chain Cryptoassets with Coin98 Wallet."
 logo = "/assets/wallets/coin98.svg"
 
-[[contract.solana]]
-name = "Mainnet"
-address = "HEvunKKgzf4SMZimVMET6HuzAyfGJS4ZMShUz94KLUdR"
-
 [contract.prize_pool]
 ethereum = "0xD3E24D732748288ad7e016f93B1dc4F909Af1ba0"
 arbitrum = "0x9e48603b87930eD3EC6eB599413C4d423D92C822"
 solana = ""
-sui = ""
 
 [contract.staking]
 ethereum = ""
 arbitrum = "0x0935a031F28F8B3E600A2E5e1f48920eD206e2d0"
-solana = ""
-sui = ""
 
 [contract.eac_aggregator_proxy]
 ethereum = ""
 arbitrum = "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612"
 solana = ""
-sui = ""
 
 [contract.registry]
 ethereum = ""
 arbitrum = "0x28EE3aCA2DAA47a7585C5c579dBb0998C08f845d"
-solana = ""

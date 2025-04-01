@@ -4,7 +4,6 @@ import BN from "bn.js";
 
 import FluidityFacadeContext from "contexts/FluidityFacade";
 import { FlyStakingContext } from "contexts/FlyStakingProvider";
-import { requestProof } from "~/queries/requestProof";
 
 import {
   Heading,
@@ -195,66 +194,6 @@ const FLYClaimSubmitModal = ({
     })();
   }, [requestSignature]);
 
-  useEffect(() => {
-    if (!address) return;
-    if (!beginRequestProof) return;
-    if (!merkleDistributorWithDeadlineIsClaimed) return;
-    (async () => {
-      try {
-        const { index, amount, proofs, error } = await requestProof(
-          address,
-          signature
-        );
-
-        // get the amount into a big number, but slice off the 0x at the start
-        const amountBn = new BN(amount.slice(2), 16);
-
-        const alreadyClaimed = await merkleDistributorWithDeadlineIsClaimed(
-          index
-        );
-
-        if (alreadyClaimed) {
-          setCurrentStatus(
-            currentMode === "stake" ? State.HasStaked : State.HasClaimed
-          );
-          onClaimComplete(amountBn);
-          shouldUpdateBalance?.();
-          return;
-        }
-
-        if (!index) throw new Error(`amount not returned, err: ${error}`);
-        await triggerMerkleClaim(index, amount, proofs);
-        if (currentMode === "stake") {
-          setCurrentStatus(State.HasStaked);
-          onStakingComplete(amountBn);
-        } else {
-          setCurrentStatus(State.HasClaimed);
-          onClaimComplete(amountBn);
-        }
-        shouldUpdateBalance?.();
-      } catch (err) {
-        setCurrentStatus(State.InError);
-        setErrorMessage(`error staking/claiming: ${err}`);
-        console.error("error staking/claiming", err);
-      }
-    })();
-  }, [address, beginRequestProof, merkleDistributorWithDeadlineIsClaimed]);
-
-  const handleBeginSigning = () => {
-    // prompt the user to sign the blob that we're using for verifying
-    // accent to the terms. using the api, request the state that we can
-    // use to log that they agreed, and store it using a state here.
-    // colour a part of the UI while setting the state to broken to
-    // set how it went.
-    setRequestSignature(true);
-  };
-
-  const handleBeginClaiming = () => {
-    // send the collected payload from the api to onchain via the claim
-    // functionality.
-    setBeginRequestProof(true);
-  };
-
   const handleBeginStaking = () => {
     // hit the stake contract using the collected data. presuming stake is
     // the current mode.
@@ -264,20 +203,11 @@ const FLYClaimSubmitModal = ({
   const handleClickButton = () => {
     switch (currentStatus) {
       case State.Disconnected:
-        // prompt wallet connection
-        showConnectWalletModal();
         break;
       case State.IsConnected:
-        // time to sign!
-        handleBeginSigning();
         break;
       case State.HasSigned:
-        // time to begin the claim UX by submitting the current merkle
-        // proof data that we have!
         switch (currentMode) {
-          case "claim":
-            handleBeginClaiming();
-            break;
           case "stake":
             handleBeginStaking();
             break;
