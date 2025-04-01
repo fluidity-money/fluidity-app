@@ -46,7 +46,7 @@ jobs:
         with:
           command: |
             flu get-diff --environment $ENVIRONMENT --tag $GITHUB_SHA
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: diff-artifact
           path: ./deployment_list.json
