@@ -5,8 +5,6 @@ import { redirect } from "@remix-run/node";
 import { useEffect, useMemo, useState } from "react";
 import config from "../../webapp.config.js";
 
-//
-
 import EthereumProvider from "contexts/EthereumProvider";
 
 import { Fragment } from "react";
